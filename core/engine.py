@@ -562,7 +562,385 @@ class Engine:
     def ejecutar_contratos_y_explorar(self) -> Dict[str, Any]:
         return self._ejecucion
 
+# ===========================================================
+# SECCIÓN 18: LOCALIZADOR UNIVERSAL DE IDs (corregido)
+# ===========================================================
+def localizar_id(self, identificador: str) -> Dict[str, Any]:
+    resultado = {
+        "id": identificador,
+        "encontrado": False,
+        "tipo": None,
+        "modulo": None,
+        "rol": None,
+        "detalle": None,
+    }
 
+    # Rol
+    if identificador in self.registro.por_rol:
+        resultado.update({
+            "encontrado": True,
+            "tipo": "rol",
+            "rol": identificador,
+            "detalle": [c.nombre for c in self.registro.por_rol[identificador]],
+        })
+        return resultado
+
+    # Módulo
+    if identificador in self.registro.contenedores:
+        cont = self.registro.contenedores[identificador]
+        resultado.update({
+            "encontrado": True,
+            "tipo": "modulo",
+            "modulo": cont.nombre,
+            "rol": cont.rol,
+            "detalle": {
+                "version": cont.version,
+                "capacidades": list(cont.capacidades.keys()),
+                "ruta": str(cont.ruta),
+            },
+        })
+        return resultado
+
+    # Capacidad
+    for nombre, cont in self.registro.contenedores.items():
+        if identificador in cont.capacidades:
+            resultado.update({
+                "encontrado": True,
+                "tipo": "capacidad",
+                "modulo": cont.nombre,
+                "rol": cont.rol,
+                "detalle": {"capacidad": identificador},
+            })
+            return resultado
+
+    # Símbolo
+    for nombre, simbolos in self._indice_simbolos.items():
+        for tipo_sim in ("clases", "funciones", "constantes"):
+            if identificador in simbolos.get(tipo_sim, []):
+                resultado.update({
+                    "encontrado": True,
+                    "tipo": tipo_sim[:-1],
+                    "modulo": nombre,
+                    "detalle": {"simbolo": identificador},
+                })
+                return resultado
+
+    # Archivo (usa índice de rutas si existe)
+    if hasattr(self, "_indice_rutas") and identificador in self._indice_rutas:
+        info = self._indice_rutas[identificador]
+        resultado.update({
+            "encontrado": True,
+            "tipo": "archivo",
+            "modulo": info.get("modulo"),
+            "detalle": info,
+        })
+        return resultado
+
+    # Fallback: búsqueda lineal en exploración
+    for nombre, data in self._exploracion.items():
+        if identificador in data.get("archivos", []):
+            resultado.update({
+                "encontrado": True,
+                "tipo": "archivo",
+                "modulo": nombre,
+                "detalle": {"ruta": identificador},
+            })
+            return resultado
+
+    return resultado
+
+
+def buscar_simbolo(self, nombre: str) -> Dict[str, Any]:
+    return self.localizar_id(nombre)
+
+def buscar_rol(self, rol: str) -> Dict[str, Any]:
+    return self.localizar_id(rol)
+
+def buscar_capacidad(self, nombre: str) -> Dict[str, Any]:
+    return self.localizar_id(nombre)
+
+def buscar_modulo(self, nombre: str) -> Dict[str, Any]:
+    return self.localizar_id(nombre)
+
+def buscar_archivo(self, ruta: str) -> Dict[str, Any]:
+    return self.localizar_id(ruta)
+
+
+# ===========================================================
+# SECCIÓN 19: RESOLVEDOR UNIVERSAL (corregido)
+# ===========================================================
+def _invocar_capacidad(self, fn, cont: Contenedor) -> Any:
+    """
+    Invoca la función de forma determinista inspeccionando la firma.
+    No usa TypeError para adivinar.
+    """
+    import inspect
+    try:
+        sig = inspect.signature(fn)
+        params = list(sig.parameters.values())
+        # Si acepta al menos un parámetro posicional o keyword, intentamos pasar contexto
+        if params and (
+            params[0].kind in (inspect.Parameter.POSITIONAL_ONLY,
+                               inspect.Parameter.POSITIONAL_OR_KEYWORD)
+            or any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params)
+        ):
+            ctx = self._preparar_contexto(cont)
+            return fn(ctx)
+        return fn()
+    except Exception:
+        # Si la inspección falla, se intenta sin argumentos
+        return fn()
+
+
+def ejecutar_capacidad(self, modulo_o_rol: str, capacidad: str) -> Dict[str, Any]:
+    cont = self.registro.primero(modulo_o_rol)
+    if cont is None:
+        return {"error": f"Módulo/rol no encontrado: {modulo_o_rol}"}
+
+    fn = cont.fn(capacidad)
+    if not callable(fn):
+        return {"error": f"Capacidad '{capacidad}' no es ejecutable"}
+
+    inicio = time.perf_counter()
+    try:
+        resultado = self._invocar_capacidad(fn, cont)
+        duracion = time.perf_counter() - inicio
+        validacion = self._validar_resultado(capacidad, resultado)
+        salida = {
+            "estado": "EXITO",
+            "resultado": resultado,
+            "duracion_s": round(duracion, 6),
+            "validacion": validacion,
+        }
+        self._registrar_traza("ejecutar_capacidad", {
+            "modulo": cont.nombre,
+            "capacidad": capacidad,
+            "estado": "EXITO",
+        })
+        return salida
+    except Exception as e:
+        duracion = time.perf_counter() - inicio
+        self._registrar_traza("ejecutar_capacidad", {
+            "modulo": cont.nombre,
+            "capacidad": capacidad,
+            "estado": "ERROR",
+            "error": str(e),
+        })
+        return {
+            "estado": "ERROR_EJECUCION",
+            "error": f"{type(e).__name__}: {e}",
+            "duracion_s": round(duracion, 6),
+        }
+
+
+def ejecutar_contrato(self, nombre_o_rol: str) -> Dict[str, Any]:
+    cont = self.registro.primero(nombre_o_rol)
+    if cont is None:
+        return {"error": f"No se encontró módulo o rol: {nombre_o_rol}"}
+
+    resultados = {}
+    for clave in cont.capacidades:
+        resultados[clave] = self.ejecutar_capacidad(cont.nombre, clave)
+
+    self._ejecucion[cont.nombre] = resultados
+    self._registrar_traza("ejecutar_contrato", {
+        "modulo": cont.nombre,
+        "capacidades": list(resultados.keys()),
+    })
+    return resultados
+
+
+def ejecutar_modulo(self, nombre_o_rol: str) -> Dict[str, Any]:
+    return self.ejecutar_contrato(nombre_o_rol)
+
+
+def ejecutar_rol(self, rol: str) -> Dict[str, Any]:
+    resultados = {}
+    for cont in self.registro.por_rol.get(rol, []):
+        resultados[cont.nombre] = self.ejecutar_contrato(cont.nombre)
+    return resultados
+
+
+def ejecutar_todo(self) -> Dict[str, Any]:
+    resultados = {}
+    for nombre in list(self.registro.contenedores.keys()):
+        resultados[nombre] = self.ejecutar_contrato(nombre)
+    return resultados
+
+
+# ===========================================================
+# SECCIÓN 20: CONTEXTO DE EJECUCIÓN
+# ===========================================================
+def _preparar_contexto(self, cont: Contenedor) -> Dict[str, Any]:
+    return {
+        "engine": self,
+        "contenedor": cont,
+        "nombre": cont.nombre,
+        "rol": cont.rol,
+        "registro": self.registro,
+    }
+
+
+# ===========================================================
+# SECCIÓN 21: VALIDADOR DEL RESULTADO
+# ===========================================================
+def _validar_resultado(self, capacidad: str, resultado: Any) -> Dict[str, Any]:
+    informe = {
+        "capacidad": capacidad,
+        "valido": True,
+        "problemas": [],
+    }
+    if resultado is None:
+        informe["valido"] = False
+        informe["problemas"].append("resultado es None")
+    return informe
+
+
+# ===========================================================
+# SECCIÓN 22: DETECTOR DE CONTRADICCIONES
+# ===========================================================
+def detectar_contradicciones(self) -> List[Dict[str, Any]]:
+    contradicciones = []
+    for nombre, resol in self._resolucion.items():
+        for cap in resol.get("no_resolubles", []):
+            contradicciones.append({
+                "tipo": "capacidad_no_resoluble",
+                "modulo": nombre,
+                "capacidad": cap,
+            })
+    for nombre, deps in self._dependencias.get("faltantes", {}).items():
+        for dep in deps:
+            contradicciones.append({
+                "tipo": "dependencia_inexistente",
+                "modulo": nombre,
+                "dependencia": dep,
+            })
+    for ciclo in self._dependencias.get("ciclos", []):
+        contradicciones.append({
+            "tipo": "ciclo_dependencia",
+            "modulo": ciclo,
+        })
+    return contradicciones
+
+
+# ===========================================================
+# SECCIÓN 23: INVENTARIO GLOBAL
+# ===========================================================
+def inventario_global(self) -> Dict[str, Any]:
+    return {
+        "modulos": list(self.registro.contenedores.keys()),
+        "roles": list(self.registro.por_rol.keys()),
+        "total_modulos": self.registro.total(),
+        "total_roles": len(self.registro.por_rol),
+        "capacidades": {
+            nombre: list(cont.capacidades.keys())
+            for nombre, cont in self.registro.contenedores.items()
+        },
+        "simbolos": self._indice_simbolos,
+        "archivos": {
+            nombre: data.get("archivos", [])
+            for nombre, data in self._exploracion.items()
+        },
+        "dependencias": self._dependencias,
+        "grafo": self._grafo,
+        "contradicciones": self.detectar_contradicciones(),
+    }
+
+
+# ===========================================================
+# SECCIÓN 24: ÍNDICE GLOBAL + ÍNDICE DE RUTAS
+# ===========================================================
+def _construir_indice_rutas(self) -> None:
+    """Construye índice de rutas durante el arranque (O(1) después)."""
+    self._indice_rutas: Dict[str, Dict[str, Any]] = {}
+    for nombre, data in self._exploracion.items():
+        for ruta in data.get("archivos", []):
+            self._indice_rutas[ruta] = {
+                "modulo": nombre,
+                "ruta": ruta,
+            }
+
+
+def indice_global(self) -> Dict[str, Any]:
+    indice: Dict[str, List[Dict[str, Any]]] = {}
+    for rol in self.registro.por_rol:
+        indice.setdefault(rol, []).append({"tipo": "rol"})
+    for nombre, cont in self.registro.contenedores.items():
+        indice.setdefault(nombre, []).append({"tipo": "modulo", "rol": cont.rol})
+        for cap in cont.capacidades:
+            indice.setdefault(cap, []).append({"tipo": "capacidad", "modulo": nombre})
+    for nombre, simbolos in self._indice_simbolos.items():
+        for tipo_sim, lista in simbolos.items():
+            if tipo_sim == "capacidades":
+                continue
+            for sim in lista:
+                indice.setdefault(sim, []).append({"tipo": tipo_sim[:-1], "modulo": nombre})
+    return indice
+
+
+# ===========================================================
+# SECCIÓN 25: TRAZABILIDAD
+# ===========================================================
+def _registrar_traza(self, evento: str, detalle: Dict[str, Any]) -> None:
+    if not hasattr(self, "_trazas"):
+        self._trazas: List[Dict[str, Any]] = []
+    self._trazas.append({
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "evento": evento,
+        "detalle": detalle,
+    })
+
+
+def obtener_trazas(self) -> List[Dict[str, Any]]:
+    return list(getattr(self, "_trazas", []))
+
+
+# ===========================================================
+# SECCIÓN 26: API UNIVERSAL + LECTOR DE ARCHIVOS
+# ===========================================================
+def leer_archivo(self, ruta_relativa: str, modo: str = "texto") -> Any:
+    """
+    Lector universal de archivos del repositorio.
+    modo: "texto" | "bytes" | "json"
+    """
+    # Buscar la ruta absoluta a partir del índice o de la exploración
+    ruta_abs = None
+    if hasattr(self, "_indice_rutas") and ruta_relativa in self._indice_rutas:
+        # Reconstruir ruta absoluta
+        for nombre, data in self._exploracion.items():
+            if ruta_relativa in data.get("archivos", []):
+                # La ruta relativa es respecto a self.raiz
+                ruta_abs = self.raiz / ruta_relativa
+                break
+    else:
+        ruta_abs = self.raiz / ruta_relativa
+
+    if ruta_abs is None or not ruta_abs.is_file():
+        return {"error": f"Archivo no encontrado: {ruta_relativa}"}
+
+    try:
+        if modo == "bytes":
+            return ruta_abs.read_bytes()
+        if modo == "json":
+            import json
+            return json.loads(ruta_abs.read_text(encoding="utf-8"))
+        # por defecto texto
+        return ruta_abs.read_text(encoding="utf-8")
+    except Exception as e:
+        return {"error": f"{type(e).__name__}: {e}"}
+
+
+def grafo_global(self) -> Dict[str, Any]:
+    return self._grafo
+
+def dependencias_globales(self) -> Dict[str, Any]:
+    return self._dependencias
+
+def auditoria_global(self) -> Dict[str, Any]:
+    return self._auditoria
+
+def indice_simbolos(self) -> Dict[str, Any]:
+    return self._indice_simbolos
 # ==============================================================
 # FIN: core/engine.py — versión corregida (separación arranque / ejecución)
 # ==============================================================

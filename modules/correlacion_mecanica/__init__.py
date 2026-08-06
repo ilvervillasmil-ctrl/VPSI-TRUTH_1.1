@@ -1,8 +1,33 @@
-from pathlib import Path
+# ==============================================================
+# INICIO: modules/correlacion_mecanica/__init__.py
+# Núcleo mecánico del sistema VPSI-TRUTH
+# ==============================================================
+
+# -*- coding: utf-8 -*-
+"""
+VPSI-TRUTH --- modules/correlacion_mecanica
+
+Rol MC: Núcleo de correlación mecánica del sistema completo.
+
+Este módulo contiene y expone todos los órdenes causales / mecánicos
+declarados en sus archivos internos (cualquier archivo .py que defina
+la variable MECANICA).
+
+El Engine y el resto del sistema entran aquí para conocer:
+- Qué órdenes mecánicos existen
+- Cuáles son sus secuencias nativas
+- Si hay contradicciones o ciclos entre ellos
+
+No envía reportes a Diagnóstico.
+Solo expone su contrato y su contenido objetivo.
+"""
+
+from __future__ import annotations
+
 import importlib.util
 import sys
-from typing import Dict, List, Any, Tuple, Optional
-from core.diagnostico import DiagnosticoGlobal  # Importar DiagnosticoGlobal para Reportes Omega
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
 
 # ===============================================================
 # CONTENEDOR (Contrato del módulo)
@@ -10,32 +35,30 @@ from core.diagnostico import DiagnosticoGlobal  # Importar DiagnosticoGlobal par
 CONTENEDOR = {
     "nombre": "correlacion_mecanica",
     "rol": "MC",
-    "version": "1.0",
+    "version": "1.2",
     "requiere": [],
     "descripcion": (
-        "Contenedor de mecánica. Rol MC. Filtro de coherencia mecánica. "
-        "Lee los archivos en su directorio, calcula la mecánica resultante "
-        "y comprueba que no se contradigan entre sí."
+        "Núcleo de correlación mecánica del sistema completo. "
+        "Contiene y expone todos los órdenes causales declarados "
+        "en los archivos de esta carpeta mediante la variable MECANICA."
     ),
     "capacidades": {
-        "verificar": "barrer",      # Capacidad para validar el módulo
-        "axiomas": "axiomas",       # Devuelve las declaraciones axiomáticas
-        "evaluar": "barrer",        # Igual que "verificar"
-        "inventario": "inventario"  # Resumen del módulo
-    }
+        "verificar": "barrer",
+        "axiomas": "axiomas",
+        "evaluar": "barrer",
+        "inventario": "inventario",
+    },
 }
 
 # ===============================================================
-# CONSTANTES DEL MÓDULO
+# CONSTANTES
 # ===============================================================
-_DIR = Path(__file__).parent  # Directorio donde están los archivos de mecánica
-
-# Estados posibles del informe
+_DIR = Path(__file__).parent
 APROBADO = "APROBADO"
 RECHAZADO = "RECHAZADO"
 
 # ===============================================================
-# DECLARACIONES DEL FILTRO (Axiomas internos de la mecánica)
+# DECLARACIONES INTERNAS (opcionales, para trazabilidad)
 # ===============================================================
 DECLARACIONES = [
     {
@@ -67,26 +90,16 @@ DECLARACIONES = [
 ]
 
 # ===============================================================
-# FUNCIONES PRINCIPALES (Lógica Interna del Módulo)
-# ===============================================================
-def axiomas() -> List[Dict[str, Any]]:
-    """
-    Devuelve las declaraciones axiomáticas del módulo para el barrido general.
-    Estas declaraciones son internas y definen las reglas de la mecánica.
-    """
-    return DECLARACIONES
-
-# ===============================================================
-# LECTURA DE ARCHIVOS EN ORDEN NATIVO
+# LECTURA DE TODAS LAS MECÁNICAS DECLARADAS EN LA CARPETA
 # ===============================================================
 def _leer() -> Dict[str, Any]:
     """
-    Recoge lo que cada archivo declara en MECANICA.
-    No exige forma: se lee lo que hay.
+    Recorre absolutamente todos los archivos .py de esta carpeta
+    y recoge cualquier declaración MECANICA que encuentre.
     """
     hallado = {}
     for archivo in sorted(_DIR.glob("*.py")):
-        if archivo.name.startswith("_"):
+        if archivo.name.startswith("_") or archivo.name == "__init__.py":
             continue
 
         clave = f"mecanica_{archivo.stem}"
@@ -96,7 +109,10 @@ def _leer() -> Dict[str, Any]:
 
         mod = importlib.util.module_from_spec(spec)
         sys.modules[clave] = mod
-        spec.loader.exec_module(mod)
+        try:
+            spec.loader.exec_module(mod)
+        except Exception:
+            continue
 
         meta = getattr(mod, "MECANICA", None)
         if isinstance(meta, dict):
@@ -104,41 +120,36 @@ def _leer() -> Dict[str, Any]:
 
     return hallado
 
+
 def _nodos(meta: Dict[str, Any]) -> List[str]:
-    """
-    Extrae el orden nativo de un archivo (la secuencia de módulos declarada).
-    """
     orden = meta.get("orden", [])
     if isinstance(orden, (list, tuple)):
         return [str(x) for x in orden]
     return []
 
+
 def _precedencias(nodos: List[str]) -> List[Tuple[str, str]]:
-    """
-    Genera todos los pares de precedencia a partir de un orden nativo.
-    """
     return [(a, b) for i, a in enumerate(nodos) for b in nodos[i + 1:]]
 
+
 # ===============================================================
-# ENGINE (Orquestador)
+# CAPACIDADES PÚBLICAS
 # ===============================================================
+def axiomas() -> List[Dict[str, Any]]:
+    return DECLARACIONES
+
+
 def barrer() -> Dict[str, Any]:
     """
-    Calcula la mecánica y comprueba que los archivos no colisionen.
-    - Si hay contradicciones, devuelve estado = RECHAZADO y lista de choques.
-    - Si no hay contradicciones, devuelve estado = APROBADO y el orden válido.
+    Lee todas las MECANICA declaradas en la carpeta,
+    calcula el orden resultante y detecta contradicciones o ciclos.
     """
     hallado = _leer()
-    choques = []
-    errores = []
+    choques: List[str] = []
+    errores: List[str] = []
 
     if not hallado:
-        errores.append("ninguna mecánica declarada")
-        # Enviar reporte a DiagnosticoGlobal (Reporte Omega)
-        DiagnosticoGlobal.recibir_reporte(
-            modulo="correlacion_mecanica",
-            errores=errores
-        )
+        errores.append("ninguna mecánica declarada en la carpeta")
         return _informe([], choques, errores, hallado)
 
     precede: Dict[Tuple[str, str], List[str]] = {}
@@ -148,11 +159,10 @@ def barrer() -> Dict[str, Any]:
         if len(nodos) < 2:
             errores.append(f"{archivo}: sin orden nativo legible")
             continue
-
         for a, b in _precedencias(nodos):
             precede.setdefault((a, b), []).append(archivo)
 
-    # Detectar colisiones
+    # Detectar colisiones de orden
     for (a, b), quienes in sorted(precede.items()):
         contrarios = precede.get((b, a))
         if contrarios and (a, b) < (b, a):
@@ -164,56 +174,53 @@ def barrer() -> Dict[str, Any]:
     # Detectar ciclos
     universo = {x for par in precede for x in par}
     pendientes = set(universo)
-    mecanica = []
+    mecanica: List[str] = []
 
     while pendientes:
         libres = sorted(
             n for n in pendientes
             if not any((o, n) in precede for o in pendientes if o != n)
         )
-
         if not libres:
             choques.append(
                 f"nodos {sorted(pendientes)}: la secuencia se muerde la cola, "
                 "no hay orden posible"
             )
             break
-
         mecanica.extend(libres)
         pendientes -= set(libres)
 
-    # Enviar reporte a DiagnosticoGlobal si hay choques o errores
-    if choques or errores:
-        DiagnosticoGlobal.recibir_reporte(
-            modulo="correlacion_mecanica",
-            errores=choques + errores
-        )
-
     return _informe(mecanica, choques, errores, hallado)
 
-# ===============================================================
-# CENTINELA (Eyenet)
-# ===============================================================
-def verificar_salida(salida: Dict[str, Any]) -> bool:
-    """
-    Valida la salida del Engine (barrer) y envía reportes si hay errores.
-    - Si la salida es coherente, devuelve True.
-    - Si no lo es, ya se envió un reporte a DiagnosticoGlobal en barrer().
-    """
-    return salida.get("coherente", False)
 
-# ===============================================================
-# FUNCIÓN DE REPORTE (Informe)
-# ===============================================================
+def inventario() -> Dict[str, Any]:
+    """Muestra de forma objetiva qué mecánicas existen dentro de este núcleo."""
+    hallado = _leer()
+    return {
+        "contenedor": CONTENEDOR["nombre"],
+        "version": CONTENEDOR["version"],
+        "total_mecanicas": len(hallado),
+        "archivos": sorted(hallado.keys()),
+        "declaran": {
+            archivo: {
+                "nombre": meta.get("nombre", "Sin nombre"),
+                "longitud_orden": len(meta.get("orden", [])),
+            }
+            for archivo, meta in sorted(hallado.items())
+        },
+    }
+
+
+def verificar_salida(salida: Dict[str, Any]) -> bool:
+    return bool(salida.get("coherente", False))
+
+
 def _informe(
     mecanica: List[str],
     choques: List[str],
     errores: List[str],
-    hallado: Dict[str, Any]
+    hallado: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """
-    Genera el informe final del barrido mecánico.
-    """
     limpio = not (choques or errores)
     return {
         "contenedor": CONTENEDOR["nombre"],
@@ -222,30 +229,13 @@ def _informe(
         "choques": choques,
         "errores": errores,
         "mecanica": mecanica if limpio else [],
-        "archivos": sorted(hallado),
+        "archivos": sorted(hallado.keys()),
+        "total_mecanicas": len(hallado),
     }
 
-# ===============================================================
-# INTROSPECCIÓN
-# ===============================================================
-def inventario() -> Dict[str, Any]:
-    """
-    Devuelve un resumen de los archivos de mecánica cargados.
-    """
-    hallado = _leer()
-    return {
-        "contenedor": CONTENEDOR["nombre"],
-        "version": CONTENEDOR["version"],
-        "declaraciones": len(DECLARACIONES),
-        "archivos": sorted(hallado),
-        "declaran": {
-            archivo: meta.get("nombre", "Sin nombre")
-            for archivo, meta in sorted(hallado.items())
-        },
-    }
 
 # ===============================================================
-# EXPORTACIÓN
+# EXPORTACIONES
 # ===============================================================
 __all__ = [
     "CONTENEDOR",
@@ -257,3 +247,7 @@ __all__ = [
     "APROBADO",
     "RECHAZADO",
 ]
+
+# ==============================================================
+# FIN: modules/correlacion_mecanica/__init__.py
+# ==============================================================

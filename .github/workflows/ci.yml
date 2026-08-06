@@ -290,12 +290,33 @@ jobs:
           from pathlib import Path
 
           sys.path.insert(0, ".")
-          from core.engine import Engine, ROLES, OBLIGATORIOS, ArranqueError
+          from core.engine import Engine, ArranqueError
 
           Path("diagnostics").mkdir(exist_ok=True)
 
-          # Cobertura de contrato: claves que el CONTENEDOR debe declarar.
-          # No se invocan aquí (sin humo). Solo resolución callable + presencia.
+          # ==========================================================
+          # 1. INICIALIZACIÓN Y EXTRACCIÓN DINÁMICA
+          # ==========================================================
+          try:
+              eng = Engine(Path("modules"), invocador_id="ci_auditoria", strict=True)
+          except ArranqueError as e:
+              informe_base = {"tipo": "auditoria_estructural_contratos", "coherente": False, "errores": [{"categoria": "arranque", "mensaje": str(e)}]}
+              Path("diagnostics/contratos_report.json").write_text(
+                  json.dumps(informe_base, indent=2, ensure_ascii=False, default=str),
+                  encoding="utf-8",
+              )
+              print(json.dumps(informe_base, indent=2, ensure_ascii=False, default=str))
+              sys.exit(1)
+
+          resumen_inicial = eng.censar()
+          roles_map = resumen_inicial.get("roles") or {}
+          
+          # Extracción dinámica combinada con los roles base esperados
+          ROLES = set(roles_map.keys()).union({
+              "CT", "AX", "FO", "MC", "CX", "CA", "DG", "SF", "RE", "VX", "TX", "CH", "CIT", "UI"
+          })
+          OBLIGATORIOS = {"AX", "FO"}
+
           ESPERADO = {
               "CT": [],
               "AX": ["verificar", "inventario", "axiomas", "generatividad"],
@@ -353,10 +374,10 @@ jobs:
               informe["avisos"].append(entrada)
               informe["por_categoria"].setdefault(cat, []).append(entrada)
 
-          def resumen_canonico(eng):
-              r = eng.censar()
+          def resumen_canonico(engine_obj):
+              r = engine_obj.censar()
               return {
-                  "estado": eng.estado,
+                  "estado": engine_obj.estado,
                   "total": r.get("total"),
                   "roles": {
                       k: list(v) for k, v in sorted((r.get("roles") or {}).items())
@@ -370,17 +391,9 @@ jobs:
                   ),
               }
 
-          try:
-              eng = Engine(Path("modules"), invocador_id="ci_auditoria", strict=True)
-          except ArranqueError as e:
-              fallar("arranque", "Engine no arrancó: {0}".format(e))
-              Path("diagnostics/contratos_report.json").write_text(
-                  json.dumps(informe, indent=2, ensure_ascii=False, default=str),
-                  encoding="utf-8",
-              )
-              print(json.dumps(informe, indent=2, ensure_ascii=False, default=str))
-              sys.exit(1)
-
+          # ==========================================================
+          # 2. VALIDACIONES Y COMPUERTA DE ARRANQUE
+          # ==========================================================
           informe["evidencia_arranque"] = {
               "estado": eng.estado,
               "invocador_id": eng.invocador_id,
@@ -404,7 +417,6 @@ jobs:
               if not hasattr(eng, attr):
                   fallar("invariantes", "falta atributo Engine.{0}".format(attr))
 
-          # Determinismo de censo (estructura), no de valuación
           try:
               eng_b = Engine(Path("modules"), invocador_id="ci_auditoria_b", strict=True)
               a = resumen_canonico(eng)
@@ -421,7 +433,6 @@ jobs:
           except ArranqueError as e:
               fallar("determinismo", "segundo Engine no arrancó: {0}".format(e))
 
-          # Registro no vacío (fix de precedencia: total primero, luego comparar)
           if hasattr(eng.registro, "total"):
               n_reg = eng.registro.total()
           else:
@@ -448,12 +459,15 @@ jobs:
                       rol=rol_c,
                   )
 
+          # ==========================================================
+          # 3. AUDITORÍA DE CONTRATOS Y CAPACIDADES
+          # ==========================================================
           caps_verificadas = 0
           caps_fallidas = 0
           contratos_validos = 0
           contratos_invalidos = 0
 
-          for rol in ROLES:
+          for rol in sorted(ROLES):
               mods = list(roles_map.get(rol) or [])
               cont = eng.registro.primero(rol)
               entry = {
@@ -492,9 +506,8 @@ jobs:
               entry["nombre"] = cont.nombre
               entry["version"] = cont.version
 
-              # Solo resolución: ¿callable? No se invoca (sin humo).
               for clave in list(cont.capacidades.keys()):
-                  fn = cont.fn(clave)
+                  fn = cont.fn(clave) if hasattr(cont, "fn") else getattr(cont.modulo, str(cont.capacidades[clave]), None)
                   item = {
                       "clave": clave,
                       "callable": callable(fn),
@@ -543,9 +556,9 @@ jobs:
 
               informe["roles"][rol] = entry
 
-          # ----- Evidencia de evaluación (FUSIÓN, no pisa) -----
-          # Este paso corre DESPUÉS de "Run tests". write_text pisaba
-          # lo que los tests depositaron. depositar() conserva otros orígenes.
+          # ==========================================================
+          # 4. FUSIÓN DE EVIDENCIA (DEPOSITAR RESULTADOS DE TESTS)
+          # ==========================================================
           evals = []
           if hasattr(eng, "get_resultados_evaluacion"):
               evals = list(eng.get_resultados_evaluacion() or [])
@@ -569,8 +582,6 @@ jobs:
                   "modo": "fusion",
               }
           except Exception as e:
-              # Fallback solo si el depositario no está: no tumbar la auditoría
-              # de contratos por un fallo de evidencia.
               avisar(
                   "integridad",
                   "depositario de evidencia no disponible; write_text de respaldo",
@@ -584,15 +595,10 @@ jobs:
                   "estado_engine": getattr(eng, "estado", None),
                   "n": len(evals),
                   "resultados": evals,
-                  "nota": (
-                      "Fallback write_text: diagnostics.evidencia no cargó. "
-                      "n puede ser 0 si no hubo ciclo real en este proceso."
-                  ),
+                  "nota": "Fallback write_text: diagnostics.evidencia no cargó.",
               }
               Path("diagnostics/evaluaciones.json").write_text(
-                  json.dumps(
-                      evaluaciones_doc, indent=2, ensure_ascii=False, default=str
-                  ),
+                  json.dumps(evaluaciones_doc, indent=2, ensure_ascii=False, default=str),
                   encoding="utf-8",
               )
               informe["resultados_evaluacion_n"] = len(evals)
@@ -602,6 +608,9 @@ jobs:
                   "modo": "fallback_write_text",
               }
 
+          # ==========================================================
+          # 5. CONSOLIDACIÓN, REPORTE Y SALIDA
+          # ==========================================================
           total_caps = caps_verificadas + caps_fallidas
           pct = (
               round(100.0 * caps_verificadas / total_caps, 2)
@@ -629,7 +638,7 @@ jobs:
           )
 
           print("=" * 60)
-          print("AUDITORÍA ESTRUCTURAL DE CONTRATOS v1.3 (sin humo + fusión)")
+          print("AUDITORÍA ESTRUCTURAL DE CONTRATOS v1.3 (Dinámica + Fusión)")
           print("=" * 60)
           print("coherente:", informe["coherente"])
           ev = informe.get("evidencia_evaluacion") or {}
@@ -638,17 +647,15 @@ jobs:
           print("  origenes:", ev.get("origenes", []))
           for k, v in informe["resumen"].items():
               print("  {0}: {1}".format(k, v))
-          for e in informe["errores"]:
-              print("  ERROR [{0}]: {1}".format(
-                  e.get("categoria"), e.get("mensaje")
-              ))
-              for k in ("rol", "modulo", "version", "clave", "error"):
-                  if k in e:
-                      print("         {0}={1}".format(k, e[k]))
+          
+          for err in informe["errores"]:
+              print("  ERROR [{0}]: {1}".format(err.get("categoria"), err.get("mensaje")))
+
           if not informe["coherente"]:
               sys.exit(1)
           print("OK  auditoría estructural de contratos")
           EOF
+
 
       # ==========================================================
       # OMEGA REPORT (solo presenta evidencia existente)

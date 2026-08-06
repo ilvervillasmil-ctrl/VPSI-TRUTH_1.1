@@ -2,9 +2,15 @@
 # VPSI-TRUTH — modules/axiomas/__init__.py
 # ===============================================================
 #
-# MÓDULO:        axiomas
-# Rol:           AX
-# Versión:       9.6
+# MÓDULO:              axiomas
+# ID:                  AX
+# Rol:                 AX
+# Versión módulo:      9.6
+# Versión contrato:    1.0
+# Esquema contrato:    VPSI-CONTRACT-1.0
+# Estabilidad:         ESTABLE
+# Compatible desde:    9.5
+# API Engine:          >=1.0
 #
 # Función:
 #   Responsable del conocimiento axiomático del sistema.
@@ -23,21 +29,21 @@
 #   - No clasifica entrada de usuario (eso es CX)
 #   - No orquesta el sistema (eso es Engine)
 #   - No genera reportes de otros módulos
-#   - No modifica declaraciones de otros módulos
+#   - No modifica declaraciones ajenas
 #
 # Responsabilidad:
 #   Ser la fuente oficial y coherente del conocimiento axiomático.
 #
 # Autoridad:
-#   - Puede exponer cualquier axioma, lema, teorema, corolario, definición
-#   - Puede responder consultas sobre ellos
-#   - Puede citarlos y relacionarlos
-#   - Puede verificar coherencia interna
-#   - Puede reportar su propio estado y diagnóstico
+#   - Exponer cualquier axioma, lema, teorema, corolario o definición
+#   - Responder consultas sobre ellos
+#   - Citarlos y relacionarlos
+#   - Verificar coherencia interna
+#   - Reportar estado, salud, inventario y diagnóstico propios
 #
 # Conocimiento exportable:
-#   Declaraciones, referencias, dependencias, dominios,
-#   generatividad, choques, inventario, estado, reporte, diagnóstico.
+#   declaraciones, referencias, dependencias, dominios,
+#   generatividad, choques, inventario, estado, reporte, diagnóstico
 #
 # Relación con Engine:
 #   Engine descubre este CONTENEDOR, ejecuta solo las capacidades
@@ -74,6 +80,45 @@ except Exception:  # noqa: BLE001
 # CONSTANTES
 # ===============================================================
 
+# Identidad inmutable
+ID_MODULO = "AX"
+NOMBRE_MODULO = "axiomas"
+ROL_MODULO = "AX"
+
+# Versiones
+VERSION_MODULO = "9.6"
+VERSION_CONTRATO = "1.0"
+ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
+
+# Compatibilidad
+COMPATIBLE_DESDE = "9.5"
+API_ENGINE = ">=1.0"
+
+# Estabilidad
+ESTABILIDAD = "ESTABLE"
+
+# Estados centralizados
+ESTADO_NO_INICIADO = "NO_INICIADO"
+ESTADO_OPERATIVO = "OPERATIVO"
+ESTADO_DEGRADADO = "DEGRADADO"
+ESTADO_RECHAZADO = "RECHAZADO"
+ESTADOS_VALIDOS = (
+    ESTADO_NO_INICIADO,
+    ESTADO_OPERATIVO,
+    ESTADO_DEGRADADO,
+    ESTADO_RECHAZADO,
+)
+
+# Invariantes
+INVARIANTES = (
+    "el id del módulo nunca cambia",
+    "el rol nunca cambia",
+    "las capacidades declaradas son siempre callables tras la resolución",
+    "este módulo no modifica el estado de otros módulos",
+    "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+)
+
+# Dominio axiomático
 OBLIGATORIOS = ("id", "tipo", "sujeto", "relacion", "objeto", "polaridad")
 TIPOS = ("axioma", "lema", "teorema", "corolario", "definicion")
 
@@ -115,12 +160,6 @@ DOMINIO_CANONICO = {
     "contexto": "SEM",
 }
 
-VERSION_MODULO = "9.6"
-NOMBRE_MODULO = "axiomas"
-ROL_MODULO = "AX"
-
-ESTADOS_VALIDOS = ("NO_INICIADO", "OPERATIVO", "DEGRADADO", "RECHAZADO")
-
 # ===============================================================
 # FIN CONSTANTES
 # ===============================================================
@@ -131,6 +170,7 @@ ESTADOS_VALIDOS = ("NO_INICIADO", "OPERATIVO", "DEGRADADO", "RECHAZADO")
 # ===============================================================
 
 _DIR = Path(__file__).parent
+
 
 def _ruta_vpsi() -> Optional[Path]:
     candidatos = [
@@ -151,7 +191,10 @@ def _ruta_vpsi() -> Optional[Path]:
 # ===============================================================
 # DEFINICIONES
 # ===============================================================
-# (Sin clases adicionales por ahora; la lógica vive en funciones)
+
+class ContratoInvalido(Exception):
+    """El CONTENEDOR no cumple el esquema o la resolución de capacidades falló."""
+    pass
 
 # ===============================================================
 # FIN DEFINICIONES
@@ -162,11 +205,19 @@ def _ruta_vpsi() -> Optional[Path]:
 # CONTRATO OFICIAL DEL MÓDULO
 # ===============================================================
 
-CONTENEDOR = {
+CONTENEDOR: Dict[str, Any] = {
+    # ----- ESQUEMA -----
+    "esquema": ESQUEMA_CONTRATO,
+    "version_contrato": VERSION_CONTRATO,
+    "version_modulo": VERSION_MODULO,
+    "estabilidad": ESTABILIDAD,
+    "compatible_desde": COMPATIBLE_DESDE,
+    "api_engine": API_ENGINE,
+
     # ----- IDENTIDAD -----
+    "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
-    "version": VERSION_MODULO,
     "descripcion": (
         "Responsable del conocimiento axiomático del sistema. "
         "Mantiene, valida, organiza y expone todas las declaraciones "
@@ -231,19 +282,16 @@ CONTENEDOR = {
     "consultas_soportadas": [
         "buscar_por_id",
         "buscar_por_dominio",
-        "buscar_por_sujeto",
-        "buscar_por_relacion",
-        "buscar_por_objeto",
-        "buscar_dependencias",
-        "obtener_declaracion_completa",
         "obtener_generatividad",
         "obtener_inventario",
         "obtener_reporte",
         "obtener_diagnostico",
         "verificar_coherencia",
+        "ids_dominio_k_o",
+        "recolectar",
     ],
 
-    # ----- CAPACIDADES (nombre → callable se resuelve al final) -----
+    # ----- CAPACIDADES -----
     "capacidades": {
         "verificar": "barrer",
         "barrer": "barrer",
@@ -260,7 +308,7 @@ CONTENEDOR = {
         "buscar_por_id": "buscar_por_id",
     },
 
-    # ----- DESCRIPCIÓN DE CAPACIDADES -----
+    # ----- METADATOS DE CAPACIDADES -----
     "capacidades_meta": {
         "barrer": {
             "descripcion": "Analiza coherencia de todas las declaraciones.",
@@ -270,7 +318,7 @@ CONTENEDOR = {
         "inventario": {
             "descripcion": "Inventario completo del módulo.",
             "entrada": "ninguna",
-            "salida": "dict con nombre, rol, version, declaraciones, cuerpos, ...",
+            "salida": "dict con id, nombre, rol, version, declaraciones, cuerpos, ...",
         },
         "generatividad": {
             "descripcion": "Mide generatividad operativa y canónica (TR1).",
@@ -310,8 +358,11 @@ CONTENEDOR = {
         "diagnostico": True,
     },
 
-    # ----- ESTADO INTERNO (valores posibles) -----
+    # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),
+
+    # ----- INVARIANTES -----
+    "invariantes": list(INVARIANTES),
 }
 
 # ===============================================================
@@ -513,6 +564,37 @@ def _medir_pares(theta: list) -> dict:
             else ("ESTANCADO" if n > 0 else "SIN_DATOS")
         ),
     }
+
+
+def _validar_contrato(cont: Dict[str, Any]) -> None:
+    """Autoauditoría del propio contrato. Falla de inmediato si es inválido."""
+    obligatorias = (
+        "esquema", "version_contrato", "version_modulo",
+        "id", "nombre", "rol", "descripcion",
+        "funcion", "no_hace", "autoridad",
+        "conocimiento_exportable", "requiere",
+        "autoriza_engine", "consultas_soportadas",
+        "capacidades", "capacidades_meta",
+        "reporting", "estados_validos", "invariantes",
+        "estabilidad", "compatible_desde", "api_engine",
+    )
+    faltantes = [k for k in obligatorias if k not in cont]
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
+        )
+    if cont.get("esquema") != ESQUEMA_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: esquema incompatible: {cont.get('esquema')}"
+        )
+    if not isinstance(cont.get("capacidades"), dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'capacidades' debe ser dict"
+        )
+    if not isinstance(cont.get("requiere"), list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'requiere' debe ser list"
+        )
 
 # ===============================================================
 # FIN FUNCIONES PRIVADAS
@@ -751,6 +833,11 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
             return d
     return None
 
+
+def verificar() -> Dict[str, Any]:
+    """Verificación de coherencia interna del módulo."""
+    return barrer()
+
 # ===============================================================
 # FIN CAPACIDADES PÚBLICAS
 # ===============================================================
@@ -764,10 +851,14 @@ def reporte() -> Dict[str, Any]:
     """Reporte interno del módulo. Solo informa estado propio."""
     r = barrer()
     return {
+        "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
-        "estado": "OPERATIVO" if r.get("coherente") else "DEGRADADO",
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "estado": ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO,
         "coherente": r.get("coherente"),
         "declaraciones": r.get("declaraciones"),
         "choques": len(r.get("choques") or []),
@@ -783,10 +874,7 @@ def reporte() -> Dict[str, Any]:
 
 
 def diagnostico() -> Dict[str, Any]:
-    """
-    Diagnóstico del módulo:
-    qué me sucede, qué falta, qué está mal, qué necesito.
-    """
+    """Diagnóstico: qué me sucede, qué falta, qué está mal, qué necesito."""
     r = barrer()
     problemas = []
     advertencias = []
@@ -811,13 +899,14 @@ def diagnostico() -> Dict[str, Any]:
         advertencias.append("No hay declaraciones cargadas")
         recomendaciones.append("Verificar que existan cuerpos .py con DECLARACIONES")
 
-    estado = "OPERATIVO"
+    estado = ESTADO_OPERATIVO
     if problemas:
-        estado = "DEGRADADO"
+        estado = ESTADO_DEGRADADO
     if not r.get("declaraciones") and not problemas:
-        estado = "NO_INICIADO"
+        estado = ESTADO_NO_INICIADO
 
     return {
+        "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "estado": estado,
         "problemas": problemas,
@@ -838,9 +927,7 @@ def diagnostico() -> Dict[str, Any]:
 # VERIFICACIÓN
 # ===============================================================
 
-def verificar() -> Dict[str, Any]:
-    """Verificación de coherencia interna del módulo."""
-    return barrer()
+# verificar() ya está en CAPACIDADES PÚBLICAS.
 
 # ===============================================================
 # FIN VERIFICACIÓN
@@ -854,9 +941,13 @@ def verificar() -> Dict[str, Any]:
 def inventario(peticion=None) -> Dict:
     decls, errores = recolectar()
     return {
+        "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
         "tipos": list(TIPOS),
         "declaraciones": len(decls),
         "por_tipo": {
@@ -869,6 +960,7 @@ def inventario(peticion=None) -> Dict:
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+        "invariantes": CONTENEDOR.get("invariantes"),
         "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
         "ids_dominio_k_o": ids_dominio_k_o(),
         "nota": (
@@ -883,7 +975,7 @@ def inventario(peticion=None) -> Dict:
 
 
 # ===============================================================
-# EXPORTACIONES
+# EXPORTACIONES + RESOLUCIÓN ESTRICTA DEL CONTRATO
 # ===============================================================
 
 _CAP_MAP = {
@@ -899,14 +991,52 @@ _CAP_MAP = {
     "reporte": reporte,
     "diagnostico": diagnostico,
     "buscar_por_id": buscar_por_id,
+    "verificar": verificar,
 }
-CONTENEDOR["capacidades"] = {
-    k: _CAP_MAP.get(v, v) if isinstance(v, str) else v
-    for k, v in CONTENEDOR["capacidades"].items()
-}
+
+
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    """Resolución estricta. Referencia inexistente → fallo inmediato."""
+    resueltas: Dict[str, Any] = {}
+    for nombre, ref in cont["capacidades"].items():
+        if callable(ref):
+            resueltas[nombre] = ref
+            continue
+        if isinstance(ref, str):
+            if ref not in _CAP_MAP:
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                    f"referencia inexistente: '{ref}'"
+                )
+            fn = _CAP_MAP[ref]
+            if not callable(fn):
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
+                )
+            resueltas[nombre] = fn
+            continue
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+            f"tiene tipo inválido: {type(ref).__name__}"
+        )
+    cont["capacidades"] = resueltas
+
+
+# Validar y resolver al cargar el módulo
+_validar_contrato(CONTENEDOR)
+_resolver_capacidades(CONTENEDOR)
+
+# A partir de aquí el CONTENEDOR se considera inmutable.
 
 __all__ = [
     "CONTENEDOR",
+    "ID_MODULO",
+    "NOMBRE_MODULO",
+    "ROL_MODULO",
+    "VERSION_MODULO",
+    "VERSION_CONTRATO",
+    "ESQUEMA_CONTRATO",
+    "ESTABILIDAD",
     "AXIOMA",
     "LEMA",
     "TEOREMA",
@@ -931,6 +1061,7 @@ __all__ = [
     "reporte",
     "diagnostico",
     "buscar_por_id",
+    "ContratoInvalido",
 ]
 
 # ===============================================================
@@ -943,10 +1074,11 @@ __all__ = [
 # ===============================================================
 #
 # Nuevas capacidades deberán:
-#   • mantener este contrato
+#   • mantener este contrato y el esquema VPSI-CONTRACT-1.0
 #   • no romper compatibilidad hacia atrás
-#   • añadirse en capacidades + capacidades_meta
+#   • añadirse en capacidades + capacidades_meta + _CAP_MAP
 #   • actualizar inventario, reporting y VERSION_MODULO
+#   • pasar _validar_contrato y _resolver_capacidades
 #
 # Engine descubrirá automáticamente cualquier capacidad nueva.
 # Omega la reportará sin modificar su código.

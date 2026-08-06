@@ -548,12 +548,12 @@ class Engine:
                 )
             )
 
-    # ===============================================================
+        # ===============================================================
     # SECCIÓN: DI — archivos del modulo
     # ===============================================================
     #
-    # Lee absolutamente todos los archivos bajo modules/diccionario/
-    # igual que la seccion AX lee modules/axiomas/.
+    # Solo modules/diccionario/
+    # Johnson / CI leen el reporte de di_auditar_archivos()
     #
     # ---------------------------------------------------------------
     # subsección: listar todos los archivos
@@ -571,7 +571,40 @@ class Engine:
     def di_archivos(self) -> List[str]:
         return self._di_listar_archivos()
 
+    # ---------------------------------------------------------------
+    # subsección: auditoria de archivos (CI / Johnson)
+    # ---------------------------------------------------------------
+    def di_auditar_archivos(self) -> Dict[str, Any]:
+        """
+        AUDITORÍA DI — archivos internos
+        Johnson / CI invocan esta funcion y reportan el dict.
+        """
+        path = self.raiz / "diccionario"
+        existe = path.is_dir()
+        archivos = self._di_listar_archivos() if existe else []
+
+        errores: List[str] = []
+        if not existe:
+            errores.append("modules/diccionario no es directorio")
+        if existe and not archivos:
+            errores.append("carpeta diccionario sin archivos")
+
+        init_ok = (path / "__init__.py").is_file() if existe else False
+        if existe and not init_ok:
+            errores.append("falta modules/diccionario/__init__.py")
+
+        reporte = {
+            "modulo": "diccionario",
+            "rol": "DI",
+            "ruta": str(path),
+            "coherente": not errores,
+            "errores": errores,
+            "archivos_n": len(archivos),
+            "archivos": archivos,
+            "tiene_init": init_ok,
+        }
+        return reporte
+
     # ===============================================================
     # FIN SECCIÓN: DI — archivos del modulo
     # ===============================================================
-

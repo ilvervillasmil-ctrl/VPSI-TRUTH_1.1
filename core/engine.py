@@ -1075,3 +1075,77 @@ class Engine:
     # ===============================================================
     # FIN SECCIÓN: FO
     # ===============================================================
+
+# ===============================================================
+# CARGADOR DE MÓDULOS / CONTENEDORES
+# ===============================================================
+    def _cargar_modulos_automaticos(self) -> None:
+        """Escanea dinámicamente la carpeta de módulos y registra cualquier CONTENEDOR válido."""
+        if not self.raiz.is_dir():
+            return
+
+        for path_dir in sorted(self.raiz.iterdir()):
+            if not path_dir.is_dir():
+                continue
+            
+            init_path = path_dir / "__init__.py"
+            if not init_path.is_file():
+                continue
+
+            nombre_mod = f"vpsi_dinamico_{path_dir.name}"
+            spec = importlib.util.spec_from_file_location(
+                nombre_mod,
+                init_path,
+                submodule_search_locations=[str(path_dir)],
+            )
+            if spec is None or spec.loader is None:
+                continue
+
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[nombre_mod] = mod
+            try:
+                spec.loader.exec_module(mod)
+            except Exception as e:
+                self.errores_arranque.append(
+                    f"{path_dir.name}: import fallo: {type(e).__name__}: {e}"
+                )
+                continue
+
+            meta = getattr(mod, "CONTENEDOR", None)
+            if not isinstance(meta, dict):
+                continue
+
+            nombre = meta.get("nombre", path_dir.name)
+            rol = meta.get("rol", "GEN")
+            version = str(meta.get("version", "1.0"))
+
+            contenedor = Contenedor(
+                nombre=nombre,
+                rol=rol,
+                version=version,
+                modulo=mod,
+                ruta=init_path,
+                meta=meta,
+            )
+            self.registro.registrar(contenedor)
+
+            caps = meta.get("capacidades", {})
+            fn_validar = caps.get("verificar") or caps.get("barrer") or caps.get("evaluar")
+            if fn_validar:
+                fn = fn_validar if callable(fn_validar) else getattr(mod, str(fn_validar), None)
+                if callable(fn):
+                    try:
+                        informe = fn()
+                        if isinstance(informe, dict) and not informe.get("coherente", True):
+                            self.errores_arranque.append(
+                                f"{rol}: módulo incoherente según su contrato"
+                            )
+                    except Exception as e:
+                        self.errores_arranque.append(
+                            f"{rol}: error ejecutando validación: {type(e).__name__}: {e}"
+                        )
+
+# ===============================================================
+# FIN DEL CARGADOR DE MÓDULOS / CONTENEDORES
+# ===============================================================
+

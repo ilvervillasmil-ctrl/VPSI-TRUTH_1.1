@@ -3,9 +3,8 @@
 VPSI-TRUTH --- core/engine.py
 Version 12.0
 
-Seccion activa: AX — modules/axiomas/__init__.py (CONTENEDOR v9.5)
-Rol solo el del modulo: AX.
-Autoridad: CONTENEDOR vivo + todos los archivos de la carpeta.
+Seccion activa: AX (modules/axiomas)
+El rol se toma del CONTENEDOR del modulo.
 """
 
 from __future__ import annotations
@@ -14,7 +13,7 @@ import importlib.util
 import sys
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 
 class ArranqueError(Exception):
@@ -68,16 +67,11 @@ class Engine:
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
-
         self.fallos: List[Dict[str, Any]] = []
         self.errores_arranque: List[str] = []
         self.informe_axiomas: Optional[Dict[str, Any]] = None
-
-        # Instancia del modulo AX (nombre distinto al metodo)
-        self._ax_cont: Optional[Contenedor] = None
-        self._ax_archivos_lista: List[str] = []
-        self._ax_reporte_capacidades: List[Dict[str, Any]] = []
-
+        self.ax_contenedor: Optional[Contenedor] = None
+        self.ax_archivos_lista: List[str] = []
         self.estado = "NO_INICIADO"
 
         self._ax_cargar_modulo()
@@ -103,7 +97,6 @@ class Engine:
         fn = cont.fn(capacidad)
         if not callable(fn):
             self.fallos.append({
-                "seccion": "AX",
                 "contenedor": cont.nombre,
                 "capacidad": capacidad,
                 "razon": "no callable",
@@ -113,7 +106,6 @@ class Engine:
             return fn(*args, **kwargs)
         except Exception as e:
             self.fallos.append({
-                "seccion": "AX",
                 "contenedor": cont.nombre,
                 "capacidad": capacidad,
                 "razon": "{0}: {1}".format(type(e).__name__, e),
@@ -125,117 +117,14 @@ class Engine:
     # SECCIÓN: AX
     # ===============================================================
     #
-    # Contrato vivo: modules/axiomas/__init__.py → CONTENEDOR
-    #   nombre      : axiomas
-    #   rol         : AX
-    #   version     : 9.5
-    #   requiere    : []
-    #   capacidades : verificar, barrer, inventario, axiomas, generatividad
-    #
-    # AX es el juez del grafo (segun el propio modulo).
-    # Engine no reimplementa contradicciones ni recolectar:
-    # ejecuta lo que el CONTENEDOR declara y valida el enlace
-    # nombre → implementacion callable del modulo.
-    #
+    # Contrato origen : modules/axiomas/__init__.py
+    # Autoridad del CONTENEDOR vivo del modulo (no una copia ciega).
+    # Lee todos los archivos bajo modules/axiomas/.
+    # Ejecuta solo capacidades declaradas y resolubles.
     # ===============================================================
 
     # ---------------------------------------------------------------
-    # subsección: validacion detallada de cada capacidad del contrato
-    # ---------------------------------------------------------------
-    def _ax_validar_capacidades(
-        self,
-        cont: Contenedor,
-    ) -> List[Dict[str, Any]]:
-        """
-        Por cada entrada de CONTENEDOR['capacidades']:
-          - existe en el dict del contrato
-          - el valor es callable o nombre de atributo del modulo
-          - el resolvido final es callable
-          - si es callable directo, opcionalmente coincide con
-            atributo homonimo del modulo cuando exista
-        """
-        reporte: List[Dict[str, Any]] = []
-        mod = cont.modulo
-
-        for nombre_cap, ref in cont.capacidades.items():
-            nombre_cap = str(nombre_cap)
-            entrada: Dict[str, Any] = {
-                "capacidad": nombre_cap,
-                "ref_tipo": type(ref).__name__,
-                "en_contrato": True,
-                "resoluble": False,
-                "callable": False,
-                "atributo_modulo": None,
-                "mismo_objeto_que_atributo": None,
-                "error": None,
-            }
-
-            attr = getattr(mod, nombre_cap, None)
-            entrada["atributo_modulo"] = (
-                "callable" if callable(attr)
-                else ("existe_no_callable" if attr is not None else "ausente")
-            )
-
-            fn = None
-            if callable(ref):
-                fn = ref
-                if callable(attr):
-                    entrada["mismo_objeto_que_atributo"] = attr is ref
-            elif isinstance(ref, str):
-                fn = getattr(mod, ref, None)
-                if fn is None:
-                    entrada["error"] = (
-                        "ref string '{0}' no existe en el modulo".format(ref)
-                    )
-            else:
-                entrada["error"] = (
-                    "ref de capacidad no es callable ni str: {0}".format(
-                        type(ref).__name__
-                    )
-                )
-
-            if callable(fn):
-                entrada["resoluble"] = True
-                entrada["callable"] = True
-                entrada["fn_nombre"] = getattr(fn, "__name__", str(fn))
-            elif entrada["error"] is None:
-                entrada["error"] = "no resolvio a callable"
-
-            reporte.append(entrada)
-
-            if not entrada["resoluble"]:
-                self.errores_arranque.append(
-                    "AX/{0}: capacidad '{1}' no resoluble ({2})".format(
-                        cont.nombre,
-                        nombre_cap,
-                        entrada.get("error") or "sin callable",
-                    )
-                )
-
-        # Capacidades esperadas por el contrato documentado del modulo
-        esperadas = {
-            "verificar", "barrer", "inventario", "axiomas", "generatividad"
-        }
-        declaradas = {str(k) for k in cont.capacidades.keys()}
-        faltan = sorted(esperadas - declaradas)
-        extra = sorted(declaradas - esperadas)
-        if faltan:
-            self.errores_arranque.append(
-                "AX/{0}: CONTENEDOR no declara capacidades esperadas: {1}".format(
-                    cont.nombre, faltan
-                )
-            )
-        if extra:
-            # no es error de arranque: el modulo puede ampliar contrato
-            self.fallos.append({
-                "seccion": "AX",
-                "razon": "capacidades extra en CONTENEDOR: {0}".format(extra),
-            })
-
-        return reporte
-
-    # ---------------------------------------------------------------
-    # subsección: carga del modulo axiomas (solo rol AX del CONTENEDOR)
+    # subsección: carga del modulo + contraste con CONTENEDOR vivo
     # ---------------------------------------------------------------
     def _ax_cargar_modulo(self) -> None:
         path = self.raiz / "axiomas" / "__init__.py"
@@ -273,7 +162,7 @@ class Engine:
         rol = meta.get("rol")
         version = str(meta.get("version", "0.0"))
         requiere = list(meta.get("requiere") or [])
-        caps = meta.get("capacidades")
+        caps_meta = meta.get("capacidades")
 
         if nombre != "axiomas":
             self.errores_arranque.append(
@@ -287,7 +176,7 @@ class Engine:
             )
             return
 
-        if not isinstance(caps, dict) or not caps:
+        if not isinstance(caps_meta, dict) or not caps_meta:
             self.errores_arranque.append(
                 "AX: CONTENEDOR sin capacidades dict"
             )
@@ -301,25 +190,37 @@ class Engine:
             ruta=path,
             meta=meta,
         )
+        self.ax_contenedor = cont
+
+        # Capacidades del CONTENEDOR vivo: deben ser resolubles
+        no_resolubles = [
+            str(k) for k in caps_meta.keys() if not cont.tiene(str(k))
+        ]
+        if no_resolubles:
+            self.errores_arranque.append(
+                "AX/{0}: capacidades no resolubles: {1}".format(
+                    cont.nombre, no_resolubles
+                )
+            )
+
+        # Inventario total de archivos de la carpeta
+        self.ax_archivos_lista = self._ax_archivos()
+
+        # Constancia de version / requiere del CONTENEDOR vivo
+        cont.version = version
         cont.requiere = requiere
-        self._ax_cont = cont
-
-        # Todos los archivos de la carpeta
-        self._ax_archivos_lista = self._ax_listar_archivos()
-
-        # Validacion detallada contrato ↔ implementacion
-        self._ax_reporte_capacidades = self._ax_validar_capacidades(cont)
 
     # ---------------------------------------------------------------
-    # subsección: contenedor (metodo ≠ atributo)
+    # subsección: contenedor
     # ---------------------------------------------------------------
     def _ax_contenedor(self) -> Optional[Contenedor]:
-        return self._ax_cont
+        return self.ax_contenedor
 
     # ---------------------------------------------------------------
-    # subsección: todos los archivos bajo modules/axiomas/
+    # subsección: todos los archivos del modulo
     # ---------------------------------------------------------------
-    def _ax_listar_archivos(self) -> List[str]:
+    def _ax_archivos(self) -> List[str]:
+        """Lee absolutamente TODOS los archivos bajo modules/axiomas/."""
         cont = self._ax_contenedor()
         if cont is None:
             return []
@@ -331,15 +232,15 @@ class Engine:
         )
 
     def ax_archivos(self) -> List[str]:
-        if not self._ax_archivos_lista:
-            self._ax_archivos_lista = self._ax_listar_archivos()
-        return list(self._ax_archivos_lista)
-
-    def ax_reporte_capacidades(self) -> List[Dict[str, Any]]:
-        return list(self._ax_reporte_capacidades)
+        """Inventario publico: todos los archivos de modules/axiomas/."""
+        if self.ax_archivos_lista:
+            return list(self.ax_archivos_lista)
+        lista = self._ax_archivos()
+        self.ax_archivos_lista = lista
+        return list(lista)
 
     # ---------------------------------------------------------------
-    # subsección: invocacion — solo CONTENEDOR vivo
+    # subsección: invocacion por contrato vivo
     # ---------------------------------------------------------------
     def _ax_capacidad(self, capacidad: str, *args: Any, **kwargs: Any) -> Any:
         cont = self._ax_contenedor()
@@ -351,11 +252,12 @@ class Engine:
             })
             return None
 
+        # Autoridad: solo lo declarado en el CONTENEDOR vivo
         if capacidad not in cont.capacidades:
             self.fallos.append({
                 "seccion": "AX",
                 "capacidad": capacidad,
-                "razon": "fuera del CONTENEDOR vivo",
+                "razon": "capacidad fuera del CONTENEDOR vivo de axiomas",
             })
             return None
 
@@ -364,7 +266,7 @@ class Engine:
                 "seccion": "AX",
                 "contenedor": cont.nombre,
                 "capacidad": capacidad,
-                "razon": "declarada pero no resoluble a callable",
+                "razon": "capacidad no resoluble en el modulo",
             })
             return None
 
@@ -413,23 +315,22 @@ class Engine:
     # ---------------------------------------------------------------
     def ax_inventario(self, peticion: Any = None) -> Optional[Dict[str, Any]]:
         out = self._ax_capacidad("inventario", peticion)
-        if not isinstance(out, dict):
-            return None
-        out = dict(out)
-        cont = self._ax_contenedor()
-        out["archivos_modulo"] = self.ax_archivos()
-        out["archivos_n"] = len(out["archivos_modulo"])
-        out["reporte_capacidades"] = self.ax_reporte_capacidades()
-        if cont is not None:
-            out["contrato_vivo"] = {
-                "nombre": cont.nombre,
-                "rol": cont.rol,
-                "version": cont.version,
-                "requiere": list(cont.requiere),
-                "descripcion": cont.descripcion,
-                "capacidades": sorted(str(k) for k in cont.capacidades.keys()),
-            }
-        return out
+        if isinstance(out, dict):
+            # Anexa inventario de archivos que Angie leyo
+            out = dict(out)
+            out["archivos_modulo"] = self.ax_archivos()
+            out["archivos_n"] = len(out["archivos_modulo"])
+            cont = self._ax_contenedor()
+            if cont is not None:
+                out["contrato_vivo"] = {
+                    "nombre": cont.nombre,
+                    "rol": cont.rol,
+                    "version": cont.version,
+                    "requiere": list(cont.requiere),
+                    "capacidades": sorted(str(k) for k in cont.capacidades.keys()),
+                }
+            return out
+        return None
 
     # ---------------------------------------------------------------
     # subsección: capacidad — generatividad
@@ -441,23 +342,26 @@ class Engine:
         return None
 
     # ---------------------------------------------------------------
-    # subsección: compuerta de arranque (juez del grafo via barrer)
+    # subsección: compuerta de arranque
     # ---------------------------------------------------------------
     def _ax_compuerta(self) -> None:
         cont = self._ax_contenedor()
         if cont is None:
-            if not any(e.startswith("AX:") for e in self.errores_arranque):
+            if not any("AX:" in e for e in self.errores_arranque):
                 self.errores_arranque.append(
                     "AX: falta contenedor (modules/axiomas)"
                 )
             return
 
-        if not self.ax_archivos():
+        archivos = self.ax_archivos()
+        if not archivos:
             self.errores_arranque.append(
                 "AX/{0}: carpeta sin archivos legibles".format(cont.nombre)
             )
 
-        # Si alguna capacidad del contrato no resolvio, ya esta en errores
+        # version / requiere del CONTENEDOR vivo quedan en cont
+        # capacidades ya validadas en _ax_cargar_modulo
+
         informe = self.ax_barrer()
         if informe is None:
             informe = self.ax_verificar()

@@ -4,37 +4,47 @@
 #
 # MÓDULO:        axiomas
 # Rol:           AX
-# Versión:       9.5
+# Versión:       9.6
 #
 # Función:
-#   Vigilar declaraciones (axioma | lema | teorema | corolario | definicion)
-#   y detectar contradicciones.
+#   Responsable del conocimiento axiomático del sistema.
+#   Mantiene, valida, organiza y expone todas las declaraciones
+#   oficiales del repositorio para cualquier módulo autorizado.
 #
 # Qué hace:
-#   - Carga cuerpos de declaraciones
-#   - Normaliza y recolecta
+#   - Carga, normaliza y recolecta declaraciones
 #   - Detecta contradicción directa y de cota
 #   - Expone generatividad (TR1 / capa canónica)
-#   - Reporta su propio estado
+#   - Responde consultas por id, dominio, sujeto, relación, objeto
+#   - Genera inventario, reporte y diagnóstico propios
 #
 # Qué NO hace:
-#   - No calcula Tru_total / Tru_Ri
-#   - No clasifica entrada (eso es CX)
+#   - No calcula Tru_total ni Tru_Ri
+#   - No clasifica entrada de usuario (eso es CX)
 #   - No orquesta el sistema (eso es Engine)
 #   - No genera reportes de otros módulos
+#   - No modifica declaraciones de otros módulos
 #
 # Responsabilidad:
-#   Coherencia axiomática interna del repositorio.
+#   Ser la fuente oficial y coherente del conocimiento axiomático.
 #
-# Conocimiento que aporta:
-#   Declaraciones normalizadas, choques, generatividad, ids de dominio K/O.
+# Autoridad:
+#   - Puede exponer cualquier axioma, lema, teorema, corolario, definición
+#   - Puede responder consultas sobre ellos
+#   - Puede citarlos y relacionarlos
+#   - Puede verificar coherencia interna
+#   - Puede reportar su propio estado y diagnóstico
+#
+# Conocimiento exportable:
+#   Declaraciones, referencias, dependencias, dominios,
+#   generatividad, choques, inventario, estado, reporte, diagnóstico.
 #
 # Relación con Engine:
-#   Engine descubre este CONTENEDOR, ejecuta las capacidades declaradas
-#   y consolida el reporte que este módulo produce.
+#   Engine descubre este CONTENEDOR, ejecuta solo las capacidades
+#   declaradas y consolida el reporte que este módulo produce.
 #
 # Relación con Omega:
-#   Omega no calcula nada de AX. Solo presenta el reporte que Engine entrega.
+#   Omega no calcula nada de AX. Solo presenta lo que Engine entrega.
 #
 # ===============================================================
 
@@ -105,9 +115,11 @@ DOMINIO_CANONICO = {
     "contexto": "SEM",
 }
 
-VERSION_MODULO = "9.5"
+VERSION_MODULO = "9.6"
 NOMBRE_MODULO = "axiomas"
 ROL_MODULO = "AX"
+
+ESTADOS_VALIDOS = ("NO_INICIADO", "OPERATIVO", "DEGRADADO", "RECHAZADO")
 
 # ===============================================================
 # FIN CONSTANTES
@@ -139,7 +151,7 @@ def _ruta_vpsi() -> Optional[Path]:
 # ===============================================================
 # DEFINICIONES
 # ===============================================================
-# (Estructuras conceptuales mínimas; la lógica vive en funciones)
+# (Sin clases adicionales por ahora; la lógica vive en funciones)
 
 # ===============================================================
 # FIN DEFINICIONES
@@ -156,42 +168,82 @@ CONTENEDOR = {
     "rol": ROL_MODULO,
     "version": VERSION_MODULO,
     "descripcion": (
-        "Contenedor de axiomas. Rol AX. "
-        "Vigila declaraciones y contradicciones. "
-        "El Engine ejecuta las capacidades declaradas aquí."
+        "Responsable del conocimiento axiomático del sistema. "
+        "Mantiene, valida, organiza y expone todas las declaraciones "
+        "oficiales del repositorio."
     ),
 
     # ----- PROPÓSITO -----
     "funcion": (
-        "Vigilar coherencia axiomática: cargar declaraciones, "
-        "detectar contradicción directa y de cota, exponer generatividad."
+        "Ser la fuente oficial del conocimiento axiomático: "
+        "cargar, normalizar, validar coherencia, responder consultas "
+        "y exponer generatividad."
     ),
     "no_hace": [
         "No calcula Tru_total ni Tru_Ri",
         "No clasifica entrada de usuario (eso es CX)",
         "No orquesta el sistema (eso es Engine)",
         "No genera reportes de otros módulos",
+        "No modifica declaraciones ajenas",
     ],
 
-    # ----- CONOCIMIENTO -----
-    "conocimiento": (
-        "Declaraciones normalizadas, choques, generatividad (TR1), "
-        "ids de dominio K/O, inventario de cuerpos axiomáticos."
-    ),
+    # ----- AUTORIDAD -----
+    "autoridad": [
+        "Exponer cualquier axioma, lema, teorema, corolario o definición",
+        "Responder consultas por id, dominio, sujeto, relación, objeto",
+        "Citar y relacionar declaraciones",
+        "Verificar coherencia interna",
+        "Reportar estado, salud, inventario y diagnóstico propios",
+    ],
+
+    # ----- CONOCIMIENTO EXPORTABLE -----
+    "conocimiento_exportable": [
+        "declaraciones",
+        "referencias",
+        "dependencias",
+        "dominios",
+        "generatividad",
+        "choques",
+        "inventario",
+        "estado",
+        "reporte",
+        "diagnostico",
+    ],
 
     # ----- DEPENDENCIAS -----
     "requiere": [],
 
     # ----- AUTORIZACIÓN AL ENGINE -----
     "autoriza_engine": {
-        "leer_archivos_del_modulo": True,
-        "ejecutar_capacidades": True,
-        "combinar_con_otros_contratos": True,
-        "persistir": False,
-        "modificar_estado_externo": False,
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+        "modificar": False,
+        "alterar": False,
+        "reescribir": False,
     },
 
-    # ----- CAPACIDADES -----
+    # ----- CONSULTAS SOPORTADAS -----
+    "consultas_soportadas": [
+        "buscar_por_id",
+        "buscar_por_dominio",
+        "buscar_por_sujeto",
+        "buscar_por_relacion",
+        "buscar_por_objeto",
+        "buscar_dependencias",
+        "obtener_declaracion_completa",
+        "obtener_generatividad",
+        "obtener_inventario",
+        "obtener_reporte",
+        "obtener_diagnostico",
+        "verificar_coherencia",
+    ],
+
+    # ----- CAPACIDADES (nombre → callable se resuelve al final) -----
     "capacidades": {
         "verificar": "barrer",
         "barrer": "barrer",
@@ -204,6 +256,42 @@ CONTENEDOR = {
         "ids_dominio_k_o": "ids_dominio_k_o",
         "recolectar": "recolectar",
         "reporte": "reporte",
+        "diagnostico": "diagnostico",
+        "buscar_por_id": "buscar_por_id",
+    },
+
+    # ----- DESCRIPCIÓN DE CAPACIDADES -----
+    "capacidades_meta": {
+        "barrer": {
+            "descripcion": "Analiza coherencia de todas las declaraciones.",
+            "entrada": "declaraciones_externas opcional",
+            "salida": "dict con coherente, choques, errores, declaraciones, ...",
+        },
+        "inventario": {
+            "descripcion": "Inventario completo del módulo.",
+            "entrada": "ninguna",
+            "salida": "dict con nombre, rol, version, declaraciones, cuerpos, ...",
+        },
+        "generatividad": {
+            "descripcion": "Mide generatividad operativa y canónica (TR1).",
+            "entrada": "ninguna",
+            "salida": "dict con theta_n, pares, im_vs_theta, capa canonica, ...",
+        },
+        "reporte": {
+            "descripcion": "Reporte interno de estado del módulo.",
+            "entrada": "ninguna",
+            "salida": "dict con estado, coherente, choques, errores, ...",
+        },
+        "diagnostico": {
+            "descripcion": "Diagnóstico: qué me sucede, qué falta, qué está mal.",
+            "entrada": "ninguna",
+            "salida": "dict con problemas, advertencias, recomendaciones",
+        },
+        "buscar_por_id": {
+            "descripcion": "Busca una declaración por su id.",
+            "entrada": "id: str",
+            "salida": "dict de la declaración o None",
+        },
     },
 
     # ----- REPORTING -----
@@ -211,13 +299,19 @@ CONTENEDOR = {
         "estado": True,
         "salud": True,
         "inventario": True,
-        "estadisticas": True,
+        "capacidades": True,
         "errores": True,
         "advertencias": True,
-        "contrato": True,
-        "capacidades": True,
         "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
     },
+
+    # ----- ESTADO INTERNO (valores posibles) -----
+    "estados_validos": list(ESTADOS_VALIDOS),
 }
 
 # ===============================================================
@@ -648,6 +742,15 @@ def generatividad() -> dict:
         ),
     }
 
+
+def buscar_por_id(id_decl: str) -> Optional[Dict]:
+    """Consulta: declaración completa por id."""
+    decls, _ = recolectar()
+    for d in decls:
+        if d.get("id") == id_decl:
+            return d
+    return None
+
 # ===============================================================
 # FIN CAPACIDADES PÚBLICAS
 # ===============================================================
@@ -658,10 +761,7 @@ def generatividad() -> dict:
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
-    """
-    Reporte interno del módulo.
-    Solo informa estado propio. No calcula Tru ni orquesta el sistema.
-    """
+    """Reporte interno del módulo. Solo informa estado propio."""
     r = barrer()
     return {
         "modulo": NOMBRE_MODULO,
@@ -676,6 +776,57 @@ def reporte() -> Dict[str, Any]:
         "por_tipo": r.get("por_tipo"),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
+        "autoridad": CONTENEDOR.get("autoridad"),
+        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+    }
+
+
+def diagnostico() -> Dict[str, Any]:
+    """
+    Diagnóstico del módulo:
+    qué me sucede, qué falta, qué está mal, qué necesito.
+    """
+    r = barrer()
+    problemas = []
+    advertencias = []
+    recomendaciones = []
+
+    if r.get("errores"):
+        problemas.append({
+            "tipo": "errores_carga",
+            "detalle": r["errores"],
+        })
+        recomendaciones.append("Revisar archivos de cuerpos con error de carga")
+
+    if r.get("choques"):
+        problemas.append({
+            "tipo": "contradicciones",
+            "cantidad": len(r["choques"]),
+            "detalle": r["choques"][:5],
+        })
+        recomendaciones.append("Resolver contradicciones directas o de cota")
+
+    if not r.get("declaraciones"):
+        advertencias.append("No hay declaraciones cargadas")
+        recomendaciones.append("Verificar que existan cuerpos .py con DECLARACIONES")
+
+    estado = "OPERATIVO"
+    if problemas:
+        estado = "DEGRADADO"
+    if not r.get("declaraciones") and not problemas:
+        estado = "NO_INICIADO"
+
+    return {
+        "modulo": NOMBRE_MODULO,
+        "estado": estado,
+        "problemas": problemas,
+        "advertencias": advertencias,
+        "recomendaciones": recomendaciones,
+        "coherente": r.get("coherente"),
+        "declaraciones": r.get("declaraciones"),
+        "choques_n": len(r.get("choques") or []),
+        "errores_n": len(r.get("errores") or []),
     }
 
 # ===============================================================
@@ -688,10 +839,7 @@ def reporte() -> Dict[str, Any]:
 # ===============================================================
 
 def verificar() -> Dict[str, Any]:
-    """
-    Verificación de coherencia interna del módulo.
-    No verifica el sistema completo.
-    """
+    """Verificación de coherencia interna del módulo."""
     return barrer()
 
 # ===============================================================
@@ -718,6 +866,9 @@ def inventario(peticion=None) -> Dict:
         "errores": errores,
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
+        "autoridad": CONTENEDOR.get("autoridad"),
+        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
         "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
         "ids_dominio_k_o": ids_dominio_k_o(),
         "nota": (
@@ -735,7 +886,6 @@ def inventario(peticion=None) -> Dict:
 # EXPORTACIONES
 # ===============================================================
 
-# Resolver referencias de capacidades (str → callable)
 _CAP_MAP = {
     "barrer": barrer,
     "verificar_salida": verificar_salida,
@@ -747,6 +897,8 @@ _CAP_MAP = {
     "ids_dominio_k_o": ids_dominio_k_o,
     "recolectar": recolectar,
     "reporte": reporte,
+    "diagnostico": diagnostico,
+    "buscar_por_id": buscar_por_id,
 }
 CONTENEDOR["capacidades"] = {
     k: _CAP_MAP.get(v, v) if isinstance(v, str) else v
@@ -777,6 +929,8 @@ __all__ = [
     "generatividad",
     "verificar",
     "reporte",
+    "diagnostico",
+    "buscar_por_id",
 ]
 
 # ===============================================================
@@ -791,12 +945,10 @@ __all__ = [
 # Nuevas capacidades deberán:
 #   • mantener este contrato
 #   • no romper compatibilidad hacia atrás
-#   • añadirse únicamente en el bloque de capacidades
-#   • actualizar inventario y reporting
-#   • actualizar VERSION_MODULO
+#   • añadirse en capacidades + capacidades_meta
+#   • actualizar inventario, reporting y VERSION_MODULO
 #
-# Engine descubrirá automáticamente cualquier capacidad nueva
-# declarada en CONTENEDOR["capacidades"].
+# Engine descubrirá automáticamente cualquier capacidad nueva.
 # Omega la reportará sin modificar su código.
 #
 # ===============================================================

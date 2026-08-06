@@ -707,6 +707,124 @@ jobs:
             diagnostics/evaluaciones.json
           if-no-files-found: warn
 
+# ===============================================================
+# SECCIÓN DE DIAGNÓSTICO FORENSE DE CONTRATOS (YAML DEL CI — v4.0 FINAL)
+# ===============================================================
+# Nota de arquitectura: Auditoría forense de precisión con enriquecimiento 
+# total de evidencia y separación estricta de responsabilidades (ENGINE, CONTENEDOR o MÓDULO).
+
+      for clave in list(contrato_capacidades.keys()):
+          objetivo = contrato_capacidades.get(clave)
+          
+          # 1. ¿El Engine pudo resolverla?
+          fn_engine = None
+          error_engine = None
+          if hasattr(cont, "fn"):
+              try:
+                  fn_engine = cont.fn(clave)
+              except Exception as e:
+                  error_engine = str(e)
+
+          # 2. Análisis del módulo (autoridad: cont.modulo) y verificación estricta de pertenencia
+          fn_modulo = None
+          existe_en_modulo = False
+          es_callable_directo = False
+
+          if callable(objetivo):
+              es_callable_directo = True
+              fn_modulo = objetivo
+              # Regla de pertenencia: Verificamos si el callable pertenece al espacio del módulo auditado
+              if hasattr(cont, "modulo") and cont.modulo is not None:
+                  mod_name = getattr(cont.modulo, "__name__", "")
+                  fn_module_origin = getattr(objetivo, "__module__", "")
+                  # Si el callable fue importado de otro lado, registramos la advertencia pero permitimos o invalidamos según rigor
+                  existe_en_modulo = (not fn_module_origin) or (fn_module_origin == mod_name) or (mod_name in fn_module_origin)
+              else:
+                  existe_en_modulo = True
+          elif isinstance(objetivo, str):
+              if hasattr(cont, "modulo") and cont.modulo is not None:
+                  existe_en_modulo = hasattr(cont.modulo, objetivo)
+                  if existe_en_modulo:
+                      fn_modulo = getattr(cont.modulo, objetivo, None)
+
+          # 3. Recolección de Evidencia Autocontenida para el informe JSON
+          item = {
+              "clave": clave,
+              "declarado": repr(objetivo),
+              "modulo": entry["nombre"],
+              "rol": rol,
+              "version": entry["version"],
+              "engine_callable": callable(fn_engine),
+              "engine_resultado": repr(fn_engine),
+              "engine_error": error_engine,
+              "modulo_callable": callable(fn_modulo),
+              "existe_en_modulo": existe_en_modulo,
+              "es_callable_directo": es_callable_directo,
+              "tipo_objeto": type(fn_modulo).__name__ if fn_modulo is not None else None,
+          }
+
+          # 4. Árbol de Decisión Causal Mutuamente Excluyente
+          if callable(fn_engine):
+              # Caso 0: Todo correcto (Engine y contrato alineados)
+              item["ok"] = True
+              item["responsable"] = None
+              item["fn_name"] = getattr(fn_engine, "__name__", str(fn_engine))
+              caps_verificadas += 1
+              entry["resolucion"].append(item)
+          elif callable(fn_modulo) and not callable(fn_engine):
+              # Caso 1: Responsable ENGINE (El contrato/módulo están bien, pero cont.fn() falló o devolvió None/excepción)
+              item["ok"] = False
+              item["responsable"] = "ENGINE"
+              razon_engine = "lanzó excepción: {0}".format(error_engine) if error_engine else "retornó None o un objeto no ejecutable"
+              fallar(
+                  "contradiccion_contrato",
+                  "Responsable: ENGINE — El contrato declara '{0}' y el módulo expone la función correctamente, pero el Engine falló al resolverla ({1})".format(clave, razon_engine),
+                  rol=rol,
+                  modulo=entry["nombre"],
+                  version=entry["version"],
+                  clave=clave,
+                  responsable="ENGINE",
+                  evidencia_engine=item,
+              )
+              caps_fallidas += 1
+              fallo_local = True
+              entry["resolucion"].append(item)
+          elif not existe_en_modulo:
+              # Caso 2: Responsable CONTENEDOR (El contrato apunta a un nombre incorrecto o importación externa no permitida)
+              item["ok"] = False
+              item["responsable"] = "CONTENEDOR"
+              fallar(
+                  "contradiccion_contrato",
+                  "Responsable: CONTENEDOR — El contrato declara la capacidad '{0}' apuntando a '{1}', pero dicho nombre no existe en el módulo o infringe la regla de pertenencia".format(clave, objetivo),
+                  rol=rol,
+                  modulo=entry["nombre"],
+                  version=entry["version"],
+                  clave=clave,
+                  responsable="CONTENEDOR",
+                  evidencia_contenedor=item,
+              )
+              caps_fallidas += 1
+              fallo_local = True
+              entry["resolucion"].append(item)
+          else:
+              # Caso 3: Responsable MÓDULO (El nombre existe pero el objeto no es callable o ejecutable)
+              item["ok"] = False
+              item["responsable"] = "MODULO"
+              fallar(
+                  "contradiccion_contrato",
+                  "Responsable: MODULO — El contrato declara '{0}' apuntando a '{1}', pero el objeto real en el módulo no es callable (tipo: {2})".format(clave, objetivo, item["tipo_objeto"]),
+                  rol=rol,
+                  modulo=entry["nombre"],
+                  version=entry["version"],
+                  clave=clave,
+                  responsable="MODULO",
+                  evidencia_modulo=item,
+              )
+              caps_fallidas += 1
+              fallo_local = True
+              entry["resolucion"].append(item)
+
+
       # ==========================================================
       # 14. COMMIT AUTOMÁTICO DE HISTORIA DE COHERENCIA
       # ==========================================================
@@ -733,3 +851,5 @@ jobs:
           git commit -m "ci: historia de coherencia [skip ci]"
           git pull --rebase -X ours origin main || true
           git push origin HEAD:main
+
+    

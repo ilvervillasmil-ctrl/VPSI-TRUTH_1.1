@@ -187,4 +187,11 @@ class Engine:
 # FIN: Método censar() para la clase Engine
 # ==========================================================
 
-       
+   # ==========================================================
+# INICIO: Atributo resultados_evaluacion en core/engine.py
+# ==========================================================
+        self.resultados_evaluacion = []
+# ==========================================================
+# FIN: Atributo resultados_evaluacion en core/engine.py
+# ==========================================================
+    

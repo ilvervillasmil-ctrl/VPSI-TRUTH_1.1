@@ -1,121 +1,8 @@
 {
   "tipo": "auditoria_estructural_contratos",
   "version": "2.0_FORENSE",
-  "coherente": true,
-  "errores": [
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "verificar"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'barrer', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "barrer"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'verificar_salida', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "verificar_salida"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "inventario"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "axiomas"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'declaraciones', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "declaraciones"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'generatividad', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "generatividad"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'por_dominio', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "por_dominio"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'ids_dominio_k_o', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "ids_dominio_k_o"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'recolectar', pero el código real no la expone o no es callable",
-      "rol": "AX",
-      "modulo": "axiomas",
-      "version": "9.5",
-      "clave": "recolectar"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
-      "rol": "FO",
-      "modulo": "formulas",
-      "version": "1.0",
-      "clave": "verificar"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'evaluar', pero el código real no la expone o no es callable",
-      "rol": "FO",
-      "modulo": "formulas",
-      "version": "1.0",
-      "clave": "evaluar"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
-      "rol": "FO",
-      "modulo": "formulas",
-      "version": "1.0",
-      "clave": "axiomas"
-    },
-    {
-      "categoria": "contradiccion_contrato",
-      "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
-      "rol": "FO",
-      "modulo": "formulas",
-      "version": "1.0",
-      "clave": "inventario"
-    }
-  ],
+  "incoherente": false,
+  "errores": [],
   "avisos": [
     {
       "categoria": "integridad",
@@ -127,120 +14,7 @@
     "arranque": [],
     "invariantes": [],
     "registro": [],
-    "contradiccion_contrato": [
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "verificar"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'barrer', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "barrer"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'verificar_salida', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "verificar_salida"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "inventario"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "axiomas"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'declaraciones', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "declaraciones"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'generatividad', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "generatividad"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'por_dominio', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "por_dominio"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'ids_dominio_k_o', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "ids_dominio_k_o"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'recolectar', pero el código real no la expone o no es callable",
-        "rol": "AX",
-        "modulo": "axiomas",
-        "version": "9.5",
-        "clave": "recolectar"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
-        "rol": "FO",
-        "modulo": "formulas",
-        "version": "1.0",
-        "clave": "verificar"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'evaluar', pero el código real no la expone o no es callable",
-        "rol": "FO",
-        "modulo": "formulas",
-        "version": "1.0",
-        "clave": "evaluar"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
-        "rol": "FO",
-        "modulo": "formulas",
-        "version": "1.0",
-        "clave": "axiomas"
-      },
-      {
-        "categoria": "contradiccion_contrato",
-        "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
-        "rol": "FO",
-        "modulo": "formulas",
-        "version": "1.0",
-        "clave": "inventario"
-      }
-    ],
+    "contradiccion_contrato": [],
     "resolucion": [],
     "integridad": [
       {
@@ -272,83 +46,173 @@
       "resolucion": [
         {
           "clave": "verificar",
-          "callable": false,
+          "declarado": "<function barrer at 0x7fcb1699d760>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function barrer at 0x7fcb1699d760>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "barrer"
         },
         {
           "clave": "barrer",
-          "callable": false,
+          "declarado": "<function barrer at 0x7fcb1699d760>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function barrer at 0x7fcb1699d760>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "barrer"
         },
         {
           "clave": "verificar_salida",
-          "callable": false,
+          "declarado": "<function verificar_salida at 0x7fcb1699d620>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function verificar_salida at 0x7fcb1699d620>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "verificar_salida"
         },
         {
           "clave": "inventario",
-          "callable": false,
+          "declarado": "<function inventario at 0x7fcb1699d120>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function inventario at 0x7fcb1699d120>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "inventario"
         },
         {
           "clave": "axiomas",
-          "callable": false,
+          "declarado": "<function axiomas at 0x7fcb1699e980>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function axiomas at 0x7fcb1699e980>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "axiomas"
         },
         {
           "clave": "declaraciones",
-          "callable": false,
+          "declarado": "<function declaraciones at 0x7fcb1699d940>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function declaraciones at 0x7fcb1699d940>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "declaraciones"
         },
         {
           "clave": "generatividad",
-          "callable": false,
+          "declarado": "<function generatividad at 0x7fcb1699e8e0>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function generatividad at 0x7fcb1699e8e0>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "generatividad"
         },
         {
           "clave": "por_dominio",
-          "callable": false,
+          "declarado": "<function por_dominio at 0x7fcb1699df80>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function por_dominio at 0x7fcb1699df80>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "por_dominio"
         },
         {
           "clave": "ids_dominio_k_o",
-          "callable": false,
+          "declarado": "<function ids_dominio_k_o at 0x7fcb1699d4e0>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function ids_dominio_k_o at 0x7fcb1699d4e0>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "ids_dominio_k_o"
         },
         {
           "clave": "recolectar",
-          "callable": false,
+          "declarado": "<function recolectar at 0x7fcb1699e200>",
           "modulo": "axiomas",
           "rol": "AX",
           "version": "9.5",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function recolectar at 0x7fcb1699e200>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "recolectar"
         }
       ],
       "nombre": "axiomas",
@@ -368,29 +232,53 @@
       "resolucion": [
         {
           "clave": "alpha",
-          "callable": true,
+          "declarado": "'get_alpha'",
           "modulo": "constante",
           "rol": "CT",
           "version": "1.0",
+          "engine_callable": true,
+          "engine_resultado": "<function get_alpha at 0x7fcb169d34c0>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": false,
+          "tipo_objeto": "function",
           "ok": true,
+          "responsable": null,
           "fn_name": "get_alpha"
         },
         {
           "clave": "beta",
-          "callable": true,
+          "declarado": "'get_beta'",
           "modulo": "constante",
           "rol": "CT",
           "version": "1.0",
+          "engine_callable": true,
+          "engine_resultado": "<function get_beta at 0x7fcb169d3420>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": false,
+          "tipo_objeto": "function",
           "ok": true,
+          "responsable": null,
           "fn_name": "get_beta"
         },
         {
           "clave": "inventario",
-          "callable": true,
+          "declarado": "'inventario'",
           "modulo": "constante",
           "rol": "CT",
           "version": "1.0",
+          "engine_callable": true,
+          "engine_resultado": "<function inventario at 0x7fcb169d3380>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": false,
+          "tipo_objeto": "function",
           "ok": true,
+          "responsable": null,
           "fn_name": "inventario"
         }
       ],
@@ -405,42 +293,150 @@
       "n_modulos": 1,
       "claves_contrato": [
         "verificar",
+        "barrer",
         "evaluar",
+        "verificar_salida",
+        "inventario",
         "axiomas",
-        "inventario"
+        "tru_ri",
+        "tru_total"
       ],
       "resolucion": [
         {
           "clave": "verificar",
-          "callable": false,
+          "declarado": "<function barrer at 0x7fcb169d7e20>",
           "modulo": "formulas",
           "rol": "FO",
           "version": "1.0",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function barrer at 0x7fcb169d7e20>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "barrer"
+        },
+        {
+          "clave": "barrer",
+          "declarado": "<function barrer at 0x7fcb169d7e20>",
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "engine_callable": true,
+          "engine_resultado": "<function barrer at 0x7fcb169d7e20>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "barrer"
         },
         {
           "clave": "evaluar",
-          "callable": false,
+          "declarado": "<function barrer at 0x7fcb169d7e20>",
           "modulo": "formulas",
           "rol": "FO",
           "version": "1.0",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function barrer at 0x7fcb169d7e20>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "barrer"
         },
         {
-          "clave": "axiomas",
-          "callable": false,
+          "clave": "verificar_salida",
+          "declarado": "<function verificar_salida at 0x7fcb169d7ec0>",
           "modulo": "formulas",
           "rol": "FO",
           "version": "1.0",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function verificar_salida at 0x7fcb169d7ec0>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "verificar_salida"
         },
         {
           "clave": "inventario",
-          "callable": false,
+          "declarado": "<function inventario at 0x7fcb169d7f60>",
           "modulo": "formulas",
           "rol": "FO",
           "version": "1.0",
-          "ok": false
+          "engine_callable": true,
+          "engine_resultado": "<function inventario at 0x7fcb169d7f60>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "inventario"
+        },
+        {
+          "clave": "axiomas",
+          "declarado": "<function axiomas at 0x7fcb169ec040>",
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "engine_callable": true,
+          "engine_resultado": "<function axiomas at 0x7fcb169ec040>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "axiomas"
+        },
+        {
+          "clave": "tru_ri",
+          "declarado": "<function tru_ri at 0x7fcb169ec680>",
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "engine_callable": true,
+          "engine_resultado": "<function tru_ri at 0x7fcb169ec680>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "tru_ri"
+        },
+        {
+          "clave": "tru_total",
+          "declarado": "<function tru_total at 0x7fcb169ec900>",
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "engine_callable": true,
+          "engine_resultado": "<function tru_total at 0x7fcb169ec900>",
+          "engine_error": null,
+          "modulo_callable": true,
+          "existe_en_modulo": true,
+          "es_callable_directo": true,
+          "tipo_objeto": "function",
+          "ok": true,
+          "responsable": null,
+          "fn_name": "tru_total"
         }
       ],
       "nombre": "formulas",
@@ -450,14 +446,14 @@
   "resumen": {
     "roles_totales": 3,
     "roles_presentes": 3,
-    "contratos_validos": 1,
-    "contratos_invalidos": 2,
-    "capacidades_verificadas": 3,
-    "capacidades_fallidas": 14,
-    "pct_integridad_capacidades": 17.65,
+    "contratos_validos": 3,
+    "contratos_invalidos": 0,
+    "capacidades_verificadas": 21,
+    "capacidades_fallidas": 0,
+    "pct_integridad_capacidades": 100.0,
     "resultados_evaluacion_n": 0,
     "rechazados_n": 0,
-    "errores_n": 14,
+    "errores_n": 0,
     "avisos_n": 1
   },
   "resultados_evaluacion_n": 0,

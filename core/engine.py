@@ -1,5 +1,5 @@
 # ==============================================================
-# INICIO: core/engine.py — versión completa con ejecución del contrato
+# INICIO: core/engine.py — versión corregida (separación arranque / ejecución)
 # ==============================================================
 
 # ilver
@@ -7,7 +7,8 @@
 VPSI-TRUTH --- core/engine.py
 
 Kernel estructural.
-Lee el CONTENEDOR y ejecuta literalmente las capacidades que declara.
+Fase de arranque: solo descubre y valida.
+Fase de ejecución: se realiza bajo demanda.
 """
 
 from __future__ import annotations
@@ -88,7 +89,7 @@ class RegistroModulos:
 # SECCIÓN 2: ENGINE
 # ===============================================================
 class Engine:
-    VERSION = "17.1-ejecuta-contrato"
+    VERSION = "17.2-separacion-fases"
 
     def __init__(
         self,
@@ -123,7 +124,7 @@ class Engine:
         self._indice_simbolos: Dict[str, Dict[str, Any]] = {}
         self._diagnosticos_causales: List[Dict[str, Any]] = []
 
-        # 2.5 Flujo
+        # 2.5 Flujo de ARRANQUE (solo validación estructural)
         self._modulos_descubiertos = self._descubrir_modulos()
         self._cargar_y_validar()
         self._resolver_dependencias()
@@ -313,11 +314,13 @@ class Engine:
         return resultado
 
     # ===========================================================
-    # SECCIÓN 10: EJECUCIÓN LITERAL DEL CONTRATO
+    # SECCIÓN 10: EJECUCIÓN DEL CONTRATO (bajo demanda)
     # ===========================================================
     def _ejecutar_contrato(self, cont: Contenedor) -> Dict[str, Any]:
         """
-        Ejecuta literalmente todas las capacidades declaradas en el CONTENEDOR.
+        Ejecuta las capacidades del contrato.
+        Esta función NO se llama durante el arranque.
+        Se usa solo cuando se solicita explícitamente.
         """
         resultados = {}
         for clave in cont.capacidades:
@@ -347,22 +350,26 @@ class Engine:
                 }
         return resultados
 
+    def ejecutar_contrato(self, nombre_o_rol: str) -> Dict[str, Any]:
+        """API pública: ejecuta el contrato de un módulo bajo demanda."""
+        cont = self.registro.primero(nombre_o_rol)
+        if cont is None:
+            return {"error": f"No se encontró módulo o rol: {nombre_o_rol}"}
+        resultado = self._ejecutar_contrato(cont)
+        self._ejecucion[cont.nombre] = resultado
+        return resultado
+
     # ===========================================================
-    # SECCIÓN 11: AUDITOR
+    # SECCIÓN 11: AUDITOR (solo validación estructural)
     # ===========================================================
-    def _auditar(self, cont: Contenedor, resolucion: Dict, ejecucion: Dict) -> Dict[str, Any]:
-        coherente = (
-            len(resolucion.get("no_resolubles", [])) == 0
-            and all(v.get("estado") == "EXITO" for v in ejecucion.values())
-        )
+    def _auditar(self, cont: Contenedor, resolucion: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "nombre": cont.nombre,
             "rol": cont.rol,
             "version": cont.version,
             "requiere": list(cont.requiere),
             "resolucion": resolucion,
-            "ejecucion": ejecucion,
-            "coherente": coherente,
+            "coherente": len(resolucion.get("no_resolubles", [])) == 0,
         }
 
     # ===========================================================
@@ -447,7 +454,7 @@ class Engine:
         self._grafo = {"nodos": nodos, "aristas": aristas}
 
     # ===========================================================
-    # SECCIÓN 15: ORQUESTACIÓN (con ejecución del contrato)
+    # SECCIÓN 15: ORQUESTACIÓN DE ARRANQUE (solo validación)
     # ===========================================================
     def _cargar_y_validar(self) -> None:
         for path_dir in self._modulos_descubiertos:
@@ -480,21 +487,21 @@ class Engine:
             self._exploracion[nombre] = self._explorar_modulo(path_dir)
             self._inspeccion[nombre] = self._inspeccionar_modulo(path_dir)
 
-            # 1. Resolver
+            # Solo resolución (no ejecución)
             resolucion = self._resolver_capacidades(cont)
             self._resolucion[nombre] = resolucion
 
-            # 2. Ejecutar el contrato
-            ejecucion = self._ejecutar_contrato(cont)
-            self._ejecucion[nombre] = ejecucion
+            # Ejecución queda pendiente
+            self._ejecucion[nombre] = {"estado": "PENDIENTE"}
 
-            # 3. Auditar
-            auditoria = self._auditar(cont, resolucion, ejecucion)
+            # Auditoría estructural
+            auditoria = self._auditar(cont, resolucion)
             self._auditoria[nombre] = auditoria
 
             if not auditoria["coherente"]:
                 self.errores_arranque.append(
-                    f"{rol}/{nombre}: fallo al ejecutar el contrato"
+                    f"{rol}/{nombre}: capacidades no resolubles: "
+                    f"{resolucion.get('no_resolubles')}"
                 )
 
     # ===========================================================
@@ -533,8 +540,9 @@ class Engine:
             "errores_arranque": list(self.errores_arranque),
             "advertencias": list(self.advertencias),
             "nota": (
-                "Estado global. El Engine ejecuta literalmente "
-                "las capacidades declaradas en cada CONTENEDOR."
+                "Estado global. "
+                "Arranque = solo validación estructural. "
+                "Ejecución de contratos se realiza bajo demanda."
             ),
         }
 
@@ -556,5 +564,5 @@ class Engine:
 
 
 # ==============================================================
-# FIN: core/engine.py — versión completa con ejecución del contrato
+# FIN: core/engine.py — versión corregida (separación arranque / ejecución)
 # ==============================================================

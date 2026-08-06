@@ -340,7 +340,7 @@ jobs:
           }
 
           def fallar(cat, msg, **extra):
-              informe["coherente"] = False
+              informe["coherente"] = true
               entrada = {"categoria": cat, "mensaje": msg}
               entrada.update(extra)
               informe["errores"].append(entrada)

@@ -1,13 +1,13 @@
 # ==============================================================
-# INICIO: core/engine.py — versión completa con secciones
+# INICIO: core/engine.py — versión completa con ejecución del contrato
 # ==============================================================
 
-# -*- coding: utf-8 -*-
+# ilver
 """
 VPSI-TRUTH --- core/engine.py
 
 Kernel estructural.
-Lee el CONTENEDOR y ejecuta literalmente todas las capacidades que declara.
+Lee el CONTENEDOR y ejecuta literalmente las capacidades que declara.
 """
 
 from __future__ import annotations
@@ -88,7 +88,7 @@ class RegistroModulos:
 # SECCIÓN 2: ENGINE
 # ===============================================================
 class Engine:
-    VERSION = "17.0-ejecuta-contrato"
+    VERSION = "17.1-ejecuta-contrato"
 
     def __init__(
         self,
@@ -96,30 +96,22 @@ class Engine:
         invocador_id: str = "core",
         strict: bool = True,
     ) -> None:
-        # ----------------------------------------------------------
-        # 2.1 Parámetros de construcción
-        # ----------------------------------------------------------
+        # 2.1 Parámetros
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
 
-        # ----------------------------------------------------------
-        # 2.2 Estado principal
-        # ----------------------------------------------------------
+        # 2.2 Estado
         self.estado = "NO_INICIADO"
 
-        # ----------------------------------------------------------
-        # 2.3 Atributos exigidos por la auditoría forense
-        # ----------------------------------------------------------
+        # 2.3 Atributos exigidos por auditoría
         self.registro = RegistroModulos()
         self.resultados_evaluacion: List[Any] = []
         self.errores_arranque: List[str] = []
         self.fallos: List[Dict[str, Any]] = []
         self.advertencias: List[str] = []
 
-        # ----------------------------------------------------------
-        # 2.4 Evidencia objetiva
-        # ----------------------------------------------------------
+        # 2.4 Evidencia
         self._modulos_descubiertos: List[Path] = []
         self._exploracion: Dict[str, Any] = {}
         self._inspeccion: Dict[str, Any] = {}
@@ -131,18 +123,14 @@ class Engine:
         self._indice_simbolos: Dict[str, Dict[str, Any]] = {}
         self._diagnosticos_causales: List[Dict[str, Any]] = []
 
-        # ----------------------------------------------------------
-        # 2.5 Flujo de arranque
-        # ----------------------------------------------------------
+        # 2.5 Flujo
         self._modulos_descubiertos = self._descubrir_modulos()
         self._cargar_y_validar()
         self._resolver_dependencias()
         self._construir_indice_simbolos()
         self._construir_grafo()
 
-        # ----------------------------------------------------------
-        # 2.6 Cierre de estado
-        # ----------------------------------------------------------
+        # 2.6 Cierre
         if self.errores_arranque:
             self.estado = "RECHAZADO"
             if self.strict:
@@ -166,7 +154,7 @@ class Engine:
         return encontrados
 
     # ===========================================================
-    # SECCIÓN 4: DIAGNÓSTICO CAUSAL DE IMPORTACIÓN
+    # SECCIÓN 4: DIAGNÓSTICO CAUSAL
     # ===========================================================
     def _diagnosticar_import_error(self, path_dir: Path, error: Exception) -> Dict[str, Any]:
         mensaje = str(error)
@@ -329,7 +317,7 @@ class Engine:
     # ===========================================================
     def _ejecutar_contrato(self, cont: Contenedor) -> Dict[str, Any]:
         """
-        Ejecuta literalmente TODAS las capacidades declaradas en el CONTENEDOR.
+        Ejecuta literalmente todas las capacidades declaradas en el CONTENEDOR.
         """
         resultados = {}
         for clave in cont.capacidades:
@@ -378,7 +366,7 @@ class Engine:
         }
 
     # ===========================================================
-    # SECCIÓN 12: RESOLUCIÓN DE DEPENDENCIAS + CICLOS
+    # SECCIÓN 12: RESOLUCIÓN DE DEPENDENCIAS
     # ===========================================================
     def _resolver_dependencias(self) -> None:
         roles_presentes = set(self.registro.por_rol.keys())
@@ -423,7 +411,7 @@ class Engine:
         }
 
     # ===========================================================
-    # SECCIÓN 13: ÍNDICE GLOBAL DE SÍMBOLOS
+    # SECCIÓN 13: ÍNDICE DE SÍMBOLOS
     # ===========================================================
     def _construir_indice_simbolos(self) -> None:
         for nombre, cont in self.registro.contenedores.items():
@@ -443,7 +431,7 @@ class Engine:
             self._indice_simbolos[nombre] = simbolos
 
     # ===========================================================
-    # SECCIÓN 14: CONSTRUCTOR DEL GRAFO
+    # SECCIÓN 14: GRAFO
     # ===========================================================
     def _construir_grafo(self) -> None:
         nodos, aristas = [], []
@@ -459,7 +447,7 @@ class Engine:
         self._grafo = {"nodos": nodos, "aristas": aristas}
 
     # ===========================================================
-    # SECCIÓN 15: ORQUESTACIÓN PRINCIPAL
+    # SECCIÓN 15: ORQUESTACIÓN (con ejecución del contrato)
     # ===========================================================
     def _cargar_y_validar(self) -> None:
         for path_dir in self._modulos_descubiertos:
@@ -492,13 +480,15 @@ class Engine:
             self._exploracion[nombre] = self._explorar_modulo(path_dir)
             self._inspeccion[nombre] = self._inspeccionar_modulo(path_dir)
 
+            # 1. Resolver
             resolucion = self._resolver_capacidades(cont)
             self._resolucion[nombre] = resolucion
 
-            # Ejecución literal del contrato
+            # 2. Ejecutar el contrato
             ejecucion = self._ejecutar_contrato(cont)
             self._ejecucion[nombre] = ejecucion
 
+            # 3. Auditar
             auditoria = self._auditar(cont, resolucion, ejecucion)
             self._auditoria[nombre] = auditoria
 
@@ -544,7 +534,7 @@ class Engine:
             "advertencias": list(self.advertencias),
             "nota": (
                 "Estado global. El Engine ejecuta literalmente "
-                "todas las capacidades declaradas en cada CONTENEDOR."
+                "las capacidades declaradas en cada CONTENEDOR."
             ),
         }
 
@@ -566,5 +556,5 @@ class Engine:
 
 
 # ==============================================================
-# FIN: core/engine.py — versión completa con secciones
+# FIN: core/engine.py — versión completa con ejecución del contrato
 # ==============================================================

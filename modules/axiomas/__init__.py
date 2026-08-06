@@ -1,28 +1,8 @@
+# -*- coding: utf-8 -*-
 """
-VPSI-TRUTH — modules/axiomas/__init__.py
+VPSI-TRUTH --- modules/axiomas/__init__.py
 
 Contenedor de axiomas. Rol AX. v9.5
-
-Qué es:
-  Vigila declaraciones (axioma | lema | teorema | corolario | definicion).
-  No pertenece a ninguna teoría. No calcula Tru_total.
-  No clasifica entrada (eso es CX). No orquesta (eso es Engine).
-
-Qué vigila:
-  - contradiccion_directa
-  - contradiccion_de_cota
-  Si hay choque o error de carga → coherente=False.
-
-Qué expone:
-  - verificar / barrer: coherencia del cuerpo
-  - axiomas / declaraciones: lista si coherente (fail-closed)
-  - generatividad: TR1/U1 sobre Θ (capa operativa + canónica paper)
-  - inventario: mapa del módulo
-
-Def-5.3.1 / dominio O:
-  Vive en las declaraciones de los cuerpos (p.ej. contexto_AX, VPSI).
-  Este INIT no re-enuncia el teorema: lo carga, lo vigila y lo expone.
-  CX aplica la clasificación de entrada; AX es el juez del grafo.
 """
 
 from __future__ import annotations
@@ -38,7 +18,7 @@ except Exception:  # noqa: BLE001
     DiagnosticoGlobal = None  # type: ignore
 
 # ===============================================================
-# Constantes
+# SECCIÓN 1: CONSTANTES Y CONFIGURACIÓN BÁSICA
 # ===============================================================
 OBLIGATORIOS = ("id", "tipo", "sujeto", "relacion", "objeto", "polaridad")
 TIPOS = ("axioma", "lema", "teorema", "corolario", "definicion")
@@ -63,7 +43,6 @@ TRADUCCION_CLAVES = {
 
 _DIR = Path(__file__).parent
 
-# Dominios donde suele vivir la exigencia de O / K (exposición, no cálculo)
 DOMINIOS_K_O = frozenset({
     "contexto", "ontologia", "epistemologia", "verificacion",
     "dominio", "k", "o_context", "correlacion",
@@ -71,7 +50,7 @@ DOMINIOS_K_O = frozenset({
 
 
 # ===============================================================
-# Carga
+# SECCIÓN 2: LECTURA FORENSE DE ARCHIVOS Y RECURSOS INTERNOS
 # ===============================================================
 def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
     if archivo.name.startswith("_"):
@@ -93,7 +72,6 @@ def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
         except Exception:  # noqa: BLE001
             declaraciones = []
 
-    # Alias frecuentes en archivos de cuerpo
     if declaraciones is None:
         for attr in ("CUERPO", "declaraciones_lista"):
             val = getattr(mod, attr, None)
@@ -117,7 +95,7 @@ def _ruta_vpsi() -> Optional[Path]:
 
 
 # ===============================================================
-# Normalización
+# SECCIÓN 3: NORMALIZACIÓN Y RECOLECCIÓN DE DATOS
 # ===============================================================
 def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
     if not isinstance(decl_original, dict):
@@ -176,20 +154,14 @@ def ref(d: Dict) -> str:
     return f"{d['cuerpo']}:{d['id']}"
 
 
-# ===============================================================
-# Recolección
-# ===============================================================
 def recolectar(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
-    """
-    Carga y normaliza todas las declaraciones del módulo.
-    Retorna (decls, errores). No lanza: acumula errores de carga.
-    """
     decls: List[Dict] = []
     errores: List[Dict] = []
 
-    for archivo in sorted(_DIR.glob("*.py")):
+    # Permite leer dinámicamente cualquier subcarpeta y archivo interno del módulo
+    for archivo in sorted(_DIR.glob("**/*.py")):
         if archivo.name == "__init__.py":
             continue
         try:
@@ -233,10 +205,6 @@ def por_dominio(
     dominio: str,
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """
-    Filtro de lectura: declaraciones cuyo gobierna toca un dominio.
-    No interpreta; no calcula Tru. Útil para CX/CIT al citar.
-    """
     dom = str(dominio).lower().strip()
     decls, _ = recolectar(declaraciones_externas)
     out = []
@@ -250,17 +218,12 @@ def por_dominio(
 def ids_dominio_k_o(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[str]:
-    """
-    Ids que gobiernan dominios relacionados con K/O/contexto.
-    Exposición del grafo ya cargado (p.ej. Def-5.3.1 si está en el cuerpo).
-    """
     decls, _ = recolectar(declaraciones_externas)
     ids: List[str] = []
     for d in decls:
         gobs = {str(g).lower().strip() for g in (d.get("gobierna") or [])}
         if gobs & DOMINIOS_K_O:
             ids.append(d["id"])
-        # también por enunciado/objeto si el id es canónico de dominio
         blob = (
             f"{d.get('sujeto','')} {d.get('objeto','')} {d.get('enunciado','')}"
         ).lower()
@@ -271,7 +234,7 @@ def ids_dominio_k_o(
 
 
 # ===============================================================
-# Contradicciones
+# SECCIÓN 4: DETECCIÓN DE CONTRADICCIONES Y RESOLUCIÓN
 # ===============================================================
 def contradiccion_directa(decls: List[Dict]) -> List[Dict]:
     grupos: Dict[Tuple[str, str, str], List[Dict]] = {}
@@ -335,10 +298,10 @@ def contradiccion_de_cota(decls: List[Dict]) -> List[Dict]:
 
 
 # ===============================================================
-# Capacidades de contrato
+# SECCIÓN 5: CAPACIDADES EXPUESTAS PARA EL ENGINE (Y ANGINA)
 # ===============================================================
 def barrer(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict:
-    """Capacidad principal: coherencia axiomática del cuerpo."""
+    """Función principal: Ejecuta la validación y solución de contratos axiomáticos."""
     decls, errores = recolectar(declaraciones_externas)
     choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
 
@@ -377,7 +340,6 @@ def verificar_salida(salida: Dict) -> bool:
 def declaraciones(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """Lista normalizada si el cuerpo es coherente; si no → []."""
     resultado = barrer(declaraciones_externas)
     if not resultado["coherente"]:
         return []
@@ -388,7 +350,6 @@ def declaraciones(
 def axiomas(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """Alias de contrato: misma semántica que declaraciones()."""
     return declaraciones(declaraciones_externas)
 
 
@@ -404,14 +365,9 @@ def inventario(peticion=None) -> Dict:
         "errores": errores,
         "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
         "ids_dominio_k_o": ids_dominio_k_o(),
-        "nota": (
-            "Def-5.3.1 y dominio O viven en los cuerpos cargados; "
-            "este módulo los vigila y expone, no los clasifica en entrada."
-        ),
     }
 
 
-# --- ids canónicos del paper (TR1, |Θ|=24) ---
 THETA_CANONICO = frozenset({
     "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10",
     "T11", "T12", "T13", "T14", "T15", "T16", "T17",
@@ -419,26 +375,11 @@ THETA_CANONICO = frozenset({
 })
 
 DOMINIO_CANONICO = {
-    "ontologia": "ONT",
-    "ont": "ONT",
-    "informacion": "INF",
-    "info": "INF",
-    "logica": "LOG",
-    "log": "LOG",
-    "epistemologia": "EPI",
-    "epi": "EPI",
-    "semantica": "SEM",
-    "sem": "SEM",
-    "temporal": "TMP",
-    "tmp": "TMP",
-    "meta": "MET",
-    "met": "MET",
-    "constantes": "MET",
-    "self": "EPI",
-    "inferencia_causal": "INF",
-    "verificacion": "EPI",
-    "ver": "VER",
-    "contexto": "SEM",
+    "ontologia": "ONT", "ont": "ONT", "informacion": "INF", "info": "INF",
+    "logica": "LOG", "log": "LOG", "epistemologia": "EPI", "epi": "EPI",
+    "semantica": "SEM", "sem": "SEM", "temporal": "TMP", "tmp": "TMP",
+    "meta": "MET", "met": "MET", "constantes": "MET", "self": "EPI",
+    "inferencia_causal": "INF", "verificacion": "EPI", "ver": "VER", "contexto": "SEM",
 }
 
 
@@ -478,14 +419,6 @@ def _medir_pares(theta: list) -> dict:
 
 
 def generatividad() -> dict:
-    """
-    TR1 en dos capas (saber, no creer):
-
-    1) operativa  — todo axioma/teorema con gobierna (grafo del repo)
-    2) canonica   — solo los 24 ids del paper + dominios normalizados
-
-    No inventa candidatos. No calcula Tru. Una sola definición (sin duplicar).
-    """
     decls, errores = recolectar()
 
     oper = []
@@ -548,23 +481,13 @@ def generatividad() -> dict:
             "ids_faltantes": faltan,
             "ids_sin_dominio": sin_dominio,
             "dominios": dominios_can,
-            "objetivo_paper": {
-                "theta_n": 24,
-                "im_esperada": 153,
-                "nota": "|Im(⊕)|=153 > 24=|Θ| en enumeración del texto",
-            },
         },
         "ids_dominio_k_o": ids_dominio_k_o(),
-        "nota": (
-            "Capa operativa = grafo del repo. "
-            "Capa canonica = solo ids TR1 del paper. "
-            "Dominio O/K: ver ids_dominio_k_o y cuerpos (no se clasifica entrada aquí)."
-        ),
     }
 
 
 # ===============================================================
-# Contrato
+# SECCIÓN 6: CONTRATO DEL CONTENEDOR (PERMISOS PARA ENGINE / ANGINA)
 # ===============================================================
 CONTENEDOR = {
     "nombre": "axiomas",
@@ -573,10 +496,7 @@ CONTENEDOR = {
     "requiere": [],
     "descripcion": (
         "Contenedor de axiomas. Rol AX. "
-        "Define y vigila axiomas, lemas, teoremas y corolarios. "
-        "No calcula Tru_total. No clasifica O de entrada (CX). "
-        "Mide generatividad TR1 sobre su propio cuerpo. "
-        "Expone ids de dominio K/O ya cargados en el grafo."
+        "otorga permisos al Engine para leer y aplicar su contrato de forma autónoma."
     ),
     "capacidades": {
         "verificar": barrer,

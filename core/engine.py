@@ -549,5 +549,29 @@ class Engine:
             )
 
     # ===============================================================
-    # FIN SECCIÓN: DI
+    # SECCIÓN: DI — archivos del modulo
     # ===============================================================
+    #
+    # Lee absolutamente todos los archivos bajo modules/diccionario/
+    # igual que la seccion AX lee modules/axiomas/.
+    #
+    # ---------------------------------------------------------------
+    # subsección: listar todos los archivos
+    # ---------------------------------------------------------------
+    def _di_listar_archivos(self) -> List[str]:
+        path = self.raiz / "diccionario"
+        if not path.is_dir():
+            return []
+        return sorted(
+            str(p.relative_to(path))
+            for p in path.rglob("*")
+            if p.is_file()
+        )
+
+    def di_archivos(self) -> List[str]:
+        return self._di_listar_archivos()
+
+    # ===============================================================
+    # FIN SECCIÓN: DI — archivos del modulo
+    # ===============================================================
+

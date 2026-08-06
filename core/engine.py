@@ -27,32 +27,86 @@ Descripcion
     El Engine activa lo que cada contrato autoriza.
     Nuevos modulos o roles = nuevas secciones, sin reescribir el resto.
 """
+
     # ===============================================================
-    # SECCIÓN AX — contrato modules/axiomas (CONTENEDOR v9.5)
-    #
-    # Origen: modules/axiomas/__init__.py
-    # Rol: AX | nombre: axiomas
-    #
-    # Autorizacion:
-    #   Todo lo que el CONTENEDOR de axiomas declara.
-    #   Capacidades: verificar, barrer, inventario, axiomas, generatividad.
-    #   El Engine no reimplementa contradicciones ni normalizacion:
-    #   ejecuta las funciones del modulo por contrato.
-    #
-    # Contrato del modulo:
-    #   - Vigila declaraciones (axioma|lema|teorema|corolario|definicion).
-    #   - No calcula Tru_total.
-    #   - No clasifica entrada O (eso es CX).
-    #   - Fail-closed: si choques o errores de carga → coherente=False.
+    # SECCIÓN: AX
     # ===============================================================
+    #
+    # Contrato origen : modules/axiomas/__init__.py
+    # nombre          : axiomas
+    # rol             : AX
+    # version         : 9.5
+    # requiere        : []
+    # capacidades     : verificar, barrer, inventario, axiomas, generatividad
+    #
+    # Autoridad de engine sobre este modulo:
+    #   - Lee el CONTENEDOR de modules/axiomas/
+    #   - Lee absolutamente TODOS los archivos bajo modules/axiomas/
+    #   - Ejecuta todas las capacidades que el CONTENEDOR declara
+    #   - No inventa oficios. No sustituye la logica del modulo.
+    #   - No calcula Tru_total. No clasifica O de entrada.
+    #
+    # Prueba:
+    #   Esta seccion se valida directamente contra modules/axiomas/
+    #
+    # ---------------------------------------------------------------
+    # subsección: metadatos del contrato
+    # ---------------------------------------------------------------
+    AX_CONTRATO = {
+        "nombre": "axiomas",
+        "rol": "AX",
+        "version": "9.5",
+        "requiere": [],
+        "capacidades": (
+            "verificar",
+            "barrer",
+            "inventario",
+            "axiomas",
+            "generatividad",
+        ),
+        "carpeta": "modules/axiomas",
+    }
+
+    # ---------------------------------------------------------------
+    # subsección: contenedor
+    # ---------------------------------------------------------------
     def _ax_contenedor(self) -> Optional[Contenedor]:
         return self.registro.primero("AX")
 
+    # ---------------------------------------------------------------
+    # subsección: todos los archivos del modulo
+    # ---------------------------------------------------------------
+    def _ax_archivos(self) -> List[str]:
+        """
+        Lee absolutamente TODOS los archivos bajo modules/axiomas/.
+        Autoridad total de Angie sobre el contenido de la carpeta.
+        """
+        cont = self._ax_contenedor()
+        if cont is None:
+            return []
+        dir_mod = Path(cont.ruta).resolve().parent
+        return sorted(
+            str(p.relative_to(dir_mod))
+            for p in dir_mod.rglob("*")
+            if p.is_file()
+        )
+
+    # ---------------------------------------------------------------
+    # subsección: invocacion por contrato
+    # ---------------------------------------------------------------
     def _ax_capacidad(self, capacidad: str, *args: Any, **kwargs: Any) -> Any:
         """
-        Invoca una capacidad declarada en CONTENEDOR de axiomas.
-        Solo lo que el contrato expone.
+        Ejecuta una capacidad declarada en el CONTENEDOR de axiomas.
+        Solo lo que el contrato autoriza.
         """
+        if capacidad not in self.AX_CONTRATO["capacidades"]:
+            self.fallos.append({
+                "seccion": "AX",
+                "capacidad": capacidad,
+                "razon": "capacidad fuera del CONTENEDOR de axiomas",
+            })
+            return None
+
         cont = self._ax_contenedor()
         if cont is None:
             self.fallos.append({
@@ -61,63 +115,89 @@ Descripcion
                 "razon": "rol AX sin contenedor cargado",
             })
             return None
+
         if not cont.tiene(capacidad):
             self.fallos.append({
                 "seccion": "AX",
                 "contenedor": cont.nombre,
                 "capacidad": capacidad,
-                "razon": "capacidad no declarada en CONTENEDOR",
+                "razon": "capacidad no resoluble en el modulo",
             })
             return None
+
         return self._ejecutar_capacidad(cont, capacidad, *args, **kwargs)
 
+    # ---------------------------------------------------------------
+    # subsección: capacidad — barrer
+    # ---------------------------------------------------------------
     def ax_barrer(
         self,
         declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
     ) -> Optional[Dict[str, Any]]:
-        """
-        Contrato: verificar / barrer.
-        Coherencia del cuerpo axiomatico (choques + errores de carga).
-        """
+        """CONTENEDOR.capacidades['barrer'] → barrer()"""
         out = self._ax_capacidad("barrer", declaraciones_externas)
         if isinstance(out, dict):
             self.informe_axiomas = out
             return out
+        return None
+
+    # ---------------------------------------------------------------
+    # subsección: capacidad — verificar
+    # ---------------------------------------------------------------
+    def ax_verificar(
+        self,
+        declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """CONTENEDOR.capacidades['verificar'] → barrer()"""
         out = self._ax_capacidad("verificar", declaraciones_externas)
         if isinstance(out, dict):
             self.informe_axiomas = out
             return out
         return None
 
+    # ---------------------------------------------------------------
+    # subsección: capacidad — axiomas
+    # ---------------------------------------------------------------
     def ax_axiomas(
         self,
         declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
     ) -> List[Dict[str, Any]]:
-        """
-        Contrato: axiomas.
-        Lista normalizada si el cuerpo es coherente; si no → [].
-        """
+        """CONTENEDOR.capacidades['axiomas'] → axiomas()"""
         out = self._ax_capacidad("axiomas", declaraciones_externas)
-        return list(out) if isinstance(out, list) else []
+        if isinstance(out, list):
+            return out
+        return []
 
+    # ---------------------------------------------------------------
+    # subsección: capacidad — inventario
+    # ---------------------------------------------------------------
     def ax_inventario(self, peticion: Any = None) -> Optional[Dict[str, Any]]:
-        """Contrato: inventario — mapa del modulo axiomas."""
+        """CONTENEDOR.capacidades['inventario'] → inventario()"""
         out = self._ax_capacidad("inventario", peticion)
-        return out if isinstance(out, dict) else None
+        if isinstance(out, dict):
+            return out
+        return None
 
+    # ---------------------------------------------------------------
+    # subsección: capacidad — generatividad
+    # ---------------------------------------------------------------
     def ax_generatividad(self) -> Optional[Dict[str, Any]]:
-        """
-        Contrato: generatividad.
-        TR1 operativa + canonica sobre el cuerpo cargado.
-        No calcula Tru.
-        """
+        """CONTENEDOR.capacidades['generatividad'] → generatividad()"""
         out = self._ax_capacidad("generatividad")
-        return out if isinstance(out, dict) else None
+        if isinstance(out, dict):
+            return out
+        return None
 
+    # ---------------------------------------------------------------
+    # subsección: compuerta de arranque
+    # ---------------------------------------------------------------
     def _ax_compuerta(self) -> None:
         """
-        Arranque: exige contenedor AX y cuerpo coherente.
-        Usa solo barrer/verificar del contrato.
+        Arranque AX contra modules/axiomas/:
+          1. Contenedor presente.
+          2. Archivos de la carpeta legibles.
+          3. barrer/verificar resuelve.
+          4. coherente=True (fail-closed del modulo).
         """
         cont = self._ax_contenedor()
         if cont is None:
@@ -126,7 +206,16 @@ Descripcion
             )
             return
 
+        archivos = self._ax_archivos()
+        if not archivos:
+            self.errores_arranque.append(
+                "AX/{0}: carpeta sin archivos legibles".format(cont.nombre)
+            )
+
         informe = self.ax_barrer()
+        if informe is None:
+            informe = self.ax_verificar()
+
         if informe is None:
             self.errores_arranque.append(
                 "AX/{0}: barrer/verificar no resolvio".format(cont.nombre)
@@ -134,11 +223,16 @@ Descripcion
             return
 
         self.informe_axiomas = informe
+
         if not informe.get("coherente", False):
-            n_choques = len(informe.get("choques") or [])
-            n_errores = len(informe.get("errores") or [])
             self.errores_arranque.append(
                 "AX/{0}: incoherente choques={1} errores={2}".format(
-                    cont.nombre, n_choques, n_errores
+                    cont.nombre,
+                    len(informe.get("choques") or []),
+                    len(informe.get("errores") or []),
                 )
             )
+
+    # ===============================================================
+    # FIN SECCIÓN: AX
+    # ===============================================================

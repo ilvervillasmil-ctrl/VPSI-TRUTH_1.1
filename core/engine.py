@@ -1,3 +1,7 @@
+# ==============================================================
+# INICIO: core/engine.py — versión completa y limpia
+# ==============================================================
+
 # -*- coding: utf-8 -*-
 """
 VPSI-TRUTH --- core/engine.py
@@ -13,6 +17,7 @@ import sys
 import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
 
 # ===============================================================
 # EXCEPCIONES Y REGISTRO
@@ -218,6 +223,7 @@ class Engine:
     # ==========================================================
     # FIN: Método censar() para la clase Engine
     # ==========================================================
+
     # ===============================================================
     # EJECUCIÓN DINÁMICA DE CONTRATOS Y EXPLORACIÓN DE CARPETAS
     # ===============================================================
@@ -274,6 +280,7 @@ class Engine:
 
         return resultados_ejecucion
 
+
 # ===============================================================
 # LISTA MAESTRA UNIVERSAL DE CAPACIDADES PARA TODOS LOS INI
 # ===============================================================
@@ -297,5 +304,12 @@ UNIVERSAL_CAPACIDADES_MAP = {
     "inyectar_en_peticion": "inyectar_en_peticion",
 }
 
+
 def obtener_funcion_universal(capacidad_clave: str) -> str:
     return UNIVERSAL_CAPACIDADES_MAP.get(capacidad_clave, capacidad_clave)
+
+
+# ==============================================================
+# FIN: core/engine.py — versión completa y limpia
+# (Pegue aquí cualquier código nuevo que se agregue en el futuro)
+# ==============================================================

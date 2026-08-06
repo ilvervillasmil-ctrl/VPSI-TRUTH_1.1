@@ -28,26 +28,31 @@ Descripcion
     Nuevos modulos o roles = nuevas secciones, sin reescribir el resto.
 """
 
+# -*- coding: utf-8 -*-
+"""
+VPSI-TRUTH --- core/engine.py
+Version 12.0
+
+Seccion activa: AX (modules/axiomas)
+El rol se toma del CONTENEDOR del modulo, no de una lista inventada aqui.
+"""
+
 from __future__ import annotations
 
 import importlib.util
 import sys
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 
 class ArranqueError(Exception):
     pass
 
 
-ROLES: Tuple[str, ...] = (
-    "CT", "AX", "FO", "MC", "SF", "DG", "CA", "CX", "DI",
-    "RE", "VX", "TX", "CH", "CIT", "UI", "GL", "TT", "CC", "CE",
-)
-
-
 class Contenedor:
+    """Contenedor leido desde el CONTENEDOR del modulo."""
+
     def __init__(
         self,
         nombre: str,
@@ -81,27 +86,7 @@ class Contenedor:
         return callable(self.fn(nombre))
 
 
-class Registro:
-    def __init__(self) -> None:
-        self.contenedores: Dict[str, Contenedor] = {}
-        self.por_rol: Dict[str, List[Contenedor]] = {r: [] for r in ROLES}
-        self.rechazados: List[Dict[str, Any]] = []
-
-    def registrar(self, cont: Contenedor) -> None:
-        if cont.nombre in self.contenedores:
-            return
-        self.contenedores[cont.nombre] = cont
-        if cont.rol in self.por_rol:
-            self.por_rol[cont.rol].append(cont)
-
-    def primero(self, rol: str) -> Optional[Contenedor]:
-        lista = self.por_rol.get(rol) or []
-        return lista[0] if lista else None
-
-
 class Engine:
-    """Orquestador por secciones de contrato. Seccion AX activa."""
-
     VERSION = "12.0"
 
     def __init__(
@@ -113,13 +98,13 @@ class Engine:
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
-        self.registro = Registro()
         self.fallos: List[Dict[str, Any]] = []
         self.errores_arranque: List[str] = []
         self.informe_axiomas: Optional[Dict[str, Any]] = None
+        self.ax_contenedor: Optional[Contenedor] = None
         self.estado = "NO_INICIADO"
 
-        self._descubrir()
+        self._ax_cargar_modulo()
         self._ax_compuerta()
 
         if self.errores_arranque:
@@ -131,59 +116,6 @@ class Engine:
                 )
         else:
             self.estado = "OPERATIVO"
-
-    def _descubrir(self) -> None:
-        if not self.raiz.exists():
-            self.errores_arranque.append(
-                "Raiz de modulos no existe: {0}".format(self.raiz)
-            )
-            return
-        for path in sorted(self.raiz.rglob("__init__.py")):
-            try:
-                rel = path.relative_to(self.raiz)
-            except ValueError:
-                continue
-            if len(rel.parts) != 2:
-                continue
-            cont = self._cargar_modulo(path)
-            if cont is not None:
-                self.registro.registrar(cont)
-
-    def _cargar_modulo(self, path: Path) -> Optional[Contenedor]:
-        directorio = path.parent
-        nombre_mod = "vpsi_{0}".format(directorio.name)
-        spec = importlib.util.spec_from_file_location(
-            nombre_mod,
-            path,
-            submodule_search_locations=[str(directorio)],
-        )
-        if spec is None or spec.loader is None:
-            return None
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[nombre_mod] = mod
-        try:
-            spec.loader.exec_module(mod)
-        except Exception as e:
-            self.registro.rechazados.append({
-                "ruta": str(path),
-                "razon": "{0}: {1}".format(type(e).__name__, e),
-            })
-            return None
-        meta = getattr(mod, "CONTENEDOR", None)
-        if not isinstance(meta, dict):
-            return None
-        nombre = meta.get("nombre")
-        rol = meta.get("rol")
-        if not nombre or not rol or rol not in ROLES:
-            return None
-        return Contenedor(
-            nombre=str(nombre),
-            rol=str(rol),
-            version=str(meta.get("version", "0.0")),
-            modulo=mod,
-            ruta=path,
-            meta=meta,
-        )
 
     def _ejecutar_capacidad(
         self,
@@ -217,24 +149,21 @@ class Engine:
     #
     # Contrato origen : modules/axiomas/__init__.py
     # nombre          : axiomas
-    # rol             : AX
+    # rol             : AX   ← solo este rol, el del propio modulo
     # version         : 9.5
     # requiere        : []
     # capacidades     : verificar, barrer, inventario, axiomas, generatividad
     #
-    # Autoridad de engine sobre este modulo:
+    # Autoridad:
     #   - Lee el CONTENEDOR de modules/axiomas/
     #   - Lee absolutamente TODOS los archivos bajo modules/axiomas/
     #   - Ejecuta todas las capacidades que el CONTENEDOR declara
+    #   - Acepta el rol que el CONTENEDOR declara (AX)
     #   - No inventa oficios. No sustituye la logica del modulo.
-    #   - No calcula Tru_total. No clasifica O de entrada.
     #
-    # Prueba:
-    #   Esta seccion se valida directamente contra modules/axiomas/
-    #
-    # ---------------------------------------------------------------
-    # subsección: metadatos del contrato
-    # ---------------------------------------------------------------
+    # Prueba: contra modules/axiomas/
+    # ===============================================================
+
     AX_CONTRATO = {
         "nombre": "axiomas",
         "rol": "AX",
@@ -251,19 +180,83 @@ class Engine:
     }
 
     # ---------------------------------------------------------------
+    # subsección: carga del modulo (solo axiomas / rol AX)
+    # ---------------------------------------------------------------
+    def _ax_cargar_modulo(self) -> None:
+        """
+        Carga modules/axiomas/__init__.py.
+        El rol aceptado es el que trae el CONTENEDOR del archivo (AX).
+        """
+        path = self.raiz / "axiomas" / "__init__.py"
+        if not path.is_file():
+            self.errores_arranque.append(
+                "AX: no existe {0}".format(path)
+            )
+            return
+
+        directorio = path.parent
+        nombre_mod = "vpsi_axiomas"
+        spec = importlib.util.spec_from_file_location(
+            nombre_mod,
+            path,
+            submodule_search_locations=[str(directorio)],
+        )
+        if spec is None or spec.loader is None:
+            self.errores_arranque.append("AX: no se pudo crear spec")
+            return
+
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[nombre_mod] = mod
+        try:
+            spec.loader.exec_module(mod)
+        except Exception as e:
+            self.errores_arranque.append(
+                "AX: import fallo: {0}: {1}".format(type(e).__name__, e)
+            )
+            return
+
+        meta = getattr(mod, "CONTENEDOR", None)
+        if not isinstance(meta, dict):
+            self.errores_arranque.append("AX: sin CONTENEDOR dict")
+            return
+
+        nombre = meta.get("nombre")
+        rol = meta.get("rol")
+        version = str(meta.get("version", "0.0"))
+
+        if nombre != self.AX_CONTRATO["nombre"]:
+            self.errores_arranque.append(
+                "AX: nombre CONTENEDOR inesperado: {0}".format(nombre)
+            )
+            return
+
+        # Solo se acepta el rol que declara ESTE modulo
+        if rol != self.AX_CONTRATO["rol"]:
+            self.errores_arranque.append(
+                "AX: rol CONTENEDOR inesperado: {0}".format(rol)
+            )
+            return
+
+        self.ax_contenedor = Contenedor(
+            nombre=str(nombre),
+            rol=str(rol),
+            version=version,
+            modulo=mod,
+            ruta=path,
+            meta=meta,
+        )
+
+    # ---------------------------------------------------------------
     # subsección: contenedor
     # ---------------------------------------------------------------
     def _ax_contenedor(self) -> Optional[Contenedor]:
-        return self.registro.primero("AX")
+        return self.ax_contenedor
 
     # ---------------------------------------------------------------
     # subsección: todos los archivos del modulo
     # ---------------------------------------------------------------
     def _ax_archivos(self) -> List[str]:
-        """
-        Lee absolutamente TODOS los archivos bajo modules/axiomas/.
-        Autoridad total de Angie sobre el contenido de la carpeta.
-        """
+        """Lee absolutamente TODOS los archivos bajo modules/axiomas/."""
         cont = self._ax_contenedor()
         if cont is None:
             return []
@@ -278,10 +271,6 @@ class Engine:
     # subsección: invocacion por contrato
     # ---------------------------------------------------------------
     def _ax_capacidad(self, capacidad: str, *args: Any, **kwargs: Any) -> Any:
-        """
-        Ejecuta una capacidad declarada en el CONTENEDOR de axiomas.
-        Solo lo que el contrato autoriza.
-        """
         if capacidad not in self.AX_CONTRATO["capacidades"]:
             self.fallos.append({
                 "seccion": "AX",
@@ -295,7 +284,7 @@ class Engine:
             self.fallos.append({
                 "seccion": "AX",
                 "capacidad": capacidad,
-                "razon": "rol AX sin contenedor cargado",
+                "razon": "modulo axiomas no cargado",
             })
             return None
 
@@ -317,7 +306,6 @@ class Engine:
         self,
         declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
     ) -> Optional[Dict[str, Any]]:
-        """CONTENEDOR.capacidades['barrer'] → barrer()"""
         out = self._ax_capacidad("barrer", declaraciones_externas)
         if isinstance(out, dict):
             self.informe_axiomas = out
@@ -331,7 +319,6 @@ class Engine:
         self,
         declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
     ) -> Optional[Dict[str, Any]]:
-        """CONTENEDOR.capacidades['verificar'] → barrer()"""
         out = self._ax_capacidad("verificar", declaraciones_externas)
         if isinstance(out, dict):
             self.informe_axiomas = out
@@ -345,7 +332,6 @@ class Engine:
         self,
         declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
     ) -> List[Dict[str, Any]]:
-        """CONTENEDOR.capacidades['axiomas'] → axiomas()"""
         out = self._ax_capacidad("axiomas", declaraciones_externas)
         if isinstance(out, list):
             return out
@@ -355,7 +341,6 @@ class Engine:
     # subsección: capacidad — inventario
     # ---------------------------------------------------------------
     def ax_inventario(self, peticion: Any = None) -> Optional[Dict[str, Any]]:
-        """CONTENEDOR.capacidades['inventario'] → inventario()"""
         out = self._ax_capacidad("inventario", peticion)
         if isinstance(out, dict):
             return out
@@ -365,7 +350,6 @@ class Engine:
     # subsección: capacidad — generatividad
     # ---------------------------------------------------------------
     def ax_generatividad(self) -> Optional[Dict[str, Any]]:
-        """CONTENEDOR.capacidades['generatividad'] → generatividad()"""
         out = self._ax_capacidad("generatividad")
         if isinstance(out, dict):
             return out
@@ -375,17 +359,10 @@ class Engine:
     # subsección: compuerta de arranque
     # ---------------------------------------------------------------
     def _ax_compuerta(self) -> None:
-        """
-        Arranque AX contra modules/axiomas/:
-          1. Contenedor presente.
-          2. Archivos de la carpeta legibles.
-          3. barrer/verificar resuelve.
-          4. coherente=True (fail-closed del modulo).
-        """
         cont = self._ax_contenedor()
         if cont is None:
             self.errores_arranque.append(
-                "AX: falta contenedor obligatorio (modules/axiomas)"
+                "AX: falta contenedor (modules/axiomas)"
             )
             return
 

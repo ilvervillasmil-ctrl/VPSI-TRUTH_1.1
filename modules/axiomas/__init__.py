@@ -14,16 +14,10 @@ Qué vigila:
   - contradiccion_de_cota
   Si hay choque o error de carga → coherente=False.
 
-Qué expone:
-  - verificar / barrer: coherencia del cuerpo
-  - axiomas / declaraciones: lista si coherente (fail-closed)
-  - generatividad: TR1/U1 sobre Θ (capa operativa + canónica paper)
-  - inventario: mapa del módulo
-
-Def-5.3.1 / dominio O:
-  Vive en las declaraciones de los cuerpos (p.ej. contexto_AX, VPSI).
-  Este INIT no re-enuncia el teorema: lo carga, lo vigila y lo expone.
-  CX aplica la clasificación de entrada; AX es el juez del grafo.
+Qué expone (CONTENEDOR.capacidades):
+  verificar, barrer, verificar_salida, inventario,
+  axiomas, declaraciones, generatividad,
+  por_dominio, ids_dominio_k_o, recolectar
 """
 
 from __future__ import annotations
@@ -39,7 +33,7 @@ except Exception:  # noqa: BLE001
     DiagnosticoGlobal = None  # type: ignore
 
 # ===============================================================
-# CONSTANTES Y CONFIGURACIÓN BÁSICA
+# CONSTANTES
 # ===============================================================
 OBLIGATORIOS = ("id", "tipo", "sujeto", "relacion", "objeto", "polaridad")
 TIPOS = ("axioma", "lema", "teorema", "corolario", "definicion")
@@ -69,15 +63,30 @@ DOMINIOS_K_O = frozenset({
     "dominio", "k", "o_context", "correlacion",
 })
 
+THETA_CANONICO = frozenset({
+    "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10",
+    "T11", "T12", "T13", "T14", "T15", "T16", "T17",
+    "U0", "U1", "M1", "M.1", "B-Canonical", "TT.6.1", "TR1",
+})
+
+DOMINIO_CANONICO = {
+    "ontologia": "ONT", "ont": "ONT", "informacion": "INF", "info": "INF",
+    "logica": "LOG", "log": "LOG", "epistemologia": "EPI", "epi": "EPI",
+    "semantica": "SEM", "sem": "SEM", "temporal": "TMP", "tmp": "TMP",
+    "meta": "MET", "met": "MET", "constantes": "MET", "self": "EPI",
+    "inferencia_causal": "INF", "verificacion": "EPI", "ver": "VER",
+    "contexto": "SEM",
+}
+
 
 # ===============================================================
-# LECTURA FORENSE DE ARCHIVOS Y RECURSOS INTERNOS
+# CARGA DE CUERPOS
 # ===============================================================
 def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
     if archivo.name.startswith("_"):
         return []
 
-    nombre_mod = f"axiomas_{archivo.stem}"
+    nombre_mod = "axiomas_{0}".format(archivo.stem)
     spec = importlib.util.spec_from_file_location(nombre_mod, archivo)
     if spec is None or spec.loader is None:
         return []
@@ -86,21 +95,21 @@ def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
     sys.modules[nombre_mod] = mod
     spec.loader.exec_module(mod)
 
-    declaraciones = getattr(mod, "DECLARACIONES", None)
-    if declaraciones is None and callable(getattr(mod, "declaraciones", None)):
+    declaraciones_raw = getattr(mod, "DECLARACIONES", None)
+    if declaraciones_raw is None and callable(getattr(mod, "declaraciones", None)):
         try:
-            declaraciones = mod.declaraciones()
+            declaraciones_raw = mod.declaraciones()
         except Exception:  # noqa: BLE001
-            declaraciones = []
+            declaraciones_raw = []
 
-    if declaraciones is None:
+    if declaraciones_raw is None:
         for attr in ("CUERPO", "declaraciones_lista"):
             val = getattr(mod, attr, None)
             if isinstance(val, list):
-                declaraciones = val
+                declaraciones_raw = val
                 break
 
-    return declaraciones if isinstance(declaraciones, list) else []
+    return declaraciones_raw if isinstance(declaraciones_raw, list) else []
 
 
 def _ruta_vpsi() -> Optional[Path]:
@@ -116,11 +125,11 @@ def _ruta_vpsi() -> Optional[Path]:
 
 
 # ===============================================================
-# NORMALIZACIÓN Y RECOLECCIÓN DE DATOS
+# NORMALIZACIÓN Y RECOLECCIÓN
 # ===============================================================
 def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
     if not isinstance(decl_original, dict):
-        raise ValueError(f"{cuerpo}: declaración no es dict")
+        raise ValueError("{0}: declaración no es dict".format(cuerpo))
 
     decl: Dict[str, Any] = {}
     for clave_orig, valor in decl_original.items():
@@ -129,7 +138,9 @@ def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
     for k in OBLIGATORIOS:
         if k not in decl:
             raise ValueError(
-                f"{cuerpo}:{decl.get('id', '?')} sin clave obligatoria '{k}'"
+                "{0}:{1} sin clave obligatoria '{2}'".format(
+                    cuerpo, decl.get("id", "?"), k
+                )
             )
 
     tipo = str(decl["tipo"]).lower()
@@ -143,10 +154,14 @@ def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
 
     if tipo not in TIPOS:
         raise ValueError(
-            f"{cuerpo}:{decl['id']} tipo '{tipo}' no válido. Admitidos: {TIPOS}"
+            "{0}:{1} tipo '{2}' no válido. Admitidos: {3}".format(
+                cuerpo, decl["id"], tipo, TIPOS
+            )
         )
     if not isinstance(decl["polaridad"], bool):
-        raise ValueError(f"{cuerpo}:{decl['id']} polaridad debe ser bool")
+        raise ValueError(
+            "{0}:{1} polaridad debe ser bool".format(cuerpo, decl["id"])
+        )
 
     return {
         "id": str(decl["id"]),
@@ -172,7 +187,7 @@ def clave(d: Dict) -> Tuple[str, str, str]:
 
 
 def ref(d: Dict) -> str:
-    return f"{d['cuerpo']}:{d['id']}"
+    return "{0}:{1}".format(d["cuerpo"], d["id"])
 
 
 def recolectar(
@@ -190,7 +205,7 @@ def recolectar(
         except Exception as e:  # noqa: BLE001
             errores.append({
                 "archivo": archivo.name,
-                "error": f"{type(e).__name__}: {e}",
+                "error": "{0}: {1}".format(type(e).__name__, e),
             })
 
     vpsi = _ruta_vpsi()
@@ -201,7 +216,7 @@ def recolectar(
         except Exception as e:  # noqa: BLE001
             errores.append({
                 "archivo": str(vpsi.name),
-                "error": f"{type(e).__name__}: {e}",
+                "error": "{0}: {1}".format(type(e).__name__, e),
             })
 
     if declaraciones_externas:
@@ -245,16 +260,23 @@ def ids_dominio_k_o(
         if gobs & DOMINIOS_K_O:
             ids.append(d["id"])
         blob = (
-            f"{d.get('sujeto','')} {d.get('objeto','')} {d.get('enunciado','')}"
+            "{0} {1} {2}".format(
+                d.get("sujeto", ""),
+                d.get("objeto", ""),
+                d.get("enunciado", ""),
+            )
         ).lower()
-        if any(x in blob for x in ("def-5.3.1", "o_context", "dominio o", "permite_k")):
+        if any(
+            x in blob
+            for x in ("def-5.3.1", "o_context", "dominio o", "permite_k")
+        ):
             if d["id"] not in ids:
                 ids.append(d["id"])
     return sorted(set(ids))
 
 
 # ===============================================================
-# DETECCIÓN DE CONTRADICCIONES Y RESOLUCIÓN
+# CONTRADICCIONES
 # ===============================================================
 def contradiccion_directa(decls: List[Dict]) -> List[Dict]:
     grupos: Dict[Tuple[str, str, str], List[Dict]] = {}
@@ -281,8 +303,9 @@ def contradiccion_directa(decls: List[Dict]) -> List[Dict]:
                         "enunciado": n["enunciado"],
                     },
                     "mensaje": (
-                        f"Contradicción en '{' - '.join(k)}': "
-                        f"{ref(a)} AFIRMA vs {ref(n)} NIEGA"
+                        "Contradicción en '{0}': {1} AFIRMA vs {2} NIEGA".format(
+                            " - ".join(k), ref(a), ref(n)
+                        )
                     ),
                 })
     return choques
@@ -310,18 +333,20 @@ def contradiccion_de_cota(decls: List[Dict]) -> List[Dict]:
                 "relacion": rel,
                 "cotas": porcota,
                 "mensaje": (
-                    f"Contradicción de cota en '{suj} {rel}'. "
-                    f"Cotas: {list(porcota.keys())}"
+                    "Contradicción de cota en '{0} {1}'. Cotas: {2}".format(
+                        suj, rel, list(porcota.keys())
+                    )
                 ),
             })
     return choques
 
 
 # ===============================================================
-# CAPACIDADES EXPUESTAS Y FUNCIONES DEL MÓDULO
+# CAPACIDADES
 # ===============================================================
-def barrer(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict:
-    """Capacidad principal: coherencia axiomática del cuerpo."""
+def barrer(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> Dict:
     decls, errores = recolectar(declaraciones_externas)
     choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
 
@@ -347,9 +372,11 @@ def barrer(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Di
         "declaraciones": len(decls),
         "cuerpos": cuerpos,
         "por_tipo": por_tipo,
-        "ids_dominio_k_o": ids_dominio_k_o(declaraciones_externas)
-        if not (choques or errores)
-        else [],
+        "ids_dominio_k_o": (
+            ids_dominio_k_o(declaraciones_externas)
+            if not (choques or errores)
+            else []
+        ),
     }
 
 
@@ -380,7 +407,9 @@ def inventario(peticion=None) -> Dict:
         "version": "9.5",
         "tipos": list(TIPOS),
         "declaraciones": len(decls),
-        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
+        "por_tipo": {
+            t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS
+        },
         "cuerpos": sorted({d["cuerpo"] for d in decls}),
         "errores": errores,
         "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
@@ -390,21 +419,6 @@ def inventario(peticion=None) -> Dict:
             "este módulo los vigila y expone, no los clasifica en entrada."
         ),
     }
-
-
-THETA_CANONICO = frozenset({
-    "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10",
-    "T11", "T12", "T13", "T14", "T15", "T16", "T17",
-    "U0", "U1", "M1", "M.1", "B-Canonical", "TT.6.1", "TR1",
-})
-
-DOMINIO_CANONICO = {
-    "ontologia": "ONT", "ont": "ONT", "informacion": "INF", "info": "INF",
-    "logica": "LOG", "log": "LOG", "epistemologia": "EPI", "epi": "EPI",
-    "semantica": "SEM", "sem": "SEM", "temporal": "TMP", "tmp": "TMP",
-    "meta": "MET", "met": "MET", "constantes": "MET", "self": "EPI",
-    "inferencia_causal": "INF", "verificacion": "EPI", "ver": "VER", "contexto": "SEM",
-}
 
 
 def _dominios_canonicos(gobierna) -> set:
@@ -436,7 +450,8 @@ def _medir_pares(theta: list) -> dict:
         "pares_compatibles": compatibles,
         "pares_novedosos": novedosos,
         "im_vs_theta": (
-            "GENERATIVO" if n > 0 and novedosos > n
+            "GENERATIVO"
+            if n > 0 and novedosos > n
             else ("ESTANCADO" if n > 0 else "SIN_DATOS")
         ),
     }
@@ -481,7 +496,8 @@ def generatividad() -> dict:
 
     u1_proxy = (
         "NO_STAGNANT"
-        if m_can.get("pares_novedosos", 0) > 0 or m_op.get("pares_novedosos", 0) > 0
+        if m_can.get("pares_novedosos", 0) > 0
+        or m_op.get("pares_novedosos", 0) > 0
         else "REVISAR"
     )
 
@@ -515,13 +531,13 @@ def generatividad() -> dict:
         "nota": (
             "Capa operativa = grafo del repo. "
             "Capa canonica = solo ids TR1 del paper. "
-            "Dominio O/K: ver ids_dominio_k_o y cuerpos (no se clasifica entrada aquí)."
+            "Dominio O/K: ver ids_dominio_k_o y cuerpos."
         ),
     }
 
 
 # ===============================================================
-# SECCIÓN DE CONTRATOS Y PERMISOS (ENGINE / ANGINA)
+# CONTENEDOR — lo que pide el Engine / auditoría
 # ===============================================================
 CONTENEDOR = {
     "nombre": "axiomas",
@@ -530,15 +546,20 @@ CONTENEDOR = {
     "requiere": [],
     "descripcion": (
         "Contenedor de axiomas. Rol AX. "
-        "Define y vigila axiomas, lemas, teoremas y corolarios. "
-        "Otorga permisos al Engine para leer y aplicar su contrato de forma autónoma."
+        "Vigila declaraciones y contradicciones. "
+        "El Engine ejecuta las capacidades declaradas aquí."
     ),
     "capacidades": {
         "verificar": barrer,
         "barrer": barrer,
+        "verificar_salida": verificar_salida,
         "inventario": inventario,
         "axiomas": axiomas,
+        "declaraciones": declaraciones,
         "generatividad": generatividad,
+        "por_dominio": por_dominio,
+        "ids_dominio_k_o": ids_dominio_k_o,
+        "recolectar": recolectar,
     },
 }
 

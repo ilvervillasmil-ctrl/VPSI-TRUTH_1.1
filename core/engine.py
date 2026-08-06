@@ -1,15 +1,13 @@
 # ==============================================================
-# INICIO: core/engine.py — nivel pro (dependencias + índice + causal)
+# INICIO: core/engine.py — versión completa con secciones
 # ==============================================================
 
 # -*- coding: utf-8 -*-
 """
 VPSI-TRUTH --- core/engine.py
 
-Kernel estructural del sistema.
-Única autoridad. Todo se deriva de los contratos.
-Incluye: resolución de dependencias, detección de ciclos,
-índice de símbolos, diagnóstico causal y estado global enriquecido.
+Kernel estructural.
+Lee el CONTENEDOR y ejecuta literalmente todas las capacidades que declara.
 """
 
 from __future__ import annotations
@@ -17,6 +15,7 @@ from __future__ import annotations
 import ast
 import importlib.util
 import sys
+import time
 from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
@@ -49,14 +48,6 @@ class Contenedor:
         self.capacidades = meta.get("capacidades", {})
         self.requiere = list(meta.get("requiere", []))
         self._fn_custom = meta.get("fn") if callable(meta.get("fn")) else None
-
-    def tiene(self, capacidad: str) -> bool:
-        if capacidad not in self.capacidades:
-            return False
-        ref = self.capacidades[capacidad]
-        if callable(ref):
-            return True
-        return self.modulo is not None and callable(getattr(self.modulo, str(ref), None))
 
     def fn(self, clave: str) -> Any:
         if self._fn_custom is not None:
@@ -97,7 +88,7 @@ class RegistroModulos:
 # SECCIÓN 2: ENGINE
 # ===============================================================
 class Engine:
-    VERSION = "16.1-determinista"
+    VERSION = "17.0-ejecuta-contrato"
 
     def __init__(
         self,
@@ -106,19 +97,19 @@ class Engine:
         strict: bool = True,
     ) -> None:
         # ----------------------------------------------------------
-        # 1. Parámetros de construcción
+        # 2.1 Parámetros de construcción
         # ----------------------------------------------------------
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
 
         # ----------------------------------------------------------
-        # 2. Estado principal del Engine
+        # 2.2 Estado principal
         # ----------------------------------------------------------
         self.estado = "NO_INICIADO"
 
         # ----------------------------------------------------------
-        # 3. Atributos exigidos por la auditoría forense (invariantes)
+        # 2.3 Atributos exigidos por la auditoría forense
         # ----------------------------------------------------------
         self.registro = RegistroModulos()
         self.resultados_evaluacion: List[Any] = []
@@ -127,12 +118,13 @@ class Engine:
         self.advertencias: List[str] = []
 
         # ----------------------------------------------------------
-        # 4. Evidencia objetiva acumulada por las capas
+        # 2.4 Evidencia objetiva
         # ----------------------------------------------------------
         self._modulos_descubiertos: List[Path] = []
         self._exploracion: Dict[str, Any] = {}
         self._inspeccion: Dict[str, Any] = {}
         self._resolucion: Dict[str, Any] = {}
+        self._ejecucion: Dict[str, Any] = {}
         self._auditoria: Dict[str, Any] = {}
         self._grafo: Dict[str, Any] = {}
         self._dependencias: Dict[str, Any] = {}
@@ -140,7 +132,7 @@ class Engine:
         self._diagnosticos_causales: List[Dict[str, Any]] = []
 
         # ----------------------------------------------------------
-        # 5. Flujo determinista de arranque
+        # 2.5 Flujo de arranque
         # ----------------------------------------------------------
         self._modulos_descubiertos = self._descubrir_modulos()
         self._cargar_y_validar()
@@ -149,7 +141,7 @@ class Engine:
         self._construir_grafo()
 
         # ----------------------------------------------------------
-        # 6. Cierre de estado
+        # 2.6 Cierre de estado
         # ----------------------------------------------------------
         if self.errores_arranque:
             self.estado = "RECHAZADO"
@@ -162,7 +154,7 @@ class Engine:
             self.estado = "OPERATIVO"
 
     # ===========================================================
-    # CAPA 1: DESCUBRIDOR
+    # SECCIÓN 3: DESCUBRIDOR
     # ===========================================================
     def _descubrir_modulos(self) -> List[Path]:
         encontrados: List[Path] = []
@@ -174,7 +166,7 @@ class Engine:
         return encontrados
 
     # ===========================================================
-    # CAPA 2: LECTOR + DIAGNÓSTICO CAUSAL
+    # SECCIÓN 4: DIAGNÓSTICO CAUSAL DE IMPORTACIÓN
     # ===========================================================
     def _diagnosticar_import_error(self, path_dir: Path, error: Exception) -> Dict[str, Any]:
         mensaje = str(error)
@@ -187,7 +179,6 @@ class Engine:
             "simbolo": None,
             "exportaciones_disponibles": [],
             "causa_raiz": None,
-            "accion_sugerida": None,
         }
         if isinstance(error, ImportError) and "cannot import name" in mensaje and " from " in mensaje:
             try:
@@ -203,22 +194,19 @@ class Engine:
                         mod_destino = importlib.import_module(modulo_origen)
                     diag["exportaciones_disponibles"] = [
                         n for n in dir(mod_destino) if not n.startswith("_")
-                    ][:40]
+                    ][:50]
                 except Exception:
-                    diag["exportaciones_disponibles"] = ["(no se pudo inspeccionar)"]
-                diag["causa_raiz"] = (
-                    f"El símbolo '{simbolo}' no existe o no se exporta en '{modulo_origen}'."
-                )
-                diag["accion_sugerida"] = (
-                    f"Verificar definición y exportación de '{simbolo}' en {modulo_origen}."
-                )
+                    pass
+                diag["causa_raiz"] = f"Símbolo '{simbolo}' no encontrado en '{modulo_origen}'."
             except Exception:
                 diag["causa_raiz"] = "ImportError no parseable"
         else:
-            diag["causa_raiz"] = f"Excepción durante la carga: {type(error).__name__}"
-            diag["accion_sugerida"] = "Revisar imports y dependencias del módulo"
+            diag["causa_raiz"] = f"{type(error).__name__}: {mensaje}"
         return diag
 
+    # ===========================================================
+    # SECCIÓN 5: LECTOR DE CONTRATO
+    # ===========================================================
     def _leer_contrato(self, path_dir: Path) -> Optional[Dict[str, Any]]:
         init_path = path_dir / "__init__.py"
         nombre_mod = f"vpsi_dinamico_{path_dir.name}"
@@ -243,16 +231,15 @@ class Engine:
         except Exception as e:
             diag = self._diagnosticar_import_error(path_dir, e)
             self._diagnosticos_causales.append(diag)
-            msg = (
+            self.errores_arranque.append(
                 f"{path_dir.name}: [{diag['tipo_error']}] "
                 f"dep={diag.get('dependencia')} símbolo={diag.get('simbolo')} "
                 f"→ {diag.get('causa_raiz')}"
             )
-            self.errores_arranque.append(msg)
             return None
 
     # ===========================================================
-    # CAPA 3: VALIDADOR DE CONTRATO
+    # SECCIÓN 6: VALIDADOR DE CONTRATO
     # ===========================================================
     def _validar_contrato(self, meta: Dict[str, Any], nombre_carpeta: str) -> List[str]:
         errores = []
@@ -274,7 +261,7 @@ class Engine:
         return errores
 
     # ===========================================================
-    # CAPA 4: EXPLORADOR
+    # SECCIÓN 7: EXPLORADOR
     # ===========================================================
     def _explorar_modulo(self, path_dir: Path) -> Dict[str, Any]:
         archivos, subcarpetas = [], []
@@ -291,7 +278,7 @@ class Engine:
         }
 
     # ===========================================================
-    # CAPA 5: INSPECTOR AST
+    # SECCIÓN 8: INSPECTOR AST
     # ===========================================================
     def _inspeccionar_archivo(self, archivo: Path) -> Dict[str, Any]:
         info: Dict[str, Any] = {
@@ -325,7 +312,7 @@ class Engine:
         return resultado
 
     # ===========================================================
-    # CAPA 6: RESOLVER CAPACIDADES
+    # SECCIÓN 9: RESOLVER CAPACIDADES
     # ===========================================================
     def _resolver_capacidades(self, cont: Contenedor) -> Dict[str, Any]:
         resultado = {"resolubles": [], "no_resolubles": [], "total": 0}
@@ -338,43 +325,47 @@ class Engine:
         return resultado
 
     # ===========================================================
-    # CAPA 7: EJECUTOR (solo capacidades de verificación)
+    # SECCIÓN 10: EJECUCIÓN LITERAL DEL CONTRATO
     # ===========================================================
-    def _es_capacidad_inspeccion(self, clave: str) -> bool:
-        """Heurística: se ejecuta automáticamente solo si el nombre sugiere inspección."""
-        return clave in {"verificar", "barrer", "evaluar", "inventario", "meta", "axiomas"}
-
-    def _ejecutar_capacidades_inspeccion(self, cont: Contenedor) -> Dict[str, Any]:
+    def _ejecutar_contrato(self, cont: Contenedor) -> Dict[str, Any]:
+        """
+        Ejecuta literalmente TODAS las capacidades declaradas en el CONTENEDOR.
+        """
         resultados = {}
         for clave in cont.capacidades:
-            if not self._es_capacidad_inspeccion(clave):
-                resultados[clave] = {"estado": "REGISTRADA_NO_EJECUTADA"}
-                continue
             fn = cont.fn(clave)
             if not callable(fn):
-                resultados[clave] = {"estado": "NO_CALLABLE"}
+                resultados[clave] = {
+                    "estado": "NO_CALLABLE",
+                    "error": "La capacidad declarada no es ejecutable",
+                }
                 continue
+
+            inicio = time.perf_counter()
             try:
                 salida = fn()
-                resultados[clave] = {"estado": "EXITO", "resultado": salida}
+                duracion = time.perf_counter() - inicio
+                resultados[clave] = {
+                    "estado": "EXITO",
+                    "resultado": salida,
+                    "duracion_s": round(duracion, 6),
+                }
             except Exception as e:
+                duracion = time.perf_counter() - inicio
                 resultados[clave] = {
                     "estado": "ERROR_EJECUCION",
                     "error": f"{type(e).__name__}: {e}",
+                    "duracion_s": round(duracion, 6),
                 }
         return resultados
 
     # ===========================================================
-    # CAPA 8: AUDITOR
+    # SECCIÓN 11: AUDITOR
     # ===========================================================
     def _auditar(self, cont: Contenedor, resolucion: Dict, ejecucion: Dict) -> Dict[str, Any]:
-        evidencia = {}
-        for clave, datos in ejecucion.items():
-            if datos.get("estado") == "EXITO" and isinstance(datos.get("resultado"), dict):
-                evidencia[clave] = datos["resultado"]
         coherente = (
             len(resolucion.get("no_resolubles", [])) == 0
-            and all(v.get("estado") in ("EXITO", "REGISTRADA_NO_EJECUTADA") for v in ejecucion.values())
+            and all(v.get("estado") == "EXITO" for v in ejecucion.values())
         )
         return {
             "nombre": cont.nombre,
@@ -383,15 +374,13 @@ class Engine:
             "requiere": list(cont.requiere),
             "resolucion": resolucion,
             "ejecucion": ejecucion,
-            "evidencia": evidencia,
             "coherente": coherente,
         }
 
     # ===========================================================
-    # CAPA 9: RESOLUCIÓN COMPLETA DE DEPENDENCIAS + CICLOS
+    # SECCIÓN 12: RESOLUCIÓN DE DEPENDENCIAS + CICLOS
     # ===========================================================
     def _resolver_dependencias(self) -> None:
-        """Construye DAG, detecta faltantes y ciclos."""
         roles_presentes = set(self.registro.por_rol.keys())
         faltantes: Dict[str, List[str]] = defaultdict(list)
         grafo_dep: Dict[str, List[str]] = defaultdict(list)
@@ -405,7 +394,6 @@ class Engine:
                         f"{cont.rol}/{nombre}: dependencia inexistente → '{dep}'"
                     )
 
-        # Detección de ciclos (Kahn)
         in_degree = {n: 0 for n in self.registro.contenedores}
         for src, dests in grafo_dep.items():
             for d in dests:
@@ -425,9 +413,7 @@ class Engine:
 
         ciclos = [n for n, deg in in_degree.items() if deg > 0]
         if ciclos:
-            self.errores_arranque.append(
-                f"Ciclos de dependencia detectados: {ciclos}"
-            )
+            self.errores_arranque.append(f"Ciclos de dependencia detectados: {ciclos}")
 
         self._dependencias = {
             "grafo": dict(grafo_dep),
@@ -437,10 +423,9 @@ class Engine:
         }
 
     # ===========================================================
-    # CAPA 10: ÍNDICE GLOBAL DE SÍMBOLOS
+    # SECCIÓN 13: ÍNDICE GLOBAL DE SÍMBOLOS
     # ===========================================================
     def _construir_indice_simbolos(self) -> None:
-        """Índice de clases, funciones y constantes exportadas por módulo."""
         for nombre, cont in self.registro.contenedores.items():
             inspeccion = self._inspeccion.get(nombre, {})
             simbolos = {
@@ -449,17 +434,16 @@ class Engine:
                 "constantes": [],
                 "capacidades": list(cont.capacidades.keys()),
             }
-            for archivo, info in inspeccion.items():
+            for info in inspeccion.values():
                 simbolos["clases"].extend(info.get("clases", []))
                 simbolos["funciones"].extend(info.get("funciones", []))
                 simbolos["constantes"].extend(info.get("constantes", []))
-            # eliminar duplicados
             for k in ("clases", "funciones", "constantes"):
                 simbolos[k] = sorted(set(simbolos[k]))
             self._indice_simbolos[nombre] = simbolos
 
     # ===========================================================
-    # CAPA 11: CONSTRUCTOR DEL GRAFO
+    # SECCIÓN 14: CONSTRUCTOR DEL GRAFO
     # ===========================================================
     def _construir_grafo(self) -> None:
         nodos, aristas = [], []
@@ -475,34 +459,56 @@ class Engine:
         self._grafo = {"nodos": nodos, "aristas": aristas}
 
     # ===========================================================
-    # ORQUESTACIÓN
+    # SECCIÓN 15: ORQUESTACIÓN PRINCIPAL
     # ===========================================================
-    def _validar_y_cargar(self) -> None:
+    def _cargar_y_validar(self) -> None:
         for path_dir in self._modulos_descubiertos:
             leido = self._leer_contrato(path_dir)
             if leido is None:
                 continue
+
             meta = leido["meta"]
             nombre_carpeta = leido["nombre_carpeta"]
+
             errores = self._validar_contrato(meta, nombre_carpeta)
             if errores:
                 self.errores_arranque.extend(errores)
                 continue
+
             nombre = meta["nombre"]
             rol = meta["rol"]
             version = str(meta.get("version", "1.0"))
-            cont = Contenedor(nombre, rol, version, leido["modulo"], leido["ruta"], meta)
+
+            cont = Contenedor(
+                nombre=nombre,
+                rol=rol,
+                version=version,
+                modulo=leido["modulo"],
+                ruta=leido["ruta"],
+                meta=meta,
+            )
             self.registro.registrar(cont)
+
             self._exploracion[nombre] = self._explorar_modulo(path_dir)
             self._inspeccion[nombre] = self._inspeccionar_modulo(path_dir)
+
             resolucion = self._resolver_capacidades(cont)
-            ejecucion = self._ejecutar_capacidades_inspeccion(cont)
-            self._auditoria[nombre] = self._auditar(cont, resolucion, ejecucion)
-            if not self._auditoria[nombre]["coherente"]:
-                self.errores_arranque.append(f"{rol}/{nombre}: problemas de coherencia")
+            self._resolucion[nombre] = resolucion
+
+            # Ejecución literal del contrato
+            ejecucion = self._ejecutar_contrato(cont)
+            self._ejecucion[nombre] = ejecucion
+
+            auditoria = self._auditar(cont, resolucion, ejecucion)
+            self._auditoria[nombre] = auditoria
+
+            if not auditoria["coherente"]:
+                self.errores_arranque.append(
+                    f"{rol}/{nombre}: fallo al ejecutar el contrato"
+                )
 
     # ===========================================================
-    # ESTADO GLOBAL (espejo completo)
+    # SECCIÓN 16: ESTADO GLOBAL
     # ===========================================================
     def estado_global(self) -> Dict[str, Any]:
         return {
@@ -527,6 +533,8 @@ class Engine:
             ],
             "exploracion": self._exploracion,
             "inspeccion": self._inspeccion,
+            "resolucion": self._resolucion,
+            "ejecucion": self._ejecucion,
             "auditoria": self._auditoria,
             "grafo": self._grafo,
             "dependencias": self._dependencias,
@@ -535,11 +543,14 @@ class Engine:
             "errores_arranque": list(self.errores_arranque),
             "advertencias": list(self.advertencias),
             "nota": (
-                "Estado global construido por el Engine (nivel pro). "
-                "Incluye dependencias, ciclos, índice de símbolos y diagnósticos causales."
+                "Estado global. El Engine ejecuta literalmente "
+                "todas las capacidades declaradas en cada CONTENEDOR."
             ),
         }
 
+    # ===========================================================
+    # SECCIÓN 17: COMPATIBILIDAD
+    # ===========================================================
     def censar(self) -> dict:
         eg = self.estado_global()
         return {
@@ -551,23 +562,9 @@ class Engine:
         }
 
     def ejecutar_contratos_y_explorar(self) -> Dict[str, Any]:
-        return self._auditoria
-
-
-# ===============================================================
-# SECCIÓN 3: ALIAS MÍNIMOS (compatibilidad temporal)
-# ===============================================================
-UNIVERSAL_CAPACIDADES_MAP = {
-    "verificar": "barrer",
-    "barrer": "barrer",
-    "evaluar": "barrer",
-}
-
-
-def obtener_funcion_universal(capacidad_clave: str) -> str:
-    return UNIVERSAL_CAPACIDADES_MAP.get(capacidad_clave, capacidad_clave)
+        return self._ejecucion
 
 
 # ==============================================================
-# FIN: core/engine.py — nivel pro (dependencias + índice + causal)
+# FIN: core/engine.py — versión completa con secciones
 # ==============================================================

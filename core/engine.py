@@ -164,3 +164,26 @@ class Engine:
                         self.errores_arranque.append(
                             f"{rol}: error ejecutando validación: {type(e).__name__}: {e}"
                         )
+
+
+==========================================================
+INICIO: Método censar() para la clase Engine
+==========================================================
+def censar(self) -> dict:
+"""Devuelve un censo estructurado de los contenedores y roles cargados dinámicamente."""
+cargados = []
+roles_dict = {}
+for nombre, cont in self.registro.contenedores.items():
+cargados.append({"nombre": cont.nombre, "rol": cont.rol, "version": cont.version})
+roles_dict.setdefault(cont.rol, []).append(cont.nombre)
+return {
+"total": self.registro.total() if hasattr(self.registro, "total") else len(self.registro.contenedores),
+"roles": roles_dict,
+"roles_vacios": [],
+"rechazados": [],
+"cargados": cargados,
+}
+==========================================================
+FIN: Método censar() para la clase Engine
+==========================================================
+

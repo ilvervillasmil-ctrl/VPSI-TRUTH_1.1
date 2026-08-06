@@ -1,60 +1,9 @@
+# -*- coding: utf-8 -*-
 """
 modules/diccionario/__init__.py
-===============================
 
 Rol DI — Diccionario (biblioteca de definiciones / invariante de significado).
-
-FUNCIÓN
-  Herramienta de definiciones para contrastar y correlacionar a nivel
-  léxico-significado. Materia prima: palabra → definición → significado.
-
-  Busca definiciones. No crea el contexto (eso es CX).
-  No correlaciona numéricamente (eso es CA/K).
-  Entrega la definición para que el resto del sistema pueda
-  armar contexto y correlacionar con base léxica explícita.
-
-  Lee automáticamente todos los archivos bajo este módulo
-  (fuentes/ y *.py del directorio que declaren DICCIONARIO).
-  No hace falta editar este init al agregar un idioma, un glosario
-  o más entradas.
-
-AGENCIA DE ENGINE
-  Engine tiene libertad de solicitar definiciones y llevarlas a
-  cualquier módulo según el contexto del ciclo (CX, CA, RE, CIT, …).
-  Eso no convierte a Engine en dueño del significado: el resultado
-  final (C, L, K, Tru) no depende de que Engine invente definiciones.
-  Depende de los contratos de cada módulo y de la materia prima que
-  DI entrega. Análogo: poner la fórmula de la verdad al alcance de
-  Engine no hace que Engine “sea” FO; solo la invoca. Aquí igual:
-  Engine invoca definiciones; DI las posee como invariante.
-
-NO HACE
-  - Calcular C, L, K, Tru_Ri ni Tru_total.
-  - Clasificar O_context (CX).
-  - Traer material externo de dominios (RE).
-  - Orquestar el ciclo (Engine).
-  - Sustituir AX, MC, CA, FO, CIT.
-
-CONTRATO DE FUENTES (archivos debajo)
-  Cada archivo puede declarar:
-    META        dict  → nombre, idioma, tipo, version, descripcion
-    DICCIONARIO dict  → {
-        "palabra": {
-            "definicion": str,
-            "significado": str,   # opcional
-            "tipo": str,          # opcional
-        },
-        ...
-    }
-
-  Tipo habitual:
-    - definiciones   → diccionario literal de un idioma (es, en, …)
-    - glosario_invariante → términos del repositorio (glosario_vpsi)
-
-  El init valida forma mínima. Archivo incoherente → error en barrer;
-  no tumba el resto de fuentes.
-
-Las fuentes base viajan con el paquete (offline / CI).
+v1.0
 """
 
 from __future__ import annotations
@@ -120,7 +69,7 @@ def _extraer_significado(entrada: Any) -> Optional[str]:
 
 
 # ===============================================================
-# DESCUBRIMIENTO — lee todos los archivos debajo del módulo
+# DESCUBRIMIENTO FORENSE — lee todos los archivos y subcarpetas
 # ===============================================================
 def _cargar_modulo(path: Path, clave: str) -> Optional[Any]:
     spec = importlib.util.spec_from_file_location(clave, path)
@@ -136,19 +85,14 @@ def _cargar_modulo(path: Path, clave: str) -> Optional[Any]:
 
 
 def _descubrir() -> None:
-    """
-    Recorre fuentes/ y *.py del directorio del módulo.
-    Registra todo lo que declare DICCIONARIO.
-    No hay lista manual de archivos en este init.
-    """
     global _CARGADO
     if _CARGADO:
         return
 
     candidatos: List[Path] = []
-    if _FUENTES.is_dir():
-        candidatos.extend(sorted(_FUENTES.glob("*.py")))
-    candidatos.extend(sorted(_DIR.glob("*.py")))
+    # Lee dinámicamente cualquier subcarpeta y archivo interno de fuentes y del módulo
+    if _DIR.is_dir():
+        candidatos.extend(sorted(_DIR.glob("**/*.py")))
 
     vistos: Set[Path] = set()
     for f in candidatos:
@@ -159,7 +103,7 @@ def _descubrir() -> None:
             continue
         vistos.add(resolved)
 
-        clave = "diccionario_{0}".format(f.stem)
+        clave = "diccionario_{0}_{1}".format(f.parent.name, f.stem)
         mod = _cargar_modulo(f, clave)
         if mod is None:
             _META[f.stem] = {"error": "carga fallida", "archivo": f.name}
@@ -195,7 +139,6 @@ def _asegurar() -> None:
 # API — materia prima de definiciones
 # ===============================================================
 def listar() -> List[str]:
-    """Nombres de todos los diccionarios/glosarios descubiertos debajo."""
     _asegurar()
     return sorted(_REGISTRO.keys())
 
@@ -216,7 +159,6 @@ def meta(nombre: str) -> Optional[Dict[str, Any]]:
 
 
 def cargar(nombre: str) -> Any:
-    """Devuelve el DICCIONARIO crudo de una fuente (tal cual está)."""
     _asegurar()
     key = _norm_nombre(nombre)
     if key not in _REGISTRO:
@@ -229,7 +171,6 @@ def cargar(nombre: str) -> Any:
 
 
 def cargar_todos() -> Dict[str, Any]:
-    """Todos los diccionarios descubiertos (nombre → datos)."""
     _asegurar()
     return {k: _REGISTRO[k] for k in sorted(_REGISTRO)}
 
@@ -239,22 +180,6 @@ def cargar_idioma(idioma: str) -> Dict[str, Any]:
 
 
 def definir(palabra: str, *nombres: str) -> Optional[Dict[str, Any]]:
-    """
-    Busca la definición de una palabra.
-
-    Si se pasan nombres de fuentes, solo busca ahí.
-    Si no, busca en todos los diccionarios descubiertos.
-
-    Retorno:
-      {
-        "palabra": str,
-        "definicion": str | None,
-        "significado": str | None,
-        "fuente": str | None,
-        "entrada": ...,
-      }
-    o None si no hay entrada.
-    """
     _asegurar()
     p = _norm_palabra(palabra)
     if not p:
@@ -291,7 +216,6 @@ def definir(palabra: str, *nombres: str) -> Optional[Dict[str, Any]]:
 
 
 def significado(palabra: str, *nombres: str) -> Optional[str]:
-    """Atajo: texto de significado o definición."""
     r = definir(palabra, *nombres)
     if r is None:
         return None
@@ -299,7 +223,6 @@ def significado(palabra: str, *nombres: str) -> Optional[str]:
 
 
 def palabras(*nombres: str) -> Set[str]:
-    """Conjunto de lemas de las fuentes indicadas (o de todas)."""
     _asegurar()
     fuentes = list(nombres) if nombres else listar()
     out: Set[str] = set()
@@ -320,11 +243,6 @@ def inyectar_en_peticion(
     *nombres: str,
     clave: str = "diccionario",
 ) -> Dict[str, Any]:
-    """
-    Entrega materia prima léxica a una petición.
-    Engine (u otro módulo) puede usar esto para pasar definiciones/lemas
-    al resto del ciclo. No calcula. No clasifica O.
-    """
     base = dict(peticion or {})
     lemas = sorted(palabras(*nombres))
     base[clave] = lemas
@@ -339,14 +257,9 @@ def inyectar_en_peticion(
 
 
 # ===============================================================
-# CENTINELA
+# CENTINELA Y CAPACIDADES EXPUESTAS
 # ===============================================================
 def barrer() -> Dict[str, Any]:
-    """
-    Coherencia interna de DI.
-    Descubre fuentes, exige forma legible, reporta errores de carga.
-    No calcula Tru.
-    """
     _asegurar()
     errores: List[str] = []
     notas: List[str] = []
@@ -431,9 +344,7 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "coherente": b.get("coherente"),
         "funcion": (
             "Biblioteca de definiciones (materia prima léxica). "
-            "Engine puede solicitar y distribuir definiciones según contexto; "
-            "el resultado final no depende de que Engine invente significados. "
-            "Auto-carga todo lo que está debajo. No calcula Tru. No clasifica O."
+            "Engine puede solicitar y distribuir definiciones según contexto."
         ),
     }
 
@@ -449,8 +360,7 @@ def axiomas() -> List[Dict[str, Any]]:
             "polaridad": True,
             "enunciado": (
                 "DI es la herramienta de definiciones para contrastar y "
-                "correlacionar a nivel léxico-significado. Materia prima: "
-                "palabra → definición → significado."
+                "correlacionar a nivel léxico-significado."
             ),
             "depende_de": [],
             "gobierna": ["diccionario"],
@@ -463,84 +373,15 @@ def axiomas() -> List[Dict[str, Any]]:
             "objeto": "Tru_ni_C_L_K",
             "polaridad": True,
             "enunciado": (
-                "DI no calcula Tru_Ri, Tru_total, C, L ni K. "
-                "Entrega definición; el cálculo preciso es oficio de CA/FO."
+                "DI no calcula Tru_Ri, Tru_total, C, L ni K."
             ),
             "depende_de": [],
             "gobierna": ["diccionario"],
-        },
-        {
-            "id": "DI-OP-3",
-            "tipo": "axioma",
-            "sujeto": "diccionario",
-            "relacion": "no_clasifica",
-            "objeto": "O_context",
-            "polaridad": True,
-            "enunciado": (
-                "DI no clasifica O_context (oficio CX). "
-                "Puede aportar definiciones sin asumir el rol de clasificación."
-            ),
-            "depende_de": [],
-            "gobierna": ["diccionario", "contexto"],
-        },
-        {
-            "id": "DI-OP-4",
-            "tipo": "axioma",
-            "sujeto": "fuentes_de_diccionario",
-            "relacion": "se_leen",
-            "objeto": "automaticamente",
-            "polaridad": True,
-            "enunciado": (
-                "Todo archivo bajo el módulo que declare DICCIONARIO se carga solo. "
-                "No hace falta editar el init al agregar idioma o glosario."
-            ),
-            "depende_de": [],
-            "gobierna": ["diccionario"],
-        },
-        {
-            "id": "DI-OP-5",
-            "tipo": "axioma",
-            "sujeto": "Engine",
-            "relacion": "puede_distribuir",
-            "objeto": "definiciones_segun_contexto",
-            "polaridad": True,
-            "enunciado": (
-                "Engine tiene libertad de solicitar definiciones a DI y "
-                "llevarlas a cualquier módulo según el contexto del ciclo. "
-                "Eso no hace a Engine dueño del significado: el resultado "
-                "final no depende de que Engine invente definiciones."
-            ),
-            "depende_de": [],
-            "gobierna": ["diccionario", "engine"],
-        },
-        {
-            "id": "DI-OP-6",
-            "tipo": "axioma",
-            "sujeto": "resultado_final",
-            "relacion": "no_depende_de",
-            "objeto": "invencion_de_significados_por_Engine",
-            "polaridad": True,
-            "enunciado": (
-                "C, L, K y Tru se calculan bajo contratos de CA/FO y el marco O. "
-                "Engine enruta definiciones; no sustituye la materia prima de DI "
-                "ni la fórmula de FO."
-            ),
-            "depende_de": ["DI-OP-5"],
-            "gobierna": ["diccionario", "engine", "calculator", "formulas"],
         },
     ]
 
 
 def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """
-    Entrega de definiciones / materia prima.
-    No clasificación de O. No cálculo de Tru.
-
-    peticion puede traer:
-      - palabra / termino → define esa palabra
-      - idioma → limita fuentes
-      - diccionarios / nombres → fuentes concretas
-    """
     peticion = dict(peticion or {})
     palabra = peticion.get("palabra") or peticion.get("termino")
     idioma = peticion.get("idioma")
@@ -561,10 +402,7 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "rol": "DI",
             "resultado": r,
             "coherente": True,
-            "notas": [
-                "Definición entregada. No se calculó Tru ni se clasificó O. "
-                "Engine puede distribuir este resultado según contexto."
-            ],
+            "notas": ["Definición entregada."],
         }
 
     if idioma and not nombres:
@@ -587,15 +425,12 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "palabras_n": len(palabras(*usados)),
         "inventario": inventario(),
         "coherente": True,
-        "notas": [
-            "Materia prima entregada. No se calculó Tru ni se clasificó O. "
-            "Engine puede distribuir definiciones a voluntad según contexto."
-        ],
+        "notas": ["Materia prima entregada."],
     }
 
 
 # ===============================================================
-# CONTENEDOR (contrato con Engine — al final)
+# CONTENEDOR (contrato estricto para Engine / Angie)
 # ===============================================================
 CONTENEDOR = {
     "nombre": "diccionario",
@@ -604,13 +439,7 @@ CONTENEDOR = {
     "requiere": [],
     "descripcion": (
         "Biblioteca de definiciones. Rol DI. "
-        "Materia prima léxica: palabra → definición → significado. "
-        "Herramienta para contrastar y correlacionar a nivel de significado. "
-        "Auto-carga todos los archivos debajo (es, en, glosario_vpsi, …). "
-        "Engine puede solicitar y distribuir definiciones a cualquier módulo "
-        "según el contexto del ciclo; el resultado final (C, L, K, Tru) no "
-        "depende de que Engine invente significados. "
-        "No calcula Tru. No clasifica O. No trae dominios externos (RE)."
+        "Materia prima léxica y descubrimiento dinámico total de fuentes y subcarpetas."
     ),
     "capacidades": {
         "verificar": barrer,
@@ -625,12 +454,25 @@ CONTENEDOR = {
         "significado": significado,
         "inyectar_en_peticion": inyectar_en_peticion,
     },
-    "agencia": (
-        "Total para entregar definiciones presentes en las fuentes. "
-        "Nula sobre valores de C/L/K/Tru y sobre clasificación de O."
-    ),
-    "agencia_engine": (
-        "Engine puede invocar DI y llevar definiciones a otros módulos "
-        "según contexto. No sustituye la materia prima ni la fórmula de FO."
-    ),
 }
+
+
+__all__ = [
+    "CONTENEDOR",
+    "VERSION",
+    "listar",
+    "listar_por_idioma",
+    "meta",
+    "cargar",
+    "cargar_todos",
+    "cargar_idioma",
+    "definir",
+    "significado",
+    "palabras",
+    "inyectar_en_peticion",
+    "barrer",
+    "verificar_salida",
+    "inventario",
+    "axiomas",
+    "resolver",
+]

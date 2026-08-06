@@ -654,3 +654,216 @@ class Engine:
     def auditar_modulo(self, cont) -> Dict[str, Any]:
         """Entrada publica para Johnson: misma auditoria, cuantas veces quiera."""
         return self._auditar_modulo(cont)
+
+    # ===============================================================
+    # SECCIÓN: JOHNSON — conectividad del Engine
+    # ===============================================================
+    #
+    # Pregunta de Johnson:
+    #   ¿Puede el Engine llegar realmente hasta este modulo
+    #   y ejecutar su contrato?
+    #
+    # Cadena por cada rol descubierto:
+    #   ROL
+    #     → CONTENEDOR encontrado
+    #     → modulo importado
+    #     → carpeta encontrada
+    #     → archivos leidos
+    #     → contrato leido
+    #     → capacidades resueltas
+    #     → dependencias (requiere) satisfechas
+    #     → conectado al Engine
+    #
+    # Johnson reporta. No interpreta logica del modulo.
+    # ===============================================================
+
+    def auditar_conectividad_engine(self) -> Dict[str, Any]:
+        from pathlib import Path
+
+        informe_roles: Dict[str, Any] = {}
+        cortes: List[Dict[str, Any]] = []
+
+        # Roles presentes en el registro (descubiertos por CONTENEDOR)
+        roles = sorted(self.registro.por_rol.keys())
+
+        # Tambien roles que tienen contenedor aunque la clave este vacia
+        for nombre, cont in self.registro.contenedores.items():
+            if cont.rol not in roles:
+                roles.append(cont.rol)
+        roles = sorted(set(roles))
+
+        for rol in roles:
+            estado = {
+                "rol": rol,
+                "contenedor": False,
+                "modulo_importado": False,
+                "carpeta": False,
+                "archivos": False,
+                "contrato": False,
+                "capacidades": False,
+                "dependencias": False,
+                "conectado": False,
+                "detalle": {},
+                "corte": None,
+            }
+
+            cont = self.registro.primero(rol)
+            if cont is None:
+                estado["corte"] = "sin contenedor"
+                cortes.append({
+                    "rol": rol,
+                    "eslabon": "contenedor",
+                    "razon": "CONTENEDOR no encontrado",
+                })
+                informe_roles[rol] = estado
+                continue
+
+            estado["contenedor"] = True
+            estado["detalle"]["nombre"] = cont.nombre
+            estado["detalle"]["version"] = cont.version
+            estado["detalle"]["ruta"] = str(cont.ruta)
+
+            # modulo importado
+            if getattr(cont, "modulo", None) is not None:
+                estado["modulo_importado"] = True
+            else:
+                estado["corte"] = "modulo no importado"
+                cortes.append({
+                    "rol": rol,
+                    "eslabon": "modulo_importado",
+                    "razon": "cont.modulo es None",
+                })
+
+            # carpeta + archivos
+            carpeta = Path(cont.ruta).resolve().parent
+            lista_archivos: List[str] = []
+            if carpeta.is_dir():
+                estado["carpeta"] = True
+                lista_archivos = sorted(
+                    str(p.relative_to(carpeta))
+                    for p in carpeta.rglob("*")
+                    if p.is_file()
+                )
+                if lista_archivos:
+                    estado["archivos"] = True
+                else:
+                    if estado["corte"] is None:
+                        estado["corte"] = "carpeta sin archivos"
+                    cortes.append({
+                        "rol": rol,
+                        "eslabon": "archivos",
+                        "razon": "carpeta vacia",
+                    })
+            else:
+                if estado["corte"] is None:
+                    estado["corte"] = "carpeta no encontrada"
+                cortes.append({
+                    "rol": rol,
+                    "eslabon": "carpeta",
+                    "razon": "no es directorio: {0}".format(carpeta),
+                })
+
+            estado["detalle"]["carpeta"] = str(carpeta)
+            estado["detalle"]["archivos"] = lista_archivos
+            estado["detalle"]["n_archivos"] = len(lista_archivos)
+
+            # contrato
+            caps = getattr(cont, "capacidades", None)
+            if isinstance(caps, dict) and caps:
+                estado["contrato"] = True
+            else:
+                if estado["corte"] is None:
+                    estado["corte"] = "contrato invalido"
+                cortes.append({
+                    "rol": rol,
+                    "eslabon": "contrato",
+                    "razon": "capacidades no es dict o esta vacio",
+                })
+
+            # capacidades resueltas
+            caps_ok = True
+            caps_fallo: List[str] = []
+            if isinstance(caps, dict):
+                for cap in caps:
+                    if not cont.tiene(cap):
+                        caps_ok = False
+                        caps_fallo.append(str(cap))
+            else:
+                caps_ok = False
+
+            estado["capacidades"] = caps_ok
+            estado["detalle"]["capacidades"] = (
+                sorted(str(k) for k in caps.keys())
+                if isinstance(caps, dict) else []
+            )
+            estado["detalle"]["capacidades_no_resolubles"] = caps_fallo
+
+            if not caps_ok and estado["corte"] is None:
+                estado["corte"] = "capacidad no resoluble"
+                cortes.append({
+                    "rol": rol,
+                    "eslabon": "capacidades",
+                    "razon": "no resolubles: {0}".format(caps_fallo),
+                })
+
+            # dependencias (requiere)
+            requiere = list(getattr(cont, "requiere", []) or [])
+            deps_ok = True
+            deps_faltan: List[str] = []
+            for req in requiere:
+                req_s = str(req)
+                # puede ser rol o nombre de modulo
+                if self.registro.primero(req_s) is None:
+                    if req_s not in self.registro.contenedores:
+                        deps_ok = False
+                        deps_faltan.append(req_s)
+
+            estado["dependencias"] = deps_ok
+            estado["detalle"]["requiere"] = requiere
+            estado["detalle"]["dependencias_faltan"] = deps_faltan
+
+            if not deps_ok and estado["corte"] is None:
+                estado["corte"] = "dependencia faltante"
+                cortes.append({
+                    "rol": rol,
+                    "eslabon": "dependencias",
+                    "razon": "faltan: {0}".format(deps_faltan),
+                })
+
+            # conectado = cadena completa
+            estado["conectado"] = all((
+                estado["contenedor"],
+                estado["modulo_importado"],
+                estado["carpeta"],
+                estado["archivos"],
+                estado["contrato"],
+                estado["capacidades"],
+                estado["dependencias"],
+            ))
+
+            informe_roles[rol] = estado
+
+        conectados = [r for r, e in informe_roles.items() if e["conectado"]]
+        desconectados = [r for r, e in informe_roles.items() if not e["conectado"]]
+
+        # primer corte = primer eslabon roto reportado
+        primer_corte = cortes[0] if cortes else None
+
+        return {
+            "auditor": "Johnson",
+            "tipo": "conectividad_engine",
+            "roles_vistos": roles,
+            "roles_n": len(roles),
+            "roles_conectados": conectados,
+            "roles_conectados_n": len(conectados),
+            "roles_desconectados": desconectados,
+            "roles_desconectados_n": len(desconectados),
+            "cortes": cortes,
+            "primer_corte": primer_corte,
+            "por_rol": informe_roles,
+            "coherente": len(desconectados) == 0,
+        }
+
+    # ===============================================================
+    # FIN SECCIÓN: JOHNSON — conectividad del Engine
+    # ===============================================================

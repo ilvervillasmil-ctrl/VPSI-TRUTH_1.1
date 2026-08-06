@@ -97,7 +97,7 @@ class RegistroModulos:
 # SECCIÓN 2: ENGINE
 # ===============================================================
 class Engine:
-    VERSION = "15.0-pro"
+    VERSION = "16.1-determinista"
 
     def __init__(
         self,
@@ -105,32 +105,52 @@ class Engine:
         invocador_id: str = "core",
         strict: bool = True,
     ) -> None:
+        # ----------------------------------------------------------
+        # 1. Parámetros de construcción
+        # ----------------------------------------------------------
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
+
+        # ----------------------------------------------------------
+        # 2. Estado principal del Engine
+        # ----------------------------------------------------------
         self.estado = "NO_INICIADO"
-        self.errores_arranque: List[str] = []
-        self.advertencias: List[str] = []
+
+        # ----------------------------------------------------------
+        # 3. Atributos exigidos por la auditoría forense (invariantes)
+        # ----------------------------------------------------------
         self.registro = RegistroModulos()
         self.resultados_evaluacion: List[Any] = []
+        self.errores_arranque: List[str] = []
+        self.fallos: List[Dict[str, Any]] = []
+        self.advertencias: List[str] = []
 
-        # Evidencia de capas
+        # ----------------------------------------------------------
+        # 4. Evidencia objetiva acumulada por las capas
+        # ----------------------------------------------------------
         self._modulos_descubiertos: List[Path] = []
         self._exploracion: Dict[str, Any] = {}
         self._inspeccion: Dict[str, Any] = {}
+        self._resolucion: Dict[str, Any] = {}
         self._auditoria: Dict[str, Any] = {}
         self._grafo: Dict[str, Any] = {}
-        self._diagnosticos_causales: List[Dict[str, Any]] = []
-        self._indice_simbolos: Dict[str, Dict[str, Any]] = {}
         self._dependencias: Dict[str, Any] = {}
+        self._indice_simbolos: Dict[str, Dict[str, Any]] = {}
+        self._diagnosticos_causales: List[Dict[str, Any]] = []
 
-        # Flujo
+        # ----------------------------------------------------------
+        # 5. Flujo determinista de arranque
+        # ----------------------------------------------------------
         self._modulos_descubiertos = self._descubrir_modulos()
-        self._validar_y_cargar()
+        self._cargar_y_validar()
         self._resolver_dependencias()
-        self._construir_grafo()
         self._construir_indice_simbolos()
+        self._construir_grafo()
 
+        # ----------------------------------------------------------
+        # 6. Cierre de estado
+        # ----------------------------------------------------------
         if self.errores_arranque:
             self.estado = "RECHAZADO"
             if self.strict:

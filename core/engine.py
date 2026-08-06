@@ -867,3 +867,210 @@ class Engine:
     # ===============================================================
     # FIN SECCIÓN: JOHNSON — conectividad del Engine
     # ===============================================================
+    # ===============================================================
+    # SECCIÓN: FO
+    # ===============================================================
+    #
+    # Origen
+    #   modules/formulas/__init__.py
+    #
+    # CONTENEDOR
+    #   nombre      : formulas
+    #   rol         : FO
+    #   version     : 1.0
+    #   requiere    : ["CT"]
+    #   capacidades :
+    #     verificar
+    #     evaluar
+    #     axiomas
+    #     inventario
+    #
+    # El Engine usa este modulo para el calculo por formula
+    # (tru_ri, tru_total viven en el modulo; el contrato expone
+    #  verificar/evaluar/axiomas/inventario).
+    #
+    # Esta seccion:
+    #   - carga el CONTENEDOR de formulas
+    #   - lee todos los archivos de modules/formulas/
+    #   - ejecuta solo las capacidades del CONTENEDOR
+    #
+    # ---------------------------------------------------------------
+    # subsección: carga del modulo
+    # ---------------------------------------------------------------
+    def _fo_cargar(self) -> None:
+        path = self.raiz / "formulas" / "__init__.py"
+        if not path.is_file():
+            self.errores_arranque.append(
+                "FO: no existe {0}".format(path)
+            )
+            return
+
+        directorio = path.parent
+        nombre_mod = "vpsi_formulas"
+        spec = importlib.util.spec_from_file_location(
+            nombre_mod,
+            path,
+            submodule_search_locations=[str(directorio)],
+        )
+        if spec is None or spec.loader is None:
+            self.errores_arranque.append("FO: no se pudo crear spec")
+            return
+
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[nombre_mod] = mod
+        try:
+            spec.loader.exec_module(mod)
+        except Exception as e:
+            self.errores_arranque.append(
+                "FO: import fallo: {0}: {1}".format(type(e).__name__, e)
+            )
+            return
+
+        meta = getattr(mod, "CONTENEDOR", None)
+        if not isinstance(meta, dict):
+            self.errores_arranque.append("FO: sin CONTENEDOR")
+            return
+
+        if meta.get("nombre") != "formulas":
+            self.errores_arranque.append(
+                "FO: nombre inesperado: {0}".format(meta.get("nombre"))
+            )
+            return
+
+        if meta.get("rol") != "FO":
+            self.errores_arranque.append(
+                "FO: rol inesperado: {0}".format(meta.get("rol"))
+            )
+            return
+
+        caps = meta.get("capacidades")
+        if not isinstance(caps, dict) or not caps:
+            self.errores_arranque.append("FO: sin capacidades")
+            return
+
+        self._fo_mod = mod
+        self._fo_meta = dict(meta)
+        self._fo_ruta = path
+        self._fo_caps = dict(caps)
+        self._fo_archivos = sorted(
+            str(p.relative_to(directorio))
+            for p in directorio.rglob("*")
+            if p.is_file()
+        )
+
+        for nombre, ref in self._fo_caps.items():
+            fn = ref if callable(ref) else getattr(mod, str(ref), None)
+            if not callable(fn):
+                self.errores_arranque.append(
+                    "FO: capacidad no resoluble: {0}".format(nombre)
+                )
+
+    # ---------------------------------------------------------------
+    # subsección: todos los archivos del modulo
+    # ---------------------------------------------------------------
+    def fo_archivos(self) -> List[str]:
+        return list(getattr(self, "_fo_archivos", []) or [])
+
+    # ---------------------------------------------------------------
+    # subsección: invocacion por contrato
+    # ---------------------------------------------------------------
+    def _fo_fn(self, capacidad: str):
+        if capacidad not in getattr(self, "_fo_caps", {}):
+            return None
+        ref = self._fo_caps[capacidad]
+        if callable(ref):
+            return ref
+        if getattr(self, "_fo_mod", None) is None:
+            return None
+        return getattr(self._fo_mod, str(ref), None)
+
+    def _fo_ejecutar(self, capacidad: str, *args, **kwargs):
+        fn = self._fo_fn(capacidad)
+        if not callable(fn):
+            self.fallos.append({
+                "seccion": "FO",
+                "capacidad": capacidad,
+                "razon": "no resoluble",
+            })
+            return None
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            self.fallos.append({
+                "seccion": "FO",
+                "capacidad": capacidad,
+                "razon": "{0}: {1}".format(type(e).__name__, e),
+                "traza": traceback.format_exc(limit=3),
+            })
+            return None
+
+    # ---------------------------------------------------------------
+    # subsección: capacidad — verificar
+    # ---------------------------------------------------------------
+    def fo_verificar(self):
+        out = self._fo_ejecutar("verificar")
+        return out if isinstance(out, dict) else None
+
+    # ---------------------------------------------------------------
+    # subsección: capacidad — evaluar
+    # ---------------------------------------------------------------
+    def fo_evaluar(self):
+        out = self._fo_ejecutar("evaluar")
+        return out if isinstance(out, dict) else None
+
+    # ---------------------------------------------------------------
+    # subsección: capacidad — axiomas
+    # ---------------------------------------------------------------
+    def fo_axiomas(self):
+        out = self._fo_ejecutar("axiomas")
+        return list(out) if isinstance(out, list) else []
+
+    # ---------------------------------------------------------------
+    # subsección: capacidad — inventario
+    # ---------------------------------------------------------------
+    def fo_inventario(self):
+        out = self._fo_ejecutar("inventario")
+        if not isinstance(out, dict):
+            return None
+        out = dict(out)
+        out["archivos_modulo"] = self.fo_archivos()
+        out["archivos_n"] = len(out["archivos_modulo"])
+        out["contrato"] = {
+            "nombre": self._fo_meta.get("nombre"),
+            "rol": self._fo_meta.get("rol"),
+            "version": self._fo_meta.get("version"),
+            "requiere": list(self._fo_meta.get("requiere") or []),
+            "capacidades": sorted(self._fo_caps.keys()),
+        }
+        return out
+
+    # ---------------------------------------------------------------
+    # subsección: compuerta
+    # ---------------------------------------------------------------
+    def _fo_compuerta(self) -> None:
+        if getattr(self, "_fo_mod", None) is None:
+            if not any(e.startswith("FO:") for e in self.errores_arranque):
+                self.errores_arranque.append("FO: modulo no cargado")
+            return
+
+        if not getattr(self, "_fo_archivos", None):
+            self.errores_arranque.append("FO: carpeta sin archivos")
+
+        informe = self.fo_verificar()
+        if informe is None:
+            informe = self.fo_evaluar()
+
+        if informe is None:
+            self.errores_arranque.append("FO: verificar/evaluar no resolvio")
+            return
+
+        if not informe.get("coherente", False):
+            self.errores_arranque.append(
+                "FO: incoherente faltas={0}".format(
+                    len(informe.get("faltas") or [])
+                )
+            )
+
+    # ===============================================================
+    # FIN SECCIÓN: FO
+    # ===============================================================

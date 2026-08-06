@@ -867,7 +867,7 @@ class Engine:
     # ===============================================================
     # FIN SECCIÓN: JOHNSON — conectividad del Engine
     # ===============================================================
-    # ===============================================================
+        # ===============================================================
     # SECCIÓN: FO
     # ===============================================================
     #
@@ -884,15 +884,6 @@ class Engine:
     #     evaluar
     #     axiomas
     #     inventario
-    #
-    # El Engine usa este modulo para el calculo por formula
-    # (tru_ri, tru_total viven en el modulo; el contrato expone
-    #  verificar/evaluar/axiomas/inventario).
-    #
-    # Esta seccion:
-    #   - carga el CONTENEDOR de formulas
-    #   - lee todos los archivos de modules/formulas/
-    #   - ejecuta solo las capacidades del CONTENEDOR
     #
     # ---------------------------------------------------------------
     # subsección: carga del modulo
@@ -965,8 +956,18 @@ class Engine:
                     "FO: capacidad no resoluble: {0}".format(nombre)
                 )
 
+        if hasattr(self, "registro"):
+            self.registro.registrar(Contenedor(
+                nombre=str(meta["nombre"]),
+                rol=str(meta["rol"]),
+                version=str(meta.get("version", "0.0")),
+                modulo=mod,
+                ruta=path,
+                meta=meta,
+            ))
+
     # ---------------------------------------------------------------
-    # subsección: todos los archivos del modulo
+    # subsección: archivos del modulo
     # ---------------------------------------------------------------
     def fo_archivos(self) -> List[str]:
         return list(getattr(self, "_fo_archivos", []) or [])

@@ -31,6 +31,13 @@ class Contenedor:
         self.meta = meta
         self.capacidades = meta.get("capacidades", {})
         self.requiere = meta.get("requiere", [])
+        
+        # Recuperación explícita o fallback universal del resolvedor fn()
+        resolver = meta.get("fn")
+        if callable(resolver):
+            self._fn_custom = resolver
+        else:
+            self._fn_custom = None
 
     def tiene(self, capacidad: str) -> bool:
         if capacidad not in self.capacidades:
@@ -39,6 +46,23 @@ class Contenedor:
         if callable(ref):
             return True
         return self.modulo is not None and callable(getattr(self.modulo, str(ref), None))
+
+    def fn(self, clave: str) -> Any:
+        """Método de resolución unificado para que el Engine y el auditor forense consulten capacidades."""
+        if self._fn_custom is not None:
+            try:
+                res = self._fn_custom(clave)
+                if res is not None:
+                    return res
+            except Exception:
+                pass
+                
+        ref = self.capacidades.get(clave)
+        if callable(ref):
+            return ref
+        if isinstance(ref, str) and self.modulo is not None:
+            return getattr(self.modulo, ref, None)
+        return None
 
 
 class RegistroModulos:
@@ -225,16 +249,11 @@ class Engine:
             }
 
             # 2. Ejecución dinámica de cada contrato/capacidad declarada en el contenedor
-            for clave_cap, ref_cap in capacidades.items():
-                fn = None
-                if callable(ref_cap):
-                    fn = ref_cap
-                elif modulo_ref is not None:
-                    fn = getattr(modulo_ref, str(ref_cap), None)
+            for clave_cap in capacidades.keys():
+                fn = contenedor.fn(clave_cap)
 
                 if callable(fn):
                     try:
-                        # Ejecución en vivo de la capacidad del contrato
                         salida = fn()
                         resultados_modulo["capacidades_ejecutadas"][clave_cap] = {
                             "estado": "EXITO",
@@ -258,27 +277,14 @@ class Engine:
 # ===============================================================
 # LISTA MAESTRA UNIVERSAL DE CAPACIDADES PARA TODOS LOS INI
 # ===============================================================
-# Nota: Esta lista unifica todas las capacidades y funciones estándar 
-# que deben estar disponibles o ser reconocidas transversalmente en 
-# todos los contenedores (__init__.py) del sistema. Si un módulo 
-# incorpora una función nueva, se anexa aquí una sola vez y queda 
-# disponible para el Engine y el auditor forense del CI.
-
 UNIVERSAL_CAPACIDADES_MAP = {
-    # --- Capacidades de Validación y Centinela ---
     "verificar": "barrer",
     "barrer": "barrer",
     "verificar_salida": "verificar_salida",
-    
-    # --- Capacidades de Inspección y Metadatos ---
     "inventario": "inventario",
     "meta": "meta",
-    
-    # --- Capacidades Axiomáticas ---
     "axiomas": "axiomas",
     "generatividad": "generatividad",
-    
-    # --- Capacidades de Resolución y Datos (Ej: Diccionario / DI) ---
     "resolver": "resolver",
     "listar": "listar",
     "listar_por_idioma": "listar_por_idioma",
@@ -289,19 +295,7 @@ UNIVERSAL_CAPACIDADES_MAP = {
     "significado": "significado",
     "palabras": "palabras",
     "inyectar_en_peticion": "inyectar_en_peticion",
-    
-    # ===========================================================
-    # ZONA DE EXPANSIÓN UNIVERSAL:
-    # Anexa aquí cualquier nueva función que encuentres en los 
-    # demás módulos a medida que vayamos avanzando.
-    # ===========================================================
-    # "nueva_funcion_encontrada": "nombre_real_en_el_modulo",
 }
 
 def obtener_funcion_universal(capacidad_clave: str) -> str:
-    """
-    Retorna la correspondencia exacta desde la lista maestra universal.
-    """
     return UNIVERSAL_CAPACIDADES_MAP.get(capacidad_clave, capacidad_clave)
-
-

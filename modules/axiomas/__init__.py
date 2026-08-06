@@ -1,24 +1,47 @@
-# -*- coding: utf-8 -*-
-"""
-VPSI-TRUTH --- modules/axiomas/__init__.py
+# ===============================================================
+# VPSI-TRUTH — modules/axiomas/__init__.py
+# ===============================================================
+#
+# MÓDULO:        axiomas
+# Rol:           AX
+# Versión:       9.5
+#
+# Función:
+#   Vigilar declaraciones (axioma | lema | teorema | corolario | definicion)
+#   y detectar contradicciones.
+#
+# Qué hace:
+#   - Carga cuerpos de declaraciones
+#   - Normaliza y recolecta
+#   - Detecta contradicción directa y de cota
+#   - Expone generatividad (TR1 / capa canónica)
+#   - Reporta su propio estado
+#
+# Qué NO hace:
+#   - No calcula Tru_total / Tru_Ri
+#   - No clasifica entrada (eso es CX)
+#   - No orquesta el sistema (eso es Engine)
+#   - No genera reportes de otros módulos
+#
+# Responsabilidad:
+#   Coherencia axiomática interna del repositorio.
+#
+# Conocimiento que aporta:
+#   Declaraciones normalizadas, choques, generatividad, ids de dominio K/O.
+#
+# Relación con Engine:
+#   Engine descubre este CONTENEDOR, ejecuta las capacidades declaradas
+#   y consolida el reporte que este módulo produce.
+#
+# Relación con Omega:
+#   Omega no calcula nada de AX. Solo presenta el reporte que Engine entrega.
+#
+# ===============================================================
 
-Contenedor de axiomas. Rol AX. v9.5
 
-Qué es:
-  Vigila declaraciones (axioma | lema | teorema | corolario | definicion).
-  No pertenece a ninguna teoría. No calcula Tru_total.
-  No clasifica entrada (eso es CX). No orquesta (eso es Engine).
-
-Qué vigila:
-  - contradiccion_directa
-  - contradiccion_de_cota
-  Si hay choque o error de carga → coherente=False.
-
-Qué expone (CONTENEDOR.capacidades):
-  verificar, barrer, verificar_salida, inventario,
-  axiomas, declaraciones, generatividad,
-  por_dominio, ids_dominio_k_o, recolectar
-"""
+# ===============================================================
+# IMPORTACIONES
+# ===============================================================
 
 from __future__ import annotations
 
@@ -33,8 +56,14 @@ except Exception:  # noqa: BLE001
     DiagnosticoGlobal = None  # type: ignore
 
 # ===============================================================
+# FIN IMPORTACIONES
+# ===============================================================
+
+
+# ===============================================================
 # CONSTANTES
 # ===============================================================
+
 OBLIGATORIOS = ("id", "tipo", "sujeto", "relacion", "objeto", "polaridad")
 TIPOS = ("axioma", "lema", "teorema", "corolario", "definicion")
 
@@ -56,8 +85,6 @@ TRADUCCION_CLAVES = {
     "cota": "cota",
 }
 
-_DIR = Path(__file__).parent
-
 DOMINIOS_K_O = frozenset({
     "contexto", "ontologia", "epistemologia", "verificacion",
     "dominio", "k", "o_context", "correlacion",
@@ -78,10 +105,130 @@ DOMINIO_CANONICO = {
     "contexto": "SEM",
 }
 
+VERSION_MODULO = "9.5"
+NOMBRE_MODULO = "axiomas"
+ROL_MODULO = "AX"
 
 # ===============================================================
-# CARGA DE CUERPOS
+# FIN CONSTANTES
 # ===============================================================
+
+
+# ===============================================================
+# CONFIGURACIÓN
+# ===============================================================
+
+_DIR = Path(__file__).parent
+
+def _ruta_vpsi() -> Optional[Path]:
+    candidatos = [
+        _DIR.parent.parent / "VPSI.py",
+        _DIR.parent / "VPSI.py",
+        _DIR / "VPSI.py",
+    ]
+    for p in candidatos:
+        if p.exists():
+            return p
+    return None
+
+# ===============================================================
+# FIN CONFIGURACIÓN
+# ===============================================================
+
+
+# ===============================================================
+# DEFINICIONES
+# ===============================================================
+# (Estructuras conceptuales mínimas; la lógica vive en funciones)
+
+# ===============================================================
+# FIN DEFINICIONES
+# ===============================================================
+
+
+# ===============================================================
+# CONTRATO OFICIAL DEL MÓDULO
+# ===============================================================
+
+CONTENEDOR = {
+    # ----- IDENTIDAD -----
+    "nombre": NOMBRE_MODULO,
+    "rol": ROL_MODULO,
+    "version": VERSION_MODULO,
+    "descripcion": (
+        "Contenedor de axiomas. Rol AX. "
+        "Vigila declaraciones y contradicciones. "
+        "El Engine ejecuta las capacidades declaradas aquí."
+    ),
+
+    # ----- PROPÓSITO -----
+    "funcion": (
+        "Vigilar coherencia axiomática: cargar declaraciones, "
+        "detectar contradicción directa y de cota, exponer generatividad."
+    ),
+    "no_hace": [
+        "No calcula Tru_total ni Tru_Ri",
+        "No clasifica entrada de usuario (eso es CX)",
+        "No orquesta el sistema (eso es Engine)",
+        "No genera reportes de otros módulos",
+    ],
+
+    # ----- CONOCIMIENTO -----
+    "conocimiento": (
+        "Declaraciones normalizadas, choques, generatividad (TR1), "
+        "ids de dominio K/O, inventario de cuerpos axiomáticos."
+    ),
+
+    # ----- DEPENDENCIAS -----
+    "requiere": [],
+
+    # ----- AUTORIZACIÓN AL ENGINE -----
+    "autoriza_engine": {
+        "leer_archivos_del_modulo": True,
+        "ejecutar_capacidades": True,
+        "combinar_con_otros_contratos": True,
+        "persistir": False,
+        "modificar_estado_externo": False,
+    },
+
+    # ----- CAPACIDADES -----
+    "capacidades": {
+        "verificar": "barrer",
+        "barrer": "barrer",
+        "verificar_salida": "verificar_salida",
+        "inventario": "inventario",
+        "axiomas": "axiomas",
+        "declaraciones": "declaraciones",
+        "generatividad": "generatividad",
+        "por_dominio": "por_dominio",
+        "ids_dominio_k_o": "ids_dominio_k_o",
+        "recolectar": "recolectar",
+        "reporte": "reporte",
+    },
+
+    # ----- REPORTING -----
+    "reporting": {
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "estadisticas": True,
+        "errores": True,
+        "advertencias": True,
+        "contrato": True,
+        "capacidades": True,
+        "dependencias": True,
+    },
+}
+
+# ===============================================================
+# FIN CONTRATO
+# ===============================================================
+
+
+# ===============================================================
+# FUNCIONES PRIVADAS
+# ===============================================================
+
 def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
     if archivo.name.startswith("_"):
         return []
@@ -112,21 +259,6 @@ def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
     return declaraciones_raw if isinstance(declaraciones_raw, list) else []
 
 
-def _ruta_vpsi() -> Optional[Path]:
-    candidatos = [
-        _DIR.parent.parent / "VPSI.py",
-        _DIR.parent / "VPSI.py",
-        _DIR / "VPSI.py",
-    ]
-    for p in candidatos:
-        if p.exists():
-            return p
-    return None
-
-
-# ===============================================================
-# NORMALIZACIÓN Y RECOLECCIÓN
-# ===============================================================
 def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
     if not isinstance(decl_original, dict):
         raise ValueError("{0}: declaración no es dict".format(cuerpo))
@@ -189,6 +321,113 @@ def clave(d: Dict) -> Tuple[str, str, str]:
 def ref(d: Dict) -> str:
     return "{0}:{1}".format(d["cuerpo"], d["id"])
 
+
+def contradiccion_directa(decls: List[Dict]) -> List[Dict]:
+    grupos: Dict[Tuple[str, str, str], List[Dict]] = {}
+    for d in decls:
+        grupos.setdefault(clave(d), []).append(d)
+
+    choques: List[Dict] = []
+    for k, grupo in grupos.items():
+        afirman = [d for d in grupo if d["polaridad"]]
+        niegan = [d for d in grupo if not d["polaridad"]]
+        for a in afirman:
+            for n in niegan:
+                choques.append({
+                    "tipo": "contradiccion_directa",
+                    "tripleta": " - ".join(k),
+                    "declaracion_1": {
+                        "id": a["id"],
+                        "ubicacion": ref(a),
+                        "enunciado": a["enunciado"],
+                    },
+                    "declaracion_2": {
+                        "id": n["id"],
+                        "ubicacion": ref(n),
+                        "enunciado": n["enunciado"],
+                    },
+                    "mensaje": (
+                        "Contradicción en '{0}': {1} AFIRMA vs {2} NIEGA".format(
+                            " - ".join(k), ref(a), ref(n)
+                        )
+                    ),
+                })
+    return choques
+
+
+def contradiccion_de_cota(decls: List[Dict]) -> List[Dict]:
+    grupos: Dict[Tuple[str, str], List[Dict]] = {}
+    for d in decls:
+        if d["cota"] is None:
+            continue
+        grupos.setdefault(
+            (d["sujeto"].lower().strip(), d["relacion"].lower().strip()),
+            [],
+        ).append(d)
+
+    choques: List[Dict] = []
+    for (suj, rel), grupo in grupos.items():
+        porcota: Dict[str, List[str]] = {}
+        for d in grupo:
+            porcota.setdefault(d["cota"], []).append(ref(d))
+        if len(porcota) > 1:
+            choques.append({
+                "tipo": "contradiccion_de_cota",
+                "sujeto": suj,
+                "relacion": rel,
+                "cotas": porcota,
+                "mensaje": (
+                    "Contradicción de cota en '{0} {1}'. Cotas: {2}".format(
+                        suj, rel, list(porcota.keys())
+                    )
+                ),
+            })
+    return choques
+
+
+def _dominios_canonicos(gobierna) -> set:
+    out = set()
+    for g in gobierna or []:
+        key = str(g).lower().strip()
+        out.add(DOMINIO_CANONICO.get(key, key.upper()[:3]))
+    return out
+
+
+def _medir_pares(theta: list) -> dict:
+    n = len(theta)
+    pares_tot = n * (n - 1) // 2 if n >= 2 else 0
+    compatibles = 0
+    novedosos = 0
+    for i in range(n):
+        Di = theta[i]["dominios"]
+        for j in range(i + 1, n):
+            Dj = theta[j]["dominios"]
+            if not (Di & Dj):
+                continue
+            compatibles += 1
+            union = Di | Dj
+            if union > Di and union > Dj:
+                novedosos += 1
+    return {
+        "theta_n": n,
+        "pares_totales": pares_tot,
+        "pares_compatibles": compatibles,
+        "pares_novedosos": novedosos,
+        "im_vs_theta": (
+            "GENERATIVO"
+            if n > 0 and novedosos > n
+            else ("ESTANCADO" if n > 0 else "SIN_DATOS")
+        ),
+    }
+
+# ===============================================================
+# FIN FUNCIONES PRIVADAS
+# ===============================================================
+
+
+# ===============================================================
+# CAPACIDADES PÚBLICAS
+# ===============================================================
 
 def recolectar(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
@@ -275,75 +514,6 @@ def ids_dominio_k_o(
     return sorted(set(ids))
 
 
-# ===============================================================
-# CONTRADICCIONES
-# ===============================================================
-def contradiccion_directa(decls: List[Dict]) -> List[Dict]:
-    grupos: Dict[Tuple[str, str, str], List[Dict]] = {}
-    for d in decls:
-        grupos.setdefault(clave(d), []).append(d)
-
-    choques: List[Dict] = []
-    for k, grupo in grupos.items():
-        afirman = [d for d in grupo if d["polaridad"]]
-        niegan = [d for d in grupo if not d["polaridad"]]
-        for a in afirman:
-            for n in niegan:
-                choques.append({
-                    "tipo": "contradiccion_directa",
-                    "tripleta": " - ".join(k),
-                    "declaracion_1": {
-                        "id": a["id"],
-                        "ubicacion": ref(a),
-                        "enunciado": a["enunciado"],
-                    },
-                    "declaracion_2": {
-                        "id": n["id"],
-                        "ubicacion": ref(n),
-                        "enunciado": n["enunciado"],
-                    },
-                    "mensaje": (
-                        "Contradicción en '{0}': {1} AFIRMA vs {2} NIEGA".format(
-                            " - ".join(k), ref(a), ref(n)
-                        )
-                    ),
-                })
-    return choques
-
-
-def contradiccion_de_cota(decls: List[Dict]) -> List[Dict]:
-    grupos: Dict[Tuple[str, str], List[Dict]] = {}
-    for d in decls:
-        if d["cota"] is None:
-            continue
-        grupos.setdefault(
-            (d["sujeto"].lower().strip(), d["relacion"].lower().strip()),
-            [],
-        ).append(d)
-
-    choques: List[Dict] = []
-    for (suj, rel), grupo in grupos.items():
-        porcota: Dict[str, List[str]] = {}
-        for d in grupo:
-            porcota.setdefault(d["cota"], []).append(ref(d))
-        if len(porcota) > 1:
-            choques.append({
-                "tipo": "contradiccion_de_cota",
-                "sujeto": suj,
-                "relacion": rel,
-                "cotas": porcota,
-                "mensaje": (
-                    "Contradicción de cota en '{0} {1}'. Cotas: {2}".format(
-                        suj, rel, list(porcota.keys())
-                    )
-                ),
-            })
-    return choques
-
-
-# ===============================================================
-# CAPACIDADES
-# ===============================================================
 def barrer(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Dict:
@@ -398,63 +568,6 @@ def axiomas(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
     return declaraciones(declaraciones_externas)
-
-
-def inventario(peticion=None) -> Dict:
-    decls, errores = recolectar()
-    return {
-        "contenedor": "axiomas",
-        "version": "9.5",
-        "tipos": list(TIPOS),
-        "declaraciones": len(decls),
-        "por_tipo": {
-            t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS
-        },
-        "cuerpos": sorted({d["cuerpo"] for d in decls}),
-        "errores": errores,
-        "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
-        "ids_dominio_k_o": ids_dominio_k_o(),
-        "nota": (
-            "Def-5.3.1 y dominio O viven en los cuerpos cargados; "
-            "este módulo los vigila y expone, no los clasifica en entrada."
-        ),
-    }
-
-
-def _dominios_canonicos(gobierna) -> set:
-    out = set()
-    for g in gobierna or []:
-        key = str(g).lower().strip()
-        out.add(DOMINIO_CANONICO.get(key, key.upper()[:3]))
-    return out
-
-
-def _medir_pares(theta: list) -> dict:
-    n = len(theta)
-    pares_tot = n * (n - 1) // 2 if n >= 2 else 0
-    compatibles = 0
-    novedosos = 0
-    for i in range(n):
-        Di = theta[i]["dominios"]
-        for j in range(i + 1, n):
-            Dj = theta[j]["dominios"]
-            if not (Di & Dj):
-                continue
-            compatibles += 1
-            union = Di | Dj
-            if union > Di and union > Dj:
-                novedosos += 1
-    return {
-        "theta_n": n,
-        "pares_totales": pares_tot,
-        "pares_compatibles": compatibles,
-        "pares_novedosos": novedosos,
-        "im_vs_theta": (
-            "GENERATIVO"
-            if n > 0 and novedosos > n
-            else ("ESTANCADO" if n > 0 else "SIN_DATOS")
-        ),
-    }
 
 
 def generatividad() -> dict:
@@ -535,34 +648,110 @@ def generatividad() -> dict:
         ),
     }
 
+# ===============================================================
+# FIN CAPACIDADES PÚBLICAS
+# ===============================================================
+
 
 # ===============================================================
-# CONTENEDOR — lo que pide el Engine / auditoría
+# REPORTING INTERNO
 # ===============================================================
-CONTENEDOR = {
-    "nombre": "axiomas",
-    "rol": "AX",
-    "version": "9.5",
-    "requiere": [],
-    "descripcion": (
-        "Contenedor de axiomas. Rol AX. "
-        "Vigila declaraciones y contradicciones. "
-        "El Engine ejecuta las capacidades declaradas aquí."
-    ),
-    "capacidades": {
-        "verificar": barrer,
-        "barrer": barrer,
-        "verificar_salida": verificar_salida,
-        "inventario": inventario,
-        "axiomas": axiomas,
-        "declaraciones": declaraciones,
-        "generatividad": generatividad,
-        "por_dominio": por_dominio,
-        "ids_dominio_k_o": ids_dominio_k_o,
-        "recolectar": recolectar,
-    },
+
+def reporte() -> Dict[str, Any]:
+    """
+    Reporte interno del módulo.
+    Solo informa estado propio. No calcula Tru ni orquesta el sistema.
+    """
+    r = barrer()
+    return {
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "estado": "OPERATIVO" if r.get("coherente") else "DEGRADADO",
+        "coherente": r.get("coherente"),
+        "declaraciones": r.get("declaraciones"),
+        "choques": len(r.get("choques") or []),
+        "errores": len(r.get("errores") or []),
+        "cuerpos": r.get("cuerpos"),
+        "por_tipo": r.get("por_tipo"),
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+    }
+
+# ===============================================================
+# FIN REPORTING
+# ===============================================================
+
+
+# ===============================================================
+# VERIFICACIÓN
+# ===============================================================
+
+def verificar() -> Dict[str, Any]:
+    """
+    Verificación de coherencia interna del módulo.
+    No verifica el sistema completo.
+    """
+    return barrer()
+
+# ===============================================================
+# FIN VERIFICACIÓN
+# ===============================================================
+
+
+# ===============================================================
+# INVENTARIO
+# ===============================================================
+
+def inventario(peticion=None) -> Dict:
+    decls, errores = recolectar()
+    return {
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "tipos": list(TIPOS),
+        "declaraciones": len(decls),
+        "por_tipo": {
+            t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS
+        },
+        "cuerpos": sorted({d["cuerpo"] for d in decls}),
+        "errores": errores,
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
+        "ids_dominio_k_o": ids_dominio_k_o(),
+        "nota": (
+            "Def-5.3.1 y dominio O viven en los cuerpos cargados; "
+            "este módulo los vigila y expone, no los clasifica en entrada."
+        ),
+    }
+
+# ===============================================================
+# FIN INVENTARIO
+# ===============================================================
+
+
+# ===============================================================
+# EXPORTACIONES
+# ===============================================================
+
+# Resolver referencias de capacidades (str → callable)
+_CAP_MAP = {
+    "barrer": barrer,
+    "verificar_salida": verificar_salida,
+    "inventario": inventario,
+    "axiomas": axiomas,
+    "declaraciones": declaraciones,
+    "generatividad": generatividad,
+    "por_dominio": por_dominio,
+    "ids_dominio_k_o": ids_dominio_k_o,
+    "recolectar": recolectar,
+    "reporte": reporte,
 }
-
+CONTENEDOR["capacidades"] = {
+    k: _CAP_MAP.get(v, v) if isinstance(v, str) else v
+    for k, v in CONTENEDOR["capacidades"].items()
+}
 
 __all__ = [
     "CONTENEDOR",
@@ -586,4 +775,35 @@ __all__ = [
     "verificar_salida",
     "inventario",
     "generatividad",
+    "verificar",
+    "reporte",
 ]
+
+# ===============================================================
+# FIN EXPORTACIONES
+# ===============================================================
+
+
+# ===============================================================
+# EXTENSIONES FUTURAS
+# ===============================================================
+#
+# Nuevas capacidades deberán:
+#   • mantener este contrato
+#   • no romper compatibilidad hacia atrás
+#   • añadirse únicamente en el bloque de capacidades
+#   • actualizar inventario y reporting
+#   • actualizar VERSION_MODULO
+#
+# Engine descubrirá automáticamente cualquier capacidad nueva
+# declarada en CONTENEDOR["capacidades"].
+# Omega la reportará sin modificar su código.
+#
+# ===============================================================
+# FIN EXTENSIONES FUTURAS
+# ===============================================================
+
+
+# ===============================================================
+# FIN DEL MÓDULO
+# ===============================================================

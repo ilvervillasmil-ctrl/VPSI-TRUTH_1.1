@@ -548,63 +548,109 @@ class Engine:
                 )
             )
 
-        # ===============================================================
-    # SECCIÓN: DI — archivos del modulo
-    # ===============================================================
-    #
-    # Solo modules/diccionario/
-    # Johnson / CI leen el reporte de di_auditar_archivos()
-    #
+      # ---------------------------------------------------------------
+    # subsección: Module Audit
     # ---------------------------------------------------------------
-    # subsección: listar todos los archivos
+    #
+    # Johnson puede llamar esto cuantas veces quiera
+    # sobre cualquier contenedor / carpeta de modulo.
+    #
+    # Tres auditorias:
+    #   1. Module Inspection
+    #   2. Module Validation
+    #   3. Source Audit
+    #
+    # No ejecuta la logica del modulo.
+    # Solo inspecciona estructura, contrato y fuentes.
     # ---------------------------------------------------------------
-    def _di_listar_archivos(self) -> List[str]:
-        path = self.raiz / "diccionario"
-        if not path.is_dir():
-            return []
-        return sorted(
-            str(p.relative_to(path))
-            for p in path.rglob("*")
+    def _auditar_modulo(self, cont) -> Dict[str, Any]:
+        from pathlib import Path
+
+        informe = {
+            "modulo": cont.nombre,
+            "rol": cont.rol,
+            "version": cont.version,
+            "inspection": {},
+            "validation": {},
+            "source_audit": {},
+        }
+
+        # ==========================================================
+        # 1. Module Inspection
+        # ==========================================================
+        raiz = Path(cont.ruta).resolve().parent
+
+        archivos = sorted(
+            str(p.relative_to(raiz))
+            for p in raiz.rglob("*")
             if p.is_file()
         )
 
-    def di_archivos(self) -> List[str]:
-        return self._di_listar_archivos()
-
-    # ---------------------------------------------------------------
-    # subsección: auditoria de archivos (CI / Johnson)
-    # ---------------------------------------------------------------
-    def di_auditar_archivos(self) -> Dict[str, Any]:
-        """
-        AUDITORÍA DI — archivos internos
-        Johnson / CI invocan esta funcion y reportan el dict.
-        """
-        path = self.raiz / "diccionario"
-        existe = path.is_dir()
-        archivos = self._di_listar_archivos() if existe else []
-
-        errores: List[str] = []
-        if not existe:
-            errores.append("modules/diccionario no es directorio")
-        if existe and not archivos:
-            errores.append("carpeta diccionario sin archivos")
-
-        init_ok = (path / "__init__.py").is_file() if existe else False
-        if existe and not init_ok:
-            errores.append("falta modules/diccionario/__init__.py")
-
-        reporte = {
-            "modulo": "diccionario",
-            "rol": "DI",
-            "ruta": str(path),
-            "coherente": not errores,
-            "errores": errores,
-            "archivos_n": len(archivos),
+        informe["inspection"] = {
+            "carpeta": str(raiz),
             "archivos": archivos,
-            "tiene_init": init_ok,
+            "n_archivos": len(archivos),
         }
-        return reporte
 
-    # ===============================================================
-    # FIN SECCIÓN: DI — archivos del modulo
-    # ===============================================================
+        # ==========================================================
+        # 2. Module Validation
+        # ==========================================================
+        errores = []
+
+        if not cont.nombre:
+            errores.append("CONTENEDOR.nombre ausente")
+
+        if not cont.rol:
+            errores.append("CONTENEDOR.rol ausente")
+
+        if not cont.version:
+            errores.append("CONTENEDOR.version ausente")
+
+        if not isinstance(cont.capacidades, dict):
+            errores.append("CONTENEDOR.capacidades no es dict")
+        else:
+            for capacidad in cont.capacidades:
+                if not cont.tiene(capacidad):
+                    errores.append(
+                        "capacidad '{0}' no resoluble".format(capacidad)
+                    )
+
+        informe["validation"] = {
+            "coherente": len(errores) == 0,
+            "errores": errores,
+            "requiere": list(getattr(cont, "requiere", []) or []),
+            "capacidades": sorted(
+                str(k) for k in (cont.capacidades or {}).keys()
+            ),
+        }
+
+        # ==========================================================
+        # 3. Source Audit
+        # ==========================================================
+        auditoria = []
+
+        for archivo in archivos:
+            ruta = raiz / archivo
+            try:
+                texto = ruta.read_text(encoding="utf-8", errors="ignore")
+                auditoria.append({
+                    "archivo": archivo,
+                    "lineas": len(texto.splitlines()),
+                    "bytes": ruta.stat().st_size,
+                })
+            except Exception as e:
+                auditoria.append({
+                    "archivo": archivo,
+                    "error": str(e),
+                })
+
+        informe["source_audit"] = {
+            "archivos": auditoria,
+            "n_archivos": len(auditoria),
+        }
+
+        return informe
+
+    def auditar_modulo(self, cont) -> Dict[str, Any]:
+        """Entrada publica para Johnson: misma auditoria, cuantas veces quiera."""
+        return self._auditar_modulo(cont)

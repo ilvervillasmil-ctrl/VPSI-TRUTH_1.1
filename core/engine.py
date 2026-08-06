@@ -272,3 +272,227 @@ class Engine:
     # ===============================================================
     # FIN SECCIÓN: AX
     # ===============================================================
+    # ===============================================================
+    # SECCIÓN: DI
+    # ===============================================================
+    #
+    # Origen
+    #   modules/diccionario/__init__.py
+    #
+    # CONTENEDOR del modulo
+    #   nombre      : diccionario
+    #   rol         : DI
+    #   version     : 1.0
+    #   requiere    : []
+    #   capacidades :
+    #     verificar
+    #     barrer
+    #     inventario
+    #     axiomas
+    #     resolver
+    #     listar
+    #     cargar
+    #     cargar_todos
+    #     definir
+    #     significado
+    #     inyectar_en_peticion
+    #
+    # El modulo es biblioteca de definiciones (materia prima lexica).
+    # Palabra → definicion → significado.
+    # Auto-carga todo archivo debajo que declare DICCIONARIO.
+    # No calcula Tru ni C/L/K.
+    # No clasifica O_context.
+    # No trae dominios externos (RE).
+    # No orquesta.
+    #
+    # Esta seccion:
+    #   - carga el CONTENEDOR de diccionario
+    #   - lee todos los archivos de modules/diccionario/
+    #   - ejecuta solo las capacidades del CONTENEDOR
+    # ===============================================================
+
+    def _di_cargar(self) -> None:
+        path = self.raiz / "diccionario" / "__init__.py"
+        if not path.is_file():
+            self.errores_arranque.append(
+                "DI: no existe {0}".format(path)
+            )
+            return
+
+        directorio = path.parent
+        nombre_mod = "vpsi_diccionario"
+        spec = importlib.util.spec_from_file_location(
+            nombre_mod,
+            path,
+            submodule_search_locations=[str(directorio)],
+        )
+        if spec is None or spec.loader is None:
+            self.errores_arranque.append("DI: no se pudo crear spec")
+            return
+
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[nombre_mod] = mod
+        try:
+            spec.loader.exec_module(mod)
+        except Exception as e:
+            self.errores_arranque.append(
+                "DI: import fallo: {0}: {1}".format(type(e).__name__, e)
+            )
+            return
+
+        meta = getattr(mod, "CONTENEDOR", None)
+        if not isinstance(meta, dict):
+            self.errores_arranque.append("DI: sin CONTENEDOR")
+            return
+
+        if meta.get("nombre") != "diccionario":
+            self.errores_arranque.append(
+                "DI: nombre inesperado: {0}".format(meta.get("nombre"))
+            )
+            return
+
+        if meta.get("rol") != "DI":
+            self.errores_arranque.append(
+                "DI: rol inesperado: {0}".format(meta.get("rol"))
+            )
+            return
+
+        caps = meta.get("capacidades")
+        if not isinstance(caps, dict) or not caps:
+            self.errores_arranque.append("DI: sin capacidades")
+            return
+
+        self._di_mod = mod
+        self._di_meta = dict(meta)
+        self._di_ruta = path
+        self._di_caps = dict(caps)
+        self._di_archivos = sorted(
+            str(p.relative_to(directorio))
+            for p in directorio.rglob("*")
+            if p.is_file()
+        )
+
+        for nombre, ref in self._di_caps.items():
+            fn = ref if callable(ref) else getattr(mod, str(ref), None)
+            if not callable(fn):
+                self.errores_arranque.append(
+                    "DI: capacidad no resoluble: {0}".format(nombre)
+                )
+
+    def _di_fn(self, capacidad: str):
+        if capacidad not in self._di_caps:
+            return None
+        ref = self._di_caps[capacidad]
+        if callable(ref):
+            return ref
+        if self._di_mod is None:
+            return None
+        return getattr(self._di_mod, str(ref), None)
+
+    def _di_ejecutar(self, capacidad: str, *args, **kwargs):
+        fn = self._di_fn(capacidad)
+        if not callable(fn):
+            self.fallos.append({
+                "seccion": "DI",
+                "capacidad": capacidad,
+                "razon": "no resoluble",
+            })
+            return None
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            self.fallos.append({
+                "seccion": "DI",
+                "capacidad": capacidad,
+                "razon": "{0}: {1}".format(type(e).__name__, e),
+                "traza": traceback.format_exc(limit=3),
+            })
+            return None
+
+    def di_barrer(self):
+        out = self._di_ejecutar("barrer")
+        return out if isinstance(out, dict) else None
+
+    def di_verificar(self):
+        out = self._di_ejecutar("verificar")
+        return out if isinstance(out, dict) else None
+
+    def di_inventario(self, peticion=None):
+        out = self._di_ejecutar("inventario", peticion)
+        if not isinstance(out, dict):
+            return None
+        out = dict(out)
+        out["archivos_modulo"] = list(self._di_archivos)
+        out["archivos_n"] = len(self._di_archivos)
+        out["contrato"] = {
+            "nombre": self._di_meta.get("nombre"),
+            "rol": self._di_meta.get("rol"),
+            "version": self._di_meta.get("version"),
+            "requiere": list(self._di_meta.get("requiere") or []),
+            "capacidades": sorted(self._di_caps.keys()),
+        }
+        return out
+
+    def di_axiomas(self):
+        out = self._di_ejecutar("axiomas")
+        return list(out) if isinstance(out, list) else []
+
+    def di_resolver(self, peticion=None):
+        out = self._di_ejecutar("resolver", peticion)
+        return out if isinstance(out, dict) else None
+
+    def di_listar(self):
+        out = self._di_ejecutar("listar")
+        return list(out) if isinstance(out, list) else []
+
+    def di_cargar(self, nombre):
+        return self._di_ejecutar("cargar", nombre)
+
+    def di_cargar_todos(self):
+        out = self._di_ejecutar("cargar_todos")
+        return out if isinstance(out, dict) else {}
+
+    def di_definir(self, palabra, *nombres):
+        out = self._di_ejecutar("definir", palabra, *nombres)
+        return out if isinstance(out, dict) else None
+
+    def di_significado(self, palabra, *nombres):
+        out = self._di_ejecutar("significado", palabra, *nombres)
+        return out if isinstance(out, str) else None
+
+    def di_inyectar_en_peticion(self, peticion=None, *nombres, clave="diccionario"):
+        out = self._di_ejecutar(
+            "inyectar_en_peticion", peticion, *nombres, clave=clave
+        )
+        return out if isinstance(out, dict) else None
+
+    def di_archivos(self):
+        return list(getattr(self, "_di_archivos", []) or [])
+
+    def _di_compuerta(self) -> None:
+        if getattr(self, "_di_mod", None) is None:
+            if not any(e.startswith("DI:") for e in self.errores_arranque):
+                self.errores_arranque.append("DI: modulo no cargado")
+            return
+
+        if not getattr(self, "_di_archivos", None):
+            self.errores_arranque.append("DI: carpeta sin archivos")
+
+        informe = self.di_barrer()
+        if informe is None:
+            informe = self.di_verificar()
+
+        if informe is None:
+            self.errores_arranque.append("DI: barrer/verificar no resolvio")
+            return
+
+        if not informe.get("coherente", False):
+            self.errores_arranque.append(
+                "DI: incoherente errores={0}".format(
+                    len(informe.get("errores") or [])
+                )
+            )
+
+    # ===============================================================
+    # FIN SECCIÓN: DI
+    # ===============================================================

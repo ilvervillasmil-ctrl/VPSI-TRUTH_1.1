@@ -27,7 +27,7 @@ _FUENTES = _DIR / "fuentes"
 VERSION = "1.0"
 
 # ===============================================================
-# ESTADO (se llena solo por descubrimiento — nada arriba nombra abajo)
+# ESTADO
 # ===============================================================
 _REGISTRO: Dict[str, Any] = {}
 _META: Dict[str, Dict[str, Any]] = {}
@@ -90,7 +90,6 @@ def _descubrir() -> None:
         return
 
     candidatos: List[Path] = []
-    # Lee dinámicamente cualquier subcarpeta y archivo interno de fuentes y del módulo
     if _DIR.is_dir():
         candidatos.extend(sorted(_DIR.glob("**/*.py")))
 
@@ -136,7 +135,7 @@ def _asegurar() -> None:
 
 
 # ===============================================================
-# API — materia prima de definiciones
+# API — MATERIA PRIMA Y EXPOSICIÓN TOTAL DE PALABRAS
 # ===============================================================
 def listar() -> List[str]:
     _asegurar()
@@ -302,6 +301,7 @@ def barrer() -> Dict[str, Any]:
         "errores": errores,
         "diccionarios": listar(),
         "total": len(_REGISTRO),
+        "palabras_totales": sorted(palabras()),
         "por_idioma": por_idioma,
         "notas": notas,
     }
@@ -339,6 +339,7 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "version": VERSION,
         "rol": "DI",
         "total": b.get("total"),
+        "palabras_totales": sorted(palabras()),
         "diccionarios": detalle,
         "por_idioma": b.get("por_idioma"),
         "coherente": b.get("coherente"),
@@ -423,9 +424,10 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "rol": "DI",
         "diccionarios_usados": usados,
         "palabras_n": len(palabras(*usados)),
+        "palabras_totales": sorted(palabras(*usados)),
         "inventario": inventario(),
         "coherente": True,
-        "notas": ["Materia prima entregada."],
+        "notas": ["Materia prima y palabras entregadas."],
     }
 
 
@@ -452,6 +454,7 @@ CONTENEDOR = {
         "cargar_todos": cargar_todos,
         "definir": definir,
         "significado": significado,
+        "palabras": palabras,
         "inyectar_en_peticion": inyectar_en_peticion,
     },
 }

@@ -255,4 +255,53 @@ class Engine:
 
         return resultados_ejecucion
 
+# ===============================================================
+# LISTA MAESTRA UNIVERSAL DE CAPACIDADES PARA TODOS LOS INI
+# ===============================================================
+# Nota: Esta lista unifica todas las capacidades y funciones estándar 
+# que deben estar disponibles o ser reconocidas transversalmente en 
+# todos los contenedores (__init__.py) del sistema. Si un módulo 
+# incorpora una función nueva, se anexa aquí una sola vez y queda 
+# disponible para el Engine y el auditor forense del CI.
+
+UNIVERSAL_CAPACIDADES_MAP = {
+    # --- Capacidades de Validación y Centinela ---
+    "verificar": "barrer",
+    "barrer": "barrer",
+    "verificar_salida": "verificar_salida",
+    
+    # --- Capacidades de Inspección y Metadatos ---
+    "inventario": "inventario",
+    "meta": "meta",
+    
+    # --- Capacidades Axiomáticas ---
+    "axiomas": "axiomas",
+    "generatividad": "generatividad",
+    
+    # --- Capacidades de Resolución y Datos (Ej: Diccionario / DI) ---
+    "resolver": "resolver",
+    "listar": "listar",
+    "listar_por_idioma": "listar_por_idioma",
+    "cargar": "cargar",
+    "cargar_todos": "cargar_todos",
+    "cargar_idioma": "cargar_idioma",
+    "definir": "definir",
+    "significado": "significado",
+    "palabras": "palabras",
+    "inyectar_en_peticion": "inyectar_en_peticion",
+    
+    # ===========================================================
+    # ZONA DE EXPANSIÓN UNIVERSAL:
+    # Anexa aquí cualquier nueva función que encuentres en los 
+    # demás módulos a medida que vayamos avanzando.
+    # ===========================================================
+    # "nueva_funcion_encontrada": "nombre_real_en_el_modulo",
+}
+
+def obtener_funcion_universal(capacidad_clave: str) -> str:
+    """
+    Retorna la correspondencia exacta desde la lista maestra universal.
+    """
+    return UNIVERSAL_CAPACIDADES_MAP.get(capacidad_clave, capacidad_clave)
+
 

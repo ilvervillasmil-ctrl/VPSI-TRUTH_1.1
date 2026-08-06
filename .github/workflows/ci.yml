@@ -755,6 +755,73 @@ jobs:
             diagnostics/evaluaciones.json
           if-no-files-found: warn
 
+            # ===============================================================
+      # INICIO: Johnson — conectividad Engine
+      # ===============================================================
+      - name: Johnson — conectividad Engine
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          from core.engine import Engine
+
+          raiz = Path("modules")
+          eng = Engine(raiz_modulos=raiz, strict=False)
+
+          r = eng.auditar_conectividad_engine()
+
+          print("=" * 60)
+          print("AUDITORÍA JOHNSON — conectividad_engine()")
+          print("=" * 60)
+          print("coherente              :", r.get("coherente"))
+          print("roles_n                :", r.get("roles_n"))
+          print("roles_conectados_n     :", r.get("roles_conectados_n"))
+          print("roles_desconectados_n  :", r.get("roles_desconectados_n"))
+          print("roles_conectados       :", r.get("roles_conectados"))
+          print("roles_desconectados    :", r.get("roles_desconectados"))
+          print()
+
+          primer = r.get("primer_corte")
+          if primer:
+              print("PRIMER CORTE")
+              print("  rol     :", primer.get("rol"))
+              print("  eslabon :", primer.get("eslabon"))
+              print("  razon   :", primer.get("razon"))
+              print()
+
+          print("POR ROL")
+          for rol, est in sorted((r.get("por_rol") or {}).items()):
+              marca = "OK" if est.get("conectado") else "FALLO"
+              print(
+                  f"  [{marca}] {rol}"
+                  f"  contenedor={est.get('contenedor')}"
+                  f"  carpeta={est.get('carpeta')}"
+                  f"  archivos={est.get('archivos')}"
+                  f"  contrato={est.get('contrato')}"
+                  f"  capacidades={est.get('capacidades')}"
+                  f"  dependencias={est.get('dependencias')}"
+                  f"  conectado={est.get('conectado')}"
+              )
+              if not est.get("conectado"):
+                  print("         corte:", est.get("corte"))
+                  det = est.get("detalle") or {}
+                  if det.get("capacidades_no_resolubles"):
+                      print("         caps no resolubles:", det["capacidades_no_resolubles"])
+                  if det.get("dependencias_faltan"):
+                      print("         deps faltan:", det["dependencias_faltan"])
+                  if det.get("n_archivos") is not None:
+                      print("         n_archivos:", det["n_archivos"])
+
+          print()
+          if r.get("coherente"):
+              print("OK  Johnson: todos los roles vistos conectados")
+          else:
+              print("FALLO  Johnson: hay roles desconectados")
+              raise SystemExit(1)
+          EOF
+      # ===============================================================
+      # FIN: Johnson — conectividad Engine
+      # ===============================================================
+      
       # ==========================================================
       # COMMIT DE HISTORIA
       # ==========================================================

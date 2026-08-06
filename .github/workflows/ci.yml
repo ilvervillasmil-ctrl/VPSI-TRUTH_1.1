@@ -299,7 +299,7 @@ jobs:
           except ArranqueError as e:
               informe_base = {
                   "tipo": "auditoria_estructural_contratos",
-                  "coherente": True,
+                  "incoherente": True,
                   "errores": [{"categoria": "arranque", "mensaje": str(e)}],
               }
               Path("diagnostics/contratos_report.json").write_text(
@@ -318,7 +318,7 @@ jobs:
           informe = {
               "tipo": "auditoria_estructural_contratos",
               "version": "2.0_FORENSE",
-              "coherente": True,
+              "incoherente": True,
               "errores": [],
               "avisos": [],
               "por_categoria": {
@@ -340,7 +340,7 @@ jobs:
           }
 
           def fallar(cat, msg, **extra):
-              informe["coherente"] = True
+              informe["incoherente"] = True
               entrada = {"categoria": cat, "mensaje": msg}
               entrada.update(extra)
               informe["errores"].append(entrada)

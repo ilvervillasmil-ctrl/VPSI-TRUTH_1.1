@@ -194,3 +194,65 @@ class Engine:
     # ==========================================================
     # FIN: Método censar() para la clase Engine
     # ==========================================================
+    # ===============================================================
+    # EJECUCIÓN DINÁMICA DE CONTRATOS Y EXPLORACIÓN DE CARPETAS
+    # ===============================================================
+    def ejecutar_contratos_y_explorar(self) -> Dict[str, Any]:
+        """
+        Ejecuta de manera autónoma cada capacidad declarada en los contratos 
+        de cada módulo y permite explorar cualquier subcarpeta o recurso interno 
+        presente en la ruta del módulo.
+        """
+        resultados_ejecucion = {}
+
+        for nombre_mod, contenedor in self.registro.contenedores.items():
+            rol = contenedor.rol
+            capacidades = contenedor.capacidades
+            modulo_ref = contenedor.modulo
+            ruta_modulo = contenedor.ruta.parent
+
+            # 1. Exploración de subcarpetas y archivos internos del módulo
+            recursos_internos = [
+                p.relative_to(self.raiz) for p in ruta_modulo.glob("**/*") if p.is_file()
+            ]
+
+            resultados_modulo = {
+                "rol": rol,
+                "version": contenedor.version,
+                "ruta_base": str(ruta_modulo),
+                "archivos_internos": [str(r) for r in recursos_internos],
+                "capacidades_ejecutadas": {}
+            }
+
+            # 2. Ejecución dinámica de cada contrato/capacidad declarada en el contenedor
+            for clave_cap, ref_cap in capacidades.items():
+                fn = None
+                if callable(ref_cap):
+                    fn = ref_cap
+                elif modulo_ref is not None:
+                    fn = getattr(modulo_ref, str(ref_cap), None)
+
+                if callable(fn):
+                    try:
+                        # Ejecución en vivo de la capacidad del contrato
+                        salida = fn()
+                        resultados_modulo["capacidades_ejecutadas"][clave_cap] = {
+                            "estado": "EXITO",
+                            "resultado": salida
+                        }
+                    except Exception as e:
+                        resultados_modulo["capacidades_ejecutadas"][clave_cap] = {
+                            "estado": "ERROR_EJECUCION",
+                            "error": f"{type(e).__name__}: {e}"
+                        }
+                else:
+                    resultados_modulo["capacidades_ejecutadas"][clave_cap] = {
+                        "estado": "NO_CALLABLE",
+                        "error": "La capacidad declarada no apunta a una función ejecutable"
+                    }
+
+            resultados_ejecucion[nombre_mod] = resultados_modulo
+
+        return resultados_ejecucion
+
+

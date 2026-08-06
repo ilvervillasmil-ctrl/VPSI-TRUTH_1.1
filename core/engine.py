@@ -941,6 +941,115 @@ def auditoria_global(self) -> Dict[str, Any]:
 
 def indice_simbolos(self) -> Dict[str, Any]:
     return self._indice_simbolos
+
+# ===========================================================
+# SECCIÓN 27: ÍNDICE DE RUTAS + LECTOR UNIVERSAL (corregida)
+# ===========================================================
+
+def _construir_indice_rutas(self) -> None:
+    """
+    Construye el índice de rutas y el índice inverso por nombre de archivo.
+    Debe llamarse una vez durante el arranque.
+    """
+    self._indice_rutas = {}
+    self._indice_nombre_archivo = {}
+
+    for nombre_modulo, data in self._exploracion.items():
+        for ruta_rel in data.get("archivos", []):
+            ruta_abs = str((self.raiz / ruta_rel).resolve())
+            self._indice_rutas[ruta_rel] = {
+                "modulo": nombre_modulo,
+                "ruta_relativa": ruta_rel,
+                "ruta_absoluta": ruta_abs,
+            }
+            nombre = Path(ruta_rel).name
+            self._indice_nombre_archivo.setdefault(nombre, []).append(ruta_rel)
+
+
+def leer_archivo(self, identificador: str, modo: str = "texto") -> Any:
+    """
+    Lector universal de archivos del repositorio.
+
+    identificador: ruta relativa o nombre de archivo.
+    modo: "texto" | "bytes" | "json" | "lineas"
+    """
+    info = self._indice_rutas.get(identificador)
+
+    # Si no se encontró por ruta exacta, intentar por nombre de archivo
+    if info is None:
+        rutas = self._indice_nombre_archivo.get(identificador, [])
+        if len(rutas) == 1:
+            info = self._indice_rutas.get(rutas[0])
+        elif len(rutas) > 1:
+            return {
+                "encontrado": False,
+                "error": f"Nombre ambiguo '{identificador}'. Rutas posibles: {rutas}",
+            }
+
+    if info is None:
+        return {
+            "encontrado": False,
+            "error": f"Archivo no encontrado: {identificador}",
+        }
+
+    ruta_abs = Path(info["ruta_absoluta"])
+    if not ruta_abs.is_file():
+        return {
+            "encontrado": False,
+            "error": f"Ruta indexada pero archivo inexistente en disco: {ruta_abs}",
+        }
+
+    try:
+        if modo == "bytes":
+            contenido = ruta_abs.read_bytes()
+        elif modo == "json":
+            import json
+            contenido = json.loads(ruta_abs.read_text(encoding="utf-8"))
+        elif modo == "lineas":
+            contenido = ruta_abs.read_text(encoding="utf-8").splitlines()
+        else:
+            contenido = ruta_abs.read_text(encoding="utf-8")
+
+        return {
+            "encontrado": True,
+            "ruta_relativa": info["ruta_relativa"],
+            "ruta_absoluta": info["ruta_absoluta"],
+            "modulo": info["modulo"],
+            "modo": modo,
+            "contenido": contenido,
+        }
+    except Exception as e:
+        return {
+            "encontrado": True,
+            "error": f"{type(e).__name__}: {e}",
+            "ruta_relativa": info["ruta_relativa"],
+            "modulo": info["modulo"],
+        }
+
+
+def leer_texto(self, identificador: str) -> Any:
+    return self.leer_archivo(identificador, modo="texto")
+
+
+def leer_bytes(self, identificador: str) -> Any:
+    return self.leer_archivo(identificador, modo="bytes")
+
+
+def leer_json(self, identificador: str) -> Any:
+    return self.leer_archivo(identificador, modo="json")
+
+
+def leer_lineas(self, identificador: str) -> Any:
+    return self.leer_archivo(identificador, modo="lineas")
+
+
+def listar_archivos(self, modulo: str = None) -> List[str]:
+    if modulo is None:
+        return sorted(self._indice_rutas.keys())
+    return sorted(
+        ruta for ruta, info in self._indice_rutas.items()
+        if info.get("modulo") == modulo
+    )
 # ==============================================================
 # FIN: core/engine.py — versión corregida (separación arranque / ejecución)
 # ==============================================================

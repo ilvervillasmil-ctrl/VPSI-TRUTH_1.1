@@ -1,0 +1,13 @@
+[
+  {
+    "utc": "2026-08-06T08:55:21.491144+00:00",
+    "sha": "101036b1fb86",
+    "ref": "refs/heads/main",
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "rate": 100.0,
+    "estado": "BASELINE"
+  }
+]

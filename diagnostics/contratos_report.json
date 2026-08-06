@@ -1,0 +1,351 @@
+{
+  "tipo": "auditoria_estructural_contratos",
+  "version": "2.0_FORENSE",
+  "coherente": true,
+  "errores": [
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "verificar"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'barrer', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "barrer"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "inventario"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "axiomas"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'generatividad', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "generatividad"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
+      "rol": "FO",
+      "modulo": "formulas",
+      "version": "1.0",
+      "clave": "verificar"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'evaluar', pero el código real no la expone o no es callable",
+      "rol": "FO",
+      "modulo": "formulas",
+      "version": "1.0",
+      "clave": "evaluar"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
+      "rol": "FO",
+      "modulo": "formulas",
+      "version": "1.0",
+      "clave": "axiomas"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
+      "rol": "FO",
+      "modulo": "formulas",
+      "version": "1.0",
+      "clave": "inventario"
+    }
+  ],
+  "avisos": [
+    {
+      "categoria": "integridad",
+      "mensaje": "depositario de evidencia no disponible; write_text de respaldo",
+      "error": "cannot import name 'evidencia' from 'diagnostics' (unknown location)"
+    }
+  ],
+  "por_categoria": {
+    "arranque": [],
+    "invariantes": [],
+    "registro": [],
+    "contradiccion_contrato": [
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "verificar"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'barrer', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "barrer"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "inventario"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "axiomas"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'generatividad', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "generatividad"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'verificar', pero el código real no la expone o no es callable",
+        "rol": "FO",
+        "modulo": "formulas",
+        "version": "1.0",
+        "clave": "verificar"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'evaluar', pero el código real no la expone o no es callable",
+        "rol": "FO",
+        "modulo": "formulas",
+        "version": "1.0",
+        "clave": "evaluar"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'axiomas', pero el código real no la expone o no es callable",
+        "rol": "FO",
+        "modulo": "formulas",
+        "version": "1.0",
+        "clave": "axiomas"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
+        "rol": "FO",
+        "modulo": "formulas",
+        "version": "1.0",
+        "clave": "inventario"
+      }
+    ],
+    "resolucion": [],
+    "integridad": [
+      {
+        "categoria": "integridad",
+        "mensaje": "depositario de evidencia no disponible; write_text de respaldo",
+        "error": "cannot import name 'evidencia' from 'diagnostics' (unknown location)"
+      }
+    ]
+  },
+  "roles": {
+    "AX": {
+      "modulos": [
+        "axiomas"
+      ],
+      "presente": true,
+      "n_modulos": 1,
+      "claves_contrato": [
+        "verificar",
+        "barrer",
+        "inventario",
+        "axiomas",
+        "generatividad"
+      ],
+      "resolucion": [
+        {
+          "clave": "verificar",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "barrer",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "inventario",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "axiomas",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "generatividad",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        }
+      ],
+      "nombre": "axiomas",
+      "version": "9.5"
+    },
+    "CT": {
+      "modulos": [
+        "constante"
+      ],
+      "presente": true,
+      "n_modulos": 1,
+      "claves_contrato": [
+        "alpha",
+        "beta",
+        "inventario"
+      ],
+      "resolucion": [
+        {
+          "clave": "alpha",
+          "callable": true,
+          "modulo": "constante",
+          "rol": "CT",
+          "version": "1.0",
+          "ok": true,
+          "fn_name": "get_alpha"
+        },
+        {
+          "clave": "beta",
+          "callable": true,
+          "modulo": "constante",
+          "rol": "CT",
+          "version": "1.0",
+          "ok": true,
+          "fn_name": "get_beta"
+        },
+        {
+          "clave": "inventario",
+          "callable": true,
+          "modulo": "constante",
+          "rol": "CT",
+          "version": "1.0",
+          "ok": true,
+          "fn_name": "inventario"
+        }
+      ],
+      "nombre": "constante",
+      "version": "1.0"
+    },
+    "FO": {
+      "modulos": [
+        "formulas"
+      ],
+      "presente": true,
+      "n_modulos": 1,
+      "claves_contrato": [
+        "verificar",
+        "evaluar",
+        "axiomas",
+        "inventario"
+      ],
+      "resolucion": [
+        {
+          "clave": "verificar",
+          "callable": false,
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "ok": false
+        },
+        {
+          "clave": "evaluar",
+          "callable": false,
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "ok": false
+        },
+        {
+          "clave": "axiomas",
+          "callable": false,
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "ok": false
+        },
+        {
+          "clave": "inventario",
+          "callable": false,
+          "modulo": "formulas",
+          "rol": "FO",
+          "version": "1.0",
+          "ok": false
+        }
+      ],
+      "nombre": "formulas",
+      "version": "1.0"
+    }
+  },
+  "resumen": {
+    "roles_totales": 3,
+    "roles_presentes": 3,
+    "contratos_validos": 1,
+    "contratos_invalidos": 2,
+    "capacidades_verificadas": 3,
+    "capacidades_fallidas": 9,
+    "pct_integridad_capacidades": 25.0,
+    "resultados_evaluacion_n": 0,
+    "rechazados_n": 0,
+    "errores_n": 9,
+    "avisos_n": 1
+  },
+  "resultados_evaluacion_n": 0,
+  "evidencia_arranque": {
+    "estado": "OPERATIVO",
+    "invocador_id": "ci_auditoria",
+    "errores_arranque": [],
+    "determinismo_censar": "OK"
+  },
+  "nota": "Auditoría Forense Universal: Escaneo automático de contratos INI/carpetas. Detección directa de contradicciones entre lo declarado y la realidad del código.",
+  "evidencia_evaluacion": {
+    "path": "diagnostics/evaluaciones.json",
+    "n": 0,
+    "modo": "fallback_write_text"
+  }
+}

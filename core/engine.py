@@ -28,6 +28,189 @@ Descripcion
     Nuevos modulos o roles = nuevas secciones, sin reescribir el resto.
 """
 
+from __future__ import annotations
+
+import importlib.util
+import sys
+import traceback
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+
+class ArranqueError(Exception):
+    pass
+
+
+ROLES: Tuple[str, ...] = (
+    "CT", "AX", "FO", "MC", "SF", "DG", "CA", "CX", "DI",
+    "RE", "VX", "TX", "CH", "CIT", "UI", "GL", "TT", "CC", "CE",
+)
+
+
+class Contenedor:
+    def __init__(
+        self,
+        nombre: str,
+        rol: str,
+        version: str,
+        modulo: Any,
+        ruta: Path,
+        meta: Dict[str, Any],
+    ) -> None:
+        self.nombre = nombre
+        self.rol = rol
+        self.version = version
+        self.modulo = modulo
+        self.ruta = ruta
+        self.requiere = list(meta.get("requiere") or [])
+        self.descripcion = str(meta.get("descripcion") or "")
+        raw = meta.get("capacidades") or {}
+        self.capacidades = dict(raw) if isinstance(raw, dict) else {}
+
+    def fn(self, nombre: str) -> Any:
+        ref = self.capacidades.get(nombre)
+        if ref is None:
+            return None
+        if callable(ref):
+            return ref
+        if isinstance(ref, str):
+            return getattr(self.modulo, ref, None)
+        return None
+
+    def tiene(self, nombre: str) -> bool:
+        return callable(self.fn(nombre))
+
+
+class Registro:
+    def __init__(self) -> None:
+        self.contenedores: Dict[str, Contenedor] = {}
+        self.por_rol: Dict[str, List[Contenedor]] = {r: [] for r in ROLES}
+        self.rechazados: List[Dict[str, Any]] = []
+
+    def registrar(self, cont: Contenedor) -> None:
+        if cont.nombre in self.contenedores:
+            return
+        self.contenedores[cont.nombre] = cont
+        if cont.rol in self.por_rol:
+            self.por_rol[cont.rol].append(cont)
+
+    def primero(self, rol: str) -> Optional[Contenedor]:
+        lista = self.por_rol.get(rol) or []
+        return lista[0] if lista else None
+
+
+class Engine:
+    """Orquestador por secciones de contrato. Seccion AX activa."""
+
+    VERSION = "12.0"
+
+    def __init__(
+        self,
+        raiz_modulos: str | Path,
+        invocador_id: str = "core",
+        strict: bool = True,
+    ) -> None:
+        self.raiz = Path(raiz_modulos).resolve()
+        self.invocador_id = invocador_id
+        self.strict = strict
+        self.registro = Registro()
+        self.fallos: List[Dict[str, Any]] = []
+        self.errores_arranque: List[str] = []
+        self.informe_axiomas: Optional[Dict[str, Any]] = None
+        self.estado = "NO_INICIADO"
+
+        self._descubrir()
+        self._ax_compuerta()
+
+        if self.errores_arranque:
+            self.estado = "RECHAZADO"
+            if self.strict:
+                raise ArranqueError(
+                    "Engine no pudo arrancar:\n  - "
+                    + "\n  - ".join(self.errores_arranque)
+                )
+        else:
+            self.estado = "OPERATIVO"
+
+    def _descubrir(self) -> None:
+        if not self.raiz.exists():
+            self.errores_arranque.append(
+                "Raiz de modulos no existe: {0}".format(self.raiz)
+            )
+            return
+        for path in sorted(self.raiz.rglob("__init__.py")):
+            try:
+                rel = path.relative_to(self.raiz)
+            except ValueError:
+                continue
+            if len(rel.parts) != 2:
+                continue
+            cont = self._cargar_modulo(path)
+            if cont is not None:
+                self.registro.registrar(cont)
+
+    def _cargar_modulo(self, path: Path) -> Optional[Contenedor]:
+        directorio = path.parent
+        nombre_mod = "vpsi_{0}".format(directorio.name)
+        spec = importlib.util.spec_from_file_location(
+            nombre_mod,
+            path,
+            submodule_search_locations=[str(directorio)],
+        )
+        if spec is None or spec.loader is None:
+            return None
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[nombre_mod] = mod
+        try:
+            spec.loader.exec_module(mod)
+        except Exception as e:
+            self.registro.rechazados.append({
+                "ruta": str(path),
+                "razon": "{0}: {1}".format(type(e).__name__, e),
+            })
+            return None
+        meta = getattr(mod, "CONTENEDOR", None)
+        if not isinstance(meta, dict):
+            return None
+        nombre = meta.get("nombre")
+        rol = meta.get("rol")
+        if not nombre or not rol or rol not in ROLES:
+            return None
+        return Contenedor(
+            nombre=str(nombre),
+            rol=str(rol),
+            version=str(meta.get("version", "0.0")),
+            modulo=mod,
+            ruta=path,
+            meta=meta,
+        )
+
+    def _ejecutar_capacidad(
+        self,
+        cont: Contenedor,
+        capacidad: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        fn = cont.fn(capacidad)
+        if not callable(fn):
+            self.fallos.append({
+                "contenedor": cont.nombre,
+                "capacidad": capacidad,
+                "razon": "no callable",
+            })
+            return None
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            self.fallos.append({
+                "contenedor": cont.nombre,
+                "capacidad": capacidad,
+                "razon": "{0}: {1}".format(type(e).__name__, e),
+                "traza": traceback.format_exc(limit=3),
+            })
+            return None
+
     # ===============================================================
     # SECCIÓN: AX
     # ===============================================================

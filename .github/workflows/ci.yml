@@ -586,7 +586,7 @@ jobs:
           print("=" * 60)
           print("AUDITORÍA FORENSE DE CONTRATOS v2.0 (Dinámica Universal)")
           print("=" * 60)
-          print("coherente:", informe["coherente"])
+          print("incoherente:", informe["incoherente"])
           ev = informe.get("evidencia_evaluacion") or {}
           print("evaluaciones.json n:", ev.get("n", 0))
           print("  modo:", ev.get("modo", "?"))

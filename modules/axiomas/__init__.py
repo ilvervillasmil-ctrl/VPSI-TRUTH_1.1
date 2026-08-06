@@ -80,24 +80,18 @@ except Exception:  # noqa: BLE001
 # CONSTANTES
 # ===============================================================
 
-# Identidad inmutable
 ID_MODULO = "AX"
 NOMBRE_MODULO = "axiomas"
 ROL_MODULO = "AX"
 
-# Versiones
 VERSION_MODULO = "9.6"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
 
-# Compatibilidad
 COMPATIBLE_DESDE = "9.5"
 API_ENGINE = ">=1.0"
-
-# Estabilidad
 ESTABILIDAD = "ESTABLE"
 
-# Estados centralizados
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
 ESTADO_DEGRADADO = "DEGRADADO"
@@ -109,7 +103,6 @@ ESTADOS_VALIDOS = (
     ESTADO_RECHAZADO,
 )
 
-# Invariantes
 INVARIANTES = (
     "el id del módulo nunca cambia",
     "el rol nunca cambia",
@@ -118,7 +111,6 @@ INVARIANTES = (
     "este módulo no inventa capacidades no declaradas en CONTENEDOR",
 )
 
-# Dominio axiomático
 OBLIGATORIOS = ("id", "tipo", "sujeto", "relacion", "objeto", "polaridad")
 TIPOS = ("axioma", "lema", "teorema", "corolario", "definicion")
 
@@ -308,36 +300,71 @@ CONTENEDOR: Dict[str, Any] = {
         "buscar_por_id": "buscar_por_id",
     },
 
-    # ----- METADATOS DE CAPACIDADES -----
+    # ----- METADATOS DE CAPACIDADES (completo: 1:1 con capacidades) -----
     "capacidades_meta": {
+        "verificar": {
+            "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
+            "entrada": "declaraciones_externas opcional (dict)",
+            "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo",
+        },
         "barrer": {
-            "descripcion": "Analiza coherencia de todas las declaraciones.",
-            "entrada": "declaraciones_externas opcional",
-            "salida": "dict con coherente, choques, errores, declaraciones, ...",
+            "descripcion": "Analiza coherencia de todas las declaraciones (contradicción directa y de cota).",
+            "entrada": "declaraciones_externas opcional (dict)",
+            "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo, ids_dominio_k_o",
+        },
+        "verificar_salida": {
+            "descripcion": "Comprueba si una salida de barrer/verificar es coherente.",
+            "entrada": "salida: dict",
+            "salida": "bool",
         },
         "inventario": {
-            "descripcion": "Inventario completo del módulo.",
-            "entrada": "ninguna",
-            "salida": "dict con id, nombre, rol, version, declaraciones, cuerpos, ...",
+            "descripcion": "Inventario completo del módulo (declaraciones, cuerpos, capacidades).",
+            "entrada": "peticion opcional",
+            "salida": "dict con id, nombre, rol, version, declaraciones, cuerpos, capacidades, ...",
+        },
+        "axiomas": {
+            "descripcion": "Devuelve las declaraciones si el módulo es coherente; lista vacía si no.",
+            "entrada": "declaraciones_externas opcional (dict)",
+            "salida": "list[dict] de declaraciones normalizadas",
+        },
+        "declaraciones": {
+            "descripcion": "Igual que axiomas: declaraciones normalizadas si coherente.",
+            "entrada": "declaraciones_externas opcional (dict)",
+            "salida": "list[dict] de declaraciones normalizadas",
         },
         "generatividad": {
             "descripcion": "Mide generatividad operativa y canónica (TR1).",
             "entrada": "ninguna",
-            "salida": "dict con theta_n, pares, im_vs_theta, capa canonica, ...",
+            "salida": "dict con theta_n, pares, im_vs_theta, capa canonica, dominios, u1_proxy",
+        },
+        "por_dominio": {
+            "descripcion": "Filtra declaraciones por dominio en gobierna.",
+            "entrada": "dominio: str; declaraciones_externas opcional",
+            "salida": "list[dict] de declaraciones del dominio",
+        },
+        "ids_dominio_k_o": {
+            "descripcion": "Ids de declaraciones ligadas a dominios K/O o Def-5.3.1.",
+            "entrada": "declaraciones_externas opcional (dict)",
+            "salida": "list[str] de ids ordenados",
+        },
+        "recolectar": {
+            "descripcion": "Carga y normaliza todas las declaraciones de los cuerpos del módulo.",
+            "entrada": "declaraciones_externas opcional (dict)",
+            "salida": "tuple[list[dict], list[dict]] → (declaraciones, errores)",
         },
         "reporte": {
             "descripcion": "Reporte interno de estado del módulo.",
             "entrada": "ninguna",
-            "salida": "dict con estado, coherente, choques, errores, ...",
+            "salida": "dict con estado, coherente, declaraciones, choques, errores, capacidades",
         },
         "diagnostico": {
-            "descripcion": "Diagnóstico: qué me sucede, qué falta, qué está mal.",
+            "descripcion": "Diagnóstico: qué me sucede, qué falta, qué está mal, qué necesito.",
             "entrada": "ninguna",
-            "salida": "dict con problemas, advertencias, recomendaciones",
+            "salida": "dict con estado, problemas, advertencias, recomendaciones",
         },
         "buscar_por_id": {
             "descripcion": "Busca una declaración por su id.",
-            "entrada": "id: str",
+            "entrada": "id_decl: str",
             "salida": "dict de la declaración o None",
         },
     },
@@ -587,14 +614,33 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
         raise ContratoInvalido(
             f"{NOMBRE_MODULO}: esquema incompatible: {cont.get('esquema')}"
         )
+    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: version_contrato inválida: {cont.get('version_contrato')}"
+        )
     if not isinstance(cont.get("capacidades"), dict):
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: 'capacidades' debe ser dict"
-        )
+        raise ContratoInvalido(f"{NOMBRE_MODULO}: 'capacidades' debe ser dict")
     if not isinstance(cont.get("requiere"), list):
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: 'requiere' debe ser list"
-        )
+        raise ContratoInvalido(f"{NOMBRE_MODULO}: 'requiere' debe ser list")
+
+    # Regla obligatoria: toda capacidad tiene capacidades_meta completa
+    meta_caps = cont.get("capacidades_meta") or {}
+    for nombre_cap in cont["capacidades"]:
+        if nombre_cap not in meta_caps:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre_cap}' sin capacidades_meta"
+            )
+        entrada = meta_caps[nombre_cap]
+        if not isinstance(entrada, dict):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] debe ser dict"
+            )
+        for campo in ("descripcion", "entrada", "salida"):
+            if campo not in entrada or not isinstance(entrada[campo], str):
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] "
+                    f"requiere '{campo}: str'"
+                )
 
 # ===============================================================
 # FIN FUNCIONES PRIVADAS
@@ -826,7 +872,6 @@ def generatividad() -> dict:
 
 
 def buscar_por_id(id_decl: str) -> Optional[Dict]:
-    """Consulta: declaración completa por id."""
     decls, _ = recolectar()
     for d in decls:
         if d.get("id") == id_decl:
@@ -835,7 +880,6 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
 
 
 def verificar() -> Dict[str, Any]:
-    """Verificación de coherencia interna del módulo."""
     return barrer()
 
 # ===============================================================
@@ -848,7 +892,6 @@ def verificar() -> Dict[str, Any]:
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
-    """Reporte interno del módulo. Solo informa estado propio."""
     r = barrer()
     return {
         "id": ID_MODULO,
@@ -874,17 +917,13 @@ def reporte() -> Dict[str, Any]:
 
 
 def diagnostico() -> Dict[str, Any]:
-    """Diagnóstico: qué me sucede, qué falta, qué está mal, qué necesito."""
     r = barrer()
     problemas = []
     advertencias = []
     recomendaciones = []
 
     if r.get("errores"):
-        problemas.append({
-            "tipo": "errores_carga",
-            "detalle": r["errores"],
-        })
+        problemas.append({"tipo": "errores_carga", "detalle": r["errores"]})
         recomendaciones.append("Revisar archivos de cuerpos con error de carga")
 
     if r.get("choques"):
@@ -927,7 +966,7 @@ def diagnostico() -> Dict[str, Any]:
 # VERIFICACIÓN
 # ===============================================================
 
-# verificar() ya está en CAPACIDADES PÚBLICAS.
+# verificar() en CAPACIDADES PÚBLICAS
 
 # ===============================================================
 # FIN VERIFICACIÓN
@@ -975,7 +1014,7 @@ def inventario(peticion=None) -> Dict:
 
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA DEL CONTRATO
+# EXPORTACIONES + RESOLUCIÓN ESTRICTA
 # ===============================================================
 
 _CAP_MAP = {
@@ -996,7 +1035,6 @@ _CAP_MAP = {
 
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
-    """Resolución estricta. Referencia inexistente → fallo inmediato."""
     resueltas: Dict[str, Any] = {}
     for nombre, ref in cont["capacidades"].items():
         if callable(ref):
@@ -1022,11 +1060,8 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     cont["capacidades"] = resueltas
 
 
-# Validar y resolver al cargar el módulo
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
-
-# A partir de aquí el CONTENEDOR se considera inmutable.
 
 __all__ = [
     "CONTENEDOR",
@@ -1073,15 +1108,13 @@ __all__ = [
 # EXTENSIONES FUTURAS
 # ===============================================================
 #
-# Nuevas capacidades deberán:
-#   • mantener este contrato y el esquema VPSI-CONTRACT-1.0
-#   • no romper compatibilidad hacia atrás
-#   • añadirse en capacidades + capacidades_meta + _CAP_MAP
-#   • actualizar inventario, reporting y VERSION_MODULO
-#   • pasar _validar_contrato y _resolver_capacidades
+# Toda capacidad nueva DEBE agregarse simultáneamente en:
+#   1. capacidades
+#   2. capacidades_meta  (descripcion, entrada, salida: str)
+#   3. _CAP_MAP
+#   4. VERSION_MODULO
 #
-# Engine descubrirá automáticamente cualquier capacidad nueva.
-# Omega la reportará sin modificar su código.
+# Engine validará automáticamente la integridad 1:1.
 #
 # ===============================================================
 # FIN EXTENSIONES FUTURAS

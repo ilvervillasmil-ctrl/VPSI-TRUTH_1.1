@@ -318,7 +318,7 @@ jobs:
           informe = {
               "tipo": "auditoria_estructural_contratos",
               "version": "2.0_FORENSE",
-              "incoherente": True,
+              "incoherente": False,
               "errores": [],
               "avisos": [],
               "por_categoria": {
@@ -463,41 +463,109 @@ jobs:
               entry["version"] = getattr(cont, "version", "0.0")
 
               for clave in list(contrato_capacidades.keys()):
-                  fn = None
+                  objetivo = contrato_capacidades.get(clave)
+                  
+                  # 1. ¿El Contenedor resolvió la capacidad a través de su método fn()?
+                  fn_engine = None
+                  error_engine = None
                   if hasattr(cont, "fn"):
                       try:
-                          fn = cont.fn(clave)
-                      except Exception:
-                          fn = None
-                  if fn is None and hasattr(cont, "modulo"):
-                      fn = getattr(cont.modulo, str(contrato_capacidades[clave]), None)
+                          fn_engine = cont.fn(clave)
+                      except Exception as e:
+                          error_engine = str(e)
 
+                  # 2. Análisis del módulo (autoridad: cont.modulo) y verificación estricta de pertenencia
+                  fn_modulo = None
+                  existe_en_modulo = False
+                  es_callable_directo = False
+
+                  if callable(objetivo):
+                      es_callable_directo = True
+                      fn_modulo = objetivo
+                      if hasattr(cont, "modulo") and cont.modulo is not None:
+                          mod_name = getattr(cont.modulo, "__name__", "")
+                          fn_module_origin = getattr(objetivo, "__module__", "")
+                          existe_en_modulo = (not fn_module_origin) or (fn_module_origin == mod_name) or (mod_name in fn_module_origin)
+                      else:
+                          existe_en_modulo = True
+                  elif isinstance(objetivo, str):
+                      if hasattr(cont, "modulo") and cont.modulo is not None:
+                          existe_en_modulo = hasattr(cont.modulo, objetivo)
+                          if existe_en_modulo:
+                              fn_modulo = getattr(cont.modulo, objetivo, None)
+
+                  # 3. Recolección de Evidencia Autocontenida para el informe JSON
                   item = {
                       "clave": clave,
-                      "callable": callable(fn),
+                      "declarado": repr(objetivo),
                       "modulo": entry["nombre"],
                       "rol": rol,
                       "version": entry["version"],
+                      "engine_callable": callable(fn_engine),
+                      "engine_resultado": repr(fn_engine),
+                      "engine_error": error_engine,
+                      "modulo_callable": callable(fn_modulo),
+                      "existe_en_modulo": existe_en_modulo,
+                      "es_callable_directo": es_callable_directo,
+                      "tipo_objeto": type(fn_modulo).__name__ if fn_modulo is not None else None,
                   }
-                  if not callable(fn):
+
+                  # 4. Árbol de Decisión Causal Mutuamente Excluyente (Atribución corregida al Contenedor en fn)
+                  if callable(fn_engine):
+                      item["ok"] = True
+                      item["responsable"] = None
+                      item["fn_name"] = getattr(fn_engine, "__name__", str(fn_engine))
+                      caps_verificadas += 1
+                      entry["resolucion"].append(item)
+                  elif callable(fn_modulo) and not callable(fn_engine):
                       item["ok"] = False
+                      item["responsable"] = "CONTENEDOR (en resolución fn)"
+                      razon_fn = "lanzó excepción: {0}".format(error_engine) if error_engine else "retornó None o un objeto no ejecutable"
                       fallar(
                           "contradiccion_contrato",
-                          "Contradicción: El contrato declara la capacidad '{0}', pero el código real no la expone o no es callable".format(clave),
+                          "Responsable: CONTENEDOR (en resolución fn) — El contrato declara '{0}' y el módulo expone la función correctamente, pero cont.fn() falló al resolverla ({1})".format(clave, razon_fn),
                           rol=rol,
                           modulo=entry["nombre"],
                           version=entry["version"],
                           clave=clave,
+                          responsable="CONTENEDOR_FN",
+                          evidencia_engine=item,
                       )
                       caps_fallidas += 1
                       fallo_local = True
                       entry["resolucion"].append(item)
-                      continue
-
-                  item["ok"] = True
-                  item["fn_name"] = getattr(fn, "__name__", str(fn))
-                  caps_verificadas += 1
-                  entry["resolucion"].append(item)
+                  elif not existe_en_modulo:
+                      item["ok"] = False
+                      item["responsable"] = "CONTENEDOR"
+                      fallar(
+                          "contradiccion_contrato",
+                          "Responsable: CONTENEDOR — El contrato declara la capacidad '{0}' apuntando al objetivo '{1}', pero dicho nombre no existe en el módulo o infringe la regla de pertenencia".format(clave, objetivo),
+                          rol=rol,
+                          modulo=entry["nombre"],
+                          version=entry["version"],
+                          clave=clave,
+                          responsable="CONTENEDOR",
+                          evidencia_contenedor=item,
+                      )
+                      caps_fallidas += 1
+                      fallo_local = True
+                      entry["resolucion"].append(item)
+                  else:
+                      item["ok"] = False
+                      item["responsable"] = "MODULO"
+                      fallar(
+                          "contradiccion_contrato",
+                          "Responsable: MODULO — El contrato declara '{0}' apuntando a '{1}', pero el objeto real en el módulo no es callable (tipo: {2})".format(clave, objetivo, item["tipo_objeto"]),
+                          rol=rol,
+                          modulo=entry["nombre"],
+                          version=entry["version"],
+                          clave=clave,
+                          responsable="MODULO",
+                          evidencia_modulo=item,
+                      )
+                      caps_fallidas += 1
+                      fallo_local = True
+                      entry["resolucion"].append(item)
 
               if fallo_local:
                   contratos_invalidos += 1
@@ -597,7 +665,7 @@ jobs:
           for err in informe["errores"]:
               print("  ERROR [{0}]: {1}".format(err.get("categoria"), err.get("mensaje")))
 
-          if not informe["coherente"]:
+          if informe["incoherente"]:
               sys.exit(1)
           print("OK  auditoría forense universal de contratos")
           EOF
@@ -733,5 +801,3 @@ jobs:
           git commit -m "ci: historia de coherencia [skip ci]"
           git pull --rebase -X ours origin main || true
           git push origin HEAD:main
-
-    

@@ -83,6 +83,14 @@ class Engine:
         # Inicialización del registro central
         self.registro = RegistroModulos()
 
+        # ==========================================================
+        # INICIO: Atributo resultados_evaluacion en core/engine.py
+        # ==========================================================
+        self.resultados_evaluacion = []
+        # ==========================================================
+        # FIN: Atributo resultados_evaluacion en core/engine.py
+        # ==========================================================
+
         # Carga automática de todos los módulos mediante su CONTENEDOR
         self._cargar_modulos_automaticos()
 
@@ -165,9 +173,9 @@ class Engine:
                             f"{rol}: error ejecutando validación: {type(e).__name__}: {e}"
                         )
 
-            # ==========================================================
-# INICIO: Método censar() para la clase Engine
-# ==========================================================
+    # ==========================================================
+    # INICIO: Método censar() para la clase Engine
+    # ==========================================================
     def censar(self) -> dict:
         """Devuelve un censo estructurado de los contenedores y roles cargados dinámicamente."""
         cargados = []
@@ -183,15 +191,6 @@ class Engine:
             "rechazados": [],
             "cargados": cargados,
         }
-# ==========================================================
-# FIN: Método censar() para la clase Engine
-# ==========================================================
-
-   # ==========================================================
-# INICIO: Atributo resultados_evaluacion en core/engine.py
-# ==========================================================
-        self.resultados_evaluacion = []
-# ==========================================================
-# FIN: Atributo resultados_evaluacion en core/engine.py
-# ==========================================================
-    
+    # ==========================================================
+    # FIN: Método censar() para la clase Engine
+    # ==========================================================

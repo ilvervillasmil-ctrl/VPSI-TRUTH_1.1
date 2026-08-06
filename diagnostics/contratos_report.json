@@ -21,6 +21,14 @@
     },
     {
       "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'verificar_salida', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "verificar_salida"
+    },
+    {
+      "categoria": "contradiccion_contrato",
       "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
       "rol": "AX",
       "modulo": "axiomas",
@@ -37,11 +45,43 @@
     },
     {
       "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'declaraciones', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "declaraciones"
+    },
+    {
+      "categoria": "contradiccion_contrato",
       "mensaje": "Contradicción: El contrato declara la capacidad 'generatividad', pero el código real no la expone o no es callable",
       "rol": "AX",
       "modulo": "axiomas",
       "version": "9.5",
       "clave": "generatividad"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'por_dominio', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "por_dominio"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'ids_dominio_k_o', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "ids_dominio_k_o"
+    },
+    {
+      "categoria": "contradiccion_contrato",
+      "mensaje": "Contradicción: El contrato declara la capacidad 'recolectar', pero el código real no la expone o no es callable",
+      "rol": "AX",
+      "modulo": "axiomas",
+      "version": "9.5",
+      "clave": "recolectar"
     },
     {
       "categoria": "contradiccion_contrato",
@@ -106,6 +146,14 @@
       },
       {
         "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'verificar_salida', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "verificar_salida"
+      },
+      {
+        "categoria": "contradiccion_contrato",
         "mensaje": "Contradicción: El contrato declara la capacidad 'inventario', pero el código real no la expone o no es callable",
         "rol": "AX",
         "modulo": "axiomas",
@@ -122,11 +170,43 @@
       },
       {
         "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'declaraciones', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "declaraciones"
+      },
+      {
+        "categoria": "contradiccion_contrato",
         "mensaje": "Contradicción: El contrato declara la capacidad 'generatividad', pero el código real no la expone o no es callable",
         "rol": "AX",
         "modulo": "axiomas",
         "version": "9.5",
         "clave": "generatividad"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'por_dominio', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "por_dominio"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'ids_dominio_k_o', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "ids_dominio_k_o"
+      },
+      {
+        "categoria": "contradiccion_contrato",
+        "mensaje": "Contradicción: El contrato declara la capacidad 'recolectar', pero el código real no la expone o no es callable",
+        "rol": "AX",
+        "modulo": "axiomas",
+        "version": "9.5",
+        "clave": "recolectar"
       },
       {
         "categoria": "contradiccion_contrato",
@@ -180,9 +260,14 @@
       "claves_contrato": [
         "verificar",
         "barrer",
+        "verificar_salida",
         "inventario",
         "axiomas",
-        "generatividad"
+        "declaraciones",
+        "generatividad",
+        "por_dominio",
+        "ids_dominio_k_o",
+        "recolectar"
       ],
       "resolucion": [
         {
@@ -195,6 +280,14 @@
         },
         {
           "clave": "barrer",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "verificar_salida",
           "callable": false,
           "modulo": "axiomas",
           "rol": "AX",
@@ -218,7 +311,39 @@
           "ok": false
         },
         {
+          "clave": "declaraciones",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
           "clave": "generatividad",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "por_dominio",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "ids_dominio_k_o",
+          "callable": false,
+          "modulo": "axiomas",
+          "rol": "AX",
+          "version": "9.5",
+          "ok": false
+        },
+        {
+          "clave": "recolectar",
           "callable": false,
           "modulo": "axiomas",
           "rol": "AX",
@@ -328,11 +453,11 @@
     "contratos_validos": 1,
     "contratos_invalidos": 2,
     "capacidades_verificadas": 3,
-    "capacidades_fallidas": 9,
-    "pct_integridad_capacidades": 25.0,
+    "capacidades_fallidas": 14,
+    "pct_integridad_capacidades": 17.65,
     "resultados_evaluacion_n": 0,
     "rechazados_n": 0,
-    "errores_n": 9,
+    "errores_n": 14,
     "avisos_n": 1
   },
   "resultados_evaluacion_n": 0,

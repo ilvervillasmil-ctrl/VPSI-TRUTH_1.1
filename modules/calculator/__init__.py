@@ -5,20 +5,23 @@
 # MÓDULO:              calculator
 # ID:                  CA
 # Rol:                 CA
-# Versión módulo:      2.2
+# Versión módulo:      2.3
 # Versión contrato:    1.0
 # Esquema contrato:    VPSI-CONTRACT-1.0
 # Estabilidad:         ESTABLE
 # Compatible desde:    1.2
 # API Engine:          >=1.0
 #
-# Regla de salida (determinista, sin ambigüedad):
-#   Todo factor calculado se reporta SIEMPRE como:
-#     fraccion  = valor oficial (Fraction)
-#     decimal   = misma magnitud en decimal fijo (default 3)
-#   Ejemplo: 7/9 = 0.778
+# Regla de salida (determinista):
+#   Todo factor se reporta SIEMPRE como un solo objeto:
+#     {
+#       valor, fraccion, numerador, denominador,
+#       decimal, display, precision, undefined
+#     }
+#   Ejemplo display: "7/9 = 0.778"
+#   No se duplican C_fraccion / C_decimal en la raíz de la respuesta.
 #
-# Pipeline:
+# Pipeline oficial:
 #   contexto → evidencia → C/L/K → centinela → ID → historial → salida
 #
 # ===============================================================
@@ -54,7 +57,7 @@ ID_MODULO = "CA"
 NOMBRE_MODULO = "calculator"
 ROL_MODULO = "CA"
 
-VERSION_MODULO = "2.2"
+VERSION_MODULO = "2.3"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
 
@@ -76,10 +79,11 @@ ESTADOS_VALIDOS = (
 INVARIANTES = (
     "CA es la unica autoridad del dominio de calculo estructural",
     "todo calculo interno utiliza Fraction como valor oficial",
-    "toda salida de factor reporta fraccion Y decimal juntos (ej: 7/9 = 0.778)",
+    "toda salida de factor es un solo objeto con fraccion+decimal (ej: 7/9 = 0.778)",
+    "no se duplican campos de factor en la raiz de la respuesta",
     "float nunca es la fuente del decimal; se usa Decimal",
-    "ningun calculo sale sin centinela ni ID unico",
-    "toda magnitud registra evidencia trazable",
+    "ningun calculo sale sin centinela ni ID unico compuesto",
+    "toda magnitud registra evidencia trazable con id_evidencia",
     "K ausente sin contexto/O es legitimo (Def-5.3.1)",
     "L = UNDEFINED cuando p=0 (AM-D6 / AM-A3)",
 )
@@ -158,7 +162,10 @@ def es_undefined(v: Any) -> bool:
 
 
 _CALC_SEQ = 0
+_EV_SEQ = 0
 _HISTORIAL: Deque[Dict[str, Any]] = deque(maxlen=HISTORIAL_MAX)
+_EVIDENCIA_POR_CALC: Dict[str, List[Dict[str, Any]]] = {}
+_REG_EVIDENCIA: Dict[str, Dict[str, Any]] = {}
 
 # ===============================================================
 # FIN DEFINICIONES
@@ -182,32 +189,33 @@ CONTENEDOR: Dict[str, Any] = {
     "rol": ROL_MODULO,
     "descripcion": (
         "Unica autoridad del dominio de calculo estructural. "
-        "Calcula C, L, K. Toda salida reporta fraccion y decimal juntos "
-        "(ejemplo: 7/9 = 0.778). No calcula Tru (FO)."
+        "Calcula C, L, K. Cada factor se reporta como un solo objeto "
+        "con fraccion y decimal (ej: 7/9 = 0.778). No calcula Tru (FO)."
     ),
 
     "funcion": (
-        "Pipeline: evidencia -> C/L/K -> centinela -> ID -> historial. "
-        "Valor oficial = Fraction. Decimal = misma magnitud, determinista."
+        "Pipeline: evidencia -> C/L/K -> centinela -> ID compuesto -> "
+        "historial liviano. Valor oficial = Fraction. Decimal via Decimal."
     ),
     "no_hace": [
         "No calcula Tru_Ri ni Tru_total",
         "No redefine constantes, axiomas ni formulas",
         "No orquesta el sistema",
         "No estima por intuicion",
-        "No deja ambigua la salida numerica",
+        "No duplica campos de factor en la raiz de la salida",
     ],
 
     "autoridad": [
         "Unica autoridad para calcular C, L, K",
-        "Reportar siempre fraccion y decimal del mismo valor",
-        "Explicar calculos con evidencia trazable",
+        "Reportar cada factor como fraccion = decimal en un solo objeto",
+        "Validar evidencia y explicar calculos con trazabilidad real",
         "Auditar integridad del dominio",
     ],
 
     "conocimiento_exportable": [
         "C", "L", "K", "factores", "UNDEFINED",
-        "evidencia", "historial", "explicaciones",
+        "evidencia", "versiones_utilizadas", "contratos_utilizados",
+        "historial", "explicaciones",
         "inventario", "estado", "reporte", "diagnostico",
     ],
 
@@ -228,9 +236,9 @@ CONTENEDOR: Dict[str, Any] = {
 
     "consultas_soportadas": [
         "calcular", "calcular_C", "calcular_L", "calcular_K",
-        "calcular_factor", "representar", "explicar_calculo",
-        "verificar_coherencia", "obtener_inventario",
-        "obtener_reporte", "obtener_diagnostico",
+        "calcular_factor", "representar", "validar_evidencia",
+        "explicar_calculo", "verificar_coherencia",
+        "obtener_inventario", "obtener_reporte", "obtener_diagnostico",
         "leer_ids_escala", "historial",
     ],
 
@@ -241,6 +249,7 @@ CONTENEDOR: Dict[str, Any] = {
         "calcular_K": "calcular_K",
         "calcular_factor": "calcular_factor",
         "representar": "representar",
+        "validar_evidencia": "validar_evidencia",
         "explicar_calculo": "explicar_calculo",
         "verificar": "barrer",
         "barrer": "barrer",
@@ -255,29 +264,29 @@ CONTENEDOR: Dict[str, Any] = {
     "capacidades_meta": {
         "calcular": {
             "descripcion": (
-                "Pipeline completo. Cada factor sale como "
-                "{fraccion, decimal, display} ej: 7/9 = 0.778"
+                "Pipeline completo. C/L/K son objetos unicos con "
+                "fraccion+decimal (ej display: 7/9 = 0.778)."
             ),
             "entrada": "peticion: dict",
             "salida": (
-                "dict con id_calculo, C, L, K (cada uno con fraccion+decimal), "
-                "evidencia, centinela, errores"
+                "dict con id_calculo, C, L, K, evidencia, "
+                "versiones_utilizadas, centinela, errores"
             ),
         },
         "calcular_C": {
-            "descripcion": "Factor C con fraccion y decimal.",
+            "descripcion": "Factor C como objeto fraccion+decimal.",
             "entrada": "peticion: dict",
-            "salida": "dict con C (objeto valor), ruta, notas, evidencia",
+            "salida": "dict con C, ruta, notas, evidencia",
         },
         "calcular_L": {
-            "descripcion": "Factor L con fraccion y decimal (o UNDEFINED).",
+            "descripcion": "Factor L como objeto (o UNDEFINED).",
             "entrada": "peticion: dict",
-            "salida": "dict con L (objeto valor), p, r, ruta, notas, evidencia",
+            "salida": "dict con L, p, r, ruta, notas, evidencia",
         },
         "calcular_K": {
-            "descripcion": "Factor K con fraccion y decimal (o None sin O).",
+            "descripcion": "Factor K como objeto (o None sin O).",
             "entrada": "peticion: dict",
-            "salida": "dict con K (objeto valor), ruta, notas, evidencia",
+            "salida": "dict con K, ruta, notas, evidencia",
         },
         "calcular_factor": {
             "descripcion": "Factor por nombre C|L|K.",
@@ -286,19 +295,29 @@ CONTENEDOR: Dict[str, Any] = {
         },
         "representar": {
             "descripcion": (
-                "Convierte Fraction a {fraccion, decimal, display}. "
-                "Ejemplo: 7/9 = 0.778"
+                "Fraction -> objeto con fraccion, numerador, denominador, "
+                "decimal, display (7/9 = 0.778). Sin float."
             ),
             "entrada": "valor: Fraction|UNDEFINED|None, precision: int=3",
-            "salida": "dict con fraccion, decimal, display, precision, undefined",
+            "salida": "dict valor completo",
+        },
+        "validar_evidencia": {
+            "descripcion": (
+                "Valida lista de evidencia sin calcular: estructura, "
+                "rechazados, conflicto de versiones del mismo modulo."
+            ),
+            "entrada": "evidencia: list[dict]",
+            "salida": "dict con ok, problemas, advertencias, evidencia_normalizada",
         },
         "explicar_calculo": {
-            "descripcion": "Explica un calculo por id_calculo.",
+            "descripcion": (
+                "Explica un calculo por id usando evidencia real almacenada."
+            ),
             "entrada": "id_calculo: str",
-            "salida": "dict explicativo o None",
+            "salida": "dict explicativo dinamico o None",
         },
         "verificar": {
-            "descripcion": "Centinela de integridad del modulo.",
+            "descripcion": "Centinela de integridad (APIs, hashes, choques).",
             "entrada": "ninguna",
             "salida": "dict con coherente, errores, choques, hashes",
         },
@@ -328,12 +347,12 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con ids, n, origenes",
         },
         "verificar_salida": {
-            "descripcion": "Forma minima: C, L, K, id_calculo.",
+            "descripcion": "Forma minima: C, L, K, id_calculo; cada factor con display.",
             "entrada": "salida: dict",
             "salida": "bool",
         },
         "historial": {
-            "descripcion": "Buffer de ultimos calculos.",
+            "descripcion": "Buffer liviano de ultimos calculos.",
             "entrada": "limite opcional: int",
             "salida": "list[dict]",
         },
@@ -442,23 +461,37 @@ def _listar_py() -> List[Path]:
     ]
 
 
-def _hash_archivo(path: Path) -> Optional[str]:
+def _meta_archivo(path: Path) -> Dict[str, Any]:
     try:
+        st = path.stat()
         h = hashlib.sha256()
         with path.open("rb") as fh:
             for chunk in iter(lambda: fh.read(65536), b""):
                 h.update(chunk)
-        return h.hexdigest()
-    except Exception:  # noqa: BLE001
-        return None
+        return {
+            "archivo": path.name,
+            "sha256": h.hexdigest(),
+            "tamano": st.st_size,
+            "timestamp_mtime": datetime.fromtimestamp(
+                st.st_mtime, tz=timezone.utc
+            ).isoformat(),
+        }
+    except Exception as e:  # noqa: BLE001
+        return {
+            "archivo": path.name,
+            "sha256": None,
+            "tamano": None,
+            "timestamp_mtime": None,
+            "error": "{0}: {1}".format(type(e).__name__, e),
+        }
 
 
-def _hashes_modulo() -> Dict[str, Optional[str]]:
-    out: Dict[str, Optional[str]] = {
-        "__init__.py": _hash_archivo(_DIR / "__init__.py")
+def _hashes_modulo() -> Dict[str, Dict[str, Any]]:
+    out: Dict[str, Dict[str, Any]] = {
+        "__init__.py": _meta_archivo(_DIR / "__init__.py")
     }
     for p in _listar_py():
-        out[p.name] = _hash_archivo(p)
+        out[p.name] = _meta_archivo(p)
     return out
 
 
@@ -507,7 +540,14 @@ def _id_escala_pedido(peticion: Dict[str, Any]) -> Optional[str]:
 def _nuevo_id_calculo() -> str:
     global _CALC_SEQ
     _CALC_SEQ += 1
-    return "CAL-{0:09d}".format(_CALC_SEQ)
+    dia = datetime.now(timezone.utc).strftime("%Y%m%d")
+    return "CA-{0}-{1:06d}".format(dia, _CALC_SEQ)
+
+
+def _nuevo_id_evidencia() -> str:
+    global _EV_SEQ
+    _EV_SEQ += 1
+    return "EV-{0:09d}".format(_EV_SEQ)
 
 
 def _normalizar_evidencia(raw: Any) -> List[Dict[str, Any]]:
@@ -521,13 +561,18 @@ def _normalizar_evidencia(raw: Any) -> List[Dict[str, Any]]:
     for item in raw:
         if not isinstance(item, dict):
             continue
-        out.append({
+        eid = item.get("id_evidencia") or _nuevo_id_evidencia()
+        entry = {
+            "id_evidencia": str(eid),
             "modulo": str(item.get("modulo") or item.get("nombre") or "?"),
             "capacidad": str(item.get("capacidad") or item.get("cap") or "?"),
             "aporte": item.get("aporte") or item.get("id") or item.get("valor"),
             "version_modulo": item.get("version_modulo") or item.get("version"),
+            "version_contrato": item.get("version_contrato"),
             "rechazado": bool(item.get("rechazado", False)),
-        })
+        }
+        out.append(entry)
+        _REG_EVIDENCIA[entry["id_evidencia"]] = entry
     return out
 
 
@@ -561,25 +606,42 @@ def _centinela_resultado(
     for factor in _FACTORES_CANONICOS:
         bloque = salida.get(factor)
         if bloque is None:
-            # None en K puede ser legitimo
             continue
         if not isinstance(bloque, dict):
             problemas.append("factor '{0}' debe ser dict valor".format(factor))
             continue
         if bloque.get("undefined"):
             continue
-        if bloque.get("fraccion") is None and bloque.get("valor") is None:
-            continue
-        # Si hay fraccion, debe haber decimal
         if bloque.get("fraccion") and not bloque.get("decimal"):
             problemas.append(
                 "factor '{0}' tiene fraccion sin decimal".format(factor)
+            )
+        if bloque.get("fraccion") and (
+            bloque.get("numerador") is None or bloque.get("denominador") is None
+        ):
+            problemas.append(
+                "factor '{0}' sin numerador/denominador".format(factor)
             )
 
     for ev in evidencia:
         if ev.get("rechazado"):
             problemas.append(
                 "evidencia de modulo rechazado: {0}".format(ev.get("modulo"))
+            )
+
+    # Mismo modulo con versiones distintas
+    por_mod: Dict[str, set] = {}
+    for ev in evidencia:
+        mod = ev.get("modulo")
+        ver = ev.get("version_modulo")
+        if mod and ver:
+            por_mod.setdefault(str(mod), set()).add(str(ver))
+    for mod, vers in por_mod.items():
+        if len(vers) > 1:
+            problemas.append(
+                "modulo '{0}' aparece con versiones distintas: {1}".format(
+                    mod, sorted(vers)
+                )
             )
 
     esperadas = peticion.get("versiones_esperadas") or {}
@@ -636,13 +698,9 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
             f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
         )
     if cont.get("esquema") != ESQUEMA_CONTRATO:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: esquema incompatible"
-        )
+        raise ContratoInvalido(f"{NOMBRE_MODULO}: esquema incompatible")
     if str(cont.get("version_contrato")) != VERSION_CONTRATO:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: version_contrato invalida"
-        )
+        raise ContratoInvalido(f"{NOMBRE_MODULO}: version_contrato invalida")
     meta_caps = cont.get("capacidades_meta") or {}
     for nombre_cap in cont.get("capacidades") or {}:
         if nombre_cap not in meta_caps:
@@ -675,8 +733,9 @@ def representar(
     precision: int = PRECISION_DECIMAL_DEFAULT,
 ) -> Dict[str, Any]:
     """
-    Siempre devuelve fraccion + decimal del mismo valor.
-    Ejemplo: 7/9 = 0.778
+    Un solo objeto determinista:
+      7/9 = 0.778
+    con numerador/denominador explicitos.
     """
     prec = max(0, int(precision))
 
@@ -684,6 +743,8 @@ def representar(
         return {
             "valor": UNDEFINED,
             "fraccion": None,
+            "numerador": None,
+            "denominador": None,
             "decimal": None,
             "display": "UNDEFINED",
             "precision": prec,
@@ -693,6 +754,8 @@ def representar(
         return {
             "valor": None,
             "fraccion": None,
+            "numerador": None,
+            "denominador": None,
             "decimal": None,
             "display": "None",
             "precision": prec,
@@ -704,6 +767,8 @@ def representar(
         return {
             "valor": None,
             "fraccion": None,
+            "numerador": None,
+            "denominador": None,
             "decimal": None,
             "display": "?",
             "precision": prec,
@@ -711,20 +776,62 @@ def representar(
             "error": "no convertible a Fraction",
         }
 
-    # Decimal sin float: Decimal(num)/Decimal(den)
     dec_val = Decimal(fr.numerator) / Decimal(fr.denominator)
     quant = Decimal("1").scaleb(-prec)
     dec_str = str(dec_val.quantize(quant, rounding=ROUND_HALF_UP))
     frac_str = str(fr)
-    display = "{0} = {1}".format(frac_str, dec_str)
-
     return {
         "valor": fr,
         "fraccion": frac_str,
+        "numerador": fr.numerator,
+        "denominador": fr.denominator,
         "decimal": dec_str,
-        "display": display,
+        "display": "{0} = {1}".format(frac_str, dec_str),
         "precision": prec,
         "undefined": False,
+    }
+
+
+def validar_evidencia(evidencia: Any = None) -> Dict[str, Any]:
+    """Valida evidencia sin calcular."""
+    normalizada = _normalizar_evidencia(evidencia)
+    problemas: List[str] = []
+    advertencias: List[str] = []
+
+    for ev in normalizada:
+        if not ev.get("modulo") or ev["modulo"] == "?":
+            problemas.append(
+                "evidencia {0} sin modulo".format(ev.get("id_evidencia"))
+            )
+        if not ev.get("capacidad") or ev["capacidad"] == "?":
+            advertencias.append(
+                "evidencia {0} sin capacidad".format(ev.get("id_evidencia"))
+            )
+        if ev.get("rechazado"):
+            problemas.append(
+                "modulo rechazado: {0}".format(ev.get("modulo"))
+            )
+
+    por_mod: Dict[str, set] = {}
+    for ev in normalizada:
+        mod = ev.get("modulo")
+        ver = ev.get("version_modulo")
+        if mod and ver:
+            por_mod.setdefault(str(mod), set()).add(str(ver))
+    for mod, vers in por_mod.items():
+        if len(vers) > 1:
+            problemas.append(
+                "modulo '{0}' con versiones distintas: {1}".format(
+                    mod, sorted(vers)
+                )
+            )
+
+    return {
+        "ok": not problemas,
+        "problemas": problemas,
+        "advertencias": advertencias,
+        "evidencia_normalizada": normalizada,
+        "n": len(normalizada),
     }
 
 
@@ -779,11 +886,11 @@ def barrer() -> Dict[str, Any]:
     stems_conocidos = set(_ARCHIVO_FACTOR.keys()) | {"conteos", "escalas_ids"}
     extra = [p.stem for p in _listar_py() if p.stem not in stems_conocidos]
 
-    for nombre, hx in hashes.items():
-        if hx is None:
+    for nombre, meta in hashes.items():
+        if meta.get("sha256") is None:
             errores.append({
                 "archivo": nombre,
-                "error": "hash sha256 no calculable",
+                "error": meta.get("error") or "hash no calculable",
             })
 
     return {
@@ -812,12 +919,16 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     evidencia = _normalizar_evidencia(peticion.get("evidencia"))
     evidencia.append({
+        "id_evidencia": _nuevo_id_evidencia(),
         "modulo": NOMBRE_MODULO,
         "capacidad": "calcular_C",
         "aporte": "factor_C",
         "version_modulo": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
         "rechazado": False,
     })
+    for e in evidencia:
+        _REG_EVIDENCIA[e["id_evidencia"]] = e
 
     fn = _APIS.get("C")
     if not callable(fn):
@@ -838,11 +949,7 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         except TypeError:
             raw = fn(peticion)
 
-        if isinstance(raw, dict) and "C" in raw:
-            val = raw["C"]
-        else:
-            val = raw
-
+        val = raw["C"] if isinstance(raw, dict) and "C" in raw else raw
         if es_undefined(val):
             obj = representar(UNDEFINED, prec)
         else:
@@ -850,12 +957,7 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 val if isinstance(val, Fraction) else _a_fraction(val),
                 prec,
             )
-        return {
-            "C": obj,
-            "ruta": metodo,
-            "notas": [],
-            "evidencia": evidencia,
-        }
+        return {"C": obj, "ruta": metodo, "notas": [], "evidencia": evidencia}
     except Exception as e:  # noqa: BLE001
         return {
             "C": representar(None, prec),
@@ -874,12 +976,16 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     evidencia = _normalizar_evidencia(peticion.get("evidencia"))
     evidencia.append({
+        "id_evidencia": _nuevo_id_evidencia(),
         "modulo": NOMBRE_MODULO,
         "capacidad": "calcular_L",
         "aporte": "factor_L",
         "version_modulo": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
         "rechazado": False,
     })
+    for e in evidencia:
+        _REG_EVIDENCIA[e["id_evidencia"]] = e
 
     fn = _APIS.get("L")
     if not callable(fn):
@@ -949,12 +1055,16 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     evidencia = _normalizar_evidencia(peticion.get("evidencia"))
     evidencia.append({
+        "id_evidencia": _nuevo_id_evidencia(),
         "modulo": NOMBRE_MODULO,
         "capacidad": "calcular_K",
         "aporte": "factor_K",
         "version_modulo": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
         "rechazado": False,
     })
+    for e in evidencia:
+        _REG_EVIDENCIA[e["id_evidencia"]] = e
 
     if o_ctx is None:
         return {
@@ -987,11 +1097,7 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         except TypeError:
             raw = fn(peticion)
 
-        if isinstance(raw, dict) and "K" in raw:
-            val = raw["K"]
-        else:
-            val = raw
-
+        val = raw["K"] if isinstance(raw, dict) and "K" in raw else raw
         if es_undefined(val):
             obj = representar(UNDEFINED, prec)
         else:
@@ -999,12 +1105,7 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 val if isinstance(val, Fraction) else _a_fraction(val),
                 prec,
             )
-        return {
-            "K": obj,
-            "ruta": metodo,
-            "notas": [],
-            "evidencia": evidencia,
-        }
+        return {"K": obj, "ruta": metodo, "notas": [], "evidencia": evidencia}
     except Exception as e:  # noqa: BLE001
         return {
             "K": representar(None, prec),
@@ -1033,8 +1134,11 @@ def calcular_factor(
 
 def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
-    Salida determinista por factor:
-      C: {fraccion: "7/9", decimal: "0.778", display: "7/9 = 0.778", valor: Fraction}
+    Salida sin duplicacion:
+      C = {fraccion, numerador, denominador, decimal, display, ...}
+      L = {...}
+      K = {...}
+    display ejemplo: "7/9 = 0.778"
     """
     t0 = datetime.now(timezone.utc)
     peticion = dict(peticion or {})
@@ -1043,7 +1147,11 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     id_calculo = _nuevo_id_calculo()
     errores: List[str] = []
 
-    evidencia = _normalizar_evidencia(peticion.get("evidencia"))
+    # Validar evidencia entrante
+    val_ev = validar_evidencia(peticion.get("evidencia"))
+    evidencia = list(val_ev.get("evidencia_normalizada") or [])
+    if not val_ev.get("ok"):
+        errores.extend(val_ev.get("problemas") or [])
 
     escala_id = _id_escala_pedido(peticion)
     escala_meta = None
@@ -1082,33 +1190,38 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     K = out_k.get("K")
 
     ev_all: List[Dict[str, Any]] = []
+    vistos_ev = set()
     for bloque in (out_c, out_l, out_k):
         for e in bloque.get("evidencia") or []:
-            if e not in ev_all:
+            eid = e.get("id_evidencia")
+            if eid and eid not in vistos_ev:
+                vistos_ev.add(eid)
                 ev_all.append(e)
         for n in bloque.get("notas") or []:
             if "Error" in str(n) or "no disponible" in str(n):
                 errores.append(str(n))
+
+    versiones_utilizadas: Dict[str, str] = {}
+    contratos_utilizados: Dict[str, str] = {}
+    for e in ev_all:
+        mod = e.get("modulo")
+        if mod and e.get("version_modulo"):
+            versiones_utilizadas[str(mod)] = str(e["version_modulo"])
+        if mod and e.get("version_contrato"):
+            contratos_utilizados[str(mod)] = str(e["version_contrato"])
 
     salida: Dict[str, Any] = {
         "id_calculo": id_calculo,
         "C": C,
         "L": L,
         "K": K,
-        # Acceso directo sin ambigüedad
-        "C_fraccion": (C or {}).get("fraccion"),
-        "C_decimal": (C or {}).get("decimal"),
-        "C_display": (C or {}).get("display"),
-        "L_fraccion": (L or {}).get("fraccion"),
-        "L_decimal": (L or {}).get("decimal"),
-        "L_display": (L or {}).get("display"),
-        "K_fraccion": (K or {}).get("fraccion"),
-        "K_decimal": (K or {}).get("decimal"),
-        "K_display": (K or {}).get("display"),
         "precision": prec,
         "errores": errores,
         "metodo": metodo,
         "evidencia": ev_all,
+        "id_evidencias": [e.get("id_evidencia") for e in ev_all],
+        "versiones_utilizadas": versiones_utilizadas,
+        "contratos_utilizados": contratos_utilizados,
         "modulos_consultados": sorted({
             e.get("modulo") for e in ev_all if e.get("modulo")
         }),
@@ -1135,19 +1248,33 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     salida["version_ca"] = VERSION_MODULO
     salida["esquema"] = ESQUEMA_CONTRATO
 
+    # Historial liviano (sin evidencia completa)
+    _EVIDENCIA_POR_CALC[id_calculo] = ev_all
     _HISTORIAL.append({
         "id_calculo": id_calculo,
         "timestamp": salida["fin"],
         "metodo": metodo,
-        "C_display": salida.get("C_display"),
-        "L_display": salida.get("L_display"),
-        "K_display": salida.get("K_display"),
-        "C_fraccion": salida.get("C_fraccion"),
-        "L_fraccion": salida.get("L_fraccion"),
-        "K_fraccion": salida.get("K_fraccion"),
-        "evidencia": ev_all,
+        "resultado": {
+            "C": {
+                "fraccion": (C or {}).get("fraccion"),
+                "decimal": (C or {}).get("decimal"),
+                "display": (C or {}).get("display"),
+            },
+            "L": {
+                "fraccion": (L or {}).get("fraccion"),
+                "decimal": (L or {}).get("decimal"),
+                "display": (L or {}).get("display"),
+            },
+            "K": {
+                "fraccion": (K or {}).get("fraccion"),
+                "decimal": (K or {}).get("decimal"),
+                "display": (K or {}).get("display"),
+            },
+        },
+        "id_evidencias": list(salida["id_evidencias"]),
         "modulos_consultados": salida["modulos_consultados"],
         "capacidades_consultadas": salida["capacidades_consultadas"],
+        "versiones_utilizadas": versiones_utilizadas,
         "centinela_ok": cent["ok"],
         "errores": list(salida["errores"]),
         "duracion_ms": salida["duracion_ms"],
@@ -1174,37 +1301,87 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 
 def explicar_calculo(id_calculo: str) -> Optional[Dict[str, Any]]:
+    """Explicacion dinamica desde evidencia real del calculo."""
     key = str(id_calculo or "").strip()
-    for item in reversed(_HISTORIAL):
-        if item.get("id_calculo") == key:
-            return {
-                "id_calculo": key,
-                "C": item.get("C_display"),
-                "L": item.get("L_display"),
-                "K": item.get("K_display"),
-                "C_fraccion": item.get("C_fraccion"),
-                "L_fraccion": item.get("L_fraccion"),
-                "K_fraccion": item.get("K_fraccion"),
-                "proviene_de": {
-                    "C": "coherencia / compromisos-contradicciones",
-                    "L": "logica / 1 - r/p (UNDEFINED si p=0)",
-                    "K": "correlacion_k / requiere O_context",
-                },
-                "modulos_consultados": item.get("modulos_consultados"),
-                "capacidades_consultadas": item.get("capacidades_consultadas"),
-                "evidencia": item.get("evidencia"),
-                "anclas": [
-                    "Def-5.3.1 (K sin O => None)",
-                    "AM-D6 / AM-A3 (L con p=0 => UNDEFINED)",
-                    "salida siempre fraccion = decimal",
-                ],
-                "centinela_ok": item.get("centinela_ok"),
-                "errores": item.get("errores"),
-                "timestamp": item.get("timestamp"),
-                "duracion_ms": item.get("duracion_ms"),
-                "precision": item.get("precision"),
-            }
-    return None
+    item = None
+    for h in reversed(_HISTORIAL):
+        if h.get("id_calculo") == key:
+            item = h
+            break
+    if item is None:
+        return None
+
+    evidencia = list(_EVIDENCIA_POR_CALC.get(key) or [])
+    # reconstruir desde ids si hace falta
+    if not evidencia:
+        for eid in item.get("id_evidencias") or []:
+            if eid in _REG_EVIDENCIA:
+                evidencia.append(_REG_EVIDENCIA[eid])
+
+    por_factor: Dict[str, List[Dict[str, Any]]] = {"C": [], "L": [], "K": []}
+    otros: List[Dict[str, Any]] = []
+    for e in evidencia:
+        cap = str(e.get("capacidad") or "")
+        if "calcular_C" in cap or cap.endswith("_C") or "coherencia" in cap:
+            por_factor["C"].append(e)
+        elif "calcular_L" in cap or "logica" in cap:
+            por_factor["L"].append(e)
+        elif "calcular_K" in cap or "correlacion" in cap:
+            por_factor["K"].append(e)
+        else:
+            otros.append(e)
+
+    def _lineas(evs: List[Dict[str, Any]]) -> List[str]:
+        lines = []
+        for e in evs:
+            lines.append(
+                "{0}.{1} aporte={2} version={3}".format(
+                    e.get("modulo"),
+                    e.get("capacidad"),
+                    e.get("aporte"),
+                    e.get("version_modulo"),
+                )
+            )
+        return lines
+
+    res = item.get("resultado") or {}
+    return {
+        "id_calculo": key,
+        "resultado": res,
+        "C": {
+            "display": (res.get("C") or {}).get("display"),
+            "proviene_de": _lineas(por_factor["C"]) or [
+                "API coherencia / conteos compromisos-contradicciones"
+            ],
+        },
+        "L": {
+            "display": (res.get("L") or {}).get("display"),
+            "proviene_de": _lineas(por_factor["L"]) or [
+                "API logica / 1 - r/p (UNDEFINED si p=0)"
+            ],
+        },
+        "K": {
+            "display": (res.get("K") or {}).get("display"),
+            "proviene_de": _lineas(por_factor["K"]) or [
+                "API correlacion_k / requiere O_context"
+            ],
+        },
+        "evidencia_adicional": _lineas(otros),
+        "modulos_consultados": item.get("modulos_consultados"),
+        "capacidades_consultadas": item.get("capacidades_consultadas"),
+        "versiones_utilizadas": item.get("versiones_utilizadas"),
+        "evidencia": evidencia,
+        "anclas": [
+            "Def-5.3.1 (K sin O => None)",
+            "AM-D6 / AM-A3 (L con p=0 => UNDEFINED)",
+            "salida: un objeto por factor con fraccion = decimal",
+        ],
+        "centinela_ok": item.get("centinela_ok"),
+        "errores": item.get("errores"),
+        "timestamp": item.get("timestamp"),
+        "duracion_ms": item.get("duracion_ms"),
+        "precision": item.get("precision"),
+    }
 
 
 def historial(limite: Optional[int] = None) -> List[Dict[str, Any]]:
@@ -1222,7 +1399,6 @@ def verificar_salida(salida: Any) -> bool:
         return False
     if not all(k in salida for k in ("C", "L", "K", "id_calculo")):
         return False
-    # Cada factor debe traer display o ser None/undefined estructurado
     for f in ("C", "L", "K"):
         bloque = salida.get(f)
         if bloque is None:
@@ -1231,6 +1407,9 @@ def verificar_salida(salida: Any) -> bool:
             return False
         if "display" not in bloque:
             return False
+        # no debe haber C_fraccion en la raiz
+    if any(k in salida for k in ("C_fraccion", "L_fraccion", "K_fraccion")):
+        return False
     return True
 
 
@@ -1256,7 +1435,7 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "invariantes": CONTENEDOR.get("invariantes"),
         "precision_decimal_default": PRECISION_DECIMAL_DEFAULT,
-        "regla_salida": "fraccion = decimal (ej: 7/9 = 0.778)",
+        "regla_salida": "un objeto por factor: fraccion = decimal (7/9 = 0.778)",
     }
 
 # ===============================================================
@@ -1288,7 +1467,7 @@ def reporte() -> Dict[str, Any]:
         "errores_n": len(b.get("errores") or []),
         "choques_n": len(b.get("choques") or []),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "regla_salida": "fraccion = decimal (ej: 7/9 = 0.778)",
+        "regla_salida": "un objeto por factor: fraccion = decimal (7/9 = 0.778)",
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
     }
@@ -1340,6 +1519,7 @@ _CAP_MAP = {
     "calcular_K": calcular_K,
     "calcular_factor": calcular_factor,
     "representar": representar,
+    "validar_evidencia": validar_evidencia,
     "explicar_calculo": explicar_calculo,
     "barrer": barrer,
     "inventario": inventario,
@@ -1393,6 +1573,7 @@ __all__ = [
     "calcular_K",
     "calcular_factor",
     "representar",
+    "validar_evidencia",
     "explicar_calculo",
     "barrer",
     "inventario",

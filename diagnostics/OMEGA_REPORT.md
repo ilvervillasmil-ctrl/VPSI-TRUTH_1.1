@@ -10,8 +10,8 @@
   version_engine: 18.3
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
-  total_modulos: 11
-  timestamp: 2026-08-07T12:46:46.463630+00:00
+  total_modulos: 12
+  timestamp: 2026-08-07T13:05:02.269827+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -22,13 +22,13 @@
   api_engine: 1.0
   estado_engine: OPERATIVO
   invocador_id: omega_report
-  total_modulos: 11
+  total_modulos: 12
   errores_arranque:
     []
   advertencias:
     []
-  trazas_n: 31
-  timestamp: 2026-08-07T12:46:46.463588+00:00
+  trazas_n: 34
+  timestamp: 2026-08-07T13:05:02.269794+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1086,32 +1086,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T12:46:40.715656+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.286819+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1188,32 +1188,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T12:46:40.715656+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.286819+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T12:46:40.716051+00:00
+        timestamp_mtime: 2026-08-07T13:04:57.287216+00:00
     factores_api:
       • C
       • K
@@ -9246,6 +9246,203 @@
     formula_referencia: Tru_Ri = C·L·K ; Tru_total = Tru_Ri·α + β — las aplica Calculator, no este módulo.
 
 ══════════════════════════════════════════════════════════════════════
+  MÓDULO VX/verificacion
+══════════════════════════════════════════════════════════════════════
+  id: VX
+  nombre: verificacion
+  rol: VX
+  version: 2.0
+  version_contrato: 1.0
+  esquema: VPSI-CONTRACT-1.0
+  estabilidad: ESTABLE
+  compatible_desde: 1.0
+  api_engine: >=1.0
+  descripcion: Autoridad exclusiva de verificación estructural. Determina si una estructura satisface o viola un conjunto de reglas formales. Jurisdicción: código, contratos, módulos, configuraciones, salidas, estructuras, grafos y futuras representaciones. Solo produce evidencia verificable. No interpreta, no calcula Tru, no decide, no corrige, no modifica, no ejecuta. No sustituye a AX ni a Diagnóstico.
+  funcion: Contrastar estructuras contra reglas formales y generar evidencia de verificación. El algoritmo operativo actual usa AuditorAxiomatico sobre código; la responsabilidad del módulo admite cualquier estructura formal sin cambiar la API.
+  no_hace:
+    • No interpreta intención
+    • No calcula C
+    • No calcula L
+    • No calcula K
+    • No calcula Tru
+    • No modifica estructuras auditadas
+    • No corrige implementaciones
+    • No toma decisiones
+    • No ejecuta acciones
+    • No deposita en Diagnóstico
+    • No sustituye a AX
+    • No sustituye a Diagnóstico
+    • No declara conocimiento axiomático oficial
+  autoridad:
+    • Verificar estructuras
+    • Contrastar estructuras contra reglas formales
+    • Reportar inconsistencias estructurales
+    • Generar evidencia de verificación
+    • Reportar su estado
+    • Reportar inventario
+    • Reportar diagnóstico propio
+  conocimiento_exportable:
+    • verificar
+    • barrer
+    • inventario
+    • reporte
+    • diagnostico
+    • verificar_salida
+    • evidencia
+  consultas_soportadas:
+    • verificar_estructura
+    • barrer
+    • obtener_inventario
+    • obtener_reporte
+    • obtener_diagnostico
+    • verificar_salida
+  requiere:
+    []
+  autoriza_engine:
+    leer: True
+    ejecutar: True
+    consultar: True
+    recombinar: True
+    reportar: True
+    auditar: True
+    inventariar: True
+    modificar: False
+    alterar: False
+    reescribir: False
+  capacidades:
+    • verificar
+    • barrer
+    • inventario
+    • reporte
+    • diagnostico
+    • verificar_salida
+    • axiomas
+  capacidades_meta:
+    verificar:
+      descripcion: Verifica una estructura contra reglas formales. Produce evidencia. No interpreta ni corrige.
+      entrada: peticion opcional: dict con codigo_fuente, declaraciones_axiomaticas, estructura (futuro)
+      salida: dict con id, coherente, errores, evidencia, detalle
+    barrer:
+      descripcion: Alias de verificar. Centinela de coherencia estructural.
+      entrada: peticion opcional: dict
+      salida: dict con id, coherente, errores, evidencia, detalle
+    inventario:
+      descripcion: Inventario contractual del módulo VX.
+      entrada: peticion opcional
+      salida: dict con id, nombre, rol, version, version_contrato, esquema, estabilidad, capacidades, jurisdiccion
+    reporte:
+      descripcion: Reporte interno de estado de VX.
+      entrada: peticion opcional
+      salida: dict con id, estado, coherente, capacidades, jurisdiccion
+    diagnostico:
+      descripcion: Diagnóstico propio de VX. No consulta DiagnosticoGlobal.
+      entrada: peticion opcional
+      salida: dict con id, estado, problemas, advertencias, recomendaciones
+    verificar_salida:
+      descripcion: Comprueba forma mínima de una salida de VX.
+      entrada: salida: dict
+      salida: bool
+    axiomas:
+      descripcion: Alias temporal de compatibilidad. AX es la única autoridad del conocimiento. No declara corpus oficial.
+      entrada: ninguna
+      salida: list vacía (conocimiento oficial en AX)
+  estados_validos:
+    • NO_INICIADO
+    • OPERATIVO
+    • DEGRADADO
+    • RECHAZADO
+  invariantes:
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • VX nunca modifica la estructura auditada
+    • VX nunca corrige evidencia
+    • VX nunca interpreta intención
+    • VX nunca calcula métricas de verdad (C/L/K/Tru)
+    • VX solo produce evidencia verificable
+    • VX no deposita en Diagnóstico; Engine decide el destino de la evidencia
+    • VX no declara conocimiento axiomático oficial (AX es la autoridad)
+    • las capacidades declaradas son callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
+    • este módulo siempre puede reportar su propio estado
+    • inventario() siempre incluye id, nombre, rol, version del CONTENEDOR
+  reporte:
+    id: VX
+    nombre: verificacion
+    rol: VX
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    estado: OPERATIVO
+    coherente: True
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • reporte
+      • diagnostico
+      • verificar_salida
+      • axiomas
+    jurisdiccion:
+      • codigo
+      • contratos
+      • modulos
+      • configuraciones
+      • salidas
+      • estructuras
+      • grafos
+      • arboles
+      • futuras_representaciones
+    requiere:
+      []
+    nota: VX no mantiene sesión de auditoría persistente. Cada verificar()/barrer() produce evidencia puntual.
+  diagnostico:
+    id: VX
+    nombre: verificacion
+    rol: VX
+    estado: OPERATIVO
+    problemas:
+      []
+    advertencias:
+      []
+    recomendaciones:
+      []
+    coherente: True
+    nota: Diagnóstico propio de VX. La evidencia de verificaciones concretas se obtiene invocando verificar()/barrer(); Engine decide su destino.
+  inventario:
+    id: VX
+    nombre: verificacion
+    rol: VX
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    compatible_desde: 1.0
+    api_engine: >=1.0
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • reporte
+      • diagnostico
+      • verificar_salida
+      • axiomas
+    funcion: Autoridad de verificación estructural. Determina si una estructura satisface o viola reglas formales. Solo produce evidencia. No interpreta, no corrige, no ejecuta.
+    jurisdiccion:
+      • codigo
+      • contratos
+      • modulos
+      • configuraciones
+      • salidas
+      • estructuras
+      • grafos
+      • arboles
+      • futuras_representaciones
+    requiere:
+      []
+
+══════════════════════════════════════════════════════════════════════
   DEPENDENCIAS
 ══════════════════════════════════════════════════════════════════════
   grafo:
@@ -9264,6 +9461,7 @@
     • formulas
     • self
     • tru_totales
+    • verificacion
   ciclos:
     []
 
@@ -9966,6 +10164,46 @@
       nombre: verificar_salida
       tipo: capacidad
       modulo: tru_totales
+    [139]
+      id: VX
+      nombre: verificacion
+      rol: VX
+      tipo: modulo
+    [140]
+      id: verificacion.verificar
+      nombre: verificar
+      tipo: capacidad
+      modulo: verificacion
+    [141]
+      id: verificacion.barrer
+      nombre: barrer
+      tipo: capacidad
+      modulo: verificacion
+    [142]
+      id: verificacion.inventario
+      nombre: inventario
+      tipo: capacidad
+      modulo: verificacion
+    [143]
+      id: verificacion.reporte
+      nombre: reporte
+      tipo: capacidad
+      modulo: verificacion
+    [144]
+      id: verificacion.diagnostico
+      nombre: diagnostico
+      tipo: capacidad
+      modulo: verificacion
+    [145]
+      id: verificacion.verificar_salida
+      nombre: verificar_salida
+      tipo: capacidad
+      modulo: verificacion
+    [146]
+      id: verificacion.axiomas
+      nombre: axiomas
+      tipo: capacidad
+      modulo: verificacion
   aristas:
     [0]
       from: axiomas
@@ -10483,227 +10721,276 @@
       from: tru_totales
       to: tru_totales.verificar_salida
       tipo: declara_capacidad
+    [129]
+      from: verificacion
+      to: verificacion.verificar
+      tipo: declara_capacidad
+    [130]
+      from: verificacion
+      to: verificacion.barrer
+      tipo: declara_capacidad
+    [131]
+      from: verificacion
+      to: verificacion.inventario
+      tipo: declara_capacidad
+    [132]
+      from: verificacion
+      to: verificacion.reporte
+      tipo: declara_capacidad
+    [133]
+      from: verificacion
+      to: verificacion.diagnostico
+      tipo: declara_capacidad
+    [134]
+      from: verificacion
+      to: verificacion.verificar_salida
+      tipo: declara_capacidad
+    [135]
+      from: verificacion
+      to: verificacion.axiomas
+      tipo: declara_capacidad
 
 ══════════════════════════════════════════════════════════════════════
   TRAZAS DE EJECUCIÓN
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T12:46:46.439148+00:00
+    timestamp: 2026-08-07T13:05:02.246673+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.006564
+    duracion_s: 0.006255
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T12:46:46.444522+00:00
+    timestamp: 2026-08-07T13:05:02.251912+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.005349
+    duracion_s: 0.005222
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T12:46:46.449543+00:00
+    timestamp: 2026-08-07T13:05:02.256822+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.005004
+    duracion_s: 0.004897
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T12:46:46.449575+00:00
+    timestamp: 2026-08-07T13:05:02.256845+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 1.9e-05
+    duracion_s: 1.3e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T12:46:46.449586+00:00
+    timestamp: 2026-08-07T13:05:02.256855+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 5e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T12:46:46.449595+00:00
+    timestamp: 2026-08-07T13:05:02.256863+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 4e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T12:46:46.450041+00:00
+    timestamp: 2026-08-07T13:05:02.257283+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00044
+    duracion_s: 0.000414
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T12:46:46.450356+00:00
+    timestamp: 2026-08-07T13:05:02.257617+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000305
+    duracion_s: 0.000324
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T12:46:46.450683+00:00
+    timestamp: 2026-08-07T13:05:02.257917+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00032
+    duracion_s: 0.000295
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T12:46:46.450959+00:00
+    timestamp: 2026-08-07T13:05:02.258168+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000269
+    duracion_s: 0.000245
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T12:46:46.452110+00:00
+    timestamp: 2026-08-07T13:05:02.259280+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001141
+    duracion_s: 0.001104
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T12:46:46.453566+00:00
+    timestamp: 2026-08-07T13:05:02.260637+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001447
+    duracion_s: 0.001348
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T12:46:46.454628+00:00
+    timestamp: 2026-08-07T13:05:02.261630+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001052
+    duracion_s: 0.000984
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T12:46:46.454820+00:00
+    timestamp: 2026-08-07T13:05:02.261794+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000183
+    duracion_s: 0.000157
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T12:46:46.454937+00:00
+    timestamp: 2026-08-07T13:05:02.261910+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000111
+    duracion_s: 0.000109
   [15]
     id_traza: 16
-    timestamp: 2026-08-07T12:46:46.454994+00:00
+    timestamp: 2026-08-07T13:05:02.261964+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 5.2e-05
+    duracion_s: 4.9e-05
   [16]
     id_traza: 17
-    timestamp: 2026-08-07T12:46:46.455153+00:00
+    timestamp: 2026-08-07T13:05:02.262101+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000152
+    duracion_s: 0.000132
   [17]
     id_traza: 18
-    timestamp: 2026-08-07T12:46:46.455279+00:00
+    timestamp: 2026-08-07T13:05:02.262223+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00012
+    duracion_s: 0.000116
   [18]
     id_traza: 19
-    timestamp: 2026-08-07T12:46:46.455397+00:00
+    timestamp: 2026-08-07T13:05:02.262356+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000111
+    duracion_s: 0.000127
   [19]
     id_traza: 20
-    timestamp: 2026-08-07T12:46:46.455921+00:00
+    timestamp: 2026-08-07T13:05:02.262765+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000514
+    duracion_s: 0.0004
   [20]
     id_traza: 21
-    timestamp: 2026-08-07T12:46:46.456459+00:00
+    timestamp: 2026-08-07T13:05:02.263144+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000525
+    duracion_s: 0.000372
   [21]
     id_traza: 22
-    timestamp: 2026-08-07T12:46:46.456619+00:00
+    timestamp: 2026-08-07T13:05:02.263233+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000148
+    duracion_s: 8.3e-05
   [22]
     id_traza: 23
-    timestamp: 2026-08-07T12:46:46.456936+00:00
+    timestamp: 2026-08-07T13:05:02.263537+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000309
+    duracion_s: 0.000298
   [23]
     id_traza: 24
-    timestamp: 2026-08-07T12:46:46.457198+00:00
+    timestamp: 2026-08-07T13:05:02.263787+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000255
+    duracion_s: 0.000243
   [24]
     id_traza: 25
-    timestamp: 2026-08-07T12:46:46.457327+00:00
+    timestamp: 2026-08-07T13:05:02.263910+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000123
+    duracion_s: 0.000118
   [25]
     id_traza: 26
-    timestamp: 2026-08-07T12:46:46.459894+00:00
+    timestamp: 2026-08-07T13:05:02.266211+00:00
     modulo: self
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002559
+    duracion_s: 0.002293
   [26]
     id_traza: 27
-    timestamp: 2026-08-07T12:46:46.461936+00:00
+    timestamp: 2026-08-07T13:05:02.268181+00:00
     modulo: self
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.002033
+    duracion_s: 0.001961
   [27]
     id_traza: 28
-    timestamp: 2026-08-07T12:46:46.461951+00:00
+    timestamp: 2026-08-07T13:05:02.268193+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 7e-06
+    duracion_s: 5e-06
   [28]
     id_traza: 29
-    timestamp: 2026-08-07T12:46:46.462546+00:00
+    timestamp: 2026-08-07T13:05:02.268773+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000589
+    duracion_s: 0.000574
   [29]
     id_traza: 30
-    timestamp: 2026-08-07T12:46:46.463068+00:00
+    timestamp: 2026-08-07T13:05:02.269276+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000515
+    duracion_s: 0.000496
   [30]
     id_traza: 31
-    timestamp: 2026-08-07T12:46:46.463579+00:00
+    timestamp: 2026-08-07T13:05:02.269772+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000504
+    duracion_s: 0.00049
+  [31]
+    id_traza: 32
+    timestamp: 2026-08-07T13:05:02.269781+00:00
+    modulo: verificacion
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 3e-06
+  [32]
+    id_traza: 33
+    timestamp: 2026-08-07T13:05:02.269785+00:00
+    modulo: verificacion
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 1e-06
+  [33]
+    id_traza: 34
+    timestamp: 2026-08-07T13:05:02.269790+00:00
+    modulo: verificacion
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 1e-06
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

@@ -2,15 +2,15 @@
 # VPSI-TRUTH — core/centinela.py
 # ===============================================================
 #
-# Centinela v5.2 — intérprete universal de expedientes y contratos.
-# Integración oficial Engine ↔ Centinela.
+# Centinela v5.3
 #
-# Clasificación por evidencia real (hojas de dominio), no por
-# listas fijas ni por la sola presencia de ciclo_id.
+# Clasificación del paquete (solo lo que trae el paquete):
+#   SIN_PAQUETE_AUDITABLE
+#   SOLO_ESTRUCTURAL
+#   CANDIDATO_OPERACIONAL
 #
-# tipo_auditoria:
-#   ESTRUCTURAL  — sin expediente de dominio
-#   OPERACIONAL  — auditoría de expediente / proceso
+# Confirmación tras CACHE:
+#   tipo_auditoria = ESTRUCTURAL | OPERACIONAL
 #
 # ===============================================================
 
@@ -65,7 +65,7 @@ from modules.cache.en import (
 CS_ID = "CS"
 CS_NOMBRE = "centinela"
 CS_ROL = "CS"
-CS_VERSION = "5.2"
+CS_VERSION = "5.3"
 CS_ESQUEMA = "VPSI-CONTRACT-1.0"
 CS_VERSION_CONTRATO = "1.0"
 
@@ -102,7 +102,12 @@ CS_ESTADOS = (
     CS_ESTADO_SIN_PAQUETE_AUDITABLE,
 )
 
-# Taxonomía real (no etapas internas)
+# Clasificación provisional (solo paquete)
+CLASE_SIN_PAQUETE = CS_ESTADO_SIN_PAQUETE_AUDITABLE
+CLASE_ESTRUCTURAL = CS_ESTADO_SOLO_ESTRUCTURAL
+CLASE_CANDIDATO_OPERACIONAL = "CANDIDATO_OPERACIONAL"
+
+# tipo_auditoria confirmado (tras CACHE si aplica)
 TIPO_AUDITORIA_ESTRUCTURAL = "ESTRUCTURAL"
 TIPO_AUDITORIA_OPERACIONAL = "OPERACIONAL"
 
@@ -295,7 +300,7 @@ _STATS = _Estadisticas()
 
 
 # ===============================================================
-# COMPARACIÓN GENÉRICA
+# COMPARACIÓN / HASH
 # ===============================================================
 
 def _normalizar(x: Any) -> Any:
@@ -412,15 +417,11 @@ def _ultimo(valores: List[Any]) -> Any:
 
 
 # ===============================================================
-# CLASIFICACIÓN (estricta — sin falsos positivos)
+# CLASIFICACIÓN PROVISIONAL (solo paquete)
 # ===============================================================
 
 def _tiene_hojas_dominio(paquete: Dict[str, Any]) -> bool:
-    """
-    Evidencia de dominio = al menos una hoja comparable
-    fuera de las claves de forma.
-    ciclo_id solo NO basta.
-    """
+    """ciclo_id solo NO basta; hace falta al menos una hoja comparable."""
     if not isinstance(paquete, dict) or not paquete:
         return False
     return len(_valores_desde(paquete)) > 0
@@ -428,24 +429,20 @@ def _tiene_hojas_dominio(paquete: Dict[str, Any]) -> bool:
 
 def _clasificar_paquete(paquete: Dict[str, Any]) -> str:
     """
-    SIN_PAQUETE_AUDITABLE — vacío / no dict
-    SOLO_ESTRUCTURAL      — sin hojas de dominio y sin ciclo
-                            (o solo forma del sistema)
-    OPERACIONAL           — hay hojas de dominio y/o ciclo_id
-                            (se abre expediente en CACHE)
+    Solo mira el paquete. No consulta CACHE.
+
+    CLASE_SIN_PAQUETE          — vacío / no dict
+    CLASE_ESTRUCTURAL          — sin hojas y sin ciclo_id
+    CLASE_CANDIDATO_OPERACIONAL — hay hojas y/o ciclo_id
+                                  (confirmación después de CACHE)
     """
     if not isinstance(paquete, dict) or not paquete:
-        return CS_ESTADO_SIN_PAQUETE_AUDITABLE
+        return CLASE_SIN_PAQUETE
     tiene_hojas = _tiene_hojas_dominio(paquete)
     tiene_ciclo = bool(paquete.get(PKG_CICLO_ID))
     if not tiene_hojas and not tiene_ciclo:
-        return CS_ESTADO_SOLO_ESTRUCTURAL
-    if not tiene_hojas and tiene_ciclo:
-        # ciclo sin resultados en el paquete: aún se abre
-        # la vía operacional para consultar CACHE; si CACHE
-        # está vacío y estado OK → RETENIDO (no se finge dominio)
-        return "OPERACIONAL"
-    return "OPERACIONAL"
+        return CLASE_ESTRUCTURAL
+    return CLASE_CANDIDATO_OPERACIONAL
 
 
 # ===============================================================
@@ -534,7 +531,7 @@ def _autoriza_ejecutar(contrato: Dict[str, Any]) -> Optional[bool]:
 
 
 # ===============================================================
-# SECUENCIA / DEPENDENCIAS / DAG
+# SECUENCIA / DEPENDENCIAS / DAG / REPRODUCCIÓN
 # ===============================================================
 
 def _ejecuciones_registradas(
@@ -884,11 +881,11 @@ class Centinela:
         ciclo_id = str(p.get(PKG_CICLO_ID) or "")
 
         # ----------------------------------------------------------
-        # Clasificación estricta
+        # 1) Clasificación provisional (solo paquete)
         # ----------------------------------------------------------
         clase = _clasificar_paquete(p)
 
-        if clase == CS_ESTADO_SIN_PAQUETE_AUDITABLE:
+        if clase == CLASE_SIN_PAQUETE:
             return self._emitir(
                 estado=CS_ESTADO_SIN_PAQUETE_AUDITABLE,
                 ciclo_id=ciclo_id or "sin_ciclo",
@@ -903,13 +900,12 @@ class Centinela:
                 tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
             )
 
-        if clase == CS_ESTADO_SOLO_ESTRUCTURAL:
+        if clase == CLASE_ESTRUCTURAL:
             return self._emitir(
                 estado=CS_ESTADO_SOLO_ESTRUCTURAL,
                 ciclo_id=ciclo_id or "estructural",
                 motivos=[
-                    "paquete estructural: sin hojas de dominio ni ciclo_id; "
-                    "no hay expediente operacional que auditar"
+                    "paquete estructural: sin hojas de dominio ni ciclo_id"
                 ],
                 advertencias=advertencias,
                 id_verificacion=id_ver,
@@ -919,7 +915,7 @@ class Centinela:
                 tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
             )
 
-        # OPERACIONAL
+        # CLASE_CANDIDATO_OPERACIONAL — aún no confirmado
         if depositar_salida and ciclo_id:
             try:
                 self._cache.guardar({
@@ -955,6 +951,9 @@ class Centinela:
         vals_p_lists = _valores_desde(p)
         valores_p = {k: _ultimo(v) for k, v in vals_p_lists.items()}
 
+        # ----------------------------------------------------------
+        # 2) Consulta CACHE — confirma u descarta operacional
+        # ----------------------------------------------------------
         try:
             eventos = self._cache.leer_ciclo(ciclo_id)
         except Exception as e:
@@ -985,9 +984,17 @@ class Centinela:
         dag = _construir_dag(ejecuciones)
         trans = _transiciones(ejecuciones)
         modulos_set: Set[str] = set(modulos)
+        vals_e_lists = _valores_desde(eventos)
+        valores_e = {k: _ultimo(v) for k, v in vals_e_lists.items()}
+
+        hay_evidencia_cache = bool(eventos) and (
+            bool(vals_e_lists) or bool(ejecuciones) or bool(contratos)
+        )
+        hay_evidencia_paquete = bool(valores_p)
 
         meta_exp = {
             "ciclo_id": ciclo_id,
+            "clase_provisional": CLASE_CANDIDATO_OPERACIONAL,
             "total_eventos": len(eventos),
             "modulos": modulos,
             "capacidades": capacidades,
@@ -999,8 +1006,10 @@ class Centinela:
             "hash_flujo": hash_flujo,
             "hash_contratos": hash_contratos,
             "hojas_en_paquete": sorted(valores_p.keys()),
+            "hojas_en_cache": sorted(valores_e.keys()),
         }
 
+        # Confirmación: sin evidencia en paquete ni en CACHE
         if not eventos:
             motivos.append("expediente vacío en CACHE")
             if estado_eng == PKG_ESTADO_OK:
@@ -1017,8 +1026,6 @@ class Centinela:
                     paquete=p,
                     valores_paquete=dict(valores_p),
                     hash_expediente=hash_exp,
-                    hash_flujo=hash_flujo,
-                    hash_contratos=hash_contratos,
                     meta_extra=meta_exp,
                     modulos=modulos,
                     capacidades=capacidades,
@@ -1027,13 +1034,13 @@ class Centinela:
                     transiciones=trans,
                     tipo_auditoria=TIPO_AUDITORIA_OPERACIONAL,
                 )
-            # sin eventos y sin estado OK: si tampoco hay hojas, no inventar dominio
-            if not valores_p:
+            if not hay_evidencia_paquete:
                 return self._emitir(
                     estado=CS_ESTADO_SOLO_ESTRUCTURAL,
                     ciclo_id=ciclo_id,
                     motivos=motivos + [
-                        "ciclo sin hojas de dominio en paquete ni en CACHE"
+                        "candidato operacional sin hojas en paquete "
+                        "ni expediente en CACHE"
                     ],
                     advertencias=advertencias,
                     id_verificacion=id_ver,
@@ -1045,7 +1052,27 @@ class Centinela:
                     tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
                 )
 
-        vals_e_lists = _valores_desde(eventos)
+        if not hay_evidencia_cache and not hay_evidencia_paquete:
+            return self._emitir(
+                estado=CS_ESTADO_SOLO_ESTRUCTURAL,
+                ciclo_id=ciclo_id,
+                motivos=[
+                    "candidato operacional sin evidencia confirmada "
+                    "en paquete ni en CACHE"
+                ],
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                hash_expediente=hash_exp,
+                meta_extra=meta_exp,
+                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
+            )
+
+        # ----------------------------------------------------------
+        # 3) Auditoría operacional confirmada
+        # ----------------------------------------------------------
         for clave, lista in vals_e_lists.items():
             if not _sin_contradiccion(lista):
                 motivos.append(
@@ -1065,9 +1092,7 @@ class Centinela:
                 ts_inicio=ts_inicio,
                 paquete=p,
                 valores_paquete=dict(valores_p),
-                valores_evidencia={
-                    k: _ultimo(v) for k, v in vals_e_lists.items()
-                },
+                valores_evidencia=dict(valores_e),
                 hash_expediente=hash_exp,
                 hash_flujo=hash_flujo,
                 hash_contratos=hash_contratos,
@@ -1079,8 +1104,6 @@ class Centinela:
                 transiciones=trans,
                 tipo_auditoria=TIPO_AUDITORIA_OPERACIONAL,
             )
-
-        valores_e = {k: _ultimo(v) for k, v in vals_e_lists.items()}
 
         for clave in sorted(set(valores_p) & set(valores_e)):
             if not _igual(valores_p[clave], valores_e[clave]):
@@ -1505,6 +1528,9 @@ __all__ = [
     "CS_ESTADO_SOLO_ESTRUCTURAL",
     "CS_ESTADO_SIN_PAQUETE_AUDITABLE",
     "CS_ESTADOS",
+    "CLASE_SIN_PAQUETE",
+    "CLASE_ESTRUCTURAL",
+    "CLASE_CANDIDATO_OPERACIONAL",
     "TIPO_AUDITORIA_ESTRUCTURAL",
     "TIPO_AUDITORIA_OPERACIONAL",
     "verificar_salida_paquete",

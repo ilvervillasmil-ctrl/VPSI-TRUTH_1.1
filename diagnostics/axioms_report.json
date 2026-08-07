@@ -2,7 +2,7 @@
   "coherente": true,
   "choques": [],
   "errores": [],
-  "declaraciones": 487,
+  "declaraciones": 504,
   "cuerpos": [
     "Anclas_de_Medicion_AM_AX",
     "VPSI_AX",
@@ -16,14 +16,15 @@
     "self",
     "sentido_estructural_AX",
     "sm_af_AX",
-    "sm_mapa_AX"
+    "sm_mapa_AX",
+    "sm_memoria_AX"
   ],
   "por_tipo": {
-    "axioma": 163,
-    "lema": 54,
-    "teorema": 120,
-    "corolario": 115,
-    "definicion": 35
+    "axioma": 166,
+    "lema": 56,
+    "teorema": 124,
+    "corolario": 119,
+    "definicion": 39
   },
   "ids_dominio_k_o": [
     "A1",

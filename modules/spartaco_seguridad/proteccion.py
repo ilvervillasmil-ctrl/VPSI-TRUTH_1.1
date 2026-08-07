@@ -1,30 +1,30 @@
 # ===============================================================
 # modules/seguridad/proteccion.py
-# Herramienta única: PROTECCION
-# Integridad + autenticidad (Ed25519) + evidencia estructural
+# PROTECCION unificada — integridad + autenticidad + evidencia
 # ===============================================================
 #
-# BUILD (orden obligatorio):
-#   datos → sellar() → firmar() → manifiesto
+# BUILD (orden fijo):
+#   datos → sellar → cuerpo → firmar(cuerpo) → {cuerpo, firma}
 #
-# RUNTIME:
-#   datos + manifiesto + clave pública → verificar()
+# RUNTIME (MODO_PROTEGIDO):
+#   datos + manifiesto{cuerpo,firma} + pub → verificar()
+#   Sin manifiesto = FAIL.
 #
-# MODO_PROTEGIDO  → firma obligatoria (fail-closed)
-# MODO_DIAGNOSTICO → firma opcional
+# Autoridad: firma Ed25519 sobre serializar(cuerpo).
+# Evidencia: canales / z / neutro (no invalidan autorización).
 #
-# La clave pública debe provenir de una raíz de confianza
-# (embebida / pinneada). No basta un .pub intercambiable
-# al lado del artefacto si el atacante puede sustituirlo.
+# Clave pública: raíz de confianza externa (pin / TPM / build).
 # ===============================================================
 
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
+import time
 from math import gcd
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
@@ -34,18 +34,16 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 )
 
 # ---------------------------------------------------------------
-# Declaración descubrible por SC
-# ---------------------------------------------------------------
 SEGURIDAD = {
     "id": "proteccion",
     "nombre": "Protección criptográfica unificada",
     "hace": (
-        "Sella, firma (Ed25519) y verifica un artefacto. "
-        "Hash = integridad. Firma = autenticidad. "
-        "Canales / z / residuo = evidencia estructural, no autoridad."
+        "Sella el artefacto, firma el cuerpo canónico del manifiesto "
+        "(Ed25519) y verifica datos contra ese cuerpo. "
+        "Firma = autoridad. Hash/canales/z/neutro = evidencia."
     ),
     "herramienta": "PROTECCION",
-    "version": "2.0",
+    "version": "3.1",
     "conceptos": [
         "FIRMA_INVÁLIDA",
         "INTEGRIDAD_COMPROMETIDA",
@@ -55,6 +53,8 @@ SEGURIDAD = {
         "AMENAZA",
         "CÓDIGO_INVÁLIDO",
         "ALERTA",
+        "MANIFIESTO_AUSENTE",
+        "VERSIÓN_REGRESIVA",
     ],
 }
 
@@ -63,10 +63,11 @@ MODO_DIAGNOSTICO = "DIAGNOSTICO"
 MARCA_NEUTRA = b"\n# OMEGA_NEUTRO:"
 ALG_HASH = "SHA-256"
 ALG_FIRMA = "Ed25519"
+ESQUEMA_MANIFIESTO = 1
 
 
 # ===============================================================
-# Núcleo C — huella (integridad, no autoridad)
+# Integridad
 # ===============================================================
 
 def nucleo(datos: bytes) -> str:
@@ -77,26 +78,18 @@ def nucleo_digest(datos: bytes) -> bytes:
     return hashlib.sha256(datos).digest()
 
 
-# ===============================================================
-# Canales S · Q — dualidad de observación (no dualidad algebraica)
-# ===============================================================
-
-def canales(datos: bytes) -> Dict[str, str]:
+def canales(datos: bytes) -> Dict[str, Any]:
     mid = len(datos) // 2
     s, q = datos[:mid], datos[mid:]
+    assert len(s) + len(q) == len(datos)
     return {
         "S": hashlib.sha256(s).hexdigest(),
         "Q": hashlib.sha256(q).hexdigest(),
         "n_S": len(s),
         "n_Q": len(q),
+        "n_total": len(datos),
     }
 
-
-# ===============================================================
-# Fragmentos exactos (sin huecos) + z estructural
-# z=1 normal · z=2 permitido · z>=3 obstrucción semántica
-# No es detector de manipulación por sí solo.
-# ===============================================================
 
 def _fragmentos(datos: bytes, k: int = 8) -> List[bytes]:
     if not datos:
@@ -122,33 +115,52 @@ def _val_efectiva(h: str) -> int:
 
 
 def z_invariante(datos: bytes, k: int = 8) -> Dict[str, Any]:
-    vals = [
-        _val_efectiva(hashlib.sha256(f).hexdigest())
-        for f in _fragmentos(datos, k=k)
-    ]
+    frags = _fragmentos(datos, k=k)
+    vals = [_val_efectiva(hashlib.sha256(f).hexdigest()) for f in frags]
     z = vals[0]
     for v in vals[1:]:
         z = gcd(z, v)
+    cubierto = sum(len(f) for f in frags)
     return {
         "z": z,
         "valuaciones": vals,
+        "n_fragmentos": len(frags),
+        "bytes_cubiertos": cubierto,
+        "cobertura_total": cubierto == len(datos),
         "regimen": (
             "normal" if z == 1 else ("cuadrado" if z == 2 else "obstruccion")
         ),
         "nota": (
-            "Marcador estructural de hashes de fragmentos. "
-            "No sustituye firma ni es control de manipulación."
+            "Evidencia estructural. No es autoridad. "
+            "La autoridad es la firma del cuerpo del manifiesto."
         ),
     }
 
 
+def comparar_z(
+    datos: bytes, vals_esperadas: List[int], k: int = 8
+) -> Dict[str, Any]:
+    r = z_invariante(datos, k=k)
+    coincide = r["valuaciones"] == list(vals_esperadas)
+    return {
+        "ok": coincide,
+        "z": r["z"],
+        "valuaciones": r["valuaciones"],
+        "esperadas": list(vals_esperadas),
+        "conceptos": (
+            [] if coincide else ["ALTERACIÓN", "INTEGRIDAD_COMPROMETIDA"]
+        ),
+        "nota": "Diagnóstico. No invalida autorización.",
+    }
+
+
 # ===============================================================
-# Identidad neutra — marca de BUILD (no autenticación)
-# Condición real: SHA256(datos) ≡ 0 (mod n)
-# Representación reportada: residuo = 1 ⇔ h % n == 0
+# Identidad neutra (marca de BUILD)
 # ===============================================================
 
-def _es_neutro(datos: bytes, n: int = 3) -> bool:
+def _es_neutro(datos: bytes, n: int) -> bool:
+    if n < 2:
+        return False
     return int(hashlib.sha256(datos).hexdigest(), 16) % n == 0
 
 
@@ -157,7 +169,6 @@ def sellar(
     n: int = 3,
     max_intentos: int = 8192,
 ) -> Dict[str, Any]:
-    """Build: padding mínimo hasta h ≡ 0 (mod n)."""
     if n < 2:
         return {
             "ok": False,
@@ -177,73 +188,140 @@ def sellar(
             }
     return {
         "ok": False,
-        "error": "no se pudo sellar",
+        "error": f"no se pudo sellar en {max_intentos} intentos",
         "conceptos": ["CÓDIGO_INVÁLIDO"],
     }
 
 
 def verificar_neutro(datos: bytes, n: int = 3) -> Dict[str, Any]:
+    if n < 2:
+        return {
+            "ok": False,
+            "n": n,
+            "neutro": False,
+            "error": "n debe ser ≥ 2",
+            "conceptos": ["CÓDIGO_INVÁLIDO"],
+        }
     ok = _es_neutro(datos, n=n)
     return {
         "ok": ok,
         "n": n,
         "neutro": ok,
-        "conceptos": [] if ok else ["FIRMA_INVÁLIDA"],
+        "conceptos": (
+            [] if ok else ["ALTERACIÓN", "INTEGRIDAD_COMPROMETIDA"]
+        ),
         "nota": "Marca de build, no autenticación.",
     }
 
 
 # ===============================================================
-# FIRMA Ed25519 — autoridad criptográfica
+# Claves y Ed25519
 # ===============================================================
 
 def generar_claves(ruta_priv: str, ruta_pub: str) -> Dict[str, Any]:
-    """La privada no se distribuye. La pública requiere raíz de confianza."""
     priv = Ed25519PrivateKey.generate()
-    Path(ruta_priv).write_bytes(
+    p = Path(ruta_priv)
+    p.write_bytes(
         priv.private_bytes(
             encoding=serialization.Encoding.Raw,
             format=serialization.PrivateFormat.Raw,
             encryption_algorithm=serialization.NoEncryption(),
         )
     )
-    Path(ruta_pub).write_bytes(
-        priv.public_key().public_bytes(
-            encoding=serialization.Encoding.Raw,
-            format=serialization.PublicFormat.Raw,
-        )
+    try:
+        p.chmod(0o600)
+    except OSError:
+        pass
+    pub_raw = priv.public_key().public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
     )
-    return {"ok": True, "priv": ruta_priv, "pub": ruta_pub}
+    Path(ruta_pub).write_bytes(pub_raw)
+    return {
+        "ok": True,
+        "priv": ruta_priv,
+        "pub": ruta_pub,
+        "pub_hex": pub_raw.hex(),
+        "conceptos": [],
+    }
 
 
 def _cargar_priv(ruta_priv: str) -> Ed25519PrivateKey:
     return Ed25519PrivateKey.from_private_bytes(Path(ruta_priv).read_bytes())
 
 
-def _cargar_pub(
+def _cargar_pub_raw(
     ruta_pub: Optional[str] = None,
     pub_bytes: Optional[bytes] = None,
-) -> Ed25519PublicKey:
-    raw = pub_bytes
-    if raw is None and ruta_pub is not None:
-        raw = Path(ruta_pub).read_bytes()
-    if raw is None:
-        raise ValueError("sin clave pública")
-    return Ed25519PublicKey.from_public_bytes(raw)
+) -> Optional[bytes]:
+    if pub_bytes is not None:
+        return pub_bytes
+    if ruta_pub is not None:
+        try:
+            return Path(ruta_pub).read_bytes()
+        except OSError:
+            return None
+    return None
+
+
+def firmar_bytes(mensaje: bytes, ruta_priv: str) -> Dict[str, Any]:
+    try:
+        priv = _cargar_priv(ruta_priv)
+    except (OSError, ValueError) as e:
+        return {
+            "ok": False,
+            "error": f"clave privada ilegible: {e}",
+            "conceptos": ["CÓDIGO_INVÁLIDO"],
+        }
+    return {
+        "ok": True,
+        "firma": priv.sign(mensaje).hex(),
+        "conceptos": [],
+    }
+
+
+def verificar_bytes(
+    mensaje: bytes,
+    firma_hex: str,
+    ruta_pub: Optional[str] = None,
+    pub_bytes: Optional[bytes] = None,
+) -> Dict[str, Any]:
+    raw = _cargar_pub_raw(ruta_pub=ruta_pub, pub_bytes=pub_bytes)
+    if raw is None or len(raw) != 32:
+        return {
+            "ok": False,
+            "error": "clave pública ausente o inválida",
+            "conceptos": ["CÓDIGO_INVÁLIDO", "FIRMA_INVÁLIDA"],
+        }
+    try:
+        Ed25519PublicKey.from_public_bytes(raw).verify(
+            bytes.fromhex(firma_hex), mensaje
+        )
+        valida = True
+    except (InvalidSignature, ValueError, TypeError):
+        valida = False
+    return {
+        "ok": valida,
+        "valida": valida,
+        "conceptos": (
+            []
+            if valida
+            else [
+                "FIRMA_INVÁLIDA",
+                "INTEGRIDAD_COMPROMETIDA",
+                "ALTERACIÓN",
+            ]
+        ),
+    }
 
 
 def firmar(datos: bytes, ruta_priv: str) -> Dict[str, Any]:
-    """Firma el digest del artefacto final (post-sellar)."""
-    priv = _cargar_priv(ruta_priv)
+    """Auxiliar: firma el digest del artefacto. Preferir build()."""
     dig = nucleo_digest(datos)
-    return {
-        "ok": True,
-        "nucleo": dig.hex(),
-        "firma": priv.sign(dig).hex(),
-        "algoritmo": ALG_FIRMA,
-        "hash": ALG_HASH,
-        "conceptos": [],
-    }
+    r = firmar_bytes(dig, ruta_priv)
+    if r.get("ok"):
+        r["nucleo"] = dig.hex()
+    return r
 
 
 def verificar_firma(
@@ -252,67 +330,133 @@ def verificar_firma(
     ruta_pub: Optional[str] = None,
     pub_bytes: Optional[bytes] = None,
 ) -> Dict[str, Any]:
-    try:
-        pub = _cargar_pub(ruta_pub=ruta_pub, pub_bytes=pub_bytes)
-    except (ValueError, Exception) as e:
-        return {
-            "ok": False,
-            "error": str(e),
-            "conceptos": ["CÓDIGO_INVÁLIDO", "FIRMA_INVÁLIDA"],
-        }
     dig = nucleo_digest(datos)
-    try:
-        pub.verify(bytes.fromhex(firma_hex), dig)
-        valida = True
-    except (InvalidSignature, ValueError):
-        valida = False
+    r = verificar_bytes(dig, firma_hex, ruta_pub=ruta_pub, pub_bytes=pub_bytes)
+    r["nucleo"] = dig.hex()
+    return r
+
+
+# ===============================================================
+# Manifiesto: SOLO {cuerpo, firma} — sin campos planos duplicados
+# ===============================================================
+
+def serializar(cuerpo: Dict[str, Any]) -> bytes:
+    return json.dumps(
+        cuerpo, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+    ).encode("utf-8")
+
+
+def construir_cuerpo(
+    datos: bytes,
+    *,
+    artifact_id: str = "",
+    version: int = 1,
+    clave_publica_id: str = "",
+    n_neutro: int = 3,
+) -> Dict[str, Any]:
+    ch = canales(datos)
+    z = z_invariante(datos)
     return {
-        "ok": valida,
-        "nucleo": dig.hex(),
-        "valida": valida,
-        "conceptos": (
-            []
-            if valida
-            else ["FIRMA_INVÁLIDA", "INTEGRIDAD_COMPROMETIDA", "ALTERACIÓN"]
-        ),
+        "esquema": ESQUEMA_MANIFIESTO,
+        "version": int(version),
+        "emitido": int(time.time()),
+        "artifact_id": artifact_id,
+        "clave_publica_id": clave_publica_id,
+        "algoritmo_hash": ALG_HASH,
+        "algoritmo_firma": ALG_FIRMA,
+        "nucleo": nucleo(datos),
+        "S": ch["S"],
+        "Q": ch["Q"],
+        "n_bytes": len(datos),
+        "n_neutro": int(n_neutro),
+        "valuaciones": z["valuaciones"],
+        "identidad_neutra": _es_neutro(datos, n=n_neutro),
     }
 
-
-# ===============================================================
-# Manifiesto canónico (lo que la firma autentica en bloque)
-# ===============================================================
 
 def construir_manifiesto(
     datos: bytes,
     firma_hex: str,
     *,
     artifact_id: str = "",
-    version: str = "1.0",
+    version: int = 1,
     clave_publica_id: str = "",
+    n_neutro: int = 3,
 ) -> Dict[str, Any]:
-    ch = canales(datos)
+    """Formato único: {cuerpo, firma}."""
+    cuerpo = construir_cuerpo(
+        datos,
+        artifact_id=artifact_id,
+        version=version,
+        clave_publica_id=clave_publica_id,
+        n_neutro=n_neutro,
+    )
+    return {"cuerpo": cuerpo, "firma": firma_hex}
+
+
+def verificar_manifiesto(
+    manifiesto: Optional[Dict[str, Any]],
+    ruta_pub: Optional[str] = None,
+    pub_bytes: Optional[bytes] = None,
+    version_minima: int = 1,
+) -> Dict[str, Any]:
+    if not isinstance(manifiesto, dict):
+        return {
+            "ok": False,
+            "error": "manifiesto ausente",
+            "conceptos": ["MANIFIESTO_AUSENTE", "INTEGRIDAD_COMPROMETIDA"],
+        }
+
+    cuerpo = manifiesto.get("cuerpo")
+    firma_hex = manifiesto.get("firma")
+    if not isinstance(cuerpo, dict) or not isinstance(firma_hex, str) or not firma_hex:
+        return {
+            "ok": False,
+            "error": "manifiesto mal formado (exige cuerpo + firma)",
+            "conceptos": ["MANIFIESTO_AUSENTE", "CÓDIGO_INVÁLIDO"],
+        }
+
+    if cuerpo.get("esquema") != ESQUEMA_MANIFIESTO:
+        return {
+            "ok": False,
+            "error": f"esquema {cuerpo.get('esquema')!r} desconocido",
+            "conceptos": ["CÓDIGO_INVÁLIDO"],
+        }
+
+    f = verificar_bytes(
+        serializar(cuerpo),
+        firma_hex,
+        ruta_pub=ruta_pub,
+        pub_bytes=pub_bytes,
+    )
+    if not f.get("ok"):
+        return {
+            "ok": False,
+            "error": "firma del manifiesto inválida",
+            "conceptos": f.get("conceptos")
+            or ["FIRMA_INVÁLIDA", "INTEGRIDAD_COMPROMETIDA"],
+        }
+
+    v = cuerpo.get("version")
+    if not isinstance(v, int) or v < version_minima:
+        return {
+            "ok": False,
+            "error": f"versión {v!r} < mínima {version_minima}",
+            "version": v,
+            "conceptos": ["VERSIÓN_REGRESIVA", "INTEGRIDAD_COMPROMETIDA"],
+        }
+
     return {
-        "artifact_id": artifact_id,
-        "version": version,
-        "algoritmo_hash": ALG_HASH,
-        "algoritmo_firma": ALG_FIRMA,
-        "nucleo": nucleo(datos),
-        "S": ch["S"],
-        "Q": ch["Q"],
-        "identidad_neutra": _es_neutro(datos),
+        "ok": True,
+        "cuerpo": cuerpo,
         "firma": firma_hex,
-        "clave_publica_id": clave_publica_id,
-        "version_contrato": "1.0",
+        "version": v,
+        "conceptos": [],
     }
 
 
-def manifiesto_canonico(m: Dict[str, Any]) -> bytes:
-    """Serialización estable para re-firma futura del manifiesto completo."""
-    return json.dumps(m, sort_keys=True, separators=(",", ":")).encode("utf-8")
-
-
 # ===============================================================
-# BUILD: sellar → firmar → manifiesto
+# BUILD
 # ===============================================================
 
 def build(
@@ -321,7 +465,7 @@ def build(
     *,
     n_neutro: int = 3,
     artifact_id: str = "",
-    version: str = "1.0",
+    version: int = 1,
     clave_publica_id: str = "",
 ) -> Dict[str, Any]:
     s = sellar(datos, n=n_neutro)
@@ -333,189 +477,198 @@ def build(
             "conceptos": s.get("conceptos") or ["CÓDIGO_INVÁLIDO"],
         }
     artefacto = s["datos"]
-    f = firmar(artefacto, ruta_priv)
+
+    cuerpo = construir_cuerpo(
+        artefacto,
+        artifact_id=artifact_id,
+        version=version,
+        clave_publica_id=clave_publica_id,
+        n_neutro=n_neutro,
+    )
+    f = firmar_bytes(serializar(cuerpo), ruta_priv)
     if not f.get("ok"):
         return {
             "ok": False,
             "fase": "firmar",
-            "error": "fallo al firmar",
-            "conceptos": ["FIRMA_INVÁLIDA"],
+            "error": f.get("error") or "fallo al firmar cuerpo",
+            "conceptos": f.get("conceptos") or ["FIRMA_INVÁLIDA"],
         }
-    man = construir_manifiesto(
-        artefacto,
-        f["firma"],
-        artifact_id=artifact_id,
-        version=version,
-        clave_publica_id=clave_publica_id,
-    )
+
+    # Única representación: cuerpo + firma
+    manifiesto = {"cuerpo": cuerpo, "firma": f["firma"]}
     return {
         "ok": True,
         "datos": artefacto,
-        "manifiesto": man,
+        "manifiesto": manifiesto,
         "firma": f["firma"],
-        "nucleo": f["nucleo"],
+        "nucleo": cuerpo["nucleo"],
         "conceptos": [],
     }
 
 
 # ===============================================================
-# RUNTIME: verificar (fail-closed en MODO_PROTEGIDO)
+# RUNTIME
 # ===============================================================
 
 def verificar(
     datos: bytes,
     *,
-    firma_hex: Optional[str] = None,
     ruta_pub: Optional[str] = None,
     pub_bytes: Optional[bytes] = None,
+    manifiesto: Optional[Dict[str, Any]] = None,
+    n_neutro: Optional[int] = None,
+    modo: str = MODO_PROTEGIDO,
+    version_minima: int = 1,
+    # Compatibilidad residual (DIAGNOSTICO / tests de evidencia):
+    firma_hex: Optional[str] = None,
     nucleo_esperado: Optional[str] = None,
     S_esperado: Optional[str] = None,
     Q_esperado: Optional[str] = None,
-    n_neutro: int = 3,
-    modo: str = MODO_PROTEGIDO,
-    manifiesto: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """
-    MODO_PROTEGIDO  → sin firma válida = FAIL
-    MODO_DIAGNOSTICO → firma opcional; reporta evidencia
-    """
     conceptos: List[str] = []
+    fallos: List[str] = []
     pasos: Dict[str, Any] = {}
+    cuerpo: Optional[Dict[str, Any]] = None
 
-    # --- Manifiesto opcional: rellena esperados si no se pasaron ---
-    if manifiesto:
-        firma_hex = firma_hex or manifiesto.get("firma")
-        nucleo_esperado = nucleo_esperado or manifiesto.get("nucleo")
-        S_esperado = S_esperado or manifiesto.get("S")
-        Q_esperado = Q_esperado or manifiesto.get("Q")
-
-    # --- FIRMA (autoridad) ---
+    # ---------- AUTORIDAD ----------
     if modo == MODO_PROTEGIDO:
-        if not firma_hex or (ruta_pub is None and pub_bytes is None):
+        if manifiesto is None:
             return {
                 "herramienta": "PROTECCION",
                 "ok": False,
                 "modo": modo,
-                "error": "firma obligatoria ausente",
-                "conceptos": ["FIRMA_INVÁLIDA", "ALERTA"],
+                "error": "manifiesto obligatorio en MODO_PROTEGIDO",
+                "conceptos": [
+                    "MANIFIESTO_AUSENTE",
+                    "FIRMA_INVÁLIDA",
+                    "ALERTA",
+                ],
+                "fallos": ["manifiesto"],
                 "pasos": {},
             }
-        fir = verificar_firma(
-            datos, firma_hex, ruta_pub=ruta_pub, pub_bytes=pub_bytes
+
+        man = verificar_manifiesto(
+            manifiesto,
+            ruta_pub=ruta_pub,
+            pub_bytes=pub_bytes,
+            version_minima=version_minima,
         )
-        pasos["firma"] = fir
-        conceptos.extend(fir.get("conceptos") or [])
-        if not fir.get("ok"):
+        pasos["manifiesto"] = man
+        conceptos.extend(man.get("conceptos") or [])
+        if not man.get("ok"):
+            fallos.append("manifiesto")
             return {
                 "herramienta": "PROTECCION",
                 "ok": False,
                 "modo": modo,
                 "conceptos": sorted(set(conceptos)),
+                "fallos": fallos,
                 "pasos": pasos,
+                "nota": "Sin manifiesto válido no hay referencia autenticada.",
             }
-    elif firma_hex and (ruta_pub is not None or pub_bytes is not None):
-        fir = verificar_firma(
-            datos, firma_hex, ruta_pub=ruta_pub, pub_bytes=pub_bytes
-        )
-        pasos["firma"] = fir
-        conceptos.extend(fir.get("conceptos") or [])
+        cuerpo = man["cuerpo"]
+        nucleo_esperado = cuerpo["nucleo"]
+        S_esperado = cuerpo["S"]
+        Q_esperado = cuerpo["Q"]
+        if n_neutro is None:
+            n_neutro = int(cuerpo.get("n_neutro") or 3)
 
-    # --- Núcleo (integridad vs esperado independiente) ---
+    else:
+        # DIAGNOSTICO: manifiesto opcional; firma-digest opcional
+        if manifiesto is not None:
+            man = verificar_manifiesto(
+                manifiesto,
+                ruta_pub=ruta_pub,
+                pub_bytes=pub_bytes,
+                version_minima=version_minima,
+            )
+            pasos["manifiesto"] = man
+            conceptos.extend(man.get("conceptos") or [])
+            if man.get("ok"):
+                cuerpo = man["cuerpo"]
+                nucleo_esperado = nucleo_esperado or cuerpo.get("nucleo")
+                S_esperado = S_esperado or cuerpo.get("S")
+                Q_esperado = Q_esperado or cuerpo.get("Q")
+                if n_neutro is None:
+                    n_neutro = int(cuerpo.get("n_neutro") or 3)
+            else:
+                fallos.append("manifiesto")
+        elif firma_hex and (ruta_pub is not None or pub_bytes is not None):
+            fir = verificar_firma(
+                datos, firma_hex, ruta_pub=ruta_pub, pub_bytes=pub_bytes
+            )
+            pasos["firma"] = fir
+            conceptos.extend(fir.get("conceptos") or [])
+            if not fir.get("ok"):
+                fallos.append("firma")
+
+        if n_neutro is None:
+            n_neutro = 3
+
+    # ---------- Núcleo (autoridad vía cuerpo autenticado) ----------
     h = nucleo(datos)
     pasos["nucleo"] = {"nucleo": h, "ok": True}
     if nucleo_esperado is not None:
-        ok_n = h == nucleo_esperado
+        ok_n = hmac.compare_digest(h, str(nucleo_esperado))
         pasos["nucleo"]["ok"] = ok_n
         pasos["nucleo"]["esperado"] = nucleo_esperado
         if not ok_n:
+            fallos.append("nucleo")
             conceptos.extend(
-                ["INTEGRIDAD_COMPROMETIDA", "ALTERACIÓN", "CÓDIGO_COMPROMETIDO"]
+                [
+                    "INTEGRIDAD_COMPROMETIDA",
+                    "ALTERACIÓN",
+                    "CÓDIGO_COMPROMETIDO",
+                ]
             )
 
-    # --- Canales (evidencia; solo si hay esperados) ---
+    # ---------- Canales (autoridad vía cuerpo autenticado) ----------
     ch = canales(datos)
     pasos["canales"] = {**ch, "ok": True}
     if S_esperado is not None and Q_esperado is not None:
-        ok_c = ch["S"] == S_esperado and ch["Q"] == Q_esperado
+        ok_c = hmac.compare_digest(
+            ch["S"], str(S_esperado)
+        ) and hmac.compare_digest(ch["Q"], str(Q_esperado))
         pasos["canales"]["ok"] = ok_c
         if not ok_c:
+            fallos.append("canales")
             conceptos.extend(
                 ["INTEGRIDAD_COMPROMETIDA", "ALTERACIÓN", "MANIPULACIÓN"]
             )
 
-    # --- Neutro (marca de build) ---
-    neu = verificar_neutro(datos, n=n_neutro)
+    # ---------- Neutro (EVIDENCIA — no añade fallos de autoridad) ----------
+    neu = verificar_neutro(datos, n=int(n_neutro))
     pasos["identidad_neutra"] = neu
-    # En protegido la marca es evidencia, no autoridad; no tumba sola
-    if modo == MODO_DIAGNOSTICO and not neu.get("ok"):
+    if not neu.get("ok"):
         conceptos.extend(neu.get("conceptos") or [])
 
-    # --- z estructural (evidencia, no control) ---
+    # ---------- z (EVIDENCIA — no añade fallos de autoridad) ----------
     z = z_invariante(datos)
     pasos["z"] = z
+    if cuerpo and isinstance(cuerpo.get("valuaciones"), list):
+        cz = comparar_z(datos, cuerpo["valuaciones"])
+        pasos["z_compare"] = cz
+        if not cz.get("ok"):
+            conceptos.extend(cz.get("conceptos") or [])
 
-    ok = not conceptos or (
-        modo == MODO_PROTEGIDO
-        and pasos.get("firma", {}).get("ok") is True
-        and pasos.get("nucleo", {}).get("ok") is True
-        and pasos.get("canales", {}).get("ok") is True
-        and not any(
-            c in conceptos
-            for c in (
-                "FIRMA_INVÁLIDA",
-                "INTEGRIDAD_COMPROMETIDA",
-                "ALTERACIÓN",
-                "MANIPULACIÓN",
-                "CÓDIGO_COMPROMETIDO",
-            )
-        )
-    )
-    # Recalcular ok de forma explícita
-    fallos_duros = []
-    if modo == MODO_PROTEGIDO:
-        if not pasos.get("firma", {}).get("ok"):
-            fallos_duros.append("firma")
-        if nucleo_esperado is not None and not pasos["nucleo"]["ok"]:
-            fallos_duros.append("nucleo")
-        if (
-            S_esperado is not None
-            and Q_esperado is not None
-            and not pasos["canales"]["ok"]
-        ):
-            fallos_duros.append("canales")
-    else:
-        if "firma" in pasos and not pasos["firma"].get("ok"):
-            fallos_duros.append("firma")
-        if nucleo_esperado is not None and not pasos["nucleo"]["ok"]:
-            fallos_duros.append("nucleo")
-        if (
-            S_esperado is not None
-            and Q_esperado is not None
-            and not pasos["canales"]["ok"]
-        ):
-            fallos_duros.append("canales")
-
-    ok = len(fallos_duros) == 0
-
+    ok = len(fallos) == 0
     return {
         "herramienta": "PROTECCION",
         "ok": ok,
         "modo": modo,
         "nucleo": h,
         "conceptos": sorted(set(conceptos)),
-        "fallos": fallos_duros,
+        "fallos": fallos,
         "pasos": pasos,
         "nota": (
-            "Firma = autoridad. Hash/canales/z/neutro = evidencia. "
-            "Clave pública requiere raíz de confianza."
+            "Autoridad = firma del cuerpo + match nucleo/S/Q. "
+            "z/neutro = evidencia (no invalidan ok). "
+            "Clave pública requiere raíz de confianza externa."
         ),
     }
 
 
 # ===============================================================
-# API pública
-# ===============================================================
-
 __all__ = [
     "SEGURIDAD",
     "MODO_PROTEGIDO",
@@ -523,12 +676,18 @@ __all__ = [
     "nucleo",
     "canales",
     "z_invariante",
+    "comparar_z",
     "sellar",
     "verificar_neutro",
     "generar_claves",
     "firmar",
+    "firmar_bytes",
     "verificar_firma",
+    "verificar_bytes",
+    "serializar",
+    "construir_cuerpo",
     "construir_manifiesto",
+    "verificar_manifiesto",
     "build",
     "verificar",
 ]

@@ -1,6 +1,6 @@
 # ===============================================================
 # VPSI-TRUTH
-# tests/test_01_arranque_engine.py
+# tests/test_engine.py
 # ===============================================================
 #
 # TEST:
@@ -15,6 +15,7 @@
 #   - Estado OPERATIVO.
 #   - Descubrimiento de módulos.
 #   - Registro creado.
+#   - Los contenedores poseen capacidades.
 #   - No existen excepciones durante el arranque.
 #
 # ===============================================================
@@ -24,7 +25,14 @@
 # IMPORTACIONES
 # ===============================================================
 
+import sys
 from pathlib import Path
+
+# Permite importar "core" desde GitHub Actions y pytest
+sys.path.insert(
+    0,
+    str(Path(__file__).resolve().parent.parent)
+)
 
 from core.engine import Engine
 
@@ -50,7 +58,7 @@ MODULOS = Path("modules")
 
 def test_engine_se_construye():
     """
-    Engine puede instanciarse.
+    El Engine puede construirse.
     """
     eng = Engine(
         MODULOS,
@@ -63,7 +71,7 @@ def test_engine_se_construye():
 
 def test_estado_operativo():
     """
-    Engine termina en estado OPERATIVO.
+    El Engine termina en estado OPERATIVO.
     """
     eng = Engine(
         MODULOS,
@@ -87,9 +95,9 @@ def test_descubre_modulos():
     assert eng.registro.total() > 0
 
 
-def test_contenedores_cargados():
+def test_contenedores_tienen_capacidades():
     """
-    Todo módulo descubierto debe tener CONTENEDOR.
+    Todo contenedor descubierto debe declarar capacidades.
     """
     eng = Engine(
         MODULOS,
@@ -97,23 +105,33 @@ def test_contenedores_cargados():
         strict=False,
     )
 
+    assert len(eng.registro.contenedores) > 0
+
     for contenedor in eng.registro.contenedores.values():
+
         assert hasattr(contenedor, "capacidades")
+
+        assert isinstance(contenedor.capacidades, dict)
+
+        assert len(contenedor.capacidades) > 0
 
 
 def test_no_excepciones_arranque():
     """
-    El arranque completo no debe producir excepción.
+    El arranque completo no debe producir excepciones.
     """
     try:
+
         Engine(
             MODULOS,
             invocador_id="pytest",
             strict=False,
         )
+
     except Exception as e:
+
         raise AssertionError(
-            f"Engine produjo excepción durante el arranque: {e}"
+            f"Engine produjo una excepción durante el arranque: {e}"
         )
 
 

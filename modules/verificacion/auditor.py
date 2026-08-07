@@ -2,105 +2,100 @@
 # VPSI-TRUTH — modules/verificacion/auditor.py
 # ===============================================================
 #
-# Auditor estructural sobre representación AST.
+# Motor de auditoría estructural sobre representación AST.
 #
 # Oficio único:
-#   Analizar una representación (AST) y producir evidencia.
+#   Recorrer AST → aplicar catálogo de reglas → producir evidencia.
 #   No interpreta intención.
 #   No calcula métricas.
 #   No modifica el código.
+#   No clasifica choques finales (eso es VX).
 #
 # Flujo:
 #   AST
 #    ↓
 #   recorrido
 #    ↓
-#   conjunto de reglas
+#   regla → return Hallazgo | None
 #    ↓
-#   hallazgos (evidencia uniforme)
+#   motor registra (hallazgo_id, forma uniforme)
 #    ↓
-#   VX clasifica / reporta
+#   evidencia → VX
 #
-# Sintaxis inválida ≠ violación axiomática.
+# Nomenclatura:
+#   AuditorEstructural — compara reglas AST, no axiomas.
+#   Los axiomas viven en AX. VX conecta estructura ↔ AX.
+#   Alias: AuditorAxiomatico (compatibilidad con INIT actual).
+#
+# Sintaxis inválida ≠ violación:
 #   Error de sintaxis → estado NO_VERIFICABLE
-#   Reglas ejecutadas  → coherente True/False + hallazgos
+#   Reglas ejecutadas  → VERIFICADO + hallazgos
 #
 # ===============================================================
 
 from __future__ import annotations
 
 import ast
-from typing import Any, Callable, Dict, List, Optional
+import itertools
+from typing import Any, Callable, Dict, List, Optional, TypedDict
 
 
 # ===============================================================
-# SECCIÓN 1 — TIPOS Y CONSTANTES
+# SECCIÓN 1 — TIPOS
 # ===============================================================
+
+class HallazgoDict(TypedDict, total=False):
+    hallazgo_id: str
+    regla_id: str
+    categoria: str
+    severidad: str
+    autoridad: str
+    archivo: str
+    linea: Optional[int]
+    razon: str
+    recomendacion: str
+    tipo_nodo: Optional[str]
+    nombre: Optional[str]
+    contexto: Optional[str]
+
+
+class MetaRegla(TypedDict, total=False):
+    id: str
+    categoria: str
+    autoridad: str
+    descripcion: str
+    severidad_default: str
+    requiere: List[str]
+    usa_ast: bool
+    usa_axiomas: bool
+    ejecutar: Callable[..., Optional[HallazgoDict]]
+
 
 Severidad = str  # INFO | ADVERTENCIA | ERROR | CRITICO
-
-_SEVERIDADES_VALIDAS = ("INFO", "ADVERTENCIA", "ERROR", "CRITICO")
+_SEVERIDADES = ("INFO", "ADVERTENCIA", "ERROR", "CRITICO")
 
 
 # ===============================================================
-# SECCIÓN 2 — EXCEPCIÓN (paro explícito, uso opcional)
+# SECCIÓN 2 — EXCEPCIÓN (paro duro opcional)
 # ===============================================================
 
 class ContradiccionCodigoError(Exception):
-    """
-    Lanzado solo si el llamador pide fallo duro ante un hallazgo crítico.
-    El barrido normal no lanza: devuelve evidencia.
-    """
+    """Uso opcional si el llamador pide fallo duro ante hallazgo crítico."""
 
     def __init__(self, axioma_id: str, detalle: str, nodo_info: str) -> None:
         self.axioma_id = axioma_id
         self.detalle = detalle
         self.nodo_info = nodo_info
         super().__init__(
-            "\n[PARO AXIOMÁTICO]\n"
-            "  -> Axioma/Regla: {0}\n"
-            "  -> Contradicción: {1}\n"
-            "  -> Contexto de Código: {2}".format(axioma_id, detalle, nodo_info)
+            "\n[PARO ESTRUCTURAL]\n"
+            "  -> Regla: {0}\n"
+            "  -> Detalle: {1}\n"
+            "  -> Contexto: {2}".format(axioma_id, detalle, nodo_info)
         )
 
 
 # ===============================================================
-# SECCIÓN 3 — REGISTRO ÚNICO DE EVIDENCIA
-# ===============================================================
-
-def _registrar_hallazgo(
-    hallazgos: List[Dict[str, Any]],
-    *,
-    regla_id: str,
-    categoria: str,
-    severidad: Severidad,
-    archivo: str,
-    linea: Optional[int],
-    razon: str,
-    tipo_nodo: Optional[str] = None,
-    nombre: Optional[str] = None,
-    contexto: Optional[str] = None,
-) -> None:
-    """
-    Única vía para construir evidencia.
-    Todas las reglas generan exactamente la misma estructura.
-    """
-    sev = severidad if severidad in _SEVERIDADES_VALIDAS else "ERROR"
-    hallazgos.append({
-        "regla_id": str(regla_id),
-        "categoria": str(categoria),
-        "severidad": sev,
-        "archivo": str(archivo),
-        "linea": linea,
-        "razon": str(razon),
-        "tipo_nodo": tipo_nodo,
-        "nombre": nombre,
-        "contexto": contexto,
-    })
-
-
-# ===============================================================
-# SECCIÓN 4 — CONTEXTO AST (ayuda a reportes futuros)
+# SECCIÓN 3 — HELPERS AST
 # ===============================================================
 
 def _nombre_callable(nodo: ast.AST) -> Optional[str]:
@@ -118,142 +113,243 @@ def _contexto_breve(nodo: ast.AST) -> str:
         return type(nodo).__name__
 
 
+def _hallazgo(
+    *,
+    regla_id: str,
+    categoria: str,
+    severidad: Severidad,
+    autoridad: str,
+    archivo: str,
+    linea: Optional[int],
+    razon: str,
+    recomendacion: str = "",
+    tipo_nodo: Optional[str] = None,
+    nombre: Optional[str] = None,
+    contexto: Optional[str] = None,
+) -> HallazgoDict:
+    """Fábrica de hallazgo (sin id; el motor asigna hallazgo_id)."""
+    sev = severidad if severidad in _SEVERIDADES else "ERROR"
+    return {
+        "regla_id": str(regla_id),
+        "categoria": str(categoria),
+        "severidad": sev,
+        "autoridad": str(autoridad),
+        "archivo": str(archivo),
+        "linea": linea,
+        "razon": str(razon),
+        "recomendacion": str(recomendacion or ""),
+        "tipo_nodo": tipo_nodo,
+        "nombre": nombre,
+        "contexto": contexto,
+    }
+
+
 # ===============================================================
-# SECCIÓN 5 — REGLAS INDEPENDIENTES
+# SECCIÓN 4 — REGLAS (solo detectan; no registran)
 # ===============================================================
 #
 # Cada regla:
-#   - recibe (subnodo, ruta, hallazgos)
-#   - decide si aplica
-#   - registra evidencia vía _registrar_hallazgo
-#   - no interpreta, no corrige, no modifica
+#   - recibe (nodo, ruta)
+#   - devuelve HallazgoDict | None
+#   - no conoce el motor ni la lista global de evidencia
 #
-# Identificadores alineables a AX (ej. AX-PRECISION-001).
 # ===============================================================
 
-def regla_float(
-    nodo: ast.AST,
-    ruta: str,
-    hallazgos: List[Dict[str, Any]],
-) -> None:
-    """
-    AX-PRECISION-001 — Prohibición de float en código de verdad estructural.
-    Piso estructural: Fraction.
-    """
+def _regla_float(nodo: ast.AST, ruta: str) -> Optional[HallazgoDict]:
     if not isinstance(nodo, ast.Call):
-        return
+        return None
     nombre = _nombre_callable(nodo.func)
     if nombre != "float":
-        return
-    _registrar_hallazgo(
-        hallazgos,
+        return None
+    return _hallazgo(
         regla_id="AX-PRECISION-001",
         categoria="precision",
         severidad="ERROR",
+        autoridad="AX",
         archivo=ruta,
         linea=getattr(nodo, "lineno", None),
         razon=(
             "Uso de float detectado. "
             "Violación de precisión exacta (piso estructural: Fraction)."
         ),
+        recomendacion="Use Fraction en lugar de float.",
         tipo_nodo="Call",
         nombre="float",
         contexto=_contexto_breve(nodo),
     )
 
 
-def regla_eval(
-    nodo: ast.AST,
-    ruta: str,
-    hallazgos: List[Dict[str, Any]],
-) -> None:
-    """AX-SEGURIDAD-001 — Prohibición de eval."""
+def _regla_eval(nodo: ast.AST, ruta: str) -> Optional[HallazgoDict]:
     if not isinstance(nodo, ast.Call):
-        return
+        return None
     nombre = _nombre_callable(nodo.func)
     if nombre != "eval":
-        return
-    _registrar_hallazgo(
-        hallazgos,
+        return None
+    return _hallazgo(
         regla_id="AX-SEGURIDAD-001",
         categoria="seguridad",
         severidad="CRITICO",
+        autoridad="AX",
         archivo=ruta,
         linea=getattr(nodo, "lineno", None),
         razon="Uso de eval detectado. Ejecución dinámica no permitida.",
+        recomendacion="Elimine eval; use rutas explícitas y tipadas.",
         tipo_nodo="Call",
         nombre="eval",
         contexto=_contexto_breve(nodo),
     )
 
 
-def regla_exec(
-    nodo: ast.AST,
-    ruta: str,
-    hallazgos: List[Dict[str, Any]],
-) -> None:
-    """AX-SEGURIDAD-002 — Prohibición de exec."""
+def _regla_exec(nodo: ast.AST, ruta: str) -> Optional[HallazgoDict]:
     if not isinstance(nodo, ast.Call):
-        return
+        return None
     nombre = _nombre_callable(nodo.func)
     if nombre != "exec":
-        return
-    _registrar_hallazgo(
-        hallazgos,
+        return None
+    return _hallazgo(
         regla_id="AX-SEGURIDAD-002",
         categoria="seguridad",
         severidad="CRITICO",
+        autoridad="AX",
         archivo=ruta,
         linea=getattr(nodo, "lineno", None),
         razon="Uso de exec detectado. Ejecución dinámica no permitida.",
+        recomendacion="Elimine exec; use composición explícita de funciones.",
         tipo_nodo="Call",
         nombre="exec",
         contexto=_contexto_breve(nodo),
     )
 
 
-# Conjunto activo de reglas (activar/desactivar sin tocar el recorrido).
-_REGLAS: List[Callable[[ast.AST, str, List[Dict[str, Any]]], None]] = [
-    regla_float,
-    regla_eval,
-    regla_exec,
-]
+# ===============================================================
+# SECCIÓN 5 — CATÁLOGO DE REGLAS (metadatos + ejecutar)
+# ===============================================================
+
+def cargar_reglas() -> List[MetaRegla]:
+    """
+    Único punto donde se listan las reglas activas.
+    Agregar una regla = definir función + una entrada aquí.
+    El motor (recorrido) no se modifica.
+    """
+    return [
+        {
+            "id": "AX-PRECISION-001",
+            "categoria": "precision",
+            "autoridad": "AX",
+            "descripcion": (
+                "Prohibición de float en código de verdad estructural. "
+                "Piso: Fraction."
+            ),
+            "severidad_default": "ERROR",
+            "requiere": [],
+            "usa_ast": True,
+            "usa_axiomas": False,
+            "ejecutar": _regla_float,
+        },
+        {
+            "id": "AX-SEGURIDAD-001",
+            "categoria": "seguridad",
+            "autoridad": "AX",
+            "descripcion": "Prohibición de eval.",
+            "severidad_default": "CRITICO",
+            "requiere": [],
+            "usa_ast": True,
+            "usa_axiomas": False,
+            "ejecutar": _regla_eval,
+        },
+        {
+            "id": "AX-SEGURIDAD-002",
+            "categoria": "seguridad",
+            "autoridad": "AX",
+            "descripcion": "Prohibición de exec.",
+            "severidad_default": "CRITICO",
+            "requiere": [],
+            "usa_ast": True,
+            "usa_axiomas": False,
+            "ejecutar": _regla_exec,
+        },
+    ]
+
+
+def listar_reglas() -> List[Dict[str, Any]]:
+    """Metadatos de reglas sin el callable (consultable por VX/Engine)."""
+    out: List[Dict[str, Any]] = []
+    for r in cargar_reglas():
+        out.append({
+            "id": r.get("id"),
+            "categoria": r.get("categoria"),
+            "autoridad": r.get("autoridad"),
+            "descripcion": r.get("descripcion"),
+            "severidad_default": r.get("severidad_default"),
+            "requiere": list(r.get("requiere") or []),
+            "usa_ast": bool(r.get("usa_ast", True)),
+            "usa_axiomas": bool(r.get("usa_axiomas", False)),
+        })
+    return out
 
 
 # ===============================================================
-# SECCIÓN 6 — MOTOR: RECORRIDO + APLICACIÓN DE REGLAS
+# SECCIÓN 6 — MOTOR (recorrido + registro; no conoce reglas a mano)
 # ===============================================================
 
-def _aplicar_reglas(
+class _ContadorHallazgos:
+    def __init__(self) -> None:
+        self._seq = itertools.count(1)
+
+    def next_id(self) -> str:
+        return "H-{0:04d}".format(next(self._seq))
+
+
+def _registrar(
+    contador: _ContadorHallazgos,
+    hallazgos: List[HallazgoDict],
+    bruto: HallazgoDict,
+) -> None:
+    item: HallazgoDict = dict(bruto)
+    item["hallazgo_id"] = contador.next_id()
+    hallazgos.append(item)
+
+
+def _aplicar_reglas_nodo(
     nodo: ast.AST,
     ruta: str,
-    hallazgos: List[Dict[str, Any]],
+    reglas: List[MetaRegla],
+    contador: _ContadorHallazgos,
+    hallazgos: List[HallazgoDict],
 ) -> None:
-    for regla in _REGLAS:
-        regla(nodo, ruta, hallazgos)
+    for meta in reglas:
+        fn = meta.get("ejecutar")
+        if not callable(fn):
+            continue
+        resultado = fn(nodo, ruta)
+        if resultado is None:
+            continue
+        if isinstance(resultado, dict):
+            _registrar(contador, hallazgos, resultado)
 
 
 def _recorrer_ast(
     arbol: ast.AST,
     ruta: str,
-    hallazgos: List[Dict[str, Any]],
+    reglas: List[MetaRegla],
+    contador: _ContadorHallazgos,
+    hallazgos: List[HallazgoDict],
 ) -> None:
     for subnodo in ast.walk(arbol):
-        _aplicar_reglas(subnodo, ruta, hallazgos)
+        _aplicar_reglas_nodo(subnodo, ruta, reglas, contador, hallazgos)
 
 
 # ===============================================================
-# SECCIÓN 7 — AUDITOR
+# SECCIÓN 7 — AUDITOR ESTRUCTURAL
 # ===============================================================
 
-class AuditorAxiomatico:
+class AuditorEstructural:
     """
-    Analiza AST del código fuente y produce hallazgos uniformes.
+    Motor de auditoría estructural (AST → hallazgos).
 
-    No clasifica choques estructurales finales (eso es VX).
-    No interpreta intención.
-    No calcula Tru / C / L / K.
-    No modifica el código.
+    No compara axiomas (AX es la autoridad del conocimiento).
+    No clasifica choques finales (VX).
+    No interpreta, no corrige, no modifica código.
     """
 
     def ejecutar_barrido_transversal(
@@ -262,24 +358,21 @@ class AuditorAxiomatico:
         axiomas_sistema: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Barrido transversal.
-
         Returns
         -------
-        dict
-            estado: "VERIFICADO" | "NO_VERIFICABLE"
-            coherente: bool
-            hallazgos: list[dict]   # evidencia uniforme
-            no_verificables: list   # sintaxis u otros bloqueos de análisis
-            reglas_aplicadas: list[str]
-            nota: str
-
-        axiomas_sistema se acepta por firma (Engine / VX pueden inyectar
-        contexto); las reglas actuales son estructurales y no dependen
-        aún de ese diccionario.
+        estado: "VERIFICADO" | "NO_VERIFICABLE"
+        coherente: bool
+        hallazgos: list[HallazgoDict]   # con hallazgo_id
+        no_verificables: list
+        reglas_aplicadas: list[str]     # ids
+        catalogo_reglas: list[dict]     # metadatos sin callable
+        nota: str
         """
-        hallazgos: List[Dict[str, Any]] = []
+        hallazgos: List[HallazgoDict] = []
         no_verificables: List[Dict[str, Any]] = []
+        contador = _ContadorHallazgos()
+        reglas = cargar_reglas()
+        ids_reglas = [str(r.get("id") or "") for r in reglas]
 
         if not isinstance(archivos_codigo, dict):
             return {
@@ -292,7 +385,8 @@ class AuditorAxiomatico:
                         "tipo": "entrada_invalida",
                     }
                 ],
-                "reglas_aplicadas": [r.__name__ for r in _REGLAS],
+                "reglas_aplicadas": ids_reglas,
+                "catalogo_reglas": listar_reglas(),
                 "nota": "Entrada inválida: no se pudo iniciar el barrido.",
             }
 
@@ -307,7 +401,6 @@ class AuditorAxiomatico:
             try:
                 arbol = ast.parse(codigo, filename=str(ruta))
             except SyntaxError as e:
-                # Sintaxis inválida ≠ violación axiomática.
                 no_verificables.append({
                     "archivo": str(ruta),
                     "error": "Error de sintaxis: {0}".format(e),
@@ -316,14 +409,9 @@ class AuditorAxiomatico:
                 })
                 continue
 
-            _recorrer_ast(arbol, str(ruta), hallazgos)
+            _recorrer_ast(arbol, str(ruta), reglas, contador, hallazgos)
 
-        if no_verificables and not hallazgos:
-            # Hubo bloqueo de análisis y ninguna regla llegó a correr
-            # sobre esos archivos fallidos.
-            estado = "NO_VERIFICABLE"
-            coherente = False
-        elif no_verificables and hallazgos:
+        if no_verificables:
             estado = "NO_VERIFICABLE"
             coherente = False
         else:
@@ -335,14 +423,19 @@ class AuditorAxiomatico:
             "coherente": coherente,
             "hallazgos": hallazgos,
             "no_verificables": no_verificables,
-            "reglas_aplicadas": [r.__name__ for r in _REGLAS],
+            "reglas_aplicadas": ids_reglas,
+            "catalogo_reglas": listar_reglas(),
             "nota": (
-                "Hallazgos = evidencia uniforme de reglas AST. "
-                "VX clasifica choques estructurales. "
-                "Sintaxis inválida se reporta como NO_VERIFICABLE, "
-                "no como hallazgo axiomático."
+                "Hallazgos = evidencia uniforme (hallazgo_id asignado por el motor). "
+                "Reglas solo detectan y devuelven; no registran. "
+                "Sintaxis inválida → NO_VERIFICABLE, no hallazgo. "
+                "VX clasifica choques. AX posee el conocimiento axiomático."
             ),
         }
+
+
+# Compatibilidad con modules/verificacion/__init__.py
+AuditorAxiomatico = AuditorEstructural
 
 
 # ===============================================================
@@ -350,6 +443,9 @@ class AuditorAxiomatico:
 # ===============================================================
 
 __all__ = [
+    "AuditorEstructural",
     "AuditorAxiomatico",
     "ContradiccionCodigoError",
+    "cargar_reglas",
+    "listar_reglas",
 ]

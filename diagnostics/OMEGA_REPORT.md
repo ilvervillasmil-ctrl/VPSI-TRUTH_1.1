@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 5
-  timestamp: 2026-08-07T01:20:03.885146+00:00
+  timestamp: 2026-08-07T01:29:06.475765+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 15
-  timestamp: 2026-08-07T01:20:03.885120+00:00
+  timestamp: 2026-08-07T01:29:06.475743+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -379,49 +379,52 @@
   id: CA
   nombre: calculator
   rol: CA
-  version: 2.0
+  version: 2.2
   version_contrato: 1.0
   esquema: VPSI-CONTRACT-1.0
   estabilidad: ESTABLE
   compatible_desde: 1.2
   api_engine: >=1.0
-  descripcion: Unica autoridad del dominio de calculo estructural del sistema VPSI. Calcula los factores C, L, K. No calcula Tru_Ri ni Tru_total (FO). Integra conocimiento autorizado del ecosistema. Todo valor oficial es Fraction; el decimal es solo representacion.
-  funcion: Calcular factores estructurales C, L, K (y derivados futuros) integrando conocimiento autorizado. Entregar resultados trazables a FO. Proteger la integridad del dominio de calculo.
+  descripcion: Unica autoridad del dominio de calculo estructural. Calcula C, L, K. Toda salida reporta fraccion y decimal juntos (ejemplo: 7/9 = 0.778). No calcula Tru (FO).
+  funcion: Pipeline: evidencia -> C/L/K -> centinela -> ID -> historial. Valor oficial = Fraction. Decimal = misma magnitud, determinista.
   no_hace:
     • No calcula Tru_Ri ni Tru_total
-    • No redefine constantes (CT)
-    • No redefine axiomas (AX)
-    • No redefine formulas (FO)
-    • No orquesta el sistema (Engine)
-    • No modifica otros modulos ni contratos ajenos
-    • No estima por intuicion: toda magnitud requiere evidencia estructural
+    • No redefine constantes, axiomas ni formulas
+    • No orquesta el sistema
+    • No estima por intuicion
+    • No deja ambigua la salida numerica
   autoridad:
-    • Unica autoridad para calcular C, L, K y factores estructurales
-    • Integrar conocimiento autorizado del ecosistema
-    • Auditar integridad del dominio de calculo (centinela)
-    • Representar Fraction en decimal configurable
-    • Reportar inventario, estado y diagnostico propios
+    • Unica autoridad para calcular C, L, K
+    • Reportar siempre fraccion y decimal del mismo valor
+    • Explicar calculos con evidencia trazable
+    • Auditar integridad del dominio
   conocimiento_exportable:
     • C
     • L
     • K
     • factores
     • UNDEFINED
+    • evidencia
+    • historial
+    • explicaciones
     • inventario
     • estado
     • reporte
     • diagnostico
   consultas_soportadas:
+    • calcular
     • calcular_C
     • calcular_L
     • calcular_K
-    • calcular
+    • calcular_factor
     • representar
+    • explicar_calculo
     • verificar_coherencia
     • obtener_inventario
     • obtener_reporte
     • obtener_diagnostico
     • leer_ids_escala
+    • historial
   requiere:
     []
   autoriza_engine:
@@ -442,6 +445,7 @@
     • calcular_K
     • calcular_factor
     • representar
+    • explicar_calculo
     • verificar
     • barrer
     • inventario
@@ -449,59 +453,68 @@
     • diagnostico
     • leer_ids_escala
     • verificar_salida
+    • historial
   capacidades_meta:
     calcular:
-      descripcion: Orquesta C, L, K sobre una peticion. Pasa por centinela.
-      entrada: peticion: dict (metodo, conteos, contexto/O, escala_id, ...)
-      salida: dict con C, L, K, errores, metodo, conteos?, escala?, centinela
+      descripcion: Pipeline completo. Cada factor sale como {fraccion, decimal, display} ej: 7/9 = 0.778
+      entrada: peticion: dict
+      salida: dict con id_calculo, C, L, K (cada uno con fraccion+decimal), evidencia, centinela, errores
     calcular_C:
-      descripcion: Calcula el factor de coherencia C.
+      descripcion: Factor C con fraccion y decimal.
       entrada: peticion: dict
-      salida: dict con C (Fraction|None), ruta, notas
+      salida: dict con C (objeto valor), ruta, notas, evidencia
     calcular_L:
-      descripcion: Calcula el factor de logica L (UNDEFINED si p=0).
+      descripcion: Factor L con fraccion y decimal (o UNDEFINED).
       entrada: peticion: dict
-      salida: dict con L (Fraction|UNDEFINED), p, r, ruta, notas
+      salida: dict con L (objeto valor), p, r, ruta, notas, evidencia
     calcular_K:
-      descripcion: Calcula el factor de correlacion K (None sin O/contexto).
-      entrada: peticion: dict con contexto/O_context
-      salida: dict con K (Fraction|None), ruta, notas
+      descripcion: Factor K con fraccion y decimal (o None sin O).
+      entrada: peticion: dict
+      salida: dict con K (objeto valor), ruta, notas, evidencia
     calcular_factor:
-      descripcion: Calcula un factor estructural por nombre (C|L|K).
+      descripcion: Factor por nombre C|L|K.
       entrada: factor: str, peticion: dict
-      salida: dict del factor solicitado
+      salida: dict del factor
     representar:
-      descripcion: Representa Fraction como decimal configurable. No altera el valor oficial.
+      descripcion: Convierte Fraction a {fraccion, decimal, display}. Ejemplo: 7/9 = 0.778
       entrada: valor: Fraction|UNDEFINED|None, precision: int=3
-      salida: dict con fraccion, decimal, precision, undefined
+      salida: dict con fraccion, decimal, display, precision, undefined
+    explicar_calculo:
+      descripcion: Explica un calculo por id_calculo.
+      entrada: id_calculo: str
+      salida: dict explicativo o None
     verificar:
-      descripcion: Centinela del modulo: archivos, APIs, choques, conteos.
+      descripcion: Centinela de integridad del modulo.
       entrada: ninguna
-      salida: dict con coherente, errores, choques, factores_api, archivos
+      salida: dict con coherente, errores, choques, hashes
     barrer:
-      descripcion: Alias de verificar. Centinela de carpeta e integridad.
+      descripcion: Alias de verificar.
       entrada: ninguna
-      salida: dict con coherente, errores, choques, factores_api
+      salida: dict con coherente, errores, choques, hashes
     inventario:
-      descripcion: Inventario completo del dominio de calculo.
+      descripcion: Inventario del dominio de calculo.
       entrada: peticion opcional
-      salida: dict con capacidades, factores, archivos, estado, version
+      salida: dict con capacidades, factores, archivos, hashes
     reporte:
-      descripcion: Reporte interno de estado del modulo CA.
+      descripcion: Reporte de estado de CA.
       entrada: ninguna
-      salida: dict con estado, coherente, factores_api, capacidades
+      salida: dict con estado, coherente, factores_api
     diagnostico:
-      descripcion: Diagnostico: problemas, advertencias, recomendaciones.
+      descripcion: Diagnostico de problemas y recomendaciones.
       entrada: ninguna
       salida: dict con estado, problemas, advertencias, recomendaciones
     leer_ids_escala:
-      descripcion: Ids de escala reconocidos (atomo, frase, sujeto, ...).
+      descripcion: Ids de escala reconocidos.
       entrada: ninguna
-      salida: dict con ids, n, origenes, disponible
+      salida: dict con ids, n, origenes
     verificar_salida:
-      descripcion: Comprueba forma minima de salida de calcular (C, L, K).
+      descripcion: Forma minima: C, L, K, id_calculo.
       entrada: salida: dict
       salida: bool
+    historial:
+      descripcion: Buffer de ultimos calculos.
+      entrada: limite opcional: int
+      salida: list[dict]
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -509,22 +522,18 @@
     • RECHAZADO
   invariantes:
     • CA es la unica autoridad del dominio de calculo estructural
-    • CA calcula unicamente factores estructurales (C, L, K, derivados)
-    • FO es la unica autoridad sobre las formulas oficiales
-    • todo calculo interno utiliza Fraction
-    • float nunca representa el valor oficial
-    • el decimal es unicamente una representacion
-    • ningun calculo sale sin pasar por el centinela interno
-    • CA nunca modifica otros modulos ni redefine conocimiento ajeno
-    • CA solo integra conocimiento autorizado por contratos
-    • todo calculo es reproducible, auditable y trazable
+    • todo calculo interno utiliza Fraction como valor oficial
+    • toda salida de factor reporta fraccion Y decimal juntos (ej: 7/9 = 0.778)
+    • float nunca es la fuente del decimal; se usa Decimal
+    • ningun calculo sale sin centinela ni ID unico
+    • toda magnitud registra evidencia trazable
     • K ausente sin contexto/O es legitimo (Def-5.3.1)
     • L = UNDEFINED cuando p=0 (AM-D6 / AM-A3)
   reporte:
     id: CA
     modulo: calculator
     rol: CA
-    version: 2.0
+    version: 2.2
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
@@ -534,7 +543,9 @@
       []
     archivos:
       []
-    conteos_disponible: False
+    hashes:
+      __init__.py: b6ff67949796b12dda10f2995c04c16c3d0b6c5eb3c4d565334d8c8585ecaf7c
+    historial_n: 0
     errores_n: 6
     choques_n: 0
     capacidades:
@@ -544,6 +555,7 @@
       • calcular_K
       • calcular_factor
       • representar
+      • explicar_calculo
       • verificar
       • barrer
       • inventario
@@ -551,35 +563,26 @@
       • diagnostico
       • leer_ids_escala
       • verificar_salida
-    requiere:
-      []
+      • historial
+    regla_salida: fraccion = decimal (ej: 7/9 = 0.778)
     autoridad:
-      • Unica autoridad para calcular C, L, K y factores estructurales
-      • Integrar conocimiento autorizado del ecosistema
-      • Auditar integridad del dominio de calculo (centinela)
-      • Representar Fraction en decimal configurable
-      • Reportar inventario, estado y diagnostico propios
+      • Unica autoridad para calcular C, L, K
+      • Reportar siempre fraccion y decimal del mismo valor
+      • Explicar calculos con evidencia trazable
+      • Auditar integridad del dominio
     conocimiento_exportable:
       • C
       • L
       • K
       • factores
       • UNDEFINED
+      • evidencia
+      • historial
+      • explicaciones
       • inventario
       • estado
       • reporte
       • diagnostico
-    consultas_soportadas:
-      • calcular_C
-      • calcular_L
-      • calcular_K
-      • calcular
-      • representar
-      • verificar_coherencia
-      • obtener_inventario
-      • obtener_reporte
-      • obtener_diagnostico
-      • leer_ids_escala
   diagnostico:
     id: CA
     modulo: calculator
@@ -599,36 +602,37 @@
             error: ModuleNotFoundError: No module named 'modules.calculator.correlacion_k'
           [3]
             archivo: ?
-            error: factor canonico 'C' sin API publica cargada
+            error: factor 'C' sin API
           [4]
             archivo: ?
-            error: factor canonico 'L' sin API publica cargada
+            error: factor 'L' sin API
           [5]
             archivo: ?
-            error: factor canonico 'K' sin API publica cargada
+            error: factor 'K' sin API
       [1]
         tipo: sin_apis
-        detalle: ningun factor C/L/K cargado
+        detalle: sin C/L/K
     advertencias:
-      • conteos.py no disponible: ruta operacional limitada
+      • conteos.py no disponible
     recomendaciones:
-      • Revisar APIs C/L/K y archivos del modulo
+      • Revisar APIs C/L/K y hashes
       • Verificar coherencia.py, logica.py, correlacion_k.py
     coherente: False
     factores_api:
       []
-    errores_n: 6
-    choques_n: 0
+    historial_n: 0
   inventario:
     id: CA
     nombre: calculator
     rol: CA
-    version: 2.0
+    version: 2.2
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
     archivos:
       []
+    hashes:
+      __init__.py: b6ff67949796b12dda10f2995c04c16c3d0b6c5eb3c4d565334d8c8585ecaf7c
     factores_api:
       []
     conteos_disponible: False
@@ -641,6 +645,7 @@
         []
       disponible: False
     coherente: False
+    historial_n: 0
     capacidades:
       • calcular
       • calcular_C
@@ -648,6 +653,7 @@
       • calcular_K
       • calcular_factor
       • representar
+      • explicar_calculo
       • verificar
       • barrer
       • inventario
@@ -655,23 +661,20 @@
       • diagnostico
       • leer_ids_escala
       • verificar_salida
+      • historial
     requiere:
       []
     invariantes:
       • CA es la unica autoridad del dominio de calculo estructural
-      • CA calcula unicamente factores estructurales (C, L, K, derivados)
-      • FO es la unica autoridad sobre las formulas oficiales
-      • todo calculo interno utiliza Fraction
-      • float nunca representa el valor oficial
-      • el decimal es unicamente una representacion
-      • ningun calculo sale sin pasar por el centinela interno
-      • CA nunca modifica otros modulos ni redefine conocimiento ajeno
-      • CA solo integra conocimiento autorizado por contratos
-      • todo calculo es reproducible, auditable y trazable
+      • todo calculo interno utiliza Fraction como valor oficial
+      • toda salida de factor reporta fraccion Y decimal juntos (ej: 7/9 = 0.778)
+      • float nunca es la fuente del decimal; se usa Decimal
+      • ningun calculo sale sin centinela ni ID unico
+      • toda magnitud registra evidencia trazable
       • K ausente sin contexto/O es legitimo (Def-5.3.1)
       • L = UNDEFINED cuando p=0 (AM-D6 / AM-A3)
     precision_decimal_default: 3
-    funcion: Calcula C, L, K. No calcula Tru (FO). K ausente sin contexto/O (Def-5.3.1). L=UNDEFINED si p=0 (AM-D6). Valor oficial = Fraction; decimal solo representacion.
+    regla_salida: fraccion = decimal (ej: 7/9 = 0.778)
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO CT/constante
@@ -1488,201 +1491,211 @@
       tipo: capacidad
       modulo: calculator
     [21]
+      id: calculator.explicar_calculo
+      nombre: explicar_calculo
+      tipo: capacidad
+      modulo: calculator
+    [22]
       id: calculator.verificar
       nombre: verificar
       tipo: capacidad
       modulo: calculator
-    [22]
+    [23]
       id: calculator.barrer
       nombre: barrer
       tipo: capacidad
       modulo: calculator
-    [23]
+    [24]
       id: calculator.inventario
       nombre: inventario
       tipo: capacidad
       modulo: calculator
-    [24]
+    [25]
       id: calculator.reporte
       nombre: reporte
       tipo: capacidad
       modulo: calculator
-    [25]
+    [26]
       id: calculator.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: calculator
-    [26]
+    [27]
       id: calculator.leer_ids_escala
       nombre: leer_ids_escala
       tipo: capacidad
       modulo: calculator
-    [27]
+    [28]
       id: calculator.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: calculator
-    [28]
+    [29]
+      id: calculator.historial
+      nombre: historial
+      tipo: capacidad
+      modulo: calculator
+    [30]
       id: CT
       nombre: constante
       rol: CT
       tipo: modulo
-    [29]
+    [31]
       id: constante.alpha
       nombre: alpha
       tipo: capacidad
       modulo: constante
-    [30]
+    [32]
       id: constante.beta
       nombre: beta
       tipo: capacidad
       modulo: constante
-    [31]
+    [33]
       id: constante.descubrir_constantes
       nombre: descubrir_constantes
       tipo: capacidad
       modulo: constante
-    [32]
+    [34]
       id: constante.listar_constantes
       nombre: listar_constantes
       tipo: capacidad
       modulo: constante
-    [33]
+    [35]
       id: constante.buscar_constante
       nombre: buscar_constante
       tipo: capacidad
       modulo: constante
-    [34]
+    [36]
       id: constante.verificar_constantes
       nombre: verificar_constantes
       tipo: capacidad
       modulo: constante
-    [35]
+    [37]
       id: constante.inventario
       nombre: inventario
       tipo: capacidad
       modulo: constante
-    [36]
+    [38]
       id: constante.reporte
       nombre: reporte
       tipo: capacidad
       modulo: constante
-    [37]
+    [39]
       id: constante.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: constante
-    [38]
+    [40]
       id: constante.verificar
       nombre: verificar
       tipo: capacidad
       modulo: constante
-    [39]
+    [41]
       id: MC
       nombre: correlacion_mecanica
       rol: MC
       tipo: modulo
-    [40]
+    [42]
       id: correlacion_mecanica.verificar
       nombre: verificar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [41]
+    [43]
       id: correlacion_mecanica.barrer
       nombre: barrer
       tipo: capacidad
       modulo: correlacion_mecanica
-    [42]
+    [44]
       id: correlacion_mecanica.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [43]
+    [45]
       id: correlacion_mecanica.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [44]
+    [46]
       id: correlacion_mecanica.inventario
       nombre: inventario
       tipo: capacidad
       modulo: correlacion_mecanica
-    [45]
+    [47]
       id: correlacion_mecanica.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: correlacion_mecanica
-    [46]
+    [48]
       id: correlacion_mecanica.reporte
       nombre: reporte
       tipo: capacidad
       modulo: correlacion_mecanica
-    [47]
+    [49]
       id: correlacion_mecanica.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: correlacion_mecanica
-    [48]
+    [50]
       id: correlacion_mecanica.listar_mecanicas
       nombre: listar_mecanicas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [49]
+    [51]
       id: FO
       nombre: formulas
       rol: FO
       tipo: modulo
-    [50]
+    [52]
       id: formulas.verificar
       nombre: verificar
       tipo: capacidad
       modulo: formulas
-    [51]
+    [53]
       id: formulas.barrer
       nombre: barrer
       tipo: capacidad
       modulo: formulas
-    [52]
+    [54]
       id: formulas.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: formulas
-    [53]
+    [55]
       id: formulas.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: formulas
-    [54]
+    [56]
       id: formulas.inventario
       nombre: inventario
       tipo: capacidad
       modulo: formulas
-    [55]
+    [57]
       id: formulas.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: formulas
-    [56]
+    [58]
       id: formulas.tru_ri
       nombre: tru_ri
       tipo: capacidad
       modulo: formulas
-    [57]
+    [59]
       id: formulas.tru_total
       nombre: tru_total
       tipo: capacidad
       modulo: formulas
-    [58]
+    [60]
       id: formulas.reporte
       nombre: reporte
       tipo: capacidad
       modulo: formulas
-    [59]
+    [61]
       id: formulas.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: formulas
-    [60]
+    [62]
       id: formulas.listar_formulas
       nombre: listar_formulas
       tipo: capacidad
@@ -1766,153 +1779,161 @@
       tipo: declara_capacidad
     [19]
       from: calculator
-      to: calculator.verificar
+      to: calculator.explicar_calculo
       tipo: declara_capacidad
     [20]
       from: calculator
-      to: calculator.barrer
+      to: calculator.verificar
       tipo: declara_capacidad
     [21]
       from: calculator
-      to: calculator.inventario
+      to: calculator.barrer
       tipo: declara_capacidad
     [22]
       from: calculator
-      to: calculator.reporte
+      to: calculator.inventario
       tipo: declara_capacidad
     [23]
       from: calculator
-      to: calculator.diagnostico
+      to: calculator.reporte
       tipo: declara_capacidad
     [24]
       from: calculator
-      to: calculator.leer_ids_escala
+      to: calculator.diagnostico
       tipo: declara_capacidad
     [25]
       from: calculator
-      to: calculator.verificar_salida
+      to: calculator.leer_ids_escala
       tipo: declara_capacidad
     [26]
-      from: constante
-      to: constante.alpha
+      from: calculator
+      to: calculator.verificar_salida
       tipo: declara_capacidad
     [27]
-      from: constante
-      to: constante.beta
+      from: calculator
+      to: calculator.historial
       tipo: declara_capacidad
     [28]
       from: constante
-      to: constante.descubrir_constantes
+      to: constante.alpha
       tipo: declara_capacidad
     [29]
       from: constante
-      to: constante.listar_constantes
+      to: constante.beta
       tipo: declara_capacidad
     [30]
       from: constante
-      to: constante.buscar_constante
+      to: constante.descubrir_constantes
       tipo: declara_capacidad
     [31]
       from: constante
-      to: constante.verificar_constantes
+      to: constante.listar_constantes
       tipo: declara_capacidad
     [32]
       from: constante
-      to: constante.inventario
+      to: constante.buscar_constante
       tipo: declara_capacidad
     [33]
       from: constante
-      to: constante.reporte
+      to: constante.verificar_constantes
       tipo: declara_capacidad
     [34]
       from: constante
-      to: constante.diagnostico
+      to: constante.inventario
       tipo: declara_capacidad
     [35]
       from: constante
-      to: constante.verificar
+      to: constante.reporte
       tipo: declara_capacidad
     [36]
-      from: correlacion_mecanica
-      to: correlacion_mecanica.verificar
+      from: constante
+      to: constante.diagnostico
       tipo: declara_capacidad
     [37]
-      from: correlacion_mecanica
-      to: correlacion_mecanica.barrer
+      from: constante
+      to: constante.verificar
       tipo: declara_capacidad
     [38]
       from: correlacion_mecanica
-      to: correlacion_mecanica.evaluar
+      to: correlacion_mecanica.verificar
       tipo: declara_capacidad
     [39]
       from: correlacion_mecanica
-      to: correlacion_mecanica.axiomas
+      to: correlacion_mecanica.barrer
       tipo: declara_capacidad
     [40]
       from: correlacion_mecanica
-      to: correlacion_mecanica.inventario
+      to: correlacion_mecanica.evaluar
       tipo: declara_capacidad
     [41]
       from: correlacion_mecanica
-      to: correlacion_mecanica.verificar_salida
+      to: correlacion_mecanica.axiomas
       tipo: declara_capacidad
     [42]
       from: correlacion_mecanica
-      to: correlacion_mecanica.reporte
+      to: correlacion_mecanica.inventario
       tipo: declara_capacidad
     [43]
       from: correlacion_mecanica
-      to: correlacion_mecanica.diagnostico
+      to: correlacion_mecanica.verificar_salida
       tipo: declara_capacidad
     [44]
       from: correlacion_mecanica
-      to: correlacion_mecanica.listar_mecanicas
+      to: correlacion_mecanica.reporte
       tipo: declara_capacidad
     [45]
-      from: formulas
-      to: CT
-      tipo: requiere
+      from: correlacion_mecanica
+      to: correlacion_mecanica.diagnostico
+      tipo: declara_capacidad
     [46]
-      from: formulas
-      to: formulas.verificar
+      from: correlacion_mecanica
+      to: correlacion_mecanica.listar_mecanicas
       tipo: declara_capacidad
     [47]
       from: formulas
-      to: formulas.barrer
-      tipo: declara_capacidad
+      to: CT
+      tipo: requiere
     [48]
       from: formulas
-      to: formulas.evaluar
+      to: formulas.verificar
       tipo: declara_capacidad
     [49]
       from: formulas
-      to: formulas.verificar_salida
+      to: formulas.barrer
       tipo: declara_capacidad
     [50]
       from: formulas
-      to: formulas.inventario
+      to: formulas.evaluar
       tipo: declara_capacidad
     [51]
       from: formulas
-      to: formulas.axiomas
+      to: formulas.verificar_salida
       tipo: declara_capacidad
     [52]
       from: formulas
-      to: formulas.tru_ri
+      to: formulas.inventario
       tipo: declara_capacidad
     [53]
       from: formulas
-      to: formulas.tru_total
+      to: formulas.axiomas
       tipo: declara_capacidad
     [54]
       from: formulas
-      to: formulas.reporte
+      to: formulas.tru_ri
       tipo: declara_capacidad
     [55]
       from: formulas
-      to: formulas.diagnostico
+      to: formulas.tru_total
       tipo: declara_capacidad
     [56]
+      from: formulas
+      to: formulas.reporte
+      tipo: declara_capacidad
+    [57]
+      from: formulas
+      to: formulas.diagnostico
+      tipo: declara_capacidad
+    [58]
       from: formulas
       to: formulas.listar_formulas
       tipo: declara_capacidad
@@ -1922,105 +1943,105 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T01:20:03.880193+00:00
+    timestamp: 2026-08-07T01:29:06.470520+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002194
+    duracion_s: 0.002326
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T01:20:03.882076+00:00
+    timestamp: 2026-08-07T01:29:06.472457+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001865
+    duracion_s: 0.001918
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T01:20:03.883759+00:00
+    timestamp: 2026-08-07T01:29:06.474205+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00167
+    duracion_s: 0.001734
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T01:20:03.883899+00:00
+    timestamp: 2026-08-07T01:29:06.474479+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000128
+    duracion_s: 0.000261
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T01:20:03.884006+00:00
+    timestamp: 2026-08-07T01:29:06.474656+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 9.7e-05
+    duracion_s: 0.000167
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T01:20:03.884107+00:00
+    timestamp: 2026-08-07T01:29:06.474846+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 9.3e-05
+    duracion_s: 0.000182
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T01:20:03.884220+00:00
+    timestamp: 2026-08-07T01:29:06.474952+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000103
+    duracion_s: 9.7e-05
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T01:20:03.884313+00:00
+    timestamp: 2026-08-07T01:29:06.475032+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 8e-05
+    duracion_s: 6.8e-05
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T01:20:03.884357+00:00
+    timestamp: 2026-08-07T01:29:06.475070+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 3.6e-05
+    duracion_s: 3.1e-05
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T01:20:03.884407+00:00
+    timestamp: 2026-08-07T01:29:06.475109+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4.3e-05
+    duracion_s: 3.4e-05
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T01:20:03.884442+00:00
+    timestamp: 2026-08-07T01:29:06.475138+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 2.9e-05
+    duracion_s: 2.4e-05
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T01:20:03.884474+00:00
+    timestamp: 2026-08-07T01:29:06.475169+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
     duracion_s: 2.7e-05
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T01:20:03.884748+00:00
+    timestamp: 2026-08-07T01:29:06.475404+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000267
+    duracion_s: 0.000229
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T01:20:03.884992+00:00
+    timestamp: 2026-08-07T01:29:06.475616+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000235
+    duracion_s: 0.000204
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T01:20:03.885113+00:00
+    timestamp: 2026-08-07T01:29:06.475736+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO

@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 4
-  timestamp: 2026-08-07T00:05:48.155435+00:00
+  timestamp: 2026-08-07T00:37:38.943881+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 12
-  timestamp: 2026-08-07T00:05:48.155411+00:00
+  timestamp: 2026-08-07T00:37:38.943861+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -379,26 +379,32 @@
   id: CT
   nombre: constante
   rol: CT
-  version: 1.1
+  version: 2.1
   version_contrato: 1.0
   esquema: VPSI-CONTRACT-1.0
   estabilidad: ESTABLE
   compatible_desde: 1.0
   api_engine: >=1.0
-  descripcion: Expone las constantes geométricas ALPHA y BETA, derivadas del cubo 3x3x3 en R³. Estas constantes son invariantes y se usan en todos los cálculos de verdad del sistema.
-  funcion: Ser la fuente oficial e invariante de ALPHA (26/27) y BETA (1/27).
+  descripcion: Unica autoridad del dominio de constantes del sistema VPSI. Toda constante oficial utilizada por cualquier modulo debe ser declarada, validada y exportada por CT. ALPHA y BETA son las constantes fundacionales estructurales (cubo 3x3x3 en R3).
+  funcion: Ser la unica autoridad del dominio de constantes del sistema VPSI. Descubrir, validar, integrar, auditar y exportar todas las constantes oficiales. ALPHA y BETA constituyen las constantes fundacionales del sistema.
   no_hace:
     • No calcula Tru_total ni Tru_Ri
     • No clasifica entrada de usuario
     • No orquesta el sistema (eso es Engine)
-    • No modifica otras constantes ni módulos
+    • No modifica otros modulos
+    • No permite que FO, AX o MC definan constantes
   autoridad:
-    • Exponer ALPHA = 26/27
-    • Exponer BETA = 1/27
-    • Reportar inventario, estado y diagnóstico propios
+    • Unica autoridad del dominio de constantes
+    • Exponer ALPHA = 26/27 y BETA = 1/27
+    • Descubrir y validar constantes oficiales del modulo
+    • Listar y buscar constantes
+    • Auditar coherencia del dominio de constantes
+    • Reportar inventario completo de constantes
+    • Reportar estado y diagnostico propios
   conocimiento_exportable:
     • ALPHA
     • BETA
+    • constantes
     • inventario
     • estado
     • reporte
@@ -406,6 +412,10 @@
   consultas_soportadas:
     • obtener_alpha
     • obtener_beta
+    • descubrir_constantes
+    • listar_constantes
+    • buscar_constante
+    • verificar_constantes
     • obtener_inventario
     • obtener_reporte
     • obtener_diagnostico
@@ -426,33 +436,53 @@
   capacidades:
     • alpha
     • beta
+    • descubrir_constantes
+    • listar_constantes
+    • buscar_constante
+    • verificar_constantes
     • inventario
     • reporte
     • diagnostico
     • verificar
   capacidades_meta:
     alpha:
-      descripcion: Devuelve la constante ALPHA = 26/27 (techo estructural).
+      descripcion: Devuelve la constante fundacional ALPHA = 26/27.
       entrada: peticion opcional (ignorada)
       salida: Fraction(26, 27)
     beta:
-      descripcion: Devuelve la constante BETA = 1/27 (piso estructural).
+      descripcion: Devuelve la constante fundacional BETA = 1/27.
       entrada: peticion opcional (ignorada)
       salida: Fraction(1, 27)
-    inventario:
-      descripcion: Inventario de las constantes geométricas del módulo.
-      entrada: peticion opcional (ignorada)
-      salida: dict con ALPHA, BETA, tipo, origen, id, version
-    reporte:
-      descripcion: Reporte interno de estado del módulo CT.
+    descubrir_constantes:
+      descripcion: Descubre todas las constantes oficiales declaradas dentro del modulo.
       entrada: ninguna
-      salida: dict con estado, ALPHA, BETA, capacidades
+      salida: dict nombre -> meta de constante + errores_carga + total
+    listar_constantes:
+      descripcion: Lista nombres de constantes fundacionales y auxiliares.
+      entrada: ninguna
+      salida: dict con fundacionales, auxiliares, total
+    buscar_constante:
+      descripcion: Busca una constante oficial por nombre.
+      entrada: nombre: str
+      salida: dict de la constante o None
+    verificar_constantes:
+      descripcion: Audita el dominio de constantes: invariante fundacional, duplicados, tipos, campos obligatorios, conflictos y carga.
+      entrada: ninguna
+      salida: dict con coherente, problemas, advertencias, total_constantes
+    inventario:
+      descripcion: Inventario completo de constantes del modulo.
+      entrada: peticion opcional
+      salida: dict con total, fundacionales, auxiliares, constantes descubiertas
+    reporte:
+      descripcion: Reporte interno de estado del modulo CT.
+      entrada: ninguna
+      salida: dict con estado, ALPHA, BETA, total_constantes, capacidades
     diagnostico:
-      descripcion: Diagnóstico: coherencia de ALPHA + BETA == 1.
+      descripcion: Diagnostico de coherencia del dominio de constantes.
       entrada: ninguna
       salida: dict con estado, problemas, advertencias, recomendaciones
     verificar:
-      descripcion: Verifica la invariante ALPHA + BETA == 1.
+      descripcion: Verifica la invariante fundacional ALPHA + BETA == 1.
       entrada: ninguna
       salida: dict con coherente, ALPHA, BETA, suma
   estados_validos:
@@ -464,13 +494,16 @@
     • el id del módulo nunca cambia
     • el rol nunca cambia
     • ALPHA y BETA son invariantes del cubo 3x3x3 en R³
+    • ALPHA + BETA == 1
+    • CT es la única autoridad del dominio de constantes
     • las capacidades declaradas son siempre callables tras la resolución
     • este módulo no modifica el estado de otros módulos
+    • este módulo siempre puede reportar su propio estado
   reporte:
     id: CT
     modulo: constante
     rol: CT
-    version: 1.1
+    version: 2.1
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
@@ -479,9 +512,16 @@
     ALPHA: 26/27
     BETA: 1/27
     suma: 1
+    total_constantes: 2
+    archivos:
+      • __init__.py
     capacidades:
       • alpha
       • beta
+      • descubrir_constantes
+      • listar_constantes
+      • buscar_constante
+      • verificar_constantes
       • inventario
       • reporte
       • diagnostico
@@ -489,12 +529,17 @@
     requiere:
       []
     autoridad:
-      • Exponer ALPHA = 26/27
-      • Exponer BETA = 1/27
-      • Reportar inventario, estado y diagnóstico propios
+      • Unica autoridad del dominio de constantes
+      • Exponer ALPHA = 26/27 y BETA = 1/27
+      • Descubrir y validar constantes oficiales del modulo
+      • Listar y buscar constantes
+      • Auditar coherencia del dominio de constantes
+      • Reportar inventario completo de constantes
+      • Reportar estado y diagnostico propios
     conocimiento_exportable:
       • ALPHA
       • BETA
+      • constantes
       • inventario
       • estado
       • reporte
@@ -502,6 +547,10 @@
     consultas_soportadas:
       • obtener_alpha
       • obtener_beta
+      • descubrir_constantes
+      • listar_constantes
+      • buscar_constante
+      • verificar_constantes
       • obtener_inventario
       • obtener_reporte
       • obtener_diagnostico
@@ -513,28 +562,42 @@
     problemas:
       []
     advertencias:
-      []
+      • Solo hay constantes fundacionales; no hay auxiliares declaradas
     recomendaciones:
       []
     coherente: True
     ALPHA: 26/27
     BETA: 1/27
     suma: 1
+    total_constantes: 2
   inventario:
     id: CT
     nombre: constante
     rol: CT
-    version: 1.1
+    version: 2.1
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
     ALPHA: 26/27
     BETA: 1/27
-    tipo: Fraction
-    origen: cubo 3x3x3 en R³
+    tipo_fundacionales: Fraction
+    origen_fundacionales: cubo 3x3x3 en R3
+    total_constantes: 2
+    constantes_fundacionales:
+      ALPHA: 26/27
+      BETA: 1/27
+    constantes_auxiliares:
+    archivos:
+      • __init__.py
+    errores_carga:
+      []
     capacidades:
       • alpha
       • beta
+      • descubrir_constantes
+      • listar_constantes
+      • buscar_constante
+      • verificar_constantes
       • inventario
       • reporte
       • diagnostico
@@ -545,8 +608,11 @@
       • el id del módulo nunca cambia
       • el rol nunca cambia
       • ALPHA y BETA son invariantes del cubo 3x3x3 en R³
+      • ALPHA + BETA == 1
+      • CT es la única autoridad del dominio de constantes
       • las capacidades declaradas son siempre callables tras la resolución
       • este módulo no modifica el estado de otros módulos
+      • este módulo siempre puede reportar su propio estado
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO MC/correlacion_mecanica
@@ -1101,131 +1167,151 @@
       tipo: capacidad
       modulo: constante
     [17]
+      id: constante.descubrir_constantes
+      nombre: descubrir_constantes
+      tipo: capacidad
+      modulo: constante
+    [18]
+      id: constante.listar_constantes
+      nombre: listar_constantes
+      tipo: capacidad
+      modulo: constante
+    [19]
+      id: constante.buscar_constante
+      nombre: buscar_constante
+      tipo: capacidad
+      modulo: constante
+    [20]
+      id: constante.verificar_constantes
+      nombre: verificar_constantes
+      tipo: capacidad
+      modulo: constante
+    [21]
       id: constante.inventario
       nombre: inventario
       tipo: capacidad
       modulo: constante
-    [18]
+    [22]
       id: constante.reporte
       nombre: reporte
       tipo: capacidad
       modulo: constante
-    [19]
+    [23]
       id: constante.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: constante
-    [20]
+    [24]
       id: constante.verificar
       nombre: verificar
       tipo: capacidad
       modulo: constante
-    [21]
+    [25]
       id: MC
       nombre: correlacion_mecanica
       rol: MC
       tipo: modulo
-    [22]
+    [26]
       id: correlacion_mecanica.verificar
       nombre: verificar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [23]
+    [27]
       id: correlacion_mecanica.barrer
       nombre: barrer
       tipo: capacidad
       modulo: correlacion_mecanica
-    [24]
+    [28]
       id: correlacion_mecanica.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [25]
+    [29]
       id: correlacion_mecanica.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [26]
+    [30]
       id: correlacion_mecanica.inventario
       nombre: inventario
       tipo: capacidad
       modulo: correlacion_mecanica
-    [27]
+    [31]
       id: correlacion_mecanica.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: correlacion_mecanica
-    [28]
+    [32]
       id: correlacion_mecanica.reporte
       nombre: reporte
       tipo: capacidad
       modulo: correlacion_mecanica
-    [29]
+    [33]
       id: correlacion_mecanica.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: correlacion_mecanica
-    [30]
+    [34]
       id: correlacion_mecanica.listar_mecanicas
       nombre: listar_mecanicas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [31]
+    [35]
       id: FO
       nombre: formulas
       rol: FO
       tipo: modulo
-    [32]
+    [36]
       id: formulas.verificar
       nombre: verificar
       tipo: capacidad
       modulo: formulas
-    [33]
+    [37]
       id: formulas.barrer
       nombre: barrer
       tipo: capacidad
       modulo: formulas
-    [34]
+    [38]
       id: formulas.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: formulas
-    [35]
+    [39]
       id: formulas.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: formulas
-    [36]
+    [40]
       id: formulas.inventario
       nombre: inventario
       tipo: capacidad
       modulo: formulas
-    [37]
+    [41]
       id: formulas.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: formulas
-    [38]
+    [42]
       id: formulas.tru_ri
       nombre: tru_ri
       tipo: capacidad
       modulo: formulas
-    [39]
+    [43]
       id: formulas.tru_total
       nombre: tru_total
       tipo: capacidad
       modulo: formulas
-    [40]
+    [44]
       id: formulas.reporte
       nombre: reporte
       tipo: capacidad
       modulo: formulas
-    [41]
+    [45]
       id: formulas.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: formulas
-    [42]
+    [46]
       id: formulas.listar_formulas
       nombre: listar_formulas
       tipo: capacidad
@@ -1293,101 +1379,117 @@
       tipo: declara_capacidad
     [15]
       from: constante
-      to: constante.inventario
+      to: constante.descubrir_constantes
       tipo: declara_capacidad
     [16]
       from: constante
-      to: constante.reporte
+      to: constante.listar_constantes
       tipo: declara_capacidad
     [17]
       from: constante
-      to: constante.diagnostico
+      to: constante.buscar_constante
       tipo: declara_capacidad
     [18]
       from: constante
-      to: constante.verificar
+      to: constante.verificar_constantes
       tipo: declara_capacidad
     [19]
-      from: correlacion_mecanica
-      to: correlacion_mecanica.verificar
+      from: constante
+      to: constante.inventario
       tipo: declara_capacidad
     [20]
-      from: correlacion_mecanica
-      to: correlacion_mecanica.barrer
+      from: constante
+      to: constante.reporte
       tipo: declara_capacidad
     [21]
-      from: correlacion_mecanica
-      to: correlacion_mecanica.evaluar
+      from: constante
+      to: constante.diagnostico
       tipo: declara_capacidad
     [22]
-      from: correlacion_mecanica
-      to: correlacion_mecanica.axiomas
+      from: constante
+      to: constante.verificar
       tipo: declara_capacidad
     [23]
       from: correlacion_mecanica
-      to: correlacion_mecanica.inventario
+      to: correlacion_mecanica.verificar
       tipo: declara_capacidad
     [24]
       from: correlacion_mecanica
-      to: correlacion_mecanica.verificar_salida
+      to: correlacion_mecanica.barrer
       tipo: declara_capacidad
     [25]
       from: correlacion_mecanica
-      to: correlacion_mecanica.reporte
+      to: correlacion_mecanica.evaluar
       tipo: declara_capacidad
     [26]
       from: correlacion_mecanica
-      to: correlacion_mecanica.diagnostico
+      to: correlacion_mecanica.axiomas
       tipo: declara_capacidad
     [27]
       from: correlacion_mecanica
-      to: correlacion_mecanica.listar_mecanicas
+      to: correlacion_mecanica.inventario
       tipo: declara_capacidad
     [28]
-      from: formulas
-      to: CT
-      tipo: requiere
+      from: correlacion_mecanica
+      to: correlacion_mecanica.verificar_salida
+      tipo: declara_capacidad
     [29]
-      from: formulas
-      to: formulas.verificar
+      from: correlacion_mecanica
+      to: correlacion_mecanica.reporte
       tipo: declara_capacidad
     [30]
-      from: formulas
-      to: formulas.barrer
+      from: correlacion_mecanica
+      to: correlacion_mecanica.diagnostico
       tipo: declara_capacidad
     [31]
-      from: formulas
-      to: formulas.evaluar
+      from: correlacion_mecanica
+      to: correlacion_mecanica.listar_mecanicas
       tipo: declara_capacidad
     [32]
       from: formulas
-      to: formulas.verificar_salida
-      tipo: declara_capacidad
+      to: CT
+      tipo: requiere
     [33]
       from: formulas
-      to: formulas.inventario
+      to: formulas.verificar
       tipo: declara_capacidad
     [34]
       from: formulas
-      to: formulas.axiomas
+      to: formulas.barrer
       tipo: declara_capacidad
     [35]
       from: formulas
-      to: formulas.tru_ri
+      to: formulas.evaluar
       tipo: declara_capacidad
     [36]
       from: formulas
-      to: formulas.tru_total
+      to: formulas.verificar_salida
       tipo: declara_capacidad
     [37]
       from: formulas
-      to: formulas.reporte
+      to: formulas.inventario
       tipo: declara_capacidad
     [38]
       from: formulas
-      to: formulas.diagnostico
+      to: formulas.axiomas
       tipo: declara_capacidad
     [39]
+      from: formulas
+      to: formulas.tru_ri
+      tipo: declara_capacidad
+    [40]
+      from: formulas
+      to: formulas.tru_total
+      tipo: declara_capacidad
+    [41]
+      from: formulas
+      to: formulas.reporte
+      tipo: declara_capacidad
+    [42]
+      from: formulas
+      to: formulas.diagnostico
+      tipo: declara_capacidad
+    [43]
       from: formulas
       to: formulas.listar_formulas
       tipo: declara_capacidad
@@ -1397,88 +1499,88 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T00:05:48.150889+00:00
+    timestamp: 2026-08-07T00:37:38.938498+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002316
+    duracion_s: 0.002783
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T00:05:48.152861+00:00
+    timestamp: 2026-08-07T00:37:38.940776+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001951
+    duracion_s: 0.002256
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T00:05:48.154611+00:00
+    timestamp: 2026-08-07T00:37:38.942792+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001735
+    duracion_s: 0.002002
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T00:05:48.154649+00:00
+    timestamp: 2026-08-07T00:37:38.942956+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 2.4e-05
+    duracion_s: 0.00015
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T00:05:48.154672+00:00
+    timestamp: 2026-08-07T00:37:38.943023+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1.5e-05
+    duracion_s: 5.9e-05
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T00:05:48.154680+00:00
+    timestamp: 2026-08-07T00:37:38.943088+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 3e-06
+    duracion_s: 5.1e-05
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T00:05:48.154743+00:00
+    timestamp: 2026-08-07T00:37:38.943124+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 5.8e-05
+    duracion_s: 3e-05
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T00:05:48.154785+00:00
+    timestamp: 2026-08-07T00:37:38.943152+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 3.1e-05
+    duracion_s: 1.7e-05
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T00:05:48.154817+00:00
+    timestamp: 2026-08-07T00:37:38.943174+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2.5e-05
+    duracion_s: 1.6e-05
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T00:05:48.155066+00:00
+    timestamp: 2026-08-07T00:37:38.943476+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000243
+    duracion_s: 0.000296
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T00:05:48.155272+00:00
+    timestamp: 2026-08-07T00:37:38.943737+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000198
+    duracion_s: 0.000253
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T00:05:48.155403+00:00
+    timestamp: 2026-08-07T00:37:38.943854+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000122
+    duracion_s: 0.000108
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

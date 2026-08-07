@@ -4,7 +4,7 @@
     "estado_engine": "OPERATIVO",
     "esquema_contrato": "VPSI-CONTRACT-1.0",
     "total_modulos": 4,
-    "timestamp": "2026-08-07T00:05:48.155435+00:00"
+    "timestamp": "2026-08-07T00:37:38.943881+00:00"
   },
   "reportes": [
     {
@@ -22,7 +22,7 @@
         "errores_arranque": [],
         "advertencias": [],
         "trazas_n": 12,
-        "timestamp": "2026-08-07T00:05:48.155411+00:00"
+        "timestamp": "2026-08-07T00:37:38.943861+00:00"
       }
     },
     {
@@ -413,28 +413,34 @@
         "id": "CT",
         "nombre": "constante",
         "rol": "CT",
-        "version": "1.1",
+        "version": "2.1",
         "version_contrato": "1.0",
         "esquema": "VPSI-CONTRACT-1.0",
         "estabilidad": "ESTABLE",
         "compatible_desde": "1.0",
         "api_engine": ">=1.0",
-        "descripcion": "Expone las constantes geométricas ALPHA y BETA, derivadas del cubo 3x3x3 en R³. Estas constantes son invariantes y se usan en todos los cálculos de verdad del sistema.",
-        "funcion": "Ser la fuente oficial e invariante de ALPHA (26/27) y BETA (1/27).",
+        "descripcion": "Unica autoridad del dominio de constantes del sistema VPSI. Toda constante oficial utilizada por cualquier modulo debe ser declarada, validada y exportada por CT. ALPHA y BETA son las constantes fundacionales estructurales (cubo 3x3x3 en R3).",
+        "funcion": "Ser la unica autoridad del dominio de constantes del sistema VPSI. Descubrir, validar, integrar, auditar y exportar todas las constantes oficiales. ALPHA y BETA constituyen las constantes fundacionales del sistema.",
         "no_hace": [
           "No calcula Tru_total ni Tru_Ri",
           "No clasifica entrada de usuario",
           "No orquesta el sistema (eso es Engine)",
-          "No modifica otras constantes ni módulos"
+          "No modifica otros modulos",
+          "No permite que FO, AX o MC definan constantes"
         ],
         "autoridad": [
-          "Exponer ALPHA = 26/27",
-          "Exponer BETA = 1/27",
-          "Reportar inventario, estado y diagnóstico propios"
+          "Unica autoridad del dominio de constantes",
+          "Exponer ALPHA = 26/27 y BETA = 1/27",
+          "Descubrir y validar constantes oficiales del modulo",
+          "Listar y buscar constantes",
+          "Auditar coherencia del dominio de constantes",
+          "Reportar inventario completo de constantes",
+          "Reportar estado y diagnostico propios"
         ],
         "conocimiento_exportable": [
           "ALPHA",
           "BETA",
+          "constantes",
           "inventario",
           "estado",
           "reporte",
@@ -443,6 +449,10 @@
         "consultas_soportadas": [
           "obtener_alpha",
           "obtener_beta",
+          "descubrir_constantes",
+          "listar_constantes",
+          "buscar_constante",
+          "verificar_constantes",
           "obtener_inventario",
           "obtener_reporte",
           "obtener_diagnostico",
@@ -464,6 +474,10 @@
         "capacidades": [
           "alpha",
           "beta",
+          "descubrir_constantes",
+          "listar_constantes",
+          "buscar_constante",
+          "verificar_constantes",
           "inventario",
           "reporte",
           "diagnostico",
@@ -471,32 +485,52 @@
         ],
         "capacidades_meta": {
           "alpha": {
-            "descripcion": "Devuelve la constante ALPHA = 26/27 (techo estructural).",
+            "descripcion": "Devuelve la constante fundacional ALPHA = 26/27.",
             "entrada": "peticion opcional (ignorada)",
             "salida": "Fraction(26, 27)"
           },
           "beta": {
-            "descripcion": "Devuelve la constante BETA = 1/27 (piso estructural).",
+            "descripcion": "Devuelve la constante fundacional BETA = 1/27.",
             "entrada": "peticion opcional (ignorada)",
             "salida": "Fraction(1, 27)"
           },
+          "descubrir_constantes": {
+            "descripcion": "Descubre todas las constantes oficiales declaradas dentro del modulo.",
+            "entrada": "ninguna",
+            "salida": "dict nombre -> meta de constante + errores_carga + total"
+          },
+          "listar_constantes": {
+            "descripcion": "Lista nombres de constantes fundacionales y auxiliares.",
+            "entrada": "ninguna",
+            "salida": "dict con fundacionales, auxiliares, total"
+          },
+          "buscar_constante": {
+            "descripcion": "Busca una constante oficial por nombre.",
+            "entrada": "nombre: str",
+            "salida": "dict de la constante o None"
+          },
+          "verificar_constantes": {
+            "descripcion": "Audita el dominio de constantes: invariante fundacional, duplicados, tipos, campos obligatorios, conflictos y carga.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, problemas, advertencias, total_constantes"
+          },
           "inventario": {
-            "descripcion": "Inventario de las constantes geométricas del módulo.",
-            "entrada": "peticion opcional (ignorada)",
-            "salida": "dict con ALPHA, BETA, tipo, origen, id, version"
+            "descripcion": "Inventario completo de constantes del modulo.",
+            "entrada": "peticion opcional",
+            "salida": "dict con total, fundacionales, auxiliares, constantes descubiertas"
           },
           "reporte": {
-            "descripcion": "Reporte interno de estado del módulo CT.",
+            "descripcion": "Reporte interno de estado del modulo CT.",
             "entrada": "ninguna",
-            "salida": "dict con estado, ALPHA, BETA, capacidades"
+            "salida": "dict con estado, ALPHA, BETA, total_constantes, capacidades"
           },
           "diagnostico": {
-            "descripcion": "Diagnóstico: coherencia de ALPHA + BETA == 1.",
+            "descripcion": "Diagnostico de coherencia del dominio de constantes.",
             "entrada": "ninguna",
             "salida": "dict con estado, problemas, advertencias, recomendaciones"
           },
           "verificar": {
-            "descripcion": "Verifica la invariante ALPHA + BETA == 1.",
+            "descripcion": "Verifica la invariante fundacional ALPHA + BETA == 1.",
             "entrada": "ninguna",
             "salida": "dict con coherente, ALPHA, BETA, suma"
           }
@@ -511,14 +545,17 @@
           "el id del módulo nunca cambia",
           "el rol nunca cambia",
           "ALPHA y BETA son invariantes del cubo 3x3x3 en R³",
+          "ALPHA + BETA == 1",
+          "CT es la única autoridad del dominio de constantes",
           "las capacidades declaradas son siempre callables tras la resolución",
-          "este módulo no modifica el estado de otros módulos"
+          "este módulo no modifica el estado de otros módulos",
+          "este módulo siempre puede reportar su propio estado"
         ],
         "reporte": {
           "id": "CT",
           "modulo": "constante",
           "rol": "CT",
-          "version": "1.1",
+          "version": "2.1",
           "version_contrato": "1.0",
           "esquema": "VPSI-CONTRACT-1.0",
           "estabilidad": "ESTABLE",
@@ -527,9 +564,17 @@
           "ALPHA": "26/27",
           "BETA": "1/27",
           "suma": "1",
+          "total_constantes": 2,
+          "archivos": [
+            "__init__.py"
+          ],
           "capacidades": [
             "alpha",
             "beta",
+            "descubrir_constantes",
+            "listar_constantes",
+            "buscar_constante",
+            "verificar_constantes",
             "inventario",
             "reporte",
             "diagnostico",
@@ -537,13 +582,18 @@
           ],
           "requiere": [],
           "autoridad": [
-            "Exponer ALPHA = 26/27",
-            "Exponer BETA = 1/27",
-            "Reportar inventario, estado y diagnóstico propios"
+            "Unica autoridad del dominio de constantes",
+            "Exponer ALPHA = 26/27 y BETA = 1/27",
+            "Descubrir y validar constantes oficiales del modulo",
+            "Listar y buscar constantes",
+            "Auditar coherencia del dominio de constantes",
+            "Reportar inventario completo de constantes",
+            "Reportar estado y diagnostico propios"
           ],
           "conocimiento_exportable": [
             "ALPHA",
             "BETA",
+            "constantes",
             "inventario",
             "estado",
             "reporte",
@@ -552,6 +602,10 @@
           "consultas_soportadas": [
             "obtener_alpha",
             "obtener_beta",
+            "descubrir_constantes",
+            "listar_constantes",
+            "buscar_constante",
+            "verificar_constantes",
             "obtener_inventario",
             "obtener_reporte",
             "obtener_diagnostico",
@@ -563,28 +617,45 @@
           "modulo": "constante",
           "estado": "OPERATIVO",
           "problemas": [],
-          "advertencias": [],
+          "advertencias": [
+            "Solo hay constantes fundacionales; no hay auxiliares declaradas"
+          ],
           "recomendaciones": [],
           "coherente": true,
           "ALPHA": "26/27",
           "BETA": "1/27",
-          "suma": "1"
+          "suma": "1",
+          "total_constantes": 2
         },
         "inventario": {
           "id": "CT",
           "nombre": "constante",
           "rol": "CT",
-          "version": "1.1",
+          "version": "2.1",
           "version_contrato": "1.0",
           "esquema": "VPSI-CONTRACT-1.0",
           "estabilidad": "ESTABLE",
           "ALPHA": "26/27",
           "BETA": "1/27",
-          "tipo": "Fraction",
-          "origen": "cubo 3x3x3 en R³",
+          "tipo_fundacionales": "Fraction",
+          "origen_fundacionales": "cubo 3x3x3 en R3",
+          "total_constantes": 2,
+          "constantes_fundacionales": {
+            "ALPHA": "26/27",
+            "BETA": "1/27"
+          },
+          "constantes_auxiliares": {},
+          "archivos": [
+            "__init__.py"
+          ],
+          "errores_carga": [],
           "capacidades": [
             "alpha",
             "beta",
+            "descubrir_constantes",
+            "listar_constantes",
+            "buscar_constante",
+            "verificar_constantes",
             "inventario",
             "reporte",
             "diagnostico",
@@ -595,8 +666,11 @@
             "el id del módulo nunca cambia",
             "el rol nunca cambia",
             "ALPHA y BETA son invariantes del cubo 3x3x3 en R³",
+            "ALPHA + BETA == 1",
+            "CT es la única autoridad del dominio de constantes",
             "las capacidades declaradas son siempre callables tras la resolución",
-            "este módulo no modifica el estado de otros módulos"
+            "este módulo no modifica el estado de otros módulos",
+            "este módulo siempre puede reportar su propio estado"
           ]
         }
       }
@@ -1243,6 +1317,30 @@
             "modulo": "constante"
           },
           {
+            "id": "constante.descubrir_constantes",
+            "nombre": "descubrir_constantes",
+            "tipo": "capacidad",
+            "modulo": "constante"
+          },
+          {
+            "id": "constante.listar_constantes",
+            "nombre": "listar_constantes",
+            "tipo": "capacidad",
+            "modulo": "constante"
+          },
+          {
+            "id": "constante.buscar_constante",
+            "nombre": "buscar_constante",
+            "tipo": "capacidad",
+            "modulo": "constante"
+          },
+          {
+            "id": "constante.verificar_constantes",
+            "nombre": "verificar_constantes",
+            "tipo": "capacidad",
+            "modulo": "constante"
+          },
+          {
             "id": "constante.inventario",
             "nombre": "inventario",
             "tipo": "capacidad",
@@ -1477,6 +1575,26 @@
           },
           {
             "from": "constante",
+            "to": "constante.descubrir_constantes",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "constante",
+            "to": "constante.listar_constantes",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "constante",
+            "to": "constante.buscar_constante",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "constante",
+            "to": "constante.verificar_constantes",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "constante",
             "to": "constante.inventario",
             "tipo": "declara_capacidad"
           },
@@ -1610,99 +1728,99 @@
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-07T00:05:48.150889+00:00",
+          "timestamp": "2026-08-07T00:37:38.938498+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002316
+          "duracion_s": 0.002783
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-07T00:05:48.152861+00:00",
+          "timestamp": "2026-08-07T00:37:38.940776+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001951
+          "duracion_s": 0.002256
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-07T00:05:48.154611+00:00",
+          "timestamp": "2026-08-07T00:37:38.942792+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001735
+          "duracion_s": 0.002002
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-07T00:05:48.154649+00:00",
+          "timestamp": "2026-08-07T00:37:38.942956+00:00",
           "modulo": "constante",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 2.4e-05
+          "duracion_s": 0.00015
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-07T00:05:48.154672+00:00",
+          "timestamp": "2026-08-07T00:37:38.943023+00:00",
           "modulo": "constante",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 1.5e-05
+          "duracion_s": 5.9e-05
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-07T00:05:48.154680+00:00",
+          "timestamp": "2026-08-07T00:37:38.943088+00:00",
           "modulo": "constante",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 3e-06
+          "duracion_s": 5.1e-05
         },
         {
           "id_traza": 7,
-          "timestamp": "2026-08-07T00:05:48.154743+00:00",
+          "timestamp": "2026-08-07T00:37:38.943124+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 5.8e-05
+          "duracion_s": 3e-05
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-07T00:05:48.154785+00:00",
+          "timestamp": "2026-08-07T00:37:38.943152+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 3.1e-05
+          "duracion_s": 1.7e-05
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-07T00:05:48.154817+00:00",
+          "timestamp": "2026-08-07T00:37:38.943174+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 2.5e-05
+          "duracion_s": 1.6e-05
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-07T00:05:48.155066+00:00",
+          "timestamp": "2026-08-07T00:37:38.943476+00:00",
           "modulo": "formulas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000243
+          "duracion_s": 0.000296
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-07T00:05:48.155272+00:00",
+          "timestamp": "2026-08-07T00:37:38.943737+00:00",
           "modulo": "formulas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000198
+          "duracion_s": 0.000253
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-07T00:05:48.155403+00:00",
+          "timestamp": "2026-08-07T00:37:38.943854+00:00",
           "modulo": "formulas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000122
+          "duracion_s": 0.000108
         }
       ]
     }

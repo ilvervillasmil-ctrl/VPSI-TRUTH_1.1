@@ -3,23 +3,11 @@
 # ===============================================================
 #
 # Centinela — intérprete universal de expedientes y contratos.
+# Integración oficial Engine ↔ Centinela incluida.
 #
 # NO contiene conocimiento de dominio.
-# NO conoce variables, fórmulas ni módulos.
+# NO importa FO, CT, AX ni módulos de cálculo.
 # NO asume Fraction como único tipo.
-# NO hardcodea cadenas de cálculo.
-#
-# Motores internos:
-#   ResolverExpediente
-#   ResolverContratos
-#   ResolverDependencias
-#   ResolverSecuencia
-#   ResolverReproduccion
-#   ResolverComparacion
-#   ResolverIntegridad
-#   EmisorVeredicto
-#
-# Autoridad única: el expediente en CACHE + contratos depositados.
 #
 # ===============================================================
 
@@ -55,7 +43,6 @@ from modules.cache.cs import (
     CS_ESTADO_APROBADO,
     CS_ESTADO_PARCIAL,
     CS_ESTADO_RETENIDO,
-    CS_ESTADOS,
     CS_TIPO_VEREDICTO,
     MODULO as CS_MODULO,
     VERSION_EVENTOS as CS_VERSION_EVENTOS,
@@ -75,7 +62,7 @@ from modules.cache.en import (
 CS_ID = "CS"
 CS_NOMBRE = "centinela"
 CS_ROL = "CS"
-CS_VERSION = "5.0"
+CS_VERSION = "5.1"
 CS_ESQUEMA = "VPSI-CONTRACT-1.0"
 CS_VERSION_CONTRATO = "1.0"
 
@@ -100,6 +87,21 @@ CS_AUTORIDAD = (
     "Reproducir capacidades vía invocador dinámico",
     "Emitir veredicto y registrarlo en CACHE",
 )
+
+CS_ESTADO_SOLO_ESTRUCTURAL = "SOLO_ESTRUCTURAL"
+CS_ESTADO_SIN_PAQUETE_AUDITABLE = "SIN_PAQUETE_AUDITABLE"
+
+CS_ESTADOS = (
+    CS_ESTADO_APROBADO,
+    CS_ESTADO_RETENIDO,
+    CS_ESTADO_PARCIAL,
+    CS_ESTADO_SOLO_ESTRUCTURAL,
+    CS_ESTADO_SIN_PAQUETE_AUDITABLE,
+)
+
+TIPO_AUDITORIA_ESTRUCTURAL = "ESTRUCTURAL"
+TIPO_AUDITORIA_DOMINIO = "DOMINIO"
+TIPO_AUDITORIA_COMPLETA = "COMPLETA"
 
 _CLAVES_FORMA = frozenset({
     PKG_CICLO_ID, PKG_ESTADO, PKG_O_CONTEXT, PKG_CONTEXTO,
@@ -134,7 +136,7 @@ class InvocadorCapacidades(Protocol):
 
 
 # ===============================================================
-# CACHE ADAPTERS
+# CACHE
 # ===============================================================
 
 class _CacheMemoriaLocal:
@@ -209,6 +211,7 @@ class Veredicto:
     ciclo_id: str
     motivos: List[str] = field(default_factory=list)
     advertencias: List[str] = field(default_factory=list)
+    tipo_auditoria: str = TIPO_AUDITORIA_COMPLETA
     id_verificacion: str = field(
         default_factory=lambda: str(uuid.uuid4())
     )
@@ -237,6 +240,8 @@ class _Estadisticas:
         self.aprobadas = 0
         self.retenidas = 0
         self.parciales = 0
+        self.estructurales = 0
+        self.sin_auditable = 0
         self.advertencias = 0
         self.duraciones_s: List[float] = []
         self.modulos_vistos: set = set()
@@ -257,6 +262,10 @@ class _Estadisticas:
             self.retenidas += 1
         elif estado == CS_ESTADO_PARCIAL:
             self.parciales += 1
+        elif estado == CS_ESTADO_SOLO_ESTRUCTURAL:
+            self.estructurales += 1
+        elif estado == CS_ESTADO_SIN_PAQUETE_AUDITABLE:
+            self.sin_auditable += 1
         self.duraciones_s.append(duracion_s)
         self.modulos_vistos.update(modulos)
         self.capacidades_vistas.update(capacidades)
@@ -270,6 +279,8 @@ class _Estadisticas:
             "aprobadas": self.aprobadas,
             "retenidas": self.retenidas,
             "parciales": self.parciales,
+            "estructurales": self.estructurales,
+            "sin_auditable": self.sin_auditable,
             "advertencias": self.advertencias,
             "tiempo_promedio_s": round(avg, 6),
             "modulos_vistos": sorted(self.modulos_vistos),
@@ -281,7 +292,7 @@ _STATS = _Estadisticas()
 
 
 # ===============================================================
-# RESOLVER COMPARACION (tipos genéricos, no solo Fraction)
+# COMPARACIÓN GENÉRICA
 # ===============================================================
 
 def _normalizar(x: Any) -> Any:
@@ -290,7 +301,10 @@ def _normalizar(x: Any) -> Any:
     if isinstance(x, float):
         raise CentinelaError("float rechazado en centinela")
     if isinstance(x, dict):
-        return {str(k): _normalizar(v) for k, v in sorted(x.items(), key=lambda kv: str(kv[0]))}
+        return {
+            str(k): _normalizar(v)
+            for k, v in sorted(x.items(), key=lambda kv: str(kv[0]))
+        }
     if isinstance(x, (list, tuple)):
         return [_normalizar(v) for v in x]
     if isinstance(x, set):
@@ -299,12 +313,10 @@ def _normalizar(x: Any) -> Any:
 
 
 def _igual(a: Any, b: Any) -> bool:
-    """Comparación estructural genérica. Sin asumir tipo de dominio."""
     if a is None and b is None:
         return True
     if a is None or b is None:
         return False
-    # Fraction / numéricos racionales
     if isinstance(a, (int, Fraction)) or isinstance(b, (int, Fraction)):
         try:
             fa = a if isinstance(a, Fraction) else (
@@ -335,7 +347,7 @@ def _hash_obj(obj: Any) -> str:
 
 
 # ===============================================================
-# RESOLVER EXPEDIENTE
+# EXPEDIENTE
 # ===============================================================
 
 def _payload(ev: Dict[str, Any]) -> Dict[str, Any]:
@@ -363,10 +375,6 @@ def _recolectar_hojas(
     destino: Dict[str, List[Any]],
     ruta: str = "",
 ) -> None:
-    """
-    Descubre cualquier hoja con valor comparable.
-    No filtra por Fraction. No conoce nombres de dominio.
-    """
     if isinstance(obj, dict):
         for k, v in obj.items():
             ks = str(k)
@@ -401,7 +409,31 @@ def _ultimo(valores: List[Any]) -> Any:
 
 
 # ===============================================================
-# RESOLVER CONTRATOS
+# CLASIFICACIÓN ENGINE ↔ CENTINELA
+# ===============================================================
+
+def _tiene_evidencia_auditable(paquete: Dict[str, Any]) -> bool:
+    """
+    True si hay ciclo de negocio o hojas de dominio.
+    No depende de lista fija de claves estructurales.
+    """
+    if not isinstance(paquete, dict) or not paquete:
+        return False
+    if paquete.get(PKG_CICLO_ID):
+        return True
+    return bool(_valores_desde(paquete))
+
+
+def _clasificar_paquete(paquete: Dict[str, Any]) -> str:
+    if not isinstance(paquete, dict) or not paquete:
+        return CS_ESTADO_SIN_PAQUETE_AUDITABLE
+    if _tiene_evidencia_auditable(paquete):
+        return "DOMINIO"
+    return CS_ESTADO_SOLO_ESTRUCTURAL
+
+
+# ===============================================================
+# CONTRATOS
 # ===============================================================
 
 def _parece_contrato(d: Dict[str, Any]) -> bool:
@@ -455,10 +487,6 @@ def _caps_declaradas(contrato: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _caps_obligatorias(contrato: Dict[str, Any]) -> Set[str]:
-    """
-    Si el contrato declara obligatoriedad, se respeta.
-    Si no, ninguna se considera obligatoria (solo advertencia de cobertura).
-    """
     out: Set[str] = set()
     meta = contrato.get("capacidades_meta")
     if isinstance(meta, dict):
@@ -490,7 +518,7 @@ def _autoriza_ejecutar(contrato: Dict[str, Any]) -> Optional[bool]:
 
 
 # ===============================================================
-# RESOLVER SECUENCIA / DEPENDENCIAS / ARBOL (DAG)
+# SECUENCIA / DEPENDENCIAS / DAG
 # ===============================================================
 
 def _ejecuciones_registradas(
@@ -604,16 +632,12 @@ def _verificar_autorizaciones(
         caps = set(_caps_declaradas(cont).keys())
         if caps and str(cap) not in caps:
             motivos.append(
-                "capacidad no declarada en contrato: {0}.{1}".format(
-                    mod, cap
-                )
+                "capacidad no declarada en contrato: {0}.{1}".format(mod, cap)
             )
         auth = _autoriza_ejecutar(cont)
         if auth is False:
             motivos.append(
-                "capacidad ejecutada sin autorización: {0}.{1}".format(
-                    mod, cap
-                )
+                "capacidad ejecutada sin autorización: {0}.{1}".format(mod, cap)
             )
     return motivos
 
@@ -652,9 +676,6 @@ def _verificar_versiones(
 def _construir_dag(
     ejecuciones: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
-    """
-    DAG de auditoría: nodos = ejecuciones; aristas = requiere / orden seq.
-    """
     nodos: List[Dict[str, Any]] = []
     for i, ej in enumerate(ejecuciones):
         nodos.append({
@@ -666,7 +687,6 @@ def _construir_dag(
             "requiere": list(ej.get("requiere") or []),
             "edges_to": [],
         })
-    # aristas por dependencia explícita
     by_mod: Dict[str, List[int]] = {}
     for i, n in enumerate(nodos):
         m = n.get("modulo")
@@ -677,7 +697,6 @@ def _construir_dag(
             for j in by_mod.get(str(dep), []):
                 if j != i:
                     n["edges_to"].append(j)
-        # arista secuencial al siguiente si no hay deps
         if i + 1 < len(nodos) and not n.get("requiere"):
             n["edges_to"].append(i + 1)
     return nodos
@@ -686,7 +705,6 @@ def _construir_dag(
 def _transiciones(
     ejecuciones: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
-    """Auditoría por transición: estado_previo → resultado."""
     out: List[Dict[str, Any]] = []
     for ej in ejecuciones:
         out.append({
@@ -703,7 +721,7 @@ def _transiciones(
 
 
 # ===============================================================
-# RESOLVER REPRODUCCION
+# REPRODUCCIÓN
 # ===============================================================
 
 def _reproducir(
@@ -741,9 +759,7 @@ def _reproducir(
 
         try:
             if kwargs and args:
-                resultado_nuevo = invocador.invocar(
-                    mod, cap, *args, **kwargs
-                )
+                resultado_nuevo = invocador.invocar(mod, cap, *args, **kwargs)
             elif kwargs:
                 resultado_nuevo = invocador.invocar(mod, cap, **kwargs)
             elif args:
@@ -784,7 +800,7 @@ def _reproducir(
 
 
 # ===============================================================
-# FORMA DEL PAQUETE
+# FORMA DEL PAQUETE (solo estructural mínima)
 # ===============================================================
 
 def _paquete_minimo_ok(paquete: Dict[str, Any]) -> List[str]:
@@ -800,112 +816,9 @@ def _paquete_minimo_ok(paquete: Dict[str, Any]) -> List[str]:
         faltas.append("estado desconocido: {0}".format(estado))
     return faltas
 
-# ===============================================================
-# COMIENZA: ENGINE ↔ CENTINELA (INTEGRACIÓN OFICIAL)
-# ===============================================================
-# Ubicación: core/centinela.py
-#
-# 1) Estados adicionales (junto a CS_ESTADO_*).
-# 2) Campo tipo_auditoria en Veredicto.
-# 3) Clasificación por evidencia auditable (no lista fija de claves).
-# 4) Rama al inicio de Centinela.verificar.
-# ===============================================================
-
-# --- Estados ---
-CS_ESTADO_SOLO_ESTRUCTURAL = "SOLO_ESTRUCTURAL"
-CS_ESTADO_SIN_PAQUETE_AUDITABLE = "SIN_PAQUETE_AUDITABLE"
-
-CS_ESTADOS = (
-    CS_ESTADO_APROBADO,
-    CS_ESTADO_RETENIDO,
-    CS_ESTADO_PARCIAL,
-    CS_ESTADO_SOLO_ESTRUCTURAL,
-    CS_ESTADO_SIN_PAQUETE_AUDITABLE,
-)
-
-# Tipos de auditoría (campo explícito del Veredicto)
-TIPO_AUDITORIA_ESTRUCTURAL = "ESTRUCTURAL"
-TIPO_AUDITORIA_DOMINIO = "DOMINIO"
-TIPO_AUDITORIA_COMPLETA = "COMPLETA"
-
-
-# --- En dataclass Veredicto, añadir el campo: ---
-#   tipo_auditoria: str = TIPO_AUDITORIA_COMPLETA
-
-
-def _tiene_evidencia_auditable(paquete: Dict[str, Any]) -> bool:
-    """
-    True si el paquete trae ciclo de negocio o hojas de dominio.
-    No usa lista fija de claves estructurales.
-    """
-    if not isinstance(paquete, dict) or not paquete:
-        return False
-    if paquete.get(PKG_CICLO_ID):
-        return True
-    # hojas de dominio descubiertas dinámicamente
-    return bool(_valores_desde(paquete))
-
-
-def _clasificar_paquete(paquete: Dict[str, Any]) -> str:
-    """
-    SIN_PAQUETE_AUDITABLE | SOLO_ESTRUCTURAL | DOMINIO
-    según presencia de evidencia auditable.
-    """
-    if not isinstance(paquete, dict) or not paquete:
-        return CS_ESTADO_SIN_PAQUETE_AUDITABLE
-    if _tiene_evidencia_auditable(paquete):
-        return CS_ESTADO_APROBADO  # señal interna: hay dominio → auditoría completa
-    return CS_ESTADO_SOLO_ESTRUCTURAL
-
-
-# --- Rama al inicio de Centinela.verificar ---
-# (después de p / ciclo_id / motivos / id_ver; antes de _paquete_minimo_ok)
-
-        clase = _clasificar_paquete(p)
-        if clase == CS_ESTADO_SIN_PAQUETE_AUDITABLE:
-            return self._emitir(
-                estado=CS_ESTADO_SIN_PAQUETE_AUDITABLE,
-                ciclo_id=ciclo_id or "sin_ciclo",
-                motivos=["sin expediente auditable: paquete vacío o inexistente"],
-                advertencias=[],
-                id_verificacion=id_ver,
-                t0=t0,
-                ts_inicio=ts_inicio,
-                paquete=p if isinstance(p, dict) else {},
-                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
-            )
-
-        if clase == CS_ESTADO_SOLO_ESTRUCTURAL:
-            return self._emitir(
-                estado=CS_ESTADO_SOLO_ESTRUCTURAL,
-                ciclo_id=ciclo_id or "estructural",
-                motivos=[
-                    "paquete estructural: describe el sistema; "
-                    "sin ciclo ni resultados de dominio que auditar"
-                ],
-                advertencias=[],
-                id_verificacion=id_ver,
-                t0=t0,
-                ts_inicio=ts_inicio,
-                paquete=p,
-                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
-            )
-
-        # Hay evidencia auditable → continúa auditoría de dominio / completa.
-        # Al emitir APROBADO/RETENIDO/PARCIAL, pasar:
-        #   tipo_auditoria=TIPO_AUDITORIA_COMPLETA
-        # (o TIPO_AUDITORIA_DOMINIO si solo se verificó dominio sin reproducción).
-
-# --- En _emitir: aceptar y propagar tipo_auditoria ---
-#   tipo_auditoria: str = TIPO_AUDITORIA_COMPLETA
-#   → v.tipo_auditoria = tipo_auditoria
 
 # ===============================================================
-# FIN: ENGINE ↔ CENTINELA (INTEGRACIÓN OFICIAL)
-# ===============================================================
-
-# ===============================================================
-# NÚCLEO — coordinador de motores
+# NÚCLEO
 # ===============================================================
 
 class Centinela:
@@ -941,18 +854,64 @@ class Centinela:
     ) -> Veredicto:
         t0 = time.perf_counter()
         ts_inicio = datetime.now(timezone.utc).isoformat()
+        id_ver = str(uuid.uuid4())
+        motivos: List[str] = []
+        advertencias: List[str] = []
+        reproducciones: List[Dict[str, Any]] = []
 
         if not isinstance(paquete, dict):
-            raise CentinelaError("paquete debe ser dict")
+            return self._emitir(
+                estado=CS_ESTADO_SIN_PAQUETE_AUDITABLE,
+                ciclo_id="sin_ciclo",
+                motivos=["paquete no es dict"],
+                advertencias=[],
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete={},
+                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
+            )
 
         p = copy.deepcopy(paquete)
         ciclo_id = str(p.get(PKG_CICLO_ID) or "")
-        motivos: List[str] = []
-        advertencias: List[str] = []
-        id_ver = str(uuid.uuid4())
-        reproducciones: List[Dict[str, Any]] = []
 
-        # 0) registrar salida presentada
+        # ----------------------------------------------------------
+        # Clasificación automática (Engine ↔ Centinela)
+        # ----------------------------------------------------------
+        clase = _clasificar_paquete(p)
+        if clase == CS_ESTADO_SIN_PAQUETE_AUDITABLE:
+            return self._emitir(
+                estado=CS_ESTADO_SIN_PAQUETE_AUDITABLE,
+                ciclo_id=ciclo_id or "sin_ciclo",
+                motivos=[
+                    "sin expediente auditable: paquete vacío o inexistente"
+                ],
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
+            )
+        if clase == CS_ESTADO_SOLO_ESTRUCTURAL:
+            return self._emitir(
+                estado=CS_ESTADO_SOLO_ESTRUCTURAL,
+                ciclo_id=ciclo_id or "estructural",
+                motivos=[
+                    "paquete estructural: describe el sistema; "
+                    "sin ciclo ni resultados de dominio que auditar"
+                ],
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
+            )
+
+        # ----------------------------------------------------------
+        # Dominio / completa
+        # ----------------------------------------------------------
         if depositar_salida and ciclo_id:
             try:
                 self._cache.guardar({
@@ -968,33 +927,42 @@ class Centinela:
                     "cache_salida: {0}: {1}".format(type(e).__name__, e)
                 )
 
-        # 1) forma estructural
         faltas = _paquete_minimo_ok(p)
         if faltas:
             return self._emitir(
-                CS_ESTADO_RETENIDO,
-                ciclo_id or "sin_ciclo",
-                ["paquete_incompleto: {0}".format(f) for f in faltas],
-                advertencias, id_ver, t0, ts_inicio, p,
+                estado=CS_ESTADO_RETENIDO,
+                ciclo_id=ciclo_id or "sin_ciclo",
+                motivos=[
+                    "paquete_incompleto: {0}".format(f) for f in faltas
+                ],
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                tipo_auditoria=TIPO_AUDITORIA_DOMINIO,
             )
 
         estado_eng = str(p.get(PKG_ESTADO) or "").upper()
-
-        # 2) variables del paquete (descubrimiento dinámico, cualquier tipo)
         vals_p_lists = _valores_desde(p)
         valores_p = {k: _ultimo(v) for k, v in vals_p_lists.items()}
 
-        # 3) expediente
         try:
             eventos = self._cache.leer_ciclo(ciclo_id)
         except Exception as e:
             return self._emitir(
-                CS_ESTADO_RETENIDO, ciclo_id,
-                motivos + [
+                estado=CS_ESTADO_RETENIDO,
+                ciclo_id=ciclo_id,
+                motivos=motivos + [
                     "cache_lectura: {0}: {1}".format(type(e).__name__, e)
                 ],
-                advertencias, id_ver, t0, ts_inicio, p,
-                valores_paquete={k: v for k, v in valores_p.items()},
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                valores_paquete=dict(valores_p),
+                tipo_auditoria=TIPO_AUDITORIA_DOMINIO,
             )
 
         modulos = _descubrir_campo(eventos, "modulo")
@@ -1028,10 +996,17 @@ class Centinela:
             motivos.append("expediente vacío en CACHE")
             if estado_eng == PKG_ESTADO_OK:
                 return self._emitir(
-                    CS_ESTADO_RETENIDO, ciclo_id,
-                    motivos + ["estado OK sin expediente en CACHE"],
-                    advertencias, id_ver, t0, ts_inicio, p,
-                    valores_paquete={k: v for k, v in valores_p.items()},
+                    estado=CS_ESTADO_RETENIDO,
+                    ciclo_id=ciclo_id,
+                    motivos=motivos + [
+                        "estado OK sin expediente en CACHE"
+                    ],
+                    advertencias=advertencias,
+                    id_verificacion=id_ver,
+                    t0=t0,
+                    ts_inicio=ts_inicio,
+                    paquete=p,
+                    valores_paquete=dict(valores_p),
                     hash_expediente=hash_exp,
                     hash_flujo=hash_flujo,
                     hash_contratos=hash_contratos,
@@ -1041,9 +1016,9 @@ class Centinela:
                     contratos=contratos,
                     arbol_auditoria=dag,
                     transiciones=trans,
+                    tipo_auditoria=TIPO_AUDITORIA_DOMINIO,
                 )
 
-        # 4) coherencia de evidencia (cualquier tipo de hoja)
         vals_e_lists = _valores_desde(eventos)
         for clave, lista in vals_e_lists.items():
             if not _sin_contradiccion(lista):
@@ -1055,9 +1030,15 @@ class Centinela:
             for lista in vals_e_lists.values()
         ):
             return self._emitir(
-                CS_ESTADO_RETENIDO, ciclo_id, motivos, advertencias,
-                id_ver, t0, ts_inicio, p,
-                valores_paquete={k: v for k, v in valores_p.items()},
+                estado=CS_ESTADO_RETENIDO,
+                ciclo_id=ciclo_id,
+                motivos=motivos,
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                valores_paquete=dict(valores_p),
                 valores_evidencia={
                     k: _ultimo(v) for k, v in vals_e_lists.items()
                 },
@@ -1070,11 +1051,11 @@ class Centinela:
                 contratos=contratos,
                 arbol_auditoria=dag,
                 transiciones=trans,
+                tipo_auditoria=TIPO_AUDITORIA_DOMINIO,
             )
 
         valores_e = {k: _ultimo(v) for k, v in vals_e_lists.items()}
 
-        # 5) paquete ≡ evidencia (intersección dinámica)
         for clave in sorted(set(valores_p) & set(valores_e)):
             if not _igual(valores_p[clave], valores_e[clave]):
                 motivos.append(
@@ -1082,10 +1063,16 @@ class Centinela:
                 )
         if motivos:
             return self._emitir(
-                CS_ESTADO_RETENIDO, ciclo_id, motivos, advertencias,
-                id_ver, t0, ts_inicio, p,
-                valores_paquete={k: v for k, v in valores_p.items()},
-                valores_evidencia={k: v for k, v in valores_e.items()},
+                estado=CS_ESTADO_RETENIDO,
+                ciclo_id=ciclo_id,
+                motivos=motivos,
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                valores_paquete=dict(valores_p),
+                valores_evidencia=dict(valores_e),
                 hash_expediente=hash_exp,
                 hash_flujo=hash_flujo,
                 hash_contratos=hash_contratos,
@@ -1095,26 +1082,30 @@ class Centinela:
                 contratos=contratos,
                 arbol_auditoria=dag,
                 transiciones=trans,
+                tipo_auditoria=TIPO_AUDITORIA_DOMINIO,
             )
 
-        # 6) secuencia, dependencias, autorizaciones, versiones
         motivos.extend(_verificar_secuencia(ejecuciones))
         motivos.extend(
             _verificar_dependencias(ejecuciones, contratos, modulos_set)
         )
-        motivos.extend(
-            _verificar_autorizaciones(ejecuciones, contratos)
-        )
+        motivos.extend(_verificar_autorizaciones(ejecuciones, contratos))
         m_ver, a_ver = _verificar_versiones(eventos, contratos)
         motivos.extend(m_ver)
         advertencias.extend(a_ver)
 
         if motivos:
             return self._emitir(
-                CS_ESTADO_RETENIDO, ciclo_id, motivos, advertencias,
-                id_ver, t0, ts_inicio, p,
-                valores_paquete={k: v for k, v in valores_p.items()},
-                valores_evidencia={k: v for k, v in valores_e.items()},
+                estado=CS_ESTADO_RETENIDO,
+                ciclo_id=ciclo_id,
+                motivos=motivos,
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                valores_paquete=dict(valores_p),
+                valores_evidencia=dict(valores_e),
                 hash_expediente=hash_exp,
                 hash_flujo=hash_flujo,
                 hash_contratos=hash_contratos,
@@ -1124,9 +1115,9 @@ class Centinela:
                 contratos=contratos,
                 arbol_auditoria=dag,
                 transiciones=trans,
+                tipo_auditoria=TIPO_AUDITORIA_COMPLETA,
             )
 
-        # 7) reproducción dinámica
         hash_repro = None
         if self._invocador is not None and ejecuciones:
             reproducciones, m_repro = _reproducir(
@@ -1139,10 +1130,16 @@ class Centinela:
                 for r in reproducciones
             ):
                 return self._emitir(
-                    CS_ESTADO_RETENIDO, ciclo_id, motivos, advertencias,
-                    id_ver, t0, ts_inicio, p,
-                    valores_paquete={k: v for k, v in valores_p.items()},
-                    valores_evidencia={k: v for k, v in valores_e.items()},
+                    estado=CS_ESTADO_RETENIDO,
+                    ciclo_id=ciclo_id,
+                    motivos=motivos,
+                    advertencias=advertencias,
+                    id_verificacion=id_ver,
+                    t0=t0,
+                    ts_inicio=ts_inicio,
+                    paquete=p,
+                    valores_paquete=dict(valores_p),
+                    valores_evidencia=dict(valores_e),
                     reproducciones=reproducciones,
                     hash_expediente=hash_exp,
                     hash_flujo=hash_flujo,
@@ -1154,13 +1151,13 @@ class Centinela:
                     contratos=contratos,
                     arbol_auditoria=dag,
                     transiciones=trans,
+                    tipo_auditoria=TIPO_AUDITORIA_COMPLETA,
                 )
         elif ejecuciones and self._invocador is None:
             advertencias.append(
                 "invocador no disponible; verificación por expediente"
             )
 
-        # 8) cobertura (obligatorias vs opcionales desde contrato)
         if contratos:
             caps_ejecutadas = {
                 str(e.get("capacidad"))
@@ -1192,10 +1189,16 @@ class Centinela:
                     )
             if motivos:
                 return self._emitir(
-                    CS_ESTADO_RETENIDO, ciclo_id, motivos, advertencias,
-                    id_ver, t0, ts_inicio, p,
-                    valores_paquete={k: v for k, v in valores_p.items()},
-                    valores_evidencia={k: v for k, v in valores_e.items()},
+                    estado=CS_ESTADO_RETENIDO,
+                    ciclo_id=ciclo_id,
+                    motivos=motivos,
+                    advertencias=advertencias,
+                    id_verificacion=id_ver,
+                    t0=t0,
+                    ts_inicio=ts_inicio,
+                    paquete=p,
+                    valores_paquete=dict(valores_p),
+                    valores_evidencia=dict(valores_e),
                     reproducciones=reproducciones,
                     hash_expediente=hash_exp,
                     hash_flujo=hash_flujo,
@@ -1207,16 +1210,23 @@ class Centinela:
                     contratos=contratos,
                     arbol_auditoria=dag,
                     transiciones=trans,
+                    tipo_auditoria=TIPO_AUDITORIA_COMPLETA,
                 )
 
-        # 9) parcial
         if estado_eng in (PKG_ESTADO_UNDEFINED, PKG_ESTADO_PARCIAL):
             return self._emitir(
-                CS_ESTADO_PARCIAL, ciclo_id,
-                motivos + ["estado de paquete no-OK: {0}".format(estado_eng)],
-                advertencias, id_ver, t0, ts_inicio, p,
-                valores_paquete={k: v for k, v in valores_p.items()},
-                valores_evidencia={k: v for k, v in valores_e.items()},
+                estado=CS_ESTADO_PARCIAL,
+                ciclo_id=ciclo_id,
+                motivos=motivos + [
+                    "estado de paquete no-OK: {0}".format(estado_eng)
+                ],
+                advertencias=advertencias,
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                valores_paquete=dict(valores_p),
+                valores_evidencia=dict(valores_e),
                 reproducciones=reproducciones,
                 hash_expediente=hash_exp,
                 hash_flujo=hash_flujo,
@@ -1228,17 +1238,22 @@ class Centinela:
                 contratos=contratos,
                 arbol_auditoria=dag,
                 transiciones=trans,
+                tipo_auditoria=TIPO_AUDITORIA_COMPLETA,
             )
 
-        # 10) APROBADO
         return self._emitir(
-            CS_ESTADO_APROBADO, ciclo_id,
-            motivos or [
+            estado=CS_ESTADO_APROBADO,
+            ciclo_id=ciclo_id,
+            motivos=motivos or [
                 "expediente coherente; proceso auditado; paquete respaldado"
             ],
-            advertencias, id_ver, t0, ts_inicio, p,
-            valores_paquete={k: v for k, v in valores_p.items()},
-            valores_evidencia={k: v for k, v in valores_e.items()},
+            advertencias=advertencias,
+            id_verificacion=id_ver,
+            t0=t0,
+            ts_inicio=ts_inicio,
+            paquete=p,
+            valores_paquete=dict(valores_p),
+            valores_evidencia=dict(valores_e),
             reproducciones=reproducciones,
             hash_expediente=hash_exp,
             hash_flujo=hash_flujo,
@@ -1250,10 +1265,12 @@ class Centinela:
             contratos=contratos,
             arbol_auditoria=dag,
             transiciones=trans,
+            tipo_auditoria=TIPO_AUDITORIA_COMPLETA,
         )
 
     def _emitir(
         self,
+        *,
         estado: str,
         ciclo_id: str,
         motivos: List[str],
@@ -1275,6 +1292,7 @@ class Centinela:
         contratos: Optional[List[Dict[str, Any]]] = None,
         arbol_auditoria: Optional[List[Dict[str, Any]]] = None,
         transiciones: Optional[List[Dict[str, Any]]] = None,
+        tipo_auditoria: str = TIPO_AUDITORIA_COMPLETA,
     ) -> Veredicto:
         ts_fin = datetime.now(timezone.utc).isoformat()
         duracion = round(time.perf_counter() - t0, 6)
@@ -1291,6 +1309,7 @@ class Centinela:
             "version_contrato": CS_VERSION_CONTRATO,
             "esquema": CS_ESQUEMA,
             "version_eventos_cs": CS_VERSION_EVENTOS,
+            "tipo_auditoria": tipo_auditoria,
             "modulos_en_expediente": mods,
             "capacidades_en_expediente": caps,
             "contratos_n": len(conts),
@@ -1311,6 +1330,7 @@ class Centinela:
             ciclo_id=ciclo_id,
             motivos=list(motivos),
             advertencias=list(advertencias),
+            tipo_auditoria=tipo_auditoria,
             id_verificacion=id_verificacion,
             hash_expediente=hash_expediente,
             hash_flujo=hash_flujo,
@@ -1374,6 +1394,8 @@ class Centinela:
             "aprobadas": s["aprobadas"],
             "retenidas": s["retenidas"],
             "parciales": s["parciales"],
+            "estructurales": s["estructurales"],
+            "sin_auditable": s["sin_auditable"],
         }
 
     def inventario(self) -> Dict[str, Any]:
@@ -1385,16 +1407,6 @@ class Centinela:
             "funcion": CS_FUNCION,
             "no_hace": list(CS_NO_HACE),
             "autoridad": list(CS_AUTORIDAD),
-            "motores": [
-                "ResolverExpediente",
-                "ResolverContratos",
-                "ResolverDependencias",
-                "ResolverSecuencia",
-                "ResolverReproduccion",
-                "ResolverComparacion",
-                "ResolverIntegridad",
-                "EmisorVeredicto",
-            ],
             "capacidades": [
                 "verificar", "reporte", "inventario",
                 "diagnostico", "estado", "salud", "estadisticas",
@@ -1435,21 +1447,16 @@ class Centinela:
         return _STATS.resumen()
 
 
-
 # ===============================================================
-# API DE CORE
+# API
 # ===============================================================
 
 def verificar_salida_paquete(
     paquete: Dict[str, Any],
     cache: Optional[CacheEvidencia] = None,
     invocador: Optional[InvocadorCapacidades] = None,
-) -> Dict[str, Any]:
-    return (
-        Centinela(cache=cache, invocador=invocador)
-        .verificar(paquete)
-        .a_dict()
-    )
+) -> Veredicto:
+    return Centinela(cache=cache, invocador=invocador).verificar(paquete)
 
 
 def verificar_salida(salida: Any) -> bool:
@@ -1473,7 +1480,12 @@ __all__ = [
     "CS_ESTADO_APROBADO",
     "CS_ESTADO_RETENIDO",
     "CS_ESTADO_PARCIAL",
+    "CS_ESTADO_SOLO_ESTRUCTURAL",
+    "CS_ESTADO_SIN_PAQUETE_AUDITABLE",
     "CS_ESTADOS",
+    "TIPO_AUDITORIA_ESTRUCTURAL",
+    "TIPO_AUDITORIA_DOMINIO",
+    "TIPO_AUDITORIA_COMPLETA",
     "verificar_salida_paquete",
     "verificar_salida",
 ]

@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 7
-  timestamp: 2026-08-07T03:21:06.112806+00:00
+  timestamp: 2026-08-07T03:28:58.314116+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 21
-  timestamp: 2026-08-07T03:21:06.112776+00:00
+  timestamp: 2026-08-07T03:28:58.314083+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -563,32 +563,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T03:20:59.816848+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368060+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -665,32 +665,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T03:20:59.816848+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368060+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T03:20:59.817338+00:00
+        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
     factores_api:
       • C
       • K
@@ -874,15 +874,61 @@
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
-    estado: OPERATIVO
-    coherente: True
-    categorias: 0
+    estado: DEGRADADO
+    coherente: False
+    categorias: 42
     ids:
-      []
+      • afirmaciones
+      • afirmaciones_falsas
+      • base_nula_c
+      • base_nula_k
+      • base_nula_l
+      • c
+      • c
+      • ca
+      • calcular_c
+      • calcular_k
+      • calcular_l
+      • calculator
+      • coherencia
+      • compromisos
+      • conteos
+      • contexto
+      • contradicciones
+      • correlacion_k
+      • escalas_ids
+      • extraer_conteos
+      • f
+      • inyectar_en_peticion
+      • k
+      • k
+      • l
+      • leer_ids_escala
+      • logica
+      • m
+      • o_context
+      • o_presente
+      • operacional
+      • p
+      • posturas
+      • r
+      • reversiones
+      • teorico
+      • tru_atomo
+      • tru_conversacion
+      • tru_frase
+      • tru_repositorio
+      • tru_sujeto
+      • undefined
     errores:
-      []
+      [0]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator']
+      [1]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator']
     notas:
-      • glosario vacío (legítimo hasta montar archivos en categorias/)
+      []
     capacidades:
       • verificar
       • barrer
@@ -920,16 +966,24 @@
   diagnostico:
     id: CC
     modulo: catalogo_citaciones
-    estado: NO_INICIADO
+    estado: DEGRADADO
     problemas:
-      []
+      [0]
+        tipo: errores_catalogo
+        detalle:
+          [0]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator']
+          [1]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator']
     advertencias:
-      • Glosario vacío (legítimo hasta montar categorias/)
-    recomendaciones:
       []
-    coherente: True
-    errores_n: 0
-    categorias_n: 0
+    recomendaciones:
+      • Corregir archivos de categorias/ con errores de forma o carga
+    coherente: False
+    errores_n: 2
+    categorias_n: 42
   inventario:
     id: CC
     nombre: catalogo_citaciones
@@ -975,13 +1029,940 @@
         • Fraction
       nota: Archivos bajo categorias/ declaran CATEGORIA o CATEGORIAS o IDS. Cada uno aporta uno o más IDs del repositorio. CC los lee y expone. No calcula. Este INIT no embebe IDs.
     categorias:
-      []
+      [0]
+        id: afirmaciones
+        nombre: afirmaciones
+        unidad: id
+        enunciado: ID del repositorio: afirmaciones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [1]
+        id: afirmaciones_falsas
+        nombre: afirmaciones_falsas
+        unidad: id
+        enunciado: ID del repositorio: afirmaciones_falsas
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [2]
+        id: base_nula_c
+        nombre: base_nula_C
+        unidad: id
+        enunciado: ID del repositorio: base_nula_C
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [3]
+        id: base_nula_k
+        nombre: base_nula_K
+        unidad: id
+        enunciado: ID del repositorio: base_nula_K
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [4]
+        id: base_nula_l
+        nombre: base_nula_L
+        unidad: id
+        enunciado: ID del repositorio: base_nula_L
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [5]
+        id: c
+        nombre: C
+        unidad: id
+        enunciado: ID del repositorio: C
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [6]
+        id: c
+        nombre: c
+        unidad: id
+        enunciado: ID del repositorio: c
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [7]
+        id: ca
+        nombre: CA
+        unidad: id
+        enunciado: ID del repositorio: CA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [8]
+        id: calcular_c
+        nombre: calcular_c
+        unidad: id
+        enunciado: ID del repositorio: calcular_c
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [9]
+        id: calcular_k
+        nombre: calcular_k
+        unidad: id
+        enunciado: ID del repositorio: calcular_k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [10]
+        id: calcular_l
+        nombre: calcular_l
+        unidad: id
+        enunciado: ID del repositorio: calcular_l
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [11]
+        id: calculator
+        nombre: calculator
+        unidad: id
+        enunciado: ID del repositorio: calculator
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [12]
+        id: coherencia
+        nombre: coherencia
+        unidad: id
+        enunciado: ID del repositorio: coherencia
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [13]
+        id: compromisos
+        nombre: compromisos
+        unidad: id
+        enunciado: ID del repositorio: compromisos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [14]
+        id: conteos
+        nombre: conteos
+        unidad: id
+        enunciado: ID del repositorio: conteos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [15]
+        id: contexto
+        nombre: contexto
+        unidad: id
+        enunciado: ID del repositorio: contexto
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [16]
+        id: contradicciones
+        nombre: contradicciones
+        unidad: id
+        enunciado: ID del repositorio: contradicciones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [17]
+        id: correlacion_k
+        nombre: correlacion_k
+        unidad: id
+        enunciado: ID del repositorio: correlacion_k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [18]
+        id: escalas_ids
+        nombre: escalas_ids
+        unidad: id
+        enunciado: ID del repositorio: escalas_ids
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [19]
+        id: extraer_conteos
+        nombre: extraer_conteos
+        unidad: id
+        enunciado: ID del repositorio: extraer_conteos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [20]
+        id: f
+        nombre: f
+        unidad: id
+        enunciado: ID del repositorio: f
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [21]
+        id: inyectar_en_peticion
+        nombre: inyectar_en_peticion
+        unidad: id
+        enunciado: ID del repositorio: inyectar_en_peticion
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [22]
+        id: k
+        nombre: K
+        unidad: id
+        enunciado: ID del repositorio: K
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [23]
+        id: k
+        nombre: k
+        unidad: id
+        enunciado: ID del repositorio: k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [24]
+        id: l
+        nombre: L
+        unidad: id
+        enunciado: ID del repositorio: L
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [25]
+        id: leer_ids_escala
+        nombre: leer_ids_escala
+        unidad: id
+        enunciado: ID del repositorio: leer_ids_escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [26]
+        id: logica
+        nombre: logica
+        unidad: id
+        enunciado: ID del repositorio: logica
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [27]
+        id: m
+        nombre: m
+        unidad: id
+        enunciado: ID del repositorio: m
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [28]
+        id: o_context
+        nombre: O_context
+        unidad: id
+        enunciado: ID del repositorio: O_context
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [29]
+        id: o_presente
+        nombre: o_presente
+        unidad: id
+        enunciado: ID del repositorio: o_presente
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [30]
+        id: operacional
+        nombre: operacional
+        unidad: id
+        enunciado: ID del repositorio: operacional
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [31]
+        id: p
+        nombre: p
+        unidad: id
+        enunciado: ID del repositorio: p
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [32]
+        id: posturas
+        nombre: posturas
+        unidad: id
+        enunciado: ID del repositorio: posturas
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [33]
+        id: r
+        nombre: r
+        unidad: id
+        enunciado: ID del repositorio: r
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [34]
+        id: reversiones
+        nombre: reversiones
+        unidad: id
+        enunciado: ID del repositorio: reversiones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [35]
+        id: teorico
+        nombre: teorico
+        unidad: id
+        enunciado: ID del repositorio: teorico
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [36]
+        id: tru_atomo
+        nombre: tru_atomo
+        unidad: id
+        enunciado: ID del repositorio: tru_atomo
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [37]
+        id: tru_conversacion
+        nombre: tru_conversacion
+        unidad: id
+        enunciado: ID del repositorio: tru_conversacion
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [38]
+        id: tru_frase
+        nombre: tru_frase
+        unidad: id
+        enunciado: ID del repositorio: tru_frase
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [39]
+        id: tru_repositorio
+        nombre: tru_repositorio
+        unidad: id
+        enunciado: ID del repositorio: tru_repositorio
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [40]
+        id: tru_sujeto
+        nombre: tru_sujeto
+        unidad: id
+        enunciado: ID del repositorio: tru_sujeto
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [41]
+        id: undefined
+        nombre: UNDEFINED
+        unidad: id
+        enunciado: ID del repositorio: UNDEFINED
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
     ids:
-      []
-    total: 0
+      • afirmaciones
+      • afirmaciones_falsas
+      • base_nula_c
+      • base_nula_k
+      • base_nula_l
+      • c
+      • c
+      • ca
+      • calcular_c
+      • calcular_k
+      • calcular_l
+      • calculator
+      • coherencia
+      • compromisos
+      • conteos
+      • contexto
+      • contradicciones
+      • correlacion_k
+      • escalas_ids
+      • extraer_conteos
+      • f
+      • inyectar_en_peticion
+      • k
+      • k
+      • l
+      • leer_ids_escala
+      • logica
+      • m
+      • o_context
+      • o_presente
+      • operacional
+      • p
+      • posturas
+      • r
+      • reversiones
+      • teorico
+      • tru_atomo
+      • tru_conversacion
+      • tru_frase
+      • tru_repositorio
+      • tru_sujeto
+      • undefined
+    total: 42
     errores:
-      []
-    coherente: True
+      [0]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator']
+      [1]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator']
+    coherente: False
     capacidades:
       • verificar
       • barrer
@@ -2769,151 +3750,151 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T03:21:06.100868+00:00
+    timestamp: 2026-08-07T03:28:58.300189+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00232
+    duracion_s: 0.00246
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T03:21:06.102756+00:00
+    timestamp: 2026-08-07T03:28:58.302286+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001869
+    duracion_s: 0.002077
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T03:21:06.104501+00:00
+    timestamp: 2026-08-07T03:28:58.304084+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001731
+    duracion_s: 0.001785
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T03:21:06.105034+00:00
+    timestamp: 2026-08-07T03:28:58.304603+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000521
+    duracion_s: 0.000506
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T03:21:06.105439+00:00
+    timestamp: 2026-08-07T03:28:58.305031+00:00
     modulo: calculator
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000418
+  [5]
+    id_traza: 6
+    timestamp: 2026-08-07T03:28:58.305418+00:00
+    modulo: calculator
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.00038
+  [6]
+    id_traza: 7
+    timestamp: 2026-08-07T03:28:58.306127+00:00
+    modulo: catalogo_citaciones
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.0007
+  [7]
+    id_traza: 8
+    timestamp: 2026-08-07T03:28:58.306541+00:00
+    modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 0.000397
-  [5]
-    id_traza: 6
-    timestamp: 2026-08-07T03:21:06.105834+00:00
-    modulo: calculator
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000387
-  [6]
-    id_traza: 7
-    timestamp: 2026-08-07T03:21:06.105896+00:00
-    modulo: catalogo_citaciones
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 5.5e-05
-  [7]
-    id_traza: 8
-    timestamp: 2026-08-07T03:21:06.105957+00:00
-    modulo: catalogo_citaciones
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 3.5e-05
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T03:21:06.105993+00:00
+    timestamp: 2026-08-07T03:28:58.306900+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 3e-05
+    duracion_s: 0.00035
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T03:21:06.106180+00:00
+    timestamp: 2026-08-07T03:28:58.307121+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000182
+    duracion_s: 0.000212
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T03:21:06.106325+00:00
+    timestamp: 2026-08-07T03:28:58.307272+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000138
+    duracion_s: 0.000142
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T03:21:06.106397+00:00
+    timestamp: 2026-08-07T03:28:58.307342+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 6.5e-05
+    duracion_s: 6.4e-05
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T03:21:06.107196+00:00
+    timestamp: 2026-08-07T03:28:58.308200+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000792
+    duracion_s: 0.00085
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T03:21:06.107716+00:00
+    timestamp: 2026-08-07T03:28:58.308726+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000509
+    duracion_s: 0.000514
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T03:21:06.107846+00:00
+    timestamp: 2026-08-07T03:28:58.308859+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000121
+    duracion_s: 0.000124
   [15]
     id_traza: 16
-    timestamp: 2026-08-07T03:21:06.109098+00:00
+    timestamp: 2026-08-07T03:28:58.310265+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001243
+    duracion_s: 0.001397
   [16]
     id_traza: 17
-    timestamp: 2026-08-07T03:21:06.109467+00:00
+    timestamp: 2026-08-07T03:28:58.310648+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000359
+    duracion_s: 0.000371
   [17]
     id_traza: 18
-    timestamp: 2026-08-07T03:21:06.109642+00:00
+    timestamp: 2026-08-07T03:28:58.310824+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000166
+    duracion_s: 0.000167
   [18]
     id_traza: 19
-    timestamp: 2026-08-07T03:21:06.111393+00:00
+    timestamp: 2026-08-07T03:28:58.312602+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001741
+    duracion_s: 0.001769
   [19]
     id_traza: 20
-    timestamp: 2026-08-07T03:21:06.112131+00:00
+    timestamp: 2026-08-07T03:28:58.313364+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000727
+    duracion_s: 0.000751
   [20]
     id_traza: 21
-    timestamp: 2026-08-07T03:21:06.112767+00:00
+    timestamp: 2026-08-07T03:28:58.314071+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000626
+    duracion_s: 0.000696
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

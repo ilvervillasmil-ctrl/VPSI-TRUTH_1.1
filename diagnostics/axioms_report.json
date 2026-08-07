@@ -2,7 +2,7 @@
   "coherente": true,
   "choques": [],
   "errores": [],
-  "declaraciones": 323,
+  "declaraciones": 338,
   "cuerpos": [
     "Anclas_de_Medicion_AM_AX",
     "VPSI_AX",
@@ -11,14 +11,15 @@
     "diccionario_AX",
     "entendimiento_fractal_AX",
     "indefinido_AX",
+    "peticion_anuncio_AX",
     "self"
   ],
   "por_tipo": {
-    "axioma": 105,
+    "axioma": 110,
     "lema": 36,
-    "teorema": 73,
-    "corolario": 80,
-    "definicion": 29
+    "teorema": 77,
+    "corolario": 83,
+    "definicion": 32
   },
   "ids_dominio_k_o": [
     "A1",
@@ -176,6 +177,11 @@
     "IND-T1",
     "IV",
     "M.1",
+    "PA-A2",
+    "PA-D1",
+    "PA-D3",
+    "PA-T1",
+    "PA-T3",
     "T1",
     "T10",
     "T11",

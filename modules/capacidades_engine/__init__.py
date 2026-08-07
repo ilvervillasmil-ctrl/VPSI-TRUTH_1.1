@@ -114,19 +114,6 @@
 # para consultas futuras del Engine.
 #
 # ---------------------------------------------------------------
-# CRECIMIENTO FUTURO (solo documentación)
-# ---------------------------------------------------------------
-#
-# Un skill del Engine podrá provenir de:
-#   - un archivo
-#   - un mandato
-#   - un procedimiento generado
-#   - una competencia aprendida
-#
-# CE seguirá siendo la capacidad estructural que expone
-# esos skills al Engine, independientemente de su origen.
-#
-# ---------------------------------------------------------------
 # REQUISITO
 # ---------------------------------------------------------------
 #
@@ -141,25 +128,27 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Directorio del propio contenedor CE (capacidad estructural).
-# Los skills viven como archivos en este directorio:
-#
-# modules/
-#   capacidades_engine/
-#       __init__.py
-#       ce_orquestar_tt.py
-#       mandato_catalogo.py
-#       mandato_sujetos.py
-#       mandato_aplicar_escala.py
-#
-# CE descubre automáticamente cualquier *.py del mismo directorio
-# que declare SKILL, CAPACIDAD, SKILLS o CAPACIDADES.
-# El propio directorio actúa como soporte físico del inventario
-# operativo de skills nativos del Engine.
+# ===============================================================
+# SECCIÓN 1 — RUTAS Y CONSTANTES DE CONTENEDOR
+# ===============================================================
 
 _DIR = Path(__file__).resolve().parent
 _CAP = _DIR
 
+_ID = "CE"
+_NOMBRE = "capacidades_engine"
+_ROL = "CE"
+_VERSION = "1.2"
+_VERSION_CONTRATO = "1.0"
+_ESQUEMA = "VPSI-CONTRACT-1.0"
+_ESTABILIDAD = "ESTABLE"
+_COMPATIBLE_DESDE = "1.0"
+_API_ENGINE = ">=1.0"
+
+
+# ===============================================================
+# SECCIÓN 2 — CARGA Y META DE SKILLS
+# ===============================================================
 
 def _extraer_meta(mod: Any) -> Optional[Dict[str, Any]]:
     """
@@ -270,6 +259,10 @@ def _validar_skills(hallado: Dict[str, Dict[str, Any]]) -> List[str]:
     return errores
 
 
+# ===============================================================
+# SECCIÓN 3 — API PÚBLICA (skills / ids / por_id / archivos)
+# ===============================================================
+
 def skills() -> List[Dict[str, Any]]:
     """
     Todos los skills válidos de la capacidad CE — a disposición
@@ -328,6 +321,10 @@ def listar_archivos() -> List[str]:
     ]
 
 
+# ===============================================================
+# SECCIÓN 4 — CENTINELA (barrer / verificar)
+# ===============================================================
+
 def barrer() -> Dict[str, Any]:
     """
     Centinela: ¿el inventario operativo de skills de CE es coherente?
@@ -355,8 +352,14 @@ def barrer() -> Dict[str, Any]:
                 notas.append("  {0}: {1}".format(sid, m["error"]))
 
     return {
-        "contenedor": "capacidades_engine",
-        "rol": "CE",
+        "id": _ID,
+        "nombre": _NOMBRE,
+        "contenedor": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "version_contrato": _VERSION_CONTRATO,
+        "esquema": _ESQUEMA,
+        "estabilidad": _ESTABILIDAD,
         "coherente": not errores,
         "errores": errores,
         "choques": [],
@@ -377,23 +380,39 @@ def verificar() -> Dict[str, Any]:
     return barrer()
 
 
+# ===============================================================
+# SECCIÓN 5 — INVENTARIO (forma mínima contractual)
+# ===============================================================
+
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     """
     Inventario operativo de las capacidades nativas del Engine
     expuestas por CE. El descubrimiento automático mantiene
     este inventario actualizado.
+
+    Forma mínima alineada a VPSI-CONTRACT-1.0:
+      id, nombre, rol, version, version_contrato, esquema,
+      estabilidad, + campos propios de CE.
     """
     b = barrer()
     return {
-        "contenedor": "capacidades_engine",
-        "rol": "CE",
-        "version": "1.2",
+        "id": _ID,
+        "nombre": _NOMBRE,
+        "contenedor": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "version_contrato": _VERSION_CONTRATO,
+        "esquema": _ESQUEMA,
+        "estabilidad": _ESTABILIDAD,
+        "compatible_desde": _COMPATIBLE_DESDE,
+        "api_engine": _API_ENGINE,
         "ids": b.get("ids"),
         "n": b.get("n"),
         "archivos": b.get("archivos"),
         "coherente": b.get("coherente"),
         "skills": skills(),
         "notas": b.get("notas"),
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "funcion": (
             "Capacidad estructural del Engine. "
             "Mantiene el inventario operativo de skills nativos. "
@@ -407,23 +426,23 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
 def verificar_salida(salida: Any) -> bool:
     if not isinstance(salida, dict):
         return False
-    return "coherente" in salida or "ids" in salida
+    return "id" in salida or "coherente" in salida or "ids" in salida
 
 
 # ===============================================================
-# CONTENEDOR — contrato exclusivo de Engine
+# SECCIÓN 6 — CONTENEDOR (contrato exclusivo de Engine)
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
-    "esquema": "VPSI-CONTRACT-1.0",
-    "version_contrato": "1.0",
-    "version_modulo": "1.2",
-    "id": "CE",
-    "nombre": "capacidades_engine",
-    "rol": "CE",
-    "estabilidad": "ESTABLE",
-    "compatible_desde": "1.0",
-    "api_engine": ">=1.0",
+    "esquema": _ESQUEMA,
+    "version_contrato": _VERSION_CONTRATO,
+    "version_modulo": _VERSION,
+    "id": _ID,
+    "nombre": _NOMBRE,
+    "rol": _ROL,
+    "estabilidad": _ESTABILIDAD,
+    "compatible_desde": _COMPATIBLE_DESDE,
+    "api_engine": _API_ENGINE,
     "descripcion": (
         "Capacidad estructural del Engine: órgano único que agrupa "
         "múltiples skills nativos. Así como un brazo posee varias "
@@ -504,7 +523,7 @@ CONTENEDOR: Dict[str, Any] = {
                 "de CE es coherente?"
             ),
             "entrada": "ninguna",
-            "salida": "dict con coherente, ids, errores, archivos",
+            "salida": "dict con id, nombre, rol, version, coherente, ids, errores",
         },
         "barrer": {
             "descripcion": (
@@ -512,15 +531,19 @@ CONTENEDOR: Dict[str, Any] = {
                 "No decide, no ejecuta, no restringe uso."
             ),
             "entrada": "ninguna",
-            "salida": "dict con coherente, ids, n, archivos, errores, notas",
+            "salida": "dict con id, nombre, rol, version, coherente, ids, n, archivos",
         },
         "inventario": {
             "descripcion": (
                 "Inventario operativo de skills nativos del Engine "
-                "expuestos por la capacidad CE."
+                "expuestos por la capacidad CE. Incluye encabezado "
+                "contractual completo (id, nombre, rol, version, …)."
             ),
             "entrada": "peticion opcional",
-            "salida": "dict con ids, n, archivos, skills, coherente",
+            "salida": (
+                "dict con id, nombre, rol, version, version_contrato, "
+                "esquema, estabilidad, ids, n, archivos, skills, coherente"
+            ),
         },
         "skills": {
             "descripcion": (
@@ -589,9 +612,14 @@ CONTENEDOR: Dict[str, Any] = {
         "este módulo no inventa capacidades no declaradas en CONTENEDOR",
         "este módulo siempre puede reportar su propio estado",
         "CE debe figurar en ROLES de core/engine.py",
+        "inventario() siempre incluye id, nombre, rol, version del CONTENEDOR",
     ],
 }
 
+
+# ===============================================================
+# SECCIÓN 7 — EXPORTS
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",

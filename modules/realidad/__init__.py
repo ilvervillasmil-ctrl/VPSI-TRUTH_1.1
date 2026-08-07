@@ -74,12 +74,11 @@
 # ===============================================================
 
 # ===============================================================
-# IMPORTACIONES  (parche — sustituye el bloque de imports de RE)
+# IMPORTACIONES
 # ===============================================================
 #
-# Engine puede cargar este archivo vía spec_from_file_location.
-# En ese modo el import relativo ".acceso" falla.
-# Se resuelve con fallback local y stubs seguros.
+# Solo stdlib, tipado y canal local de este módulo.
+# No importar AX, FO, CA, MC, CIT, … — Engine resuelve.
 #
 
 from __future__ import annotations
@@ -89,52 +88,12 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-_DIR = Path(__file__).parent
-
-
-def _cargar_acceso() -> Any:
-    """
-    Carga acceso.py del mismo directorio sin depender del nombre del paquete.
-    Si no existe o falla, devuelve stubs: el contrato RE sigue cargando.
-    """
-    ruta = _DIR / "acceso.py"
-    if not ruta.is_file():
-        return None
-    nombre = "realidad_acceso_local"
-    spec = importlib.util.spec_from_file_location(nombre, str(ruta))
-    if spec is None or spec.loader is None:
-        return None
-    mod = importlib.util.module_from_spec(spec)
-    try:
-        sys.modules[nombre] = mod
-        spec.loader.exec_module(mod)
-        return mod
-    except Exception:
-        sys.modules.pop(nombre, None)
-        return None
-
-
-_acceso = _cargar_acceso()
-
-if _acceso is not None:
-    Canal = getattr(_acceso, "Canal", None)
-    hay_acceso = getattr(_acceso, "hay_acceso", None)
-    hay_dns = getattr(_acceso, "hay_dns", None)
-    HAY_REQUESTS = bool(getattr(_acceso, "HAY_REQUESTS", False))
-else:
-    Canal = None
-
-    def hay_acceso(timeout: float = 2) -> bool:  # type: ignore[misc]
-        return False
-
-    def hay_dns() -> bool:  # type: ignore[misc]
-        return False
-
-    HAY_REQUESTS = False
+from .acceso import Canal, hay_acceso, hay_dns, HAY_REQUESTS
 
 # ===============================================================
 # FIN IMPORTACIONES
 # ===============================================================
+
 # ===============================================================
 # CONSTANTES
 # ===============================================================

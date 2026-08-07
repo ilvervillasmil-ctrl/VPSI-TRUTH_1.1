@@ -2,7 +2,7 @@
   "coherente": true,
   "choques": [],
   "errores": [],
-  "declaraciones": 301,
+  "declaraciones": 323,
   "cuerpos": [
     "Anclas_de_Medicion_AM_AX",
     "VPSI_AX",
@@ -10,13 +10,14 @@
     "correlacion_AX",
     "diccionario_AX",
     "entendimiento_fractal_AX",
-    "indefinido_AX"
+    "indefinido_AX",
+    "self"
   ],
   "por_tipo": {
-    "axioma": 100,
+    "axioma": 105,
     "lema": 36,
-    "teorema": 69,
-    "corolario": 67,
+    "teorema": 73,
+    "corolario": 80,
     "definicion": 29
   },
   "ids_dominio_k_o": [

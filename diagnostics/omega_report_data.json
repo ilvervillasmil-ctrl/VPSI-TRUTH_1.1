@@ -3,8 +3,8 @@
     "version_engine": "18.3",
     "estado_engine": "OPERATIVO",
     "esquema_contrato": "VPSI-CONTRACT-1.0",
-    "total_modulos": 10,
-    "timestamp": "2026-08-07T11:46:42.860520+00:00"
+    "total_modulos": 11,
+    "timestamp": "2026-08-07T12:46:46.463630+00:00"
   },
   "reportes": [
     {
@@ -18,11 +18,11 @@
         "api_engine": "1.0",
         "estado_engine": "OPERATIVO",
         "invocador_id": "omega_report",
-        "total_modulos": 10,
+        "total_modulos": 11,
         "errores_arranque": [],
         "advertencias": [],
-        "trazas_n": 30,
-        "timestamp": "2026-08-07T11:46:42.860467+00:00"
+        "trazas_n": 31,
+        "timestamp": "2026-08-07T12:46:46.463588+00:00"
       }
     },
     {
@@ -1182,37 +1182,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T11:46:33.738678+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.715656+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             }
           },
           "historial_n": 0,
@@ -1295,37 +1295,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T11:46:33.738678+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.715656+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T11:46:33.739190+00:00"
+              "timestamp_mtime": "2026-08-07T12:46:40.716051+00:00"
             }
           },
           "factores_api": [
@@ -1387,9 +1387,192 @@
       }
     },
     {
+      "id": "CE",
+      "titulo": "MÓDULO CE/capacidades_engine",
+      "orden": 4,
+      "contenido": {
+        "id": "CE",
+        "nombre": "capacidades_engine",
+        "rol": "CE",
+        "version": "1.2",
+        "version_contrato": "1.0",
+        "esquema": "VPSI-CONTRACT-1.0",
+        "estabilidad": "ESTABLE",
+        "compatible_desde": "1.0",
+        "api_engine": ">=1.0",
+        "descripcion": "Capacidad estructural del Engine: órgano único que agrupa múltiples skills nativos. Así como un brazo posee varias habilidades sin dejar de ser un solo órgano, CE agrupa skills sin ser un módulo de dominio. Los archivos son implementación física; los skills son competencias operativas; el mandato es la forma en que Engine los invoca. Engine no pide permiso a CE: los skills forman parte de su propia estructura. CE mantiene el inventario operativo de esas capacidades nativas.",
+        "funcion": "Mantener el inventario operativo de skills nativos del Engine. El descubrimiento automático de *.py actualiza ese inventario. Validar forma mínima y exponer ids/skills a Engine. No calcular. No depositar. No ejecutar. No decidir.",
+        "no_hace": [
+          "No toma decisiones",
+          "No selecciona skills",
+          "No ejecuta skills (solo Engine ejecuta)",
+          "No coordina ciclos",
+          "No interpreta peticiones",
+          "No calcula C / L / K / Tru",
+          "No deposita evidencia",
+          "No orquesta el sistema",
+          "No compite con módulos de dominio (AX, CA, CH, TT, SF, …)"
+        ],
+        "autoridad": [
+          "Mantener el inventario operativo de skills nativos del Engine",
+          "Descubrir y validar forma mínima de cada skill",
+          "Exponer ids y skills a Engine",
+          "Reportar estado e inventario propios"
+        ],
+        "conocimiento_exportable": [
+          "skills",
+          "ids",
+          "por_id",
+          "listar_archivos",
+          "inventario",
+          "barrer",
+          "verificar"
+        ],
+        "consultas_soportadas": [
+          "listar_skills",
+          "listar_ids",
+          "obtener_por_id",
+          "listar_archivos",
+          "obtener_inventario",
+          "verificar_coherencia"
+        ],
+        "requiere": [],
+        "autoriza_engine": {
+          "leer": true,
+          "ejecutar": true,
+          "consultar": true,
+          "recombinar": true,
+          "reportar": true,
+          "auditar": true,
+          "inventariar": true,
+          "modificar": false,
+          "alterar": false,
+          "reescribir": false
+        },
+        "capacidades": [
+          "verificar",
+          "barrer",
+          "inventario",
+          "skills",
+          "ids",
+          "por_id",
+          "listar_archivos",
+          "verificar_salida"
+        ],
+        "capacidades_meta": {
+          "verificar": {
+            "descripcion": "Alias de barrer. ¿El inventario operativo de skills de CE es coherente?",
+            "entrada": "ninguna",
+            "salida": "dict con id, nombre, rol, version, coherente, ids, errores"
+          },
+          "barrer": {
+            "descripcion": "Centinela de CE: valida forma de skills nativos. No decide, no ejecuta, no restringe uso.",
+            "entrada": "ninguna",
+            "salida": "dict con id, nombre, rol, version, coherente, ids, n, archivos"
+          },
+          "inventario": {
+            "descripcion": "Inventario operativo de skills nativos del Engine expuestos por la capacidad CE. Incluye encabezado contractual completo (id, nombre, rol, version, …).",
+            "entrada": "peticion opcional",
+            "salida": "dict con id, nombre, rol, version, version_contrato, esquema, estabilidad, ids, n, archivos, skills, coherente"
+          },
+          "skills": {
+            "descripcion": "Lista de skills válidos (nombre histórico de la API). Futuro: podrá coexistir con procedimientos()/competencias() como alias. Preparación: resolver(id)/existe(id).",
+            "entrada": "ninguna",
+            "salida": "list[dict] con id, nombre, version, descripcion, archivo"
+          },
+          "ids": {
+            "descripcion": "Ids de todos los skills válidos de CE.",
+            "entrada": "ninguna",
+            "salida": "list[str]"
+          },
+          "por_id": {
+            "descripcion": "Resuelve un skill por id.",
+            "entrada": "skill_id: str",
+            "salida": "dict del skill o None"
+          },
+          "listar_archivos": {
+            "descripcion": "Nombres de *.py del directorio CE (implementación física de los skills).",
+            "entrada": "ninguna",
+            "salida": "list[str]"
+          },
+          "verificar_salida": {
+            "descripcion": "Comprueba forma mínima de una salida de CE.",
+            "entrada": "salida: dict",
+            "salida": "bool"
+          }
+        },
+        "estados_validos": [
+          "NO_INICIADO",
+          "OPERATIVO",
+          "DEGRADADO",
+          "RECHAZADO"
+        ],
+        "invariantes": [
+          "el id del módulo nunca cambia",
+          "el rol nunca cambia",
+          "CE es una capacidad estructural; los skills son competencias operativas",
+          "Engine es la única autoridad que ejecuta los skills expuestos por CE",
+          "CE únicamente descubre, valida y expone skills",
+          "CE no toma decisiones ni selecciona skills",
+          "CE no coordina ciclos ni interpreta peticiones",
+          "las capacidades declaradas son callables tras la resolución",
+          "este módulo no modifica el estado de otros módulos",
+          "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+          "este módulo siempre puede reportar su propio estado",
+          "CE debe figurar en ROLES de core/engine.py",
+          "inventario() siempre incluye id, nombre, rol, version del CONTENEDOR"
+        ],
+        "reporte": null,
+        "diagnostico": null,
+        "inventario": {
+          "id": "CE",
+          "nombre": "capacidades_engine",
+          "contenedor": "capacidades_engine",
+          "rol": "CE",
+          "version": "1.2",
+          "version_contrato": "1.0",
+          "esquema": "VPSI-CONTRACT-1.0",
+          "estabilidad": "ESTABLE",
+          "compatible_desde": "1.0",
+          "api_engine": ">=1.0",
+          "ids": [
+            "ce_mandato_catalogo"
+          ],
+          "n": 1,
+          "archivos": [
+            "mandatos_ce.py"
+          ],
+          "coherente": true,
+          "skills": [
+            {
+              "id": "ce_mandato_catalogo",
+              "nombre": "Mandato: consultar catalogo TT",
+              "version": "1.0",
+              "descripcion": "Mandato del Engine: descubrir las escalas de verdad declaradas en el catalogo TT (y registrables en CA). CE no calcula ni inventa escalas.",
+              "archivo": "mandatos_ce.py",
+              "oficio": null,
+              "material": null
+            }
+          ],
+          "notas": [],
+          "capacidades": [
+            "verificar",
+            "barrer",
+            "inventario",
+            "skills",
+            "ids",
+            "por_id",
+            "listar_archivos",
+            "verificar_salida"
+          ],
+          "funcion": "Capacidad estructural del Engine. Mantiene el inventario operativo de skills nativos. Cada archivo implementa uno o más skills. Engine es la única autoridad que los ejecuta. CE no calcula, no deposita, no decide, no selecciona."
+        }
+      }
+    },
+    {
       "id": "CC",
       "titulo": "MÓDULO CC/catalogo_citaciones",
-      "orden": 4,
+      "orden": 5,
       "contenido": {
         "id": "CC",
         "nombre": "catalogo_citaciones",
@@ -7193,7 +7376,7 @@
     {
       "id": "CT",
       "titulo": "MÓDULO CT/constante",
-      "orden": 5,
+      "orden": 6,
       "contenido": {
         "id": "CT",
         "nombre": "constante",
@@ -7463,7 +7646,7 @@
     {
       "id": "CX",
       "titulo": "MÓDULO CX/contexto",
-      "orden": 6,
+      "orden": 7,
       "contenido": {
         "id": "CX",
         "nombre": "contexto",
@@ -7761,7 +7944,7 @@
     {
       "id": "MC",
       "titulo": "MÓDULO MC/correlacion_mecanica",
-      "orden": 7,
+      "orden": 8,
       "contenido": {
         "id": "MC",
         "nombre": "correlacion_mecanica",
@@ -8025,7 +8208,7 @@
     {
       "id": "FO",
       "titulo": "MÓDULO FO/formulas",
-      "orden": 8,
+      "orden": 9,
       "contenido": {
         "id": "FO",
         "nombre": "formulas",
@@ -8296,7 +8479,7 @@
     {
       "id": "SF",
       "titulo": "MÓDULO SF/self",
-      "orden": 9,
+      "orden": 10,
       "contenido": {
         "id": "SF",
         "nombre": "self",
@@ -8554,7 +8737,7 @@
     {
       "id": "TT",
       "titulo": "MÓDULO TT/tru_totales",
-      "orden": 10,
+      "orden": 11,
       "contenido": {
         "id": "TT",
         "nombre": "tru_totales",
@@ -8874,7 +9057,7 @@
     {
       "id": "dependencias",
       "titulo": "DEPENDENCIAS",
-      "orden": 11,
+      "orden": 12,
       "contenido": {
         "grafo": {
           "formulas": [
@@ -8886,6 +9069,7 @@
           "axiomas",
           "cache",
           "calculator",
+          "capacidades_engine",
           "catalogo_citaciones",
           "constante",
           "contexto",
@@ -8900,7 +9084,7 @@
     {
       "id": "grafo",
       "titulo": "GRAFO ESTRUCTURAL",
-      "orden": 12,
+      "orden": 13,
       "contenido": {
         "nodos": [
           {
@@ -9220,6 +9404,60 @@
             "nombre": "historial",
             "tipo": "capacidad",
             "modulo": "calculator"
+          },
+          {
+            "id": "CE",
+            "nombre": "capacidades_engine",
+            "rol": "CE",
+            "tipo": "modulo"
+          },
+          {
+            "id": "capacidades_engine.verificar",
+            "nombre": "verificar",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
+            "id": "capacidades_engine.barrer",
+            "nombre": "barrer",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
+            "id": "capacidades_engine.inventario",
+            "nombre": "inventario",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
+            "id": "capacidades_engine.skills",
+            "nombre": "skills",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
+            "id": "capacidades_engine.ids",
+            "nombre": "ids",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
+            "id": "capacidades_engine.por_id",
+            "nombre": "por_id",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
+            "id": "capacidades_engine.listar_archivos",
+            "nombre": "listar_archivos",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
+            "id": "capacidades_engine.verificar_salida",
+            "nombre": "verificar_salida",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
           },
           {
             "id": "CC",
@@ -9936,6 +10174,46 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.verificar",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.barrer",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.skills",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.ids",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.por_id",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.listar_archivos",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.verificar_salida",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "catalogo_citaciones",
             "to": "catalogo_citaciones.verificar",
             "tipo": "declara_capacidad"
@@ -10296,247 +10574,255 @@
     {
       "id": "trazas",
       "titulo": "TRAZAS DE EJECUCIÓN",
-      "orden": 13,
+      "orden": 14,
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-07T11:46:42.829882+00:00",
+          "timestamp": "2026-08-07T12:46:46.439148+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.008447
+          "duracion_s": 0.006564
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-07T11:46:42.836807+00:00",
+          "timestamp": "2026-08-07T12:46:46.444522+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.00689
+          "duracion_s": 0.005349
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-07T11:46:42.843202+00:00",
+          "timestamp": "2026-08-07T12:46:46.449543+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.00637
+          "duracion_s": 0.005004
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-07T11:46:42.843246+00:00",
+          "timestamp": "2026-08-07T12:46:46.449575+00:00",
           "modulo": "cache",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 2.4e-05
+          "duracion_s": 1.9e-05
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-07T11:46:42.843261+00:00",
+          "timestamp": "2026-08-07T12:46:46.449586+00:00",
           "modulo": "cache",
           "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 8e-06
-        },
-        {
-          "id_traza": 6,
-          "timestamp": "2026-08-07T11:46:42.843273+00:00",
-          "modulo": "cache",
-          "capacidad": "inventario",
           "estado": "EXITO",
           "duracion_s": 6e-06
         },
         {
+          "id_traza": 6,
+          "timestamp": "2026-08-07T12:46:46.449595+00:00",
+          "modulo": "cache",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 5e-06
+        },
+        {
           "id_traza": 7,
-          "timestamp": "2026-08-07T11:46:42.843874+00:00",
+          "timestamp": "2026-08-07T12:46:46.450041+00:00",
           "modulo": "calculator",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000593
+          "duracion_s": 0.00044
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-07T11:46:42.844286+00:00",
+          "timestamp": "2026-08-07T12:46:46.450356+00:00",
           "modulo": "calculator",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000398
+          "duracion_s": 0.000305
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-07T11:46:42.844692+00:00",
+          "timestamp": "2026-08-07T12:46:46.450683+00:00",
           "modulo": "calculator",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000398
+          "duracion_s": 0.00032
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-07T11:46:42.846147+00:00",
-          "modulo": "catalogo_citaciones",
-          "capacidad": "reporte",
+          "timestamp": "2026-08-07T12:46:46.450959+00:00",
+          "modulo": "capacidades_engine",
+          "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001445
+          "duracion_s": 0.000269
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-07T11:46:42.848163+00:00",
+          "timestamp": "2026-08-07T12:46:46.452110+00:00",
           "modulo": "catalogo_citaciones",
-          "capacidad": "diagnostico",
+          "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002004
+          "duracion_s": 0.001141
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-07T11:46:42.849472+00:00",
+          "timestamp": "2026-08-07T12:46:46.453566+00:00",
           "modulo": "catalogo_citaciones",
-          "capacidad": "inventario",
+          "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001296
+          "duracion_s": 0.001447
         },
         {
           "id_traza": 13,
-          "timestamp": "2026-08-07T11:46:42.849739+00:00",
+          "timestamp": "2026-08-07T12:46:46.454628+00:00",
+          "modulo": "catalogo_citaciones",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.001052
+        },
+        {
+          "id_traza": 14,
+          "timestamp": "2026-08-07T12:46:46.454820+00:00",
           "modulo": "constante",
           "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000183
+        },
+        {
+          "id_traza": 15,
+          "timestamp": "2026-08-07T12:46:46.454937+00:00",
+          "modulo": "constante",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000111
+        },
+        {
+          "id_traza": 16,
+          "timestamp": "2026-08-07T12:46:46.454994+00:00",
+          "modulo": "constante",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 5.2e-05
+        },
+        {
+          "id_traza": 17,
+          "timestamp": "2026-08-07T12:46:46.455153+00:00",
+          "modulo": "contexto",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000152
+        },
+        {
+          "id_traza": 18,
+          "timestamp": "2026-08-07T12:46:46.455279+00:00",
+          "modulo": "contexto",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.00012
+        },
+        {
+          "id_traza": 19,
+          "timestamp": "2026-08-07T12:46:46.455397+00:00",
+          "modulo": "contexto",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000111
+        },
+        {
+          "id_traza": 20,
+          "timestamp": "2026-08-07T12:46:46.455921+00:00",
+          "modulo": "correlacion_mecanica",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000514
+        },
+        {
+          "id_traza": 21,
+          "timestamp": "2026-08-07T12:46:46.456459+00:00",
+          "modulo": "correlacion_mecanica",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000525
+        },
+        {
+          "id_traza": 22,
+          "timestamp": "2026-08-07T12:46:46.456619+00:00",
+          "modulo": "correlacion_mecanica",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000148
+        },
+        {
+          "id_traza": 23,
+          "timestamp": "2026-08-07T12:46:46.456936+00:00",
+          "modulo": "formulas",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000309
+        },
+        {
+          "id_traza": 24,
+          "timestamp": "2026-08-07T12:46:46.457198+00:00",
+          "modulo": "formulas",
+          "capacidad": "diagnostico",
           "estado": "EXITO",
           "duracion_s": 0.000255
         },
         {
-          "id_traza": 14,
-          "timestamp": "2026-08-07T11:46:42.849897+00:00",
-          "modulo": "constante",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000149
-        },
-        {
-          "id_traza": 15,
-          "timestamp": "2026-08-07T11:46:42.849970+00:00",
-          "modulo": "constante",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 6.6e-05
-        },
-        {
-          "id_traza": 16,
-          "timestamp": "2026-08-07T11:46:42.850172+00:00",
-          "modulo": "contexto",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000194
-        },
-        {
-          "id_traza": 17,
-          "timestamp": "2026-08-07T11:46:42.850334+00:00",
-          "modulo": "contexto",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000153
-        },
-        {
-          "id_traza": 18,
-          "timestamp": "2026-08-07T11:46:42.850485+00:00",
-          "modulo": "contexto",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000144
-        },
-        {
-          "id_traza": 19,
-          "timestamp": "2026-08-07T11:46:42.851022+00:00",
-          "modulo": "correlacion_mecanica",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000528
-        },
-        {
-          "id_traza": 20,
-          "timestamp": "2026-08-07T11:46:42.851587+00:00",
-          "modulo": "correlacion_mecanica",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000555
-        },
-        {
-          "id_traza": 21,
-          "timestamp": "2026-08-07T11:46:42.851720+00:00",
-          "modulo": "correlacion_mecanica",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000124
-        },
-        {
-          "id_traza": 22,
-          "timestamp": "2026-08-07T11:46:42.852106+00:00",
-          "modulo": "formulas",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000375
-        },
-        {
-          "id_traza": 23,
-          "timestamp": "2026-08-07T11:46:42.852436+00:00",
-          "modulo": "formulas",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000321
-        },
-        {
-          "id_traza": 24,
-          "timestamp": "2026-08-07T11:46:42.852619+00:00",
-          "modulo": "formulas",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000175
-        },
-        {
           "id_traza": 25,
-          "timestamp": "2026-08-07T11:46:42.855771+00:00",
-          "modulo": "self",
-          "capacidad": "reporte",
+          "timestamp": "2026-08-07T12:46:46.457327+00:00",
+          "modulo": "formulas",
+          "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.003141
+          "duracion_s": 0.000123
         },
         {
           "id_traza": 26,
-          "timestamp": "2026-08-07T11:46:42.858344+00:00",
+          "timestamp": "2026-08-07T12:46:46.459894+00:00",
           "modulo": "self",
-          "capacidad": "diagnostico",
+          "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002557
+          "duracion_s": 0.002559
         },
         {
           "id_traza": 27,
-          "timestamp": "2026-08-07T11:46:42.858368+00:00",
+          "timestamp": "2026-08-07T12:46:46.461936+00:00",
           "modulo": "self",
-          "capacidad": "inventario",
+          "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 8e-06
+          "duracion_s": 0.002033
         },
         {
           "id_traza": 28,
-          "timestamp": "2026-08-07T11:46:42.859134+00:00",
-          "modulo": "tru_totales",
-          "capacidad": "reporte",
+          "timestamp": "2026-08-07T12:46:46.461951+00:00",
+          "modulo": "self",
+          "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000757
+          "duracion_s": 7e-06
         },
         {
           "id_traza": 29,
-          "timestamp": "2026-08-07T11:46:42.859828+00:00",
+          "timestamp": "2026-08-07T12:46:46.462546+00:00",
           "modulo": "tru_totales",
-          "capacidad": "diagnostico",
+          "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000684
+          "duracion_s": 0.000589
         },
         {
           "id_traza": 30,
-          "timestamp": "2026-08-07T11:46:42.860455+00:00",
+          "timestamp": "2026-08-07T12:46:46.463068+00:00",
+          "modulo": "tru_totales",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000515
+        },
+        {
+          "id_traza": 31,
+          "timestamp": "2026-08-07T12:46:46.463579+00:00",
           "modulo": "tru_totales",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000619
+          "duracion_s": 0.000504
         }
       ]
     }

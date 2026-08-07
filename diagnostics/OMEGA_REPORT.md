@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 5
-  timestamp: 2026-08-07T01:33:52.210859+00:00
+  timestamp: 2026-08-07T02:01:33.656710+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 15
-  timestamp: 2026-08-07T01:33:52.210834+00:00
+  timestamp: 2026-08-07T02:01:33.656658+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -549,17 +549,22 @@
     estado: DEGRADADO
     coherente: False
     factores_api:
-      []
+      • C
     archivos:
-      []
+      • coherencia.py
     hashes:
       __init__.py:
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T01:33:44.880757+00:00
+        timestamp_mtime: 2026-08-07T02:01:27.473411+00:00
+      coherencia.py:
+        archivo: coherencia.py
+        sha256: 365a6915a3f03e3b1b22cb41ce35a86d82fbaf9301db11ad530e93ba3e7ba6e1
+        tamano: 5422
+        timestamp_mtime: 2026-08-07T02:01:27.473855+00:00
     historial_n: 0
-    errores_n: 6
+    errores_n: 4
     choques_n: 0
     capacidades:
       • calcular
@@ -608,34 +613,24 @@
         tipo: errores_carga
         detalle:
           [0]
-            archivo: coherencia.py
-            error: ModuleNotFoundError: No module named 'modules.calculator.coherencia'
-          [1]
             archivo: logica.py
             error: ModuleNotFoundError: No module named 'modules.calculator.logica'
-          [2]
+          [1]
             archivo: correlacion_k.py
             error: ModuleNotFoundError: No module named 'modules.calculator.correlacion_k'
-          [3]
-            archivo: ?
-            error: factor 'C' sin API
-          [4]
+          [2]
             archivo: ?
             error: factor 'L' sin API
-          [5]
+          [3]
             archivo: ?
             error: factor 'K' sin API
-      [1]
-        tipo: sin_apis
-        detalle: sin C/L/K
     advertencias:
       • conteos.py no disponible
     recomendaciones:
       • Revisar APIs C/L/K y hashes
-      • Verificar coherencia.py, logica.py, correlacion_k.py
     coherente: False
     factores_api:
-      []
+      • C
     historial_n: 0
   inventario:
     id: CA
@@ -646,15 +641,20 @@
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
     archivos:
-      []
+      • coherencia.py
     hashes:
       __init__.py:
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T01:33:44.880757+00:00
+        timestamp_mtime: 2026-08-07T02:01:27.473411+00:00
+      coherencia.py:
+        archivo: coherencia.py
+        sha256: 365a6915a3f03e3b1b22cb41ce35a86d82fbaf9301db11ad530e93ba3e7ba6e1
+        tamano: 5422
+        timestamp_mtime: 2026-08-07T02:01:27.473855+00:00
     factores_api:
-      []
+      • C
     conteos_disponible: False
     escalas_ids_disponible: False
     ids_escala:
@@ -1974,109 +1974,109 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T01:33:52.205336+00:00
+    timestamp: 2026-08-07T02:01:33.650970+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002289
+    duracion_s: 0.002266
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T01:33:52.207243+00:00
+    timestamp: 2026-08-07T02:01:33.652903+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00189
+    duracion_s: 0.001914
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T01:33:52.209003+00:00
+    timestamp: 2026-08-07T02:01:33.654700+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001747
+    duracion_s: 0.001783
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T01:33:52.209310+00:00
+    timestamp: 2026-08-07T02:01:33.655073+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000295
+    duracion_s: 0.00036
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T01:33:52.209534+00:00
+    timestamp: 2026-08-07T02:01:33.655351+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000212
+    duracion_s: 0.000268
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T01:33:52.209749+00:00
+    timestamp: 2026-08-07T02:01:33.655626+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000206
+    duracion_s: 0.000264
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T01:33:52.209867+00:00
+    timestamp: 2026-08-07T02:01:33.655769+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000108
+    duracion_s: 0.000132
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T01:33:52.209963+00:00
+    timestamp: 2026-08-07T02:01:33.655864+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 8.1e-05
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T01:33:52.210009+00:00
+    timestamp: 2026-08-07T02:01:33.655909+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 3.8e-05
+    duracion_s: 3.7e-05
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T01:33:52.210081+00:00
+    timestamp: 2026-08-07T02:01:33.655960+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 6.5e-05
+    duracion_s: 4.4e-05
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T01:33:52.210118+00:00
+    timestamp: 2026-08-07T02:01:33.655997+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 3e-05
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T01:33:52.210152+00:00
+    timestamp: 2026-08-07T02:01:33.656030+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
     duracion_s: 2.7e-05
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T01:33:52.210433+00:00
+    timestamp: 2026-08-07T02:01:33.656285+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000274
+    duracion_s: 0.000247
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T01:33:52.210692+00:00
+    timestamp: 2026-08-07T02:01:33.656523+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000249
+    duracion_s: 0.000229
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T01:33:52.210826+00:00
+    timestamp: 2026-08-07T02:01:33.656651+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000126
+    duracion_s: 0.000119
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

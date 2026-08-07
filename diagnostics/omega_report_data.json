@@ -4,7 +4,7 @@
     "estado_engine": "OPERATIVO",
     "esquema_contrato": "VPSI-CONTRACT-1.0",
     "total_modulos": 8,
-    "timestamp": "2026-08-07T04:32:32.605847+00:00"
+    "timestamp": "2026-08-07T04:34:48.324794+00:00"
   },
   "reportes": [
     {
@@ -22,7 +22,7 @@
         "errores_arranque": [],
         "advertencias": [],
         "trazas_n": 24,
-        "timestamp": "2026-08-07T04:32:32.605812+00:00"
+        "timestamp": "2026-08-07T04:34:48.324757+00:00"
       }
     },
     {
@@ -198,18 +198,19 @@
           "estabilidad": "ESTABLE",
           "estado": "OPERATIVO",
           "coherente": true,
-          "declaraciones": 111,
+          "declaraciones": 190,
           "choques": 0,
           "errores": 0,
           "cuerpos": [
             "Anclas_de_Medicion_AM_AX",
-            "VPSI_AX"
+            "VPSI_AX",
+            "contexto_AX"
           ],
           "por_tipo": {
-            "axioma": 47,
-            "lema": 8,
-            "teorema": 34,
-            "corolario": 16,
+            "axioma": 74,
+            "lema": 19,
+            "teorema": 51,
+            "corolario": 40,
             "definicion": 6
           },
           "capacidades": [
@@ -268,7 +269,7 @@
           "advertencias": [],
           "recomendaciones": [],
           "coherente": true,
-          "declaraciones": 111,
+          "declaraciones": 190,
           "choques_n": 0,
           "errores_n": 0
         },
@@ -287,17 +288,18 @@
             "corolario",
             "definicion"
           ],
-          "declaraciones": 111,
+          "declaraciones": 190,
           "por_tipo": {
-            "axioma": 47,
-            "lema": 8,
-            "teorema": 34,
-            "corolario": 16,
+            "axioma": 74,
+            "lema": 19,
+            "teorema": 51,
+            "corolario": 40,
             "definicion": 6
           },
           "cuerpos": [
             "Anclas_de_Medicion_AM_AX",
-            "VPSI_AX"
+            "VPSI_AX",
+            "contexto_AX"
           ],
           "errores": [],
           "capacidades": [
@@ -380,6 +382,85 @@
             "AM-L3",
             "AM-T1",
             "B-Canonical",
+            "CX-A1",
+            "CX-A10",
+            "CX-A11",
+            "CX-A12",
+            "CX-A13",
+            "CX-A14",
+            "CX-A15",
+            "CX-A16",
+            "CX-A17",
+            "CX-A18",
+            "CX-A19",
+            "CX-A2",
+            "CX-A20",
+            "CX-A21",
+            "CX-A22",
+            "CX-A23",
+            "CX-A24",
+            "CX-A25",
+            "CX-A26",
+            "CX-A27",
+            "CX-A3",
+            "CX-A4",
+            "CX-A5",
+            "CX-A6",
+            "CX-A7",
+            "CX-A8",
+            "CX-A9",
+            "CX-C1",
+            "CX-C10",
+            "CX-C11",
+            "CX-C12",
+            "CX-C13",
+            "CX-C14",
+            "CX-C15",
+            "CX-C16",
+            "CX-C17",
+            "CX-C18",
+            "CX-C2",
+            "CX-C3",
+            "CX-C4",
+            "CX-C5",
+            "CX-C6",
+            "CX-C7",
+            "CX-C8",
+            "CX-C9",
+            "CX-D16",
+            "CX-D17",
+            "CX-D18",
+            "CX-D19",
+            "CX-D20",
+            "CX-D21",
+            "CX-L1",
+            "CX-L10",
+            "CX-L11",
+            "CX-L2",
+            "CX-L3",
+            "CX-L4",
+            "CX-L5",
+            "CX-L6",
+            "CX-L7",
+            "CX-L8",
+            "CX-L9",
+            "CX-T1",
+            "CX-T10",
+            "CX-T11",
+            "CX-T12",
+            "CX-T13",
+            "CX-T14",
+            "CX-T15",
+            "CX-T16",
+            "CX-T17",
+            "CX-T2",
+            "CX-T3",
+            "CX-T4",
+            "CX-T5",
+            "CX-T6",
+            "CX-T7",
+            "CX-T8",
+            "CX-T9",
             "Def-5.3.1",
             "E1",
             "E2",
@@ -918,37 +999,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T04:32:28.365935+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.933705+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             }
           },
           "historial_n": 0,
@@ -1031,37 +1112,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T04:32:28.365935+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.933705+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T04:32:28.366800+00:00"
+              "timestamp_mtime": "2026-08-07T04:34:40.934800+00:00"
             }
           },
           "factores_api": [
@@ -9125,195 +9206,195 @@
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-07T04:32:32.586908+00:00",
+          "timestamp": "2026-08-07T04:34:48.302773+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002956
+          "duracion_s": 0.004396
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-07T04:32:32.589474+00:00",
+          "timestamp": "2026-08-07T04:34:48.306696+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.002549
+          "duracion_s": 0.003902
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-07T04:32:32.591856+00:00",
+          "timestamp": "2026-08-07T04:34:48.310372+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.002369
+          "duracion_s": 0.003661
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-07T04:32:32.591878+00:00",
+          "timestamp": "2026-08-07T04:34:48.310398+00:00",
           "modulo": "cache",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 1e-05
+          "duracion_s": 1.3e-05
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-07T04:32:32.591890+00:00",
+          "timestamp": "2026-08-07T04:34:48.310410+00:00",
           "modulo": "cache",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 5e-06
+          "duracion_s": 6e-06
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-07T04:32:32.591898+00:00",
+          "timestamp": "2026-08-07T04:34:48.310419+00:00",
           "modulo": "cache",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 3e-06
+          "duracion_s": 4e-06
         },
         {
           "id_traza": 7,
-          "timestamp": "2026-08-07T04:32:32.592429+00:00",
+          "timestamp": "2026-08-07T04:34:48.311020+00:00",
           "modulo": "calculator",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000524
+          "duracion_s": 0.000594
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-07T04:32:32.592909+00:00",
+          "timestamp": "2026-08-07T04:34:48.311505+00:00",
           "modulo": "calculator",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000466
+          "duracion_s": 0.000469
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-07T04:32:32.593338+00:00",
+          "timestamp": "2026-08-07T04:34:48.311971+00:00",
           "modulo": "calculator",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.00042
+          "duracion_s": 0.000457
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-07T04:32:32.595675+00:00",
+          "timestamp": "2026-08-07T04:34:48.314773+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002328
+          "duracion_s": 0.00279
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-07T04:32:32.597439+00:00",
+          "timestamp": "2026-08-07T04:34:48.316210+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001752
+          "duracion_s": 0.001426
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-07T04:32:32.598783+00:00",
+          "timestamp": "2026-08-07T04:34:48.317583+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001333
+          "duracion_s": 0.001361
         },
         {
           "id_traza": 13,
-          "timestamp": "2026-08-07T04:32:32.599005+00:00",
+          "timestamp": "2026-08-07T04:34:48.317814+00:00",
           "modulo": "constante",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000211
+          "duracion_s": 0.00022
         },
         {
           "id_traza": 14,
-          "timestamp": "2026-08-07T04:32:32.599178+00:00",
+          "timestamp": "2026-08-07T04:34:48.318024+00:00",
           "modulo": "constante",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000164
+          "duracion_s": 0.000201
         },
         {
           "id_traza": 15,
-          "timestamp": "2026-08-07T04:32:32.599262+00:00",
+          "timestamp": "2026-08-07T04:34:48.318114+00:00",
           "modulo": "constante",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 7.5e-05
+          "duracion_s": 8e-05
         },
         {
           "id_traza": 16,
-          "timestamp": "2026-08-07T04:32:32.600028+00:00",
+          "timestamp": "2026-08-07T04:34:48.318867+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000757
+          "duracion_s": 0.000743
         },
         {
           "id_traza": 17,
-          "timestamp": "2026-08-07T04:32:32.600520+00:00",
+          "timestamp": "2026-08-07T04:34:48.319400+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000481
+          "duracion_s": 0.000522
         },
         {
           "id_traza": 18,
-          "timestamp": "2026-08-07T04:32:32.600697+00:00",
+          "timestamp": "2026-08-07T04:34:48.319539+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000167
+          "duracion_s": 0.000129
         },
         {
           "id_traza": 19,
-          "timestamp": "2026-08-07T04:32:32.601872+00:00",
+          "timestamp": "2026-08-07T04:34:48.320700+00:00",
           "modulo": "formulas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001164
+          "duracion_s": 0.00115
         },
         {
           "id_traza": 20,
-          "timestamp": "2026-08-07T04:32:32.602278+00:00",
+          "timestamp": "2026-08-07T04:34:48.321152+00:00",
           "modulo": "formulas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000395
+          "duracion_s": 0.000441
         },
         {
           "id_traza": 21,
-          "timestamp": "2026-08-07T04:32:32.602482+00:00",
+          "timestamp": "2026-08-07T04:34:48.321359+00:00",
           "modulo": "formulas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000196
+          "duracion_s": 0.000198
         },
         {
           "id_traza": 22,
-          "timestamp": "2026-08-07T04:32:32.604269+00:00",
+          "timestamp": "2026-08-07T04:34:48.323205+00:00",
           "modulo": "tru_totales",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001776
+          "duracion_s": 0.001835
         },
         {
           "id_traza": 23,
-          "timestamp": "2026-08-07T04:32:32.605068+00:00",
+          "timestamp": "2026-08-07T04:34:48.324025+00:00",
           "modulo": "tru_totales",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000788
+          "duracion_s": 0.000808
         },
         {
           "id_traza": 24,
-          "timestamp": "2026-08-07T04:32:32.605802+00:00",
+          "timestamp": "2026-08-07T04:34:48.324748+00:00",
           "modulo": "tru_totales",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000725
+          "duracion_s": 0.000713
         }
       ]
     }

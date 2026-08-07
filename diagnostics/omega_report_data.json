@@ -4,7 +4,7 @@
     "estado_engine": "OPERATIVO",
     "esquema_contrato": "VPSI-CONTRACT-1.0",
     "total_modulos": 7,
-    "timestamp": "2026-08-07T03:40:34.836038+00:00"
+    "timestamp": "2026-08-07T03:43:07.058748+00:00"
   },
   "reportes": [
     {
@@ -22,7 +22,7 @@
         "errores_arranque": [],
         "advertencias": [],
         "trazas_n": 21,
-        "timestamp": "2026-08-07T03:40:34.836004+00:00"
+        "timestamp": "2026-08-07T03:43:07.058720+00:00"
       }
     },
     {
@@ -623,37 +623,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             }
           },
           "historial_n": 0,
@@ -736,37 +736,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T03:40:30.687878+00:00"
+              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
             }
           },
           "factores_api": [
@@ -1208,432 +1208,432 @@
           ],
           "errores": [
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ca' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'fo' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tt' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'cc' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ct' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ax' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'mc' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'cx' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'dg' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'en' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calculator' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'coherencia' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'logica' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'correlacion_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'conteos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'escalas_ids' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'formulas' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'truth' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_totales' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'catalogo_citaciones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'coherencia_fn' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'logica_fn' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'correlacion_fn' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calcular_c' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calcular_l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calcular_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_c' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'extraer_conteos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'inyectar_en_peticion' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'leer_ids_escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'representar' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'resolver_pedido' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'categorias' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'por_id' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ids' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'es_valida' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'esquema' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'barrer' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_salida' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'inventario' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'reporte' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'diagnostico' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'recolectar' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'descubrir' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'resolver_dependencias' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ejecutar_capacidad' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'beta' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'm' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'p' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'r' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'f' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'compromisos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'contradicciones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'posturas' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'reversiones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'afirmaciones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'afirmaciones_falsas' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula_c' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula_l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'o_presente' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'o_context' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'contexto' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'undefined' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_atomo' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_frase' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_sujeto' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_conversacion' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_repositorio' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'fraccion' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'decimal' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'display' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'numerador' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'denominador' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'precision' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'valor' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'contenedor' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'capacidades' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'capacidades_meta' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'autoriza_engine' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'conocimiento_exportable' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'requiere' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'reporting' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'invariantes' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'estados_validos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'esquema_categoria' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'no_iniciado' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'operativo' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'degradado' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'rechazado' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'engine' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'omega' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'omegareport' en ['ids_sistema', 'ids_sistema']"
             }
           ],
           "notas": [],
@@ -1684,432 +1684,432 @@
               "tipo": "errores_catalogo",
               "detalle": [
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'ca' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'fo' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tt' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'cc' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'ct' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'ax' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'mc' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'cx' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'dg' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'en' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'calculator' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'coherencia' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'logica' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'correlacion_k' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'conteos' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'escalas_ids' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'formulas' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'truth' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'escala' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_totales' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'catalogo_citaciones' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'coherencia_fn' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'logica_fn' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'correlacion_fn' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'calcular_c' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'calcular_l' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'calcular_k' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'verificar_c' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'verificar_l' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'verificar_k' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'extraer_conteos' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'inyectar_en_peticion' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'leer_ids_escala' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'representar' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'verificar_escala' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'resolver_pedido' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'categorias' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'por_id' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'ids' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'es_valida' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'esquema' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'barrer' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'verificar' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'verificar_salida' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'inventario' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'reporte' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'diagnostico' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'recolectar' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'descubrir' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'resolver_dependencias' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'ejecutar_capacidad' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+                  "error": "id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'l' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+                  "error": "id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'beta' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'm' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'p' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'r' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'f' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'compromisos' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'contradicciones' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'posturas' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'reversiones' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'afirmaciones' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'afirmaciones_falsas' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'base_nula' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'base_nula_c' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'base_nula_l' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'base_nula_k' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'o_presente' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'o_context' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'contexto' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'undefined' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_atomo' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_frase' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_sujeto' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_conversacion' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'tru_repositorio' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'fraccion' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'decimal' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'display' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'numerador' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'denominador' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'precision' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'valor' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'contenedor' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'capacidades' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'capacidades_meta' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'autoriza_engine' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'conocimiento_exportable' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'requiere' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'reporting' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'invariantes' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'estados_validos' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'esquema_categoria' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'no_iniciado' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'operativo' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'degradado' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'rechazado' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'engine' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'omega' en ['ids_sistema', 'ids_sistema']"
                 },
                 {
-                  "archivo": "Ids_calculator,Ids_calculator",
-                  "error": "id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']"
+                  "archivo": "ids_sistema,ids_sistema",
+                  "error": "id duplicado 'omegareport' en ['ids_sistema', 'ids_sistema']"
                 }
               ]
             }
@@ -2185,7 +2185,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=conteo"
             },
@@ -2202,7 +2202,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2219,7 +2219,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=conteo"
             },
@@ -2236,7 +2236,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2253,7 +2253,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=factor"
             },
@@ -2270,7 +2270,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2287,7 +2287,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -2304,7 +2304,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2321,7 +2321,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -2338,7 +2338,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2355,7 +2355,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -2372,7 +2372,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2389,7 +2389,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -2406,7 +2406,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2423,7 +2423,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -2440,7 +2440,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2457,7 +2457,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -2474,7 +2474,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2491,7 +2491,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -2508,7 +2508,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2525,7 +2525,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -2542,7 +2542,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2559,7 +2559,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=factor"
             },
@@ -2576,7 +2576,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2593,7 +2593,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=factor"
             },
@@ -2610,7 +2610,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=variable"
             },
@@ -2627,7 +2627,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2644,7 +2644,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2661,7 +2661,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -2678,7 +2678,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2695,7 +2695,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -2712,7 +2712,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2729,7 +2729,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -2746,7 +2746,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2763,7 +2763,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -2780,7 +2780,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2797,7 +2797,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -2814,7 +2814,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2831,7 +2831,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -2848,7 +2848,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2865,7 +2865,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -2882,7 +2882,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2899,7 +2899,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -2916,7 +2916,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2933,7 +2933,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -2950,7 +2950,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -2967,7 +2967,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -2984,7 +2984,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3001,7 +3001,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -3018,7 +3018,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3035,7 +3035,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3052,7 +3052,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3069,7 +3069,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3086,7 +3086,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3103,7 +3103,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=conteo"
             },
@@ -3120,7 +3120,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3137,7 +3137,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -3154,7 +3154,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3171,7 +3171,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -3188,7 +3188,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3205,7 +3205,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -3222,7 +3222,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3239,7 +3239,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -3256,7 +3256,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3273,7 +3273,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=conteo"
             },
@@ -3290,7 +3290,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3307,7 +3307,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3324,7 +3324,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3341,7 +3341,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -3358,7 +3358,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3375,7 +3375,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -3392,7 +3392,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3409,7 +3409,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -3426,7 +3426,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3443,7 +3443,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=representacion"
             },
@@ -3460,7 +3460,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3477,7 +3477,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=estado"
             },
@@ -3494,7 +3494,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3511,7 +3511,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=representacion"
             },
@@ -3528,7 +3528,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3545,7 +3545,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3562,7 +3562,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3579,7 +3579,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -3596,7 +3596,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3613,7 +3613,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3630,7 +3630,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3647,7 +3647,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=representacion"
             },
@@ -3664,7 +3664,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3681,7 +3681,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3698,7 +3698,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3715,7 +3715,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -3732,7 +3732,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3749,7 +3749,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=agente"
             },
@@ -3766,7 +3766,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3783,7 +3783,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3800,7 +3800,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3817,7 +3817,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -3834,7 +3834,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3851,7 +3851,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -3868,7 +3868,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3885,7 +3885,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -3902,7 +3902,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3919,7 +3919,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -3936,7 +3936,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3953,7 +3953,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -3970,7 +3970,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -3987,7 +3987,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -4004,7 +4004,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4021,7 +4021,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=variable"
             },
@@ -4038,7 +4038,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4055,7 +4055,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -4072,7 +4072,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4089,7 +4089,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -4106,7 +4106,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4123,7 +4123,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=representacion"
             },
@@ -4140,7 +4140,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4157,7 +4157,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -4174,7 +4174,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4191,7 +4191,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -4208,7 +4208,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4225,7 +4225,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -4242,7 +4242,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4259,7 +4259,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -4276,7 +4276,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4293,7 +4293,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=factor"
             },
@@ -4310,7 +4310,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=variable"
             },
@@ -4327,7 +4327,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4344,7 +4344,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4361,7 +4361,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=factor"
             },
@@ -4378,7 +4378,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4395,7 +4395,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -4412,7 +4412,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4429,7 +4429,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -4446,7 +4446,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4463,7 +4463,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -4480,7 +4480,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4497,7 +4497,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=variable"
             },
@@ -4514,7 +4514,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4531,7 +4531,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -4548,7 +4548,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4565,7 +4565,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=estado"
             },
@@ -4582,7 +4582,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4599,7 +4599,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=representacion"
             },
@@ -4616,7 +4616,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4633,7 +4633,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -4650,7 +4650,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4667,7 +4667,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -4684,7 +4684,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4701,7 +4701,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=agente"
             },
@@ -4718,7 +4718,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4735,7 +4735,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=agente"
             },
@@ -4752,7 +4752,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4769,7 +4769,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=estado"
             },
@@ -4786,7 +4786,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4803,7 +4803,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=variable"
             },
@@ -4820,7 +4820,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4837,7 +4837,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -4854,7 +4854,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4871,7 +4871,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=conteo"
             },
@@ -4888,7 +4888,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4905,7 +4905,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=representacion"
             },
@@ -4922,7 +4922,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4939,7 +4939,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=variable"
             },
@@ -4956,7 +4956,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -4973,7 +4973,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=estado"
             },
@@ -4990,7 +4990,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5007,7 +5007,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5024,7 +5024,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5041,7 +5041,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5058,7 +5058,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5075,7 +5075,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -5092,7 +5092,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5109,7 +5109,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5126,7 +5126,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5143,7 +5143,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=contrato"
             },
@@ -5160,7 +5160,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5177,7 +5177,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5194,7 +5194,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5211,7 +5211,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5228,7 +5228,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5245,7 +5245,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=conteo"
             },
@@ -5262,7 +5262,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5279,7 +5279,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=escala"
             },
@@ -5296,7 +5296,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5313,7 +5313,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=escala"
             },
@@ -5330,7 +5330,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5347,7 +5347,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=escala"
             },
@@ -5364,7 +5364,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5381,7 +5381,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=escala"
             },
@@ -5398,7 +5398,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5415,7 +5415,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5432,7 +5432,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=factor"
             },
@@ -5449,7 +5449,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5466,7 +5466,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5483,7 +5483,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=escala"
             },
@@ -5500,7 +5500,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5517,7 +5517,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5534,7 +5534,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=factor"
             },
@@ -5551,7 +5551,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5568,7 +5568,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5585,7 +5585,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -5602,7 +5602,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5619,7 +5619,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=archivo"
             },
@@ -5636,7 +5636,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5653,7 +5653,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=modulo"
             },
@@ -5670,7 +5670,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5687,7 +5687,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=meta"
             },
@@ -5704,7 +5704,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5721,7 +5721,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=representacion"
             },
@@ -5738,7 +5738,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5755,7 +5755,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5772,7 +5772,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5789,7 +5789,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5806,7 +5806,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5823,7 +5823,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5840,7 +5840,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5857,7 +5857,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5874,7 +5874,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5891,7 +5891,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5908,7 +5908,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             },
@@ -5925,7 +5925,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": "clase=funcion"
             },
@@ -5942,7 +5942,7 @@
               "fuente_modulo": null,
               "senales": [],
               "anclas": [],
-              "origen": "Ids_calculator",
+              "origen": "ids_sistema",
               "version": "1.0",
               "notas": ""
             }
@@ -6174,432 +6174,432 @@
           "total": 222,
           "errores": [
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ca' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'fo' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tt' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'cc' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ct' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ax' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'mc' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'cx' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'dg' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'en' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calculator' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'coherencia' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'logica' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'correlacion_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'conteos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'escalas_ids' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'formulas' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'truth' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_totales' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'catalogo_citaciones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'coherencia_fn' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'logica_fn' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'correlacion_fn' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calcular_c' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calcular_l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'calcular_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_c' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'extraer_conteos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'inyectar_en_peticion' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'leer_ids_escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'representar' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_escala' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'resolver_pedido' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'categorias' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'por_id' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ids' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'es_valida' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'esquema' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'barrer' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'verificar_salida' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'inventario' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'reporte' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'diagnostico' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'recolectar' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'descubrir' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'resolver_dependencias' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'ejecutar_capacidad' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema,ids_sistema,ids_sistema",
+              "error": "id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'beta' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'm' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'p' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'r' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'f' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'compromisos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'contradicciones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'posturas' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'reversiones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'afirmaciones' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'afirmaciones_falsas' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula_c' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula_l' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'base_nula_k' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'o_presente' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'o_context' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'contexto' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'undefined' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_atomo' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_frase' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_sujeto' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_conversacion' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'tru_repositorio' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'fraccion' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'decimal' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'display' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'numerador' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'denominador' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'precision' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'valor' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'contenedor' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'capacidades' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'capacidades_meta' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'autoriza_engine' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'conocimiento_exportable' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'requiere' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'reporting' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'invariantes' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'estados_validos' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'esquema_categoria' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'no_iniciado' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'operativo' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'degradado' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'rechazado' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'engine' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'omega' en ['ids_sistema', 'ids_sistema']"
             },
             {
-              "archivo": "Ids_calculator,Ids_calculator",
-              "error": "id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']"
+              "archivo": "ids_sistema,ids_sistema",
+              "error": "id duplicado 'omegareport' en ['ids_sistema', 'ids_sistema']"
             }
           ],
           "coherente": false,
@@ -8702,171 +8702,171 @@
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-07T03:40:34.817146+00:00",
+          "timestamp": "2026-08-07T03:43:07.045107+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002384
+          "duracion_s": 0.001798
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-07T03:40:34.819190+00:00",
+          "timestamp": "2026-08-07T03:43:07.046568+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.002022
+          "duracion_s": 0.001444
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-07T03:40:34.820990+00:00",
+          "timestamp": "2026-08-07T03:43:07.047956+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001785
+          "duracion_s": 0.001377
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-07T03:40:34.821517+00:00",
+          "timestamp": "2026-08-07T03:43:07.048361+00:00",
           "modulo": "calculator",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000514
+          "duracion_s": 0.000395
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-07T03:40:34.821949+00:00",
+          "timestamp": "2026-08-07T03:43:07.048667+00:00",
           "modulo": "calculator",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000422
+          "duracion_s": 0.0003
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-07T03:40:34.822343+00:00",
+          "timestamp": "2026-08-07T03:43:07.048979+00:00",
           "modulo": "calculator",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000386
+          "duracion_s": 0.000306
         },
         {
           "id_traza": 7,
-          "timestamp": "2026-08-07T03:40:34.824860+00:00",
+          "timestamp": "2026-08-07T03:43:07.050891+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002508
+          "duracion_s": 0.001903
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-07T03:40:34.826354+00:00",
+          "timestamp": "2026-08-07T03:43:07.052038+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001474
+          "duracion_s": 0.001118
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-07T03:40:34.828597+00:00",
+          "timestamp": "2026-08-07T03:43:07.053378+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.002229
+          "duracion_s": 0.001329
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-07T03:40:34.828845+00:00",
+          "timestamp": "2026-08-07T03:43:07.053560+00:00",
           "modulo": "constante",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000235
+          "duracion_s": 0.000174
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-07T03:40:34.829030+00:00",
+          "timestamp": "2026-08-07T03:43:07.053675+00:00",
           "modulo": "constante",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000176
+          "duracion_s": 0.000108
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-07T03:40:34.829103+00:00",
+          "timestamp": "2026-08-07T03:43:07.053733+00:00",
           "modulo": "constante",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 6.5e-05
+          "duracion_s": 5.2e-05
         },
         {
           "id_traza": 13,
-          "timestamp": "2026-08-07T03:40:34.829863+00:00",
+          "timestamp": "2026-08-07T03:43:07.054356+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000752
+          "duracion_s": 0.000616
         },
         {
           "id_traza": 14,
-          "timestamp": "2026-08-07T03:40:34.830410+00:00",
+          "timestamp": "2026-08-07T03:43:07.054771+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000536
+          "duracion_s": 0.000407
         },
         {
           "id_traza": 15,
-          "timestamp": "2026-08-07T03:40:34.830549+00:00",
+          "timestamp": "2026-08-07T03:43:07.054871+00:00",
           "modulo": "correlacion_mecanica",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 9.3e-05
+        },
+        {
+          "id_traza": 16,
+          "timestamp": "2026-08-07T03:43:07.055771+00:00",
+          "modulo": "formulas",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000892
+        },
+        {
+          "id_traza": 17,
+          "timestamp": "2026-08-07T03:43:07.056076+00:00",
+          "modulo": "formulas",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000296
+        },
+        {
+          "id_traza": 18,
+          "timestamp": "2026-08-07T03:43:07.056211+00:00",
+          "modulo": "formulas",
           "capacidad": "inventario",
           "estado": "EXITO",
           "duracion_s": 0.000129
         },
         {
-          "id_traza": 16,
-          "timestamp": "2026-08-07T03:40:34.831990+00:00",
-          "modulo": "formulas",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.00143
-        },
-        {
-          "id_traza": 17,
-          "timestamp": "2026-08-07T03:40:34.832570+00:00",
-          "modulo": "formulas",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000566
-        },
-        {
-          "id_traza": 18,
-          "timestamp": "2026-08-07T03:40:34.832756+00:00",
-          "modulo": "formulas",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000176
-        },
-        {
           "id_traza": 19,
-          "timestamp": "2026-08-07T03:40:34.834578+00:00",
+          "timestamp": "2026-08-07T03:43:07.057599+00:00",
           "modulo": "tru_totales",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001811
+          "duracion_s": 0.001379
         },
         {
           "id_traza": 20,
-          "timestamp": "2026-08-07T03:40:34.835333+00:00",
+          "timestamp": "2026-08-07T03:43:07.058211+00:00",
           "modulo": "tru_totales",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000744
+          "duracion_s": 0.000602
         },
         {
           "id_traza": 21,
-          "timestamp": "2026-08-07T03:40:34.835993+00:00",
+          "timestamp": "2026-08-07T03:43:07.058711+00:00",
           "modulo": "tru_totales",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.00065
+          "duracion_s": 0.000492
         }
       ]
     }

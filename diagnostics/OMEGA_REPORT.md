@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 7
-  timestamp: 2026-08-07T03:40:34.836038+00:00
+  timestamp: 2026-08-07T03:43:07.058748+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 21
-  timestamp: 2026-08-07T03:40:34.836004+00:00
+  timestamp: 2026-08-07T03:43:07.058720+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -563,32 +563,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -665,32 +665,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
+        timestamp_mtime: 2026-08-07T03:42:58.557693+00:00
     factores_api:
       • C
       • K
@@ -1102,326 +1102,326 @@
       • verificar_salida
     errores:
       [0]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ca' en ['ids_sistema', 'ids_sistema']
       [1]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'fo' en ['ids_sistema', 'ids_sistema']
       [2]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tt' en ['ids_sistema', 'ids_sistema']
       [3]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'cc' en ['ids_sistema', 'ids_sistema']
       [4]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ct' en ['ids_sistema', 'ids_sistema']
       [5]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ax' en ['ids_sistema', 'ids_sistema']
       [6]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'mc' en ['ids_sistema', 'ids_sistema']
       [7]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'cx' en ['ids_sistema', 'ids_sistema']
       [8]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'dg' en ['ids_sistema', 'ids_sistema']
       [9]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'en' en ['ids_sistema', 'ids_sistema']
       [10]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calculator' en ['ids_sistema', 'ids_sistema']
       [11]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'coherencia' en ['ids_sistema', 'ids_sistema']
       [12]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'logica' en ['ids_sistema', 'ids_sistema']
       [13]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'correlacion_k' en ['ids_sistema', 'ids_sistema']
       [14]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'conteos' en ['ids_sistema', 'ids_sistema']
       [15]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'escalas_ids' en ['ids_sistema', 'ids_sistema']
       [16]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'formulas' en ['ids_sistema', 'ids_sistema']
       [17]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'truth' en ['ids_sistema', 'ids_sistema']
       [18]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'escala' en ['ids_sistema', 'ids_sistema']
       [19]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_totales' en ['ids_sistema', 'ids_sistema']
       [20]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'catalogo_citaciones' en ['ids_sistema', 'ids_sistema']
       [21]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'coherencia_fn' en ['ids_sistema', 'ids_sistema']
       [22]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'logica_fn' en ['ids_sistema', 'ids_sistema']
       [23]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'correlacion_fn' en ['ids_sistema', 'ids_sistema']
       [24]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calcular_c' en ['ids_sistema', 'ids_sistema']
       [25]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calcular_l' en ['ids_sistema', 'ids_sistema']
       [26]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calcular_k' en ['ids_sistema', 'ids_sistema']
       [27]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_c' en ['ids_sistema', 'ids_sistema']
       [28]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_l' en ['ids_sistema', 'ids_sistema']
       [29]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_k' en ['ids_sistema', 'ids_sistema']
       [30]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'extraer_conteos' en ['ids_sistema', 'ids_sistema']
       [31]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'inyectar_en_peticion' en ['ids_sistema', 'ids_sistema']
       [32]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'leer_ids_escala' en ['ids_sistema', 'ids_sistema']
       [33]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'representar' en ['ids_sistema', 'ids_sistema']
       [34]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [35]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [36]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']
       [37]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_escala' en ['ids_sistema', 'ids_sistema']
       [38]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'resolver_pedido' en ['ids_sistema', 'ids_sistema']
       [39]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'categorias' en ['ids_sistema', 'ids_sistema']
       [40]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'por_id' en ['ids_sistema', 'ids_sistema']
       [41]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ids' en ['ids_sistema', 'ids_sistema']
       [42]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'es_valida' en ['ids_sistema', 'ids_sistema']
       [43]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'esquema' en ['ids_sistema', 'ids_sistema']
       [44]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'barrer' en ['ids_sistema', 'ids_sistema']
       [45]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar' en ['ids_sistema', 'ids_sistema']
       [46]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_salida' en ['ids_sistema', 'ids_sistema']
       [47]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'inventario' en ['ids_sistema', 'ids_sistema']
       [48]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'reporte' en ['ids_sistema', 'ids_sistema']
       [49]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'diagnostico' en ['ids_sistema', 'ids_sistema']
       [50]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'recolectar' en ['ids_sistema', 'ids_sistema']
       [51]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'descubrir' en ['ids_sistema', 'ids_sistema']
       [52]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'resolver_dependencias' en ['ids_sistema', 'ids_sistema']
       [53]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ejecutar_capacidad' en ['ids_sistema', 'ids_sistema']
       [54]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']
       [55]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [56]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'l' en ['ids_sistema', 'ids_sistema']
       [57]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [58]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']
       [59]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'beta' en ['ids_sistema', 'ids_sistema']
       [60]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'm' en ['ids_sistema', 'ids_sistema']
       [61]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'p' en ['ids_sistema', 'ids_sistema']
       [62]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'r' en ['ids_sistema', 'ids_sistema']
       [63]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'f' en ['ids_sistema', 'ids_sistema']
       [64]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'compromisos' en ['ids_sistema', 'ids_sistema']
       [65]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'contradicciones' en ['ids_sistema', 'ids_sistema']
       [66]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'posturas' en ['ids_sistema', 'ids_sistema']
       [67]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'reversiones' en ['ids_sistema', 'ids_sistema']
       [68]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'afirmaciones' en ['ids_sistema', 'ids_sistema']
       [69]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'afirmaciones_falsas' en ['ids_sistema', 'ids_sistema']
       [70]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula' en ['ids_sistema', 'ids_sistema']
       [71]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula_c' en ['ids_sistema', 'ids_sistema']
       [72]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula_l' en ['ids_sistema', 'ids_sistema']
       [73]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula_k' en ['ids_sistema', 'ids_sistema']
       [74]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'o_presente' en ['ids_sistema', 'ids_sistema']
       [75]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'o_context' en ['ids_sistema', 'ids_sistema']
       [76]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'contexto' en ['ids_sistema', 'ids_sistema']
       [77]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'undefined' en ['ids_sistema', 'ids_sistema']
       [78]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_atomo' en ['ids_sistema', 'ids_sistema']
       [79]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_frase' en ['ids_sistema', 'ids_sistema']
       [80]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_sujeto' en ['ids_sistema', 'ids_sistema']
       [81]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_conversacion' en ['ids_sistema', 'ids_sistema']
       [82]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_repositorio' en ['ids_sistema', 'ids_sistema']
       [83]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'fraccion' en ['ids_sistema', 'ids_sistema']
       [84]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'decimal' en ['ids_sistema', 'ids_sistema']
       [85]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'display' en ['ids_sistema', 'ids_sistema']
       [86]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'numerador' en ['ids_sistema', 'ids_sistema']
       [87]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'denominador' en ['ids_sistema', 'ids_sistema']
       [88]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'precision' en ['ids_sistema', 'ids_sistema']
       [89]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'valor' en ['ids_sistema', 'ids_sistema']
       [90]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'contenedor' en ['ids_sistema', 'ids_sistema']
       [91]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'capacidades' en ['ids_sistema', 'ids_sistema']
       [92]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'capacidades_meta' en ['ids_sistema', 'ids_sistema']
       [93]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'autoriza_engine' en ['ids_sistema', 'ids_sistema']
       [94]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'conocimiento_exportable' en ['ids_sistema', 'ids_sistema']
       [95]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'requiere' en ['ids_sistema', 'ids_sistema']
       [96]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'reporting' en ['ids_sistema', 'ids_sistema']
       [97]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'invariantes' en ['ids_sistema', 'ids_sistema']
       [98]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'estados_validos' en ['ids_sistema', 'ids_sistema']
       [99]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'esquema_categoria' en ['ids_sistema', 'ids_sistema']
       [100]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'no_iniciado' en ['ids_sistema', 'ids_sistema']
       [101]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'operativo' en ['ids_sistema', 'ids_sistema']
       [102]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'degradado' en ['ids_sistema', 'ids_sistema']
       [103]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'rechazado' en ['ids_sistema', 'ids_sistema']
       [104]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'engine' en ['ids_sistema', 'ids_sistema']
       [105]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'omega' en ['ids_sistema', 'ids_sistema']
       [106]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'omegareport' en ['ids_sistema', 'ids_sistema']
     notas:
       []
     capacidades:
@@ -1467,326 +1467,326 @@
         tipo: errores_catalogo
         detalle:
           [0]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'ca' en ['ids_sistema', 'ids_sistema']
           [1]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'fo' en ['ids_sistema', 'ids_sistema']
           [2]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tt' en ['ids_sistema', 'ids_sistema']
           [3]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'cc' en ['ids_sistema', 'ids_sistema']
           [4]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'ct' en ['ids_sistema', 'ids_sistema']
           [5]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'ax' en ['ids_sistema', 'ids_sistema']
           [6]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'mc' en ['ids_sistema', 'ids_sistema']
           [7]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'cx' en ['ids_sistema', 'ids_sistema']
           [8]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'dg' en ['ids_sistema', 'ids_sistema']
           [9]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'en' en ['ids_sistema', 'ids_sistema']
           [10]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'calculator' en ['ids_sistema', 'ids_sistema']
           [11]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'coherencia' en ['ids_sistema', 'ids_sistema']
           [12]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'logica' en ['ids_sistema', 'ids_sistema']
           [13]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'correlacion_k' en ['ids_sistema', 'ids_sistema']
           [14]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'conteos' en ['ids_sistema', 'ids_sistema']
           [15]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'escalas_ids' en ['ids_sistema', 'ids_sistema']
           [16]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'formulas' en ['ids_sistema', 'ids_sistema']
           [17]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'truth' en ['ids_sistema', 'ids_sistema']
           [18]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'escala' en ['ids_sistema', 'ids_sistema']
           [19]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_totales' en ['ids_sistema', 'ids_sistema']
           [20]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'catalogo_citaciones' en ['ids_sistema', 'ids_sistema']
           [21]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'coherencia_fn' en ['ids_sistema', 'ids_sistema']
           [22]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'logica_fn' en ['ids_sistema', 'ids_sistema']
           [23]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'correlacion_fn' en ['ids_sistema', 'ids_sistema']
           [24]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'calcular_c' en ['ids_sistema', 'ids_sistema']
           [25]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'calcular_l' en ['ids_sistema', 'ids_sistema']
           [26]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'calcular_k' en ['ids_sistema', 'ids_sistema']
           [27]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'verificar_c' en ['ids_sistema', 'ids_sistema']
           [28]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'verificar_l' en ['ids_sistema', 'ids_sistema']
           [29]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'verificar_k' en ['ids_sistema', 'ids_sistema']
           [30]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'extraer_conteos' en ['ids_sistema', 'ids_sistema']
           [31]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'inyectar_en_peticion' en ['ids_sistema', 'ids_sistema']
           [32]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'leer_ids_escala' en ['ids_sistema', 'ids_sistema']
           [33]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'representar' en ['ids_sistema', 'ids_sistema']
           [34]
-            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+            error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
           [35]
-            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+            error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
           [36]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']
           [37]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'verificar_escala' en ['ids_sistema', 'ids_sistema']
           [38]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'resolver_pedido' en ['ids_sistema', 'ids_sistema']
           [39]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'categorias' en ['ids_sistema', 'ids_sistema']
           [40]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'por_id' en ['ids_sistema', 'ids_sistema']
           [41]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'ids' en ['ids_sistema', 'ids_sistema']
           [42]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'es_valida' en ['ids_sistema', 'ids_sistema']
           [43]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'esquema' en ['ids_sistema', 'ids_sistema']
           [44]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'barrer' en ['ids_sistema', 'ids_sistema']
           [45]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'verificar' en ['ids_sistema', 'ids_sistema']
           [46]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'verificar_salida' en ['ids_sistema', 'ids_sistema']
           [47]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'inventario' en ['ids_sistema', 'ids_sistema']
           [48]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'reporte' en ['ids_sistema', 'ids_sistema']
           [49]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'diagnostico' en ['ids_sistema', 'ids_sistema']
           [50]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'recolectar' en ['ids_sistema', 'ids_sistema']
           [51]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'descubrir' en ['ids_sistema', 'ids_sistema']
           [52]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'resolver_dependencias' en ['ids_sistema', 'ids_sistema']
           [53]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'ejecutar_capacidad' en ['ids_sistema', 'ids_sistema']
           [54]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']
           [55]
-            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-            error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+            error: id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
           [56]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'l' en ['ids_sistema', 'ids_sistema']
           [57]
-            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-            error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+            error: id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
           [58]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']
           [59]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'beta' en ['ids_sistema', 'ids_sistema']
           [60]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'm' en ['ids_sistema', 'ids_sistema']
           [61]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'p' en ['ids_sistema', 'ids_sistema']
           [62]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'r' en ['ids_sistema', 'ids_sistema']
           [63]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'f' en ['ids_sistema', 'ids_sistema']
           [64]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'compromisos' en ['ids_sistema', 'ids_sistema']
           [65]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'contradicciones' en ['ids_sistema', 'ids_sistema']
           [66]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'posturas' en ['ids_sistema', 'ids_sistema']
           [67]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'reversiones' en ['ids_sistema', 'ids_sistema']
           [68]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'afirmaciones' en ['ids_sistema', 'ids_sistema']
           [69]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'afirmaciones_falsas' en ['ids_sistema', 'ids_sistema']
           [70]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'base_nula' en ['ids_sistema', 'ids_sistema']
           [71]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'base_nula_c' en ['ids_sistema', 'ids_sistema']
           [72]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'base_nula_l' en ['ids_sistema', 'ids_sistema']
           [73]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'base_nula_k' en ['ids_sistema', 'ids_sistema']
           [74]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'o_presente' en ['ids_sistema', 'ids_sistema']
           [75]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'o_context' en ['ids_sistema', 'ids_sistema']
           [76]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'contexto' en ['ids_sistema', 'ids_sistema']
           [77]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'undefined' en ['ids_sistema', 'ids_sistema']
           [78]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_atomo' en ['ids_sistema', 'ids_sistema']
           [79]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_frase' en ['ids_sistema', 'ids_sistema']
           [80]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_sujeto' en ['ids_sistema', 'ids_sistema']
           [81]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_conversacion' en ['ids_sistema', 'ids_sistema']
           [82]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_repositorio' en ['ids_sistema', 'ids_sistema']
           [83]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'fraccion' en ['ids_sistema', 'ids_sistema']
           [84]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'decimal' en ['ids_sistema', 'ids_sistema']
           [85]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'display' en ['ids_sistema', 'ids_sistema']
           [86]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'numerador' en ['ids_sistema', 'ids_sistema']
           [87]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'denominador' en ['ids_sistema', 'ids_sistema']
           [88]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'precision' en ['ids_sistema', 'ids_sistema']
           [89]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'valor' en ['ids_sistema', 'ids_sistema']
           [90]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'contenedor' en ['ids_sistema', 'ids_sistema']
           [91]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'capacidades' en ['ids_sistema', 'ids_sistema']
           [92]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'capacidades_meta' en ['ids_sistema', 'ids_sistema']
           [93]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'autoriza_engine' en ['ids_sistema', 'ids_sistema']
           [94]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'conocimiento_exportable' en ['ids_sistema', 'ids_sistema']
           [95]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'requiere' en ['ids_sistema', 'ids_sistema']
           [96]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'reporting' en ['ids_sistema', 'ids_sistema']
           [97]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'invariantes' en ['ids_sistema', 'ids_sistema']
           [98]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'estados_validos' en ['ids_sistema', 'ids_sistema']
           [99]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'esquema_categoria' en ['ids_sistema', 'ids_sistema']
           [100]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'no_iniciado' en ['ids_sistema', 'ids_sistema']
           [101]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'operativo' en ['ids_sistema', 'ids_sistema']
           [102]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'degradado' en ['ids_sistema', 'ids_sistema']
           [103]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'rechazado' en ['ids_sistema', 'ids_sistema']
           [104]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'engine' en ['ids_sistema', 'ids_sistema']
           [105]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'omega' en ['ids_sistema', 'ids_sistema']
           [106]
-            archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'omegareport' en ['ids_sistema', 'ids_sistema']
     advertencias:
       []
     recomendaciones:
@@ -1857,7 +1857,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=conteo
       [1]
@@ -1878,7 +1878,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [2]
@@ -1899,7 +1899,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=conteo
       [3]
@@ -1920,7 +1920,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [4]
@@ -1941,7 +1941,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=factor
       [5]
@@ -1962,7 +1962,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [6]
@@ -1983,7 +1983,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [7]
@@ -2004,7 +2004,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [8]
@@ -2025,7 +2025,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [9]
@@ -2046,7 +2046,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [10]
@@ -2067,7 +2067,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [11]
@@ -2088,7 +2088,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [12]
@@ -2109,7 +2109,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [13]
@@ -2130,7 +2130,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [14]
@@ -2151,7 +2151,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [15]
@@ -2172,7 +2172,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [16]
@@ -2193,7 +2193,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [17]
@@ -2214,7 +2214,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [18]
@@ -2235,7 +2235,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [19]
@@ -2256,7 +2256,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [20]
@@ -2277,7 +2277,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [21]
@@ -2298,7 +2298,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [22]
@@ -2319,7 +2319,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=factor
       [23]
@@ -2340,7 +2340,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [24]
@@ -2361,7 +2361,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=factor
       [25]
@@ -2382,7 +2382,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=variable
       [26]
@@ -2403,7 +2403,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [27]
@@ -2424,7 +2424,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [28]
@@ -2445,7 +2445,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [29]
@@ -2466,7 +2466,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [30]
@@ -2487,7 +2487,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [31]
@@ -2508,7 +2508,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [32]
@@ -2529,7 +2529,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [33]
@@ -2550,7 +2550,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [34]
@@ -2571,7 +2571,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [35]
@@ -2592,7 +2592,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [36]
@@ -2613,7 +2613,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [37]
@@ -2634,7 +2634,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [38]
@@ -2655,7 +2655,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [39]
@@ -2676,7 +2676,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [40]
@@ -2697,7 +2697,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [41]
@@ -2718,7 +2718,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [42]
@@ -2739,7 +2739,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [43]
@@ -2760,7 +2760,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [44]
@@ -2781,7 +2781,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [45]
@@ -2802,7 +2802,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [46]
@@ -2823,7 +2823,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [47]
@@ -2844,7 +2844,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [48]
@@ -2865,7 +2865,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [49]
@@ -2886,7 +2886,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [50]
@@ -2907,7 +2907,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [51]
@@ -2928,7 +2928,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [52]
@@ -2949,7 +2949,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [53]
@@ -2970,7 +2970,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [54]
@@ -2991,7 +2991,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=conteo
       [55]
@@ -3012,7 +3012,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [56]
@@ -3033,7 +3033,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [57]
@@ -3054,7 +3054,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [58]
@@ -3075,7 +3075,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [59]
@@ -3096,7 +3096,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [60]
@@ -3117,7 +3117,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [61]
@@ -3138,7 +3138,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [62]
@@ -3159,7 +3159,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [63]
@@ -3180,7 +3180,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [64]
@@ -3201,7 +3201,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=conteo
       [65]
@@ -3222,7 +3222,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [66]
@@ -3243,7 +3243,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [67]
@@ -3264,7 +3264,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [68]
@@ -3285,7 +3285,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [69]
@@ -3306,7 +3306,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [70]
@@ -3327,7 +3327,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [71]
@@ -3348,7 +3348,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [72]
@@ -3369,7 +3369,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [73]
@@ -3390,7 +3390,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [74]
@@ -3411,7 +3411,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=representacion
       [75]
@@ -3432,7 +3432,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [76]
@@ -3453,7 +3453,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=estado
       [77]
@@ -3474,7 +3474,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [78]
@@ -3495,7 +3495,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=representacion
       [79]
@@ -3516,7 +3516,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [80]
@@ -3537,7 +3537,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [81]
@@ -3558,7 +3558,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [82]
@@ -3579,7 +3579,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [83]
@@ -3600,7 +3600,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [84]
@@ -3621,7 +3621,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [85]
@@ -3642,7 +3642,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [86]
@@ -3663,7 +3663,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=representacion
       [87]
@@ -3684,7 +3684,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [88]
@@ -3705,7 +3705,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [89]
@@ -3726,7 +3726,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [90]
@@ -3747,7 +3747,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [91]
@@ -3768,7 +3768,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [92]
@@ -3789,7 +3789,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=agente
       [93]
@@ -3810,7 +3810,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [94]
@@ -3831,7 +3831,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [95]
@@ -3852,7 +3852,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [96]
@@ -3873,7 +3873,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [97]
@@ -3894,7 +3894,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [98]
@@ -3915,7 +3915,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [99]
@@ -3936,7 +3936,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [100]
@@ -3957,7 +3957,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [101]
@@ -3978,7 +3978,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [102]
@@ -3999,7 +3999,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [103]
@@ -4020,7 +4020,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [104]
@@ -4041,7 +4041,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [105]
@@ -4062,7 +4062,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [106]
@@ -4083,7 +4083,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [107]
@@ -4104,7 +4104,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [108]
@@ -4125,7 +4125,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=variable
       [109]
@@ -4146,7 +4146,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [110]
@@ -4167,7 +4167,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [111]
@@ -4188,7 +4188,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [112]
@@ -4209,7 +4209,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [113]
@@ -4230,7 +4230,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [114]
@@ -4251,7 +4251,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=representacion
       [115]
@@ -4272,7 +4272,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [116]
@@ -4293,7 +4293,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [117]
@@ -4314,7 +4314,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [118]
@@ -4335,7 +4335,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [119]
@@ -4356,7 +4356,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [120]
@@ -4377,7 +4377,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [121]
@@ -4398,7 +4398,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [122]
@@ -4419,7 +4419,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [123]
@@ -4440,7 +4440,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [124]
@@ -4461,7 +4461,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=factor
       [125]
@@ -4482,7 +4482,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=variable
       [126]
@@ -4503,7 +4503,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [127]
@@ -4524,7 +4524,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [128]
@@ -4545,7 +4545,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=factor
       [129]
@@ -4566,7 +4566,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [130]
@@ -4587,7 +4587,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [131]
@@ -4608,7 +4608,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [132]
@@ -4629,7 +4629,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [133]
@@ -4650,7 +4650,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [134]
@@ -4671,7 +4671,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [135]
@@ -4692,7 +4692,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [136]
@@ -4713,7 +4713,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=variable
       [137]
@@ -4734,7 +4734,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [138]
@@ -4755,7 +4755,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [139]
@@ -4776,7 +4776,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [140]
@@ -4797,7 +4797,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=estado
       [141]
@@ -4818,7 +4818,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [142]
@@ -4839,7 +4839,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=representacion
       [143]
@@ -4860,7 +4860,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [144]
@@ -4881,7 +4881,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [145]
@@ -4902,7 +4902,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [146]
@@ -4923,7 +4923,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [147]
@@ -4944,7 +4944,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [148]
@@ -4965,7 +4965,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=agente
       [149]
@@ -4986,7 +4986,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [150]
@@ -5007,7 +5007,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=agente
       [151]
@@ -5028,7 +5028,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [152]
@@ -5049,7 +5049,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=estado
       [153]
@@ -5070,7 +5070,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [154]
@@ -5091,7 +5091,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=variable
       [155]
@@ -5112,7 +5112,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [156]
@@ -5133,7 +5133,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [157]
@@ -5154,7 +5154,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [158]
@@ -5175,7 +5175,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=conteo
       [159]
@@ -5196,7 +5196,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [160]
@@ -5217,7 +5217,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=representacion
       [161]
@@ -5238,7 +5238,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [162]
@@ -5259,7 +5259,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=variable
       [163]
@@ -5280,7 +5280,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [164]
@@ -5301,7 +5301,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=estado
       [165]
@@ -5322,7 +5322,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [166]
@@ -5343,7 +5343,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [167]
@@ -5364,7 +5364,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [168]
@@ -5385,7 +5385,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [169]
@@ -5406,7 +5406,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [170]
@@ -5427,7 +5427,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [171]
@@ -5448,7 +5448,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [172]
@@ -5469,7 +5469,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [173]
@@ -5490,7 +5490,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [174]
@@ -5511,7 +5511,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=contrato
       [175]
@@ -5532,7 +5532,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [176]
@@ -5553,7 +5553,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [177]
@@ -5574,7 +5574,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [178]
@@ -5595,7 +5595,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [179]
@@ -5616,7 +5616,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [180]
@@ -5637,7 +5637,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=conteo
       [181]
@@ -5658,7 +5658,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [182]
@@ -5679,7 +5679,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=escala
       [183]
@@ -5700,7 +5700,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [184]
@@ -5721,7 +5721,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=escala
       [185]
@@ -5742,7 +5742,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [186]
@@ -5763,7 +5763,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=escala
       [187]
@@ -5784,7 +5784,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [188]
@@ -5805,7 +5805,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=escala
       [189]
@@ -5826,7 +5826,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [190]
@@ -5847,7 +5847,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [191]
@@ -5868,7 +5868,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=factor
       [192]
@@ -5889,7 +5889,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [193]
@@ -5910,7 +5910,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [194]
@@ -5931,7 +5931,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=escala
       [195]
@@ -5952,7 +5952,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [196]
@@ -5973,7 +5973,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [197]
@@ -5994,7 +5994,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=factor
       [198]
@@ -6015,7 +6015,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [199]
@@ -6036,7 +6036,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [200]
@@ -6057,7 +6057,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [201]
@@ -6078,7 +6078,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [202]
@@ -6099,7 +6099,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=archivo
       [203]
@@ -6120,7 +6120,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [204]
@@ -6141,7 +6141,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=modulo
       [205]
@@ -6162,7 +6162,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [206]
@@ -6183,7 +6183,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=meta
       [207]
@@ -6204,7 +6204,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [208]
@@ -6225,7 +6225,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=representacion
       [209]
@@ -6246,7 +6246,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [210]
@@ -6267,7 +6267,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [211]
@@ -6288,7 +6288,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [212]
@@ -6309,7 +6309,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [213]
@@ -6330,7 +6330,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [214]
@@ -6351,7 +6351,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [215]
@@ -6372,7 +6372,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [216]
@@ -6393,7 +6393,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [217]
@@ -6414,7 +6414,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [218]
@@ -6435,7 +6435,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [219]
@@ -6456,7 +6456,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
       [220]
@@ -6477,7 +6477,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: clase=funcion
       [221]
@@ -6498,7 +6498,7 @@
           []
         anclas:
           []
-        origen: Ids_calculator
+        origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
     ids:
@@ -6727,326 +6727,326 @@
     total: 222
     errores:
       [0]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ca' en ['ids_sistema', 'ids_sistema']
       [1]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'fo' en ['ids_sistema', 'ids_sistema']
       [2]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tt' en ['ids_sistema', 'ids_sistema']
       [3]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'cc' en ['ids_sistema', 'ids_sistema']
       [4]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ct' en ['ids_sistema', 'ids_sistema']
       [5]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ax' en ['ids_sistema', 'ids_sistema']
       [6]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'mc' en ['ids_sistema', 'ids_sistema']
       [7]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'cx' en ['ids_sistema', 'ids_sistema']
       [8]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'dg' en ['ids_sistema', 'ids_sistema']
       [9]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'en' en ['ids_sistema', 'ids_sistema']
       [10]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calculator' en ['ids_sistema', 'ids_sistema']
       [11]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'coherencia' en ['ids_sistema', 'ids_sistema']
       [12]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'logica' en ['ids_sistema', 'ids_sistema']
       [13]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'correlacion_k' en ['ids_sistema', 'ids_sistema']
       [14]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'conteos' en ['ids_sistema', 'ids_sistema']
       [15]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'escalas_ids' en ['ids_sistema', 'ids_sistema']
       [16]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'formulas' en ['ids_sistema', 'ids_sistema']
       [17]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'truth' en ['ids_sistema', 'ids_sistema']
       [18]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'escala' en ['ids_sistema', 'ids_sistema']
       [19]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_totales' en ['ids_sistema', 'ids_sistema']
       [20]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'catalogo_citaciones' en ['ids_sistema', 'ids_sistema']
       [21]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'coherencia_fn' en ['ids_sistema', 'ids_sistema']
       [22]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'logica_fn' en ['ids_sistema', 'ids_sistema']
       [23]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'correlacion_fn' en ['ids_sistema', 'ids_sistema']
       [24]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calcular_c' en ['ids_sistema', 'ids_sistema']
       [25]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calcular_l' en ['ids_sistema', 'ids_sistema']
       [26]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'calcular_k' en ['ids_sistema', 'ids_sistema']
       [27]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_c' en ['ids_sistema', 'ids_sistema']
       [28]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_l' en ['ids_sistema', 'ids_sistema']
       [29]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_k' en ['ids_sistema', 'ids_sistema']
       [30]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'extraer_conteos' en ['ids_sistema', 'ids_sistema']
       [31]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'inyectar_en_peticion' en ['ids_sistema', 'ids_sistema']
       [32]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'leer_ids_escala' en ['ids_sistema', 'ids_sistema']
       [33]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'representar' en ['ids_sistema', 'ids_sistema']
       [34]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [35]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [36]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']
       [37]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_escala' en ['ids_sistema', 'ids_sistema']
       [38]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'resolver_pedido' en ['ids_sistema', 'ids_sistema']
       [39]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'categorias' en ['ids_sistema', 'ids_sistema']
       [40]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'por_id' en ['ids_sistema', 'ids_sistema']
       [41]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ids' en ['ids_sistema', 'ids_sistema']
       [42]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'es_valida' en ['ids_sistema', 'ids_sistema']
       [43]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'esquema' en ['ids_sistema', 'ids_sistema']
       [44]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'barrer' en ['ids_sistema', 'ids_sistema']
       [45]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar' en ['ids_sistema', 'ids_sistema']
       [46]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'verificar_salida' en ['ids_sistema', 'ids_sistema']
       [47]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'inventario' en ['ids_sistema', 'ids_sistema']
       [48]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'reporte' en ['ids_sistema', 'ids_sistema']
       [49]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'diagnostico' en ['ids_sistema', 'ids_sistema']
       [50]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'recolectar' en ['ids_sistema', 'ids_sistema']
       [51]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'descubrir' en ['ids_sistema', 'ids_sistema']
       [52]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'resolver_dependencias' en ['ids_sistema', 'ids_sistema']
       [53]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'ejecutar_capacidad' en ['ids_sistema', 'ids_sistema']
       [54]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']
       [55]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [56]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'l' en ['ids_sistema', 'ids_sistema']
       [57]
-        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
-        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
+        error: id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
       [58]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']
       [59]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'beta' en ['ids_sistema', 'ids_sistema']
       [60]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'm' en ['ids_sistema', 'ids_sistema']
       [61]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'p' en ['ids_sistema', 'ids_sistema']
       [62]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'r' en ['ids_sistema', 'ids_sistema']
       [63]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'f' en ['ids_sistema', 'ids_sistema']
       [64]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'compromisos' en ['ids_sistema', 'ids_sistema']
       [65]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'contradicciones' en ['ids_sistema', 'ids_sistema']
       [66]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'posturas' en ['ids_sistema', 'ids_sistema']
       [67]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'reversiones' en ['ids_sistema', 'ids_sistema']
       [68]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'afirmaciones' en ['ids_sistema', 'ids_sistema']
       [69]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'afirmaciones_falsas' en ['ids_sistema', 'ids_sistema']
       [70]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula' en ['ids_sistema', 'ids_sistema']
       [71]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula_c' en ['ids_sistema', 'ids_sistema']
       [72]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula_l' en ['ids_sistema', 'ids_sistema']
       [73]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'base_nula_k' en ['ids_sistema', 'ids_sistema']
       [74]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'o_presente' en ['ids_sistema', 'ids_sistema']
       [75]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'o_context' en ['ids_sistema', 'ids_sistema']
       [76]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'contexto' en ['ids_sistema', 'ids_sistema']
       [77]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'undefined' en ['ids_sistema', 'ids_sistema']
       [78]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_atomo' en ['ids_sistema', 'ids_sistema']
       [79]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_frase' en ['ids_sistema', 'ids_sistema']
       [80]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_sujeto' en ['ids_sistema', 'ids_sistema']
       [81]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_conversacion' en ['ids_sistema', 'ids_sistema']
       [82]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_repositorio' en ['ids_sistema', 'ids_sistema']
       [83]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'fraccion' en ['ids_sistema', 'ids_sistema']
       [84]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'decimal' en ['ids_sistema', 'ids_sistema']
       [85]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'display' en ['ids_sistema', 'ids_sistema']
       [86]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'numerador' en ['ids_sistema', 'ids_sistema']
       [87]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'denominador' en ['ids_sistema', 'ids_sistema']
       [88]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'precision' en ['ids_sistema', 'ids_sistema']
       [89]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'valor' en ['ids_sistema', 'ids_sistema']
       [90]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'contenedor' en ['ids_sistema', 'ids_sistema']
       [91]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'capacidades' en ['ids_sistema', 'ids_sistema']
       [92]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'capacidades_meta' en ['ids_sistema', 'ids_sistema']
       [93]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'autoriza_engine' en ['ids_sistema', 'ids_sistema']
       [94]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'conocimiento_exportable' en ['ids_sistema', 'ids_sistema']
       [95]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'requiere' en ['ids_sistema', 'ids_sistema']
       [96]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'reporting' en ['ids_sistema', 'ids_sistema']
       [97]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'invariantes' en ['ids_sistema', 'ids_sistema']
       [98]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'estados_validos' en ['ids_sistema', 'ids_sistema']
       [99]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'esquema_categoria' en ['ids_sistema', 'ids_sistema']
       [100]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'no_iniciado' en ['ids_sistema', 'ids_sistema']
       [101]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'operativo' en ['ids_sistema', 'ids_sistema']
       [102]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'degradado' en ['ids_sistema', 'ids_sistema']
       [103]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'rechazado' en ['ids_sistema', 'ids_sistema']
       [104]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'engine' en ['ids_sistema', 'ids_sistema']
       [105]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'omega' en ['ids_sistema', 'ids_sistema']
       [106]
-        archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'omegareport' en ['ids_sistema', 'ids_sistema']
     coherente: False
     capacidades:
       • verificar
@@ -8835,151 +8835,151 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T03:40:34.817146+00:00
+    timestamp: 2026-08-07T03:43:07.045107+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002384
+    duracion_s: 0.001798
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T03:40:34.819190+00:00
+    timestamp: 2026-08-07T03:43:07.046568+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.002022
+    duracion_s: 0.001444
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T03:40:34.820990+00:00
+    timestamp: 2026-08-07T03:43:07.047956+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001785
+    duracion_s: 0.001377
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T03:40:34.821517+00:00
+    timestamp: 2026-08-07T03:43:07.048361+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000514
+    duracion_s: 0.000395
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T03:40:34.821949+00:00
+    timestamp: 2026-08-07T03:43:07.048667+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000422
+    duracion_s: 0.0003
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T03:40:34.822343+00:00
+    timestamp: 2026-08-07T03:43:07.048979+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000386
+    duracion_s: 0.000306
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T03:40:34.824860+00:00
+    timestamp: 2026-08-07T03:43:07.050891+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002508
+    duracion_s: 0.001903
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T03:40:34.826354+00:00
+    timestamp: 2026-08-07T03:43:07.052038+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001474
+    duracion_s: 0.001118
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T03:40:34.828597+00:00
+    timestamp: 2026-08-07T03:43:07.053378+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.002229
+    duracion_s: 0.001329
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T03:40:34.828845+00:00
+    timestamp: 2026-08-07T03:43:07.053560+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000235
+    duracion_s: 0.000174
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T03:40:34.829030+00:00
+    timestamp: 2026-08-07T03:43:07.053675+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000176
+    duracion_s: 0.000108
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T03:40:34.829103+00:00
+    timestamp: 2026-08-07T03:43:07.053733+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 6.5e-05
+    duracion_s: 5.2e-05
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T03:40:34.829863+00:00
+    timestamp: 2026-08-07T03:43:07.054356+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000752
+    duracion_s: 0.000616
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T03:40:34.830410+00:00
+    timestamp: 2026-08-07T03:43:07.054771+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000536
+    duracion_s: 0.000407
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T03:40:34.830549+00:00
+    timestamp: 2026-08-07T03:43:07.054871+00:00
     modulo: correlacion_mecanica
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 9.3e-05
+  [15]
+    id_traza: 16
+    timestamp: 2026-08-07T03:43:07.055771+00:00
+    modulo: formulas
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000892
+  [16]
+    id_traza: 17
+    timestamp: 2026-08-07T03:43:07.056076+00:00
+    modulo: formulas
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000296
+  [17]
+    id_traza: 18
+    timestamp: 2026-08-07T03:43:07.056211+00:00
+    modulo: formulas
     capacidad: inventario
     estado: EXITO
     duracion_s: 0.000129
-  [15]
-    id_traza: 16
-    timestamp: 2026-08-07T03:40:34.831990+00:00
-    modulo: formulas
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.00143
-  [16]
-    id_traza: 17
-    timestamp: 2026-08-07T03:40:34.832570+00:00
-    modulo: formulas
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000566
-  [17]
-    id_traza: 18
-    timestamp: 2026-08-07T03:40:34.832756+00:00
-    modulo: formulas
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000176
   [18]
     id_traza: 19
-    timestamp: 2026-08-07T03:40:34.834578+00:00
+    timestamp: 2026-08-07T03:43:07.057599+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001811
+    duracion_s: 0.001379
   [19]
     id_traza: 20
-    timestamp: 2026-08-07T03:40:34.835333+00:00
+    timestamp: 2026-08-07T03:43:07.058211+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000744
+    duracion_s: 0.000602
   [20]
     id_traza: 21
-    timestamp: 2026-08-07T03:40:34.835993+00:00
+    timestamp: 2026-08-07T03:43:07.058711+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00065
+    duracion_s: 0.000492
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

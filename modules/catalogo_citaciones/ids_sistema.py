@@ -1,5 +1,5 @@
 # ===============================================================
-# VPSI-TRUTH — modules/catalogo_citaciones/categorias/ids_sistema.py
+# VPSI-TRUTH — modules/catalogo_citaciones/ids_sistema.py
 # ===============================================================
 #
 # Catálogo de IDs del sistema.

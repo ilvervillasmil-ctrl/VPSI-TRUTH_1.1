@@ -3,8 +3,8 @@
     "version_engine": "18.3",
     "estado_engine": "OPERATIVO",
     "esquema_contrato": "VPSI-CONTRACT-1.0",
-    "total_modulos": 4,
-    "timestamp": "2026-08-07T00:37:38.943881+00:00"
+    "total_modulos": 5,
+    "timestamp": "2026-08-07T01:09:35.879300+00:00"
   },
   "reportes": [
     {
@@ -18,11 +18,11 @@
         "api_engine": "1.0",
         "estado_engine": "OPERATIVO",
         "invocador_id": "omega_report",
-        "total_modulos": 4,
+        "total_modulos": 5,
         "errores_arranque": [],
         "advertencias": [],
-        "trazas_n": 12,
-        "timestamp": "2026-08-07T00:37:38.943861+00:00"
+        "trazas_n": 15,
+        "timestamp": "2026-08-07T01:09:35.879274+00:00"
       }
     },
     {
@@ -406,9 +406,346 @@
       }
     },
     {
+      "id": "CA",
+      "titulo": "MÓDULO CA/calculator",
+      "orden": 2,
+      "contenido": {
+        "id": "CA",
+        "nombre": "calculator",
+        "rol": "CA",
+        "version": "2.0",
+        "version_contrato": "1.0",
+        "esquema": "VPSI-CONTRACT-1.0",
+        "estabilidad": "ESTABLE",
+        "compatible_desde": "1.2",
+        "api_engine": ">=1.0",
+        "descripcion": "Unica autoridad del dominio de calculo estructural del sistema VPSI. Calcula los factores C, L, K. No calcula Tru_Ri ni Tru_total (FO). Integra conocimiento autorizado del ecosistema. Todo valor oficial es Fraction; el decimal es solo representacion.",
+        "funcion": "Calcular factores estructurales C, L, K (y derivados futuros) integrando conocimiento autorizado. Entregar resultados trazables a FO. Proteger la integridad del dominio de calculo.",
+        "no_hace": [
+          "No calcula Tru_Ri ni Tru_total",
+          "No redefine constantes (CT)",
+          "No redefine axiomas (AX)",
+          "No redefine formulas (FO)",
+          "No orquesta el sistema (Engine)",
+          "No modifica otros modulos ni contratos ajenos",
+          "No estima por intuicion: toda magnitud requiere evidencia estructural"
+        ],
+        "autoridad": [
+          "Unica autoridad para calcular C, L, K y factores estructurales",
+          "Integrar conocimiento autorizado del ecosistema",
+          "Auditar integridad del dominio de calculo (centinela)",
+          "Representar Fraction en decimal configurable",
+          "Reportar inventario, estado y diagnostico propios"
+        ],
+        "conocimiento_exportable": [
+          "C",
+          "L",
+          "K",
+          "factores",
+          "UNDEFINED",
+          "inventario",
+          "estado",
+          "reporte",
+          "diagnostico"
+        ],
+        "consultas_soportadas": [
+          "calcular_C",
+          "calcular_L",
+          "calcular_K",
+          "calcular",
+          "representar",
+          "verificar_coherencia",
+          "obtener_inventario",
+          "obtener_reporte",
+          "obtener_diagnostico",
+          "leer_ids_escala"
+        ],
+        "requiere": [],
+        "autoriza_engine": {
+          "leer": true,
+          "ejecutar": true,
+          "consultar": true,
+          "recombinar": true,
+          "reportar": true,
+          "auditar": true,
+          "inventariar": true,
+          "modificar": false,
+          "alterar": false,
+          "reescribir": false
+        },
+        "capacidades": [
+          "calcular",
+          "calcular_C",
+          "calcular_L",
+          "calcular_K",
+          "calcular_factor",
+          "representar",
+          "verificar",
+          "barrer",
+          "inventario",
+          "reporte",
+          "diagnostico",
+          "leer_ids_escala",
+          "verificar_salida"
+        ],
+        "capacidades_meta": {
+          "calcular": {
+            "descripcion": "Orquesta C, L, K sobre una peticion. Pasa por centinela.",
+            "entrada": "peticion: dict (metodo, conteos, contexto/O, escala_id, ...)",
+            "salida": "dict con C, L, K, errores, metodo, conteos?, escala?, centinela"
+          },
+          "calcular_C": {
+            "descripcion": "Calcula el factor de coherencia C.",
+            "entrada": "peticion: dict",
+            "salida": "dict con C (Fraction|None), ruta, notas"
+          },
+          "calcular_L": {
+            "descripcion": "Calcula el factor de logica L (UNDEFINED si p=0).",
+            "entrada": "peticion: dict",
+            "salida": "dict con L (Fraction|UNDEFINED), p, r, ruta, notas"
+          },
+          "calcular_K": {
+            "descripcion": "Calcula el factor de correlacion K (None sin O/contexto).",
+            "entrada": "peticion: dict con contexto/O_context",
+            "salida": "dict con K (Fraction|None), ruta, notas"
+          },
+          "calcular_factor": {
+            "descripcion": "Calcula un factor estructural por nombre (C|L|K).",
+            "entrada": "factor: str, peticion: dict",
+            "salida": "dict del factor solicitado"
+          },
+          "representar": {
+            "descripcion": "Representa Fraction como decimal configurable. No altera el valor oficial.",
+            "entrada": "valor: Fraction|UNDEFINED|None, precision: int=3",
+            "salida": "dict con fraccion, decimal, precision, undefined"
+          },
+          "verificar": {
+            "descripcion": "Centinela del modulo: archivos, APIs, choques, conteos.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, errores, choques, factores_api, archivos"
+          },
+          "barrer": {
+            "descripcion": "Alias de verificar. Centinela de carpeta e integridad.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, errores, choques, factores_api"
+          },
+          "inventario": {
+            "descripcion": "Inventario completo del dominio de calculo.",
+            "entrada": "peticion opcional",
+            "salida": "dict con capacidades, factores, archivos, estado, version"
+          },
+          "reporte": {
+            "descripcion": "Reporte interno de estado del modulo CA.",
+            "entrada": "ninguna",
+            "salida": "dict con estado, coherente, factores_api, capacidades"
+          },
+          "diagnostico": {
+            "descripcion": "Diagnostico: problemas, advertencias, recomendaciones.",
+            "entrada": "ninguna",
+            "salida": "dict con estado, problemas, advertencias, recomendaciones"
+          },
+          "leer_ids_escala": {
+            "descripcion": "Ids de escala reconocidos (atomo, frase, sujeto, ...).",
+            "entrada": "ninguna",
+            "salida": "dict con ids, n, origenes, disponible"
+          },
+          "verificar_salida": {
+            "descripcion": "Comprueba forma minima de salida de calcular (C, L, K).",
+            "entrada": "salida: dict",
+            "salida": "bool"
+          }
+        },
+        "estados_validos": [
+          "NO_INICIADO",
+          "OPERATIVO",
+          "DEGRADADO",
+          "RECHAZADO"
+        ],
+        "invariantes": [
+          "CA es la unica autoridad del dominio de calculo estructural",
+          "CA calcula unicamente factores estructurales (C, L, K, derivados)",
+          "FO es la unica autoridad sobre las formulas oficiales",
+          "todo calculo interno utiliza Fraction",
+          "float nunca representa el valor oficial",
+          "el decimal es unicamente una representacion",
+          "ningun calculo sale sin pasar por el centinela interno",
+          "CA nunca modifica otros modulos ni redefine conocimiento ajeno",
+          "CA solo integra conocimiento autorizado por contratos",
+          "todo calculo es reproducible, auditable y trazable",
+          "K ausente sin contexto/O es legitimo (Def-5.3.1)",
+          "L = UNDEFINED cuando p=0 (AM-D6 / AM-A3)"
+        ],
+        "reporte": {
+          "id": "CA",
+          "modulo": "calculator",
+          "rol": "CA",
+          "version": "2.0",
+          "version_contrato": "1.0",
+          "esquema": "VPSI-CONTRACT-1.0",
+          "estabilidad": "ESTABLE",
+          "estado": "DEGRADADO",
+          "coherente": false,
+          "factores_api": [],
+          "archivos": [],
+          "conteos_disponible": false,
+          "errores_n": 6,
+          "choques_n": 0,
+          "capacidades": [
+            "calcular",
+            "calcular_C",
+            "calcular_L",
+            "calcular_K",
+            "calcular_factor",
+            "representar",
+            "verificar",
+            "barrer",
+            "inventario",
+            "reporte",
+            "diagnostico",
+            "leer_ids_escala",
+            "verificar_salida"
+          ],
+          "requiere": [],
+          "autoridad": [
+            "Unica autoridad para calcular C, L, K y factores estructurales",
+            "Integrar conocimiento autorizado del ecosistema",
+            "Auditar integridad del dominio de calculo (centinela)",
+            "Representar Fraction en decimal configurable",
+            "Reportar inventario, estado y diagnostico propios"
+          ],
+          "conocimiento_exportable": [
+            "C",
+            "L",
+            "K",
+            "factores",
+            "UNDEFINED",
+            "inventario",
+            "estado",
+            "reporte",
+            "diagnostico"
+          ],
+          "consultas_soportadas": [
+            "calcular_C",
+            "calcular_L",
+            "calcular_K",
+            "calcular",
+            "representar",
+            "verificar_coherencia",
+            "obtener_inventario",
+            "obtener_reporte",
+            "obtener_diagnostico",
+            "leer_ids_escala"
+          ]
+        },
+        "diagnostico": {
+          "id": "CA",
+          "modulo": "calculator",
+          "estado": "DEGRADADO",
+          "problemas": [
+            {
+              "tipo": "errores_carga",
+              "detalle": [
+                {
+                  "archivo": "coherencia.py",
+                  "error": "ModuleNotFoundError: No module named 'modules.calculator.coherencia'"
+                },
+                {
+                  "archivo": "logica.py",
+                  "error": "ModuleNotFoundError: No module named 'modules.calculator.logica'"
+                },
+                {
+                  "archivo": "correlacion_k.py",
+                  "error": "ModuleNotFoundError: No module named 'modules.calculator.correlacion_k'"
+                },
+                {
+                  "archivo": "?",
+                  "error": "factor canonico 'C' sin API publica cargada"
+                },
+                {
+                  "archivo": "?",
+                  "error": "factor canonico 'L' sin API publica cargada"
+                },
+                {
+                  "archivo": "?",
+                  "error": "factor canonico 'K' sin API publica cargada"
+                }
+              ]
+            },
+            {
+              "tipo": "sin_apis",
+              "detalle": "ningun factor C/L/K cargado"
+            }
+          ],
+          "advertencias": [
+            "conteos.py no disponible: ruta operacional limitada"
+          ],
+          "recomendaciones": [
+            "Revisar APIs C/L/K y archivos del modulo",
+            "Verificar coherencia.py, logica.py, correlacion_k.py"
+          ],
+          "coherente": false,
+          "factores_api": [],
+          "errores_n": 6,
+          "choques_n": 0
+        },
+        "inventario": {
+          "id": "CA",
+          "nombre": "calculator",
+          "rol": "CA",
+          "version": "2.0",
+          "version_contrato": "1.0",
+          "esquema": "VPSI-CONTRACT-1.0",
+          "estabilidad": "ESTABLE",
+          "archivos": [],
+          "factores_api": [],
+          "conteos_disponible": false,
+          "escalas_ids_disponible": false,
+          "ids_escala": {
+            "ids": [],
+            "n": 0,
+            "origenes": [],
+            "disponible": false
+          },
+          "coherente": false,
+          "capacidades": [
+            "calcular",
+            "calcular_C",
+            "calcular_L",
+            "calcular_K",
+            "calcular_factor",
+            "representar",
+            "verificar",
+            "barrer",
+            "inventario",
+            "reporte",
+            "diagnostico",
+            "leer_ids_escala",
+            "verificar_salida"
+          ],
+          "requiere": [],
+          "invariantes": [
+            "CA es la unica autoridad del dominio de calculo estructural",
+            "CA calcula unicamente factores estructurales (C, L, K, derivados)",
+            "FO es la unica autoridad sobre las formulas oficiales",
+            "todo calculo interno utiliza Fraction",
+            "float nunca representa el valor oficial",
+            "el decimal es unicamente una representacion",
+            "ningun calculo sale sin pasar por el centinela interno",
+            "CA nunca modifica otros modulos ni redefine conocimiento ajeno",
+            "CA solo integra conocimiento autorizado por contratos",
+            "todo calculo es reproducible, auditable y trazable",
+            "K ausente sin contexto/O es legitimo (Def-5.3.1)",
+            "L = UNDEFINED cuando p=0 (AM-D6 / AM-A3)"
+          ],
+          "precision_decimal_default": 3,
+          "funcion": "Calcula C, L, K. No calcula Tru (FO). K ausente sin contexto/O (Def-5.3.1). L=UNDEFINED si p=0 (AM-D6). Valor oficial = Fraction; decimal solo representacion."
+        }
+      }
+    },
+    {
       "id": "CT",
       "titulo": "MÓDULO CT/constante",
-      "orden": 2,
+      "orden": 3,
       "contenido": {
         "id": "CT",
         "nombre": "constante",
@@ -678,7 +1015,7 @@
     {
       "id": "MC",
       "titulo": "MÓDULO MC/correlacion_mecanica",
-      "orden": 3,
+      "orden": 4,
       "contenido": {
         "id": "MC",
         "nombre": "correlacion_mecanica",
@@ -925,7 +1262,7 @@
     {
       "id": "FO",
       "titulo": "MÓDULO FO/formulas",
-      "orden": 4,
+      "orden": 5,
       "contenido": {
         "id": "FO",
         "nombre": "formulas",
@@ -1191,7 +1528,7 @@
     {
       "id": "dependencias",
       "titulo": "DEPENDENCIAS",
-      "orden": 5,
+      "orden": 6,
       "contenido": {
         "grafo": {
           "formulas": [
@@ -1201,6 +1538,7 @@
         "faltantes": {},
         "orden_topologico": [
           "axiomas",
+          "calculator",
           "constante",
           "correlacion_mecanica",
           "formulas"
@@ -1211,7 +1549,7 @@
     {
       "id": "grafo",
       "titulo": "GRAFO ESTRUCTURAL",
-      "orden": 6,
+      "orden": 7,
       "contenido": {
         "nodos": [
           {
@@ -1297,6 +1635,90 @@
             "nombre": "buscar_por_id",
             "tipo": "capacidad",
             "modulo": "axiomas"
+          },
+          {
+            "id": "CA",
+            "nombre": "calculator",
+            "rol": "CA",
+            "tipo": "modulo"
+          },
+          {
+            "id": "calculator.calcular",
+            "nombre": "calcular",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.calcular_C",
+            "nombre": "calcular_C",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.calcular_L",
+            "nombre": "calcular_L",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.calcular_K",
+            "nombre": "calcular_K",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.calcular_factor",
+            "nombre": "calcular_factor",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.representar",
+            "nombre": "representar",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.verificar",
+            "nombre": "verificar",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.barrer",
+            "nombre": "barrer",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.inventario",
+            "nombre": "inventario",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.reporte",
+            "nombre": "reporte",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.diagnostico",
+            "nombre": "diagnostico",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.leer_ids_escala",
+            "nombre": "leer_ids_escala",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
+            "id": "calculator.verificar_salida",
+            "nombre": "verificar_salida",
+            "tipo": "capacidad",
+            "modulo": "calculator"
           },
           {
             "id": "CT",
@@ -1564,6 +1986,71 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "calculator",
+            "to": "calculator.calcular",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.calcular_C",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.calcular_L",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.calcular_K",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.calcular_factor",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.representar",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.verificar",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.barrer",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.reporte",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.diagnostico",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.leer_ids_escala",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "calculator",
+            "to": "calculator.verificar_salida",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "constante",
             "to": "constante.alpha",
             "tipo": "declara_capacidad"
@@ -1724,103 +2211,127 @@
     {
       "id": "trazas",
       "titulo": "TRAZAS DE EJECUCIÓN",
-      "orden": 7,
+      "orden": 8,
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-07T00:37:38.938498+00:00",
+          "timestamp": "2026-08-07T01:09:35.874273+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002783
+          "duracion_s": 0.002255
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-07T00:37:38.940776+00:00",
+          "timestamp": "2026-08-07T01:09:35.876372+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.002256
+          "duracion_s": 0.002079
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-07T00:37:38.942792+00:00",
+          "timestamp": "2026-08-07T01:09:35.878071+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.002002
+          "duracion_s": 0.001685
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-07T00:37:38.942956+00:00",
-          "modulo": "constante",
+          "timestamp": "2026-08-07T01:09:35.878203+00:00",
+          "modulo": "calculator",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.00015
+          "duracion_s": 0.000119
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-07T00:37:38.943023+00:00",
-          "modulo": "constante",
+          "timestamp": "2026-08-07T01:09:35.878295+00:00",
+          "modulo": "calculator",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 5.9e-05
+          "duracion_s": 8.4e-05
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-07T00:37:38.943088+00:00",
-          "modulo": "constante",
+          "timestamp": "2026-08-07T01:09:35.878380+00:00",
+          "modulo": "calculator",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 5.1e-05
+          "duracion_s": 7.8e-05
         },
         {
           "id_traza": 7,
-          "timestamp": "2026-08-07T00:37:38.943124+00:00",
-          "modulo": "correlacion_mecanica",
+          "timestamp": "2026-08-07T01:09:35.878486+00:00",
+          "modulo": "constante",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 3e-05
+          "duracion_s": 0.0001
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-07T00:37:38.943152+00:00",
-          "modulo": "correlacion_mecanica",
+          "timestamp": "2026-08-07T01:09:35.878566+00:00",
+          "modulo": "constante",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 1.7e-05
+          "duracion_s": 6.9e-05
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-07T00:37:38.943174+00:00",
-          "modulo": "correlacion_mecanica",
+          "timestamp": "2026-08-07T01:09:35.878604+00:00",
+          "modulo": "constante",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 1.6e-05
+          "duracion_s": 3.2e-05
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-07T00:37:38.943476+00:00",
-          "modulo": "formulas",
+          "timestamp": "2026-08-07T01:09:35.878645+00:00",
+          "modulo": "correlacion_mecanica",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000296
+          "duracion_s": 3.6e-05
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-07T00:37:38.943737+00:00",
-          "modulo": "formulas",
+          "timestamp": "2026-08-07T01:09:35.878674+00:00",
+          "modulo": "correlacion_mecanica",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000253
+          "duracion_s": 2.4e-05
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-07T00:37:38.943854+00:00",
+          "timestamp": "2026-08-07T01:09:35.878700+00:00",
+          "modulo": "correlacion_mecanica",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 2.3e-05
+        },
+        {
+          "id_traza": 13,
+          "timestamp": "2026-08-07T01:09:35.878956+00:00",
+          "modulo": "formulas",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.00025
+        },
+        {
+          "id_traza": 14,
+          "timestamp": "2026-08-07T01:09:35.879164+00:00",
+          "modulo": "formulas",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.0002
+        },
+        {
+          "id_traza": 15,
+          "timestamp": "2026-08-07T01:09:35.879267+00:00",
           "modulo": "formulas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000108
+          "duracion_s": 9.7e-05
         }
       ]
     }

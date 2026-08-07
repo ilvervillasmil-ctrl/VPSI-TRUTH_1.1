@@ -10,8 +10,8 @@
   version_engine: 18.3
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
-  total_modulos: 8
-  timestamp: 2026-08-07T08:06:10.905180+00:00
+  total_modulos: 9
+  timestamp: 2026-08-07T08:08:33.051603+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -22,13 +22,13 @@
   api_engine: 1.0
   estado_engine: OPERATIVO
   invocador_id: omega_report
-  total_modulos: 8
+  total_modulos: 9
   errores_arranque:
     []
   advertencias:
     []
-  trazas_n: 24
-  timestamp: 2026-08-07T08:06:10.905146+00:00
+  trazas_n: 27
+  timestamp: 2026-08-07T08:08:33.051573+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1027,32 +1027,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T08:06:02.629657+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645074+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1129,32 +1129,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T08:06:02.629657+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645074+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T08:06:02.630106+00:00
+        timestamp_mtime: 2026-08-07T08:08:26.645438+00:00
     factores_api:
       • C
       • K
@@ -7779,6 +7779,267 @@
       • este módulo siempre puede reportar su propio estado
 
 ══════════════════════════════════════════════════════════════════════
+  MÓDULO CX/contexto
+══════════════════════════════════════════════════════════════════════
+  id: CX
+  nombre: contexto
+  rol: CX
+  version: 2.0
+  version_contrato: 1.0
+  esquema: VPSI-CONTRACT-1.0
+  estabilidad: ESTABLE
+  compatible_desde: 1.0
+  api_engine: >=1.0
+  descripcion: Clasificación operativa de O_context. Auto-carga y valida cada *.py interno. No calcula Tru. No declara dependencias.
+  funcion: Clasificar el marco evaluable O_context: registro, estado, evento, ligaduras, permite_k, pedir_anuncio. Validar clasificadores internos sin listarlos por nombre.
+  no_hace:
+    • No calcula Tru_Ri / Tru_total / C / L / K
+    • No importa código ajeno a su directorio
+    • No declara dependencias
+    • No orquesta el ciclo
+    • No emite cadena auditable
+    • No asigna K numérico
+  autoridad:
+    • Declarar el registro O y permite_k
+    • Clasificar modo_entrada, estado y evento
+    • Validar forma y dominio de cada *.py interno
+    • Reportar estado, inventario y diagnóstico propios
+  conocimiento_exportable:
+    • O_context
+    • registro
+    • permite_k
+    • pedir_anuncio
+    • tipos_peticion
+    • inventario
+    • reporte
+    • diagnostico
+    • axiomas
+  consultas_soportadas:
+    • resolver_contexto
+    • obtener_registro_O
+    • consultar_permite_k
+    • obtener_inventario
+    • obtener_reporte
+    • obtener_diagnostico
+    • verificar_coherencia
+    • listar_axiomas_operativos
+  requiere:
+    []
+  autoriza_engine:
+    leer: True
+    ejecutar: True
+    consultar: True
+    recombinar: True
+    reportar: True
+    auditar: True
+    inventariar: True
+    modificar: False
+    alterar: False
+    reescribir: False
+  capacidades:
+    • verificar
+    • barrer
+    • evaluar
+    • resolver
+    • inventario
+    • axiomas
+    • reporte
+    • diagnostico
+    • verificar_salida
+  capacidades_meta:
+    verificar:
+      descripcion: Alias de barrer. Verifica coherencia de este módulo.
+      entrada: peticion opcional dict
+      salida: dict con coherente, errores, registro, permite_k
+    barrer:
+      descripcion: Evalúa coherencia de clasificadores internos. No calcula Tru.
+      entrada: peticion opcional dict
+      salida: dict con coherente, errores, reglas_internas
+    evaluar:
+      descripcion: Alias de resolver. Clasifica O_context.
+      entrada: peticion: dict | None
+      salida: dict con O_context, registro, permite_k, coherente
+    resolver:
+      descripcion: Clasifica el marco O: registro, estado, evento, permite_k, pedir_anuncio. Centinela auto-valida *.py.
+      entrada: peticion: dict | None
+      salida: dict con O_context, registro, permite_k, errores, notas
+    inventario:
+      descripcion: Inventario de modos, estados, reglas internas y centinela.
+      entrada: peticion opcional
+      salida: dict con id, version, reglas_internas, modos_entrada
+    axiomas:
+      descripcion: Declaraciones operativas de este módulo.
+      entrada: ninguna
+      salida: list[dict] de declaraciones
+    reporte:
+      descripcion: Reporte interno de estado de este módulo.
+      entrada: ninguna
+      salida: dict con estado, coherente, errores, capacidades
+    diagnostico:
+      descripcion: Diagnóstico: qué falta o está mal en este módulo.
+      entrada: ninguna
+      salida: dict con estado, problemas, advertencias, recomendaciones
+    verificar_salida:
+      descripcion: Comprueba si una salida de resolver/barrer es coherente.
+      entrada: salida: dict
+      salida: bool
+  estados_validos:
+    • NO_INICIADO
+    • OPERATIVO
+    • DEGRADADO
+    • RECHAZADO
+  invariantes:
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • las capacidades declaradas son siempre callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no calcula Tru / C / L / K
+    • este módulo no importa código ajeno a su directorio
+    • este módulo no declara dependencias
+    • este módulo no orquesta el ciclo
+    • todo *.py interno se valida por centinela de módulo
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
+  reporte:
+    id: CX
+    modulo: contexto
+    rol: CX
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    estado: OPERATIVO
+    coherente: True
+    errores:
+      []
+    reglas_internas:
+      total: 0
+      choques:
+        []
+      detalle:
+    permite_k: False
+    pedir_anuncio: False
+    notas:
+      • sin petición: solo centinela de archivos internos; K no reclamable sin registro O estable
+      • sin archivos de regla internos (vacío legítimo hasta montar clasificadores)
+    capacidades:
+      • verificar
+      • barrer
+      • evaluar
+      • resolver
+      • inventario
+      • axiomas
+      • reporte
+      • diagnostico
+      • verificar_salida
+    requiere:
+      []
+    autoridad:
+      • Declarar el registro O y permite_k
+      • Clasificar modo_entrada, estado y evento
+      • Validar forma y dominio de cada *.py interno
+      • Reportar estado, inventario y diagnóstico propios
+    conocimiento_exportable:
+      • O_context
+      • registro
+      • permite_k
+      • pedir_anuncio
+      • tipos_peticion
+      • inventario
+      • reporte
+      • diagnostico
+      • axiomas
+    consultas_soportadas:
+      • resolver_contexto
+      • obtener_registro_O
+      • consultar_permite_k
+      • obtener_inventario
+      • obtener_reporte
+      • obtener_diagnostico
+      • verificar_coherencia
+      • listar_axiomas_operativos
+  diagnostico:
+    id: CX
+    modulo: contexto
+    estado: NO_INICIADO
+    problemas:
+      []
+    advertencias:
+      • Sin clasificadores internos (legítimo hasta montar archivos de regla)
+    recomendaciones:
+      []
+    coherente: True
+    errores_n: 0
+    reglas_n: 0
+  inventario:
+    id: CX
+    nombre: contexto
+    rol: CX
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    reglas_internas:
+      []
+    total_reglas: 0
+    reglas_con_alerta_centinela: 0
+    modos_entrada:
+      • conversacion
+      • afirmacion
+      • teorema
+      • auditoria
+      • texto_libre
+      • repositorio
+    estados_O:
+      • estable
+      • cambio
+      • indefinido
+    eventos:
+      • mismo_O
+      • expansion
+      • cambio
+      • indefinido
+    tipos_peticion:
+      • por_que_valor
+      • dame_O
+      • dame_evidencia
+      • dame_normas
+      • dame_limites
+      • dame_cadena_completa
+    centinela:
+      regla_campos_obligatorios:
+        • id
+        • nombre
+        • version
+        • descripcion
+      auto_carga: True
+      rechaza_tru_en_clasificar: True
+      choque_id_nombre: True
+    capacidades:
+      • verificar
+      • barrer
+      • evaluar
+      • resolver
+      • inventario
+      • axiomas
+      • reporte
+      • diagnostico
+      • verificar_salida
+    requiere:
+      []
+    invariantes:
+      • el id del módulo nunca cambia
+      • el rol nunca cambia
+      • las capacidades declaradas son siempre callables tras la resolución
+      • este módulo no modifica el estado de otros módulos
+      • este módulo no calcula Tru / C / L / K
+      • este módulo no importa código ajeno a su directorio
+      • este módulo no declara dependencias
+      • este módulo no orquesta el ciclo
+      • todo *.py interno se valida por centinela de módulo
+      • este módulo no inventa capacidades no declaradas en CONTENEDOR
+    funcion: Clasifica O_context (registro, modo, ligaduras, evento, permite_k, pedir_anuncio). Centinela auto-valida cada *.py interno. No calcula Tru.
+
+══════════════════════════════════════════════════════════════════════
   MÓDULO MC/correlacion_mecanica
 ══════════════════════════════════════════════════════════════════════
   id: MC
@@ -8542,6 +8803,7 @@
     • calculator
     • catalogo_citaciones
     • constante
+    • contexto
     • correlacion_mecanica
     • formulas
     • tru_totales
@@ -8928,161 +9190,211 @@
       tipo: capacidad
       modulo: constante
     [75]
+      id: CX
+      nombre: contexto
+      rol: CX
+      tipo: modulo
+    [76]
+      id: contexto.verificar
+      nombre: verificar
+      tipo: capacidad
+      modulo: contexto
+    [77]
+      id: contexto.barrer
+      nombre: barrer
+      tipo: capacidad
+      modulo: contexto
+    [78]
+      id: contexto.evaluar
+      nombre: evaluar
+      tipo: capacidad
+      modulo: contexto
+    [79]
+      id: contexto.resolver
+      nombre: resolver
+      tipo: capacidad
+      modulo: contexto
+    [80]
+      id: contexto.inventario
+      nombre: inventario
+      tipo: capacidad
+      modulo: contexto
+    [81]
+      id: contexto.axiomas
+      nombre: axiomas
+      tipo: capacidad
+      modulo: contexto
+    [82]
+      id: contexto.reporte
+      nombre: reporte
+      tipo: capacidad
+      modulo: contexto
+    [83]
+      id: contexto.diagnostico
+      nombre: diagnostico
+      tipo: capacidad
+      modulo: contexto
+    [84]
+      id: contexto.verificar_salida
+      nombre: verificar_salida
+      tipo: capacidad
+      modulo: contexto
+    [85]
       id: MC
       nombre: correlacion_mecanica
       rol: MC
       tipo: modulo
-    [76]
+    [86]
       id: correlacion_mecanica.verificar
       nombre: verificar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [77]
+    [87]
       id: correlacion_mecanica.barrer
       nombre: barrer
       tipo: capacidad
       modulo: correlacion_mecanica
-    [78]
+    [88]
       id: correlacion_mecanica.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [79]
+    [89]
       id: correlacion_mecanica.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [80]
+    [90]
       id: correlacion_mecanica.inventario
       nombre: inventario
       tipo: capacidad
       modulo: correlacion_mecanica
-    [81]
+    [91]
       id: correlacion_mecanica.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: correlacion_mecanica
-    [82]
+    [92]
       id: correlacion_mecanica.reporte
       nombre: reporte
       tipo: capacidad
       modulo: correlacion_mecanica
-    [83]
+    [93]
       id: correlacion_mecanica.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: correlacion_mecanica
-    [84]
+    [94]
       id: correlacion_mecanica.listar_mecanicas
       nombre: listar_mecanicas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [85]
+    [95]
       id: FO
       nombre: formulas
       rol: FO
       tipo: modulo
-    [86]
+    [96]
       id: formulas.verificar
       nombre: verificar
       tipo: capacidad
       modulo: formulas
-    [87]
+    [97]
       id: formulas.barrer
       nombre: barrer
       tipo: capacidad
       modulo: formulas
-    [88]
+    [98]
       id: formulas.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: formulas
-    [89]
+    [99]
       id: formulas.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: formulas
-    [90]
+    [100]
       id: formulas.inventario
       nombre: inventario
       tipo: capacidad
       modulo: formulas
-    [91]
+    [101]
       id: formulas.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: formulas
-    [92]
+    [102]
       id: formulas.tru_ri
       nombre: tru_ri
       tipo: capacidad
       modulo: formulas
-    [93]
+    [103]
       id: formulas.tru_total
       nombre: tru_total
       tipo: capacidad
       modulo: formulas
-    [94]
+    [104]
       id: formulas.reporte
       nombre: reporte
       tipo: capacidad
       modulo: formulas
-    [95]
+    [105]
       id: formulas.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: formulas
-    [96]
+    [106]
       id: formulas.listar_formulas
       nombre: listar_formulas
       tipo: capacidad
       modulo: formulas
-    [97]
+    [107]
       id: TT
       nombre: tru_totales
       rol: TT
       tipo: modulo
-    [98]
+    [108]
       id: tru_totales.verificar
       nombre: verificar
       tipo: capacidad
       modulo: tru_totales
-    [99]
+    [109]
       id: tru_totales.barrer
       nombre: barrer
       tipo: capacidad
       modulo: tru_totales
-    [100]
+    [110]
       id: tru_totales.inventario
       nombre: inventario
       tipo: capacidad
       modulo: tru_totales
-    [101]
+    [111]
       id: tru_totales.capacidades
       nombre: capacidades
       tipo: capacidad
       modulo: tru_totales
-    [102]
+    [112]
       id: tru_totales.categorias
       nombre: categorias
       tipo: capacidad
       modulo: tru_totales
-    [103]
+    [113]
       id: tru_totales.resolver_pedido
       nombre: resolver_pedido
       tipo: capacidad
       modulo: tru_totales
-    [104]
+    [114]
       id: tru_totales.reporte
       nombre: reporte
       tipo: capacidad
       modulo: tru_totales
-    [105]
+    [115]
       id: tru_totales.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: tru_totales
-    [106]
+    [116]
       id: tru_totales.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
@@ -9369,122 +9681,158 @@
       to: constante.verificar
       tipo: declara_capacidad
     [70]
+      from: contexto
+      to: contexto.verificar
+      tipo: declara_capacidad
+    [71]
+      from: contexto
+      to: contexto.barrer
+      tipo: declara_capacidad
+    [72]
+      from: contexto
+      to: contexto.evaluar
+      tipo: declara_capacidad
+    [73]
+      from: contexto
+      to: contexto.resolver
+      tipo: declara_capacidad
+    [74]
+      from: contexto
+      to: contexto.inventario
+      tipo: declara_capacidad
+    [75]
+      from: contexto
+      to: contexto.axiomas
+      tipo: declara_capacidad
+    [76]
+      from: contexto
+      to: contexto.reporte
+      tipo: declara_capacidad
+    [77]
+      from: contexto
+      to: contexto.diagnostico
+      tipo: declara_capacidad
+    [78]
+      from: contexto
+      to: contexto.verificar_salida
+      tipo: declara_capacidad
+    [79]
       from: correlacion_mecanica
       to: correlacion_mecanica.verificar
       tipo: declara_capacidad
-    [71]
+    [80]
       from: correlacion_mecanica
       to: correlacion_mecanica.barrer
       tipo: declara_capacidad
-    [72]
+    [81]
       from: correlacion_mecanica
       to: correlacion_mecanica.evaluar
       tipo: declara_capacidad
-    [73]
+    [82]
       from: correlacion_mecanica
       to: correlacion_mecanica.axiomas
       tipo: declara_capacidad
-    [74]
+    [83]
       from: correlacion_mecanica
       to: correlacion_mecanica.inventario
       tipo: declara_capacidad
-    [75]
+    [84]
       from: correlacion_mecanica
       to: correlacion_mecanica.verificar_salida
       tipo: declara_capacidad
-    [76]
+    [85]
       from: correlacion_mecanica
       to: correlacion_mecanica.reporte
       tipo: declara_capacidad
-    [77]
+    [86]
       from: correlacion_mecanica
       to: correlacion_mecanica.diagnostico
       tipo: declara_capacidad
-    [78]
+    [87]
       from: correlacion_mecanica
       to: correlacion_mecanica.listar_mecanicas
       tipo: declara_capacidad
-    [79]
+    [88]
       from: formulas
       to: CT
       tipo: requiere
-    [80]
+    [89]
       from: formulas
       to: formulas.verificar
       tipo: declara_capacidad
-    [81]
+    [90]
       from: formulas
       to: formulas.barrer
       tipo: declara_capacidad
-    [82]
+    [91]
       from: formulas
       to: formulas.evaluar
       tipo: declara_capacidad
-    [83]
+    [92]
       from: formulas
       to: formulas.verificar_salida
       tipo: declara_capacidad
-    [84]
+    [93]
       from: formulas
       to: formulas.inventario
       tipo: declara_capacidad
-    [85]
+    [94]
       from: formulas
       to: formulas.axiomas
       tipo: declara_capacidad
-    [86]
+    [95]
       from: formulas
       to: formulas.tru_ri
       tipo: declara_capacidad
-    [87]
+    [96]
       from: formulas
       to: formulas.tru_total
       tipo: declara_capacidad
-    [88]
+    [97]
       from: formulas
       to: formulas.reporte
       tipo: declara_capacidad
-    [89]
+    [98]
       from: formulas
       to: formulas.diagnostico
       tipo: declara_capacidad
-    [90]
+    [99]
       from: formulas
       to: formulas.listar_formulas
       tipo: declara_capacidad
-    [91]
+    [100]
       from: tru_totales
       to: tru_totales.verificar
       tipo: declara_capacidad
-    [92]
+    [101]
       from: tru_totales
       to: tru_totales.barrer
       tipo: declara_capacidad
-    [93]
+    [102]
       from: tru_totales
       to: tru_totales.inventario
       tipo: declara_capacidad
-    [94]
+    [103]
       from: tru_totales
       to: tru_totales.capacidades
       tipo: declara_capacidad
-    [95]
+    [104]
       from: tru_totales
       to: tru_totales.categorias
       tipo: declara_capacidad
-    [96]
+    [105]
       from: tru_totales
       to: tru_totales.resolver_pedido
       tipo: declara_capacidad
-    [97]
+    [106]
       from: tru_totales
       to: tru_totales.reporte
       tipo: declara_capacidad
-    [98]
+    [107]
       from: tru_totales
       to: tru_totales.diagnostico
       tipo: declara_capacidad
-    [99]
+    [108]
       from: tru_totales
       to: tru_totales.verificar_salida
       tipo: declara_capacidad
@@ -9494,172 +9842,193 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T08:06:10.888643+00:00
+    timestamp: 2026-08-07T08:08:33.036694+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.003678
+    duracion_s: 0.003243
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T08:06:10.891865+00:00
+    timestamp: 2026-08-07T08:08:33.039592+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.0032
+    duracion_s: 0.00288
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T08:06:10.894854+00:00
+    timestamp: 2026-08-07T08:08:33.042274+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.002973
+    duracion_s: 0.002667
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T08:06:10.894882+00:00
+    timestamp: 2026-08-07T08:08:33.042299+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 1.5e-05
+    duracion_s: 1.3e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T08:06:10.894893+00:00
+    timestamp: 2026-08-07T08:08:33.042311+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 6e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T08:06:10.894901+00:00
+    timestamp: 2026-08-07T08:08:33.042319+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
     duracion_s: 4e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T08:06:10.895301+00:00
+    timestamp: 2026-08-07T08:08:33.042661+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000395
+    duracion_s: 0.000337
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T08:06:10.895571+00:00
+    timestamp: 2026-08-07T08:08:33.042946+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000259
+    duracion_s: 0.000276
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T08:06:10.895842+00:00
+    timestamp: 2026-08-07T08:08:33.043174+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000264
+    duracion_s: 0.000222
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T08:06:10.898140+00:00
+    timestamp: 2026-08-07T08:08:33.045232+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002289
+    duracion_s: 0.002049
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T08:06:10.899317+00:00
+    timestamp: 2026-08-07T08:08:33.046288+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001164
+    duracion_s: 0.001044
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T08:06:10.900407+00:00
+    timestamp: 2026-08-07T08:08:33.047273+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00108
+    duracion_s: 0.000975
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T08:06:10.900568+00:00
+    timestamp: 2026-08-07T08:08:33.047421+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000151
+    duracion_s: 0.000139
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T08:06:10.900669+00:00
+    timestamp: 2026-08-07T08:08:33.047510+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 9.5e-05
+    duracion_s: 8.3e-05
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T08:06:10.900713+00:00
+    timestamp: 2026-08-07T08:08:33.047551+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 3.9e-05
+    duracion_s: 3.5e-05
   [15]
     id_traza: 16
-    timestamp: 2026-08-07T08:06:10.901328+00:00
-    modulo: correlacion_mecanica
+    timestamp: 2026-08-07T08:08:33.047581+00:00
+    modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000609
+    duracion_s: 2.6e-05
   [16]
     id_traza: 17
-    timestamp: 2026-08-07T08:06:10.901738+00:00
-    modulo: correlacion_mecanica
+    timestamp: 2026-08-07T08:08:33.047600+00:00
+    modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000401
+    duracion_s: 1.5e-05
   [17]
     id_traza: 18
-    timestamp: 2026-08-07T08:06:10.901847+00:00
+    timestamp: 2026-08-07T08:08:33.047618+00:00
+    modulo: contexto
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 1.4e-05
+  [18]
+    id_traza: 19
+    timestamp: 2026-08-07T08:08:33.048178+00:00
+    modulo: correlacion_mecanica
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000555
+  [19]
+    id_traza: 20
+    timestamp: 2026-08-07T08:08:33.048544+00:00
+    modulo: correlacion_mecanica
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000359
+  [20]
+    id_traza: 21
+    timestamp: 2026-08-07T08:08:33.048622+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000102
-  [18]
-    id_traza: 19
-    timestamp: 2026-08-07T08:06:10.902695+00:00
-    modulo: formulas
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.00084
-  [19]
-    id_traza: 20
-    timestamp: 2026-08-07T08:06:10.902979+00:00
-    modulo: formulas
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000274
-  [20]
-    id_traza: 21
-    timestamp: 2026-08-07T08:06:10.903098+00:00
-    modulo: formulas
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000112
+    duracion_s: 7.3e-05
   [21]
     id_traza: 22
-    timestamp: 2026-08-07T08:06:10.904196+00:00
+    timestamp: 2026-08-07T08:08:33.049388+00:00
+    modulo: formulas
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000758
+  [22]
+    id_traza: 23
+    timestamp: 2026-08-07T08:08:33.049620+00:00
+    modulo: formulas
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000223
+  [23]
+    id_traza: 24
+    timestamp: 2026-08-07T08:08:33.049724+00:00
+    modulo: formulas
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 9.7e-05
+  [24]
+    id_traza: 25
+    timestamp: 2026-08-07T08:08:33.050672+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001088
-  [22]
-    id_traza: 23
-    timestamp: 2026-08-07T08:06:10.904684+00:00
+    duracion_s: 0.000941
+  [25]
+    id_traza: 26
+    timestamp: 2026-08-07T08:08:33.051178+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000479
-  [23]
-    id_traza: 24
-    timestamp: 2026-08-07T08:06:10.905138+00:00
+    duracion_s: 0.000498
+  [26]
+    id_traza: 27
+    timestamp: 2026-08-07T08:08:33.051566+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000445
+    duracion_s: 0.00038
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

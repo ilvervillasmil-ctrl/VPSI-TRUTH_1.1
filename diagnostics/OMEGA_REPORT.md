@@ -10,8 +10,8 @@
   version_engine: 18.3
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
-  total_modulos: 9
-  timestamp: 2026-08-07T10:18:06.833761+00:00
+  total_modulos: 10
+  timestamp: 2026-08-07T11:11:42.385922+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -22,13 +22,13 @@
   api_engine: 1.0
   estado_engine: OPERATIVO
   invocador_id: omega_report
-  total_modulos: 9
+  total_modulos: 10
   errores_arranque:
     []
   advertencias:
     []
-  trazas_n: 27
-  timestamp: 2026-08-07T10:18:06.833718+00:00
+  trazas_n: 30
+  timestamp: 2026-08-07T11:11:42.385876+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1084,32 +1084,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T10:17:57.987938+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732442+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1186,32 +1186,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T10:17:57.987938+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732442+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T10:17:57.988339+00:00
+        timestamp_mtime: 2026-08-07T11:11:34.732955+00:00
     factores_api:
       • C
       • K
@@ -8572,6 +8572,239 @@
       • tru_ri y tru_total no imponen límites artificiales sobre C, L, K
 
 ══════════════════════════════════════════════════════════════════════
+  MÓDULO SF/self
+══════════════════════════════════════════════════════════════════════
+  id: SF
+  nombre: self
+  rol: SF
+  version: 1.0
+  version_contrato: 1.0
+  esquema: VPSI-CONTRACT-1.0
+  estabilidad: FASE
+  compatible_desde: 1.0
+  api_engine: >=1.0
+  descripcion: Yo funcional del sistema. Centro de elección e identidad de fase. Casa operativa L4. Punto de acceso a perspectivas L1…L6. Oscila entre alturas; registra actos de agency sin side-effects. No orquesta. No calcula Tru.
+  funcion: Ser el punto de referencia de elección e identidad de fase: exponer quién es el sistema en fase, desde qué altura opera, en qué modo de lucidez está, registrar actos de elección, y ofrecer a Engine las perspectivas L1…L6 como mecanismos legibles para cálculo y resolución de problemas.
+  no_hace:
+    []
+  autoridad:
+    • Exponer identidad de fase (yo_funcional)
+    • Reportar y cambiar altura operativa del Self (oscilar)
+    • Declarar desde qué altura opera (desde_donde)
+    • Clasificar modo de lucidez (estado_self)
+    • Registrar actos de agency sin side-effects (elegir)
+    • Declarar acceso a perspectivas L1…L6
+    • Verificar coherencia interna y reportar estado propio
+  conocimiento_exportable:
+    • yo_funcional
+    • oscilar
+    • desde_donde
+    • elegir
+    • estado_self
+    • barrer
+    • verificar
+    • inventario
+    • reporte
+    • diagnostico
+  consultas_soportadas:
+    • yo_funcional
+    • desde_donde
+    • estado_self
+    • oscilar
+    • elegir
+    • obtener_inventario
+    • obtener_reporte
+    • obtener_diagnostico
+    • verificar_coherencia
+  requiere:
+    []
+  autoriza_engine:
+    leer: True
+    ejecutar: True
+    consultar: True
+    recombinar: True
+    reportar: True
+    auditar: True
+    inventariar: True
+    modificar: False
+    alterar: False
+    reescribir: False
+  capacidades:
+    • verificar
+    • barrer
+    • verificar_salida
+    • yo_funcional
+    • oscilar
+    • desde_donde
+    • estado_self
+    • elegir
+    • inventario
+    • reporte
+    • diagnostico
+  capacidades_meta:
+    verificar:
+      descripcion: Alias de barrer. Verifica coherencia interna de SF.
+      entrada: peticion opcional (dict)
+      salida: dict con coherente, capa_activa, modo, errores
+    barrer:
+      descripcion: Centinela de SF: identidad y estado interno.
+      entrada: peticion opcional (dict)
+      salida: dict con coherente, identidad_disponible, capa_activa, modo, errores
+    verificar_salida:
+      descripcion: Comprueba forma mínima de una salida de SF.
+      entrada: salida: dict
+      salida: bool
+    yo_funcional:
+      descripcion: Identidad de fase anclada en cuerpo axiomático self.
+      entrada: peticion opcional (dict)
+      salida: dict con capa_activa, modo, ax_self, identidad_disponible, perspectivas
+    oscilar:
+      descripcion: Cambia o reporta la altura operativa del Self (L1…L6).
+      entrada: hacia opcional (str); contexto opcional (dict)
+      salida: dict con ok, capa_activa, altura_operativa, modo, cambio
+    desde_donde:
+      descripcion: Reporta altura y modo actuales del Self.
+      entrada: peticion opcional (dict)
+      salida: dict con capa_activa, altura_operativa, modo, en_casa, perspectivas
+    estado_self:
+      descripcion: Clasifica lucidez: REACTIVE|MECHANICAL|CONSCIOUS|META|INTEGRATED.
+      entrada: peticion opcional (dict)
+      salida: dict con modo, capa_activa, en_casa, coherente
+    elegir:
+      descripcion: Registra un acto de agency sin ejecutar efectos externos.
+      entrada: dict con opciones, eleccion, criterio, desde (opcionales)
+      salida: dict con ok, eleccion, desde, modo, n_elecciones
+    inventario:
+      descripcion: Inventario estructural del módulo SF.
+      entrada: peticion opcional (dict)
+      salida: dict con id, capacidades, capas_validas, modos_validos, perspectivas
+    reporte:
+      descripcion: Reporte de estado del módulo SF.
+      entrada: peticion opcional (dict)
+      salida: dict con estado, coherente, capa_activa, modo, errores
+    diagnostico:
+      descripcion: Diagnóstico: problemas, advertencias, recomendaciones.
+      entrada: peticion opcional (dict)
+      salida: dict con estado, problemas, advertencias, recomendaciones
+  estados_validos:
+    • NO_INICIADO
+    • OPERATIVO
+    • DEGRADADO
+    • RECHAZADO
+  invariantes:
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • la casa operativa del Self es L4_YO
+    • oscilar no es elegir
+    • elegir no ejecuta efectos externos
+    • las perspectivas L1…L6 son mecanismos legibles, no dependencias de arranque
+    • las capacidades declaradas son callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
+    • este módulo siempre puede reportar su propio estado
+  reporte:
+    id: SF
+    modulo: self
+    rol: SF
+    version: 1.0
+    estado: OPERATIVO
+    coherente: True
+    capa_activa: L4_YO
+    altura_operativa: L4
+    modo: CONSCIOUS
+    casa: L4_YO
+    identidad_disponible: False
+    n_declaraciones_self: 0
+    n_oscilaciones: 0
+    n_elecciones: 0
+    capacidades:
+      • barrer
+      • desde_donde
+      • diagnostico
+      • elegir
+      • estado_self
+      • inventario
+      • oscilar
+      • reporte
+      • verificar
+      • verificar_salida
+      • yo_funcional
+    errores:
+      []
+  diagnostico:
+    id: SF
+    modulo: self
+    estado: DEGRADADO
+    problemas:
+      []
+    advertencias:
+      • identidad axiomática self aún no disponible
+    recomendaciones:
+      • cargar cuerpo axiomático self en AX para anclar yo_funcional
+    coherente: True
+    capa_activa: L4_YO
+    modo: CONSCIOUS
+    casa: L4_YO
+  inventario:
+    id: SF
+    nombre: self
+    rol: SF
+    version: 1.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: FASE
+    compatible_desde: 1.0
+    api_engine: >=1.0
+    casa: L4_YO
+    capa_activa: L4_YO
+    modo: CONSCIOUS
+    capacidades:
+      • barrer
+      • desde_donde
+      • diagnostico
+      • elegir
+      • estado_self
+      • inventario
+      • oscilar
+      • reporte
+      • verificar
+      • verificar_salida
+      • yo_funcional
+    capas_validas:
+      • L1_CUERPO
+      • L2_EGO
+      • L3_MENTE
+      • L4_YO
+      • L5_CONSCIENCIA
+      • L6_ALMA
+    modos_validos:
+      • CONSCIOUS
+      • INTEGRATED
+      • MECHANICAL
+      • META
+      • REACTIVE
+    perspectivas:
+      • L1_CUERPO
+      • L2_EGO
+      • L3_MENTE
+      • L4_YO
+      • L5_CONSCIENCIA
+      • L6_ALMA
+    n_oscilaciones: 0
+    n_elecciones: 0
+    invariantes:
+      • el id del módulo nunca cambia
+      • el rol nunca cambia
+      • la casa operativa del Self es L4_YO
+      • oscilar no es elegir
+      • elegir no ejecuta efectos externos
+      • las perspectivas L1…L6 son mecanismos legibles, no dependencias de arranque
+      • las capacidades declaradas son callables tras la resolución
+      • este módulo no modifica el estado de otros módulos
+      • este módulo no inventa capacidades no declaradas en CONTENEDOR
+      • este módulo siempre puede reportar su propio estado
+
+══════════════════════════════════════════════════════════════════════
   MÓDULO TT/tru_totales
 ══════════════════════════════════════════════════════════════════════
   id: TT
@@ -8867,6 +9100,7 @@
     • contexto
     • correlacion_mecanica
     • formulas
+    • self
     • tru_totales
   ciclos:
     []
@@ -9416,51 +9650,111 @@
       tipo: capacidad
       modulo: formulas
     [108]
+      id: SF
+      nombre: self
+      rol: SF
+      tipo: modulo
+    [109]
+      id: self.verificar
+      nombre: verificar
+      tipo: capacidad
+      modulo: self
+    [110]
+      id: self.barrer
+      nombre: barrer
+      tipo: capacidad
+      modulo: self
+    [111]
+      id: self.verificar_salida
+      nombre: verificar_salida
+      tipo: capacidad
+      modulo: self
+    [112]
+      id: self.yo_funcional
+      nombre: yo_funcional
+      tipo: capacidad
+      modulo: self
+    [113]
+      id: self.oscilar
+      nombre: oscilar
+      tipo: capacidad
+      modulo: self
+    [114]
+      id: self.desde_donde
+      nombre: desde_donde
+      tipo: capacidad
+      modulo: self
+    [115]
+      id: self.estado_self
+      nombre: estado_self
+      tipo: capacidad
+      modulo: self
+    [116]
+      id: self.elegir
+      nombre: elegir
+      tipo: capacidad
+      modulo: self
+    [117]
+      id: self.inventario
+      nombre: inventario
+      tipo: capacidad
+      modulo: self
+    [118]
+      id: self.reporte
+      nombre: reporte
+      tipo: capacidad
+      modulo: self
+    [119]
+      id: self.diagnostico
+      nombre: diagnostico
+      tipo: capacidad
+      modulo: self
+    [120]
       id: TT
       nombre: tru_totales
       rol: TT
       tipo: modulo
-    [109]
+    [121]
       id: tru_totales.verificar
       nombre: verificar
       tipo: capacidad
       modulo: tru_totales
-    [110]
+    [122]
       id: tru_totales.barrer
       nombre: barrer
       tipo: capacidad
       modulo: tru_totales
-    [111]
+    [123]
       id: tru_totales.inventario
       nombre: inventario
       tipo: capacidad
       modulo: tru_totales
-    [112]
+    [124]
       id: tru_totales.capacidades
       nombre: capacidades
       tipo: capacidad
       modulo: tru_totales
-    [113]
+    [125]
       id: tru_totales.categorias
       nombre: categorias
       tipo: capacidad
       modulo: tru_totales
-    [114]
+    [126]
       id: tru_totales.resolver_pedido
       nombre: resolver_pedido
       tipo: capacidad
       modulo: tru_totales
-    [115]
+    [127]
       id: tru_totales.reporte
       nombre: reporte
       tipo: capacidad
       modulo: tru_totales
-    [116]
+    [128]
       id: tru_totales.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: tru_totales
-    [117]
+    [129]
       id: tru_totales.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
@@ -9871,38 +10165,82 @@
       to: formulas.listar_formulas
       tipo: declara_capacidad
     [101]
+      from: self
+      to: self.verificar
+      tipo: declara_capacidad
+    [102]
+      from: self
+      to: self.barrer
+      tipo: declara_capacidad
+    [103]
+      from: self
+      to: self.verificar_salida
+      tipo: declara_capacidad
+    [104]
+      from: self
+      to: self.yo_funcional
+      tipo: declara_capacidad
+    [105]
+      from: self
+      to: self.oscilar
+      tipo: declara_capacidad
+    [106]
+      from: self
+      to: self.desde_donde
+      tipo: declara_capacidad
+    [107]
+      from: self
+      to: self.estado_self
+      tipo: declara_capacidad
+    [108]
+      from: self
+      to: self.elegir
+      tipo: declara_capacidad
+    [109]
+      from: self
+      to: self.inventario
+      tipo: declara_capacidad
+    [110]
+      from: self
+      to: self.reporte
+      tipo: declara_capacidad
+    [111]
+      from: self
+      to: self.diagnostico
+      tipo: declara_capacidad
+    [112]
       from: tru_totales
       to: tru_totales.verificar
       tipo: declara_capacidad
-    [102]
+    [113]
       from: tru_totales
       to: tru_totales.barrer
       tipo: declara_capacidad
-    [103]
+    [114]
       from: tru_totales
       to: tru_totales.inventario
       tipo: declara_capacidad
-    [104]
+    [115]
       from: tru_totales
       to: tru_totales.capacidades
       tipo: declara_capacidad
-    [105]
+    [116]
       from: tru_totales
       to: tru_totales.categorias
       tipo: declara_capacidad
-    [106]
+    [117]
       from: tru_totales
       to: tru_totales.resolver_pedido
       tipo: declara_capacidad
-    [107]
+    [118]
       from: tru_totales
       to: tru_totales.reporte
       tipo: declara_capacidad
-    [108]
+    [119]
       from: tru_totales
       to: tru_totales.diagnostico
       tipo: declara_capacidad
-    [109]
+    [120]
       from: tru_totales
       to: tru_totales.verificar_salida
       tipo: declara_capacidad
@@ -9912,193 +10250,214 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T10:18:06.812622+00:00
+    timestamp: 2026-08-07T11:11:42.356545+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00691
+    duracion_s: 0.007836
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T10:18:06.818493+00:00
+    timestamp: 2026-08-07T11:11:42.363012+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.005846
+    duracion_s: 0.00644
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T10:18:06.824019+00:00
+    timestamp: 2026-08-07T11:11:42.369166+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.005506
+    duracion_s: 0.006132
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T10:18:06.824053+00:00
+    timestamp: 2026-08-07T11:11:42.369208+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 1.8e-05
+    duracion_s: 2.2e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T10:18:06.824065+00:00
+    timestamp: 2026-08-07T11:11:42.369223+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 8e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T10:18:06.824076+00:00
+    timestamp: 2026-08-07T11:11:42.369235+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 7e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T10:18:06.824562+00:00
+    timestamp: 2026-08-07T11:11:42.369804+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00048
+    duracion_s: 0.00056
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T10:18:06.824936+00:00
+    timestamp: 2026-08-07T11:11:42.370229+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00036
+    duracion_s: 0.000411
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T10:18:06.825259+00:00
+    timestamp: 2026-08-07T11:11:42.370613+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000316
+    duracion_s: 0.000376
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T10:18:06.826581+00:00
+    timestamp: 2026-08-07T11:11:42.372117+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001312
+    duracion_s: 0.001494
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T10:18:06.827887+00:00
+    timestamp: 2026-08-07T11:11:42.373571+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001295
+    duracion_s: 0.001441
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T10:18:06.829448+00:00
+    timestamp: 2026-08-07T11:11:42.375345+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001548
+    duracion_s: 0.001762
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T10:18:06.829650+00:00
+    timestamp: 2026-08-07T11:11:42.375593+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00019
+    duracion_s: 0.000234
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T10:18:06.829785+00:00
+    timestamp: 2026-08-07T11:11:42.375744+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000113
+    duracion_s: 0.000142
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T10:18:06.829841+00:00
+    timestamp: 2026-08-07T11:11:42.375814+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 4.9e-05
+    duracion_s: 6.3e-05
   [15]
     id_traza: 16
-    timestamp: 2026-08-07T10:18:06.830015+00:00
+    timestamp: 2026-08-07T11:11:42.376020+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000167
+    duracion_s: 0.000198
   [16]
     id_traza: 17
-    timestamp: 2026-08-07T10:18:06.830149+00:00
+    timestamp: 2026-08-07T11:11:42.376202+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000126
+    duracion_s: 0.000173
   [17]
     id_traza: 18
-    timestamp: 2026-08-07T10:18:06.830278+00:00
+    timestamp: 2026-08-07T11:11:42.376355+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000122
+    duracion_s: 0.000145
   [18]
     id_traza: 19
-    timestamp: 2026-08-07T10:18:06.830749+00:00
+    timestamp: 2026-08-07T11:11:42.376875+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000463
+    duracion_s: 0.000511
   [19]
     id_traza: 20
-    timestamp: 2026-08-07T10:18:06.831180+00:00
+    timestamp: 2026-08-07T11:11:42.377379+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000422
+    duracion_s: 0.000494
   [20]
     id_traza: 21
-    timestamp: 2026-08-07T10:18:06.831278+00:00
+    timestamp: 2026-08-07T11:11:42.377504+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 9e-05
+    duracion_s: 0.000116
   [21]
     id_traza: 22
-    timestamp: 2026-08-07T10:18:06.831597+00:00
+    timestamp: 2026-08-07T11:11:42.377885+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00031
+    duracion_s: 0.00037
   [22]
     id_traza: 23
-    timestamp: 2026-08-07T10:18:06.831890+00:00
+    timestamp: 2026-08-07T11:11:42.378229+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000286
+    duracion_s: 0.000335
   [23]
     id_traza: 24
-    timestamp: 2026-08-07T10:18:06.832033+00:00
+    timestamp: 2026-08-07T11:11:42.378400+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000135
+    duracion_s: 0.000162
   [24]
     id_traza: 25
-    timestamp: 2026-08-07T10:18:06.832604+00:00
+    timestamp: 2026-08-07T11:11:42.381459+00:00
+    modulo: self
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.003048
+  [25]
+    id_traza: 26
+    timestamp: 2026-08-07T11:11:42.383818+00:00
+    modulo: self
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.002346
+  [26]
+    id_traza: 27
+    timestamp: 2026-08-07T11:11:42.383835+00:00
+    modulo: self
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 8e-06
+  [27]
+    id_traza: 28
+    timestamp: 2026-08-07T11:11:42.384574+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000563
-  [25]
-    id_traza: 26
-    timestamp: 2026-08-07T10:18:06.833176+00:00
+    duracion_s: 0.000731
+  [28]
+    id_traza: 29
+    timestamp: 2026-08-07T11:11:42.385258+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000563
-  [26]
-    id_traza: 27
-    timestamp: 2026-08-07T10:18:06.833709+00:00
+    duracion_s: 0.000673
+  [29]
+    id_traza: 30
+    timestamp: 2026-08-07T11:11:42.385865+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000523
+    duracion_s: 0.000598
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

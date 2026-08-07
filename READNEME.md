@@ -14,12 +14,12 @@ Framework Villasmil–Omega · Universal Coherence Framework (UCF) · VPSI-CONTR
 
 ---
 
-## 1. Qué es VPSI-TRUTH
-VPSI-TRUTH es un sistema de software determinista cuya función es calcular la verdad estructural de una descripción, cualquiera que sea su origen o su escala: una palabra, una frase, un diálogo, un documento o un conjunto de afirmaciones.
+## 1. 1. Qué es VPSI-TRUTH
+VPSI-TRUTH es un sistema de software determinista cuya función es calcular la verdad de una descripción, cualquiera que sea su origen o su escala: una palabra, una frase, un diálogo, un documento o un conjunto de afirmaciones.
 No interpreta opiniones.
 No genera respuestas persuasivas.
 No clasifica lo “aceptable”.
-Calcula, registra y audita la coherencia estructural de esa descripción bajo reglas explícitas y contratos verificables.
+Calcula, registra y audita la verdad de esa descripción bajo reglas explícitas y contratos verificables.
 No es un chatbot.
 No es un modelo de lenguaje.
 No es un filtro ideológico.

@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 7
-  timestamp: 2026-08-07T03:28:58.314116+00:00
+  timestamp: 2026-08-07T03:40:34.836038+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 21
-  timestamp: 2026-08-07T03:28:58.314083+00:00
+  timestamp: 2026-08-07T03:40:34.836004+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -563,32 +563,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T03:28:51.368060+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -665,32 +665,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T03:28:51.368060+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T03:28:51.368500+00:00
+        timestamp_mtime: 2026-08-07T03:40:30.687878+00:00
     factores_api:
       • C
       • K
@@ -876,57 +876,552 @@
     estabilidad: ESTABLE
     estado: DEGRADADO
     coherente: False
-    categorias: 42
+    categorias: 222
     ids:
       • afirmaciones
+      • afirmaciones
       • afirmaciones_falsas
+      • afirmaciones_falsas
+      • alpha
+      • alpha
+      • aplicar_escala
+      • aplicar_escala
+      • autoriza_engine
+      • autoriza_engine
+      • ax
+      • ax
+      • barrer
+      • barrer
+      • base_nula
+      • base_nula
+      • base_nula_c
       • base_nula_c
       • base_nula_k
+      • base_nula_k
       • base_nula_l
+      • base_nula_l
+      • beta
+      • beta
+      • c
+      • c
       • c
       • c
       • ca
+      • ca
+      • calcular_c
       • calcular_c
       • calcular_k
+      • calcular_k
+      • calcular_l
       • calcular_l
       • calculator
+      • calculator
+      • capacidades
+      • capacidades
+      • capacidades_meta
+      • capacidades_meta
+      • catalogo_citaciones
+      • catalogo_citaciones
+      • categorias
+      • categorias
+      • cc
+      • cc
       • coherencia
+      • coherencia
+      • coherencia_fn
+      • coherencia_fn
+      • combinar_resultados
+      • combinar_resultados
       • compromisos
+      • compromisos
+      • conocimiento_exportable
+      • conocimiento_exportable
+      • contenedor
+      • contenedor
+      • conteos
       • conteos
       • contexto
+      • contexto
       • contradicciones
+      • contradicciones
+      • correlacion_fn
+      • correlacion_fn
       • correlacion_k
+      • correlacion_k
+      • ct
+      • ct
+      • cx
+      • cx
+      • decimal
+      • decimal
+      • degradado
+      • degradado
+      • denominador
+      • denominador
+      • descubrir
+      • descubrir
+      • dg
+      • dg
+      • diagnostico
+      • diagnostico
+      • display
+      • display
+      • ejecutar_capacidad
+      • ejecutar_capacidad
+      • en
+      • en
+      • engine
+      • engine
+      • es_valida
+      • es_valida
+      • escala
+      • escala
       • escalas_ids
+      • escalas_ids
+      • esquema
+      • esquema
+      • esquema_categoria
+      • esquema_categoria
+      • estados_validos
+      • estados_validos
+      • extraer_conteos
       • extraer_conteos
       • f
+      • f
+      • fo
+      • fo
+      • formulas
+      • formulas
+      • fraccion
+      • fraccion
+      • ids
+      • ids
+      • invariantes
+      • invariantes
+      • inventario
+      • inventario
+      • inyectar_en_peticion
       • inyectar_en_peticion
       • k
       • k
+      • k
+      • k
+      • l
       • l
       • leer_ids_escala
+      • leer_ids_escala
       • logica
+      • logica
+      • logica_fn
+      • logica_fn
       • m
+      • m
+      • mc
+      • mc
+      • no_iniciado
+      • no_iniciado
+      • numerador
+      • numerador
+      • o_context
       • o_context
       • o_presente
-      • operacional
+      • o_presente
+      • omega
+      • omega
+      • omegareport
+      • omegareport
+      • operativo
+      • operativo
       • p
+      • p
+      • por_id
+      • por_id
       • posturas
+      • posturas
+      • precision
+      • precision
       • r
+      • r
+      • rechazado
+      • rechazado
+      • recolectar
+      • recolectar
+      • reporte
+      • reporte
+      • reporting
+      • reporting
+      • representar
+      • representar
+      • requiere
+      • requiere
+      • resolver_dependencias
+      • resolver_dependencias
+      • resolver_pedido
+      • resolver_pedido
       • reversiones
-      • teorico
+      • reversiones
+      • tru_atomo
       • tru_atomo
       • tru_conversacion
+      • tru_conversacion
+      • tru_frase
       • tru_frase
       • tru_repositorio
+      • tru_repositorio
+      • tru_ri
+      • tru_ri
+      • tru_ri
+      • tru_ri
       • tru_sujeto
+      • tru_sujeto
+      • tru_total
+      • tru_total
+      • tru_total
+      • tru_total
+      • tru_totales
+      • tru_totales
+      • truth
+      • truth
+      • tt
+      • tt
       • undefined
+      • undefined
+      • valor
+      • valor
+      • verificar
+      • verificar
+      • verificar_c
+      • verificar_c
+      • verificar_escala
+      • verificar_escala
+      • verificar_k
+      • verificar_k
+      • verificar_l
+      • verificar_l
+      • verificar_salida
+      • verificar_salida
     errores:
       [0]
         archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator']
+        error: id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']
       [1]
         archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator']
+        error: id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']
+      [2]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']
+      [3]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']
+      [4]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']
+      [5]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']
+      [6]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']
+      [7]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']
+      [8]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']
+      [9]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']
+      [10]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']
+      [11]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']
+      [12]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']
+      [13]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']
+      [14]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']
+      [15]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']
+      [16]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']
+      [17]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']
+      [18]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']
+      [19]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']
+      [20]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']
+      [21]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']
+      [22]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']
+      [23]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']
+      [24]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']
+      [25]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']
+      [26]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']
+      [27]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']
+      [28]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']
+      [29]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']
+      [30]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']
+      [31]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']
+      [32]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']
+      [33]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']
+      [34]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [35]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [36]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']
+      [37]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']
+      [38]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']
+      [39]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']
+      [40]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']
+      [41]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']
+      [42]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']
+      [43]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']
+      [44]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']
+      [45]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']
+      [46]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']
+      [47]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']
+      [48]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']
+      [49]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']
+      [50]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']
+      [51]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']
+      [52]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']
+      [53]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']
+      [54]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']
+      [55]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [56]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']
+      [57]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [58]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']
+      [59]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']
+      [60]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']
+      [61]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']
+      [62]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']
+      [63]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']
+      [64]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']
+      [65]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']
+      [66]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']
+      [67]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']
+      [68]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']
+      [69]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']
+      [70]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']
+      [71]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']
+      [72]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']
+      [73]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']
+      [74]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']
+      [75]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']
+      [76]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']
+      [77]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']
+      [78]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']
+      [79]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']
+      [80]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']
+      [81]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']
+      [82]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']
+      [83]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']
+      [84]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']
+      [85]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']
+      [86]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']
+      [87]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']
+      [88]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']
+      [89]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']
+      [90]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']
+      [91]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']
+      [92]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']
+      [93]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']
+      [94]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']
+      [95]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']
+      [96]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']
+      [97]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']
+      [98]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']
+      [99]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']
+      [100]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']
+      [101]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']
+      [102]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']
+      [103]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']
+      [104]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']
+      [105]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']
+      [106]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']
     notas:
       []
     capacidades:
@@ -973,17 +1468,332 @@
         detalle:
           [0]
             archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator']
+            error: id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']
           [1]
             archivo: Ids_calculator,Ids_calculator
-            error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator']
+            error: id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']
+          [2]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']
+          [3]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']
+          [4]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']
+          [5]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']
+          [6]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']
+          [7]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']
+          [8]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']
+          [9]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']
+          [10]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']
+          [11]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']
+          [12]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']
+          [13]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']
+          [14]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']
+          [15]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']
+          [16]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']
+          [17]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']
+          [18]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']
+          [19]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']
+          [20]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']
+          [21]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']
+          [22]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']
+          [23]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']
+          [24]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']
+          [25]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']
+          [26]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']
+          [27]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']
+          [28]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']
+          [29]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']
+          [30]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']
+          [31]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']
+          [32]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']
+          [33]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']
+          [34]
+            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+          [35]
+            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+          [36]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']
+          [37]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']
+          [38]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']
+          [39]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']
+          [40]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']
+          [41]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']
+          [42]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']
+          [43]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']
+          [44]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']
+          [45]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']
+          [46]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']
+          [47]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']
+          [48]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']
+          [49]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']
+          [50]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']
+          [51]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']
+          [52]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']
+          [53]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']
+          [54]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']
+          [55]
+            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+            error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+          [56]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']
+          [57]
+            archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+            error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+          [58]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']
+          [59]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']
+          [60]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']
+          [61]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']
+          [62]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']
+          [63]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']
+          [64]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']
+          [65]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']
+          [66]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']
+          [67]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']
+          [68]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']
+          [69]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']
+          [70]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']
+          [71]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']
+          [72]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']
+          [73]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']
+          [74]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']
+          [75]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']
+          [76]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']
+          [77]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']
+          [78]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']
+          [79]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']
+          [80]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']
+          [81]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']
+          [82]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']
+          [83]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']
+          [84]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']
+          [85]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']
+          [86]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']
+          [87]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']
+          [88]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']
+          [89]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']
+          [90]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']
+          [91]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']
+          [92]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']
+          [93]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']
+          [94]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']
+          [95]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']
+          [96]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']
+          [97]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']
+          [98]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']
+          [99]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']
+          [100]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']
+          [101]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']
+          [102]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']
+          [103]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']
+          [104]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']
+          [105]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']
+          [106]
+            archivo: Ids_calculator,Ids_calculator
+            error: id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']
     advertencias:
       []
     recomendaciones:
       • Corregir archivos de categorias/ con errores de forma o carga
     coherente: False
-    errores_n: 2
-    categorias_n: 42
+    errores_n: 107
+    categorias_n: 222
   inventario:
     id: CC
     nombre: catalogo_citaciones
@@ -1032,6 +1842,27 @@
       [0]
         id: afirmaciones
         nombre: afirmaciones
+        unidad: clave
+        enunciado: Clave de conteo: afirmaciones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=conteo
+      [1]
+        id: afirmaciones
+        nombre: afirmaciones
         unidad: id
         enunciado: ID del repositorio: afirmaciones
         nivel_fractal: NO ENTREGADO POR ENGINE
@@ -1050,7 +1881,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [1]
+      [2]
+        id: afirmaciones_falsas
+        nombre: afirmaciones_falsas
+        unidad: clave
+        enunciado: Clave de conteo: afirmaciones_falsas
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=conteo
+      [3]
         id: afirmaciones_falsas
         nombre: afirmaciones_falsas
         unidad: id
@@ -1071,7 +1923,280 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [2]
+      [4]
+        id: alpha
+        nombre: ALPHA
+        unidad: factor
+        enunciado: Factor o magnitud: ALPHA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=factor
+      [5]
+        id: alpha
+        nombre: ALPHA
+        unidad: id
+        enunciado: ID del repositorio: ALPHA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [6]
+        id: aplicar_escala
+        nombre: aplicar_escala
+        unidad: funcion
+        enunciado: Función o capacidad: aplicar_escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [7]
+        id: aplicar_escala
+        nombre: aplicar_escala
+        unidad: id
+        enunciado: ID del repositorio: aplicar_escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [8]
+        id: autoriza_engine
+        nombre: autoriza_engine
+        unidad: campo
+        enunciado: Campo estructural de contrato: autoriza_engine
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [9]
+        id: autoriza_engine
+        nombre: autoriza_engine
+        unidad: id
+        enunciado: ID del repositorio: autoriza_engine
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [10]
+        id: ax
+        nombre: AX
+        unidad: rol
+        enunciado: Módulo / rol del sistema: AX
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [11]
+        id: ax
+        nombre: AX
+        unidad: id
+        enunciado: ID del repositorio: AX
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [12]
+        id: barrer
+        nombre: barrer
+        unidad: funcion
+        enunciado: Función o capacidad: barrer
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [13]
+        id: barrer
+        nombre: barrer
+        unidad: id
+        enunciado: ID del repositorio: barrer
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [14]
+        id: base_nula
+        nombre: base_nula
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [15]
+        id: base_nula
+        nombre: base_nula
+        unidad: id
+        enunciado: ID del repositorio: base_nula
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [16]
+        id: base_nula_c
+        nombre: base_nula_C
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula_C
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [17]
         id: base_nula_c
         nombre: base_nula_C
         unidad: id
@@ -1092,7 +2217,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [3]
+      [18]
+        id: base_nula_k
+        nombre: base_nula_K
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula_K
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [19]
         id: base_nula_k
         nombre: base_nula_K
         unidad: id
@@ -1113,7 +2259,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [4]
+      [20]
+        id: base_nula_l
+        nombre: base_nula_L
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula_L
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [21]
         id: base_nula_l
         nombre: base_nula_L
         unidad: id
@@ -1134,7 +2301,91 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [5]
+      [22]
+        id: beta
+        nombre: BETA
+        unidad: factor
+        enunciado: Factor o magnitud: BETA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=factor
+      [23]
+        id: beta
+        nombre: BETA
+        unidad: id
+        enunciado: ID del repositorio: BETA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [24]
+        id: c
+        nombre: C
+        unidad: factor
+        enunciado: Factor o magnitud: C
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=factor
+      [25]
+        id: c
+        nombre: c
+        unidad: variable
+        enunciado: Variable matemática: c
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=variable
+      [26]
         id: c
         nombre: C
         unidad: id
@@ -1155,7 +2406,7 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [6]
+      [27]
         id: c
         nombre: c
         unidad: id
@@ -1176,7 +2427,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [7]
+      [28]
+        id: ca
+        nombre: CA
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [29]
         id: ca
         nombre: CA
         unidad: id
@@ -1197,7 +2469,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [8]
+      [30]
+        id: calcular_c
+        nombre: calcular_c
+        unidad: funcion
+        enunciado: Función o capacidad: calcular_c
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [31]
         id: calcular_c
         nombre: calcular_c
         unidad: id
@@ -1218,7 +2511,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [9]
+      [32]
+        id: calcular_k
+        nombre: calcular_k
+        unidad: funcion
+        enunciado: Función o capacidad: calcular_k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [33]
         id: calcular_k
         nombre: calcular_k
         unidad: id
@@ -1239,7 +2553,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [10]
+      [34]
+        id: calcular_l
+        nombre: calcular_l
+        unidad: funcion
+        enunciado: Función o capacidad: calcular_l
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [35]
         id: calcular_l
         nombre: calcular_l
         unidad: id
@@ -1260,7 +2595,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [11]
+      [36]
+        id: calculator
+        nombre: calculator
+        unidad: archivo
+        enunciado: Archivo del repositorio: calculator
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [37]
         id: calculator
         nombre: calculator
         unidad: id
@@ -1281,7 +2637,238 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [12]
+      [38]
+        id: capacidades
+        nombre: capacidades
+        unidad: campo
+        enunciado: Campo estructural de contrato: capacidades
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [39]
+        id: capacidades
+        nombre: capacidades
+        unidad: id
+        enunciado: ID del repositorio: capacidades
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [40]
+        id: capacidades_meta
+        nombre: capacidades_meta
+        unidad: campo
+        enunciado: Campo estructural de contrato: capacidades_meta
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [41]
+        id: capacidades_meta
+        nombre: capacidades_meta
+        unidad: id
+        enunciado: ID del repositorio: capacidades_meta
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [42]
+        id: catalogo_citaciones
+        nombre: catalogo_citaciones
+        unidad: archivo
+        enunciado: Archivo del repositorio: catalogo_citaciones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [43]
+        id: catalogo_citaciones
+        nombre: catalogo_citaciones
+        unidad: id
+        enunciado: ID del repositorio: catalogo_citaciones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [44]
+        id: categorias
+        nombre: categorias
+        unidad: funcion
+        enunciado: Función o capacidad: categorias
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [45]
+        id: categorias
+        nombre: categorias
+        unidad: id
+        enunciado: ID del repositorio: categorias
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [46]
+        id: cc
+        nombre: CC
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CC
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [47]
+        id: cc
+        nombre: CC
+        unidad: id
+        enunciado: ID del repositorio: CC
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [48]
+        id: coherencia
+        nombre: coherencia
+        unidad: archivo
+        enunciado: Archivo del repositorio: coherencia
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [49]
         id: coherencia
         nombre: coherencia
         unidad: id
@@ -1302,7 +2889,112 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [13]
+      [50]
+        id: coherencia_fn
+        nombre: coherencia_fn
+        unidad: funcion
+        enunciado: Función o capacidad: coherencia_fn
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [51]
+        id: coherencia_fn
+        nombre: coherencia_fn
+        unidad: id
+        enunciado: ID del repositorio: coherencia_fn
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [52]
+        id: combinar_resultados
+        nombre: combinar_resultados
+        unidad: funcion
+        enunciado: Función o capacidad: combinar_resultados
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [53]
+        id: combinar_resultados
+        nombre: combinar_resultados
+        unidad: id
+        enunciado: ID del repositorio: combinar_resultados
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [54]
+        id: compromisos
+        nombre: compromisos
+        unidad: clave
+        enunciado: Clave de conteo: compromisos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=conteo
+      [55]
         id: compromisos
         nombre: compromisos
         unidad: id
@@ -1323,7 +3015,112 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [14]
+      [56]
+        id: conocimiento_exportable
+        nombre: conocimiento_exportable
+        unidad: campo
+        enunciado: Campo estructural de contrato: conocimiento_exportable
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [57]
+        id: conocimiento_exportable
+        nombre: conocimiento_exportable
+        unidad: id
+        enunciado: ID del repositorio: conocimiento_exportable
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [58]
+        id: contenedor
+        nombre: CONTENEDOR
+        unidad: campo
+        enunciado: Campo estructural de contrato: CONTENEDOR
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [59]
+        id: contenedor
+        nombre: CONTENEDOR
+        unidad: id
+        enunciado: ID del repositorio: CONTENEDOR
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [60]
+        id: conteos
+        nombre: conteos
+        unidad: archivo
+        enunciado: Archivo del repositorio: conteos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [61]
         id: conteos
         nombre: conteos
         unidad: id
@@ -1344,7 +3141,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [15]
+      [62]
+        id: contexto
+        nombre: contexto
+        unidad: meta
+        enunciado: Metadato de dominio: contexto
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [63]
         id: contexto
         nombre: contexto
         unidad: id
@@ -1365,7 +3183,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [16]
+      [64]
+        id: contradicciones
+        nombre: contradicciones
+        unidad: clave
+        enunciado: Clave de conteo: contradicciones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=conteo
+      [65]
         id: contradicciones
         nombre: contradicciones
         unidad: id
@@ -1386,7 +3225,70 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [17]
+      [66]
+        id: correlacion_fn
+        nombre: correlacion_fn
+        unidad: funcion
+        enunciado: Función o capacidad: correlacion_fn
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [67]
+        id: correlacion_fn
+        nombre: correlacion_fn
+        unidad: id
+        enunciado: ID del repositorio: correlacion_fn
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [68]
+        id: correlacion_k
+        nombre: correlacion_k
+        unidad: archivo
+        enunciado: Archivo del repositorio: correlacion_k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [69]
         id: correlacion_k
         nombre: correlacion_k
         unidad: id
@@ -1407,7 +3309,616 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [18]
+      [70]
+        id: ct
+        nombre: CT
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CT
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [71]
+        id: ct
+        nombre: CT
+        unidad: id
+        enunciado: ID del repositorio: CT
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [72]
+        id: cx
+        nombre: CX
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CX
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [73]
+        id: cx
+        nombre: CX
+        unidad: id
+        enunciado: ID del repositorio: CX
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [74]
+        id: decimal
+        nombre: decimal
+        unidad: campo
+        enunciado: Campo de representación: decimal
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=representacion
+      [75]
+        id: decimal
+        nombre: decimal
+        unidad: id
+        enunciado: ID del repositorio: decimal
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [76]
+        id: degradado
+        nombre: DEGRADADO
+        unidad: estado
+        enunciado: Estado de módulo: DEGRADADO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=estado
+      [77]
+        id: degradado
+        nombre: DEGRADADO
+        unidad: id
+        enunciado: ID del repositorio: DEGRADADO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [78]
+        id: denominador
+        nombre: denominador
+        unidad: campo
+        enunciado: Campo de representación: denominador
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=representacion
+      [79]
+        id: denominador
+        nombre: denominador
+        unidad: id
+        enunciado: ID del repositorio: denominador
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [80]
+        id: descubrir
+        nombre: descubrir
+        unidad: funcion
+        enunciado: Función o capacidad: descubrir
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [81]
+        id: descubrir
+        nombre: descubrir
+        unidad: id
+        enunciado: ID del repositorio: descubrir
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [82]
+        id: dg
+        nombre: DG
+        unidad: rol
+        enunciado: Módulo / rol del sistema: DG
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [83]
+        id: dg
+        nombre: DG
+        unidad: id
+        enunciado: ID del repositorio: DG
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [84]
+        id: diagnostico
+        nombre: diagnostico
+        unidad: funcion
+        enunciado: Función o capacidad: diagnostico
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [85]
+        id: diagnostico
+        nombre: diagnostico
+        unidad: id
+        enunciado: ID del repositorio: diagnostico
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [86]
+        id: display
+        nombre: display
+        unidad: campo
+        enunciado: Campo de representación: display
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=representacion
+      [87]
+        id: display
+        nombre: display
+        unidad: id
+        enunciado: ID del repositorio: display
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [88]
+        id: ejecutar_capacidad
+        nombre: ejecutar_capacidad
+        unidad: funcion
+        enunciado: Función o capacidad: ejecutar_capacidad
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [89]
+        id: ejecutar_capacidad
+        nombre: ejecutar_capacidad
+        unidad: id
+        enunciado: ID del repositorio: ejecutar_capacidad
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [90]
+        id: en
+        nombre: EN
+        unidad: rol
+        enunciado: Módulo / rol del sistema: EN
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [91]
+        id: en
+        nombre: EN
+        unidad: id
+        enunciado: ID del repositorio: EN
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [92]
+        id: engine
+        nombre: Engine
+        unidad: agente
+        enunciado: Agente del sistema: Engine
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=agente
+      [93]
+        id: engine
+        nombre: Engine
+        unidad: id
+        enunciado: ID del repositorio: Engine
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [94]
+        id: es_valida
+        nombre: es_valida
+        unidad: funcion
+        enunciado: Función o capacidad: es_valida
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [95]
+        id: es_valida
+        nombre: es_valida
+        unidad: id
+        enunciado: ID del repositorio: es_valida
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [96]
+        id: escala
+        nombre: escala
+        unidad: archivo
+        enunciado: Archivo del repositorio: escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [97]
+        id: escala
+        nombre: escala
+        unidad: id
+        enunciado: ID del repositorio: escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [98]
+        id: escalas_ids
+        nombre: escalas_ids
+        unidad: archivo
+        enunciado: Archivo del repositorio: escalas_ids
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [99]
         id: escalas_ids
         nombre: escalas_ids
         unidad: id
@@ -1428,7 +3939,154 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [19]
+      [100]
+        id: esquema
+        nombre: esquema
+        unidad: funcion
+        enunciado: Función o capacidad: esquema
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [101]
+        id: esquema
+        nombre: esquema
+        unidad: id
+        enunciado: ID del repositorio: esquema
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [102]
+        id: esquema_categoria
+        nombre: ESQUEMA_CATEGORIA
+        unidad: campo
+        enunciado: Campo estructural de contrato: ESQUEMA_CATEGORIA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [103]
+        id: esquema_categoria
+        nombre: ESQUEMA_CATEGORIA
+        unidad: id
+        enunciado: ID del repositorio: ESQUEMA_CATEGORIA
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [104]
+        id: estados_validos
+        nombre: estados_validos
+        unidad: campo
+        enunciado: Campo estructural de contrato: estados_validos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [105]
+        id: estados_validos
+        nombre: estados_validos
+        unidad: id
+        enunciado: ID del repositorio: estados_validos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [106]
+        id: extraer_conteos
+        nombre: extraer_conteos
+        unidad: funcion
+        enunciado: Función o capacidad: extraer_conteos
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [107]
         id: extraer_conteos
         nombre: extraer_conteos
         unidad: id
@@ -1449,7 +4107,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [20]
+      [108]
+        id: f
+        nombre: f
+        unidad: variable
+        enunciado: Variable matemática: f
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=variable
+      [109]
         id: f
         nombre: f
         unidad: id
@@ -1470,7 +4149,280 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [21]
+      [110]
+        id: fo
+        nombre: FO
+        unidad: rol
+        enunciado: Módulo / rol del sistema: FO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [111]
+        id: fo
+        nombre: FO
+        unidad: id
+        enunciado: ID del repositorio: FO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [112]
+        id: formulas
+        nombre: formulas
+        unidad: archivo
+        enunciado: Archivo del repositorio: formulas
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [113]
+        id: formulas
+        nombre: formulas
+        unidad: id
+        enunciado: ID del repositorio: formulas
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [114]
+        id: fraccion
+        nombre: fraccion
+        unidad: campo
+        enunciado: Campo de representación: fraccion
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=representacion
+      [115]
+        id: fraccion
+        nombre: fraccion
+        unidad: id
+        enunciado: ID del repositorio: fraccion
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [116]
+        id: ids
+        nombre: ids
+        unidad: funcion
+        enunciado: Función o capacidad: ids
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [117]
+        id: ids
+        nombre: ids
+        unidad: id
+        enunciado: ID del repositorio: ids
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [118]
+        id: invariantes
+        nombre: invariantes
+        unidad: campo
+        enunciado: Campo estructural de contrato: invariantes
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [119]
+        id: invariantes
+        nombre: invariantes
+        unidad: id
+        enunciado: ID del repositorio: invariantes
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [120]
+        id: inventario
+        nombre: inventario
+        unidad: funcion
+        enunciado: Función o capacidad: inventario
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [121]
+        id: inventario
+        nombre: inventario
+        unidad: id
+        enunciado: ID del repositorio: inventario
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [122]
+        id: inyectar_en_peticion
+        nombre: inyectar_en_peticion
+        unidad: funcion
+        enunciado: Función o capacidad: inyectar_en_peticion
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [123]
         id: inyectar_en_peticion
         nombre: inyectar_en_peticion
         unidad: id
@@ -1491,7 +4443,49 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [22]
+      [124]
+        id: k
+        nombre: K
+        unidad: factor
+        enunciado: Factor o magnitud: K
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=factor
+      [125]
+        id: k
+        nombre: k
+        unidad: variable
+        enunciado: Variable matemática: k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=variable
+      [126]
         id: k
         nombre: K
         unidad: id
@@ -1512,7 +4506,7 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [23]
+      [127]
         id: k
         nombre: k
         unidad: id
@@ -1533,7 +4527,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [24]
+      [128]
+        id: l
+        nombre: L
+        unidad: factor
+        enunciado: Factor o magnitud: L
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=factor
+      [129]
         id: l
         nombre: L
         unidad: id
@@ -1554,7 +4569,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [25]
+      [130]
+        id: leer_ids_escala
+        nombre: leer_ids_escala
+        unidad: funcion
+        enunciado: Función o capacidad: leer_ids_escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [131]
         id: leer_ids_escala
         nombre: leer_ids_escala
         unidad: id
@@ -1575,7 +4611,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [26]
+      [132]
+        id: logica
+        nombre: logica
+        unidad: archivo
+        enunciado: Archivo del repositorio: logica
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [133]
         id: logica
         nombre: logica
         unidad: id
@@ -1596,7 +4653,70 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [27]
+      [134]
+        id: logica_fn
+        nombre: logica_fn
+        unidad: funcion
+        enunciado: Función o capacidad: logica_fn
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [135]
+        id: logica_fn
+        nombre: logica_fn
+        unidad: id
+        enunciado: ID del repositorio: logica_fn
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [136]
+        id: m
+        nombre: m
+        unidad: variable
+        enunciado: Variable matemática: m
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=variable
+      [137]
         id: m
         nombre: m
         unidad: id
@@ -1617,7 +4737,154 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [28]
+      [138]
+        id: mc
+        nombre: MC
+        unidad: rol
+        enunciado: Módulo / rol del sistema: MC
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [139]
+        id: mc
+        nombre: MC
+        unidad: id
+        enunciado: ID del repositorio: MC
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [140]
+        id: no_iniciado
+        nombre: NO_INICIADO
+        unidad: estado
+        enunciado: Estado de módulo: NO_INICIADO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=estado
+      [141]
+        id: no_iniciado
+        nombre: NO_INICIADO
+        unidad: id
+        enunciado: ID del repositorio: NO_INICIADO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [142]
+        id: numerador
+        nombre: numerador
+        unidad: campo
+        enunciado: Campo de representación: numerador
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=representacion
+      [143]
+        id: numerador
+        nombre: numerador
+        unidad: id
+        enunciado: ID del repositorio: numerador
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [144]
+        id: o_context
+        nombre: O_context
+        unidad: meta
+        enunciado: Metadato de dominio: O_context
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [145]
         id: o_context
         nombre: O_context
         unidad: id
@@ -1638,7 +4905,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [29]
+      [146]
+        id: o_presente
+        nombre: o_presente
+        unidad: meta
+        enunciado: Metadato de dominio: o_presente
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [147]
         id: o_presente
         nombre: o_presente
         unidad: id
@@ -1659,11 +4947,32 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [30]
-        id: operacional
-        nombre: operacional
+      [148]
+        id: omega
+        nombre: Omega
+        unidad: agente
+        enunciado: Agente del sistema: Omega
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=agente
+      [149]
+        id: omega
+        nombre: Omega
         unidad: id
-        enunciado: ID del repositorio: operacional
+        enunciado: ID del repositorio: Omega
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -1680,7 +4989,112 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [31]
+      [150]
+        id: omegareport
+        nombre: OmegaReport
+        unidad: agente
+        enunciado: Agente del sistema: OmegaReport
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=agente
+      [151]
+        id: omegareport
+        nombre: OmegaReport
+        unidad: id
+        enunciado: ID del repositorio: OmegaReport
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [152]
+        id: operativo
+        nombre: OPERATIVO
+        unidad: estado
+        enunciado: Estado de módulo: OPERATIVO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=estado
+      [153]
+        id: operativo
+        nombre: OPERATIVO
+        unidad: id
+        enunciado: ID del repositorio: OPERATIVO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [154]
+        id: p
+        nombre: p
+        unidad: variable
+        enunciado: Variable matemática: p
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=variable
+      [155]
         id: p
         nombre: p
         unidad: id
@@ -1701,7 +5115,70 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [32]
+      [156]
+        id: por_id
+        nombre: por_id
+        unidad: funcion
+        enunciado: Función o capacidad: por_id
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [157]
+        id: por_id
+        nombre: por_id
+        unidad: id
+        enunciado: ID del repositorio: por_id
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [158]
+        id: posturas
+        nombre: posturas
+        unidad: clave
+        enunciado: Clave de conteo: posturas
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=conteo
+      [159]
         id: posturas
         nombre: posturas
         unidad: id
@@ -1722,7 +5199,70 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [33]
+      [160]
+        id: precision
+        nombre: precision
+        unidad: campo
+        enunciado: Campo de representación: precision
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=representacion
+      [161]
+        id: precision
+        nombre: precision
+        unidad: id
+        enunciado: ID del repositorio: precision
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [162]
+        id: r
+        nombre: r
+        unidad: variable
+        enunciado: Variable matemática: r
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=variable
+      [163]
         id: r
         nombre: r
         unidad: id
@@ -1743,7 +5283,364 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [34]
+      [164]
+        id: rechazado
+        nombre: RECHAZADO
+        unidad: estado
+        enunciado: Estado de módulo: RECHAZADO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=estado
+      [165]
+        id: rechazado
+        nombre: RECHAZADO
+        unidad: id
+        enunciado: ID del repositorio: RECHAZADO
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [166]
+        id: recolectar
+        nombre: recolectar
+        unidad: funcion
+        enunciado: Función o capacidad: recolectar
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [167]
+        id: recolectar
+        nombre: recolectar
+        unidad: id
+        enunciado: ID del repositorio: recolectar
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [168]
+        id: reporte
+        nombre: reporte
+        unidad: funcion
+        enunciado: Función o capacidad: reporte
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [169]
+        id: reporte
+        nombre: reporte
+        unidad: id
+        enunciado: ID del repositorio: reporte
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [170]
+        id: reporting
+        nombre: reporting
+        unidad: campo
+        enunciado: Campo estructural de contrato: reporting
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [171]
+        id: reporting
+        nombre: reporting
+        unidad: id
+        enunciado: ID del repositorio: reporting
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [172]
+        id: representar
+        nombre: representar
+        unidad: funcion
+        enunciado: Función o capacidad: representar
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [173]
+        id: representar
+        nombre: representar
+        unidad: id
+        enunciado: ID del repositorio: representar
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [174]
+        id: requiere
+        nombre: requiere
+        unidad: campo
+        enunciado: Campo estructural de contrato: requiere
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=contrato
+      [175]
+        id: requiere
+        nombre: requiere
+        unidad: id
+        enunciado: ID del repositorio: requiere
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [176]
+        id: resolver_dependencias
+        nombre: resolver_dependencias
+        unidad: funcion
+        enunciado: Función o capacidad: resolver_dependencias
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [177]
+        id: resolver_dependencias
+        nombre: resolver_dependencias
+        unidad: id
+        enunciado: ID del repositorio: resolver_dependencias
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [178]
+        id: resolver_pedido
+        nombre: resolver_pedido
+        unidad: funcion
+        enunciado: Función o capacidad: resolver_pedido
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [179]
+        id: resolver_pedido
+        nombre: resolver_pedido
+        unidad: id
+        enunciado: ID del repositorio: resolver_pedido
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [180]
+        id: reversiones
+        nombre: reversiones
+        unidad: clave
+        enunciado: Clave de conteo: reversiones
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=conteo
+      [181]
         id: reversiones
         nombre: reversiones
         unidad: id
@@ -1764,11 +5661,11 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [35]
-        id: teorico
-        nombre: teorico
-        unidad: id
-        enunciado: ID del repositorio: teorico
+      [182]
+        id: tru_atomo
+        nombre: tru_atomo
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_atomo
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -1784,8 +5681,8 @@
           []
         origen: Ids_calculator
         version: 1.0
-        notas: NO ENTREGADO POR ENGINE
-      [36]
+        notas: clase=escala
+      [183]
         id: tru_atomo
         nombre: tru_atomo
         unidad: id
@@ -1806,7 +5703,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [37]
+      [184]
+        id: tru_conversacion
+        nombre: tru_conversacion
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_conversacion
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=escala
+      [185]
         id: tru_conversacion
         nombre: tru_conversacion
         unidad: id
@@ -1827,7 +5745,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [38]
+      [186]
+        id: tru_frase
+        nombre: tru_frase
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_frase
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=escala
+      [187]
         id: tru_frase
         nombre: tru_frase
         unidad: id
@@ -1848,7 +5787,28 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [39]
+      [188]
+        id: tru_repositorio
+        nombre: tru_repositorio
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_repositorio
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=escala
+      [189]
         id: tru_repositorio
         nombre: tru_repositorio
         unidad: id
@@ -1869,7 +5829,112 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [40]
+      [190]
+        id: tru_ri
+        nombre: tru_ri
+        unidad: funcion
+        enunciado: Función o capacidad: tru_ri
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [191]
+        id: tru_ri
+        nombre: Tru_Ri
+        unidad: factor
+        enunciado: Factor o magnitud: Tru_Ri
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=factor
+      [192]
+        id: tru_ri
+        nombre: tru_ri
+        unidad: id
+        enunciado: ID del repositorio: tru_ri
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [193]
+        id: tru_ri
+        nombre: Tru_Ri
+        unidad: id
+        enunciado: ID del repositorio: Tru_Ri
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [194]
+        id: tru_sujeto
+        nombre: tru_sujeto
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_sujeto
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=escala
+      [195]
         id: tru_sujeto
         nombre: tru_sujeto
         unidad: id
@@ -1890,7 +5955,238 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [41]
+      [196]
+        id: tru_total
+        nombre: tru_total
+        unidad: funcion
+        enunciado: Función o capacidad: tru_total
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [197]
+        id: tru_total
+        nombre: Tru_total
+        unidad: factor
+        enunciado: Factor o magnitud: Tru_total
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=factor
+      [198]
+        id: tru_total
+        nombre: tru_total
+        unidad: id
+        enunciado: ID del repositorio: tru_total
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [199]
+        id: tru_total
+        nombre: Tru_total
+        unidad: id
+        enunciado: ID del repositorio: Tru_total
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [200]
+        id: tru_totales
+        nombre: tru_totales
+        unidad: archivo
+        enunciado: Archivo del repositorio: tru_totales
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [201]
+        id: tru_totales
+        nombre: tru_totales
+        unidad: id
+        enunciado: ID del repositorio: tru_totales
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [202]
+        id: truth
+        nombre: truth
+        unidad: archivo
+        enunciado: Archivo del repositorio: truth
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=archivo
+      [203]
+        id: truth
+        nombre: truth
+        unidad: id
+        enunciado: ID del repositorio: truth
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [204]
+        id: tt
+        nombre: TT
+        unidad: rol
+        enunciado: Módulo / rol del sistema: TT
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=modulo
+      [205]
+        id: tt
+        nombre: TT
+        unidad: id
+        enunciado: ID del repositorio: TT
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [206]
+        id: undefined
+        nombre: UNDEFINED
+        unidad: meta
+        enunciado: Metadato de dominio: UNDEFINED
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=meta
+      [207]
         id: undefined
         nombre: UNDEFINED
         unidad: id
@@ -1911,57 +6207,846 @@
         origen: Ids_calculator
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
+      [208]
+        id: valor
+        nombre: valor
+        unidad: campo
+        enunciado: Campo de representación: valor
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=representacion
+      [209]
+        id: valor
+        nombre: valor
+        unidad: id
+        enunciado: ID del repositorio: valor
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [210]
+        id: verificar
+        nombre: verificar
+        unidad: funcion
+        enunciado: Función o capacidad: verificar
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [211]
+        id: verificar
+        nombre: verificar
+        unidad: id
+        enunciado: ID del repositorio: verificar
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [212]
+        id: verificar_c
+        nombre: verificar_c
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_c
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [213]
+        id: verificar_c
+        nombre: verificar_c
+        unidad: id
+        enunciado: ID del repositorio: verificar_c
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [214]
+        id: verificar_escala
+        nombre: verificar_escala
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [215]
+        id: verificar_escala
+        nombre: verificar_escala
+        unidad: id
+        enunciado: ID del repositorio: verificar_escala
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [216]
+        id: verificar_k
+        nombre: verificar_k
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [217]
+        id: verificar_k
+        nombre: verificar_k
+        unidad: id
+        enunciado: ID del repositorio: verificar_k
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [218]
+        id: verificar_l
+        nombre: verificar_l
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_l
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [219]
+        id: verificar_l
+        nombre: verificar_l
+        unidad: id
+        enunciado: ID del repositorio: verificar_l
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
+      [220]
+        id: verificar_salida
+        nombre: verificar_salida
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_salida
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: clase=funcion
+      [221]
+        id: verificar_salida
+        nombre: verificar_salida
+        unidad: id
+        enunciado: ID del repositorio: verificar_salida
+        nivel_fractal: NO ENTREGADO POR ENGINE
+        jurisdiccion: NO ENTREGADO POR ENGINE
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: NO ENTREGADO POR ENGINE
+        senales:
+          []
+        anclas:
+          []
+        origen: Ids_calculator
+        version: 1.0
+        notas: NO ENTREGADO POR ENGINE
     ids:
       • afirmaciones
+      • afirmaciones
       • afirmaciones_falsas
+      • afirmaciones_falsas
+      • alpha
+      • alpha
+      • aplicar_escala
+      • aplicar_escala
+      • autoriza_engine
+      • autoriza_engine
+      • ax
+      • ax
+      • barrer
+      • barrer
+      • base_nula
+      • base_nula
+      • base_nula_c
       • base_nula_c
       • base_nula_k
+      • base_nula_k
       • base_nula_l
+      • base_nula_l
+      • beta
+      • beta
+      • c
+      • c
       • c
       • c
       • ca
+      • ca
+      • calcular_c
       • calcular_c
       • calcular_k
+      • calcular_k
+      • calcular_l
       • calcular_l
       • calculator
+      • calculator
+      • capacidades
+      • capacidades
+      • capacidades_meta
+      • capacidades_meta
+      • catalogo_citaciones
+      • catalogo_citaciones
+      • categorias
+      • categorias
+      • cc
+      • cc
       • coherencia
+      • coherencia
+      • coherencia_fn
+      • coherencia_fn
+      • combinar_resultados
+      • combinar_resultados
       • compromisos
+      • compromisos
+      • conocimiento_exportable
+      • conocimiento_exportable
+      • contenedor
+      • contenedor
+      • conteos
       • conteos
       • contexto
+      • contexto
       • contradicciones
+      • contradicciones
+      • correlacion_fn
+      • correlacion_fn
       • correlacion_k
+      • correlacion_k
+      • ct
+      • ct
+      • cx
+      • cx
+      • decimal
+      • decimal
+      • degradado
+      • degradado
+      • denominador
+      • denominador
+      • descubrir
+      • descubrir
+      • dg
+      • dg
+      • diagnostico
+      • diagnostico
+      • display
+      • display
+      • ejecutar_capacidad
+      • ejecutar_capacidad
+      • en
+      • en
+      • engine
+      • engine
+      • es_valida
+      • es_valida
+      • escala
+      • escala
       • escalas_ids
+      • escalas_ids
+      • esquema
+      • esquema
+      • esquema_categoria
+      • esquema_categoria
+      • estados_validos
+      • estados_validos
+      • extraer_conteos
       • extraer_conteos
       • f
+      • f
+      • fo
+      • fo
+      • formulas
+      • formulas
+      • fraccion
+      • fraccion
+      • ids
+      • ids
+      • invariantes
+      • invariantes
+      • inventario
+      • inventario
+      • inyectar_en_peticion
       • inyectar_en_peticion
       • k
       • k
+      • k
+      • k
+      • l
       • l
       • leer_ids_escala
+      • leer_ids_escala
       • logica
+      • logica
+      • logica_fn
+      • logica_fn
       • m
+      • m
+      • mc
+      • mc
+      • no_iniciado
+      • no_iniciado
+      • numerador
+      • numerador
+      • o_context
       • o_context
       • o_presente
-      • operacional
+      • o_presente
+      • omega
+      • omega
+      • omegareport
+      • omegareport
+      • operativo
+      • operativo
       • p
+      • p
+      • por_id
+      • por_id
       • posturas
+      • posturas
+      • precision
+      • precision
       • r
+      • r
+      • rechazado
+      • rechazado
+      • recolectar
+      • recolectar
+      • reporte
+      • reporte
+      • reporting
+      • reporting
+      • representar
+      • representar
+      • requiere
+      • requiere
+      • resolver_dependencias
+      • resolver_dependencias
+      • resolver_pedido
+      • resolver_pedido
       • reversiones
-      • teorico
+      • reversiones
+      • tru_atomo
       • tru_atomo
       • tru_conversacion
+      • tru_conversacion
+      • tru_frase
       • tru_frase
       • tru_repositorio
+      • tru_repositorio
+      • tru_ri
+      • tru_ri
+      • tru_ri
+      • tru_ri
       • tru_sujeto
+      • tru_sujeto
+      • tru_total
+      • tru_total
+      • tru_total
+      • tru_total
+      • tru_totales
+      • tru_totales
+      • truth
+      • truth
+      • tt
+      • tt
       • undefined
-    total: 42
+      • undefined
+      • valor
+      • valor
+      • verificar
+      • verificar
+      • verificar_c
+      • verificar_c
+      • verificar_escala
+      • verificar_escala
+      • verificar_k
+      • verificar_k
+      • verificar_l
+      • verificar_l
+      • verificar_salida
+      • verificar_salida
+    total: 222
     errores:
       [0]
         archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator']
+        error: id duplicado 'ca' en ['Ids_calculator', 'Ids_calculator']
       [1]
         archivo: Ids_calculator,Ids_calculator
-        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator']
+        error: id duplicado 'fo' en ['Ids_calculator', 'Ids_calculator']
+      [2]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tt' en ['Ids_calculator', 'Ids_calculator']
+      [3]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'cc' en ['Ids_calculator', 'Ids_calculator']
+      [4]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ct' en ['Ids_calculator', 'Ids_calculator']
+      [5]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ax' en ['Ids_calculator', 'Ids_calculator']
+      [6]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'mc' en ['Ids_calculator', 'Ids_calculator']
+      [7]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'cx' en ['Ids_calculator', 'Ids_calculator']
+      [8]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'dg' en ['Ids_calculator', 'Ids_calculator']
+      [9]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'en' en ['Ids_calculator', 'Ids_calculator']
+      [10]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calculator' en ['Ids_calculator', 'Ids_calculator']
+      [11]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'coherencia' en ['Ids_calculator', 'Ids_calculator']
+      [12]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'logica' en ['Ids_calculator', 'Ids_calculator']
+      [13]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'correlacion_k' en ['Ids_calculator', 'Ids_calculator']
+      [14]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'conteos' en ['Ids_calculator', 'Ids_calculator']
+      [15]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'escalas_ids' en ['Ids_calculator', 'Ids_calculator']
+      [16]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'formulas' en ['Ids_calculator', 'Ids_calculator']
+      [17]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'truth' en ['Ids_calculator', 'Ids_calculator']
+      [18]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'escala' en ['Ids_calculator', 'Ids_calculator']
+      [19]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_totales' en ['Ids_calculator', 'Ids_calculator']
+      [20]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'catalogo_citaciones' en ['Ids_calculator', 'Ids_calculator']
+      [21]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'coherencia_fn' en ['Ids_calculator', 'Ids_calculator']
+      [22]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'logica_fn' en ['Ids_calculator', 'Ids_calculator']
+      [23]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'correlacion_fn' en ['Ids_calculator', 'Ids_calculator']
+      [24]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calcular_c' en ['Ids_calculator', 'Ids_calculator']
+      [25]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calcular_l' en ['Ids_calculator', 'Ids_calculator']
+      [26]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'calcular_k' en ['Ids_calculator', 'Ids_calculator']
+      [27]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_c' en ['Ids_calculator', 'Ids_calculator']
+      [28]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_l' en ['Ids_calculator', 'Ids_calculator']
+      [29]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_k' en ['Ids_calculator', 'Ids_calculator']
+      [30]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'extraer_conteos' en ['Ids_calculator', 'Ids_calculator']
+      [31]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'inyectar_en_peticion' en ['Ids_calculator', 'Ids_calculator']
+      [32]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'leer_ids_escala' en ['Ids_calculator', 'Ids_calculator']
+      [33]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'representar' en ['Ids_calculator', 'Ids_calculator']
+      [34]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_ri' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [35]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_total' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [36]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'aplicar_escala' en ['Ids_calculator', 'Ids_calculator']
+      [37]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_escala' en ['Ids_calculator', 'Ids_calculator']
+      [38]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'resolver_pedido' en ['Ids_calculator', 'Ids_calculator']
+      [39]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'categorias' en ['Ids_calculator', 'Ids_calculator']
+      [40]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'por_id' en ['Ids_calculator', 'Ids_calculator']
+      [41]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ids' en ['Ids_calculator', 'Ids_calculator']
+      [42]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'es_valida' en ['Ids_calculator', 'Ids_calculator']
+      [43]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'esquema' en ['Ids_calculator', 'Ids_calculator']
+      [44]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'barrer' en ['Ids_calculator', 'Ids_calculator']
+      [45]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar' en ['Ids_calculator', 'Ids_calculator']
+      [46]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'verificar_salida' en ['Ids_calculator', 'Ids_calculator']
+      [47]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'inventario' en ['Ids_calculator', 'Ids_calculator']
+      [48]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'reporte' en ['Ids_calculator', 'Ids_calculator']
+      [49]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'diagnostico' en ['Ids_calculator', 'Ids_calculator']
+      [50]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'recolectar' en ['Ids_calculator', 'Ids_calculator']
+      [51]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'descubrir' en ['Ids_calculator', 'Ids_calculator']
+      [52]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'resolver_dependencias' en ['Ids_calculator', 'Ids_calculator']
+      [53]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'ejecutar_capacidad' en ['Ids_calculator', 'Ids_calculator']
+      [54]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'combinar_resultados' en ['Ids_calculator', 'Ids_calculator']
+      [55]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'c' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [56]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'l' en ['Ids_calculator', 'Ids_calculator']
+      [57]
+        archivo: Ids_calculator,Ids_calculator,Ids_calculator,Ids_calculator
+        error: id duplicado 'k' en ['Ids_calculator', 'Ids_calculator', 'Ids_calculator', 'Ids_calculator']
+      [58]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'alpha' en ['Ids_calculator', 'Ids_calculator']
+      [59]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'beta' en ['Ids_calculator', 'Ids_calculator']
+      [60]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'm' en ['Ids_calculator', 'Ids_calculator']
+      [61]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'p' en ['Ids_calculator', 'Ids_calculator']
+      [62]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'r' en ['Ids_calculator', 'Ids_calculator']
+      [63]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'f' en ['Ids_calculator', 'Ids_calculator']
+      [64]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'compromisos' en ['Ids_calculator', 'Ids_calculator']
+      [65]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'contradicciones' en ['Ids_calculator', 'Ids_calculator']
+      [66]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'posturas' en ['Ids_calculator', 'Ids_calculator']
+      [67]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'reversiones' en ['Ids_calculator', 'Ids_calculator']
+      [68]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'afirmaciones' en ['Ids_calculator', 'Ids_calculator']
+      [69]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'afirmaciones_falsas' en ['Ids_calculator', 'Ids_calculator']
+      [70]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula' en ['Ids_calculator', 'Ids_calculator']
+      [71]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula_c' en ['Ids_calculator', 'Ids_calculator']
+      [72]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula_l' en ['Ids_calculator', 'Ids_calculator']
+      [73]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'base_nula_k' en ['Ids_calculator', 'Ids_calculator']
+      [74]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'o_presente' en ['Ids_calculator', 'Ids_calculator']
+      [75]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'o_context' en ['Ids_calculator', 'Ids_calculator']
+      [76]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'contexto' en ['Ids_calculator', 'Ids_calculator']
+      [77]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'undefined' en ['Ids_calculator', 'Ids_calculator']
+      [78]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_atomo' en ['Ids_calculator', 'Ids_calculator']
+      [79]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_frase' en ['Ids_calculator', 'Ids_calculator']
+      [80]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_sujeto' en ['Ids_calculator', 'Ids_calculator']
+      [81]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_conversacion' en ['Ids_calculator', 'Ids_calculator']
+      [82]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'tru_repositorio' en ['Ids_calculator', 'Ids_calculator']
+      [83]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'fraccion' en ['Ids_calculator', 'Ids_calculator']
+      [84]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'decimal' en ['Ids_calculator', 'Ids_calculator']
+      [85]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'display' en ['Ids_calculator', 'Ids_calculator']
+      [86]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'numerador' en ['Ids_calculator', 'Ids_calculator']
+      [87]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'denominador' en ['Ids_calculator', 'Ids_calculator']
+      [88]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'precision' en ['Ids_calculator', 'Ids_calculator']
+      [89]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'valor' en ['Ids_calculator', 'Ids_calculator']
+      [90]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'contenedor' en ['Ids_calculator', 'Ids_calculator']
+      [91]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'capacidades' en ['Ids_calculator', 'Ids_calculator']
+      [92]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'capacidades_meta' en ['Ids_calculator', 'Ids_calculator']
+      [93]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'autoriza_engine' en ['Ids_calculator', 'Ids_calculator']
+      [94]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'conocimiento_exportable' en ['Ids_calculator', 'Ids_calculator']
+      [95]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'requiere' en ['Ids_calculator', 'Ids_calculator']
+      [96]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'reporting' en ['Ids_calculator', 'Ids_calculator']
+      [97]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'invariantes' en ['Ids_calculator', 'Ids_calculator']
+      [98]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'estados_validos' en ['Ids_calculator', 'Ids_calculator']
+      [99]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'esquema_categoria' en ['Ids_calculator', 'Ids_calculator']
+      [100]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'no_iniciado' en ['Ids_calculator', 'Ids_calculator']
+      [101]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'operativo' en ['Ids_calculator', 'Ids_calculator']
+      [102]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'degradado' en ['Ids_calculator', 'Ids_calculator']
+      [103]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'rechazado' en ['Ids_calculator', 'Ids_calculator']
+      [104]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'engine' en ['Ids_calculator', 'Ids_calculator']
+      [105]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'omega' en ['Ids_calculator', 'Ids_calculator']
+      [106]
+        archivo: Ids_calculator,Ids_calculator
+        error: id duplicado 'omegareport' en ['Ids_calculator', 'Ids_calculator']
     coherente: False
     capacidades:
       • verificar
@@ -3750,151 +8835,151 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T03:28:58.300189+00:00
+    timestamp: 2026-08-07T03:40:34.817146+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00246
+    duracion_s: 0.002384
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T03:28:58.302286+00:00
+    timestamp: 2026-08-07T03:40:34.819190+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.002077
+    duracion_s: 0.002022
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T03:28:58.304084+00:00
+    timestamp: 2026-08-07T03:40:34.820990+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
     duracion_s: 0.001785
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T03:28:58.304603+00:00
+    timestamp: 2026-08-07T03:40:34.821517+00:00
     modulo: calculator
     capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000506
-  [4]
-    id_traza: 5
-    timestamp: 2026-08-07T03:28:58.305031+00:00
-    modulo: calculator
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000418
-  [5]
-    id_traza: 6
-    timestamp: 2026-08-07T03:28:58.305418+00:00
-    modulo: calculator
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.00038
-  [6]
-    id_traza: 7
-    timestamp: 2026-08-07T03:28:58.306127+00:00
-    modulo: catalogo_citaciones
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.0007
-  [7]
-    id_traza: 8
-    timestamp: 2026-08-07T03:28:58.306541+00:00
-    modulo: catalogo_citaciones
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000397
-  [8]
-    id_traza: 9
-    timestamp: 2026-08-07T03:28:58.306900+00:00
-    modulo: catalogo_citaciones
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.00035
-  [9]
-    id_traza: 10
-    timestamp: 2026-08-07T03:28:58.307121+00:00
-    modulo: constante
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000212
-  [10]
-    id_traza: 11
-    timestamp: 2026-08-07T03:28:58.307272+00:00
-    modulo: constante
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000142
-  [11]
-    id_traza: 12
-    timestamp: 2026-08-07T03:28:58.307342+00:00
-    modulo: constante
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 6.4e-05
-  [12]
-    id_traza: 13
-    timestamp: 2026-08-07T03:28:58.308200+00:00
-    modulo: correlacion_mecanica
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.00085
-  [13]
-    id_traza: 14
-    timestamp: 2026-08-07T03:28:58.308726+00:00
-    modulo: correlacion_mecanica
-    capacidad: diagnostico
     estado: EXITO
     duracion_s: 0.000514
+  [4]
+    id_traza: 5
+    timestamp: 2026-08-07T03:40:34.821949+00:00
+    modulo: calculator
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000422
+  [5]
+    id_traza: 6
+    timestamp: 2026-08-07T03:40:34.822343+00:00
+    modulo: calculator
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.000386
+  [6]
+    id_traza: 7
+    timestamp: 2026-08-07T03:40:34.824860+00:00
+    modulo: catalogo_citaciones
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.002508
+  [7]
+    id_traza: 8
+    timestamp: 2026-08-07T03:40:34.826354+00:00
+    modulo: catalogo_citaciones
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.001474
+  [8]
+    id_traza: 9
+    timestamp: 2026-08-07T03:40:34.828597+00:00
+    modulo: catalogo_citaciones
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.002229
+  [9]
+    id_traza: 10
+    timestamp: 2026-08-07T03:40:34.828845+00:00
+    modulo: constante
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000235
+  [10]
+    id_traza: 11
+    timestamp: 2026-08-07T03:40:34.829030+00:00
+    modulo: constante
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000176
+  [11]
+    id_traza: 12
+    timestamp: 2026-08-07T03:40:34.829103+00:00
+    modulo: constante
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 6.5e-05
+  [12]
+    id_traza: 13
+    timestamp: 2026-08-07T03:40:34.829863+00:00
+    modulo: correlacion_mecanica
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000752
+  [13]
+    id_traza: 14
+    timestamp: 2026-08-07T03:40:34.830410+00:00
+    modulo: correlacion_mecanica
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000536
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T03:28:58.308859+00:00
+    timestamp: 2026-08-07T03:40:34.830549+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000124
+    duracion_s: 0.000129
   [15]
     id_traza: 16
-    timestamp: 2026-08-07T03:28:58.310265+00:00
+    timestamp: 2026-08-07T03:40:34.831990+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001397
+    duracion_s: 0.00143
   [16]
     id_traza: 17
-    timestamp: 2026-08-07T03:28:58.310648+00:00
+    timestamp: 2026-08-07T03:40:34.832570+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000371
+    duracion_s: 0.000566
   [17]
     id_traza: 18
-    timestamp: 2026-08-07T03:28:58.310824+00:00
+    timestamp: 2026-08-07T03:40:34.832756+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000167
+    duracion_s: 0.000176
   [18]
     id_traza: 19
-    timestamp: 2026-08-07T03:28:58.312602+00:00
+    timestamp: 2026-08-07T03:40:34.834578+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001769
+    duracion_s: 0.001811
   [19]
     id_traza: 20
-    timestamp: 2026-08-07T03:28:58.313364+00:00
+    timestamp: 2026-08-07T03:40:34.835333+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000751
+    duracion_s: 0.000744
   [20]
     id_traza: 21
-    timestamp: 2026-08-07T03:28:58.314071+00:00
+    timestamp: 2026-08-07T03:40:34.835993+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000696
+    duracion_s: 0.00065
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

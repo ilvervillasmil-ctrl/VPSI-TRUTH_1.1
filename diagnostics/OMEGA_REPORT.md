@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 5
-  timestamp: 2026-08-07T01:16:20.783474+00:00
+  timestamp: 2026-08-07T01:20:03.885146+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 15
-  timestamp: 2026-08-07T01:16:20.783447+00:00
+  timestamp: 2026-08-07T01:20:03.885120+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1922,109 +1922,109 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T01:16:20.778364+00:00
+    timestamp: 2026-08-07T01:20:03.880193+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002322
+    duracion_s: 0.002194
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T01:16:20.780318+00:00
+    timestamp: 2026-08-07T01:20:03.882076+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001932
+    duracion_s: 0.001865
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T01:16:20.782033+00:00
+    timestamp: 2026-08-07T01:20:03.883759+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001699
+    duracion_s: 0.00167
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T01:16:20.782176+00:00
+    timestamp: 2026-08-07T01:20:03.883899+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00013
+    duracion_s: 0.000128
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T01:16:20.782287+00:00
+    timestamp: 2026-08-07T01:20:03.884006+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.0001
+    duracion_s: 9.7e-05
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T01:16:20.782393+00:00
+    timestamp: 2026-08-07T01:20:03.884107+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 9.6e-05
+    duracion_s: 9.3e-05
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T01:16:20.782515+00:00
+    timestamp: 2026-08-07T01:20:03.884220+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000112
+    duracion_s: 0.000103
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T01:16:20.782645+00:00
+    timestamp: 2026-08-07T01:20:03.884313+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000116
+    duracion_s: 8e-05
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T01:16:20.782692+00:00
+    timestamp: 2026-08-07T01:20:03.884357+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 3.8e-05
+    duracion_s: 3.6e-05
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T01:16:20.782745+00:00
+    timestamp: 2026-08-07T01:20:03.884407+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4.5e-05
+    duracion_s: 4.3e-05
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T01:16:20.782781+00:00
+    timestamp: 2026-08-07T01:20:03.884442+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 2.9e-05
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T01:16:20.782814+00:00
+    timestamp: 2026-08-07T01:20:03.884474+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
     duracion_s: 2.7e-05
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T01:16:20.783071+00:00
+    timestamp: 2026-08-07T01:20:03.884748+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00025
+    duracion_s: 0.000267
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T01:16:20.783317+00:00
+    timestamp: 2026-08-07T01:20:03.884992+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000237
+    duracion_s: 0.000235
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T01:16:20.783438+00:00
+    timestamp: 2026-08-07T01:20:03.885113+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000113
+    duracion_s: 0.000112
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

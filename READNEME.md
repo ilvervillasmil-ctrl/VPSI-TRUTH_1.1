@@ -32,7 +32,7 @@ Principio operativo:
 saber ≠ creer
 El sistema no opina. Ejecuta contratos. Produce evidencia inspectable.
 
-2. Filosofía de diseño
+2. mecánica ⚙️ de diseño
 VPSI-TRUTH se organiza sobre una separación estricta de responsabilidades:
 Componente
 Posee
@@ -436,6 +436,7 @@ Engine        →  construye el espacio causal y ejecuta
 CACHE         →  conserva el expediente
 Centinela     →  certifica
 Omega         →  presenta
+
 Un desarrollador que lea únicamente este documento debe poder comprender la filosofía, la arquitectura, el papel de cada componente, el modelo contractual, el flujo de ejecución, el proceso de auditoría y el procedimiento para extender el sistema sin modificar el núcleo.
 
 Documento arquitectónico oficial de VPSI-TRUTH. Si el mapa narrativo y la evidencia JSON divergen, prevalece la evidencia.

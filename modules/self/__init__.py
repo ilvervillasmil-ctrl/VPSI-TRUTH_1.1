@@ -9,24 +9,27 @@
 # Versión contrato:    1.0
 # Esquema contrato:    VPSI-CONTRACT-1.0
 # Estabilidad:         FASE
-# Compatible desde:    0.1
+# Compatible desde:    1.0
 # API Engine:          >=1.0
 #
 # Función:
 #   Yo funcional del sistema. Centro de elección e identidad de fase.
-#   Casa operativa: L4. Oscila entre alturas; registra actos de agency
-#   sin ejecutar efectos externos.
+#   Casa operativa: L4. Punto de acceso a las perspectivas L1…L6.
+#   Oscila entre alturas; registra actos de agency sin side-effects.
 #
 # Qué hace:
 #   - Expone identidad de fase anclada en el cuerpo axiomático self.
 #   - Reporta y cambia la altura operativa (L1…L6) del Self.
 #   - Clasifica el modo de lucidez (REACTIVE…INTEGRATED).
-#   - Registra actos de elección sin side-effects.
+#   - Registra actos de elección sin efectos externos.
+#   - Declara el acceso a mecanismos de perspectiva L1…L6
+#     para cálculo y resolución de problemas.
 #   - Verifica coherencia interna y reporta estado propio.
 #
 # Responsabilidad:
 #   Ser el punto de referencia de elección e identidad de fase.
 #   Distinguir oscilar (altura) de elegir (agency).
+#   Ofrecer a Engine las perspectivas L1…L6 como mecanismos legibles.
 #
 # Autoridad:
 #   - Declarar desde qué altura opera el Self.
@@ -39,8 +42,8 @@
 #
 # Observaciones:
 #   No orquesta. No calcula Tru. No interpreta contenido de negocio.
-#   AX se consulta en runtime solo para identidad; no es dependencia
-#   de arranque. Capas L1–L3 y L5–L6 no se implementan aquí.
+#   Las subcarpetas L1…L6 son mecanismos de perspectiva, no dependencias
+#   de arranque. AX se consulta en runtime solo para identidad.
 #
 # ===============================================================
 
@@ -65,11 +68,11 @@ CAPAS_VALIDAS: Set[str] = {
 CASA_SELF = "L4_YO"
 
 MODOS_VALIDOS: Set[str] = {
-    "REACTIVE",      # L1–L2: arrastrado
-    "MECHANICAL",    # L3: patrones mentales
-    "CONSCIOUS",     # L4: elige (casa)
-    "META",          # L5: observa sus procesos
-    "INTEGRATED",    # L6: dirige con propósito
+    "REACTIVE",
+    "MECHANICAL",
+    "CONSCIOUS",
+    "META",
+    "INTEGRATED",
 }
 
 # ---------------------------------------------------------------------------
@@ -115,7 +118,6 @@ def _normalizar_capa(hacia: str) -> Optional[str]:
     for c in CAPAS_VALIDAS:
         if c.startswith(clave + "_") or c == clave:
             return c
-    # admite "L4" puro
     for c in CAPAS_VALIDAS:
         if c.startswith(clave):
             return c
@@ -199,9 +201,11 @@ def yo_funcional(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "casa": CASA_SELF,
         "ax_self": ax,
         "identidad_disponible": bool(ax.get("ok") and ax.get("n", 0) > 0),
+        "perspectivas": sorted(CAPAS_VALIDAS),
         "nota": (
             "Yo funcional de fase. Casa L4. "
-            "Identidad anclada en cuerpo self; no implica capas implementadas."
+            "Acceso a perspectivas L1…L6 para cálculo y resolución. "
+            "Identidad anclada en cuerpo self."
         ),
     }
 
@@ -271,6 +275,7 @@ def desde_donde(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "loop_sospechado": bool(_estado_self.get("loop_sospechado")),
         "n_oscilaciones": len(_estado_self.get("historial_oscilacion") or []),
         "n_elecciones": len(_estado_self.get("historial_elecciones") or []),
+        "perspectivas": sorted(CAPAS_VALIDAS),
     }
 
 
@@ -365,7 +370,6 @@ def barrer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         errores.append("capa_activa inválida: {0}".format(capa))
 
     coherente = len(errores) == 0
-    # identidad vacía no tumba el módulo en fase; se reporta
     return {
         "contenedor": "self",
         "id": "SF",
@@ -380,6 +384,7 @@ def barrer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "n_oscilaciones": len(_estado_self.get("historial_oscilacion") or []),
         "n_elecciones": len(_estado_self.get("historial_elecciones") or []),
         "capas_validas": sorted(CAPAS_VALIDAS),
+        "perspectivas": sorted(CAPAS_VALIDAS),
         "errores": errores,
     }
 
@@ -409,12 +414,16 @@ def inventario(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "version": cfg.get("version_modulo"),
         "version_contrato": cfg.get("version_contrato"),
         "esquema": cfg.get("esquema"),
+        "estabilidad": cfg.get("estabilidad"),
+        "compatible_desde": cfg.get("compatible_desde"),
+        "api_engine": cfg.get("api_engine"),
         "casa": CASA_SELF,
         "capa_activa": _estado_self.get("capa_activa"),
         "modo": _estado_self.get("modo"),
         "capacidades": sorted((cfg.get("capacidades") or {}).keys()),
         "capas_validas": sorted(CAPAS_VALIDAS),
         "modos_validos": sorted(MODOS_VALIDOS),
+        "perspectivas": sorted(CAPAS_VALIDAS),
         "n_oscilaciones": len(_estado_self.get("historial_oscilacion") or []),
         "n_elecciones": len(_estado_self.get("historial_elecciones") or []),
         "invariantes": list(cfg.get("invariantes") or []),
@@ -497,15 +506,21 @@ CONTENEDOR: Dict[str, Any] = {
     "id": "SF",
     "nombre": "self",
     "rol": "SF",
+    "estabilidad": "FASE",
+    "compatible_desde": "1.0",
+    "api_engine": ">=1.0",
     "descripcion": (
         "Yo funcional del sistema. Centro de elección e identidad de fase. "
-        "Casa operativa L4. Oscila entre alturas; registra actos de agency "
-        "sin ejecutar efectos externos. No orquesta. No calcula Tru."
+        "Casa operativa L4. Punto de acceso a perspectivas L1…L6. "
+        "Oscila entre alturas; registra actos de agency sin side-effects. "
+        "No orquesta. No calcula Tru."
     ),
     "funcion": (
         "Ser el punto de referencia de elección e identidad de fase: "
         "exponer quién es el sistema en fase, desde qué altura opera, "
-        "en qué modo de lucidez está, y registrar actos de elección."
+        "en qué modo de lucidez está, registrar actos de elección, "
+        "y ofrecer a Engine las perspectivas L1…L6 como mecanismos "
+        "legibles para cálculo y resolución de problemas."
     ),
     "no_hace": [],
     "autoridad": [
@@ -514,6 +529,7 @@ CONTENEDOR: Dict[str, Any] = {
         "Declarar desde qué altura opera (desde_donde)",
         "Clasificar modo de lucidez (estado_self)",
         "Registrar actos de agency sin side-effects (elegir)",
+        "Declarar acceso a perspectivas L1…L6",
         "Verificar coherencia interna y reportar estado propio",
     ],
     "conocimiento_exportable": [
@@ -584,7 +600,7 @@ CONTENEDOR: Dict[str, Any] = {
         "yo_funcional": {
             "descripcion": "Identidad de fase anclada en cuerpo axiomático self.",
             "entrada": "peticion opcional (dict)",
-            "salida": "dict con capa_activa, modo, ax_self, identidad_disponible",
+            "salida": "dict con capa_activa, modo, ax_self, identidad_disponible, perspectivas",
         },
         "oscilar": {
             "descripcion": "Cambia o reporta la altura operativa del Self (L1…L6).",
@@ -594,7 +610,7 @@ CONTENEDOR: Dict[str, Any] = {
         "desde_donde": {
             "descripcion": "Reporta altura y modo actuales del Self.",
             "entrada": "peticion opcional (dict)",
-            "salida": "dict con capa_activa, altura_operativa, modo, en_casa",
+            "salida": "dict con capa_activa, altura_operativa, modo, en_casa, perspectivas",
         },
         "estado_self": {
             "descripcion": "Clasifica lucidez: REACTIVE|MECHANICAL|CONSCIOUS|META|INTEGRATED.",
@@ -609,7 +625,7 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario": {
             "descripcion": "Inventario estructural del módulo SF.",
             "entrada": "peticion opcional (dict)",
-            "salida": "dict con id, capacidades, capas_validas, modos_validos",
+            "salida": "dict con id, capacidades, capas_validas, modos_validos, perspectivas",
         },
         "reporte": {
             "descripcion": "Reporte de estado del módulo SF.",
@@ -623,9 +639,19 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
     "reporting": {
-        "inventario": "inventario",
-        "reporte": "reporte",
-        "diagnostico": "diagnostico",
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
+        "reporte": True,
     },
     "estados_validos": [
         "NO_INICIADO",
@@ -639,6 +665,7 @@ CONTENEDOR: Dict[str, Any] = {
         "la casa operativa del Self es L4_YO",
         "oscilar no es elegir",
         "elegir no ejecuta efectos externos",
+        "las perspectivas L1…L6 son mecanismos legibles, no dependencias de arranque",
         "las capacidades declaradas son callables tras la resolución",
         "este módulo no modifica el estado de otros módulos",
         "este módulo no inventa capacidades no declaradas en CONTENEDOR",

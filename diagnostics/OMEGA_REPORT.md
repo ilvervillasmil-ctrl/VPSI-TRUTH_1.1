@@ -10,8 +10,8 @@
   version_engine: 18.3
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
-  total_modulos: 14
-  timestamp: 2026-08-07T21:47:11.620231+00:00
+  total_modulos: 15
+  timestamp: 2026-08-07T21:56:55.732347+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -22,13 +22,13 @@
   api_engine: 1.0
   estado_engine: OPERATIVO
   invocador_id: omega_report
-  total_modulos: 14
+  total_modulos: 15
   errores_arranque:
     []
   advertencias:
     []
-  trazas_n: 40
-  timestamp: 2026-08-07T21:47:11.620135+00:00
+  trazas_n: 43
+  timestamp: 2026-08-07T21:56:55.732272+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1190,32 +1190,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753340+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1292,32 +1292,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753340+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T21:47:06.984817+00:00
+        timestamp_mtime: 2026-08-07T21:56:50.753868+00:00
     factores_api:
       • C
       • K
@@ -9784,6 +9784,204 @@
       • este módulo siempre puede reportar su propio estado
 
 ══════════════════════════════════════════════════════════════════════
+  MÓDULO TX/taxonomia
+══════════════════════════════════════════════════════════════════════
+  id: TX
+  nombre: taxonomia
+  rol: TX
+  version: 2.0
+  version_contrato: 1.0
+  esquema: VPSI-CONTRACT-1.0
+  estabilidad: ESTABLE
+  compatible_desde: 1.0
+  api_engine: >=1.0
+  descripcion: Taxonomía metodológica (TX). Reglas deterministas de estructura para medir tácticas (T1–T15). Sin interpretación. No calcula Tru_total. El init audita cada táctica; si no pasa el filtro, no sale. Engine aplica esta taxonomía sobre un O_context cuando el contrato y la correlación mecánica lo autorizan.
+  funcion: Auditar declaraciones de táctica; filtrar las inválidas; aplicar coincidencia estructural determinista; reportar estado propio del catálogo TX.
+  no_hace:
+    • No interpreta contenido semántico libre
+    • No calcula C, L, K, Tru_Ri ni Tru_total
+    • No orquesta el ciclo del sistema
+    • No deposita reportes en Diagnóstico
+    • No aplica tácticas que no pasaron el filtro interno
+  autoridad:
+    • Declarar y filtrar tácticas metodológicas por estructura
+    • Detectar id/nombre duplicados entre archivos
+    • Aplicar coincidencia estructural sobre una descripción
+    • Reportar inventario, reporte y diagnóstico propios
+  conocimiento_exportable:
+    • inventario
+    • reporte
+    • diagnostico
+    • tacticas
+    • axiomas
+  consultas_soportadas:
+    • verificar
+    • barrer
+    • aplicar
+    • inventario
+    • reporte
+    • diagnostico
+    • axiomas
+    • verificar_salida
+  requiere:
+    []
+  autoriza_engine:
+    leer: True
+    ejecutar: True
+    consultar: True
+    recombinar: True
+    reportar: True
+    auditar: True
+    inventariar: True
+    modificar: False
+    alterar: False
+    reescribir: False
+  capacidades:
+    • verificar
+    • barrer
+    • aplicar
+    • inventario
+    • reporte
+    • diagnostico
+    • axiomas
+    • verificar_salida
+  capacidades_meta:
+    verificar:
+      descripcion: Coherencia interna de TX (alias de barrer).
+      entrada: ninguna
+      salida: dict con coherente, choques, errores, tacticas
+    barrer:
+      descripcion: Audita tácticas, detecta choques y filtra inválidas.
+      entrada: ninguna
+      salida: dict con coherente, choques, errores, tacticas, total_declaradas, total_validas, notas
+    aplicar:
+      descripcion: Aplica coincidencia estructural de tácticas válidas sobre una descripción. No calcula Tru.
+      entrada: descripcion: dict, contexto: dict opcional (O_context)
+      salida: dict con aplicadas, total, tacticas_disponibles, O_context
+    inventario:
+      descripcion: Enumeración de tácticas que pasaron el filtro.
+      entrada: peticion opcional
+      salida: dict con id, version, tacticas, total_validas
+    reporte:
+      descripcion: Estado actual del módulo TX.
+      entrada: ninguna
+      salida: dict con estado, version, capacidades, coherente
+    diagnostico:
+      descripcion: Problemas, advertencias y recomendaciones de TX.
+      entrada: ninguna
+      salida: dict con estado, problemas, advertencias, recomendaciones
+    axiomas:
+      descripcion: Declaraciones axiomáticas del oficio TX.
+      entrada: ninguna
+      salida: lista de dicts axiomáticos
+    verificar_salida:
+      descripcion: Forma mínima de una salida de TX.
+      entrada: salida: dict
+      salida: bool
+  estados_validos:
+    • NO_INICIADO
+    • OPERATIVO
+    • DEGRADADO
+    • RECHAZADO
+  invariantes:
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • las capacidades declaradas son siempre callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
+    • TX no calcula Tru_total
+    • solo tácticas que pasan el filtro se aplican
+    • medición por estructura explícita, no por interpretación
+  reporte:
+    id: TX
+    modulo: taxonomia
+    rol: TX
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    estado: OPERATIVO
+    coherente: True
+    capacidades:
+      • verificar
+      • barrer
+      • aplicar
+      • inventario
+      • reporte
+      • diagnostico
+      • axiomas
+      • verificar_salida
+    requiere:
+      []
+    tacticas:
+      []
+    total_validas: 0
+    autoridad:
+      • Declarar y filtrar tácticas metodológicas por estructura
+      • Detectar id/nombre duplicados entre archivos
+      • Aplicar coincidencia estructural sobre una descripción
+      • Reportar inventario, reporte y diagnóstico propios
+    conocimiento_exportable:
+      • inventario
+      • reporte
+      • diagnostico
+      • tacticas
+      • axiomas
+  diagnostico:
+    id: TX
+    modulo: taxonomia
+    estado: OPERATIVO
+    problemas:
+      []
+    advertencias:
+      • sin archivos de táctica (vacío legítimo)
+    recomendaciones:
+      []
+    coherente: True
+  inventario:
+    id: TX
+    nombre: taxonomia
+    rol: TX
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    capacidades:
+      • verificar
+      • barrer
+      • aplicar
+      • inventario
+      • reporte
+      • diagnostico
+      • axiomas
+      • verificar_salida
+    requiere:
+      []
+    tacticas:
+    total_validas: 0
+    funcion: Auditar declaraciones de táctica; filtrar las inválidas; aplicar coincidencia estructural determinista; reportar estado propio del catálogo TX.
+    autoridad:
+      • Declarar y filtrar tácticas metodológicas por estructura
+      • Detectar id/nombre duplicados entre archivos
+      • Aplicar coincidencia estructural sobre una descripción
+      • Reportar inventario, reporte y diagnóstico propios
+    conocimiento_exportable:
+      • inventario
+      • reporte
+      • diagnostico
+      • tacticas
+      • axiomas
+    invariantes:
+      • el id del módulo nunca cambia
+      • el rol nunca cambia
+      • las capacidades declaradas son siempre callables tras la resolución
+      • este módulo no modifica el estado de otros módulos
+      • este módulo no inventa capacidades no declaradas en CONTENEDOR
+      • TX no calcula Tru_total
+      • solo tácticas que pasan el filtro se aplican
+      • medición por estructura explícita, no por interpretación
+
+══════════════════════════════════════════════════════════════════════
   MÓDULO TT/tru_totales
 ══════════════════════════════════════════════════════════════════════
   id: TT
@@ -10280,6 +10478,7 @@
     • formulas
     • realidad
     • self
+    • taxonomia
     • tru_totales
     • verificacion
   ciclos:
@@ -11070,91 +11269,136 @@
       tipo: capacidad
       modulo: self
     [156]
+      id: TX
+      nombre: taxonomia
+      rol: TX
+      tipo: modulo
+    [157]
+      id: taxonomia.verificar
+      nombre: verificar
+      tipo: capacidad
+      modulo: taxonomia
+    [158]
+      id: taxonomia.barrer
+      nombre: barrer
+      tipo: capacidad
+      modulo: taxonomia
+    [159]
+      id: taxonomia.aplicar
+      nombre: aplicar
+      tipo: capacidad
+      modulo: taxonomia
+    [160]
+      id: taxonomia.inventario
+      nombre: inventario
+      tipo: capacidad
+      modulo: taxonomia
+    [161]
+      id: taxonomia.reporte
+      nombre: reporte
+      tipo: capacidad
+      modulo: taxonomia
+    [162]
+      id: taxonomia.diagnostico
+      nombre: diagnostico
+      tipo: capacidad
+      modulo: taxonomia
+    [163]
+      id: taxonomia.axiomas
+      nombre: axiomas
+      tipo: capacidad
+      modulo: taxonomia
+    [164]
+      id: taxonomia.verificar_salida
+      nombre: verificar_salida
+      tipo: capacidad
+      modulo: taxonomia
+    [165]
       id: TT
       nombre: tru_totales
       rol: TT
       tipo: modulo
-    [157]
+    [166]
       id: tru_totales.verificar
       nombre: verificar
       tipo: capacidad
       modulo: tru_totales
-    [158]
+    [167]
       id: tru_totales.barrer
       nombre: barrer
       tipo: capacidad
       modulo: tru_totales
-    [159]
+    [168]
       id: tru_totales.inventario
       nombre: inventario
       tipo: capacidad
       modulo: tru_totales
-    [160]
+    [169]
       id: tru_totales.capacidades
       nombre: capacidades
       tipo: capacidad
       modulo: tru_totales
-    [161]
+    [170]
       id: tru_totales.categorias
       nombre: categorias
       tipo: capacidad
       modulo: tru_totales
-    [162]
+    [171]
       id: tru_totales.resolver_pedido
       nombre: resolver_pedido
       tipo: capacidad
       modulo: tru_totales
-    [163]
+    [172]
       id: tru_totales.reporte
       nombre: reporte
       tipo: capacidad
       modulo: tru_totales
-    [164]
+    [173]
       id: tru_totales.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: tru_totales
-    [165]
+    [174]
       id: tru_totales.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: tru_totales
-    [166]
+    [175]
       id: VX
       nombre: verificacion
       rol: VX
       tipo: modulo
-    [167]
+    [176]
       id: verificacion.verificar
       nombre: verificar
       tipo: capacidad
       modulo: verificacion
-    [168]
+    [177]
       id: verificacion.barrer
       nombre: barrer
       tipo: capacidad
       modulo: verificacion
-    [169]
+    [178]
       id: verificacion.inventario
       nombre: inventario
       tipo: capacidad
       modulo: verificacion
-    [170]
+    [179]
       id: verificacion.reporte
       nombre: reporte
       tipo: capacidad
       modulo: verificacion
-    [171]
+    [180]
       id: verificacion.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: verificacion
-    [172]
+    [181]
       id: verificacion.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: verificacion
-    [173]
+    [182]
       id: verificacion.axiomas
       nombre: axiomas
       tipo: capacidad
@@ -11741,66 +11985,98 @@
       to: self.diagnostico
       tipo: declara_capacidad
     [145]
-      from: tru_totales
-      to: tru_totales.verificar
+      from: taxonomia
+      to: taxonomia.verificar
       tipo: declara_capacidad
     [146]
-      from: tru_totales
-      to: tru_totales.barrer
+      from: taxonomia
+      to: taxonomia.barrer
       tipo: declara_capacidad
     [147]
-      from: tru_totales
-      to: tru_totales.inventario
+      from: taxonomia
+      to: taxonomia.aplicar
       tipo: declara_capacidad
     [148]
-      from: tru_totales
-      to: tru_totales.capacidades
+      from: taxonomia
+      to: taxonomia.inventario
       tipo: declara_capacidad
     [149]
-      from: tru_totales
-      to: tru_totales.categorias
+      from: taxonomia
+      to: taxonomia.reporte
       tipo: declara_capacidad
     [150]
-      from: tru_totales
-      to: tru_totales.resolver_pedido
+      from: taxonomia
+      to: taxonomia.diagnostico
       tipo: declara_capacidad
     [151]
-      from: tru_totales
-      to: tru_totales.reporte
+      from: taxonomia
+      to: taxonomia.axiomas
       tipo: declara_capacidad
     [152]
-      from: tru_totales
-      to: tru_totales.diagnostico
+      from: taxonomia
+      to: taxonomia.verificar_salida
       tipo: declara_capacidad
     [153]
       from: tru_totales
-      to: tru_totales.verificar_salida
+      to: tru_totales.verificar
       tipo: declara_capacidad
     [154]
+      from: tru_totales
+      to: tru_totales.barrer
+      tipo: declara_capacidad
+    [155]
+      from: tru_totales
+      to: tru_totales.inventario
+      tipo: declara_capacidad
+    [156]
+      from: tru_totales
+      to: tru_totales.capacidades
+      tipo: declara_capacidad
+    [157]
+      from: tru_totales
+      to: tru_totales.categorias
+      tipo: declara_capacidad
+    [158]
+      from: tru_totales
+      to: tru_totales.resolver_pedido
+      tipo: declara_capacidad
+    [159]
+      from: tru_totales
+      to: tru_totales.reporte
+      tipo: declara_capacidad
+    [160]
+      from: tru_totales
+      to: tru_totales.diagnostico
+      tipo: declara_capacidad
+    [161]
+      from: tru_totales
+      to: tru_totales.verificar_salida
+      tipo: declara_capacidad
+    [162]
       from: verificacion
       to: verificacion.verificar
       tipo: declara_capacidad
-    [155]
+    [163]
       from: verificacion
       to: verificacion.barrer
       tipo: declara_capacidad
-    [156]
+    [164]
       from: verificacion
       to: verificacion.inventario
       tipo: declara_capacidad
-    [157]
+    [165]
       from: verificacion
       to: verificacion.reporte
       tipo: declara_capacidad
-    [158]
+    [166]
       from: verificacion
       to: verificacion.diagnostico
       tipo: declara_capacidad
-    [159]
+    [167]
       from: verificacion
       to: verificacion.verificar_salida
       tipo: declara_capacidad
-    [160]
+    [168]
       from: verificacion
       to: verificacion.axiomas
       tipo: declara_capacidad
@@ -11810,280 +12086,301 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T21:47:11.547121+00:00
+    timestamp: 2026-08-07T21:56:55.663429+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.013042
+    duracion_s: 0.012652
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T21:47:11.558919+00:00
+    timestamp: 2026-08-07T21:56:55.675148+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.011772
+    duracion_s: 0.011684
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T21:47:11.569108+00:00
+    timestamp: 2026-08-07T21:56:55.685413+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.010169
+    duracion_s: 0.010238
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T21:47:11.569143+00:00
+    timestamp: 2026-08-07T21:56:55.685459+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 1.9e-05
+    duracion_s: 2.6e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T21:47:11.569168+00:00
+    timestamp: 2026-08-07T21:56:55.685474+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 7e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T21:47:11.569179+00:00
+    timestamp: 2026-08-07T21:56:55.685486+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
     duracion_s: 6e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T21:47:11.569736+00:00
+    timestamp: 2026-08-07T21:56:55.686102+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00055
+    duracion_s: 0.000608
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T21:47:11.570163+00:00
+    timestamp: 2026-08-07T21:56:55.686508+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000399
+    duracion_s: 0.000392
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T21:47:11.570556+00:00
+    timestamp: 2026-08-07T21:56:55.686911+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000385
+    duracion_s: 0.000395
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T21:47:11.570890+00:00
+    timestamp: 2026-08-07T21:56:55.687299+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000325
+    duracion_s: 0.000378
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T21:47:11.572320+00:00
+    timestamp: 2026-08-07T21:56:55.688765+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00142
+    duracion_s: 0.001454
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T21:47:11.573708+00:00
+    timestamp: 2026-08-07T21:56:55.690136+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001377
+    duracion_s: 0.001359
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T21:47:11.575026+00:00
+    timestamp: 2026-08-07T21:56:55.691443+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001306
+    duracion_s: 0.001295
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T21:47:11.575040+00:00
+    timestamp: 2026-08-07T21:56:55.691458+00:00
     modulo: citacion
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 3e-06
-  [14]
-    id_traza: 15
-    timestamp: 2026-08-07T21:47:11.575047+00:00
-    modulo: citacion
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 2e-06
-  [15]
-    id_traza: 16
-    timestamp: 2026-08-07T21:47:11.575054+00:00
-    modulo: citacion
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 3e-06
-  [16]
-    id_traza: 17
-    timestamp: 2026-08-07T21:47:11.575345+00:00
-    modulo: constante
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000283
-  [17]
-    id_traza: 18
-    timestamp: 2026-08-07T21:47:11.575506+00:00
-    modulo: constante
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.00015
-  [18]
-    id_traza: 19
-    timestamp: 2026-08-07T21:47:11.575580+00:00
-    modulo: constante
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 6.6e-05
-  [19]
-    id_traza: 20
-    timestamp: 2026-08-07T21:47:11.575781+00:00
-    modulo: contexto
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000192
-  [20]
-    id_traza: 21
-    timestamp: 2026-08-07T21:47:11.575951+00:00
-    modulo: contexto
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000162
-  [21]
-    id_traza: 22
-    timestamp: 2026-08-07T21:47:11.576108+00:00
-    modulo: contexto
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000149
-  [22]
-    id_traza: 23
-    timestamp: 2026-08-07T21:47:11.586524+00:00
-    modulo: correlacion_mecanica
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.010404
-  [23]
-    id_traza: 24
-    timestamp: 2026-08-07T21:47:11.596103+00:00
-    modulo: correlacion_mecanica
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.009562
-  [24]
-    id_traza: 25
-    timestamp: 2026-08-07T21:47:11.597346+00:00
-    modulo: correlacion_mecanica
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.001227
-  [25]
-    id_traza: 26
-    timestamp: 2026-08-07T21:47:11.597756+00:00
-    modulo: formulas
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000398
-  [26]
-    id_traza: 27
-    timestamp: 2026-08-07T21:47:11.598084+00:00
-    modulo: formulas
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000318
-  [27]
-    id_traza: 28
-    timestamp: 2026-08-07T21:47:11.598281+00:00
-    modulo: formulas
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000188
-  [28]
-    id_traza: 29
-    timestamp: 2026-08-07T21:47:11.599530+00:00
-    modulo: realidad
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.001238
-  [29]
-    id_traza: 30
-    timestamp: 2026-08-07T21:47:11.600249+00:00
-    modulo: realidad
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000707
-  [30]
-    id_traza: 31
-    timestamp: 2026-08-07T21:47:11.608176+00:00
-    modulo: realidad
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.007914
-  [31]
-    id_traza: 32
-    timestamp: 2026-08-07T21:47:11.613689+00:00
-    modulo: self
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.005495
-  [32]
-    id_traza: 33
-    timestamp: 2026-08-07T21:47:11.617998+00:00
-    modulo: self
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.004294
-  [33]
-    id_traza: 34
-    timestamp: 2026-08-07T21:47:11.618017+00:00
-    modulo: self
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 8e-06
-  [34]
-    id_traza: 35
-    timestamp: 2026-08-07T21:47:11.618791+00:00
-    modulo: tru_totales
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000764
-  [35]
-    id_traza: 36
-    timestamp: 2026-08-07T21:47:11.619479+00:00
-    modulo: tru_totales
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000678
-  [36]
-    id_traza: 37
-    timestamp: 2026-08-07T21:47:11.620104+00:00
-    modulo: tru_totales
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000615
-  [37]
-    id_traza: 38
-    timestamp: 2026-08-07T21:47:11.620116+00:00
-    modulo: verificacion
     capacidad: reporte
     estado: EXITO
     duracion_s: 5e-06
+  [14]
+    id_traza: 15
+    timestamp: 2026-08-07T21:56:55.691464+00:00
+    modulo: citacion
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 1e-06
+  [15]
+    id_traza: 16
+    timestamp: 2026-08-07T21:56:55.691472+00:00
+    modulo: citacion
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 4e-06
+  [16]
+    id_traza: 17
+    timestamp: 2026-08-07T21:56:55.691724+00:00
+    modulo: constante
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000245
+  [17]
+    id_traza: 18
+    timestamp: 2026-08-07T21:56:55.691903+00:00
+    modulo: constante
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.00017
+  [18]
+    id_traza: 19
+    timestamp: 2026-08-07T21:56:55.691981+00:00
+    modulo: constante
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 7e-05
+  [19]
+    id_traza: 20
+    timestamp: 2026-08-07T21:56:55.692186+00:00
+    modulo: contexto
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000195
+  [20]
+    id_traza: 21
+    timestamp: 2026-08-07T21:56:55.692362+00:00
+    modulo: contexto
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000167
+  [21]
+    id_traza: 22
+    timestamp: 2026-08-07T21:56:55.692513+00:00
+    modulo: contexto
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.000143
+  [22]
+    id_traza: 23
+    timestamp: 2026-08-07T21:56:55.701973+00:00
+    modulo: correlacion_mecanica
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.009448
+  [23]
+    id_traza: 24
+    timestamp: 2026-08-07T21:56:55.710953+00:00
+    modulo: correlacion_mecanica
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.008965
+  [24]
+    id_traza: 25
+    timestamp: 2026-08-07T21:56:55.712234+00:00
+    modulo: correlacion_mecanica
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.001261
+  [25]
+    id_traza: 26
+    timestamp: 2026-08-07T21:56:55.712661+00:00
+    modulo: formulas
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000414
+  [26]
+    id_traza: 27
+    timestamp: 2026-08-07T21:56:55.713012+00:00
+    modulo: formulas
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000341
+  [27]
+    id_traza: 28
+    timestamp: 2026-08-07T21:56:55.713179+00:00
+    modulo: formulas
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.000159
+  [28]
+    id_traza: 29
+    timestamp: 2026-08-07T21:56:55.714473+00:00
+    modulo: realidad
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.001284
+  [29]
+    id_traza: 30
+    timestamp: 2026-08-07T21:56:55.715189+00:00
+    modulo: realidad
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000705
+  [30]
+    id_traza: 31
+    timestamp: 2026-08-07T21:56:55.719874+00:00
+    modulo: realidad
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.004673
+  [31]
+    id_traza: 32
+    timestamp: 2026-08-07T21:56:55.725531+00:00
+    modulo: self
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.005633
+  [32]
+    id_traza: 33
+    timestamp: 2026-08-07T21:56:55.729876+00:00
+    modulo: self
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.004329
+  [33]
+    id_traza: 34
+    timestamp: 2026-08-07T21:56:55.729896+00:00
+    modulo: self
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 9e-06
+  [34]
+    id_traza: 35
+    timestamp: 2026-08-07T21:56:55.729965+00:00
+    modulo: taxonomia
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 6.1e-05
+  [35]
+    id_traza: 36
+    timestamp: 2026-08-07T21:56:55.730003+00:00
+    modulo: taxonomia
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 3.1e-05
+  [36]
+    id_traza: 37
+    timestamp: 2026-08-07T21:56:55.730033+00:00
+    modulo: taxonomia
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 2.6e-05
+  [37]
+    id_traza: 38
+    timestamp: 2026-08-07T21:56:55.730868+00:00
+    modulo: tru_totales
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.000827
   [38]
     id_traza: 39
-    timestamp: 2026-08-07T21:47:11.620122+00:00
+    timestamp: 2026-08-07T21:56:55.731567+00:00
+    modulo: tru_totales
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000689
+  [39]
+    id_traza: 40
+    timestamp: 2026-08-07T21:56:55.732238+00:00
+    modulo: tru_totales
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.000662
+  [40]
+    id_traza: 41
+    timestamp: 2026-08-07T21:56:55.732252+00:00
+    modulo: verificacion
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 6e-06
+  [41]
+    id_traza: 42
+    timestamp: 2026-08-07T21:56:55.732258+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
-  [39]
-    id_traza: 40
-    timestamp: 2026-08-07T21:47:11.620127+00:00
+  [42]
+    id_traza: 43
+    timestamp: 2026-08-07T21:56:55.732263+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO

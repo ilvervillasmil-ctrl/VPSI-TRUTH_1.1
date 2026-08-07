@@ -62,10 +62,26 @@
 
 from __future__ import annotations
 
-import importlib.util
+import os
 import sys
+import json
+import math
+import copy
+import time
+import types
+import logging
+import hashlib
+import inspect
+import itertools
+import functools
+import traceback
+import importlib
+import importlib.util
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+
+from dataclasses import dataclass, field
+from collections import defaultdict, deque
+from typing import Any, Dict, List, Tuple, Set, Optional, Iterable, Callable
 
 try:
     from core.diagnostico import DiagnosticoGlobal  # type: ignore

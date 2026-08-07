@@ -3,8 +3,8 @@
     "version_engine": "18.3",
     "estado_engine": "OPERATIVO",
     "esquema_contrato": "VPSI-CONTRACT-1.0",
-    "total_modulos": 7,
-    "timestamp": "2026-08-07T03:43:07.058748+00:00"
+    "total_modulos": 8,
+    "timestamp": "2026-08-07T04:04:47.566975+00:00"
   },
   "reportes": [
     {
@@ -18,11 +18,11 @@
         "api_engine": "1.0",
         "estado_engine": "OPERATIVO",
         "invocador_id": "omega_report",
-        "total_modulos": 7,
+        "total_modulos": 8,
         "errores_arranque": [],
         "advertencias": [],
-        "trazas_n": 21,
-        "timestamp": "2026-08-07T03:43:07.058720+00:00"
+        "trazas_n": 24,
+        "timestamp": "2026-08-07T04:04:47.566950+00:00"
       }
     },
     {
@@ -406,9 +406,294 @@
       }
     },
     {
+      "id": "CH",
+      "titulo": "MÓDULO CH/cache",
+      "orden": 2,
+      "contenido": {
+        "id": "CH",
+        "nombre": "cache",
+        "rol": "CH",
+        "version": "2.1",
+        "version_contrato": "1.0",
+        "esquema": "VPSI-CONTRACT-1.0",
+        "estabilidad": "ESTABLE",
+        "compatible_desde": "1.0",
+        "api_engine": ">=1.0",
+        "descripcion": "Registro oficial e inmutable de la evidencia del ciclo. Libro de actas de la ejecución del sistema. Preserva trazabilidad completa. Append-only. No es caché de resultados. No calcula. No orquesta.",
+        "funcion": "Registrar la evidencia generada durante un ciclo, conservar el orden de registro, preservar la trazabilidad completa y exponer la evidencia para lectura. Nunca altera la evidencia registrada.",
+        "no_hace": [
+          "No calcula Tru_Ri / Tru_total / C / L / K",
+          "No orquesta el ciclo",
+          "No define el orden causal (eso es MC)",
+          "No interpreta ni clasifica información",
+          "No reorganiza causalmente ni determina precedencias",
+          "No valida fórmulas",
+          "No modifica, sobrescribe ni borra evidencia",
+          "No inicia operaciones ni solicita información",
+          "No envía reportes a otros módulos"
+        ],
+        "autoridad": [
+          "Registrar evidencia depositada por Engine",
+          "Registrar veredicto depositado por Centinela (como evento nuevo)",
+          "Entregar lecturas de evidencia",
+          "Exponer secuencia ordenada de un ciclo",
+          "Verificar integridad del registro (no de cálculos)",
+          "Reportar estado, inventario y diagnóstico propios"
+        ],
+        "conocimiento_exportable": [
+          "depositar",
+          "leer",
+          "secuencia",
+          "ultimo",
+          "inventario",
+          "reporte",
+          "diagnostico",
+          "backend_para_centinela"
+        ],
+        "consultas_soportadas": [
+          "depositar_evidencia",
+          "leer_evidencia",
+          "secuencia_ciclo",
+          "obtener_inventario",
+          "obtener_reporte",
+          "obtener_diagnostico",
+          "verificar_integridad_registro"
+        ],
+        "requiere": [],
+        "autoriza_engine": {
+          "leer": true,
+          "ejecutar": true,
+          "consultar": true,
+          "recombinar": true,
+          "reportar": true,
+          "auditar": true,
+          "inventariar": true,
+          "modificar": false,
+          "alterar": false,
+          "reescribir": false
+        },
+        "capacidades": [
+          "verificar",
+          "barrer",
+          "depositar",
+          "leer",
+          "secuencia",
+          "ultimo",
+          "inventario",
+          "reporte",
+          "diagnostico",
+          "verificar_salida",
+          "backend_para_centinela"
+        ],
+        "capacidades_meta": {
+          "verificar": {
+            "descripcion": "Alias de barrer. Verifica integridad del registro (seq, timestamps, estructura). No recalcula Tru.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, inmutable, errores, resumen"
+          },
+          "barrer": {
+            "descripcion": "Verifica únicamente la integridad del registro: seq creciente, timestamps, estructura completa, append-only. No revisa C, L, K ni Tru.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, inmutable, errores, resumen"
+          },
+          "depositar": {
+            "descripcion": "Registra un evento de evidencia. Única vía de escritura. Append-only. Nunca modifica eventos previos.",
+            "entrada": "tipo: str, payload: dict, ciclo_id?, origen?",
+            "salida": "dict del evento registrado (seq, timestamp, tipo, ...)"
+          },
+          "leer": {
+            "descripcion": "Lectura de evidencia por ciclo, tipo o desde_seq. No muta.",
+            "entrada": "ciclo_id?, tipo?, desde_seq?",
+            "salida": "list[dict] de eventos"
+          },
+          "secuencia": {
+            "descripcion": "Secuencia completa de un ciclo en orden de registro.",
+            "entrada": "ciclo_id: str",
+            "salida": "list[dict] de eventos ordenados por seq"
+          },
+          "ultimo": {
+            "descripcion": "Último evento de un ciclo, opcionalmente filtrado por tipo.",
+            "entrada": "ciclo_id: str, tipo?",
+            "salida": "dict | None"
+          },
+          "inventario": {
+            "descripcion": "Inventario del módulo y resumen de la memoria de evidencia.",
+            "entrada": "ninguna",
+            "salida": "dict con id, version, memoria, capacidades"
+          },
+          "reporte": {
+            "descripcion": "Reporte interno de estado del módulo CH.",
+            "entrada": "ninguna",
+            "salida": "dict con estado, coherente, memoria, capacidades"
+          },
+          "diagnostico": {
+            "descripcion": "Diagnóstico de integridad del registro de evidencia.",
+            "entrada": "ninguna",
+            "salida": "dict con estado, problemas, advertencias, recomendaciones"
+          },
+          "verificar_salida": {
+            "descripcion": "Comprueba forma de una salida de barrer o depósito.",
+            "entrada": "salida: dict",
+            "salida": "bool"
+          },
+          "backend_para_centinela": {
+            "descripcion": "Adaptador estable CacheBackend para Centinela (guardar/obtener). Centinela no conoce la implementación interna.",
+            "entrada": "ninguna",
+            "salida": "CacheBackend"
+          }
+        },
+        "estados_validos": [
+          "NO_INICIADO",
+          "OPERATIVO",
+          "DEGRADADO",
+          "RECHAZADO"
+        ],
+        "invariantes": [
+          "el id del módulo nunca cambia",
+          "el rol nunca cambia",
+          "las capacidades declaradas son siempre callables tras la resolución",
+          "este módulo no modifica el estado de otros módulos",
+          "este módulo no calcula Tru / C / L / K",
+          "este módulo no orquesta el ciclo",
+          "este módulo no define el orden causal (eso es MC)",
+          "la evidencia depositada nunca se modifica",
+          "la evidencia depositada nunca se sobrescribe",
+          "la evidencia depositada nunca cambia de posición",
+          "la evidencia depositada nunca se reordena",
+          "la evidencia depositada nunca desaparece durante el ciclo",
+          "toda información nueva se incorpora solo como evento nuevo",
+          "este módulo no inventa capacidades no declaradas en CONTENEDOR"
+        ],
+        "reporte": {
+          "id": "CH",
+          "modulo": "cache",
+          "rol": "CH",
+          "version": "2.1",
+          "version_contrato": "1.0",
+          "esquema": "VPSI-CONTRACT-1.0",
+          "estabilidad": "ESTABLE",
+          "estado": "OPERATIVO",
+          "coherente": true,
+          "inmutable": true,
+          "errores": [],
+          "memoria": {
+            "total_eventos": 0,
+            "ciclos": 0,
+            "por_tipo": {},
+            "seq_actual": 0,
+            "inmutable": true
+          },
+          "capacidades": [
+            "verificar",
+            "barrer",
+            "depositar",
+            "leer",
+            "secuencia",
+            "ultimo",
+            "inventario",
+            "reporte",
+            "diagnostico",
+            "verificar_salida",
+            "backend_para_centinela"
+          ],
+          "requiere": [],
+          "autoridad": [
+            "Registrar evidencia depositada por Engine",
+            "Registrar veredicto depositado por Centinela (como evento nuevo)",
+            "Entregar lecturas de evidencia",
+            "Exponer secuencia ordenada de un ciclo",
+            "Verificar integridad del registro (no de cálculos)",
+            "Reportar estado, inventario y diagnóstico propios"
+          ],
+          "conocimiento_exportable": [
+            "depositar",
+            "leer",
+            "secuencia",
+            "ultimo",
+            "inventario",
+            "reporte",
+            "diagnostico",
+            "backend_para_centinela"
+          ],
+          "consultas_soportadas": [
+            "depositar_evidencia",
+            "leer_evidencia",
+            "secuencia_ciclo",
+            "obtener_inventario",
+            "obtener_reporte",
+            "obtener_diagnostico",
+            "verificar_integridad_registro"
+          ]
+        },
+        "diagnostico": {
+          "id": "CH",
+          "modulo": "cache",
+          "estado": "OPERATIVO",
+          "problemas": [],
+          "advertencias": [
+            "Memoria de evidencia vacía (legítimo al inicio del ciclo)"
+          ],
+          "recomendaciones": [],
+          "coherente": true,
+          "inmutable": true,
+          "total_eventos": 0,
+          "ciclos": 0,
+          "seq_actual": 0
+        },
+        "inventario": {
+          "id": "CH",
+          "nombre": "cache",
+          "rol": "CH",
+          "version": "2.1",
+          "version_contrato": "1.0",
+          "esquema": "VPSI-CONTRACT-1.0",
+          "estabilidad": "ESTABLE",
+          "funcion": "Registro oficial e inmutable de la evidencia del ciclo. Libro de actas. Append-only. No calcula.",
+          "memoria": {
+            "total_eventos": 0,
+            "ciclos": 0,
+            "por_tipo": {},
+            "seq_actual": 0,
+            "inmutable": true
+          },
+          "capacidades": [
+            "verificar",
+            "barrer",
+            "depositar",
+            "leer",
+            "secuencia",
+            "ultimo",
+            "inventario",
+            "reporte",
+            "diagnostico",
+            "verificar_salida",
+            "backend_para_centinela"
+          ],
+          "requiere": [],
+          "invariantes": [
+            "el id del módulo nunca cambia",
+            "el rol nunca cambia",
+            "las capacidades declaradas son siempre callables tras la resolución",
+            "este módulo no modifica el estado de otros módulos",
+            "este módulo no calcula Tru / C / L / K",
+            "este módulo no orquesta el ciclo",
+            "este módulo no define el orden causal (eso es MC)",
+            "la evidencia depositada nunca se modifica",
+            "la evidencia depositada nunca se sobrescribe",
+            "la evidencia depositada nunca cambia de posición",
+            "la evidencia depositada nunca se reordena",
+            "la evidencia depositada nunca desaparece durante el ciclo",
+            "toda información nueva se incorpora solo como evento nuevo",
+            "este módulo no inventa capacidades no declaradas en CONTENEDOR"
+          ],
+          "nota": "Append-only. Orden causal: MC. CACHE solo registra evidencia. Toda reconstrucción del ciclo se hace desde aquí."
+        }
+      }
+    },
+    {
       "id": "CA",
       "titulo": "MÓDULO CA/calculator",
-      "orden": 2,
+      "orden": 3,
       "contenido": {
         "id": "CA",
         "nombre": "calculator",
@@ -623,37 +908,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562426+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             }
           },
           "historial_n": 0,
@@ -736,37 +1021,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562426+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-07T03:42:58.557693+00:00"
+              "timestamp_mtime": "2026-08-07T04:04:38.562886+00:00"
             }
           },
           "factores_api": [
@@ -830,7 +1115,7 @@
     {
       "id": "CC",
       "titulo": "MÓDULO CC/catalogo_citaciones",
-      "orden": 3,
+      "orden": 4,
       "contenido": {
         "id": "CC",
         "nombre": "catalogo_citaciones",
@@ -6634,7 +6919,7 @@
     {
       "id": "CT",
       "titulo": "MÓDULO CT/constante",
-      "orden": 4,
+      "orden": 5,
       "contenido": {
         "id": "CT",
         "nombre": "constante",
@@ -6904,7 +7189,7 @@
     {
       "id": "MC",
       "titulo": "MÓDULO MC/correlacion_mecanica",
-      "orden": 5,
+      "orden": 6,
       "contenido": {
         "id": "MC",
         "nombre": "correlacion_mecanica",
@@ -7168,7 +7453,7 @@
     {
       "id": "FO",
       "titulo": "MÓDULO FO/formulas",
-      "orden": 6,
+      "orden": 7,
       "contenido": {
         "id": "FO",
         "nombre": "formulas",
@@ -7439,7 +7724,7 @@
     {
       "id": "TT",
       "titulo": "MÓDULO TT/tru_totales",
-      "orden": 7,
+      "orden": 8,
       "contenido": {
         "id": "TT",
         "nombre": "tru_totales",
@@ -7759,7 +8044,7 @@
     {
       "id": "dependencias",
       "titulo": "DEPENDENCIAS",
-      "orden": 8,
+      "orden": 9,
       "contenido": {
         "grafo": {
           "formulas": [
@@ -7769,6 +8054,7 @@
         "faltantes": {},
         "orden_topologico": [
           "axiomas",
+          "cache",
           "calculator",
           "catalogo_citaciones",
           "constante",
@@ -7782,7 +8068,7 @@
     {
       "id": "grafo",
       "titulo": "GRAFO ESTRUCTURAL",
-      "orden": 9,
+      "orden": 10,
       "contenido": {
         "nodos": [
           {
@@ -7868,6 +8154,78 @@
             "nombre": "buscar_por_id",
             "tipo": "capacidad",
             "modulo": "axiomas"
+          },
+          {
+            "id": "CH",
+            "nombre": "cache",
+            "rol": "CH",
+            "tipo": "modulo"
+          },
+          {
+            "id": "cache.verificar",
+            "nombre": "verificar",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.barrer",
+            "nombre": "barrer",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.depositar",
+            "nombre": "depositar",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.leer",
+            "nombre": "leer",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.secuencia",
+            "nombre": "secuencia",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.ultimo",
+            "nombre": "ultimo",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.inventario",
+            "nombre": "inventario",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.reporte",
+            "nombre": "reporte",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.diagnostico",
+            "nombre": "diagnostico",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.verificar_salida",
+            "nombre": "verificar_salida",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
+            "id": "cache.backend_para_centinela",
+            "nombre": "backend_para_centinela",
+            "tipo": "capacidad",
+            "modulo": "cache"
           },
           {
             "id": "CA",
@@ -8363,6 +8721,61 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "cache",
+            "to": "cache.verificar",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.barrer",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.depositar",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.leer",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.secuencia",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.ultimo",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.reporte",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.diagnostico",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.verificar_salida",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "cache",
+            "to": "cache.backend_para_centinela",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "calculator",
             "to": "calculator.calcular",
             "tipo": "declara_capacidad"
@@ -8698,175 +9111,199 @@
     {
       "id": "trazas",
       "titulo": "TRAZAS DE EJECUCIÓN",
-      "orden": 10,
+      "orden": 11,
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-07T03:43:07.045107+00:00",
+          "timestamp": "2026-08-07T04:04:47.556673+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001798
+          "duracion_s": 0.00143
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-07T03:43:07.046568+00:00",
+          "timestamp": "2026-08-07T04:04:47.557875+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001444
+          "duracion_s": 0.001185
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-07T03:43:07.047956+00:00",
+          "timestamp": "2026-08-07T04:04:47.558947+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001377
+          "duracion_s": 0.001061
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-07T03:43:07.048361+00:00",
-          "modulo": "calculator",
+          "timestamp": "2026-08-07T04:04:47.558972+00:00",
+          "modulo": "cache",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000395
+          "duracion_s": 1.1e-05
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-07T03:43:07.048667+00:00",
-          "modulo": "calculator",
+          "timestamp": "2026-08-07T04:04:47.558979+00:00",
+          "modulo": "cache",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.0003
+          "duracion_s": 4e-06
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-07T03:43:07.048979+00:00",
-          "modulo": "calculator",
+          "timestamp": "2026-08-07T04:04:47.558985+00:00",
+          "modulo": "cache",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000306
+          "duracion_s": 3e-06
         },
         {
           "id_traza": 7,
-          "timestamp": "2026-08-07T03:43:07.050891+00:00",
-          "modulo": "catalogo_citaciones",
+          "timestamp": "2026-08-07T04:04:47.559313+00:00",
+          "modulo": "calculator",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001903
+          "duracion_s": 0.000324
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-07T03:43:07.052038+00:00",
-          "modulo": "catalogo_citaciones",
+          "timestamp": "2026-08-07T04:04:47.559543+00:00",
+          "modulo": "calculator",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001118
+          "duracion_s": 0.000222
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-07T03:43:07.053378+00:00",
-          "modulo": "catalogo_citaciones",
+          "timestamp": "2026-08-07T04:04:47.559735+00:00",
+          "modulo": "calculator",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001329
+          "duracion_s": 0.000187
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-07T03:43:07.053560+00:00",
-          "modulo": "constante",
+          "timestamp": "2026-08-07T04:04:47.561215+00:00",
+          "modulo": "catalogo_citaciones",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000174
+          "duracion_s": 0.001473
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-07T03:43:07.053675+00:00",
-          "modulo": "constante",
+          "timestamp": "2026-08-07T04:04:47.562449+00:00",
+          "modulo": "catalogo_citaciones",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000108
+          "duracion_s": 0.001222
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-07T03:43:07.053733+00:00",
-          "modulo": "constante",
+          "timestamp": "2026-08-07T04:04:47.563316+00:00",
+          "modulo": "catalogo_citaciones",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 5.2e-05
+          "duracion_s": 0.000857
         },
         {
           "id_traza": 13,
-          "timestamp": "2026-08-07T03:43:07.054356+00:00",
-          "modulo": "correlacion_mecanica",
+          "timestamp": "2026-08-07T04:04:47.563458+00:00",
+          "modulo": "constante",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000616
+          "duracion_s": 0.000132
         },
         {
           "id_traza": 14,
-          "timestamp": "2026-08-07T03:43:07.054771+00:00",
-          "modulo": "correlacion_mecanica",
+          "timestamp": "2026-08-07T04:04:47.563553+00:00",
+          "modulo": "constante",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000407
+          "duracion_s": 8.8e-05
         },
         {
           "id_traza": 15,
-          "timestamp": "2026-08-07T03:43:07.054871+00:00",
-          "modulo": "correlacion_mecanica",
+          "timestamp": "2026-08-07T04:04:47.563592+00:00",
+          "modulo": "constante",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 9.3e-05
+          "duracion_s": 3.5e-05
         },
         {
           "id_traza": 16,
-          "timestamp": "2026-08-07T03:43:07.055771+00:00",
-          "modulo": "formulas",
+          "timestamp": "2026-08-07T04:04:47.564080+00:00",
+          "modulo": "correlacion_mecanica",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000892
+          "duracion_s": 0.000482
         },
         {
           "id_traza": 17,
-          "timestamp": "2026-08-07T03:43:07.056076+00:00",
-          "modulo": "formulas",
+          "timestamp": "2026-08-07T04:04:47.564387+00:00",
+          "modulo": "correlacion_mecanica",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000296
+          "duracion_s": 0.000301
         },
         {
           "id_traza": 18,
-          "timestamp": "2026-08-07T03:43:07.056211+00:00",
-          "modulo": "formulas",
+          "timestamp": "2026-08-07T04:04:47.564455+00:00",
+          "modulo": "correlacion_mecanica",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000129
+          "duracion_s": 6.3e-05
         },
         {
           "id_traza": 19,
-          "timestamp": "2026-08-07T03:43:07.057599+00:00",
-          "modulo": "tru_totales",
+          "timestamp": "2026-08-07T04:04:47.565113+00:00",
+          "modulo": "formulas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001379
+          "duracion_s": 0.000651
         },
         {
           "id_traza": 20,
-          "timestamp": "2026-08-07T03:43:07.058211+00:00",
-          "modulo": "tru_totales",
+          "timestamp": "2026-08-07T04:04:47.565306+00:00",
+          "modulo": "formulas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000602
+          "duracion_s": 0.000185
         },
         {
           "id_traza": 21,
-          "timestamp": "2026-08-07T03:43:07.058711+00:00",
+          "timestamp": "2026-08-07T04:04:47.565397+00:00",
+          "modulo": "formulas",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 8.7e-05
+        },
+        {
+          "id_traza": 22,
+          "timestamp": "2026-08-07T04:04:47.566247+00:00",
+          "modulo": "tru_totales",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000844
+        },
+        {
+          "id_traza": 23,
+          "timestamp": "2026-08-07T04:04:47.566610+00:00",
+          "modulo": "tru_totales",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000355
+        },
+        {
+          "id_traza": 24,
+          "timestamp": "2026-08-07T04:04:47.566944+00:00",
           "modulo": "tru_totales",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000492
+          "duracion_s": 0.000328
         }
       ]
     }

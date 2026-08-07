@@ -10,8 +10,8 @@
   version_engine: 18.3
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
-  total_modulos: 5
-  timestamp: 2026-08-07T02:43:11.275747+00:00
+  total_modulos: 6
+  timestamp: 2026-08-07T02:51:39.412822+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -22,13 +22,13 @@
   api_engine: 1.0
   estado_engine: OPERATIVO
   invocador_id: omega_report
-  total_modulos: 5
+  total_modulos: 6
   errores_arranque:
     []
   advertencias:
     []
-  trazas_n: 15
-  timestamp: 2026-08-07T02:43:11.275728+00:00
+  trazas_n: 18
+  timestamp: 2026-08-07T02:51:39.412799+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -563,32 +563,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T02:43:06.492202+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034012+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -665,32 +665,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T02:43:06.492202+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034012+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T02:43:06.492545+00:00
+        timestamp_mtime: 2026-08-07T02:51:32.034351+00:00
     factores_api:
       • C
       • K
@@ -1455,6 +1455,223 @@
       • tru_ri y tru_total no imponen límites artificiales sobre C, L, K
 
 ══════════════════════════════════════════════════════════════════════
+  MÓDULO TT/tru_totales
+══════════════════════════════════════════════════════════════════════
+  id: TT
+  nombre: tru_totales
+  rol: TT
+  version: 2.0
+  version_contrato: 1.0
+  esquema: VPSI-CONTRACT-1.0
+  estabilidad: ESTABLE
+  compatible_desde: 1.0
+  api_engine: >=1.0
+  descripcion: Catálogo pasivo de categorías de alcance de Tru_Ri / Tru_total. Declara qué escalas existen, su unidad y el material que requieren. No calcula. No orquesta.
+  funcion: Exponer el catálogo ordenado de categorías evaluables, resolver un pedido a una categoría y reportar coherencia propia.
+  no_hace:
+    • No calcula Tru_Ri ni Tru_total
+    • No calcula C, L, K
+    • No orquesta el ciclo (eso es Engine)
+    • No fija el contexto O (eso es CX)
+    • No cuenta material (eso es conteos)
+    • No modifica otros módulos
+  autoridad:
+    • Declarar las categorías disponibles en el catálogo
+    • Resolver un pedido de Omega/Engine a una categoría
+    • Leer y normalizar todos los archivos de categorias/
+    • Reportar estado, inventario y diagnóstico propios
+  conocimiento_exportable:
+    • categorias
+    • ids
+    • resolver_pedido
+    • inventario
+    • reporte
+    • diagnostico
+    • capacidades
+  consultas_soportadas:
+    • listar_categorias
+    • resolver_pedido
+    • obtener_inventario
+    • obtener_reporte
+    • obtener_diagnostico
+    • verificar_coherencia
+  requiere:
+    []
+  autoriza_engine:
+    leer: True
+    ejecutar: True
+    consultar: True
+    recombinar: True
+    reportar: True
+    auditar: True
+    inventariar: True
+    modificar: False
+    alterar: False
+    reescribir: False
+  capacidades:
+    • verificar
+    • barrer
+    • inventario
+    • capacidades
+    • categorias
+    • resolver_pedido
+    • reporte
+    • diagnostico
+    • verificar_salida
+  capacidades_meta:
+    verificar:
+      descripcion: Alias de barrer. Verifica coherencia del catálogo.
+      entrada: ninguna
+      salida: dict con coherente, categorias, ids, errores
+    barrer:
+      descripcion: Evalúa coherencia del catálogo. No calcula Tru.
+      entrada: ninguna
+      salida: dict con coherente, categorias, ids, errores, version
+    inventario:
+      descripcion: Inventario completo del módulo y del catálogo.
+      entrada: peticion opcional
+      salida: dict con id, version, capacidades, extension
+    capacidades:
+      descripcion: Vista explícita del catálogo para Engine/Omega.
+      entrada: ninguna
+      salida: dict con categorias resumidas, total, coherente
+    categorias:
+      descripcion: Lista del catálogo si coherente; si no, lista vacía.
+      entrada: ninguna
+      salida: list[dict] de categorías normalizadas
+    resolver_pedido:
+      descripcion: Normaliza un pedido de Omega/Engine a una categoría. No calcula. No orquesta.
+      entrada: dict con escala_id|categoria|pedido|texto|...
+      salida: dict con ok, categoria, unidad, factores_evaluables, ...
+    reporte:
+      descripcion: Reporte interno de estado del módulo TT.
+      entrada: ninguna
+      salida: dict con estado, coherente, categorias, errores
+    diagnostico:
+      descripcion: Diagnóstico: qué falta o está mal en el catálogo.
+      entrada: ninguna
+      salida: dict con estado, problemas, advertencias, recomendaciones
+    verificar_salida:
+      descripcion: Comprueba si una salida de barrer o resolver es válida.
+      entrada: salida: dict
+      salida: bool
+  estados_validos:
+    • NO_INICIADO
+    • OPERATIVO
+    • DEGRADADO
+    • RECHAZADO
+  invariantes:
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • las capacidades declaradas son siempre callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no calcula Tru_Ri ni Tru_total
+    • este módulo no orquesta el ciclo
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
+  reporte:
+    id: TT
+    modulo: tru_totales
+    rol: TT
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    estado: OPERATIVO
+    coherente: True
+    categorias: 0
+    ids:
+      []
+    errores:
+      []
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • capacidades
+      • categorias
+      • resolver_pedido
+      • reporte
+      • diagnostico
+      • verificar_salida
+    requiere:
+      []
+    autoridad:
+      • Declarar las categorías disponibles en el catálogo
+      • Resolver un pedido de Omega/Engine a una categoría
+      • Leer y normalizar todos los archivos de categorias/
+      • Reportar estado, inventario y diagnóstico propios
+    conocimiento_exportable:
+      • categorias
+      • ids
+      • resolver_pedido
+      • inventario
+      • reporte
+      • diagnostico
+      • capacidades
+    consultas_soportadas:
+      • listar_categorias
+      • resolver_pedido
+      • obtener_inventario
+      • obtener_reporte
+      • obtener_diagnostico
+      • verificar_coherencia
+  diagnostico:
+    id: TT
+    modulo: tru_totales
+    estado: NO_INICIADO
+    problemas:
+      []
+    advertencias:
+      • No hay categorías cargadas
+    recomendaciones:
+      • Agregar al menos un archivo válido en categorias/
+    coherente: True
+    errores_n: 0
+    categorias_n: 0
+  inventario:
+    id: TT
+    nombre: tru_totales
+    rol: TT
+    version: 2.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    funcion: Catálogo pasivo de categorías de alcance de Tru_Ri / Tru_total. Auto-carga categorias/*.py. No calcula. No orquesta.
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • capacidades
+      • categorias
+      • resolver_pedido
+      • reporte
+      • diagnostico
+      • verificar_salida
+    catalogo:
+      modulo: tru_totales
+      version: 2.0
+      mensaje: Capacidades de categorías de Tru_Ri y Tru_total. Úsenlas cuando quieran. Este módulo no calcula.
+      como_usar: Omega declara el total a mostrar; Engine resuelve la categoría con resolver_pedido / por_id; CX aporta O; conteos + Calculator aplican la fórmula sobre el segmento.
+      categorias:
+        []
+      total: 0
+      coherente: True
+      errores:
+        []
+    requiere:
+      []
+    invariantes:
+      • el id del módulo nunca cambia
+      • el rol nunca cambia
+      • las capacidades declaradas son siempre callables tras la resolución
+      • este módulo no modifica el estado de otros módulos
+      • este módulo no calcula Tru_Ri ni Tru_total
+      • este módulo no orquesta el ciclo
+      • este módulo no inventa capacidades no declaradas en CONTENEDOR
+    extension: Editar o agregar un archivo en categorias/ sin tocar este INIT.
+    formula_referencia: Tru_Ri = C·L·K ; Tru_total = Tru_Ri·α + β — las aplica Calculator, no este módulo.
+
+══════════════════════════════════════════════════════════════════════
   DEPENDENCIAS
 ══════════════════════════════════════════════════════════════════════
   grafo:
@@ -1467,6 +1684,7 @@
     • constante
     • correlacion_mecanica
     • formulas
+    • tru_totales
   ciclos:
     []
 
@@ -1794,6 +2012,56 @@
       nombre: listar_formulas
       tipo: capacidad
       modulo: formulas
+    [64]
+      id: TT
+      nombre: tru_totales
+      rol: TT
+      tipo: modulo
+    [65]
+      id: tru_totales.verificar
+      nombre: verificar
+      tipo: capacidad
+      modulo: tru_totales
+    [66]
+      id: tru_totales.barrer
+      nombre: barrer
+      tipo: capacidad
+      modulo: tru_totales
+    [67]
+      id: tru_totales.inventario
+      nombre: inventario
+      tipo: capacidad
+      modulo: tru_totales
+    [68]
+      id: tru_totales.capacidades
+      nombre: capacidades
+      tipo: capacidad
+      modulo: tru_totales
+    [69]
+      id: tru_totales.categorias
+      nombre: categorias
+      tipo: capacidad
+      modulo: tru_totales
+    [70]
+      id: tru_totales.resolver_pedido
+      nombre: resolver_pedido
+      tipo: capacidad
+      modulo: tru_totales
+    [71]
+      id: tru_totales.reporte
+      nombre: reporte
+      tipo: capacidad
+      modulo: tru_totales
+    [72]
+      id: tru_totales.diagnostico
+      nombre: diagnostico
+      tipo: capacidad
+      modulo: tru_totales
+    [73]
+      id: tru_totales.verificar_salida
+      nombre: verificar_salida
+      tipo: capacidad
+      modulo: tru_totales
   aristas:
     [0]
       from: axiomas
@@ -2035,115 +2303,172 @@
       from: formulas
       to: formulas.listar_formulas
       tipo: declara_capacidad
+    [60]
+      from: tru_totales
+      to: tru_totales.verificar
+      tipo: declara_capacidad
+    [61]
+      from: tru_totales
+      to: tru_totales.barrer
+      tipo: declara_capacidad
+    [62]
+      from: tru_totales
+      to: tru_totales.inventario
+      tipo: declara_capacidad
+    [63]
+      from: tru_totales
+      to: tru_totales.capacidades
+      tipo: declara_capacidad
+    [64]
+      from: tru_totales
+      to: tru_totales.categorias
+      tipo: declara_capacidad
+    [65]
+      from: tru_totales
+      to: tru_totales.resolver_pedido
+      tipo: declara_capacidad
+    [66]
+      from: tru_totales
+      to: tru_totales.reporte
+      tipo: declara_capacidad
+    [67]
+      from: tru_totales
+      to: tru_totales.diagnostico
+      tipo: declara_capacidad
+    [68]
+      from: tru_totales
+      to: tru_totales.verificar_salida
+      tipo: declara_capacidad
 
 ══════════════════════════════════════════════════════════════════════
   TRAZAS DE EJECUCIÓN
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T02:43:11.270048+00:00
+    timestamp: 2026-08-07T02:51:39.406855+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001621
+    duracion_s: 0.001684
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T02:43:11.271414+00:00
+    timestamp: 2026-08-07T02:51:39.408214+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00135
+    duracion_s: 0.001342
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T02:43:11.272605+00:00
+    timestamp: 2026-08-07T02:51:39.409482+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001181
+    duracion_s: 0.001255
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T02:43:11.272933+00:00
+    timestamp: 2026-08-07T02:51:39.409829+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000319
+    duracion_s: 0.000336
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T02:43:11.273174+00:00
+    timestamp: 2026-08-07T02:51:39.410066+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000235
+    duracion_s: 0.000231
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T02:43:11.273407+00:00
+    timestamp: 2026-08-07T02:51:39.410290+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000227
+    duracion_s: 0.000219
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T02:43:11.273482+00:00
+    timestamp: 2026-08-07T02:51:39.410367+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 6.9e-05
+    duracion_s: 7.1e-05
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T02:43:11.273534+00:00
+    timestamp: 2026-08-07T02:51:39.410418+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 4.3e-05
+    duracion_s: 4.2e-05
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T02:43:11.273559+00:00
+    timestamp: 2026-08-07T02:51:39.410441+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2e-05
+    duracion_s: 1.8e-05
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T02:43:11.274111+00:00
+    timestamp: 2026-08-07T02:51:39.411013+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000546
+    duracion_s: 0.000567
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T02:43:11.274490+00:00
+    timestamp: 2026-08-07T02:51:39.411377+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000372
+    duracion_s: 0.000358
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T02:43:11.274576+00:00
+    timestamp: 2026-08-07T02:51:39.411458+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 7.9e-05
+    duracion_s: 7.6e-05
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T02:43:11.275377+00:00
+    timestamp: 2026-08-07T02:51:39.412322+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000795
+    duracion_s: 0.000856
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T02:43:11.275612+00:00
+    timestamp: 2026-08-07T02:51:39.412559+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000226
+    duracion_s: 0.000228
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T02:43:11.275722+00:00
+    timestamp: 2026-08-07T02:51:39.412704+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000105
+    duracion_s: 0.000138
+  [15]
+    id_traza: 16
+    timestamp: 2026-08-07T02:51:39.412751+00:00
+    modulo: tru_totales
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 4e-05
+  [16]
+    id_traza: 17
+    timestamp: 2026-08-07T02:51:39.412774+00:00
+    modulo: tru_totales
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 1.9e-05
+  [17]
+    id_traza: 18
+    timestamp: 2026-08-07T02:51:39.412794+00:00
+    modulo: tru_totales
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 1.6e-05
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

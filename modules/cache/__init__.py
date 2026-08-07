@@ -5,7 +5,7 @@
 # MÓDULO:              cache
 # ID:                  CH
 # Rol:                 CH
-# Versión módulo:      2.1
+# Versión módulo:      4.0
 # Versión contrato:    1.0
 # Esquema contrato:    VPSI-CONTRACT-1.0
 # Estabilidad:         ESTABLE
@@ -13,78 +13,62 @@
 # API Engine:          >=1.0
 #
 # Función:
-#   Registro oficial de la evidencia del ciclo.
-#   Libro de actas de la ejecución del sistema.
+#   Registrador universal de eventos.
+#   Libro de actas del sistema.
 #
-#   CACHE no es un caché tradicional.
-#   No es memoria temporal de resultados.
-#   Es el registro oficial e inmutable de la trazabilidad
-#   de cada ciclo de ejecución.
-#
-# Qué hace:
-#   - Registra la evidencia generada durante un ciclo
-#   - Conserva el orden de registro (append-only)
-#   - Preserva la trazabilidad completa
-#   - Expone la evidencia para lectura
-#   - Nunca altera la evidencia registrada
-#
-# Qué NO hace:
-#   - No calcula Tru_Ri / Tru_total / C / L / K
-#   - No orquesta el ciclo
-#   - No define el orden causal (eso es MC)
-#   - No interpreta, clasifica ni reorganiza
-#   - No valida fórmulas
-#   - No modifica, sobrescribe ni borra evidencia
-#   - No inicia operaciones ni solicita información
-#
-# Responsabilidad:
-#   Trazabilidad. Registrar lo ocurrido. Nada más.
-#
-# Trazabilidad:
-#   Capacidad de reconstruir completamente un ciclo
-#   utilizando únicamente la evidencia registrada.
-#   Cada evento conserva: orden, secuencia, origen,
-#   tipo, timestamp y payload.
-#
-# Autoridad:
-#   - Registrar lo que Engine deposita
-#   - Registrar el veredicto que Centinela deposita
-#   - Entregar lecturas de evidencia
-#   - Reportar estado, inventario y diagnóstico propios
-#
-# Relación con Engine:
-#   Engine es el único agente que utiliza CACHE durante
-#   la ejecución: ejecuta capacidades, obtiene resultados,
-#   deposita evidencia, consulta evidencia y entrega a Omega.
-#   CACHE nunca inicia operaciones.
-#
-# Relación con Centinela:
-#   Centinela utiliza CACHE como fuente oficial de
-#   trazabilidad del ciclo.
-#   Flujo:
-#     Engine ejecuta → deposita evidencia → CACHE
-#     → Centinela lee → verifica → emite veredicto
-#     → CACHE registra el veredicto (nuevo evento)
-#     → Engine entrega → Omega presenta
-#   Centinela nunca modifica evidencia previa.
-#   Solo consulta y deposita su veredicto como evento nuevo.
-#
-# Relación con Omega:
-#   Omega no calcula nada de CH.
-#   Solo presenta lo que Engine entrega.
+#   CACHE no sabe lo que ocurrió.
+#   Solo sabe qué fue registrado.
 #
 # Principio:
-#   CACHE es el registro oficial e inmutable de la
-#   evidencia del sistema. Toda reconstrucción de un
-#   ciclo debe poder realizarse exclusivamente a partir
-#   de la evidencia registrada.
+#   Engine produce.
+#   Centinela verifica.
+#   CACHE conserva.
+#   (Futuro) Analizadores interpretan.
+#   Omega presenta.
 #
-# Separación:
-#   Calculator → cálculo
-#   MC         → orden causal
-#   Engine     → agencia y ejecución
-#   Centinela  → verificación
-#   CACHE      → trazabilidad
+# Qué hace:
+#   - Registrar exactamente lo que ocurrió durante la ejecución
+#   - Conservar evidencia objetiva (append-only)
+#   - Exponer lecturas filtradas por campos del registro
+#   - Descubrir categorías dinámicamente al depositar
+#
+# Qué NO hace:
+#   - No interpreta
+#   - No deduce
+#   - No reconstruye
+#   - No infiere
+#   - No calcula
+#   - No descubre relaciones
+#   - No genera grafos ni árboles
+#   - No explica razonamientos
+#   - No responde "por qué", "qué significa", "cuál fue la causa"
+#
+# Registro neutro (cada evento):
+#   seq, timestamp, run_id, ciclo_id, origen, destino,
+#   modulo, capacidad, tipo, categoria, estado, payload
+#
+# Categorías:
+#   Dinámicas. Si Engine deposita categoria="predicciones",
+#   CACHE la registra. No hay lista fija de dominios.
+#
+# Lecturas:
+#   Solo filtros sobre lo registrado.
+#   Nunca reconstrucciones ni proyecciones interpretativas.
+#
+# Relación con Engine:
+#   Engine deposita. Engine lee. CACHE no inicia operaciones.
+#
+# Relación con Centinela:
+#   Centinela consulta y deposita veredicto como evento nuevo.
+#   Nunca modifica evidencia previa.
+#
+# Relación con Omega:
+#   Omega solo presenta lo que Engine entrega.
+#
+# Futuro:
+#   Un módulo analizador de trazabilidad leerá CACHE
+#   para grafos, rutas, causalidad y explicaciones.
+#   Ese análisis no pertenece a este módulo.
 #
 # ===============================================================
 
@@ -114,7 +98,7 @@ ID_MODULO = "CH"
 NOMBRE_MODULO = "cache"
 ROL_MODULO = "CH"
 
-VERSION_MODULO = "2.1"
+VERSION_MODULO = "4.0"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
 
@@ -133,20 +117,37 @@ ESTADOS_VALIDOS = (
     ESTADO_RECHAZADO,
 )
 
+# Campos del registro neutro
+CAMPOS_REGISTRO = (
+    "seq",
+    "timestamp",
+    "run_id",
+    "ciclo_id",
+    "origen",
+    "destino",
+    "modulo",
+    "capacidad",
+    "tipo",
+    "categoria",
+    "estado",
+    "payload",
+)
+
 INVARIANTES = (
     "el id del módulo nunca cambia",
     "el rol nunca cambia",
     "las capacidades declaradas son siempre callables tras la resolución",
     "este módulo no modifica el estado de otros módulos",
-    "este módulo no calcula Tru / C / L / K",
-    "este módulo no orquesta el ciclo",
-    "este módulo no define el orden causal (eso es MC)",
+    "este módulo no calcula",
+    "este módulo no interpreta",
+    "este módulo no deduce ni infiere",
+    "este módulo no reconstruye ni genera grafos",
     "la evidencia depositada nunca se modifica",
     "la evidencia depositada nunca se sobrescribe",
-    "la evidencia depositada nunca cambia de posición",
     "la evidencia depositada nunca se reordena",
     "la evidencia depositada nunca desaparece durante el ciclo",
     "toda información nueva se incorpora solo como evento nuevo",
+    "las categorías son dinámicas; no hay lista fija de dominios",
     "este módulo no inventa capacidades no declaradas en CONTENEDOR",
 )
 
@@ -159,8 +160,8 @@ INVARIANTES = (
 # CONFIGURACIÓN
 # ===============================================================
 
-# Políticas futuras (persistencia, sin-internet, prioridad, evicción)
-# vivirán en archivos bajo cache/. Este INIT no las inventa.
+# Carpetas físicas futuras: solo datos, sin lógica.
+# cache/ciclos/run_x/ciclo_001/registros/ ...
 
 # ===============================================================
 # FIN CONFIGURACIÓN
@@ -186,85 +187,123 @@ class CacheInmutableError(CacheError):
     pass
 
 
-class _MemoriaEvidencia:
+class _RegistroEventos:
     """
-    Almacén de fase: lista ordenada de eventos.
-    Append-only. No permite mutar registros ya escritos.
+    Almacén append-only de registros neutros.
+    No interpreta. No indexa relaciones. Solo guarda y filtra.
     """
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._eventos: List[Dict[str, Any]] = []
-        self._por_ciclo: Dict[str, List[int]] = defaultdict(list)
         self._seq = 0
+        self._categorias: set = set()
 
-    def append(self, evento: Dict[str, Any]) -> Dict[str, Any]:
-        if not isinstance(evento, dict):
-            raise CacheError("evento debe ser dict")
+    def append(self, datos: Dict[str, Any]) -> Dict[str, Any]:
+        if not isinstance(datos, dict):
+            raise CacheError("datos debe ser dict")
         with self._lock:
             self._seq += 1
+            categoria = datos.get("categoria")
+            if categoria is not None:
+                self._categorias.add(str(categoria))
             entrada = {
                 "seq": self._seq,
                 "timestamp": datetime.now(timezone.utc).isoformat(),
-                "tipo": evento.get("tipo", "evento"),
-                "ciclo_id": evento.get("ciclo_id"),
-                "origen": evento.get("origen"),
-                "payload": copy.deepcopy(evento.get("payload", evento)),
+                "run_id": datos.get("run_id"),
+                "ciclo_id": datos.get("ciclo_id"),
+                "origen": datos.get("origen"),
+                "destino": datos.get("destino"),
+                "modulo": datos.get("modulo"),
+                "capacidad": datos.get("capacidad"),
+                "tipo": datos.get("tipo") or "evento",
+                "categoria": categoria,
+                "estado": datos.get("estado"),
+                "payload": copy.deepcopy(datos.get("payload") or {}),
             }
-            for k in ("tipo", "ciclo_id", "origen", "payload"):
-                entrada["payload"].pop(k, None)
+            if isinstance(entrada["payload"], dict):
+                for k in CAMPOS_REGISTRO:
+                    entrada["payload"].pop(k, None)
             self._eventos.append(entrada)
-            cid = entrada.get("ciclo_id")
-            if cid:
-                self._por_ciclo[str(cid)].append(len(self._eventos) - 1)
             return copy.deepcopy(entrada)
 
-    def listar(
+    def filtrar(
         self,
+        *,
         ciclo_id: Optional[str] = None,
+        run_id: Optional[str] = None,
+        modulo: Optional[str] = None,
         tipo: Optional[str] = None,
+        categoria: Optional[str] = None,
+        capacidad: Optional[str] = None,
+        origen: Optional[str] = None,
+        destino: Optional[str] = None,
+        estado: Optional[str] = None,
         desde_seq: Optional[int] = None,
+        hasta_seq: Optional[int] = None,
+        desde_timestamp: Optional[str] = None,
+        hasta_timestamp: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         with self._lock:
             out: List[Dict[str, Any]] = []
             for e in self._eventos:
                 if ciclo_id is not None and str(e.get("ciclo_id")) != str(ciclo_id):
                     continue
+                if run_id is not None and str(e.get("run_id")) != str(run_id):
+                    continue
+                if modulo is not None and str(e.get("modulo")) != str(modulo):
+                    continue
                 if tipo is not None and e.get("tipo") != tipo:
                     continue
-                if desde_seq is not None and int(e.get("seq", 0)) < int(desde_seq):
+                if categoria is not None and str(e.get("categoria")) != str(categoria):
+                    continue
+                if capacidad is not None and str(e.get("capacidad")) != str(capacidad):
+                    continue
+                if origen is not None and str(e.get("origen")) != str(origen):
+                    continue
+                if destino is not None and str(e.get("destino")) != str(destino):
+                    continue
+                if estado is not None and str(e.get("estado")) != str(estado):
+                    continue
+                seq = int(e.get("seq") or 0)
+                if desde_seq is not None and seq < int(desde_seq):
+                    continue
+                if hasta_seq is not None and seq > int(hasta_seq):
+                    continue
+                ts = e.get("timestamp") or ""
+                if desde_timestamp is not None and ts < str(desde_timestamp):
+                    continue
+                if hasta_timestamp is not None and ts > str(hasta_timestamp):
                     continue
                 out.append(copy.deepcopy(e))
             return out
 
-    def secuencia_ciclo(self, ciclo_id: str) -> List[Dict[str, Any]]:
-        return self.listar(ciclo_id=str(ciclo_id))
-
-    def obtener_ultimo(
-        self, ciclo_id: str, tipo: Optional[str] = None
-    ) -> Optional[Dict[str, Any]]:
-        regs = self.listar(ciclo_id=str(ciclo_id), tipo=tipo)
-        return regs[-1] if regs else None
+    def categorias_conocidas(self) -> List[str]:
+        with self._lock:
+            return sorted(self._categorias)
 
     def resumen(self) -> Dict[str, Any]:
         with self._lock:
             por_tipo: Dict[str, int] = defaultdict(int)
+            por_cat: Dict[str, int] = defaultdict(int)
+            ciclos: set = set()
             for e in self._eventos:
                 por_tipo[str(e.get("tipo"))] += 1
+                if e.get("categoria") is not None:
+                    por_cat[str(e.get("categoria"))] += 1
+                if e.get("ciclo_id") is not None:
+                    ciclos.add(str(e.get("ciclo_id")))
             return {
                 "total_eventos": len(self._eventos),
-                "ciclos": len(self._por_ciclo),
-                "por_tipo": dict(por_tipo),
+                "ciclos": len(ciclos),
                 "seq_actual": self._seq,
+                "por_tipo": dict(por_tipo),
+                "por_categoria": dict(por_cat),
+                "categorias": sorted(self._categorias),
                 "inmutable": True,
             }
 
     def verificar_integridad(self) -> List[str]:
-        """
-        Solo integridad del registro:
-        seq creciente, timestamps presentes, estructura completa.
-        No recalcula Tru. No revisa C, L, K.
-        """
         errores: List[str] = []
         with self._lock:
             seq_prev = 0
@@ -279,9 +318,7 @@ class _MemoriaEvidencia:
                         )
                 seq = e.get("seq")
                 if not isinstance(seq, int):
-                    errores.append(
-                        "evento[{0}] seq no es int".format(i)
-                    )
+                    errores.append("evento[{0}] seq no es int".format(i))
                 elif seq <= seq_prev:
                     errores.append(
                         "evento[{0}] seq no creciente: {1} <= {2}".format(
@@ -291,9 +328,7 @@ class _MemoriaEvidencia:
                 else:
                     seq_prev = seq
                 if not e.get("timestamp"):
-                    errores.append(
-                        "evento[{0}] sin timestamp".format(i)
-                    )
+                    errores.append("evento[{0}] sin timestamp".format(i))
                 if not isinstance(e.get("payload"), dict):
                     errores.append(
                         "evento[{0}] payload no es dict".format(i)
@@ -311,7 +346,7 @@ class _MemoriaEvidencia:
         )
 
 
-_memoria = _MemoriaEvidencia()
+_registro = _RegistroEventos()
 
 # ===============================================================
 # FIN DEFINICIONES
@@ -336,38 +371,36 @@ CONTENEDOR: Dict[str, Any] = {
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
     "descripcion": (
-        "Registro oficial e inmutable de la evidencia del ciclo. "
-        "Libro de actas de la ejecución del sistema. "
-        "Preserva trazabilidad completa. Append-only. "
-        "No es caché de resultados. No calcula. No orquesta."
+        "Registrador universal de eventos. Libro de actas del sistema. "
+        "Conserva evidencia objetiva. Categorías dinámicas. "
+        "No interpreta. No deduce. No reconstruye. No calcula."
     ),
 
     # ----- PROPÓSITO -----
     "funcion": (
-        "Registrar la evidencia generada durante un ciclo, "
-        "conservar el orden de registro, preservar la trazabilidad "
-        "completa y exponer la evidencia para lectura. "
-        "Nunca altera la evidencia registrada."
+        "Registrar exactamente lo que ocurrió durante la ejecución "
+        "y exponer lecturas filtradas por campos del registro. "
+        "Nada más."
     ),
     "no_hace": [
-        "No calcula Tru_Ri / Tru_total / C / L / K",
-        "No orquesta el ciclo",
-        "No define el orden causal (eso es MC)",
-        "No interpreta ni clasifica información",
-        "No reorganiza causalmente ni determina precedencias",
-        "No valida fórmulas",
-        "No modifica, sobrescribe ni borra evidencia",
-        "No inicia operaciones ni solicita información",
+        "No interpreta",
+        "No deduce ni infiere",
+        "No reconstruye ciclos",
+        "No genera grafos ni árboles",
+        "No explica razonamientos ni causas",
+        "No calcula C / L / K / Tru",
+        "No descubre relaciones",
+        "No altera evidencia depositada",
+        "No inicia operaciones",
         "No envía reportes a otros módulos",
     ],
 
     # ----- AUTORIDAD -----
     "autoridad": [
-        "Registrar evidencia depositada por Engine",
-        "Registrar veredicto depositado por Centinela (como evento nuevo)",
-        "Entregar lecturas de evidencia",
-        "Exponer secuencia ordenada de un ciclo",
-        "Verificar integridad del registro (no de cálculos)",
+        "Registrar eventos depositados por Engine o Centinela",
+        "Entregar lecturas filtradas por campos del registro",
+        "Exponer categorías descubiertas dinámicamente",
+        "Verificar integridad del registro (forma, no contenido)",
         "Reportar estado, inventario y diagnóstico propios",
     ],
 
@@ -375,8 +408,18 @@ CONTENEDOR: Dict[str, Any] = {
     "conocimiento_exportable": [
         "depositar",
         "leer",
-        "secuencia",
-        "ultimo",
+        "leer_eventos",
+        "leer_por_ciclo",
+        "leer_por_modulo",
+        "leer_por_tipo",
+        "leer_por_categoria",
+        "leer_por_capacidad",
+        "leer_por_origen",
+        "leer_por_destino",
+        "leer_por_estado",
+        "leer_por_seq",
+        "leer_por_timestamp",
+        "categorias",
         "inventario",
         "reporte",
         "diagnostico",
@@ -402,9 +445,10 @@ CONTENEDOR: Dict[str, Any] = {
 
     # ----- CONSULTAS SOPORTADAS -----
     "consultas_soportadas": [
-        "depositar_evidencia",
-        "leer_evidencia",
-        "secuencia_ciclo",
+        "depositar_evento",
+        "leer_eventos",
+        "filtrar_por_campo",
+        "listar_categorias",
         "obtener_inventario",
         "obtener_reporte",
         "obtener_diagnostico",
@@ -417,8 +461,18 @@ CONTENEDOR: Dict[str, Any] = {
         "barrer": "barrer",
         "depositar": "depositar",
         "leer": "leer",
-        "secuencia": "secuencia",
-        "ultimo": "ultimo",
+        "leer_eventos": "leer_eventos",
+        "leer_por_ciclo": "leer_por_ciclo",
+        "leer_por_modulo": "leer_por_modulo",
+        "leer_por_tipo": "leer_por_tipo",
+        "leer_por_categoria": "leer_por_categoria",
+        "leer_por_capacidad": "leer_por_capacidad",
+        "leer_por_origen": "leer_por_origen",
+        "leer_por_destino": "leer_por_destino",
+        "leer_por_estado": "leer_por_estado",
+        "leer_por_seq": "leer_por_seq",
+        "leer_por_timestamp": "leer_por_timestamp",
+        "categorias": "categorias",
         "inventario": "inventario",
         "reporte": "reporte",
         "diagnostico": "diagnostico",
@@ -429,49 +483,98 @@ CONTENEDOR: Dict[str, Any] = {
     # ----- METADATOS DE CAPACIDADES (1:1 obligatorio) -----
     "capacidades_meta": {
         "verificar": {
-            "descripcion": (
-                "Alias de barrer. Verifica integridad del registro "
-                "(seq, timestamps, estructura). No recalcula Tru."
-            ),
+            "descripcion": "Alias de barrer. Integridad formal del registro.",
             "entrada": "ninguna",
             "salida": "dict con coherente, inmutable, errores, resumen",
         },
         "barrer": {
             "descripcion": (
-                "Verifica únicamente la integridad del registro: "
-                "seq creciente, timestamps, estructura completa, "
-                "append-only. No revisa C, L, K ni Tru."
+                "Verifica forma del registro: seq creciente, timestamps, "
+                "payload dict. No interpreta contenido."
             ),
             "entrada": "ninguna",
             "salida": "dict con coherente, inmutable, errores, resumen",
         },
         "depositar": {
             "descripcion": (
-                "Registra un evento de evidencia. Única vía de escritura. "
-                "Append-only. Nunca modifica eventos previos."
+                "Registra un evento neutro. Única vía de escritura. "
+                "Append-only. Categorías se descubren al depositar."
             ),
-            "entrada": "tipo: str, payload: dict, ciclo_id?, origen?",
-            "salida": "dict del evento registrado (seq, timestamp, tipo, ...)",
+            "entrada": (
+                "tipo, payload, ciclo_id?, run_id?, origen?, destino?, "
+                "modulo?, capacidad?, categoria?, estado?"
+            ),
+            "salida": "dict del evento registrado",
         },
         "leer": {
-            "descripcion": "Lectura de evidencia por ciclo, tipo o desde_seq. No muta.",
-            "entrada": "ciclo_id?, tipo?, desde_seq?",
-            "salida": "list[dict] de eventos",
+            "descripcion": "Lectura genérica con filtros opcionales por campo.",
+            "entrada": "filtros opcionales por campo del registro",
+            "salida": "list[dict]",
         },
-        "secuencia": {
-            "descripcion": "Secuencia completa de un ciclo en orden de registro.",
+        "leer_eventos": {
+            "descripcion": "Alias de leer sin filtros (todos los eventos).",
+            "entrada": "ninguna",
+            "salida": "list[dict]",
+        },
+        "leer_por_ciclo": {
+            "descripcion": "Eventos de un ciclo_id.",
             "entrada": "ciclo_id: str",
-            "salida": "list[dict] de eventos ordenados por seq",
+            "salida": "list[dict]",
         },
-        "ultimo": {
-            "descripcion": "Último evento de un ciclo, opcionalmente filtrado por tipo.",
-            "entrada": "ciclo_id: str, tipo?",
-            "salida": "dict | None",
+        "leer_por_modulo": {
+            "descripcion": "Eventos de un módulo.",
+            "entrada": "modulo: str, ciclo_id?",
+            "salida": "list[dict]",
+        },
+        "leer_por_tipo": {
+            "descripcion": "Eventos de un tipo.",
+            "entrada": "tipo: str, ciclo_id?",
+            "salida": "list[dict]",
+        },
+        "leer_por_categoria": {
+            "descripcion": "Eventos de una categoría (dinámica).",
+            "entrada": "categoria: str, ciclo_id?",
+            "salida": "list[dict]",
+        },
+        "leer_por_capacidad": {
+            "descripcion": "Eventos de una capacidad.",
+            "entrada": "capacidad: str, ciclo_id?",
+            "salida": "list[dict]",
+        },
+        "leer_por_origen": {
+            "descripcion": "Eventos con un origen dado.",
+            "entrada": "origen: str, ciclo_id?",
+            "salida": "list[dict]",
+        },
+        "leer_por_destino": {
+            "descripcion": "Eventos con un destino dado.",
+            "entrada": "destino: str, ciclo_id?",
+            "salida": "list[dict]",
+        },
+        "leer_por_estado": {
+            "descripcion": "Eventos con un estado dado.",
+            "entrada": "estado: str, ciclo_id?",
+            "salida": "list[dict]",
+        },
+        "leer_por_seq": {
+            "descripcion": "Eventos en un rango de seq.",
+            "entrada": "desde_seq?, hasta_seq?",
+            "salida": "list[dict]",
+        },
+        "leer_por_timestamp": {
+            "descripcion": "Eventos en un rango de timestamp.",
+            "entrada": "desde_timestamp?, hasta_timestamp?",
+            "salida": "list[dict]",
+        },
+        "categorias": {
+            "descripcion": "Categorías descubiertas dinámicamente hasta ahora.",
+            "entrada": "ninguna",
+            "salida": "list[str]",
         },
         "inventario": {
-            "descripcion": "Inventario del módulo y resumen de la memoria de evidencia.",
+            "descripcion": "Inventario del módulo y resumen del registro.",
             "entrada": "ninguna",
-            "salida": "dict con id, version, memoria, capacidades",
+            "salida": "dict con id, version, memoria, categorias, capacidades",
         },
         "reporte": {
             "descripcion": "Reporte interno de estado del módulo CH.",
@@ -479,7 +582,7 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con estado, coherente, memoria, capacidades",
         },
         "diagnostico": {
-            "descripcion": "Diagnóstico de integridad del registro de evidencia.",
+            "descripcion": "Diagnóstico de integridad formal del registro.",
             "entrada": "ninguna",
             "salida": "dict con estado, problemas, advertencias, recomendaciones",
         },
@@ -490,8 +593,8 @@ CONTENEDOR: Dict[str, Any] = {
         },
         "backend_para_centinela": {
             "descripcion": (
-                "Adaptador estable CacheBackend para Centinela "
-                "(guardar/obtener). Centinela no conoce la implementación interna."
+                "Adaptador estable CacheBackend para Centinela. "
+                "Centinela no conoce la implementación interna."
             ),
             "entrada": "ninguna",
             "salida": "CacheBackend",
@@ -594,53 +697,160 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 
 def depositar(
     tipo: str,
-    payload: Dict[str, Any],
+    payload: Optional[Dict[str, Any]] = None,
     *,
     ciclo_id: Optional[str] = None,
+    run_id: Optional[str] = None,
     origen: Optional[str] = None,
+    destino: Optional[str] = None,
+    modulo: Optional[str] = None,
+    capacidad: Optional[str] = None,
+    categoria: Optional[str] = None,
+    estado: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Registra un evento de evidencia. Única vía de escritura.
-    Append-only. Nunca modifica eventos previos.
-
-    tipos de fase (ejemplos, no exhaustivo):
-      propuesta_engine, veredicto_centinela, secuencia_mecanica,
-      factores, contexto, evaluacion, meta
+    Registra un evento neutro. Única vía de escritura.
+    Append-only. Categorías se descubren al depositar.
     """
     if not tipo or not isinstance(tipo, str):
         raise CacheError("tipo debe ser str no vacío")
+    if payload is None:
+        payload = {}
     if not isinstance(payload, dict):
         raise CacheError("payload debe ser dict")
-    return _memoria.append({
+    return _registro.append({
         "tipo": tipo,
-        "ciclo_id": ciclo_id or payload.get("ciclo_id"),
-        "origen": origen or payload.get("origen") or "desconocido",
         "payload": payload,
+        "ciclo_id": ciclo_id,
+        "run_id": run_id,
+        "origen": origen or "desconocido",
+        "destino": destino,
+        "modulo": modulo,
+        "capacidad": capacidad,
+        "categoria": categoria,
+        "estado": estado,
     })
 
 
 def leer(
     ciclo_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    modulo: Optional[str] = None,
     tipo: Optional[str] = None,
+    categoria: Optional[str] = None,
+    capacidad: Optional[str] = None,
+    origen: Optional[str] = None,
+    destino: Optional[str] = None,
+    estado: Optional[str] = None,
     desde_seq: Optional[int] = None,
+    hasta_seq: Optional[int] = None,
+    desde_timestamp: Optional[str] = None,
+    hasta_timestamp: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """Lectura de evidencia; no muta."""
-    return _memoria.listar(
-        ciclo_id=ciclo_id, tipo=tipo, desde_seq=desde_seq
+    """Lectura genérica. Solo filtros. Sin interpretación."""
+    return _registro.filtrar(
+        ciclo_id=ciclo_id,
+        run_id=run_id,
+        modulo=modulo,
+        tipo=tipo,
+        categoria=categoria,
+        capacidad=capacidad,
+        origen=origen,
+        destino=destino,
+        estado=estado,
+        desde_seq=desde_seq,
+        hasta_seq=hasta_seq,
+        desde_timestamp=desde_timestamp,
+        hasta_timestamp=hasta_timestamp,
     )
 
 
-def secuencia(ciclo_id: str) -> List[Dict[str, Any]]:
-    """Secuencia completa de un ciclo en orden de registro."""
+def leer_eventos() -> List[Dict[str, Any]]:
+    return leer()
+
+
+def leer_por_ciclo(ciclo_id: str) -> List[Dict[str, Any]]:
     if not ciclo_id:
         raise CacheError("ciclo_id obligatorio")
-    return _memoria.secuencia_ciclo(ciclo_id)
+    return leer(ciclo_id=str(ciclo_id))
 
 
-def ultimo(
-    ciclo_id: str, tipo: Optional[str] = None
-) -> Optional[Dict[str, Any]]:
-    return _memoria.obtener_ultimo(ciclo_id, tipo=tipo)
+def leer_por_modulo(
+    modulo: str, ciclo_id: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    if not modulo:
+        raise CacheError("modulo obligatorio")
+    return leer(modulo=str(modulo), ciclo_id=ciclo_id)
+
+
+def leer_por_tipo(
+    tipo: str, ciclo_id: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    if not tipo:
+        raise CacheError("tipo obligatorio")
+    return leer(tipo=str(tipo), ciclo_id=ciclo_id)
+
+
+def leer_por_categoria(
+    categoria: str, ciclo_id: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    if not categoria:
+        raise CacheError("categoria obligatoria")
+    return leer(categoria=str(categoria), ciclo_id=ciclo_id)
+
+
+def leer_por_capacidad(
+    capacidad: str, ciclo_id: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    if not capacidad:
+        raise CacheError("capacidad obligatoria")
+    return leer(capacidad=str(capacidad), ciclo_id=ciclo_id)
+
+
+def leer_por_origen(
+    origen: str, ciclo_id: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    if not origen:
+        raise CacheError("origen obligatorio")
+    return leer(origen=str(origen), ciclo_id=ciclo_id)
+
+
+def leer_por_destino(
+    destino: str, ciclo_id: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    if not destino:
+        raise CacheError("destino obligatorio")
+    return leer(destino=str(destino), ciclo_id=ciclo_id)
+
+
+def leer_por_estado(
+    estado: str, ciclo_id: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    if not estado:
+        raise CacheError("estado obligatorio")
+    return leer(estado=str(estado), ciclo_id=ciclo_id)
+
+
+def leer_por_seq(
+    desde_seq: Optional[int] = None,
+    hasta_seq: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    return leer(desde_seq=desde_seq, hasta_seq=hasta_seq)
+
+
+def leer_por_timestamp(
+    desde_timestamp: Optional[str] = None,
+    hasta_timestamp: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    return leer(
+        desde_timestamp=desde_timestamp,
+        hasta_timestamp=hasta_timestamp,
+    )
+
+
+def categorias() -> List[str]:
+    """Categorías descubiertas dinámicamente hasta ahora."""
+    return _registro.categorias_conocidas()
 
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
@@ -653,29 +863,26 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
         "funcion": (
-            "Registro oficial e inmutable de la evidencia del ciclo. "
-            "Libro de actas. Append-only. No calcula."
+            "Registrador universal de eventos. Libro de actas. "
+            "Append-only. No interpreta."
         ),
-        "memoria": _memoria.resumen(),
+        "memoria": _registro.resumen(),
+        "categorias": _registro.categorias_conocidas(),
+        "campos_registro": list(CAMPOS_REGISTRO),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "invariantes": CONTENEDOR.get("invariantes"),
         "nota": (
-            "Append-only. Orden causal: MC. "
-            "CACHE solo registra evidencia. "
-            "Toda reconstrucción del ciclo se hace desde aquí."
+            "CACHE no sabe lo que ocurrió. Solo sabe qué fue registrado. "
+            "Análisis de trazabilidad: módulo futuro, no este."
         ),
     }
 
 
 def barrer() -> Dict[str, Any]:
-    """
-    Verifica únicamente la integridad del registro:
-    seq creciente, timestamps, estructura, append-only.
-    No recalcula Tru. No revisa C, L, K.
-    """
-    errores = _memoria.verificar_integridad()
-    res = _memoria.resumen()
+    """Integridad formal del registro. No interpreta contenido."""
+    errores = _registro.verificar_integridad()
+    res = _registro.resumen()
     return {
         "contenedor": NOMBRE_MODULO,
         "rol": ROL_MODULO,
@@ -710,30 +917,38 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
 class CacheBackend:
     """
     Adaptador estable para Centinela.
-    Centinela no conoce la implementación interna de CACHE.
-    Solo deposita veredictos (evento nuevo) y consulta evidencia.
-    Nunca modifica evidencia previa.
+    Solo deposita veredictos (evento nuevo) y consulta registros.
+    Nunca modifica evidencia previa. Nunca interpreta.
     """
 
     def guardar(self, registro: Dict[str, Any]) -> None:
         tipo = str(registro.get("tipo") or "veredicto_centinela")
-        ciclo_id = registro.get("ciclo_id")
         depositar(
             tipo,
-            registro,
-            ciclo_id=str(ciclo_id) if ciclo_id else None,
+            registro if isinstance(registro, dict) else {},
+            ciclo_id=(
+                str(registro.get("ciclo_id"))
+                if registro.get("ciclo_id") is not None
+                else None
+            ),
+            run_id=(
+                str(registro.get("run_id"))
+                if registro.get("run_id") is not None
+                else None
+            ),
             origen=str(registro.get("origen") or "centinela"),
+            modulo=str(registro.get("modulo") or "centinela"),
+            capacidad=registro.get("capacidad"),
+            categoria=registro.get("categoria"),
+            estado=registro.get("estado"),
         )
 
     def obtener(self, ciclo_id: str) -> Optional[Dict[str, Any]]:
-        reg = ultimo(ciclo_id, tipo="propuesta_engine")
-        if reg is None:
-            regs = secuencia(ciclo_id)
-            return regs[-1] if regs else None
-        payload = reg.get("payload") or {}
-        if "paquete" in payload:
-            return {"paquete": payload["paquete"], "ciclo_id": ciclo_id}
-        return {"paquete": payload, "ciclo_id": ciclo_id}
+        regs = leer_por_ciclo(str(ciclo_id))
+        if not regs:
+            return None
+        # último registro del ciclo; sin interpretación de contenido
+        return regs[-1]
 
 
 def backend_para_centinela() -> CacheBackend:
@@ -765,6 +980,7 @@ def reporte() -> Dict[str, Any]:
         "inmutable": True,
         "errores": r.get("errores"),
         "memoria": r.get("resumen"),
+        "categorias": _registro.categorias_conocidas(),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "autoridad": CONTENEDOR.get("autoridad"),
@@ -788,12 +1004,12 @@ def diagnostico() -> Dict[str, Any]:
             "detalle": r["errores"],
         })
         recomendaciones.append(
-            "Revisar integridad del registro de evidencia"
+            "Revisar integridad formal del registro de eventos"
         )
 
     if res.get("total_eventos", 0) == 0:
         advertencias.append(
-            "Memoria de evidencia vacía (legítimo al inicio del ciclo)"
+            "Registro vacío (legítimo al inicio del ciclo)"
         )
 
     estado = ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO
@@ -810,6 +1026,7 @@ def diagnostico() -> Dict[str, Any]:
         "total_eventos": res.get("total_eventos", 0),
         "ciclos": res.get("ciclos", 0),
         "seq_actual": res.get("seq_actual", 0),
+        "categorias_n": len(res.get("categorias") or []),
     }
 
 # ===============================================================
@@ -826,8 +1043,18 @@ _CAP_MAP = {
     "verificar": verificar,
     "depositar": depositar,
     "leer": leer,
-    "secuencia": secuencia,
-    "ultimo": ultimo,
+    "leer_eventos": leer_eventos,
+    "leer_por_ciclo": leer_por_ciclo,
+    "leer_por_modulo": leer_por_modulo,
+    "leer_por_tipo": leer_por_tipo,
+    "leer_por_categoria": leer_por_categoria,
+    "leer_por_capacidad": leer_por_capacidad,
+    "leer_por_origen": leer_por_origen,
+    "leer_por_destino": leer_por_destino,
+    "leer_por_estado": leer_por_estado,
+    "leer_por_seq": leer_por_seq,
+    "leer_por_timestamp": leer_por_timestamp,
+    "categorias": categorias,
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
@@ -876,12 +1103,23 @@ __all__ = [
     "VERSION_CONTRATO",
     "ESQUEMA_CONTRATO",
     "ESTABILIDAD",
+    "CAMPOS_REGISTRO",
     "CacheError",
     "CacheInmutableError",
     "depositar",
     "leer",
-    "secuencia",
-    "ultimo",
+    "leer_eventos",
+    "leer_por_ciclo",
+    "leer_por_modulo",
+    "leer_por_tipo",
+    "leer_por_categoria",
+    "leer_por_capacidad",
+    "leer_por_origen",
+    "leer_por_destino",
+    "leer_por_estado",
+    "leer_por_seq",
+    "leer_por_timestamp",
+    "categorias",
     "inventario",
     "verificar",
     "barrer",
@@ -902,14 +1140,14 @@ __all__ = [
 # EXTENSIONES FUTURAS
 # ===============================================================
 #
+# Carpetas físicas: solo datos, sin lógica.
+# Analizador de trazabilidad: módulo futuro, no este.
+#
 # Toda capacidad nueva DEBE agregarse simultáneamente en:
 #   1. capacidades
-#   2. capacidades_meta  (descripcion, entrada, salida: str)
+#   2. capacidades_meta
 #   3. _CAP_MAP
 #   4. VERSION_MODULO
-#
-# Políticas futuras (persistencia, prioridad, modo sin red)
-# vivirán en archivos bajo cache/. Este INIT no las inventa.
 #
 # ===============================================================
 # FIN EXTENSIONES FUTURAS

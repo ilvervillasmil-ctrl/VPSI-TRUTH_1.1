@@ -5,48 +5,23 @@
 # MÓDULO:              contexto
 # ID:                  CX
 # Rol:                 CX
-# Versión módulo:      2.0
+# Versión módulo:      2.2
 # Versión contrato:    1.0
 # Esquema contrato:    VPSI-CONTRACT-1.0
 # Estabilidad:         ESTABLE
 # Compatible desde:    1.0
 # API Engine:          >=1.0
 #
-# Función:
-#   Clasificar y amarrar el marco evaluable O_context.
-#   Centinela interno: auto-carga y valida cada *.py del directorio.
+# Identidad:
+#   Representación operativa del marco evaluable O_context.
 #
-# Qué hace:
-#   - Clasifica registro O (estado, evento, ligaduras, modo_entrada)
-#   - Determina permite_k y pedir_anuncio desde el propio registro
-#   - Auto-carga clasificadores internos y valida forma y dominio
-#   - Expone inventario, reporte y diagnóstico propios
-#
-# Qué NO hace:
-#   - No calcula Tru_Ri / Tru_total / C / L / K
-#   - No importa ni invoca código ajeno a este directorio
-#   - No declara dependencias
-#   - No orquesta el ciclo
-#   - No emite cadena auditable
-#
-# Responsabilidad:
-#   Entregar el marco O clasificado. Cero cálculo de verdad.
-#
-# Autoridad:
-#   - Declarar el registro O y permite_k
-#   - Validar clasificadores internos
-#   - Reportar estado, inventario y diagnóstico propios
+# Capacidades:
+#   resolver, centinela, inventario, reporte, diagnostico,
+#   verificar, axiomas, verificar_salida
 #
 # Conocimiento exportable:
-#   O_context, registro, permite_k, pedir_anuncio, tipos_peticion,
-#   inventario, reporte, diagnostico, axiomas operativos
-#
-# Relación con Engine:
-#   Engine descubre este CONTENEDOR, ejecuta solo las capacidades
-#   declaradas y consolida el reporte que este módulo produce.
-#
-# Relación con Omega:
-#   Omega solo presenta lo que Engine entrega de este módulo.
+#   O_context, registro, permite_k, pedir_anuncio,
+#   tipos_peticion, inventario, reporte, diagnostico
 #
 # ===============================================================
 
@@ -75,7 +50,7 @@ ID_MODULO = "CX"
 NOMBRE_MODULO = "contexto"
 ROL_MODULO = "CX"
 
-VERSION_MODULO = "2.0"
+VERSION_MODULO = "2.2"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
 
@@ -97,14 +72,10 @@ ESTADOS_VALIDOS = (
 INVARIANTES = (
     "el id del módulo nunca cambia",
     "el rol nunca cambia",
-    "las capacidades declaradas son siempre callables tras la resolución",
-    "este módulo no modifica el estado de otros módulos",
-    "este módulo no calcula Tru / C / L / K",
-    "este módulo no importa código ajeno a su directorio",
-    "este módulo no declara dependencias",
-    "este módulo no orquesta el ciclo",
-    "todo *.py interno se valida por centinela de módulo",
-    "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+    "las capacidades declaradas son callables tras la resolución",
+    "todo *.py interno se valida por estructura y dominio",
+    "permite_k exige registro con estado=estable, O_id y enunciado_O",
+    "pedir_anuncio verdadero implica tipos_peticion no vacío",
 )
 
 MODOS_ENTRADA = (
@@ -139,14 +110,12 @@ _CLAVES_PEDIR_ANUNCIO = (
 
 REGLA_CAMPOS_OBLIGATORIOS = ("id", "nombre", "version", "descripcion")
 
-_PROHIBIDOS_EN_DESCRIPCION = (
-    "calcula tru",
-    "calcular tru",
-    "tru_total",
-    "tru_ri",
-    "asigna k numérico",
-    "asigna k numerico",
-)
+# Claves de dominio ajenas a la clasificación O (rechazo estructural)
+_CLAVES_FUERA_DE_DOMINIO = frozenset({
+    "Tru_Ri", "Tru_total", "tru_ri", "tru_total",
+    "C", "L", "K",
+    "alpha", "beta", "ALPHA", "BETA",
+})
 
 # ===============================================================
 # FIN CONSTANTES
@@ -173,7 +142,7 @@ class ContratoInvalido(Exception):
 
 
 class ContextoError(Exception):
-    """Error de coherencia o de regla contextual."""
+    """Error de forma o de regla contextual."""
 
 
 class _Undefined:
@@ -221,31 +190,21 @@ CONTENEDOR: Dict[str, Any] = {
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
     "descripcion": (
-        "Clasificación operativa de O_context. "
-        "Auto-carga y valida cada *.py interno. "
-        "No calcula Tru. No declara dependencias."
+        "Representación operativa del marco evaluable O_context: "
+        "registro, estado, evento, ligaduras, permite_k y pedir_anuncio."
     ),
 
     # ----- PROPÓSITO -----
     "funcion": (
-        "Clasificar el marco evaluable O_context: registro, estado, "
-        "evento, ligaduras, permite_k, pedir_anuncio. Validar "
-        "clasificadores internos sin listarlos por nombre."
+        "Generar el marco O a partir de la petición y validar "
+        "por estructura cada archivo interno del directorio."
     ),
-    "no_hace": [
-        "No calcula Tru_Ri / Tru_total / C / L / K",
-        "No importa código ajeno a su directorio",
-        "No declara dependencias",
-        "No orquesta el ciclo",
-        "No emite cadena auditable",
-        "No asigna K numérico",
-    ],
 
     # ----- AUTORIDAD -----
     "autoridad": [
         "Declarar el registro O y permite_k",
         "Clasificar modo_entrada, estado y evento",
-        "Validar forma y dominio de cada *.py interno",
+        "Validar estructura y dominio de cada *.py interno",
         "Reportar estado, inventario y diagnóstico propios",
     ],
 
@@ -259,13 +218,12 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario",
         "reporte",
         "diagnostico",
-        "axiomas",
     ],
 
     # ----- DEPENDENCIAS -----
     "requiere": [],
 
-    # ----- AUTORIZACIÓN AL ENGINE -----
+    # ----- AUTORIZACIÓN -----
     "autoriza_engine": {
         "leer": True,
         "ejecutar": True,
@@ -281,79 +239,81 @@ CONTENEDOR: Dict[str, Any] = {
 
     # ----- CONSULTAS SOPORTADAS -----
     "consultas_soportadas": [
-        "resolver_contexto",
-        "obtener_registro_O",
-        "consultar_permite_k",
-        "obtener_inventario",
-        "obtener_reporte",
-        "obtener_diagnostico",
-        "verificar_coherencia",
-        "listar_axiomas_operativos",
+        "resolver",
+        "centinela",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "verificar",
+        "axiomas",
     ],
 
     # ----- CAPACIDADES -----
     "capacidades": {
+        "resolver": "resolver",
+        "evaluar": "resolver",
+        "centinela": "centinela",
         "verificar": "barrer",
         "barrer": "barrer",
-        "evaluar": "resolver",
-        "resolver": "resolver",
         "inventario": "inventario",
-        "axiomas": "axiomas",
         "reporte": "reporte",
         "diagnostico": "diagnostico",
+        "axiomas": "axiomas",
         "verificar_salida": "verificar_salida",
     },
 
-    # ----- METADATOS DE CAPACIDADES (1:1 obligatorio) -----
+    # ----- METADATOS DE CAPACIDADES (1:1) -----
     "capacidades_meta": {
-        "verificar": {
-            "descripcion": "Alias de barrer. Verifica coherencia de este módulo.",
-            "entrada": "peticion opcional dict",
-            "salida": "dict con coherente, errores, registro, permite_k",
-        },
-        "barrer": {
-            "descripcion": (
-                "Evalúa coherencia de clasificadores internos. "
-                "No calcula Tru."
-            ),
-            "entrada": "peticion opcional dict",
-            "salida": "dict con coherente, errores, reglas_internas",
+        "resolver": {
+            "descripcion": "Clasifica el marco O a partir de la petición.",
+            "entrada": "peticion: dict | None",
+            "salida": "dict con O_context, registro, permite_k, coherente, errores",
         },
         "evaluar": {
-            "descripcion": "Alias de resolver. Clasifica O_context.",
+            "descripcion": "Alias de resolver.",
             "entrada": "peticion: dict | None",
             "salida": "dict con O_context, registro, permite_k, coherente",
         },
-        "resolver": {
-            "descripcion": (
-                "Clasifica el marco O: registro, estado, evento, "
-                "permite_k, pedir_anuncio. Centinela auto-valida *.py."
-            ),
-            "entrada": "peticion: dict | None",
-            "salida": "dict con O_context, registro, permite_k, errores, notas",
+        "centinela": {
+            "descripcion": "Audita estructura y dominio de los *.py internos.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, total, choques, detalle, errores",
+        },
+        "verificar": {
+            "descripcion": "Alias de barrer.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, errores, reglas_internas",
+        },
+        "barrer": {
+            "descripcion": "Evalúa coherencia estructural de clasificadores internos.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, errores, reglas_internas",
         },
         "inventario": {
-            "descripcion": "Inventario de modos, estados, reglas internas y centinela.",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, version, reglas_internas, modos_entrada",
-        },
-        "axiomas": {
-            "descripcion": "Declaraciones operativas de este módulo.",
+            "descripcion": "Declara qué existe en este módulo.",
             "entrada": "ninguna",
-            "salida": "list[dict] de declaraciones",
+            "salida": "dict con id, version, reglas_internas, modos, estados, capacidades",
         },
         "reporte": {
-            "descripcion": "Reporte interno de estado de este módulo.",
+            "descripcion": "Declara el estado actual de este módulo.",
             "entrada": "ninguna",
-            "salida": "dict con estado, coherente, errores, capacidades",
+            "salida": "dict con estado, coherente, version, reglas_n",
         },
         "diagnostico": {
-            "descripcion": "Diagnóstico: qué falta o está mal en este módulo.",
+            "descripcion": "Declara problemas, advertencias y recomendaciones.",
             "entrada": "ninguna",
             "salida": "dict con estado, problemas, advertencias, recomendaciones",
         },
+        "axiomas": {
+            "descripcion": "Declaraciones operativas del dominio O.",
+            "entrada": "ninguna",
+            "salida": "list[dict]",
+        },
         "verificar_salida": {
-            "descripcion": "Comprueba si una salida de resolver/barrer es coherente.",
+            "descripcion": (
+                "Valida estructura de una salida: campos, tipos, "
+                "estados e invariantes de registro."
+            ),
             "entrada": "salida: dict",
             "salida": "bool",
         },
@@ -375,10 +335,8 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
     },
 
-    # ----- ESTADOS VÁLIDOS -----
+    # ----- ESTADOS E INVARIANTES -----
     "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ----- INVARIANTES -----
     "invariantes": list(INVARIANTES),
 }
 
@@ -505,7 +463,6 @@ def _conflicto_ligaduras(ligaduras: Dict[str, str]) -> List[str]:
 
 
 def _permite_k(registro: Dict[str, Any]) -> bool:
-    """Solo mira el propio registro."""
     if registro.get("estado") != "estable":
         return False
     if not registro.get("O_id") or not registro.get("enunciado_O"):
@@ -514,6 +471,7 @@ def _permite_k(registro: Dict[str, Any]) -> bool:
 
 
 def _validar_regla_meta(stem: str, regla: Any) -> List[str]:
+    """Validación estructural de REGLA (campos, tipos, anclaje de id)."""
     errs: List[str] = []
     if not isinstance(regla, dict):
         return ["{0}: REGLA debe ser dict".format(stem)]
@@ -525,45 +483,44 @@ def _validar_regla_meta(stem: str, regla: Any) -> List[str]:
             )
 
     rid = str(regla.get("id", "")).strip()
-    if rid and not (
-        rid.startswith("CX-")
-        or rid.startswith("CX_R")
-        or "CX" in rid.upper()
-    ):
-        anclas = regla.get("anclas_cx") or regla.get("anclas") or []
-        if not anclas:
+    if rid:
+        anclado = (
+            rid.startswith("CX-")
+            or rid.startswith("CX_R")
+            or "CX" in rid.upper()
+            or bool(regla.get("anclas_cx") or regla.get("anclas"))
+        )
+        if not anclado:
             errs.append(
-                "{0}: id '{1}' no anclado a dominio CX "
-                "(use prefijo CX- o anclas_cx/anclas)".format(stem, rid)
+                "{0}: id '{1}' sin anclaje de dominio CX".format(stem, rid)
             )
 
-    desc = str(regla.get("descripcion", "")).lower()
-    for frag in _PROHIBIDOS_EN_DESCRIPCION:
-        if frag in desc:
+    # Rechazo estructural: claves de dominio ajeno dentro de REGLA
+    for clave in _CLAVES_FUERA_DE_DOMINIO:
+        if clave in regla and regla[clave] is not None:
             errs.append(
-                "{0}: descripcion declara oficio prohibido ({1!r}); "
-                "este módulo no calcula Tru ni asigna K numérico".format(
-                    stem, frag
+                "{0}: REGLA contiene clave fuera de dominio: '{1}'".format(
+                    stem, clave
                 )
             )
     return errs
 
 
 def _validar_clasificacion(stem: str, cls: Any) -> List[str]:
+    """Validación estructural de la salida de clasificar()."""
     errs: List[str] = []
     if not isinstance(cls, dict):
         return ["{0}: clasificar() debe devolver dict".format(stem)]
 
-    for k in ("Tru_Ri", "Tru_total", "tru_ri", "tru_total", "C", "L", "K"):
-        if k in cls and cls[k] is not None:
-            if k == "K" and not isinstance(cls.get("K"), bool):
-                errs.append(
-                    "{0}: clasificar() no debe asignar K numérico".format(stem)
+    for clave in _CLAVES_FUERA_DE_DOMINIO:
+        if clave in cls and cls[clave] is not None:
+            if clave == "K" and isinstance(cls.get("K"), bool):
+                continue
+            errs.append(
+                "{0}: clasificar() emite clave fuera de dominio: '{1}'".format(
+                    stem, clave
                 )
-            if k.lower().startswith("tru"):
-                errs.append(
-                    "{0}: clasificar() no debe emitir {1}".format(stem, k)
-                )
+            )
 
     if "estado" in cls and cls["estado"] is not None:
         if cls["estado"] not in ESTADOS_O:
@@ -607,8 +564,7 @@ def _centinela_archivo(
 
     if meta is None and not callable(validador) and not callable(clasificador):
         errores_c.append(
-            "{0}: sin REGLA ni validar()/clasificar() — "
-            "no es clasificador de este módulo".format(stem)
+            "{0}: sin REGLA ni validar()/clasificar()".format(stem)
         )
         entrada["error"] = errores_c[-1]
         entrada["errores_centinela"] = errores_c
@@ -715,7 +671,7 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
     obligatorias = (
         "esquema", "version_contrato", "version_modulo",
         "id", "nombre", "rol", "descripcion",
-        "funcion", "no_hace", "autoridad",
+        "funcion", "autoridad",
         "conocimiento_exportable", "requiere",
         "autoriza_engine", "consultas_soportadas",
         "capacidades", "capacidades_meta",
@@ -773,18 +729,11 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # CAPACIDADES PÚBLICAS
 # ===============================================================
 
-def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """
-    Clasifica el contexto aplicable + centinela de archivos internos.
-    No calcula Tru. No asigna K numérico.
-    """
-    peticion = dict(peticion or {})
-    reglas = _cargar_reglas(peticion if peticion else None)
-    choques_reglas = _detectar_choques_reglas(reglas)
-
-    errores: List[str] = []
-    if choques_reglas:
-        errores.extend(choques_reglas)
+def centinela() -> Dict[str, Any]:
+    """Audita estructura y dominio de los *.py internos."""
+    reglas = _cargar_reglas(None)
+    choques = _detectar_choques_reglas(reglas)
+    errores: List[str] = list(choques)
 
     for nombre, datos in reglas.items():
         if "error" in datos:
@@ -793,155 +742,206 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             if ec not in errores:
                 errores.append("centinela '{0}': {1}".format(nombre, ec))
 
+    return {
+        "contenedor": NOMBRE_MODULO,
+        "coherente": not errores,
+        "total": len(reglas),
+        "choques": choques,
+        "detalle": reglas,
+        "errores": errores,
+        "version": VERSION_MODULO,
+    }
+
+
+def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Clasifica el marco O a partir de la petición."""
+    peticion = dict(peticion or {})
+
     if not peticion:
-        salida = {
+        audit = centinela()
+        return {
             "O_context": None,
             "registro": None,
             "permite_k": False,
             "pedir_anuncio": False,
             "tipos_peticion": [],
-            "coherente": not errores,
+            "coherente": audit.get("coherente", False),
             "escala": "macro",
             "modo_entrada": "repositorio",
             "reglas_internas": {
-                "total": len(reglas),
-                "choques": choques_reglas,
-                "detalle": reglas,
+                "total": audit.get("total", 0),
+                "choques": audit.get("choques") or [],
             },
-            "errores": errores,
-            "notas": [
-                "sin petición: solo centinela de archivos internos; "
-                "K no reclamable sin registro O estable"
-            ],
-            "ids_cx_relevantes": ["CX-A1", "CX-C4"],
+            "errores": list(audit.get("errores") or []),
+            "notas": ["sin petición: solo auditoría de clasificadores"],
         }
-    else:
-        registro = _normalizar_registro(peticion)
-        errores.extend(_conflicto_ligaduras(registro.get("ligaduras") or {}))
 
-        if (
-            registro.get("modo_entrada")
-            and registro["modo_entrada"] not in MODOS_ENTRADA
-        ):
-            errores.append(
-                "modo_entrada no reconocido: {0!r} (admitidos: {1})".format(
-                    registro["modo_entrada"], MODOS_ENTRADA
-                )
+    reglas = _cargar_reglas(peticion)
+    choques = _detectar_choques_reglas(reglas)
+    errores: List[str] = list(choques)
+
+    for nombre, datos in reglas.items():
+        if "error" in datos:
+            errores.append("regla '{0}': {1}".format(nombre, datos["error"]))
+        for ec in datos.get("errores_centinela") or []:
+            if ec not in errores:
+                errores.append("centinela '{0}': {1}".format(nombre, ec))
+
+    registro = _normalizar_registro(peticion)
+    errores.extend(_conflicto_ligaduras(registro.get("ligaduras") or {}))
+
+    if (
+        registro.get("modo_entrada")
+        and registro["modo_entrada"] not in MODOS_ENTRADA
+    ):
+        errores.append(
+            "modo_entrada no reconocido: {0!r}".format(
+                registro["modo_entrada"]
             )
-
-        for nombre, datos in reglas.items():
-            cls = datos.get("clasificacion")
-            if not isinstance(cls, dict):
-                continue
-            if cls.get("estado") in ESTADOS_O:
-                registro["estado"] = cls["estado"]
-            if cls.get("evento") in EVENTOS:
-                registro["evento"] = cls["evento"]
-            if cls.get("pedir_anuncio") is True:
-                registro["pedir_anuncio"] = True
-            tps = cls.get("tipos_peticion")
-            if isinstance(tps, list) and tps:
-                seen = set(registro.get("tipos_peticion") or [])
-                for t in tps:
-                    if t in TIPOS_PETICION and t not in seen:
-                        registro.setdefault("tipos_peticion", []).append(t)
-                        seen.add(t)
-                if registro.get("tipos_peticion") and not registro.get(
-                    "pedir_anuncio"
-                ):
-                    registro["pedir_anuncio"] = True
-            if cls.get("error"):
-                errores.append(
-                    "clasificacion '{0}': {1}".format(nombre, cls["error"])
-                )
-
-        if registro.get("pedir_anuncio") and not registro.get("tipos_peticion"):
-            registro["tipos_peticion"] = ["dame_cadena_completa"]
-
-        permite = _permite_k(registro)
-        o_ctx = registro.get("enunciado_O") or registro.get("O_id") or UNDEFINED
-
-        ids = ["CX-A14", "CX-A1", "CX-C4"]
-        if registro["estado"] != "estable":
-            ids.extend(["CX-A10", "CX-T13"])
-        if registro.get("ligaduras"):
-            ids.extend(["CX-A15", "CX-T12"])
-        if registro.get("evento") == "cambio":
-            ids.extend(["CX-A8", "CX-T6"])
-        if registro.get("pedir_anuncio"):
-            ids.extend(["PA-A1", "PA-A2", "PA-T1", "PA-C2"])
-
-        salida = {
-            "O_context": o_ctx if not es_undefined(o_ctx) else UNDEFINED,
-            "registro": registro,
-            "permite_k": permite,
-            "pedir_anuncio": bool(registro.get("pedir_anuncio")),
-            "tipos_peticion": list(registro.get("tipos_peticion") or []),
-            "coherente": not errores,
-            "escala": "micro+macro",
-            "modo_entrada": registro.get("modo_entrada"),
-            "reglas_internas": {
-                "total": len(reglas),
-                "choques": choques_reglas,
-                "detalle": reglas,
-            },
-            "errores": errores,
-            "notas": [],
-            "ids_cx_relevantes": ids,
-        }
-        if not registro.get("O_id") or not registro.get("enunciado_O"):
-            salida["notas"].append(
-                "registro incompleto: sin O_id o enunciado_O → estado indefinido; "
-                "no reclamar Tru/K completo"
-            )
-        if not permite:
-            salida["notas"].append(
-                "permite_k=False: O no estable o registro incompleto"
-            )
-        if registro.get("pedir_anuncio"):
-            salida["notas"].append(
-                "pedir_anuncio=True: solicitud de cadena clasificada; "
-                "no implica permite_k ni Tru"
-            )
-
-    if not reglas:
-        salida["notas"].append(
-            "sin archivos de regla internos "
-            "(vacío legítimo hasta montar clasificadores)"
         )
 
-    return salida
+    for nombre, datos in reglas.items():
+        cls = datos.get("clasificacion")
+        if not isinstance(cls, dict):
+            continue
+        if cls.get("estado") in ESTADOS_O:
+            registro["estado"] = cls["estado"]
+        if cls.get("evento") in EVENTOS:
+            registro["evento"] = cls["evento"]
+        if cls.get("pedir_anuncio") is True:
+            registro["pedir_anuncio"] = True
+        tps = cls.get("tipos_peticion")
+        if isinstance(tps, list) and tps:
+            seen = set(registro.get("tipos_peticion") or [])
+            for t in tps:
+                if t in TIPOS_PETICION and t not in seen:
+                    registro.setdefault("tipos_peticion", []).append(t)
+                    seen.add(t)
+            if registro.get("tipos_peticion") and not registro.get(
+                "pedir_anuncio"
+            ):
+                registro["pedir_anuncio"] = True
+        if cls.get("error"):
+            errores.append(
+                "clasificacion '{0}': {1}".format(nombre, cls["error"])
+            )
+
+    if registro.get("pedir_anuncio") and not registro.get("tipos_peticion"):
+        registro["tipos_peticion"] = ["dame_cadena_completa"]
+
+    permite = _permite_k(registro)
+    o_ctx = registro.get("enunciado_O") or registro.get("O_id") or UNDEFINED
+
+    notas: List[str] = []
+    if not registro.get("O_id") or not registro.get("enunciado_O"):
+        notas.append("registro incompleto: sin O_id o enunciado_O")
+    if not permite:
+        notas.append("permite_k=False")
+    if registro.get("pedir_anuncio"):
+        notas.append("pedir_anuncio=True")
+    if not reglas:
+        notas.append("sin clasificadores internos")
+
+    return {
+        "O_context": o_ctx if not es_undefined(o_ctx) else UNDEFINED,
+        "registro": registro,
+        "permite_k": permite,
+        "pedir_anuncio": bool(registro.get("pedir_anuncio")),
+        "tipos_peticion": list(registro.get("tipos_peticion") or []),
+        "coherente": not errores,
+        "escala": "micro",
+        "modo_entrada": registro.get("modo_entrada"),
+        "reglas_internas": {
+            "total": len(reglas),
+            "choques": choques,
+        },
+        "errores": errores,
+        "notas": notas,
+    }
 
 
-def barrer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    r = resolver(peticion)
+def barrer() -> Dict[str, Any]:
+    """Coherencia estructural de clasificadores internos."""
+    audit = centinela()
     return {
         "contenedor": NOMBRE_MODULO,
         "rol": ROL_MODULO,
-        "coherente": r.get("coherente", False),
-        "errores": r.get("errores") or [],
-        "reglas_internas": r.get("reglas_internas"),
-        "registro": r.get("registro"),
-        "permite_k": r.get("permite_k"),
-        "pedir_anuncio": r.get("pedir_anuncio"),
-        "notas": r.get("notas") or [],
+        "coherente": audit.get("coherente", False),
+        "errores": audit.get("errores") or [],
+        "reglas_internas": {
+            "total": audit.get("total", 0),
+            "choques": audit.get("choques") or [],
+        },
         "version": VERSION_MODULO,
     }
 
 
 def verificar_salida(salida: Dict[str, Any]) -> bool:
+    """Validador estructural de una salida de resolver/barrer."""
     if not isinstance(salida, dict):
         return False
-    if "coherente" not in salida:
+    if "coherente" not in salida or not isinstance(salida["coherente"], bool):
         return False
-    return bool(salida.get("coherente", False))
+    if "errores" in salida and not isinstance(salida["errores"], list):
+        return False
+    if "notas" in salida and not isinstance(salida["notas"], list):
+        return False
+
+    if "registro" in salida:
+        reg = salida["registro"]
+        if reg is not None:
+            if not isinstance(reg, dict):
+                return False
+            if "estado" in reg and reg["estado"] not in ESTADOS_O:
+                return False
+            if "evento" in reg and reg["evento"] not in EVENTOS:
+                return False
+            if "tipos_peticion" in reg:
+                if not isinstance(reg["tipos_peticion"], list):
+                    return False
+                for t in reg["tipos_peticion"]:
+                    if t not in TIPOS_PETICION:
+                        return False
+            if "pedir_anuncio" in reg and not isinstance(
+                reg["pedir_anuncio"], bool
+            ):
+                return False
+
+        if "permite_k" not in salida or not isinstance(
+            salida["permite_k"], bool
+        ):
+            return False
+
+        if salida.get("permite_k") is True:
+            if not isinstance(reg, dict):
+                return False
+            if reg.get("estado") != "estable":
+                return False
+            if not reg.get("O_id") or not reg.get("enunciado_O"):
+                return False
+
+        if isinstance(reg, dict) and reg.get("pedir_anuncio") is True:
+            if not (reg.get("tipos_peticion") or []):
+                return False
+
+        if "pedir_anuncio" in salida and not isinstance(
+            salida["pedir_anuncio"], bool
+        ):
+            return False
+
+        if "tipos_peticion" in salida:
+            if not isinstance(salida["tipos_peticion"], list):
+                return False
+            for t in salida["tipos_peticion"]:
+                if t not in TIPOS_PETICION:
+                    return False
+
+    return True
 
 
-def inventario(peticion: Any = None) -> Dict[str, Any]:
+def inventario() -> Dict[str, Any]:
+    """Qué existe en este módulo."""
     reglas = _cargar_reglas()
-    n_centinela = sum(
-        1 for d in reglas.values() if d.get("errores_centinela")
-    )
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -950,27 +950,15 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "reglas_internas": list(reglas.keys()),
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "reglas_internas": sorted(reglas.keys()),
         "total_reglas": len(reglas),
-        "reglas_con_alerta_centinela": n_centinela,
         "modos_entrada": list(MODOS_ENTRADA),
         "estados_O": list(ESTADOS_O),
         "eventos": list(EVENTOS),
         "tipos_peticion": list(TIPOS_PETICION),
-        "centinela": {
-            "regla_campos_obligatorios": list(REGLA_CAMPOS_OBLIGATORIOS),
-            "auto_carga": True,
-            "rechaza_tru_en_clasificar": True,
-            "choque_id_nombre": True,
-        },
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "invariantes": CONTENEDOR.get("invariantes"),
-        "funcion": (
-            "Clasifica O_context (registro, modo, ligaduras, evento, "
-            "permite_k, pedir_anuncio). Centinela auto-valida cada *.py "
-            "interno. No calcula Tru."
-        ),
+        "requiere": [],
+        "invariantes": list(INVARIANTES),
     }
 
 
@@ -979,13 +967,13 @@ def axiomas() -> List[Dict[str, Any]]:
         {
             "id": "CX-OP-1",
             "tipo": "axioma",
-            "sujeto": "contexto_modulo",
-            "relacion": "clasifica_y_no_calcula",
-            "objeto": "Tru_Ri_ni_Tru_total",
+            "sujeto": "contexto",
+            "relacion": "genera",
+            "objeto": "marco_O",
             "polaridad": True,
             "enunciado": (
-                "Este módulo clasifica el marco O; "
-                "no calcula Tru_Ri ni Tru_total."
+                "Este módulo genera el marco evaluable O a partir "
+                "de la petición."
             ),
             "depende_de": [],
             "gobierna": ["contexto"],
@@ -993,12 +981,13 @@ def axiomas() -> List[Dict[str, Any]]:
         {
             "id": "CX-OP-2",
             "tipo": "axioma",
-            "sujeto": "K",
-            "relacion": "requiere",
+            "sujeto": "permite_k",
+            "relacion": "exige",
             "objeto": "registro_O_estable",
             "polaridad": True,
             "enunciado": (
-                "Sin registro O estable, K no es reclamable."
+                "permite_k es verdadero solo con registro estable "
+                "que tenga O_id y enunciado_O."
             ),
             "depende_de": [],
             "gobierna": ["contexto"],
@@ -1007,12 +996,11 @@ def axiomas() -> List[Dict[str, Any]]:
             "id": "CX-OP-3",
             "tipo": "axioma",
             "sujeto": "reglas_internas",
-            "relacion": "no_deben",
-            "objeto": "contradecirse",
+            "relacion": "unicidad",
+            "objeto": "id_y_nombre",
             "polaridad": True,
             "enunciado": (
-                "Los archivos de regla de este módulo no pueden contradecirse; "
-                "el init vela id/nombre únicos y forma de dominio."
+                "Los clasificadores internos no comparten id ni nombre."
             ),
             "depende_de": [],
             "gobierna": ["contexto"],
@@ -1021,12 +1009,11 @@ def axiomas() -> List[Dict[str, Any]]:
             "id": "CX-OP-4",
             "tipo": "axioma",
             "sujeto": "pedir_anuncio",
-            "relacion": "clasifica_y_no_emite",
-            "objeto": "cadena_auditable",
+            "relacion": "implica",
+            "objeto": "tipos_peticion_no_vacio",
             "polaridad": True,
             "enunciado": (
-                "pedir_anuncio clasifica la solicitud de cadena; "
-                "no calcula Tru."
+                "pedir_anuncio verdadero implica tipos_peticion no vacío."
             ),
             "depende_de": [],
             "gobierna": ["contexto"],
@@ -1034,14 +1021,13 @@ def axiomas() -> List[Dict[str, Any]]:
         {
             "id": "CX-OP-5",
             "tipo": "axioma",
-            "sujeto": "centinela_contexto",
-            "relacion": "rechaza",
-            "objeto": "archivo_mal_formado",
+            "sujeto": "centinela",
+            "relacion": "valida",
+            "objeto": "estructura_de_archivos_internos",
             "polaridad": True,
             "enunciado": (
-                "Todo *.py interno se carga automáticamente; "
-                "si incumple forma REGLA, oficio o unicidad id/nombre, "
-                "el módulo marca error y coherente=False."
+                "Todo *.py interno se valida por estructura, dominio "
+                "y unicidad."
             ),
             "depende_de": ["CX-OP-3"],
             "gobierna": ["contexto"],
@@ -1058,11 +1044,12 @@ def verificar() -> Dict[str, Any]:
 
 
 # ===============================================================
-# REPORTING INTERNO
+# REPORTING
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
-    r = barrer()
+    """Estado actual de este módulo."""
+    audit = centinela()
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1072,48 +1059,47 @@ def reporte() -> Dict[str, Any]:
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
         "estado": (
-            ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO
+            ESTADO_OPERATIVO
+            if audit.get("coherente")
+            else ESTADO_DEGRADADO
         ),
-        "coherente": r.get("coherente"),
-        "errores": r.get("errores"),
-        "reglas_internas": r.get("reglas_internas"),
-        "permite_k": r.get("permite_k"),
-        "pedir_anuncio": r.get("pedir_anuncio"),
-        "notas": r.get("notas"),
+        "coherente": audit.get("coherente"),
+        "reglas_n": audit.get("total", 0),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get(
-            "conocimiento_exportable"
-        ),
-        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
     }
 
 
 def diagnostico() -> Dict[str, Any]:
-    r = barrer()
+    """Problemas, advertencias y recomendaciones."""
+    audit = centinela()
     problemas: List[Dict[str, Any]] = []
     advertencias: List[str] = []
     recomendaciones: List[str] = []
 
-    if r.get("errores"):
+    if audit.get("errores"):
         problemas.append({
-            "tipo": "errores_contexto",
-            "detalle": r["errores"],
+            "tipo": "errores_clasificadores",
+            "detalle": audit["errores"],
         })
         recomendaciones.append(
-            "Corregir clasificadores internos con errores de forma o carga"
+            "Corregir archivos internos con errores de forma o carga"
         )
 
-    reglas = (r.get("reglas_internas") or {}).get("total", 0)
-    if not reglas:
-        advertencias.append(
-            "Sin clasificadores internos "
-            "(legítimo hasta montar archivos de regla)"
+    total = audit.get("total", 0)
+    if not total:
+        advertencias.append("Sin clasificadores internos")
+
+    if audit.get("choques"):
+        problemas.append({
+            "tipo": "choques_id_nombre",
+            "detalle": audit["choques"],
+        })
+        recomendaciones.append(
+            "Unificar o renombrar reglas con id/nombre duplicado"
         )
 
-    estado = ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO
-    if not reglas and not problemas:
+    estado = ESTADO_OPERATIVO if audit.get("coherente") else ESTADO_DEGRADADO
+    if not total and not problemas:
         estado = ESTADO_NO_INICIADO
 
     return {
@@ -1123,9 +1109,9 @@ def diagnostico() -> Dict[str, Any]:
         "problemas": problemas,
         "advertencias": advertencias,
         "recomendaciones": recomendaciones,
-        "coherente": r.get("coherente"),
-        "errores_n": len(r.get("errores") or []),
-        "reglas_n": reglas,
+        "coherente": audit.get("coherente"),
+        "errores_n": len(audit.get("errores") or []),
+        "reglas_n": total,
     }
 
 # ===============================================================
@@ -1138,14 +1124,15 @@ def diagnostico() -> Dict[str, Any]:
 # ===============================================================
 
 _CAP_MAP = {
-    "barrer": barrer,
-    "verificar": verificar,
     "resolver": resolver,
     "evaluar": resolver,
+    "centinela": centinela,
+    "barrer": barrer,
+    "verificar": verificar,
     "inventario": inventario,
-    "axiomas": axiomas,
     "reporte": reporte,
     "diagnostico": diagnostico,
+    "axiomas": axiomas,
     "verificar_salida": verificar_salida,
 }
 
@@ -1199,6 +1186,7 @@ __all__ = [
     "EVENTOS",
     "TIPOS_PETICION",
     "resolver",
+    "centinela",
     "barrer",
     "verificar",
     "verificar_salida",
@@ -1217,14 +1205,11 @@ __all__ = [
 # EXTENSIONES FUTURAS
 # ===============================================================
 #
-# Toda capacidad nueva DEBE agregarse simultáneamente en:
-#   1. capacidades
-#   2. capacidades_meta  (descripcion, entrada, salida: str)
-#   3. _CAP_MAP
-#   4. VERSION_MODULO
+# Capacidad nueva → capacidades + capacidades_meta + _CAP_MAP
+# + VERSION_MODULO
 #
-# Todo clasificador nuevo: agregar archivo *.py en este directorio
-# con REGLA y/o clasificar()/validar(). Este INIT lo descubre solo.
+# Clasificador nuevo → *.py en este directorio con REGLA
+# y/o clasificar()/validar(). Descubrimiento automático.
 #
 # ===============================================================
 # FIN EXTENSIONES FUTURAS

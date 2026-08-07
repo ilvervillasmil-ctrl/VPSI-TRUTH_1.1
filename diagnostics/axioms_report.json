@@ -2,16 +2,17 @@
   "coherente": true,
   "choques": [],
   "errores": [],
-  "declaraciones": 89,
+  "declaraciones": 111,
   "cuerpos": [
+    "Anclas_de_Medicion_AM_AX",
     "VPSI_AX"
   ],
   "por_tipo": {
-    "axioma": 42,
-    "lema": 5,
-    "teorema": 31,
-    "corolario": 11,
-    "definicion": 0
+    "axioma": 47,
+    "lema": 8,
+    "teorema": 34,
+    "corolario": 16,
+    "definicion": 6
   },
   "ids_dominio_k_o": [
     "A1",
@@ -25,6 +26,14 @@
     "A7",
     "A8",
     "A9",
+    "AM-A3",
+    "AM-C3",
+    "AM-D1",
+    "AM-D3",
+    "AM-D4",
+    "AM-D6",
+    "AM-L3",
+    "AM-T1",
     "B-Canonical",
     "Def-5.3.1",
     "E1",

@@ -2,7 +2,7 @@
   "coherente": true,
   "choques": [],
   "errores": [],
-  "declaraciones": 470,
+  "declaraciones": 487,
   "cuerpos": [
     "Anclas_de_Medicion_AM_AX",
     "VPSI_AX",
@@ -15,14 +15,15 @@
     "realidad_AX",
     "self",
     "sentido_estructural_AX",
-    "sm_af_AX"
+    "sm_af_AX",
+    "sm_mapa_AX"
   ],
   "por_tipo": {
-    "axioma": 160,
-    "lema": 51,
-    "teorema": 116,
-    "corolario": 111,
-    "definicion": 32
+    "axioma": 163,
+    "lema": 54,
+    "teorema": 120,
+    "corolario": 115,
+    "definicion": 35
   },
   "ids_dominio_k_o": [
     "A1",
@@ -246,6 +247,7 @@
     "SE-T3",
     "SE-T4",
     "SM-A1",
+    "SM-A12",
     "SM-A2",
     "SM-A3",
     "SM-A4",
@@ -253,6 +255,7 @@
     "SM-A8",
     "SM-C1",
     "SM-C10",
+    "SM-C12",
     "SM-C3",
     "SM-C7",
     "SM-D1",
@@ -262,6 +265,7 @@
     "SM-D6",
     "SM-L2",
     "SM-L4",
+    "SM-L9",
     "SM-T1",
     "SM-T2",
     "SM-T4",

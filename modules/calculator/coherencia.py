@@ -1,202 +1,222 @@
-"""
-VPSI-TRUTH --- modules/calculator/coherencia.py
-
-Cálculo del factor de coherencia C.
-
-Versión: 2.0
-Cambio principal respecto a 1.x:
-  - Ancla de base nula (AM-D6 / AM-A3): si m == 0 (o base_nula_C),
-    C = UNDEFINED. No se maquilla como 1.
-  - Acepta k (contradicciones) como Fraction de la retícula AM-D5
-    (no solo enteros binarios).
-  - C = 1 - k/m  (exacto, Fraction) cuando m > 0.
-  - Comentarios explícitos de las anclas para que el código
-    documente la fórmula de medición.
-
-Fórmula canónica (operacional):
-    C(D) = 1 - k/m
-    donde
-        m = número de compromisos de adopción propia (AM-D2)
-        k = suma de pesos de severidad de las contradicciones (AM-D5)
-
-Referencias:
-  Def 5.1 (Coherencia), AM-D2, AM-D5, AM-D6, AM-A3
-  PROTOCOLO sec. 0.15
-  conteos.py v2.0 (productor de m y k)
-"""
+# ===============================================================
+# VPSI-TRUTH — modules/calculator/coherencia.py
+# ===============================================================
+#
+# COHERENCIA C
+# -------------
+# La coherencia mide la ausencia de contradicción interna en D.
+# C = 1  si y solo si no existe una proposición P tal que
+#        D afirma P y D afirma ¬P a la vez.
+#
+# Fórmula operacional:
+#
+#   C(m, k) =
+#       UNDEFINED          si base_nula ∨ m ≤ 0
+#       1 − k/m ∈ [0, 1]   si m > 0
+#
+#   m  = tamaño de la base (cuántos compromisos se adoptan)
+#   k  = peso total de las contradicciones sobre esa base
+#
+# Por qué UNDEFINED cuando m ≤ 0:
+#   Sin base no hay nada que contradecir ni que sostener.
+#   Asignar C = 1 en ese caso inflaría artificialmente Tru_Ri.
+#   Por eso la base vacía no produce un número: produce UNDEFINED.
+#
+# Por qué 1 − k/m:
+#   Cada unidad de contradicción (k) degrada la base (m).
+#   Si no hay contradicción (k = 0), C = 1.
+#   Si la base queda anulada (k = m), C = 0.
+#
+# Por qué k debe estar en [0, m]:
+#   Un peso de contradicción mayor que la base no tiene sentido
+#   en la definición: no se puede romper más de lo que existe.
+#   Si llega k fuera de [0, m], es violación de dominio → error.
+#
+# Por qué Fraction y no float:
+#   C es un valor racional exacto. float introduciría error binario.
+#
+# Este archivo solo implementa esa función. No interpreta texto,
+# no cuenta compromisos, no orquesta. Recibe m, k, base_nula
+# ya resueltos y devuelve C.
+# ===============================================================
 
 from __future__ import annotations
 
 from fractions import Fraction
 from typing import Any, Dict, Optional, Union
 
-# Sentinel compartido con el resto de CA
+
 try:
     from modules.calculator import UNDEFINED
 except Exception:
-    UNDEFINED = "UNDEFINED"
+    class _Undefined:
+        __slots__ = ()
 
+        def __repr__(self) -> str:
+            return "UNDEFINED"
 
-VERSION = "2.0"
+        def __bool__(self):
+            raise TypeError("UNDEFINED no admite conversion a booleano")
+
+        def __eq__(self, other):
+            return isinstance(other, _Undefined)
+
+        def __hash__(self):
+            return hash("VPSI_CA_UNDEFINED")
+
+    UNDEFINED = _Undefined()
 
 
 def _a_fraction(x: Any) -> Fraction:
-    """Convierte a Fraction de forma determinista. No inventa."""
+    # Conversión estricta al dominio racional.
+    # No inventa ceros: una entrada inválida debe fallar a la vista.
     if isinstance(x, Fraction):
         return x
-    if isinstance(x, (int, float)):
+    if isinstance(x, bool):
+        return Fraction(int(x))
+    if isinstance(x, int):
+        return Fraction(x)
+    if isinstance(x, float):
         return Fraction(x).limit_denominator(10_000)
     if isinstance(x, str):
-        try:
-            return Fraction(x)
-        except Exception:
-            return Fraction(0)
-    return Fraction(0)
+        return Fraction(x)
+    raise TypeError(
+        "se esperaba int|float|str|Fraction, recibido {0}".format(
+            type(x).__name__
+        )
+    )
 
 
-def _calcular_c_operacional(
+def coherencia(
     m: int,
-    k: Union[int, Fraction],
+    k: Union[int, Fraction] = 0,
     base_nula: bool = False,
 ) -> Any:
     """
-    Ruta operacional pura.
+    C(m, k) =
+        UNDEFINED          si base_nula ∨ m ≤ 0
+        1 − k/m ∈ [0, 1]   si m > 0
 
-    AM-A3 / AM-D6:
-        Si m == 0 o base_nula → UNDEFINED.
-        (Antes se devolvía 1; eso inflaba Tru_Ri artificialmente.)
-
-    AM-D5:
-        k puede ser Fraction (suma de pesos de la retícula).
-        C = 1 - k/m  se calcula en Fraction exacta.
+    m : tamaño de la base de compromisos (entero ≥ 0)
+    k : peso de contradicción sobre esa base (racional en [0, m])
     """
+    m = int(m)
+
+    # m negativo no pertenece al dominio de la definición.
+    if m < 0:
+        raise ValueError("m < 0 fuera de dominio")
+
+    # Base vacía o marcada nula → no hay C numérico.
+    # UNDEFINED evita inflar Tru_Ri con un 1 artificial.
     if base_nula or m <= 0:
         return UNDEFINED
 
     k_f = _a_fraction(k)
-    # k no puede superar m en peso efectivo; se acota por seguridad
-    # (un peso total > m no tiene sentido físico en la definición)
-    if k_f > m:
-        k_f = Fraction(m)
 
-    c = Fraction(1) - (k_f / Fraction(m))
-    # C ∈ [0, 1]
-    if c < 0:
-        c = Fraction(0)
-    if c > 1:
-        c = Fraction(1)
-    return c
+    # Dominio de k: 0 ≤ k ≤ m.
+    # k > m rompería más de lo que la base contiene.
+    # k < 0 no es un peso de contradicción válido.
+    if k_f < 0 or k_f > m:
+        raise ValueError("k fuera de dominio [0, m]")
+
+    # Núcleo de la definición: C = 1 − k/m
+    resultado = Fraction(1) - (k_f / Fraction(m))
+
+    # Cierre del intervalo [0, 1] (propiedad del dominio de C).
+    if resultado < 0:
+        resultado = Fraction(0)
+    if resultado > 1:
+        resultado = Fraction(1)
+    return resultado
 
 
-def _calcular_c_teorico(peticion: Dict[str, Any]) -> Any:
+def calcular_c(
+    m: Optional[int] = None,
+    k: Any = None,
+    base_nula: bool = False,
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
-    Ruta teórica (si el llamador ya aporta C explícito o
-    una lista de contradicciones lógicas formales).
-    No inventa valores.
+    Interfaz mínima hacia Calculator.
+
+    Solo acepta m, k, base_nula.
+    Calculator es quien normaliza nombres operacionales
+    y entrega estos tres datos ya resueltos.
     """
-    if "C" in peticion and peticion["C"] is not None:
-        val = peticion["C"]
-        if val == UNDEFINED or str(val).upper() == "UNDEFINED":
-            return UNDEFINED
-        return _a_fraction(val)
+    if peticion is not None:
+        if not isinstance(peticion, dict):
+            raise TypeError("peticion debe ser dict")
+        if m is None:
+            m = peticion.get("m")
+        if k is None:
+            k = peticion.get("k")
+        if not base_nula:
+            base_nula = bool(peticion.get("base_nula", False))
 
-    # Si hay flag de contradicción lógica dura
-    if peticion.get("contradiccion_logica") is True:
-        return Fraction(0)
-
-    return None  # no hay dato teórico → se cae a operacional
-
-
-def calcular_c(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """
-    Oficio público de coherencia.
-
-    Entrada esperada (inyectada por conteos.inyectar_en_peticion
-    o por el ciclo de Engine):
-        compromisos          : list
-        contradicciones      : int | Fraction   (k)
-        _conteos_meta        : dict opcional con base_nula_C, m, ...
-
-    Salida:
-        {
-            "C": Fraction | UNDEFINED,
-            "m": int,
-            "k": Fraction,
-            "ruta": "operacional" | "teorico",
-            "version": "2.0",
-            "notas": list[str],
-        }
-    """
-    peticion = dict(peticion or {})
-    notas: list[str] = []
-
-    # ----- Intento teórico primero -----
-    c_teo = _calcular_c_teorico(peticion)
-    if c_teo is not None:
-        return {
-            "C": c_teo,
-            "m": peticion.get("m") or len(peticion.get("compromisos") or []),
-            "k": _a_fraction(peticion.get("contradicciones") or 0),
-            "ruta": "teorico",
-            "version": VERSION,
-            "notas": ["C tomado de ruta teórica"],
-        }
-
-    # ----- Ruta operacional -----
-    meta = peticion.get("_conteos_meta") or {}
-    compromisos = peticion.get("compromisos") or []
-    m = meta.get("m")
     if m is None:
-        m = len(compromisos)
-    m = int(m)
-
-    k = peticion.get("contradicciones")
+        raise ValueError("falta m")
     if k is None:
-        k = meta.get("k") or 0
+        k = 0
+
+    m = int(m)
     k_f = _a_fraction(k)
-
-    base_nula = bool(meta.get("base_nula_C", False)) or (m <= 0)
-
-    c = _calcular_c_operacional(m, k_f, base_nula=base_nula)
-
-    if c is UNDEFINED:
-        notas.append(
-            "C = UNDEFINED (AM-D6 / AM-A3): m=0 tras ancla de inclusión. "
-            "No se asigna 1 artificialmente."
-        )
-    else:
-        notas.append(
-            "C = 1 - k/m = 1 - {0}/{1} = {2} (Fraction exacta, AM-D5)".format(
-                str(k_f), m, str(c)
-            )
-        )
+    valor = coherencia(m, k_f, base_nula=base_nula)
 
     return {
-        "C": c,
+        "C": valor,
         "m": m,
-        "k": k_f,
-        "ruta": "operacional",
-        "version": VERSION,
-        "notas": notas,
+        # Si la base es nula, k efectivo para el registro es 0.
+        "k": k_f if not (base_nula or m <= 0) else Fraction(0),
     }
 
 
 def verificar_c(salida: Any) -> bool:
+    """
+    Comprueba solo propiedades matemáticas del resultado:
+      C ∈ {UNDEFINED} ∪ [0, 1]
+      m ≥ 0
+      0 ≤ k ≤ m   (cuando m > 0)
+    """
     if not isinstance(salida, dict):
         return False
     if "C" not in salida:
         return False
+
     val = salida["C"]
-    if val is UNDEFINED or str(val).upper() == "UNDEFINED":
-        return True
-    if isinstance(val, Fraction):
-        return Fraction(0) <= val <= Fraction(1)
-    return False
+    es_und = val is UNDEFINED or str(val).upper() == "UNDEFINED"
+
+    if not es_und:
+        if not isinstance(val, Fraction):
+            return False
+        if val < Fraction(0) or val > Fraction(1):
+            return False
+
+    if "m" in salida:
+        try:
+            m = int(salida["m"])
+        except Exception:
+            return False
+        if m < 0:
+            return False
+    else:
+        m = None
+
+    if "k" in salida and salida["k"] is not None:
+        try:
+            k_f = _a_fraction(salida["k"])
+        except Exception:
+            return False
+        if k_f < 0:
+            return False
+        if m is not None and m > 0 and k_f > m:
+            return False
+
+    return True
 
 
 __all__ = [
+    "coherencia",
     "calcular_c",
     "verificar_c",
-    "VERSION",
     "UNDEFINED",
 ]

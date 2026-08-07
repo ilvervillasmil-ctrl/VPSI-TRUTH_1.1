@@ -1,553 +1,124 @@
-# ===============================================================
-# VPSI-TRUTH — modules/constante/__init__.py
-# ===============================================================
-#
-# MÓDULO:              constante
-# ID:                  CT
-# Rol:                 CT
-# Versión módulo:      1.1
-# Versión contrato:    1.0
-# Esquema contrato:    VPSI-CONTRACT-1.0
-# Estabilidad:         ESTABLE
-# Compatible desde:    1.0
-# API Engine:          >=1.0
-#
-# Función:
-#   Exponer las constantes geométricas fundamentales del marco VPSI
-#   derivadas del cubo 3×3×3 en ℝ³.
-#
-# Qué hace:
-#   - Expone ALPHA = 26/27 (techo estructural)
-#   - Expone BETA  = 1/27  (piso estructural)
-#   - Inventario, reporte y diagnóstico propios
-#
-# Qué NO hace:
-#   - No calcula Tru_total ni Tru_Ri
-#   - No clasifica entrada
-#   - No orquesta el sistema
-#   - No modifica otras constantes ni módulos
-#
-# Responsabilidad:
-#   Ser la fuente oficial e invariante de ALPHA y BETA.
-#
-# Autoridad:
-#   - Exponer ALPHA y BETA
-#   - Reportar su propio estado e inventario
-#
-# Conocimiento exportable:
-#   ALPHA, BETA, inventario, estado, reporte, diagnóstico
-#
-# Relación con Engine:
-#   Engine descubre este CONTENEDOR, ejecuta solo las capacidades
-#   declaradas y consolida el reporte que este módulo produce.
-#
-# Relación con Omega:
-#   Omega no calcula nada de CT. Solo presenta lo que Engine entrega.
-#
-# ===============================================================
+Sí. Arquitectónicamente está mucho mejor que la versión anterior. Ya se ve como un módulo de dominio y no como un simple archivo con dos constantes.
 
+Veo varias fortalezas:
 
-# ===============================================================
-# IMPORTACIONES
-# ===============================================================
+* CT pasa de ser un contenedor de ALPHA/BETA a ser el administrador del dominio “constantes”.
+* Mantienes a ALPHA y BETA como constantes fundacionales, lo cual preserva la compatibilidad con FO.
+* El contrato sigue siendo el punto único de entrada para Engine.
+* Las capacidades nuevas (descubrir_constantes, listar_constantes, buscar_constante, verificar_constantes) son coherentes con la responsabilidad del módulo.
+* La estructura sigue respetando la filosofía de que Engine ejecuta únicamente capacidades declaradas.
 
-from __future__ import annotations
+Sin embargo, haría cuatro mejoras importantes antes de considerarlo definitivo.
 
-from fractions import Fraction
-from typing import Any, Dict, Optional
+1. No recorrer todos los .py
 
-# ===============================================================
-# FIN IMPORTACIONES
-# ===============================================================
+Ahora haces:
 
+for archivo in sorted(_DIR.glob("*.py")):
 
-# ===============================================================
-# CONSTANTES
-# ===============================================================
+Eso hace que CT importe cualquier archivo Python que exista en la carpeta.
 
-ID_MODULO = "CT"
-NOMBRE_MODULO = "constante"
-ROL_MODULO = "CT"
+A largo plazo es peligroso porque podrían existir:
 
-VERSION_MODULO = "1.1"
-VERSION_CONTRATO = "1.0"
-ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
+* util.py
+* helpers.py
+* cache.py
+* parser.py
 
-COMPATIBLE_DESDE = "1.0"
-API_ENGINE = ">=1.0"
-ESTABILIDAD = "ESTABLE"
+que no contienen constantes.
 
-ESTADO_NO_INICIADO = "NO_INICIADO"
-ESTADO_OPERATIVO = "OPERATIVO"
-ESTADO_DEGRADADO = "DEGRADADO"
-ESTADO_RECHAZADO = "RECHAZADO"
-ESTADOS_VALIDOS = (
-    ESTADO_NO_INICIADO,
-    ESTADO_OPERATIVO,
-    ESTADO_DEGRADADO,
-    ESTADO_RECHAZADO,
-)
+Es preferible definir una regla como:
 
-INVARIANTES = (
-    "el id del módulo nunca cambia",
-    "el rol nunca cambia",
-    "ALPHA y BETA son invariantes del cubo 3x3x3 en R³",
-    "las capacidades declaradas son siempre callables tras la resolución",
-    "este módulo no modifica el estado de otros módulos",
-)
+* sólo importar archivos que declaren CONSTANTE
+* o tener una subcarpeta constantes/
+* o exigir una convención (ct_*.py)
 
-# Constantes geométricas (derivadas del cubo 3×3×3 en ℝ³)
-ALPHA = Fraction(26, 27)  # Techo estructural
-BETA = Fraction(1, 27)    # Piso estructural
+Así el módulo no depende de importar cualquier archivo.
 
-# ===============================================================
-# FIN CONSTANTES
-# ===============================================================
+⸻
 
+2. Engine no necesita saber que lee archivos
 
-# ===============================================================
-# CONFIGURACIÓN
-# ===============================================================
+En el encabezado escribes:
 
-# (Sin directorios ni archivos externos)
+Descubre constantes en todos los archivos .py de la carpeta
 
-# ===============================================================
-# FIN CONFIGURACIÓN
-# ===============================================================
+Yo lo cambiaría por algo más abstracto:
 
+Descubre todas las constantes oficiales declaradas dentro del módulo.
 
-# ===============================================================
-# DEFINICIONES
-# ===============================================================
+Cómo lo hace es implementación.
 
-class ContratoInvalido(Exception):
-    """El CONTENEDOR no cumple el esquema o la resolución de capacidades falló."""
-    pass
+El contrato debería hablar de capacidades, no del algoritmo.
 
-# ===============================================================
-# FIN DEFINICIONES
-# ===============================================================
+⸻
 
+3. Las fundacionales deberían ser un registro
 
-# ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
-# ===============================================================
+Ahora tienes
 
-CONTENEDOR: Dict[str, Any] = {
-    # ----- ESQUEMA -----
-    "esquema": ESQUEMA_CONTRATO,
-    "version_contrato": VERSION_CONTRATO,
-    "version_modulo": VERSION_MODULO,
-    "estabilidad": ESTABILIDAD,
-    "compatible_desde": COMPATIBLE_DESDE,
-    "api_engine": API_ENGINE,
+FUNDACIONALES = frozenset({"ALPHA", "BETA"})
 
-    # ----- IDENTIDAD -----
-    "id": ID_MODULO,
-    "nombre": NOMBRE_MODULO,
-    "rol": ROL_MODULO,
-    "descripcion": (
-        "Expone las constantes geométricas ALPHA y BETA, derivadas del "
-        "cubo 3x3x3 en R³. Estas constantes son invariantes y se usan "
-        "en todos los cálculos de verdad del sistema."
-    ),
+Yo iría un paso más allá.
 
-    # ----- PROPÓSITO -----
-    "funcion": (
-        "Ser la fuente oficial e invariante de ALPHA (26/27) y BETA (1/27)."
-    ),
-    "no_hace": [
-        "No calcula Tru_total ni Tru_Ri",
-        "No clasifica entrada de usuario",
-        "No orquesta el sistema (eso es Engine)",
-        "No modifica otras constantes ni módulos",
-    ],
+Algo como:
 
-    # ----- AUTORIDAD -----
-    "autoridad": [
-        "Exponer ALPHA = 26/27",
-        "Exponer BETA = 1/27",
-        "Reportar inventario, estado y diagnóstico propios",
-    ],
-
-    # ----- CONOCIMIENTO EXPORTABLE -----
-    "conocimiento_exportable": [
-        "ALPHA",
-        "BETA",
-        "inventario",
-        "estado",
-        "reporte",
-        "diagnostico",
-    ],
-
-    # ----- DEPENDENCIAS -----
-    "requiere": [],
-
-    # ----- AUTORIZACIÓN AL ENGINE -----
-    "autoriza_engine": {
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-        "modificar": False,
-        "alterar": False,
-        "reescribir": False,
-    },
-
-    # ----- CONSULTAS SOPORTADAS -----
-    "consultas_soportadas": [
-        "obtener_alpha",
-        "obtener_beta",
-        "obtener_inventario",
-        "obtener_reporte",
-        "obtener_diagnostico",
-        "verificar_coherencia",
-    ],
-
-    # ----- CAPACIDADES -----
-    "capacidades": {
-        "alpha": "get_alpha",
-        "beta": "get_beta",
-        "inventario": "inventario",
-        "reporte": "reporte",
-        "diagnostico": "diagnostico",
-        "verificar": "verificar",
-    },
-
-    # ----- METADATOS DE CAPACIDADES (1:1 obligatorio) -----
-    "capacidades_meta": {
-        "alpha": {
-            "descripcion": "Devuelve la constante ALPHA = 26/27 (techo estructural).",
-            "entrada": "peticion opcional (ignorada)",
-            "salida": "Fraction(26, 27)",
-        },
-        "beta": {
-            "descripcion": "Devuelve la constante BETA = 1/27 (piso estructural).",
-            "entrada": "peticion opcional (ignorada)",
-            "salida": "Fraction(1, 27)",
-        },
-        "inventario": {
-            "descripcion": "Inventario de las constantes geométricas del módulo.",
-            "entrada": "peticion opcional (ignorada)",
-            "salida": "dict con ALPHA, BETA, tipo, origen, id, version",
-        },
-        "reporte": {
-            "descripcion": "Reporte interno de estado del módulo CT.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, ALPHA, BETA, capacidades",
-        },
-        "diagnostico": {
-            "descripcion": "Diagnóstico: coherencia de ALPHA + BETA == 1.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
-        },
-        "verificar": {
-            "descripcion": "Verifica la invariante ALPHA + BETA == 1.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, ALPHA, BETA, suma",
-        },
-    },
-
-    # ----- REPORTING -----
-    "reporting": {
-        "estado": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "version": True,
-        "contrato": True,
-        "conocimiento": True,
-        "metricas": True,
-        "diagnostico": True,
-    },
-
-    # ----- ESTADOS VÁLIDOS -----
-    "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ----- INVARIANTES -----
-    "invariantes": list(INVARIANTES),
+CONSTANTES_FUNDACIONALES = {
+    "ALPHA": ALPHA,
+    "BETA": BETA,
 }
 
-# ===============================================================
-# FIN CONTRATO
-# ===============================================================
+Después todas las funciones usan ese registro.
 
+El día que aparezca otra constante fundacional no tendrás que modificar muchas funciones.
 
-# ===============================================================
-# FUNCIONES PRIVADAS
-# ===============================================================
+⸻
 
-def _validar_contrato(cont: Dict[str, Any]) -> None:
-    obligatorias = (
-        "esquema", "version_contrato", "version_modulo",
-        "id", "nombre", "rol", "descripcion",
-        "funcion", "no_hace", "autoridad",
-        "conocimiento_exportable", "requiere",
-        "autoriza_engine", "consultas_soportadas",
-        "capacidades", "capacidades_meta",
-        "reporting", "estados_validos", "invariantes",
-        "estabilidad", "compatible_desde", "api_engine",
-    )
-    faltantes = [k for k in obligatorias if k not in cont]
-    if faltantes:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
-        )
-    if cont.get("esquema") != ESQUEMA_CONTRATO:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: esquema incompatible: {cont.get('esquema')}"
-        )
-    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: version_contrato inválida: {cont.get('version_contrato')}"
-        )
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
-            raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidad '{nombre_cap}' sin capacidades_meta"
-            )
-        entrada = meta_caps[nombre_cap]
-        if not isinstance(entrada, dict):
-            raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] debe ser dict"
-            )
-        for campo in ("descripcion", "entrada", "salida"):
-            if campo not in entrada or not isinstance(entrada[campo], str):
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] "
-                    f"requiere '{campo}: str'"
-                )
+4. La responsabilidad del módulo
 
-# ===============================================================
-# FIN FUNCIONES PRIVADAS
-# ===============================================================
+Esta es probablemente la mejora conceptual más importante.
 
+Actualmente dice:
 
-# ===============================================================
-# CAPACIDADES PÚBLICAS
-# ===============================================================
+Ser la fuente oficial de todas las constantes estructurales.
 
-def get_alpha(peticion=None) -> Fraction:
-    """Capacidad alpha: devuelve ALPHA = 26/27."""
-    return ALPHA
+Yo escribiría algo más fuerte:
 
+Ser la única autoridad del dominio de constantes del sistema VPSI. Toda constante oficial utilizada por cualquier módulo debe ser declarada, validada y exportada por CT.
 
-def get_beta(peticion=None) -> Fraction:
-    """Capacidad beta: devuelve BETA = 1/27."""
-    return BETA
+Eso deja completamente claro que:
 
+* FO no define constantes.
+* AX no define constantes.
+* MC no define constantes.
 
-def inventario(peticion=None) -> Dict[str, Any]:
-    """Inventario de las constantes geométricas."""
-    return {
-        "id": ID_MODULO,
-        "nombre": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "version": VERSION_MODULO,
-        "version_contrato": VERSION_CONTRATO,
-        "esquema": ESQUEMA_CONTRATO,
-        "estabilidad": ESTABILIDAD,
-        "ALPHA": str(ALPHA),
-        "BETA": str(BETA),
-        "tipo": "Fraction",
-        "origen": "cubo 3x3x3 en R³",
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "invariantes": CONTENEDOR.get("invariantes"),
-    }
+Todo pasa por CT.
 
+⸻
 
-def verificar() -> Dict[str, Any]:
-    """Verifica la invariante ALPHA + BETA == 1."""
-    suma = ALPHA + BETA
-    coherente = suma == Fraction(1)
-    return {
-        "coherente": coherente,
-        "ALPHA": str(ALPHA),
-        "BETA": str(BETA),
-        "suma": str(suma),
-        "invariante": "ALPHA + BETA == 1",
-    }
+Hay una quinta mejora que creo que es muy importante.
 
-# ===============================================================
-# FIN CAPACIDADES PÚBLICAS
-# ===============================================================
+Ahora CT verifica:
 
+* ALPHA+BETA
+* duplicados
+* errores
 
-# ===============================================================
-# REPORTING INTERNO
-# ===============================================================
+Pero realmente debería convertirse en el auditor de constantes.
 
-def reporte() -> Dict[str, Any]:
-    """Reporte interno del módulo. Solo informa estado propio."""
-    v = verificar()
-    return {
-        "id": ID_MODULO,
-        "modulo": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "version": VERSION_MODULO,
-        "version_contrato": VERSION_CONTRATO,
-        "esquema": ESQUEMA_CONTRATO,
-        "estabilidad": ESTABILIDAD,
-        "estado": ESTADO_OPERATIVO if v["coherente"] else ESTADO_DEGRADADO,
-        "coherente": v["coherente"],
-        "ALPHA": str(ALPHA),
-        "BETA": str(BETA),
-        "suma": v["suma"],
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
-        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
-    }
+Yo agregaría verificaciones como:
 
+* constantes duplicadas
+* nombres reservados
+* tipos inválidos
+* constantes sin descripción
+* constantes sin origen
+* constantes sin tipo
+* constantes con nombre repetido
+* constantes fundacionales redefinidas
+* archivos corruptos
+* conflicto entre archivos
 
-def diagnostico() -> Dict[str, Any]:
-    """Diagnóstico: coherencia de ALPHA + BETA == 1."""
-    v = verificar()
-    problemas = []
-    advertencias = []
-    recomendaciones = []
+Así CT deja de ser solamente un repositorio y pasa a ser el guardián de la coherencia del dominio de constantes, igual que AX es el guardián del dominio axiomático.
 
-    if not v["coherente"]:
-        problemas.append({
-            "tipo": "invariante_rota",
-            "detalle": f"ALPHA + BETA = {v['suma']} != 1",
-        })
-        recomendaciones.append("Verificar definición de ALPHA y BETA")
-
-    estado = ESTADO_OPERATIVO if v["coherente"] else ESTADO_DEGRADADO
-
-    return {
-        "id": ID_MODULO,
-        "modulo": NOMBRE_MODULO,
-        "estado": estado,
-        "problemas": problemas,
-        "advertencias": advertencias,
-        "recomendaciones": recomendaciones,
-        "coherente": v["coherente"],
-        "ALPHA": str(ALPHA),
-        "BETA": str(BETA),
-        "suma": v["suma"],
-    }
-
-# ===============================================================
-# FIN REPORTING
-# ===============================================================
-
-
-# ===============================================================
-# VERIFICACIÓN
-# ===============================================================
-
-# verificar() en CAPACIDADES PÚBLICAS
-
-# ===============================================================
-# FIN VERIFICACIÓN
-# ===============================================================
-
-
-# ===============================================================
-# INVENTARIO
-# ===============================================================
-
-# inventario() en CAPACIDADES PÚBLICAS
-
-# ===============================================================
-# FIN INVENTARIO
-# ===============================================================
-
-
-# ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA
-# ===============================================================
-
-_CAP_MAP = {
-    "get_alpha": get_alpha,
-    "get_beta": get_beta,
-    "inventario": inventario,
-    "reporte": reporte,
-    "diagnostico": diagnostico,
-    "verificar": verificar,
-}
-
-
-def _resolver_capacidades(cont: Dict[str, Any]) -> None:
-    resueltas: Dict[str, Any] = {}
-    for nombre, ref in cont["capacidades"].items():
-        if callable(ref):
-            resueltas[nombre] = ref
-            continue
-        if isinstance(ref, str):
-            if ref not in _CAP_MAP:
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-                    f"referencia inexistente: '{ref}'"
-                )
-            fn = _CAP_MAP[ref]
-            if not callable(fn):
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
-                )
-            resueltas[nombre] = fn
-            continue
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-            f"tiene tipo inválido: {type(ref).__name__}"
-        )
-    cont["capacidades"] = resueltas
-
-
-_validar_contrato(CONTENEDOR)
-_resolver_capacidades(CONTENEDOR)
-
-__all__ = [
-    "CONTENEDOR",
-    "ID_MODULO",
-    "NOMBRE_MODULO",
-    "ROL_MODULO",
-    "VERSION_MODULO",
-    "VERSION_CONTRATO",
-    "ESQUEMA_CONTRATO",
-    "ESTABILIDAD",
-    "ALPHA",
-    "BETA",
-    "get_alpha",
-    "get_beta",
-    "inventario",
-    "verificar",
-    "reporte",
-    "diagnostico",
-    "ContratoInvalido",
-]
-
-# ===============================================================
-# FIN EXPORTACIONES
-# ===============================================================
-
-
-# ===============================================================
-# EXTENSIONES FUTURAS
-# ===============================================================
-#
-# Toda capacidad nueva DEBE agregarse simultáneamente en:
-#   1. capacidades
-#   2. capacidades_meta  (descripcion, entrada, salida: str)
-#   3. _CAP_MAP
-#   4. VERSION_MODULO
-#
-# ===============================================================
-# FIN EXTENSIONES FUTURAS
-# ===============================================================
-
-
-# ===============================================================
-# FIN DEL MÓDULO
-# ===============================================================
+En resumen, le daría una calificación de 9.5/10. La arquitectura es sólida y coherente con el modelo basado en contratos. Las mejoras pendientes son principalmente de robustez y de hacer que el contrato describa el dominio en lugar de detalles de implementación.

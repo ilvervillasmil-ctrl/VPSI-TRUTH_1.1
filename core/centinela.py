@@ -1333,6 +1333,110 @@ class Centinela:
 
 
 # ===============================================================
+# COMIENZA: ENGINE ↔ CENTINELA (INTEGRACIÓN OFICIAL)
+# ===============================================================
+# Ubicación: core/centinela.py
+#
+# 1) Estados adicionales (junto a CS_ESTADO_*).
+# 2) Campo tipo_auditoria en Veredicto.
+# 3) Clasificación por evidencia auditable (no lista fija de claves).
+# 4) Rama al inicio de Centinela.verificar.
+# ===============================================================
+
+# --- Estados ---
+CS_ESTADO_SOLO_ESTRUCTURAL = "SOLO_ESTRUCTURAL"
+CS_ESTADO_SIN_PAQUETE_AUDITABLE = "SIN_PAQUETE_AUDITABLE"
+
+CS_ESTADOS = (
+    CS_ESTADO_APROBADO,
+    CS_ESTADO_RETENIDO,
+    CS_ESTADO_PARCIAL,
+    CS_ESTADO_SOLO_ESTRUCTURAL,
+    CS_ESTADO_SIN_PAQUETE_AUDITABLE,
+)
+
+# Tipos de auditoría (campo explícito del Veredicto)
+TIPO_AUDITORIA_ESTRUCTURAL = "ESTRUCTURAL"
+TIPO_AUDITORIA_DOMINIO = "DOMINIO"
+TIPO_AUDITORIA_COMPLETA = "COMPLETA"
+
+
+# --- En dataclass Veredicto, añadir el campo: ---
+#   tipo_auditoria: str = TIPO_AUDITORIA_COMPLETA
+
+
+def _tiene_evidencia_auditable(paquete: Dict[str, Any]) -> bool:
+    """
+    True si el paquete trae ciclo de negocio o hojas de dominio.
+    No usa lista fija de claves estructurales.
+    """
+    if not isinstance(paquete, dict) or not paquete:
+        return False
+    if paquete.get(PKG_CICLO_ID):
+        return True
+    # hojas de dominio descubiertas dinámicamente
+    return bool(_valores_desde(paquete))
+
+
+def _clasificar_paquete(paquete: Dict[str, Any]) -> str:
+    """
+    SIN_PAQUETE_AUDITABLE | SOLO_ESTRUCTURAL | DOMINIO
+    según presencia de evidencia auditable.
+    """
+    if not isinstance(paquete, dict) or not paquete:
+        return CS_ESTADO_SIN_PAQUETE_AUDITABLE
+    if _tiene_evidencia_auditable(paquete):
+        return CS_ESTADO_APROBADO  # señal interna: hay dominio → auditoría completa
+    return CS_ESTADO_SOLO_ESTRUCTURAL
+
+
+# --- Rama al inicio de Centinela.verificar ---
+# (después de p / ciclo_id / motivos / id_ver; antes de _paquete_minimo_ok)
+
+        clase = _clasificar_paquete(p)
+        if clase == CS_ESTADO_SIN_PAQUETE_AUDITABLE:
+            return self._emitir(
+                estado=CS_ESTADO_SIN_PAQUETE_AUDITABLE,
+                ciclo_id=ciclo_id or "sin_ciclo",
+                motivos=["sin expediente auditable: paquete vacío o inexistente"],
+                advertencias=[],
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p if isinstance(p, dict) else {},
+                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
+            )
+
+        if clase == CS_ESTADO_SOLO_ESTRUCTURAL:
+            return self._emitir(
+                estado=CS_ESTADO_SOLO_ESTRUCTURAL,
+                ciclo_id=ciclo_id or "estructural",
+                motivos=[
+                    "paquete estructural: describe el sistema; "
+                    "sin ciclo ni resultados de dominio que auditar"
+                ],
+                advertencias=[],
+                id_verificacion=id_ver,
+                t0=t0,
+                ts_inicio=ts_inicio,
+                paquete=p,
+                tipo_auditoria=TIPO_AUDITORIA_ESTRUCTURAL,
+            )
+
+        # Hay evidencia auditable → continúa auditoría de dominio / completa.
+        # Al emitir APROBADO/RETENIDO/PARCIAL, pasar:
+        #   tipo_auditoria=TIPO_AUDITORIA_COMPLETA
+        # (o TIPO_AUDITORIA_DOMINIO si solo se verificó dominio sin reproducción).
+
+# --- En _emitir: aceptar y propagar tipo_auditoria ---
+#   tipo_auditoria: str = TIPO_AUDITORIA_COMPLETA
+#   → v.tipo_auditoria = tipo_auditoria
+
+# ===============================================================
+# FIN: ENGINE ↔ CENTINELA (INTEGRACIÓN OFICIAL)
+# ===============================================================
+
+# ===============================================================
 # API DE CORE
 # ===============================================================
 

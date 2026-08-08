@@ -494,27 +494,37 @@ def diagnostico(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "casa": CASA_SELF,
     }
 
-
 # ---------------------------------------------------------------------------
-# CONTRATO
+# CONTRATO exclusivo
 # ---------------------------------------------------------------------------
 
 CONTENEDOR: Dict[str, Any] = {
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": "VPSI-CONTRACT-1.0",
     "version_contrato": "1.0",
     "version_modulo": "1.0",
-    "id": "SF",
-    "nombre": "self",
-    "rol": "SF",
     "estabilidad": "FASE",
     "compatible_desde": "1.0",
     "api_engine": ">=1.0",
+
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
+    "id": "SF",
+    "nombre": "self",
+    "rol": "SF",
     "descripcion": (
         "Yo funcional del sistema. Centro de elección e identidad de fase. "
         "Casa operativa L4. Punto de acceso a perspectivas L1…L6. "
         "Oscila entre alturas; registra actos de agency sin side-effects. "
         "No orquesta. No calcula Tru."
     ),
+
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
     "funcion": (
         "Ser el punto de referencia de elección e identidad de fase: "
         "exponer quién es el sistema en fase, desde qué altura opera, "
@@ -523,6 +533,10 @@ CONTENEDOR: Dict[str, Any] = {
         "legibles para cálculo y resolución de problemas."
     ),
     "no_hace": [],
+
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
     "autoridad": [
         "Exponer identidad de fase (yo_funcional)",
         "Reportar y cambiar altura operativa del Self (oscilar)",
@@ -532,6 +546,10 @@ CONTENEDOR: Dict[str, Any] = {
         "Declarar acceso a perspectivas L1…L6",
         "Verificar coherencia interna y reportar estado propio",
     ],
+
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
     "conocimiento_exportable": [
         "yo_funcional",
         "oscilar",
@@ -544,8 +562,17 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
     ],
+
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
     "requiere": [],
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # ============================================================
     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -553,10 +580,52 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
         "alterar": False,
         "reescribir": False,
+        "crear": False,
+        "eliminar": False,
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": False,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
+
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
     "consultas_soportadas": [
         "yo_funcional",
         "desde_donde",
@@ -568,6 +637,10 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_diagnostico",
         "verificar_coherencia",
     ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
     "capacidades": {
         "verificar": verificar,
         "barrer": barrer,
@@ -581,6 +654,10 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": reporte,
         "diagnostico": diagnostico,
     },
+
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia interna de SF.",
@@ -638,6 +715,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con estado, problemas, advertencias, recomendaciones",
         },
     },
+
+    # ============================================================
+    # REPORTING
+    # ============================================================
     "reporting": {
         "estado": True,
         "salud": True,
@@ -653,12 +734,20 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
         "reporte": True,
     },
+
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
     "estados_validos": [
         "NO_INICIADO",
         "OPERATIVO",
         "DEGRADADO",
         "RECHAZADO",
     ],
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
     "invariantes": [
         "el id del módulo nunca cambia",
         "el rol nunca cambia",
@@ -671,7 +760,8 @@ CONTENEDOR: Dict[str, Any] = {
         "este módulo no inventa capacidades no declaradas en CONTENEDOR",
         "este módulo siempre puede reportar su propio estado",
     ],
-}
+
+}  # <--- CIERRE FINAL
 
 __all__ = [
     "CONTENEDOR",

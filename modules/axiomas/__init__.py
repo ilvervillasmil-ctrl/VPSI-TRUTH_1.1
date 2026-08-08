@@ -271,11 +271,10 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
     ],
-}  # <--- CIERRE FINAL
 
     # ----- DEPENDENCIAS -----
-    "requiere": [],
-
+    "requiere": [],  # <--- 4 espacios exactos (misma indentación que las demás claves)
+}
     # ----- AUTORIZACIÓN AL ENGINE -----
     "autoriza_engine": {
         "leer": True,

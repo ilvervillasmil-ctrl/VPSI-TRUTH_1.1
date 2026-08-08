@@ -78,8 +78,6 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
     ],
-    # Axiomas es un cimiento base, por lo que requiere a DG para ser auditado por él si lo exige el flujo,
-    # o limpio si opera de forma autónoma. Para que Diagnostics lo lea y reconozca sin fricción:
     "requiere": [],
     "autoriza_engine": {
         "leer": True,
@@ -161,7 +159,7 @@ def axiomas() -> List[Dict[str, Any]]:
             "relacion": "opera_bajo",
             "objeto": "contratos_coherentes",
             "polaridad": True,
-            enunciado := "Todo componente operativo responde a un contrato validado por el Engine.",
+            "enunciado": "Todo componente operativo responde a un contrato validado por el Engine.",
             "depende_de": [],
             "gobierna": ["core", "modules"],
         }

@@ -1,5 +1,5 @@
 # ===============================================================
-# VPSI-TRUTH — indio/test_procesamiento.py
+# VPSI-TRUTH — tests/test_procesamiento_indio.py
 # ===============================================================
 #
 # TEST: INDIO-STRESS-TEST-v1.0 (Protocolo de Latencia y Coherencia Fractal)
@@ -30,7 +30,9 @@
 from __future__ import annotations
 
 import time
+from pathlib import Path
 from typing import Any, Dict
+from core.engine import Engine
 
 # ===============================================================
 # FIN IMPORTACIONES
@@ -41,36 +43,42 @@ from typing import Any, Dict
 # DEFINICIONES Y CAPACIDAD DE TEST
 # ===============================================================
 
-def test_procesamiento_indio(engine_ref: Any) -> Dict[str, Any]:
+def test_procesamiento_indio() -> None:
     """
     INDIO-STRESS-TEST-v1.0
-    Ejecuta el escaneo transversal de la red, consolidando el censo,
-    los reportes de los 16 módulos y las trazas de ejecución en un 
-    solo pulso de evaluación sistémica.
+    Instancia el Engine sobre la raíz de módulos, ejecuta el escaneo 
+    transversal de la red, consolidando el censo, los reportes y las 
+    trazas de ejecución en un solo pulso de evaluación sistémica.
     """
+    # 1. Determinación de la ruta raíz de los módulos del repositorio
+    raiz_actual = Path(__file__).resolve().parent.parent
+    
+    # 2. Inicialización del Engine en modo estricto
+    engine_ref = Engine(raiz_modulos=raiz_actual, invocador_id="indio_test", strict=True)
+    
     inicio = time.perf_counter()
     
-    # 1. Fase de Censo y Escucha Total de la Red
+    # 3. Fase de Censo y Escucha Total de la Red
     censado = engine_ref.censar()
     total_modulos = censado.get("total", 0)
     rechazados = censado.get("rechazados", [])
     
-    # 2. Fase de Consolidación de Reportes del Sistema
+    # 4. Fase de Consolidación de Reportes del Sistema
     reportes_globales = engine_ref.consolidar_reportes()
     
-    # 3. Extracción de Estado Global y Evidencia de Trazas
+    # 5. Extracción de Estado Global y Evidencia de Trazas
     estado_global = engine_ref.estado_global()
     trazas = engine_ref.obtener_trazas()
     
     duracion = round(time.perf_counter() - inicio, 6)
     
-    # 4. Evaluación de Coherencia Transversal
+    # 6. Evaluación de Coherencia Transversal
     coherente_sistema = len(rechazados) == 0 and estado_global.get("estado") == "OPERATIVO"
     
-    # 5. Cálculo del Índice de Carga Procesada (ICP)
+    # 7. Cálculo del Índice de Carga Procesada (ICP)
     icp_score = round((total_modulos * 100) / (duracion + 0.001), 2)
     
-    return {
+    resultado = {
         "test_nombre": "INDIO-STRESS-TEST-v1.0",
         "estado_indio": "OPERATIVO" if coherente_sistema else "DEGRADADO",
         "metrica_latencia_s": duracion,
@@ -80,6 +88,10 @@ def test_procesamiento_indio(engine_ref: Any) -> Dict[str, Any]:
         "coherencia_transversal": coherente_sistema,
         "veredicto": "SISTEMA INTEGRO Y SINCRONIZADO" if coherente_sistema else "ANOMALÍA DETECTADA EN EL FLUJO"
     }
+
+    # Aserción estructural de validación para pytest
+    assert resultado["coherencia_transversal"] is True
+    assert resultado["modulos_procesados"] > 0
 
 # ===============================================================
 # FIN DEFINICIONES

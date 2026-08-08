@@ -438,6 +438,18 @@ CONTENEDOR: Dict[str, Any] = {
     "conocimiento": True,
     "diagnostico": True,
     "reporte": True,
+    "estado": True,
+    "salud": True,
+    "inventario": True,
+    "capacidades": True,
+    "errores": True,
+    "advertencias": True,
+    "dependencias": True,
+    "version": True,
+    "contrato": True,
+    "conocimiento": True,
+    "metricas": True,
+    "diagnostico": True,
 },
    
     

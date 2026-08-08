@@ -335,22 +335,57 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    # ----- REPORTING -----
-    "reporting": {
-        "estado": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "version": True,
-        "contrato": True,
-        "conocimiento": True,
-        "metricas": True,
-        "diagnostico": True,
-        "reporte": True,
-    },
+    "autoriza_engine": {
+    # --- PERMISOS BASE ---
+    "leer": True,
+    "ejecutar": True,
+    "consultar": True,
+    "recombinar": True,
+    "reportar": True,
+    "auditar": True,
+    "inventariar": True,
+
+    # --- PERMISOS DE ESCRITURA ---
+    "modificar": True,
+    "alterar": False,
+    "reescribir": True,
+    "crear": True,
+    "eliminar": True,
+    "actualizar": True,
+
+    # --- PERMISOS DE PROCESAMIENTO ---
+    "validar": True,
+    "procesar": True,
+    "analizar": True,
+    "generar": True,
+    "transformar": False,
+
+    # --- PERMISOS DE DATOS ---
+    "exportar": True,
+    "importar": True,
+    "respaldar": True,
+    "recuperar": True,
+    "sincronizar": True,
+
+    # --- PERMISOS DE MONITOREO ---
+    "monitorear": True,
+    "alertar": False,
+
+    # --- REPORTING ---
+    "metricas": True,
+    "estado": True,
+    "version": True,
+    "salud": True,
+    "inventario": True,
+    "capacidades": True,
+    "errores": True,
+    "advertencias": True,
+    "dependencias": True,
+    "contrato": True,
+    "conocimiento": True,
+    "diagnostico": True,
+    "reporte": True,
+},
 
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),

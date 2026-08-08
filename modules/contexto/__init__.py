@@ -184,14 +184,14 @@ def es_undefined(v: Any) -> bool:
 # ===============================================================
 # FIN DEFINICIONES
 # ===============================================================
-
-
 # ===============================================================
 # CONTRATO OFICIAL DEL MÓDULO
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
-    # ----- ESQUEMA -----
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
@@ -199,7 +199,9 @@ CONTENEDOR: Dict[str, Any] = {
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
 
-    # ----- IDENTIDAD -----
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
@@ -209,7 +211,9 @@ CONTENEDOR: Dict[str, Any] = {
         "Representación operativa del marco evaluable O_context."
     ),
 
-    # ----- PROPÓSITO -----
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
     "funcion": (
         "Generar el marco O a partir de la petición y garantizar "
         "la coherencia estructural de su dominio."
@@ -223,7 +227,9 @@ CONTENEDOR: Dict[str, Any] = {
         "No emite cadenas auditables",
     ],
 
-    # ----- AUTORIDAD -----
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
     "autoridad": [
         "Declarar el registro O y permite_k",
         "Clasificar el contexto evaluable",
@@ -231,7 +237,9 @@ CONTENEDOR: Dict[str, Any] = {
         "Reportar el estado estructural del módulo",
     ],
 
-    # ----- CONOCIMIENTO EXPORTABLE -----
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
     "conocimiento_exportable": [
         "O_context",
         "registro",
@@ -244,10 +252,14 @@ CONTENEDOR: Dict[str, Any] = {
         "axiomas",
     ],
 
-    # ----- DEPENDENCIAS (clave obligatoria del esquema) -----
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
     "requiere": [],
 
-    # ----- DOMINIO -----
+    # ============================================================
+    # DOMINIO
+    # ============================================================
     "modos_entrada": [
         "conversacion",
         "afirmacion",
@@ -281,8 +293,11 @@ CONTENEDOR: Dict[str, Any] = {
         "alpha", "beta", "ALPHA", "BETA",
     ],
 
-    # ----- AUTORIZACIÓN AL ENGINE -----
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # ============================================================
     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -290,12 +305,52 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
-        "modificar": False,
-        "alterar": False,
-        "reescribir": False,
+
+        # --- PERMISOS DE ESCRITURA ---
+        "modificar": True,
+        "alterar": True,
+        "reescribir": True,
+        "crear": True,
+        "eliminar": True,
+        "actualizar": True,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        "transformar": True,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
 
-    # ----- CONSULTAS SOPORTADAS -----
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
     "consultas_soportadas": [
         "resolver",
         "centinela",
@@ -306,7 +361,9 @@ CONTENEDOR: Dict[str, Any] = {
         "axiomas",
     ],
 
-    # ----- CAPACIDADES -----
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
     "capacidades": {
         "resolver": "resolver",
         "evaluar": "resolver",
@@ -320,7 +377,9 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida": "verificar_salida",
     },
 
-    # ----- METADATOS DE CAPACIDADES (1:1) -----
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
     "capacidades_meta": {
         "resolver": {
             "descripcion": "Garantiza el marco O clasificado a partir de la petición.",
@@ -374,70 +433,40 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    "autoriza_engine": {
-    # --- PERMISOS BASE ---
-    "leer": True,
-    "ejecutar": True,
-    "consultar": True,
-    "recombinar": True,
-    "reportar": True,
-    "auditar": True,
-    "inventariar": True,
+    # ============================================================
+    # REPORTING
+    # ============================================================
+    "reporting": {
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
+        "reporte": True,
+    },
 
-    # --- PERMISOS DE ESCRITURA ---
-    "modificar": True,
-    "alterar": True,
-    "reescribir": True,
-    "crear": True,
-    "eliminar": True,
-    "actualizar": True,
-
-    # --- PERMISOS DE PROCESAMIENTO ---
-    "validar": True,
-    "procesar": True,
-    "analizar": True,
-    "generar": True,
-    "transformar": True,
-
-    # --- PERMISOS DE DATOS ---
-    "exportar": True,
-    "importar": True,
-    "respaldar": True,
-    "recuperar": True,
-    "sincronizar": True,
-
-    # --- PERMISOS DE MONITOREO ---
-    "monitorear": True,
-    "alertar": True,
-
-    # --- REPORTING ---
-    "metricas": True,
-    "estado": True,
-    "version": True,
-    "salud": True,
-    "inventario": True,
-    "capacidades": True,
-    "errores": True,
-    "advertencias": True,
-    "dependencias": True,
-    "contrato": True,
-    "conocimiento": True,
-    "diagnostico": True,
-    "reporte": True,
-},
-
-    # ----- ESTADOS VÁLIDOS -----
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
 
-    # ----- INVARIANTES -----
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
     "invariantes": list(INVARIANTES),
-}
+
+}  # <--- CIERRE FINAL
 
 # ===============================================================
 # FIN CONTRATO
 # ===============================================================
-
-
 # ===============================================================
 # FUNCIONES PRIVADAS
 # ===============================================================

@@ -2,41 +2,37 @@
 # VPSI-TRUTH — modules/spartaco_seguridad/proteccion.py
 # ===============================================================
 #
-# UNA SOLA REGLA GENERATIVA
+# CONTRATO DE IDENTIDAD (genealogía + autoridad)
 #
-#   DATOS
-#     │
-#     ▼
-#   PARTIR en 3  (Z_bytes, S_bytes, Q_bytes)
-#     │
-#     ├── Nodo(Z_bytes)  → compromiso_Z
-#     ├── Nodo(S_bytes)  → compromiso_S
-#     └── Nodo(Q_bytes)  → compromiso_Q
-#             │
-#             ▼
-#   compromiso(N) = H("N" | Z | S | Q)
-#             │
-#             ▼  (recursión hasta hoja)
-#           ROOT
-#             │
-#             ▼
-#          Ed25519
+#   LLAVE (clave_publica_id)
+#           │
+#           ▼
+#   ARTEFACTO (artifact_id)
+#           │
+#           ▼
+#   NÚCLEO  ← entidad arquitectónica
+#   ├── digest = SHA-256(datos)     = cuerpo["nucleo"]
+#   ├── root   = H(N|Z|S|Q)         = compromiso ZSQ (interno)
+#   └── authority_id
+#           │
+#      ┌────┼────┐
+#      ▼    ▼    ▼
+#      Z    S    Q   cada uno: id, parent_id, role, depth, digest
+#      │
+#     hijos con la misma ficha de identidad…
 #
-# INVARIANTE DE CIERRE (todo nodo N):
-#   válido(N) ⇔ Z(N) ∧ S(N) ∧ Q(N) ∧ hijos_válidos ∧ ROOT autenticado
+# node_id = H(artifact_id | path)   path = "ROOT" | "ROOT/Z" | …
+# parent_id = node_id del padre ("" en ROOT)
 #
-#   Quitar / añadir / alterar / reordenar una pieza
-#   → compromiso del ancestro diverge
-#   → ROOT diverge
-#   → firma inválida o raíz no coincide
-#   → ok=False
+# DIAGNÓSTICO POR ENTIDAD (no por edificio):
+#   datos ≠ nucleo  → fallos += "nucleo"
+#   S/Q divergen    → fallos += "canales"
+#   pasos: manifiesto, nucleo, canales, z, n_bytes, identidad_neutra
 #
-# NODOS INMUTABLES: no se mutan. Cambio ⇒ nodo nuevo ⇒ padre nuevo ⇒ ROOT nuevo.
+# CUERPO FIRMADO (CLAVES_CUERPO): nucleo, S, Q, valuaciones, …
+# ROOT no sustituye a nucleo. valuaciones se deposita autenticada.
 #
-# Z/S/Q son tres ramas equivalentes (ternaria), no "hash total + dos mitades".
-# Nucleo del artefacto = ROOT. Canales del artefacto = (Z,S,Q) de la raíz.
-#
-# FRONTERA: todo lo externo es NO CONFIABLE.
+# serializar = frontera: valida tipo/rango ANTES de json.dumps.
 # ===============================================================
 
 from __future__ import annotations
@@ -60,9 +56,9 @@ from cryptography.hazmat.primitives.serialization import (
     PublicFormat,
 )
 
-# ===============================================================
+# ---------------------------------------------------------------
 # CONTRATO
-# ===============================================================
+# ---------------------------------------------------------------
 
 ESQUEMA_MANIFIESTO: int = 1
 VERSION_MINIMA_DEFAULT: int = 1
@@ -74,11 +70,9 @@ MODO_DIAGNOSTICO: str = "DIAGNOSTICO"
 ALGORITMO_HASH: str = "SHA-256"
 ALGORITMO_FIRMA: str = "Ed25519"
 
-# Partición ternaria recursiva
-HOJA_MAX_BYTES: int = 32          # bajo este tamaño (o profundidad máx) → hoja
+HOJA_MAX_BYTES: int = 32
 PROFUNDIDAD_MAX: int = 12
 
-# Campos del cuerpo autenticado (metadatos + raíz ZSQ de los DATOS)
 CLAVES_CUERPO: frozenset = frozenset(
     {
         "esquema",
@@ -88,14 +82,13 @@ CLAVES_CUERPO: frozenset = frozenset(
         "clave_publica_id",
         "algoritmo_hash",
         "algoritmo_firma",
+        "nucleo",
+        "S",
+        "Q",
         "n_bytes",
         "n_neutro",
+        "valuaciones",
         "identidad_neutra",
-        # raíz y ramas del árbol de DATOS
-        "root",   # compromiso(Nodo(datos))
-        "Z",      # rama Z de la raíz
-        "S",      # rama S de la raíz
-        "Q",      # rama Q de la raíz
     }
 )
 
@@ -103,10 +96,10 @@ SEGURIDAD: Dict[str, Any] = {
     "id": "PROTECCION",
     "nombre": "proteccion",
     "hace": (
-        "Integridad recursiva Z/S/Q del artefacto + autoridad Ed25519 sobre la raíz. "
-        "Una sola regla generativa: partir datos en Z/S/Q, comprometer, repetir."
+        "Autentica artefactos con identidad genealógica: nucleo, canales S/Q, "
+        "valuaciones y árbol ZSQ con node_id/parent_id; autoridad Ed25519."
     ),
-    "herramienta": "NodoZSQ ternario recursivo + Ed25519 + manifiesto {cuerpo, firma}",
+    "herramienta": "Ed25519 + SHA-256 + NodoZSQ(id) + manifiesto {cuerpo, firma}",
     "conceptos": [
         "FIRMA_INVÁLIDA",
         "INTEGRIDAD_COMPROMETIDA",
@@ -120,9 +113,9 @@ SEGURIDAD: Dict[str, Any] = {
 }
 
 
-# ===============================================================
-# TIPO (sin coerción)
-# ===============================================================
+# ---------------------------------------------------------------
+# TIPO
+# ---------------------------------------------------------------
 
 def _es_int(x: Any) -> bool:
     return type(x) is int
@@ -156,12 +149,46 @@ def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-# ===============================================================
-# CANÓNICO / CONGELACIÓN
-# ===============================================================
+# ---------------------------------------------------------------
+# CANÓNICO — frontera segura
+# ---------------------------------------------------------------
+# Rechaza tipo/rango ANTES de json.dumps.
+# No deja que bytes / objetos / int gigante lleguen al encoder.
+
+def _prevalidar_json(obj: Any, _depth: int = 0) -> None:
+    if _depth > 64:
+        raise ValueError("profundidad JSON excesiva")
+    if obj is None or _es_bool(obj) or _es_str(obj):
+        return
+    if _es_int(obj):
+        # evita conversion overflow (version gigante, etc.)
+        if obj.bit_length() > 256:
+            raise ValueError("entero fuera de rango contractual")
+        return
+    if type(obj) is float:
+        if obj != obj or obj in (float("inf"), float("-inf")):
+            raise ValueError("float no finito")
+        return
+    if type(obj) is list:
+        for x in obj:
+            _prevalidar_json(x, _depth + 1)
+        return
+    if type(obj) is dict:
+        for k, v in obj.items():
+            if not _es_str(k):
+                raise ValueError("clave JSON no str")
+            _prevalidar_json(v, _depth + 1)
+        return
+    raise ValueError(f"tipo no JSON: {type(obj).__name__}")
+
 
 def serializar(obj: Any) -> bytes:
+    """
+    Frontera canónica. Valida dominio JSON contractual y luego codifica.
+    Lanza ValueError clasificado (no TypeError crudo del encoder).
+    """
     try:
+        _prevalidar_json(obj)
         texto = json.dumps(
             obj,
             sort_keys=True,
@@ -194,254 +221,207 @@ def _descongelar_json(canonico: bytes) -> Any:
         raise ValueError(f"JSON inválido: {e}") from e
 
 
-# ===============================================================
-# PARTICIÓN TERNARIA (regla generativa única)
-# ===============================================================
+# ---------------------------------------------------------------
+# IDENTIDAD DE NODO (genealogía)
+# ---------------------------------------------------------------
+
+def node_id(artifact_id: str, path: str) -> str:
+    """ID determinista: H(artifact_id | path)."""
+    if not _es_str(artifact_id) or not _es_str(path):
+        raise ValueError("artifact_id/path inválidos")
+    return _sha(f"{artifact_id}|{path}".encode("utf-8"))
+
 
 def _partir3(data: bytes) -> Tuple[bytes, bytes, bytes]:
-    """
-    Parte en tres trozos lo más iguales posible.
-    Z = primer tercio, S = segundo, Q = resto.
-    Conserva todos los bytes; es invertible por concatenación.
-    """
     n = len(data)
     a = n // 3
     b = n // 3
-    # c = n - a - b  (puede ser a o a+1)
     return data[:a], data[a : a + b], data[a + b :]
 
 
-def _es_hoja(data: bytes, profundidad: int) -> bool:
-    return len(data) <= HOJA_MAX_BYTES or profundidad >= PROFUNDIDAD_MAX
-
-
-# ===============================================================
-# NODO Z/S/Q INMUTABLE
-# ===============================================================
-#
-# Construcción:
-#   hoja:   Z=H(Z_bytes), S=H(S_bytes), Q=H(Q_bytes)
-#           compromiso = H("N"|Z|S|Q)
-#   interior:
-#           hijo_Z = Nodo(Z_bytes), hijo_S = Nodo(S_bytes), hijo_Q = Nodo(Q_bytes)
-#           Z = hijo_Z.compromiso, S = hijo_S.compromiso, Q = hijo_Q.compromiso
-#           compromiso = H("N"|Z|S|Q)
-#
-# No hay setters. Cambio de datos ⇒ construir nodo nuevo.
-#
-
 class NodoZSQ:
-    __slots__ = ("_data", "_prof", "_z", "_s", "_q", "_c", "_hijo_z", "_hijo_s", "_hijo_q")
+    """
+    Nodo inmutable con ficha de identidad.
 
-    def __init__(self, data: bytes, profundidad: int = 0) -> None:
+    id, parent_id, role, depth, path, digest, authority_id, artifact_id
+    """
+
+    __slots__ = (
+        "id",
+        "parent_id",
+        "role",
+        "depth",
+        "path",
+        "digest",
+        "authority_id",
+        "artifact_id",
+        "z",
+        "s",
+        "q",
+        "_hijo_z",
+        "_hijo_s",
+        "_hijo_q",
+    )
+
+    def __init__(
+        self,
+        data: bytes,
+        *,
+        artifact_id: str,
+        authority_id: str,
+        role: str = "ROOT",
+        path: str = "ROOT",
+        parent_id: str = "",
+        depth: int = 0,
+    ) -> None:
         if not _es_bytes(data):
             raise TypeError("data debe ser bytes")
-        if not _es_int(profundidad) or profundidad < 0:
-            raise ValueError("profundidad inválida")
-        self._data = bytes(data)
-        self._prof = profundidad
-        self._z: str
-        self._s: str
-        self._q: str
-        self._c: str
-        self._hijo_z: Optional["NodoZSQ"] = None
-        self._hijo_s: Optional["NodoZSQ"] = None
-        self._hijo_q: Optional["NodoZSQ"] = None
-        self._construir()
+        if role not in ("ROOT", "Z", "S", "Q"):
+            raise ValueError("role inválido")
+        data = bytes(data)
+        self.artifact_id = artifact_id
+        self.authority_id = authority_id
+        self.role = role
+        self.path = path
+        self.parent_id = parent_id
+        self.depth = depth
+        self.id = node_id(artifact_id, path)
+        self._hijo_z = self._hijo_s = self._hijo_q = None
 
-    def _construir(self) -> None:
-        z_b, s_b, q_b = _partir3(self._data)
-        if _es_hoja(self._data, self._prof):
-            self._z = _sha(b"Z|" + z_b)
-            self._s = _sha(b"S|" + s_b)
-            self._q = _sha(b"Q|" + q_b)
+        z_b, s_b, q_b = _partir3(data)
+        if len(data) <= HOJA_MAX_BYTES or depth >= PROFUNDIDAD_MAX:
+            self.z = _sha(b"Z|" + z_b)
+            self.s = _sha(b"S|" + s_b)
+            self.q = _sha(b"Q|" + q_b)
         else:
-            self._hijo_z = NodoZSQ(z_b, self._prof + 1)
-            self._hijo_s = NodoZSQ(s_b, self._prof + 1)
-            self._hijo_q = NodoZSQ(q_b, self._prof + 1)
-            self._z = self._hijo_z.compromiso
-            self._s = self._hijo_s.compromiso
-            self._q = self._hijo_q.compromiso
-        self._c = _sha(
+            self._hijo_z = NodoZSQ(
+                z_b,
+                artifact_id=artifact_id,
+                authority_id=authority_id,
+                role="Z",
+                path=f"{path}/Z",
+                parent_id=self.id,
+                depth=depth + 1,
+            )
+            self._hijo_s = NodoZSQ(
+                s_b,
+                artifact_id=artifact_id,
+                authority_id=authority_id,
+                role="S",
+                path=f"{path}/S",
+                parent_id=self.id,
+                depth=depth + 1,
+            )
+            self._hijo_q = NodoZSQ(
+                q_b,
+                artifact_id=artifact_id,
+                authority_id=authority_id,
+                role="Q",
+                path=f"{path}/Q",
+                parent_id=self.id,
+                depth=depth + 1,
+            )
+            self.z = self._hijo_z.digest
+            self.s = self._hijo_s.digest
+            self.q = self._hijo_q.digest
+
+        self.digest = _sha(
             b"N|"
-            + self._z.encode("ascii")
+            + self.z.encode("ascii")
             + b"|"
-            + self._s.encode("ascii")
+            + self.s.encode("ascii")
             + b"|"
-            + self._q.encode("ascii")
+            + self.q.encode("ascii")
         )
 
-    # --- API de solo lectura ---
-
-    @property
-    def z(self) -> str:
-        return self._z
-
-    @property
-    def s(self) -> str:
-        return self._s
-
-    @property
-    def q(self) -> str:
-        return self._q
-
-    @property
-    def compromiso(self) -> str:
-        return self._c
-
-    @property
-    def es_hoja(self) -> bool:
-        return self._hijo_z is None
-
-    @property
-    def n_bytes(self) -> int:
-        return len(self._data)
+    def ficha(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "parent_id": self.parent_id,
+            "role": self.role,
+            "depth": self.depth,
+            "path": self.path,
+            "digest": self.digest,
+            "z": self.z,
+            "s": self.s,
+            "q": self.q,
+            "authority_id": self.authority_id,
+            "artifact_id": self.artifact_id,
+        }
 
     def snapshot(self) -> Dict[str, Any]:
-        out: Dict[str, Any] = {
-            "z": self._z,
-            "s": self._s,
-            "q": self._q,
-            "compromiso": self._c,
-            "n_bytes": len(self._data),
-            "profundidad": self._prof,
-            "hoja": self.es_hoja,
-        }
-        if not self.es_hoja:
+        out = self.ficha()
+        if self._hijo_z is not None:
             out["hijos"] = {
-                "Z": self._hijo_z.snapshot() if self._hijo_z else None,
+                "Z": self._hijo_z.snapshot(),
                 "S": self._hijo_s.snapshot() if self._hijo_s else None,
                 "Q": self._hijo_q.snapshot() if self._hijo_q else None,
             }
         return out
 
 
-def construir_raiz(datos: bytes) -> Dict[str, Any]:
-    """
-    DATOS → NodoZSQ → {root, Z, S, Q, arbol}.
-    Frontera de tipo: datos debe ser bytes.
-    """
+def construir_arbol(
+    datos: bytes,
+    *,
+    artifact_id: str = "",
+    authority_id: str = "",
+) -> Dict[str, Any]:
     if not _es_bytes(datos):
         return _rechazo("CÓDIGO_INVÁLIDO", error="datos no bytes")
     try:
-        nodo = NodoZSQ(bytes(datos), 0)
-    except (TypeError, ValueError, OverflowError) as e:
+        root = NodoZSQ(
+            bytes(datos),
+            artifact_id=artifact_id,
+            authority_id=authority_id,
+            role="ROOT",
+            path="ROOT",
+            parent_id="",
+            depth=0,
+        )
+    except (TypeError, ValueError) as e:
         return _rechazo("CÓDIGO_INVÁLIDO", error=str(e))
     return {
         "ok": True,
-        "root": nodo.compromiso,
-        "Z": nodo.z,
-        "S": nodo.s,
-        "Q": nodo.q,
-        "n_bytes": nodo.n_bytes,
-        "arbol": nodo.snapshot(),
+        "root_digest": root.digest,
+        "nucleo_id": root.id,
+        "Z": root.z,
+        "S": root.s,
+        "Q": root.q,
+        "ficha": root.ficha(),
+        "arbol": root.snapshot(),
         "conceptos": [],
     }
 
 
-def verificar_raiz(datos: bytes, root: str, Z: str, S: str, Q: str) -> Dict[str, Any]:
-    """
-    Reconstruye el árbol desde datos y exige igualdad exacta de root/Z/S/Q.
-    Cualquier byte distinto → diverge.
-    """
-    if not _es_bytes(datos):
-        return _rechazo("CÓDIGO_INVÁLIDO", error="datos no bytes")
-    for nombre, val in (("root", root), ("Z", Z), ("S", S), ("Q", Q)):
-        if not _es_hex64(val):
-            return _rechazo("CÓDIGO_INVÁLIDO", error=f"{nombre} no hex64")
-
-    calc = construir_raiz(datos)
-    if not calc.get("ok"):
-        return calc
-
-    if not hmac.compare_digest(calc["root"], root):
-        return _rechazo(
-            "INTEGRIDAD_COMPROMETIDA",
-            "ALTERACIÓN",
-            error="root diverge",
-            root_real=calc["root"],
-            root_declarado=root,
-        )
-    if not (
-        hmac.compare_digest(calc["Z"], Z)
-        and hmac.compare_digest(calc["S"], S)
-        and hmac.compare_digest(calc["Q"], Q)
-    ):
-        return _rechazo(
-            "INTEGRIDAD_COMPROMETIDA",
-            "ALTERACIÓN",
-            error="ramas Z/S/Q divergen",
-        )
-    return {
-        "ok": True,
-        "root": calc["root"],
-        "Z": calc["Z"],
-        "S": calc["S"],
-        "Q": calc["Q"],
-        "arbol": calc["arbol"],
-        "conceptos": [],
-    }
-
-
-# ===============================================================
-# COMPATIBILIDAD: nucleo / canales / z_invariante
-# (derivados de la misma regla, no un sistema paralelo)
-# ===============================================================
+# ---------------------------------------------------------------
+# INTEGRIDAD CONTRACTUAL (nombres públicos)
+# ---------------------------------------------------------------
 
 def nucleo(datos: bytes) -> str:
-    """Identidad criptográfica del artefacto = ROOT del árbol ZSQ."""
-    r = construir_raiz(datos)
-    if not r.get("ok"):
-        raise TypeError(r.get("error", "nucleo"))
-    return r["root"]
+    """Digest contractual del artefacto = SHA-256(datos). Entidad: nucleo."""
+    if not _es_bytes(datos):
+        raise TypeError("datos debe ser bytes")
+    return hashlib.sha256(bytes(datos)).hexdigest()
 
 
 def nucleo_digest(datos: bytes) -> bytes:
-    return bytes.fromhex(nucleo(datos))
+    if not _es_bytes(datos):
+        raise TypeError("datos debe ser bytes")
+    return hashlib.sha256(bytes(datos)).digest()
 
 
 def canales(datos: bytes) -> Tuple[str, str]:
-    """S y Q de la raíz del árbol (ramas estructurales)."""
-    r = construir_raiz(datos)
-    if not r.get("ok"):
-        raise TypeError(r.get("error", "canales"))
-    return r["S"], r["Q"]
-
-
-def z_invariante(datos: bytes, k: int = 8) -> Dict[str, Any]:
-    """
-    Evidencia: Z de la raíz + profundidad efectiva.
-    k se ignora como parámetro de fragmentación fija (la partición es ternaria recursiva).
-    """
     if not _es_bytes(datos):
-        return _rechazo("CÓDIGO_INVÁLIDO", error="datos no bytes", z=None, valuaciones=[])
-    r = construir_raiz(datos)
-    if not r.get("ok"):
-        return _rechazo("CÓDIGO_INVÁLIDO", error=r.get("error", "z"), z=None, valuaciones=[])
-    # valuaciones: compromisos de las tres ramas (evidencia, no autoridad extra)
-    return {
-        "ok": True,
-        "z": r["Z"],
-        "valuaciones": [r["Z"], r["S"], r["Q"]],
-        "root": r["root"],
-        "conceptos": [],
-    }
-
-
-def comparar_z(z_a: Any, z_b: Any) -> Dict[str, Any]:
-    if not _es_str(z_a) or not _es_str(z_b):
-        # también acepta int legacy
-        if not (_es_int(z_a) and _es_int(z_b)):
-            return _rechazo("CÓDIGO_INVÁLIDO", error="z tipo inválido")
-        return {"ok": True, "igual": z_a == z_b, "conceptos": []}
-    return {"ok": True, "igual": hmac.compare_digest(z_a, z_b), "conceptos": []}
+        raise TypeError("datos debe ser bytes")
+    datos = bytes(datos)
+    mid = len(datos) // 2
+    return (
+        hashlib.sha256(datos[:mid]).hexdigest(),
+        hashlib.sha256(datos[mid:]).hexdigest(),
+    )
 
 
 def _fragmentos(datos: bytes, k: int = 8) -> List[bytes]:
-    """
-    Compatibilidad residual. La partición canónica es ternaria recursiva (_partir3).
-    Esta función solo se conserva para callers antiguos; no define la invariante.
-    """
     if not _es_bytes(datos):
         raise TypeError("datos debe ser bytes")
     if not _es_int(k) or k < 1:
@@ -462,9 +442,41 @@ def _fragmentos(datos: bytes, k: int = 8) -> List[bytes]:
     return out
 
 
-# ===============================================================
-# IDENTIDAD NEUTRA
-# ===============================================================
+def z_invariante(datos: bytes, k: int = 8) -> Dict[str, Any]:
+    if not _es_bytes(datos):
+        return _rechazo("CÓDIGO_INVÁLIDO", error="datos no bytes", z=None, valuaciones=[])
+    try:
+        frags = _fragmentos(bytes(datos), k=k)
+    except (TypeError, ValueError) as e:
+        return _rechazo("CÓDIGO_INVÁLIDO", error=str(e), z=None, valuaciones=[])
+    vals: List[int] = []
+    for f in frags:
+        h = hashlib.sha256(f).digest()
+        z = 0
+        for b in h:
+            if b == 0:
+                z += 8
+            else:
+                z += 8 - b.bit_length()
+                break
+        vals.append(z)
+    return {
+        "ok": True,
+        "z": min(vals) if vals else 0,
+        "valuaciones": vals,
+        "conceptos": [],
+    }
+
+
+def comparar_z(z_a: Any, z_b: Any) -> Dict[str, Any]:
+    if not _es_int(z_a) or not _es_int(z_b):
+        return _rechazo("CÓDIGO_INVÁLIDO", error="z no int")
+    return {"ok": True, "igual": z_a == z_b, "conceptos": []}
+
+
+# ---------------------------------------------------------------
+# NEUTRO
+# ---------------------------------------------------------------
 
 MARCA_NEUTRA = b"\n#VPSI-NEUTRO:"
 
@@ -499,9 +511,9 @@ def verificar_neutro(datos: bytes, n: int = 3) -> Dict[str, Any]:
     return {"ok": ok, "n": n, "conceptos": [] if ok else ["CÓDIGO_INVÁLIDO"]}
 
 
-# ===============================================================
+# ---------------------------------------------------------------
 # Ed25519
-# ===============================================================
+# ---------------------------------------------------------------
 
 def generar_claves(ruta_priv: str, ruta_pub: str) -> Dict[str, Any]:
     if not _es_str(ruta_priv) or not _es_str(ruta_pub):
@@ -573,9 +585,9 @@ def verificar_firma(
     return verificar_bytes(datos, firma_hex, pub_bytes=pub_bytes)
 
 
-# ===============================================================
-# ESQUEMA DEL CUERPO
-# ===============================================================
+# ---------------------------------------------------------------
+# ESQUEMA / CUERPO
+# ---------------------------------------------------------------
 
 def _validar_cuerpo_esquema(
     cuerpo: Any,
@@ -611,7 +623,7 @@ def _validar_cuerpo_esquema(
     if cuerpo["algoritmo_firma"] != ALGORITMO_FIRMA:
         return _rechazo("CÓDIGO_INVÁLIDO", error="algoritmo_firma")
 
-    for campo in ("root", "Z", "S", "Q"):
+    for campo in ("nucleo", "S", "Q"):
         if not _es_hex64(cuerpo[campo]):
             return _rechazo("CÓDIGO_INVÁLIDO", error=f"{campo} no hex64")
 
@@ -619,6 +631,11 @@ def _validar_cuerpo_esquema(
         return _rechazo("CÓDIGO_INVÁLIDO", error="n_bytes")
     if not _es_int(cuerpo["n_neutro"]) or cuerpo["n_neutro"] < 2:
         return _rechazo("CÓDIGO_INVÁLIDO", error="n_neutro")
+
+    vals = cuerpo["valuaciones"]
+    if type(vals) is not list or not all(_es_int(x) for x in vals):
+        return _rechazo("CÓDIGO_INVÁLIDO", error="valuaciones")
+
     if not _es_bool(cuerpo["identidad_neutra"]):
         return _rechazo("CÓDIGO_INVÁLIDO", error="identidad_neutra")
 
@@ -644,11 +661,16 @@ def construir_cuerpo(
         return _rechazo("CÓDIGO_INVÁLIDO", error="ids no str")
 
     datos = bytes(datos)
-    raiz = construir_raiz(datos)
-    if not raiz.get("ok"):
-        return raiz
-
+    s_chan, q_chan = canales(datos)
+    zinfo = z_invariante(datos)
+    if not zinfo.get("ok"):
+        return _rechazo("CÓDIGO_INVÁLIDO", error="z")
     neutro = verificar_neutro(datos, n=n_neutro)
+
+    # genealogía (depositable como evidencia de pasos; no sustituye nucleo)
+    arbol = construir_arbol(
+        datos, artifact_id=artifact_id, authority_id=clave_publica_id
+    )
 
     cuerpo: Dict[str, Any] = {
         "esquema": ESQUEMA_MANIFIESTO,
@@ -662,13 +684,13 @@ def construir_cuerpo(
         "clave_publica_id": clave_publica_id,
         "algoritmo_hash": ALGORITMO_HASH,
         "algoritmo_firma": ALGORITMO_FIRMA,
+        "nucleo": nucleo(datos),
+        "S": s_chan,
+        "Q": q_chan,
         "n_bytes": len(datos),
         "n_neutro": n_neutro,
+        "valuaciones": zinfo["valuaciones"],
         "identidad_neutra": bool(neutro.get("ok")),
-        "root": raiz["root"],
-        "Z": raiz["Z"],
-        "S": raiz["S"],
-        "Q": raiz["Q"],
     }
 
     val = _validar_cuerpo_esquema(cuerpo, version_minima=1)
@@ -677,7 +699,7 @@ def construir_cuerpo(
     return {
         "ok": True,
         "cuerpo": cuerpo,
-        "arbol": raiz["arbol"],
+        "genealogia": arbol if arbol.get("ok") else None,
         "conceptos": [],
     }
 
@@ -692,9 +714,9 @@ def construir_manifiesto(cuerpo: Dict[str, Any], firma_hex: str) -> Dict[str, An
     }
 
 
-# ===============================================================
+# ---------------------------------------------------------------
 # VERIFICAR MANIFIESTO
-# ===============================================================
+# ---------------------------------------------------------------
 
 def verificar_manifiesto(
     manifiesto: Any,
@@ -739,18 +761,13 @@ def verificar_manifiesto(
     sem = _validar_cuerpo_esquema(cuerpo, version_minima=version_minima)
     if not sem.get("ok"):
         return sem
-    cuerpo = sem["cuerpo"]
 
-    return {
-        "ok": True,
-        "cuerpo": cuerpo,
-        "conceptos": [],
-    }
+    return {"ok": True, "cuerpo": sem["cuerpo"], "conceptos": []}
 
 
-# ===============================================================
+# ---------------------------------------------------------------
 # BUILD
-# ===============================================================
+# ---------------------------------------------------------------
 
 def build(
     datos: bytes,
@@ -795,9 +812,8 @@ def build(
             error=ser.get("error", "canónico"),
             fallos=["canonicalización"],
         )
-    canonico = ser["bytes"]
 
-    firma = firmar_bytes(canonico, ruta_priv)
+    firma = firmar_bytes(ser["bytes"], ruta_priv)
     if not firma.get("ok"):
         return _rechazo("CÓDIGO_INVÁLIDO", error=firma.get("error", "firma"), fallos=["firma"])
 
@@ -822,19 +838,14 @@ def build(
         "ok": True,
         "datos": datos_s,
         "manifiesto": man,
-        "arbol": cb.get("arbol"),
+        "genealogia": cb.get("genealogia"),
         "conceptos": [],
     }
 
 
-# ===============================================================
-# RUNTIME verificar()
-# ===============================================================
-#
-# UNA pregunta estructural:
-#   ¿Los datos reconstruyen exactamente root/Z/S/Q del cuerpo
-#    y ese cuerpo está autorizado por Ed25519?
-#
+# ---------------------------------------------------------------
+# RUNTIME verificar()  — diagnóstico por entidad
+# ---------------------------------------------------------------
 
 def verificar(
     datos: Any,
@@ -868,7 +879,6 @@ def verificar(
 
     cuerpo: Optional[Dict[str, Any]] = None
 
-    # --- autoridad del manifiesto ---
     if modo == MODO_PROTEGIDO:
         if manifiesto is None:
             return {
@@ -913,15 +923,16 @@ def verificar(
         else:
             pasos["manifiesto"] = {"ok": None, "nota": "ausente en diagnóstico"}
 
-    # --- referencias: cuerpo firmado manda en PROTEGIDO ---
     if cuerpo is not None:
-        root_ref = cuerpo["root"]
-        z_ref = cuerpo["Z"]
+        nucleo_ref = cuerpo["nucleo"]
         s_ref = cuerpo["S"]
         q_ref = cuerpo["Q"]
         n_bytes_ref = cuerpo["n_bytes"]
         n_uso = cuerpo["n_neutro"]
+        vals_ref = cuerpo["valuaciones"]
         neutro_ref = cuerpo["identidad_neutra"]
+        artifact_id = cuerpo["artifact_id"]
+        authority_id = cuerpo["clave_publica_id"]
     else:
         if n_neutro is not None and (not _es_int(n_neutro) or n_neutro < 2):
             return {
@@ -931,39 +942,49 @@ def verificar(
                 "pasos": pasos,
             }
         n_uso = n_neutro if _es_int(n_neutro) else 3
-        root_ref = nucleo_esperado if _es_hex64(nucleo_esperado) else None
-        z_ref = None
+        nucleo_ref = nucleo_esperado if _es_hex64(nucleo_esperado) else None
         s_ref = S_esperado if _es_hex64(S_esperado) else None
         q_ref = Q_esperado if _es_hex64(Q_esperado) else None
         n_bytes_ref = None
+        vals_ref = None
         neutro_ref = None
+        artifact_id = ""
+        authority_id = ""
 
-    # --- UNA pregunta: datos → árbol ¿coincide con root/Z/S/Q autorizados? ---
-    if root_ref is not None and z_ref is not None and s_ref is not None and q_ref is not None:
-        vr = verificar_raiz(datos, root_ref, z_ref, s_ref, q_ref)
-        pasos["zsq"] = {
-            "ok": bool(vr.get("ok")),
-            "root": vr.get("root_real", vr.get("root")),
-            "error": vr.get("error"),
+    # --- entidad NÚCLEO ---
+    h = nucleo(datos)
+    if nucleo_ref is not None:
+        ok_n = hmac.compare_digest(h, nucleo_ref)
+        pasos["nucleo"] = {
+            "ok": ok_n,
+            "real": h,
+            "esperado": nucleo_ref,
+            "id": node_id(artifact_id, "ROOT") if artifact_id else None,
+            "authority_id": authority_id or None,
         }
-        if not vr.get("ok"):
-            fallos.append("zsq")
-            conceptos.extend(vr.get("conceptos") or ["INTEGRIDAD_COMPROMETIDA"])
+        if not ok_n:
+            fallos.append("nucleo")
+            conceptos.append("INTEGRIDAD_COMPROMETIDA")
     else:
-        # diagnóstico parcial
-        calc = construir_raiz(datos)
-        pasos["zsq"] = {
-            "ok": None,
-            "root": calc.get("root"),
-            "Z": calc.get("Z"),
-            "S": calc.get("S"),
-            "Q": calc.get("Q"),
+        pasos["nucleo"] = {"ok": None, "real": h}
+
+    # --- entidades S / Q (canales) ---
+    s_real, q_real = canales(datos)
+    if s_ref is not None and q_ref is not None:
+        ok_c = hmac.compare_digest(s_real, s_ref) and hmac.compare_digest(q_real, q_ref)
+        pasos["canales"] = {
+            "ok": ok_c,
+            "S": s_real,
+            "Q": q_real,
+            "S_id": node_id(artifact_id, "ROOT/S") if artifact_id else None,
+            "Q_id": node_id(artifact_id, "ROOT/Q") if artifact_id else None,
         }
-        if root_ref is not None and calc.get("ok"):
-            if not hmac.compare_digest(calc["root"], root_ref):
-                fallos.append("root")
+        if not ok_c:
+            fallos.append("canales")
+            if "INTEGRIDAD_COMPROMETIDA" not in conceptos:
                 conceptos.append("INTEGRIDAD_COMPROMETIDA")
-                pasos["zsq"]["ok"] = False
+    else:
+        pasos["canales"] = {"ok": None, "S": s_real, "Q": q_real}
 
     if n_bytes_ref is not None and n_bytes_ref != len(datos):
         fallos.append("n_bytes")
@@ -975,25 +996,31 @@ def verificar(
             "real": len(datos),
         }
 
-    # neutro: si el cuerpo lo declara, debe coincidir
+    # --- evidencia Z (no autoridad; no entra en fallos) ---
+    zinfo = z_invariante(datos)
+    pasos["z"] = {
+        "ok": True,
+        "z": zinfo.get("z"),
+        "valuaciones": zinfo.get("valuaciones"),
+        "coherente_con_cuerpo": (
+            zinfo.get("valuaciones") == vals_ref if vals_ref is not None else None
+        ),
+    }
+
     neutro = verificar_neutro(datos, n=n_uso)
-    coherente_neutro = (
-        bool(neutro.get("ok")) == bool(neutro_ref) if neutro_ref is not None else None
-    )
     pasos["identidad_neutra"] = {
         "ok": bool(neutro.get("ok")),
         "n": n_uso,
-        "coherente_con_cuerpo": coherente_neutro,
+        "coherente_con_cuerpo": (
+            bool(neutro.get("ok")) == bool(neutro_ref) if neutro_ref is not None else None
+        ),
     }
-    if coherente_neutro is False:
-        fallos.append("identidad_neutra")
-        conceptos.append("INTEGRIDAD_COMPROMETIDA")
 
-    # --- veredicto ---
     if modo == MODO_PROTEGIDO:
         ok = (
             pasos.get("manifiesto", {}).get("ok") is True
-            and pasos.get("zsq", {}).get("ok") is True
+            and pasos.get("nucleo", {}).get("ok") is True
+            and pasos.get("canales", {}).get("ok") is True
             and len(fallos) == 0
         )
     else:
@@ -1007,9 +1034,9 @@ def verificar(
     }
 
 
-# ===============================================================
+# ---------------------------------------------------------------
 # EXPORTS
-# ===============================================================
+# ---------------------------------------------------------------
 
 __all__ = [
     "SEGURIDAD",
@@ -1017,8 +1044,8 @@ __all__ = [
     "MODO_PROTEGIDO",
     "MODO_DIAGNOSTICO",
     "NodoZSQ",
-    "construir_raiz",
-    "verificar_raiz",
+    "node_id",
+    "construir_arbol",
     "nucleo",
     "nucleo_digest",
     "canales",

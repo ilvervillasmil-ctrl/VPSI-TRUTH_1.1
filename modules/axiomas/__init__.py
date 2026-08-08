@@ -259,20 +259,6 @@ CONTENEDOR: Dict[str, Any] = {
     # ----- DEPENDENCIAS -----
     "requiere": [],
 
-    # ----- AUTORIZACIÓN AL ENGINE -----
-    "autoriza_engine": {
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-        "modificar": False,
-        "alterar": False,
-        "reescribir": False,
-    },
-
     # ----- CONSULTAS SOPORTADAS -----
     "consultas_soportadas": [
         "buscar_por_id",
@@ -372,42 +358,64 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
+    # ----- AUTORIZACIÓN AL ENGINE (UN SOLO BLOQUE) -----
     "autoriza_engine": {
-    # --- PERMISOS BASE ---
-    "leer": True,
-    "ejecutar": True,
-    "consultar": True,
-    "recombinar": True,
-    "reportar": True,
-    "auditar": True,
-    "inventariar": True,
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
 
-    # --- PERMISOS DE ESCRITURA ---
-    "modificar": False,
-    "crear": True,
-    "eliminar": False,
+        # --- PERMISOS DE ESCRITURA ---
+        "modificar": False,
+        "alterar": False,
+        "reescribir": False,
+        "crear": True,
+        "eliminar": False,
+        "actualizar": False,
 
-    # --- PERMISOS DE PROCESAMIENTO ---
-    "validar": True,
-    "procesar": True,
-    "analizar": True,
-    "generar": True,
-    "transformar": False,
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        "transformar": False,
 
-    # --- PERMISOS DE DATOS ---
-    "exportar": True,
-    "importar": True,
-    "respaldar": True,
-    "recuperar": True,
-    "sincronizar": True,
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
 
-    # --- PERMISOS DE MONITOREO ---
-    "monitorear": True,
-    "alertar": True,
-    "metricas": True,
-    "diagnostico": True,
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
 
-    # --- REPORTING (agrupado) ---
+        # --- REPORTING ---
+        "reporting": {
+            "estado": True,
+            "salud": True,
+            "inventario": True,
+            "capacidades": True,
+            "errores": True,
+            "advertencias": True,
+            "dependencias": True,
+            "version": True,
+            "contrato": True,
+            "conocimiento": True,
+            "metricas": True,
+            "diagnostico": True,
+            "reporte": True,
+        },
+    },
+
+    # ----- REPORTING (NECESARIO PARA EL CONTRATO) -----
     "reporting": {
         "estado": True,
         "salud": True,
@@ -423,7 +431,7 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
         "reporte": True,
     },
-},
+}  # <--- CIERRE FINAL (sin coma)
 
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),

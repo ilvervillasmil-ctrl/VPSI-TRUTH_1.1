@@ -1,15 +1,21 @@
 """
-VPSI-TRUTH — modules/diagnostics/__init__.py
+VPSI-TRUTH --- modules/diagnostics/__init__.py
 
-Rol: DG — Diagnóstico / Omega Report.
+Rol DGS: diagnóstico sistémico / Omega Report.
 
-Este módulo NO calcula Tru.
-Este módulo NO recalcula C, L, K, Tru_Ri ni Tru_total.
-Este módulo NO orquesta el Engine.
-Este módulo recibe y presenta información ya producida por el sistema.
+Este módulo es reconocido directamente por el Engine como DGS.
 
-Contrato:
-    VPSI-CONTRACT-1.0
+No calcula Tru.
+No recalcula C, L, K, Tru_Ri ni Tru_total.
+No ejecuta módulos de dominio.
+No modifica el estado del Engine.
+No altera contratos.
+No reconstruye evidencia.
+
+Recibe información ya producida por el Engine y por los módulos,
+valida su integridad estructural y genera el Omega Report.
+
+La persistencia de evidencia corresponde a diagnostics/evidencia.py.
 """
 
 from __future__ import annotations
@@ -21,71 +27,74 @@ from typing import Any, Dict, List, Optional
 
 
 # ===============================================================
-# CONTRATO VPSI-CONTRACT-1.0
+# CONTENEDOR — CONTRATO VPSI
 # ===============================================================
 
-CONTRATO: Dict[str, Any] = {
+CONTENEDOR: Dict[str, Any] = {
+    "nombre": "diagnostics",
+    "rol": "DG",
+
+    # -----------------------------------------------------------
+    # IDENTIDAD CONTRACTUAL
+    # -----------------------------------------------------------
     "esquema": "VPSI-CONTRACT-1.0",
     "version_contrato": "1.0",
     "version_modulo": "1.1",
+    "id": "DGS",
 
-    "id": "diagnostics",
-
+    # -----------------------------------------------------------
+    # FUNCIÓN
+    # -----------------------------------------------------------
     "funcion": (
-        "Recibir, validar y presentar información diagnóstica "
-        "producida previamente por el Engine y los módulos."
+        "Diagnóstico sistémico y generación del Omega Report "
+        "a partir de información real producida por el Engine "
+        "y los módulos del sistema."
     ),
 
+    # -----------------------------------------------------------
+    # LÍMITES
+    # -----------------------------------------------------------
     "no_hace": [
-        "No calcula C.",
-        "No calcula L.",
-        "No calcula K.",
-        "No calcula Tru_Ri.",
-        "No calcula Tru_total.",
-        "No recalcula axiomas.",
-        "No recalcula mecánica.",
-        "No altera estados del Engine.",
-        "No modifica contadores.",
-        "No escribe evidencia persistente.",
-        "No sustituye al Centinela.",
-        "No sustituye al Omega.",
+        "No calcula Tru.",
+        "No recalcula C, L, K, Tru_Ri ni Tru_total.",
+        "No vuelve a barrer axiomas.",
+        "No ejecuta mecánica de dominio.",
+        "No modifica el estado del Engine.",
+        "No modifica contratos de otros módulos.",
+        "No reconstruye registros de evidencia.",
+        "No elimina claves de los registros recibidos.",
+        "No decide por sí mismo la validez del sistema.",
     ],
 
-    "autoridad": {
-        "nivel": "DG",
-        "fuente": "Engine",
-        "alcance": "diagnostico_presentacion",
+    # -----------------------------------------------------------
+    # AUTORIDAD
+    # -----------------------------------------------------------
+    "autoridad": "DG",
+
+    "conocimiento_exportable": {
+        "reportes": True,
+        "evidencia": True,
+        "diagnostico": True,
         "solo_lectura": True,
     },
 
-    "conocimiento_exportable": {
-        "tipo": "diagnostico",
-        "exporta": [
-            "estado_engine",
-            "constantes",
-            "informe_axiomas",
-            "resultados_evaluacion",
-            "informe_formulas",
-            "informe_mecanica",
-            "informe_self",
-            "errores_arranque",
-            "registro_modulos",
-            "tests",
-            "contratos",
-            "citacion",
-            "taxonomia",
-            "evidencia_persistente",
-        ],
-    },
-
+    # -----------------------------------------------------------
+    # AUTORIZACIÓN DEL ENGINE
+    # -----------------------------------------------------------
     "autoriza_engine": {
-        "lectura": True,
-        "escritura": False,
-        "mutacion_estado": False,
-        "orquestacion": False,
-        "ejecucion_negocio": False,
+        "registrar": True,
+        "consultar": True,
+        "reportar": True,
+        "generar_reporte": True,
+        "ejecutar": False,
+        "modificar_estado": False,
+        "modificar_contratos": False,
+        "modificar_evidencia": False,
     },
 
+    # -----------------------------------------------------------
+    # CONSULTAS SOPORTADAS
+    # -----------------------------------------------------------
     "consultas_soportadas": [
         "verificar",
         "inventario",
@@ -94,77 +103,78 @@ CONTRATO: Dict[str, Any] = {
         "leer_evidencia",
     ],
 
+    # -----------------------------------------------------------
+    # CAPACIDADES META
+    # -----------------------------------------------------------
     "capacidades_meta": {
-        "verificar": "Verifica suficiencia estructural de una entrada.",
-        "inventario": "Expone identidad, contrato y capacidades del módulo.",
-        "generar_reporte": "Genera el Omega Report sin recalcular métricas.",
-        "validar_entrada": "Valida presencia y forma de los datos recibidos.",
-        "leer_evidencia": "Lee evidencia persistente en modo solo lectura.",
+        "observacion": True,
+        "diagnostico": True,
+        "presentacion": True,
+        "actuacion": False,
+        "mutacion_engine": False,
     },
 
+    # -----------------------------------------------------------
+    # REPORTING
+    # -----------------------------------------------------------
     "reporting": {
-        "produce": [
-            "omega_report",
-            "diagnostico_global",
-        ],
-        "formato": "dict",
+        "produce_reporte": True,
+        "nombre_reporte": "OMEGA REPORT",
         "solo_presentacion": True,
-        "recalcula_metricas": False,
+        "recalculo": False,
     },
 
+    # -----------------------------------------------------------
+    # ESTADOS
+    # -----------------------------------------------------------
     "estados_validos": [
         "OPERATIVO",
         "RECHAZADO",
         "NO_INICIADO",
     ],
 
+    # -----------------------------------------------------------
+    # INVARIANTES
+    # -----------------------------------------------------------
     "invariantes": [
         "No modifica el estado del Engine.",
-        "No recalcula C.",
-        "No recalcula L.",
-        "No recalcula K.",
-        "No recalcula Tru_Ri.",
-        "No recalcula Tru_total.",
-        "No modifica evaluaciones persistentes.",
-        "No sustituye la autoridad del Engine.",
-        "Los datos del reporte proceden de fuentes ya producidas.",
+        "No recalcula métricas.",
+        "No altera evidencia recibida.",
+        "No ejecuta lógica de dominio.",
+        "No modifica contratos.",
+        "Conserva la estructura de los registros recibidos.",
     ],
 
+    # -----------------------------------------------------------
+    # ESTABILIDAD
+    # -----------------------------------------------------------
     "estabilidad": {
-        "tipo": "ESTABLE",
-        "compatibilidad": "BACKWARD_COMPATIBLE",
-        "estado": "ACTIVO",
+        "inmutable": True,
+        "persistencia_externa": True,
+        "compatible": True,
     },
 
+    # -----------------------------------------------------------
+    # COMPATIBILIDAD / API
+    # -----------------------------------------------------------
     "compatible_desde": "1.0",
+    "api_engine": "1.0",
 
-    "api_engine": [
-        "verificar",
-        "inventario",
-        "generar_reporte",
-        "validar_entrada",
-        "leer_evidencia",
-    ],
-}
-
-
-# ===============================================================
-# CONTENEDOR
-# ===============================================================
-
-CONTENEDOR: Dict[str, Any] = {
-    "nombre": "diagnostics",
-    "rol": "DG",
-    "version": "1.1",
+    # -----------------------------------------------------------
+    # DEPENDENCIAS
+    # -----------------------------------------------------------
     "requiere": ["CT", "AX", "FO"],
+
     "descripcion": (
-        "Contenedor de diagnóstico. Rol DG. "
-        "Recibe los informes reales producidos por el Engine y los módulos "
-        "y genera el Omega Report sin recalcular nada. "
-        "Lee evidencia persistente si existe; no la escribe."
+        "Contenedor de diagnóstico sistémico DGS. "
+        "Recibe los informes reales producidos por el Engine "
+        "y los módulos y genera el Omega Report sin recalcular "
+        "ninguna métrica. Puede leer evidencia persistente, "
+        "pero no la modifica directamente."
     ),
+
+    # Se rellenan al final con callables reales.
     "capacidades": {},
-    "contrato": CONTRATO,
 }
 
 
@@ -183,7 +193,7 @@ class EntradaIncompletaError(DiagnosticoError):
 
 
 # ===============================================================
-# DATOS EXIGIDOS AL ENGINE
+# DATOS OBLIGATORIOS DEL ENGINE
 # ===============================================================
 
 CAMPOS_OBLIGATORIOS = (
@@ -214,9 +224,10 @@ def validar_entrada(datos: Dict[str, Any]) -> List[str]:
     """
     Verifica que el Engine haya pasado la información mínima real.
 
-    No calcula ninguna métrica.
+    No calcula.
+    No modifica.
+    Solo valida presencia y estructura.
     """
-
     faltas: List[str] = []
 
     if not isinstance(datos, dict):
@@ -229,32 +240,35 @@ def validar_entrada(datos: Dict[str, Any]) -> List[str]:
             )
 
     if "constantes" in datos:
-        constantes = datos["constantes"]
+        c = datos["constantes"]
 
-        if (
-            not isinstance(constantes, dict)
-            or "ALPHA" not in constantes
-            or "BETA" not in constantes
-        ):
+        if not isinstance(c, dict):
+            faltas.append(
+                "constantes debe ser dict"
+            )
+        elif "ALPHA" not in c or "BETA" not in c:
             faltas.append(
                 "constantes debe contener ALPHA y BETA"
             )
 
     if "informe_axiomas" in datos:
-        informe_axiomas = datos["informe_axiomas"]
+        ia = datos["informe_axiomas"]
 
-        if not isinstance(informe_axiomas, dict):
+        if not isinstance(ia, dict):
             faltas.append(
                 "informe_axiomas debe ser dict"
             )
-
-        elif "coherente" not in informe_axiomas:
+        elif "coherente" not in ia:
             faltas.append(
                 "informe_axiomas sin clave 'coherente'"
             )
 
     if "estado_engine" in datos:
-        if datos["estado_engine"] not in ESTADOS_VALIDOS:
+        if datos["estado_engine"] not in (
+            "OPERATIVO",
+            "RECHAZADO",
+            "NO_INICIADO",
+        ):
             faltas.append(
                 "estado_engine invalido: {0}".format(
                     datos["estado_engine"]
@@ -262,10 +276,7 @@ def validar_entrada(datos: Dict[str, Any]) -> List[str]:
             )
 
     if "resultados_evaluacion" in datos:
-        if not isinstance(
-            datos["resultados_evaluacion"],
-            list,
-        ):
+        if not isinstance(datos["resultados_evaluacion"], list):
             faltas.append(
                 "resultados_evaluacion debe ser list"
             )
@@ -279,35 +290,27 @@ def validar_entrada(datos: Dict[str, Any]) -> List[str]:
 
 def _ruta_evaluaciones() -> Path:
     """
+    diagnostics/ en la raíz del repositorio.
+
     modules/diagnostics/__init__.py
-    parents[2] = raíz del repositorio.
+        parents[2]
+            -> raíz del repo
 
-    La evidencia está en:
-        diagnostics/evaluaciones.json
-
-    No es:
-        modules/diagnostics/evaluaciones.json
+    Por tanto:
+        raíz/diagnostics/evaluaciones.json
     """
-
     raiz = Path(__file__).resolve().parents[2]
-
-    return (
-        raiz
-        / "diagnostics"
-        / "evaluaciones.json"
-    )
+    return raiz / "diagnostics" / "evaluaciones.json"
 
 
 def leer_evidencia() -> Dict[str, Any]:
     """
-    Lee diagnostics/evaluaciones.json.
+    Lee diagnostics/evaluaciones.json si existe.
 
-    Solo lectura.
     No escribe.
+    No modifica.
     No fusiona.
-    No recalcula.
     """
-
     vacio: Dict[str, Any] = {
         "tipo": "evidencia_evaluacion",
         "version": None,
@@ -324,20 +327,15 @@ def leer_evidencia() -> Dict[str, Any]:
 
     try:
         doc = json.loads(
-            ruta.read_text(
-                encoding="utf-8"
-            )
+            ruta.read_text(encoding="utf-8")
         )
     except Exception:
         return vacio
 
-    if (
-        not isinstance(doc, dict)
-        or not isinstance(
-            doc.get("resultados"),
-            list,
-        )
-    ):
+    if not isinstance(doc, dict):
+        return vacio
+
+    if not isinstance(doc.get("resultados"), list):
         return vacio
 
     return doc
@@ -347,10 +345,13 @@ def leer_evidencia() -> Dict[str, Any]:
 # EXTRACCIÓN DE FACTORES
 # ===============================================================
 
-def _extraer_factores(
-    entrada: Any,
-) -> Dict[str, Any]:
+def _extraer_factores(entrada: Any) -> Dict[str, Any]:
+    """
+    Normaliza una fila de evaluación.
 
+    No calcula ningún valor.
+    Solo lee claves ya existentes.
+    """
     if not isinstance(entrada, dict):
         return {
             "C": None,
@@ -363,28 +364,19 @@ def _extraer_factores(
             "citas": None,
         }
 
-    resultado = entrada.get("resultado")
-
-    if isinstance(resultado, dict):
-        r = resultado
-    else:
-        r = entrada
+    r = (
+        entrada.get("resultado")
+        if isinstance(entrada.get("resultado"), dict)
+        else entrada
+    )
 
     def _get(*claves: str) -> Any:
+        for k in claves:
+            if k in r and r[k] is not None:
+                return r[k]
 
-        for clave in claves:
-
-            if (
-                clave in r
-                and r[clave] is not None
-            ):
-                return r[clave]
-
-            if (
-                clave in entrada
-                and entrada[clave] is not None
-            ):
-                return entrada[clave]
+            if k in entrada and entrada[k] is not None:
+                return entrada[k]
 
         return None
 
@@ -428,7 +420,11 @@ def _bloque_calculo(
     titulo: str,
     factores: Dict[str, Any],
 ) -> Dict[str, Any]:
+    """
+    Bloque de presentación.
 
+    No calcula.
+    """
     return {
         "titulo": titulo,
         "C": factores.get("C"),
@@ -447,7 +443,7 @@ def _bloque_calculo(
 
 
 # ===============================================================
-# RESUMEN
+# RESUMEN DE EVALUACIONES
 # ===============================================================
 
 def _resumen_evaluaciones(
@@ -468,48 +464,46 @@ def _resumen_evaluaciones(
             "origenes": [],
         }
 
-    origenes = sorted(
-        {
-            str(e.get("origen"))
-            for e in evaluaciones
-            if (
-                isinstance(e, dict)
-                and e.get("origen")
-            )
-        }
-    )
+    origenes = sorted({
+        str(e.get("origen"))
+        for e in evaluaciones
+        if isinstance(e, dict)
+        and e.get("origen")
+    })
 
     sistema_filas = [
         e
         for e in evaluaciones
-        if (
-            isinstance(e, dict)
-            and not str(
-                e.get("origen") or ""
-            ).startswith("test_")
-        )
+        if isinstance(e, dict)
+        and not str(
+            e.get("origen") or ""
+        ).startswith("test_")
     ]
 
     if not sistema_filas:
-        sistema_filas = [
-            evaluaciones[0]
-        ]
+        sistema_filas = (
+            [evaluaciones[0]]
+            if evaluaciones
+            else []
+        )
 
     test_filas = [
         e
         for e in evaluaciones
-        if (
-            isinstance(e, dict)
-            and str(
-                e.get("origen") or ""
-            ).startswith("test_")
-        )
+        if isinstance(e, dict)
+        and str(
+            e.get("origen") or ""
+        ).startswith("test_")
     ]
 
     ultimo = (
         test_filas[-1]
         if test_filas
-        else evaluaciones[-1]
+        else (
+            evaluaciones[-1]
+            if evaluaciones
+            else {}
+        )
     )
 
     sistema_ref = (
@@ -521,15 +515,11 @@ def _resumen_evaluaciones(
     return {
         "sistema": _bloque_calculo(
             "Auditoria del VPSI",
-            _extraer_factores(
-                sistema_ref
-            ),
+            _extraer_factores(sistema_ref),
         ),
         "ultimo_test": _bloque_calculo(
             "Ultimo test",
-            _extraer_factores(
-                ultimo
-            ),
+            _extraer_factores(ultimo),
         ),
         "n": len(evaluaciones),
         "origenes": origenes,
@@ -545,7 +535,14 @@ def generar_reporte(
     salida: Optional[Path] = None,
     incluir_evidencia: bool = True,
 ) -> Dict[str, Any]:
+    """
+    Genera el Omega Report.
 
+    No ejecuta barrer().
+    No llama a tru_ri().
+    No llama a tru_total().
+    No recalcula métricas.
+    """
     faltas = validar_entrada(datos)
 
     if faltas:
@@ -556,9 +553,7 @@ def generar_reporte(
         )
 
     evals_memoria = list(
-        datos.get(
-            "resultados_evaluacion"
-        ) or []
+        datos.get("resultados_evaluacion") or []
     )
 
     if incluir_evidencia:
@@ -571,65 +566,44 @@ def generar_reporte(
         }
 
     evals_disco = list(
-        evidencia.get(
-            "resultados"
-        ) or []
+        evidencia.get("resultados") or []
     )
 
-    todas = (
-        evals_memoria
-        + evals_disco
-    )
+    todas = evals_memoria + evals_disco
 
-    resumen = _resumen_evaluaciones(
-        todas
-    )
+    resumen = _resumen_evaluaciones(todas)
 
     reporte: Dict[str, Any] = {
-        "titulo": (
-            "OMEGA REPORT - VPSI-TRUTH"
-        ),
+        "titulo": "OMEGA REPORT - VPSI-TRUTH",
+        "version_dg": CONTENEDOR["version_modulo"],
+        "id_dg": CONTENEDOR["id"],
+        "generado": datetime.now(
+            timezone.utc
+        ).isoformat(),
 
-        "version_dg": (
-            CONTENEDOR["version"]
-        ),
+        "estado_engine": datos["estado_engine"],
 
-        "generado": (
-            datetime.now(
-                timezone.utc
-            ).isoformat()
-        ),
-
-        "estado_engine": (
-            datos["estado_engine"]
-        ),
-
-        "constantes": (
-            datos["constantes"]
-        ),
+        "constantes": datos["constantes"],
 
         "axiomas": {
-            "coherente": (
-                datos[
-                    "informe_axiomas"
-                ].get("coherente")
-            ),
-            "declaraciones": (
-                datos[
-                    "informe_axiomas"
-                ].get("declaraciones")
-            ),
+            "coherente": datos[
+                "informe_axiomas"
+            ].get("coherente"),
+
+            "declaraciones": datos[
+                "informe_axiomas"
+            ].get("declaraciones"),
+
             "choques": len(
                 datos[
                     "informe_axiomas"
-                ].get("choques")
-                or []
+                ].get("choques") or []
             ),
+
             "errores": len(
                 datos[
                     "informe_axiomas"
-                ].get("errores")
-                or []
+                ].get("errores") or []
             ),
         },
 
@@ -645,13 +619,13 @@ def generar_reporte(
             "contratos"
         ),
 
-        "calculo_sistema": (
-            resumen["sistema"]
-        ),
+        "calculo_sistema": resumen[
+            "sistema"
+        ],
 
-        "calculo_ultimo_test": (
-            resumen["ultimo_test"]
-        ),
+        "calculo_ultimo_test": resumen[
+            "ultimo_test"
+        ],
 
         "evaluaciones": {
             "n": resumen["n"],
@@ -675,23 +649,17 @@ def generar_reporte(
                 "n",
                 0,
             ),
-            "origenes": (
-                evidencia.get(
-                    "origenes"
-                )
-                or []
-            ),
+            "origenes": evidencia.get(
+                "origenes"
+            ) or [],
             "version": evidencia.get(
                 "version"
             ),
         },
 
-        "errores_arranque": (
-            datos.get(
-                "errores_arranque"
-            )
-            or []
-        ),
+        "errores_arranque": datos.get(
+            "errores_arranque"
+        ) or [],
 
         "modulos": datos.get(
             "registro_modulos"
@@ -716,9 +684,7 @@ def generar_reporte(
     }
 
     if salida is not None:
-
         salida = Path(salida)
-
         salida.parent.mkdir(
             parents=True,
             exist_ok=True,
@@ -747,28 +713,26 @@ def verificar(
 
     if datos is None:
         return {
-            "contenedor": (
-                CONTENEDOR["nombre"]
-            ),
+            "contenedor": CONTENEDOR["nombre"],
+            "id": CONTENEDOR["id"],
+            "rol": CONTENEDOR["rol"],
             "estado": "APROBADO",
             "coherente": True,
             "mensaje": (
-                "Modulo DG listo. "
-                "Esperando datos reales del Engine."
+                "DGS listo. Esperando datos reales "
+                "del Engine."
             ),
             "evidencia_disponible": (
                 _ruta_evaluaciones().exists()
             ),
         }
 
-    faltas = validar_entrada(
-        datos
-    )
+    faltas = validar_entrada(datos)
 
     return {
-        "contenedor": (
-            CONTENEDOR["nombre"]
-        ),
+        "contenedor": CONTENEDOR["nombre"],
+        "id": CONTENEDOR["id"],
+        "rol": CONTENEDOR["rol"],
         "estado": (
             "APROBADO"
             if not faltas
@@ -791,15 +755,14 @@ def inventario(
 ) -> Dict[str, Any]:
 
     return {
-        "contenedor": (
-            CONTENEDOR["nombre"]
-        ),
-        "version": (
-            CONTENEDOR["version"]
-        ),
-        "rol": (
-            CONTENEDOR["rol"]
-        ),
+        "contenedor": CONTENEDOR["nombre"],
+        "id": CONTENEDOR["id"],
+        "version": CONTENEDOR["version_modulo"],
+        "rol": CONTENEDOR["rol"],
+        "esquema": CONTENEDOR["esquema"],
+        "version_contrato": CONTENEDOR[
+            "version_contrato"
+        ],
         "requiere": list(
             CONTENEDOR["requiere"]
         ),
@@ -821,7 +784,7 @@ def inventario(
 
 
 # ===============================================================
-# CAPACIDADES REALES
+# CONTENEDOR — CAPACIDADES REALES
 # ===============================================================
 
 CONTENEDOR["capacidades"] = {
@@ -838,7 +801,6 @@ CONTENEDOR["capacidades"] = {
 # ===============================================================
 
 __all__ = [
-    "CONTRATO",
     "CONTENEDOR",
     "verificar",
     "inventario",

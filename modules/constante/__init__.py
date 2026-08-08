@@ -310,6 +310,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
+    # ----- REPORTING -----
     "reporting": {
         "estado": True,
         "salud": True,
@@ -323,6 +324,7 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "metricas": True,
         "diagnostico": True,
+        "reporte": True,
     },
 
     "estados_validos": list(ESTADOS_VALIDOS),

@@ -171,12 +171,14 @@ _REG_EVIDENCIA: Dict[str, Dict[str, Any]] = {}
 # FIN DEFINICIONES
 # ===============================================================
 
-
 # ===============================================================
 # CONTRATO OFICIAL DEL MÓDULO
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
@@ -184,6 +186,9 @@ CONTENEDOR: Dict[str, Any] = {
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
 
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
@@ -193,6 +198,9 @@ CONTENEDOR: Dict[str, Any] = {
         "con fraccion y decimal (ej: 7/9 = 0.778). No calcula Tru (FO)."
     ),
 
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
     "funcion": (
         "Pipeline: evidencia -> C/L/K -> centinela -> ID compuesto -> "
         "historial liviano. Valor oficial = Fraction. Decimal via Decimal."
@@ -205,6 +213,9 @@ CONTENEDOR: Dict[str, Any] = {
         "No duplica campos de factor en la raiz de la salida",
     ],
 
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
     "autoridad": [
         "Unica autoridad para calcular C, L, K",
         "Reportar cada factor como fraccion = decimal en un solo objeto",
@@ -212,6 +223,9 @@ CONTENEDOR: Dict[str, Any] = {
         "Auditar integridad del dominio",
     ],
 
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
     "conocimiento_exportable": [
         "C", "L", "K", "factores", "UNDEFINED",
         "evidencia", "versiones_utilizadas", "contratos_utilizados",
@@ -219,39 +233,69 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario", "estado", "reporte", "diagnostico",
     ],
 
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
     "requiere": [],
 
-    # ----- REPORTING -----
-"reporting": {
-    "estado": True,
-    "salud": True,
-    "inventario": True,
-    "capacidades": True,
-    "errores": True,
-    "advertencias": True,
-    "dependencias": True,
-    "version": True,
-    "contrato": True,
-    "conocimiento": True,
-    "metricas": True,
-    "diagnostico": True,
-    "reporte": True,
-},
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # ============================================================
+    "autoriza_engine": {
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
 
-# ----- AUTORIZACIONES -----
-"autoriza_engine": {
-    "leer": True,
-    "ejecutar": True,
-    "consultar": True,
-    "recombinar": True,
-    "reportar": True,
-    "auditar": True,
-    "inventariar": True,
-    "modificar": False,
-    "alterar": False,
-    "reescribir": False,
-},
+        # --- PERMISOS DE ESCRITURA ---
+        "modificar": False,
+        "alterar": False,
+        "reescribir": False,
+        "crear": False,
+        "eliminar": False,
+        "actualizar": False,
 
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": False,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+    },
+
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
     "consultas_soportadas": [
         "calcular", "calcular_C", "calcular_L", "calcular_K",
         "calcular_factor", "representar", "validar_evidencia",
@@ -260,6 +304,9 @@ CONTENEDOR: Dict[str, Any] = {
         "leer_ids_escala", "historial",
     ],
 
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
     "capacidades": {
         "calcular": "calcular",
         "calcular_C": "calcular_C",
@@ -279,6 +326,9 @@ CONTENEDOR: Dict[str, Any] = {
         "historial": "historial",
     },
 
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
     "capacidades_meta": {
         "calcular": {
             "descripcion": (
@@ -376,16 +426,40 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
+    # ============================================================
+    # REPORTING
+    # ============================================================
+    "reporting": {
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
+        "reporte": True,
+    },
 
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
     "invariantes": list(INVARIANTES),
-}
+
+}  # <--- CIERRE FINAL
 
 # ===============================================================
 # FIN CONTRATO
 # ===============================================================
-
-
 # ===============================================================
 # FUNCIONES PRIVADAS
 # ===============================================================

@@ -115,6 +115,7 @@ BANDERAS_REPORTING = (
     "conocimiento",
     "metricas",
     "diagnostico",
+    "reporte",
 )
 
 CLAVES_META_CAPACIDAD = ("descripcion", "entrada", "salida")

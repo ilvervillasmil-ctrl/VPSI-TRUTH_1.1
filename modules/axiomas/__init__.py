@@ -425,6 +425,7 @@ CONTENEDOR: Dict[str, Any] = {
     "alertar": True,
 
     # --- REPORTING ---
+"reporting": {
     "metricas": True,
     "estado": True,
     "version": True,

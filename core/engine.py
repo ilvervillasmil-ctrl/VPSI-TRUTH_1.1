@@ -1,4 +1,4 @@
-# ===============================================================
+===============================================================
 # VPSI-TRUTH — core/engine.py
 # ===============================================================
 #
@@ -270,7 +270,6 @@ class Engine:
                 )
         else:
             self.estado = ESTADO_OPERATIVO
-            self._ejecutar_contratos_automaticos()
 
     # ----------------------------------------------------------
     # DESCUBRIMIENTO
@@ -361,13 +360,13 @@ class Engine:
             if actual != requerida:
                 return (
                     f"api_engine exige exactamente {ver_str}, "
-                    f"Engine is {API_ENGINE_ACTUAL}"
+                    f"Engine es {API_ENGINE_ACTUAL}"
                 )
         else:
             if actual < requerida:
                 return (
                     f"api_engine exige >={ver_str}, "
-                    f"Engine is {API_ENGINE_ACTUAL}"
+                    f"Engine es {API_ENGINE_ACTUAL}"
                 )
         return None
 
@@ -665,31 +664,6 @@ class Engine:
         self._grafo = {"nodos": nodos, "aristas": aristas}
 
     # ----------------------------------------------------------
-    # EJECUCIÓN AUTOMÁTICA DE CONTRATOS
-    # ----------------------------------------------------------
-    def _ejecutar_contratos_automaticos(self) -> None:
-        """
-        Recorre los módulos cargados y ejecuta automáticamente
-        aquellas capacidades declaradas para el arranque (ej. 'ejecutar_contrato', 'inicializar').
-        """
-        for nombre, cont in self.registro.contenedores.items():
-            if cont.autoriza_engine.get("ejecutar") is False:
-                continue
-            
-            capacidad_arranque = None
-            for posible_cap in ["ejecutar_contrato", "inicializar", "arrancar"]:
-                if posible_cap in cont.capacidades:
-                    capacidad_arranque = posible_cap
-                    break
-            
-            if capacidad_arranque:
-                resultado_ejecucion = self.ejecutar_capacidad(nombre, capacidad_arranque)
-                if resultado_ejecucion.get("estado") != "EXITO":
-                    self.advertencias.append(
-                        f"Módulo '{nombre}' falló en su ejecución automática de contrato: {resultado_ejecucion.get('error')}"
-                    )
-
-    # ----------------------------------------------------------
     # TRAZA
     # ----------------------------------------------------------
     def _registrar_traza(
@@ -699,7 +673,6 @@ class Engine:
         estado: str,
         duracion_s: float,
         error: Optional[str] = None,
-        **extras: Any,
     ) -> None:
         self._traza_seq += 1
         entrada: Dict[str, Any] = {
@@ -712,9 +685,6 @@ class Engine:
         }
         if error:
             entrada["error"] = error
-        for clave, valor in extras.items():
-            if valor is not None:
-                entrada[clave] = valor
         self._trazas.append(entrada)
 
     # ----------------------------------------------------------
@@ -964,6 +934,31 @@ class Engine:
 #    (después de obtener_trazas / antes de FIN ENGINE).
 # ===============================================================
 
+    def _registrar_traza(
+        self,
+        modulo: str,
+        capacidad: str,
+        estado: str,
+        duracion_s: float,
+        error: Optional[str] = None,
+        **extras: Any,
+    ) -> None:
+        self._traza_seq += 1
+        entrada: Dict[str, Any] = {
+            "id_traza": self._traza_seq,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "modulo": modulo,
+            "capacidad": capacidad,
+            "estado": estado,
+            "duracion_s": duracion_s,
+        }
+        if error:
+            entrada["error"] = error
+        for clave, valor in extras.items():
+            if valor is not None:
+                entrada[clave] = valor
+        self._trazas.append(entrada)
+
     @property
     def centinela(self) -> Centinela:
         """
@@ -1048,162 +1043,14 @@ class Engine:
 # ===============================================================
 
 __all__ = [
-    "APROBADO",
-    "AXIOMA",
-    "ALPHA",
-    "BETA",
-    "CAMPOS_OBLIGATORIOS",
-    "CAMPOS_OPCIONALES",
-    "CAMPOS_REGISTRO",
-    "CAPAS_VALIDAS",
-    "CASA_SELF",
-    "CLAVE_DECLARACION",
-    "CONTRATO",
-    "CONTENEDOR",
-    "Canal",
-    "CacheError",
-    "CacheInmutableError",
-    "CacheBackend",
-    "ContratoInvalido",
-    "COROLARIO",
-    "DEFINICION",
-    "DECLARACIONES",
-    "DiagnosticoGlobal",
-    "DiagnosticoError",
-    "ESQUEMA_CONTRATO",
-    "ESQUEMA_CATEGORIA",
-    "ESTABILIDAD",
-    "ESTADOS_MATERIAL",
-    "FormulaError",
-    "FormulaNoEncontradaError",
-    "HAY_REQUESTS",
-    "ID_MODULO",
-    "ID_AUSENTE",
-    "ID_DUPLICADO",
-    "LEMA",
-    "MODO_PROTEGIDO",
-    "MODO_DIAGNOSTICO",
-    "MODOS_VALIDOS",
-    "NOMBRE_MODULO",
-    "NOMBRE_INVALIDO",
-    "NO_CARGABLE",
-    "NO_CALLABLE",
-    "OK",
-    "OPERATIVO",
-    "DEGRADADO",
-    "PESOS",
-    "RECHAZADO",
-    "ROL_MODULO",
-    "SEGURIDAD",
-    "SIN_DECLARAR",
-    "SIN_SEGURIDAD",
-    "TEOREMA",
-    "TIPOS",
-    "TIPOS_DECLARACION",
-    "RELACIONES",
-    "UNDEFINED",
-    "VERSION_MODULO",
-    "VERSION_CONTRATO",
-    "YA_CARGADO",
-    "CARGADO_AQUI",
-    "AUTO_REFERENCIA",
-    "anunciar",
-    "anunciar_todo",
-    "auditar",
-    "axiomas",
-    "barrer",
-    "barrer_diagnostico",
-    "backend_para_centinela",
-    "buscar",
-    "buscar_por_id",
-    "buscar_constante",
-    "cadena",
-    "catalogo",
-    "capacidades_de",
-    "capacidades",
-    "censo",
-    "categorias",
-    "citar",
-    "contradiccion_directa",
-    "contradiccion_de_cota",
-    "calcular",
-    "calcular_C",
-    "calcular_L",
-    "calcular_K",
-    "calcular_factor",
-    "depositar",
-    "descubrir_constantes",
-    "diagnostico",
-    "es_undefined",
-    "es_valida",
-    "esquema",
-    "explicar",
-    "explicar_calculo",
-    "firmar",
-    "firmar_bytes",
-    "generar_claves",
-    "generatividad",
-    "get_alpha",
-    "get_beta",
-    "hay_acceso",
-    "hay_dns",
-    "historial",
-    "ids",
-    "ids_dominio_k_o",
-    "inventario",
-    "limpiar_ciclo",
-    "listar_archivos",
-    "listar_constantes",
-    "listar_formulas",
-    "listar_mecanicas",
-    "node_id",
-    "NodoZSQ",
-    "nucleo",
-    "nucleo_digest",
-    "normalizar",
-    "oscilar",
-    "por_dominio",
-    "por_id",
-    "recolectar",
-    "recombinar",
-    "ref",
-    "relacionar",
-    "representar",
-    "reporte",
-    "reportar",
-    "registrar_resultado_dominio",
-    "resolver",
-    "resolver_enunciado",
-    "resolver_pedido",
-    "sellar",
-    "serializar",
-    "serializar_seguro",
-    "skills",
-    "tru_ri",
-    "tru_total",
-    "verificar",
-    "verificar_salida",
-    "verificar_constantes",
-    "verificar_firma",
-    "verificar_bytes",
-    "verificar_manifiesto",
-    "verificar_neutro",
-    "yo_funcional",
-    "z_invariante",
-    "comparar_z",
-    "build",
-    "presentar",
-    "aplicar",
-    "desde_donde",
-    "estado_self",
-    "elegir",
-    "canales",
-    "_fragmentos",
-    "_partir3",
-    "clave",
-    "declaraciones",
+    "Engine",
+    "ArranqueError",
+    "Contenedor",
+    "RegistroModulos",
+    "VERSION_ENGINE",
+    "ESQUEMA_CONTRATO_REQUERIDO",
+    "VERSION_CONTRATO_REQUERIDA",
 ]
-
 
 # ===============================================================
 # FIN DEL MÓDULO ENGINE

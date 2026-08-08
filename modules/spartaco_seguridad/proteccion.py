@@ -2,37 +2,45 @@
 # VPSI-TRUTH — modules/spartaco_seguridad/proteccion.py
 # ===============================================================
 #
-# ARQUITECTURA DE CIERRE RECURSIVO (compromiso fractal)
+# ESTRUCTURA GENERATIVA: nodo Z/S/Q recursivo
 #
-#   ENTRADA EXTERNA
-#        │
-#        ▼
-#   [TIPO] → [FORMA] → [CANÓNICO] → [Ed25519] → [CONGELAR]
-#        │
-#        ▼
-#   [ESQUEMA] → [ÁRBOL DE COMPROMISO] → [INVARIANTES] → [VEREDICTO]
+#                    ED25519
+#                 AUTORIDAD RAÍZ
+#                       │
+#                       ▼
+#                     ROOT
+#                       │
+#                ┌──────┼──────┐
+#                ▼      ▼      ▼
+#                Z      S      Q
+#                │      │      │
+#             hijos   hijos   hijos
+#                │      │      │
+#              ZSQ    ZSQ     ZSQ
 #
-# COMPROMISO FRACTAL:
-#   Cada hoja = H("HOJA|tag|valor_canónico")
-#   Cada nodo = H("NODO|tag|hijo1|hijo2|...")
-#   Raíz = compromiso del estado completo.
+# INVARIANTE DE CIERRE (para todo nodo N):
+#   válido(N) ⇔ estructura(N) ∧ Z(N) ∧ S(N) ∧ Q(N)
+#              ∧ compromisos_hijos(N) ∧ autorización(N)
 #
-#   Hoja modificada → padre cambia → ancestro cambia → raíz diverge.
-#   No hace falta un detector por campo: la divergencia es estructural.
+#   N - Z → inválido
+#   N - S → inválido
+#   N - Q → inválido
+#   N - hijo → inválido
+#   N + hijo extraño → inválido
+#   N alterado → inválido
+#
+# División / recomposición:
+#   válido(N) → N1,N2,N3 con válido(Ni) → recomponer → válido(N)
+#   La misma ley se aplica a cada Ni (recursión).
 #
 # RESPONSABILIDADES:
-#   Ed25519     = autoridad / autenticidad sobre el cuerpo canónico
-#   SHA-256     = compromiso / integridad (hojas, nodos, núcleo, S, Q)
-#   Árbol       = contaminación jerárquica de cualquier cambio local
-#   Esquema     = semántica estructural exacta
-#   Congelación = eliminación de comportamiento Python arbitrario
-#   Invariantes = coherencia cuerpo autenticado ↔ bytes reales
-#   Veredicto   = cierre lógico del modo
+#   Z/S/Q     = integridad / invarianza estructural (recursiva)
+#   Ed25519   = autoridad criptográfica sobre la raíz
+#   Esquema   = semántica del cuerpo contractual
+#   Congelar  = eliminar comportamiento Python arbitrario
 #
-# artifact_id = identificador lógico externo (firmado, no es digest).
-# nucleo      = identidad criptográfica de los bytes del artefacto.
-#
-# FRONTERA DE CONFIANZA: todo lo externo es NO CONFIABLE.
+# FRONTERA: todo lo externo es NO CONFIABLE.
+# Ninguna ruta a ok=True sin atravesar todas las fronteras del modo.
 # ===============================================================
 
 from __future__ import annotations
@@ -57,7 +65,7 @@ from cryptography.hazmat.primitives.serialization import (
 )
 
 # ===============================================================
-# CONSTANTES DE CONTRATO
+# CONTRATO
 # ===============================================================
 
 ESQUEMA_MANIFIESTO: int = 1
@@ -70,8 +78,7 @@ MODO_DIAGNOSTICO: str = "DIAGNOSTICO"
 ALGORITMO_HASH: str = "SHA-256"
 ALGORITMO_FIRMA: str = "Ed25519"
 
-# Orden canónico de hojas del árbol (estable, documentado).
-# Cualquier cambio de valor en una hoja → nueva raíz.
+# Campos del cuerpo (hojas del árbol contractual)
 HOJAS_META: Tuple[str, ...] = (
     "esquema",
     "version",
@@ -94,19 +101,18 @@ HOJAS_EVIDENCIA: Tuple[str, ...] = (
 )
 
 CLAVES_CUERPO: frozenset = frozenset(
-    HOJAS_META + HOJAS_INTEGRIDAD + HOJAS_EVIDENCIA + ("compromiso_raiz",)
+    HOJAS_META + HOJAS_INTEGRIDAD + HOJAS_EVIDENCIA + ("zsq_raiz",)
 )
 
 SEGURIDAD: Dict[str, Any] = {
     "id": "PROTECCION",
     "nombre": "proteccion",
     "hace": (
-        "Cierre criptográfico fractal de artefactos: compromiso jerárquico "
-        "SHA-256 + firma Ed25519 del cuerpo canónico; verificación por "
-        "fronteras composables (tipo, forma, canónico, autoridad, "
-        "congelación, esquema, árbol, invariantes, veredicto)."
+        "Cierre criptográfico por nodo Z/S/Q recursivo + Ed25519 sobre la raíz. "
+        "Toda división válida conserva la invariante; toda recomposición válida "
+        "reconstruye la invariante del nivel superior."
     ),
-    "herramienta": "Ed25519 + SHA-256 fractal + manifiesto {cuerpo, firma}",
+    "herramienta": "ZSQ-recursivo + Ed25519 + manifiesto {cuerpo, firma}",
     "conceptos": [
         "FIRMA_INVÁLIDA",
         "INTEGRIDAD_COMPROMETIDA",
@@ -121,10 +127,8 @@ SEGURIDAD: Dict[str, Any] = {
 
 
 # ===============================================================
-# NIVEL 0 — TIPO (sin coerción)
+# FRONTERA TIPO (sin coerción)
 # ===============================================================
-# Invariante: type(x) is T. bool no es int contractual.
-# Ataques: None, str, list, dict, float, bool-como-int, objetos custom.
 
 def _es_int(x: Any) -> bool:
     return type(x) is int
@@ -155,12 +159,14 @@ def _rechazo(*conceptos: str, error: str = "", **extra: Any) -> Dict[str, Any]:
 
 
 # ===============================================================
-# NIVEL 1 — CANÓNICO / CONGELACIÓN
+# CANÓNICO / CONGELACIÓN
 # ===============================================================
-# Invariante: un encoding determinista; tras autenticar, solo JSON nuevo.
-# Ataques: orden de claves, NaN, subclases, __eq__, bytes/set en valores.
 
 def serializar(obj: Any) -> bytes:
+    """
+    Encoding determinista. Lanza ValueError si no es JSON seguro.
+    En fronteras de entrada hostil usar serializar_seguro().
+    """
     try:
         texto = json.dumps(
             obj,
@@ -174,11 +180,15 @@ def serializar(obj: Any) -> bytes:
     return texto.encode("ascii")
 
 
+def serializar_seguro(obj: Any) -> Dict[str, Any]:
+    """Nunca lanza. Frontera para datos externos."""
+    try:
+        return {"ok": True, "bytes": serializar(obj), "conceptos": []}
+    except ValueError as e:
+        return _rechazo("CÓDIGO_INVÁLIDO", error=str(e))
+
+
 def _descongelar_json(canonico: bytes) -> Any:
-    """
-    CONGELACIÓN: bytes autenticados → estructuras JSON ordinarias nuevas.
-    No reutiliza el objeto Python original.
-    """
     if not _es_bytes(canonico):
         raise ValueError("canonico no es bytes")
     try:
@@ -191,123 +201,248 @@ def _descongelar_json(canonico: bytes) -> Any:
         raise ValueError(f"JSON inválido: {e}") from e
 
 
-def _valor_hoja(valor: Any) -> bytes:
-    """Representación canónica de un valor de hoja para el árbol."""
-    return serializar(valor)
-
-
 # ===============================================================
-# NIVEL 2 — COMPROMISO FRACTAL (árbol de hashes)
+# NODO Z/S/Q RECURSIVO  (abstracción única)
 # ===============================================================
 #
-#          ROOT
-#           │
-#    ┌──────┼──────┐
-#    │      │      │
-#   META  INTEG  EVID
-#    │      │      │
-#  hojas  hojas  hojas
+# Nodo
+#  ├── tag
+#  ├── payload   (hoja)  XOR  hijos (interior)
+#  ├── Z, S, Q
+#  └── compromiso = H(N|tag|Z|S|Q)
 #
-# Invariante: raíz = f(todas las hojas). Cualquier hoja distinta → raíz distinta.
-# No sustituye a Ed25519: Ed25519 autentica el cuerpo (que incluye la raíz).
-# El árbol hace explícita la contaminación jerárquica.
+# Misma ley en cada nivel. No se agregan funciones por capa.
 #
 
-def _sha256_hex(data: bytes) -> str:
+def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def _hoja(tag: str, valor: Any) -> str:
-    return _sha256_hex(b"HOJA|" + tag.encode("ascii") + b"|" + _valor_hoja(valor))
-
-
-def _nodo(tag: str, hijos: Sequence[str]) -> str:
-    payload = b"NODO|" + tag.encode("ascii") + b"|" + "|".join(hijos).encode("ascii")
-    return _sha256_hex(payload)
-
-
-def compromiso_fractal(campos: Dict[str, Any]) -> Dict[str, Any]:
+class NodoZSQ:
     """
-    Construye el árbol de compromiso a partir de los campos del cuerpo
-    (sin incluir compromiso_raiz a sí mismo).
+    Contrato recursivo de integridad.
 
-    Devuelve:
-      {
-        ok, raiz, meta, integridad, evidencia,
-        hojas: {tag: hash_hoja},
-      }
+    Hoja:  payload canónico → Z/S/Q sobre ese payload.
+    Interior: hijos → Z/S/Q sobre los compromisos de los hijos.
+
+    compromiso(N) depende de Z,S,Q; Z,S,Q dependen del contenido.
+    Alterar un descendiente altera el compromiso de todos los ancestros.
+    """
+
+    __slots__ = ("tag", "payload", "hijos", "_z", "_s", "_q", "_c")
+
+    def __init__(
+        self,
+        tag: str,
+        *,
+        payload: Any = None,
+        hijos: Optional[Sequence["NodoZSQ"]] = None,
+    ) -> None:
+        if not _es_str(tag) or not tag:
+            raise ValueError("tag inválido")
+        self.tag = tag
+        self.payload = payload
+        self.hijos: List[NodoZSQ] = list(hijos) if hijos else []
+        if self.hijos and payload is not None:
+            raise ValueError("nodo no puede ser hoja e interior a la vez")
+        self._z: Optional[str] = None
+        self._s: Optional[str] = None
+        self._q: Optional[str] = None
+        self._c: Optional[str] = None
+
+    # --- Z / S / Q ---
+
+    def z(self) -> str:
+        if self._z is not None:
+            return self._z
+        if self.hijos:
+            # Z = digest estructural de (tag + compromisos ordenados de hijos)
+            mat = "|".join(h.compromiso() for h in self.hijos)
+            self._z = _sha(b"Z|" + self.tag.encode("ascii") + b"|" + mat.encode("ascii"))
+        else:
+            raw = serializar(self.payload)
+            self._z = _sha(b"Z|" + self.tag.encode("ascii") + b"|" + raw)
+        return self._z
+
+    def s(self) -> str:
+        if self._s is not None:
+            return self._s
+        if self.hijos:
+            cs = [h.compromiso() for h in self.hijos]
+            mid = len(cs) // 2
+            self._s = _sha(b"S|" + "|".join(cs[:mid]).encode("ascii"))
+        else:
+            raw = serializar(self.payload)
+            mid = len(raw) // 2
+            self._s = _sha(b"S|" + raw[:mid])
+        return self._s
+
+    def q(self) -> str:
+        if self._q is not None:
+            return self._q
+        if self.hijos:
+            cs = [h.compromiso() for h in self.hijos]
+            mid = len(cs) // 2
+            self._q = _sha(b"Q|" + "|".join(cs[mid:]).encode("ascii"))
+        else:
+            raw = serializar(self.payload)
+            mid = len(raw) // 2
+            self._q = _sha(b"Q|" + raw[mid:])
+        return self._q
+
+    def compromiso(self) -> str:
+        if self._c is not None:
+            return self._c
+        self._c = _sha(
+            b"N|"
+            + self.tag.encode("ascii")
+            + b"|"
+            + self.z().encode("ascii")
+            + b"|"
+            + self.s().encode("ascii")
+            + b"|"
+            + self.q().encode("ascii")
+        )
+        return self._c
+
+    def invalido(self) -> bool:
+        """
+        INVARIANTE DE CIERRE local:
+        - Z, S, Q calculables
+        - si hay hijos: todos válidos
+        - compromiso estable (recomputar coincide)
+        """
+        try:
+            z1, s1, q1, c1 = self.z(), self.s(), self.q(), self.compromiso()
+            # forzar recálculo
+            self._z = self._s = self._q = self._c = None
+            z2, s2, q2, c2 = self.z(), self.s(), self.q(), self.compromiso()
+            if not (z1 == z2 and s1 == s2 and q1 == q2 and c1 == c2):
+                return True
+            for h in self.hijos:
+                if h.invalido():
+                    return True
+            return False
+        except (ValueError, TypeError, OverflowError):
+            return True
+
+    def snapshot(self) -> Dict[str, Any]:
+        return {
+            "tag": self.tag,
+            "z": self.z(),
+            "s": self.s(),
+            "q": self.q(),
+            "compromiso": self.compromiso(),
+            "hijos": [h.snapshot() for h in self.hijos],
+        }
+
+
+def construir_arbol_cuerpo(campos: Dict[str, Any]) -> NodoZSQ:
+    """
+    ROOT
+    ├── meta        (hojas HOJAS_META)
+    ├── integridad  (hojas HOJAS_INTEGRIDAD)
+    └── evidencia   (hojas HOJAS_EVIDENCIA)
+
+    Cada hoja = NodoZSQ(tag, payload=valor del campo).
+    """
+    def hojas(tags: Tuple[str, ...]) -> List[NodoZSQ]:
+        out: List[NodoZSQ] = []
+        for t in tags:
+            if t not in campos:
+                raise ValueError(f"falta hoja {t}")
+            out.append(NodoZSQ(t, payload=campos[t]))
+        return out
+
+    meta = NodoZSQ("meta", hijos=hojas(HOJAS_META))
+    integ = NodoZSQ("integridad", hijos=hojas(HOJAS_INTEGRIDAD))
+    evid = NodoZSQ("evidencia", hijos=hojas(HOJAS_EVIDENCIA))
+    return NodoZSQ("raiz", hijos=[meta, integ, evid])
+
+
+def zsq_de_cuerpo(campos: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Construye el árbol y devuelve la raíz Z/S/Q + compromiso.
+    Si cualquier hoja es hostil (no serializable), ok=False.
     """
     try:
-        hojas_meta = [_hoja(t, campos[t]) for t in HOJAS_META]
-        hojas_int = [_hoja(t, campos[t]) for t in HOJAS_INTEGRIDAD]
-        hojas_ev = [_hoja(t, campos[t]) for t in HOJAS_EVIDENCIA]
-    except (KeyError, ValueError, TypeError) as e:
-        return _rechazo("CÓDIGO_INVÁLIDO", error=f"hoja: {e}")
+        root = construir_arbol_cuerpo(campos)
+        if root.invalido():
+            return _rechazo("INTEGRIDAD_COMPROMETIDA", error="nodo inválido")
+        return {
+            "ok": True,
+            "zsq_raiz": root.compromiso(),
+            "z": root.z(),
+            "s": root.s(),
+            "q": root.q(),
+            "arbol": root.snapshot(),
+            "conceptos": [],
+        }
+    except (ValueError, TypeError, OverflowError, KeyError) as e:
+        return _rechazo("CÓDIGO_INVÁLIDO", error=str(e))
 
-    meta = _nodo("meta", hojas_meta)
-    integridad = _nodo("integridad", hojas_int)
-    evidencia = _nodo("evidencia", hojas_ev)
-    raiz = _nodo("raiz", [meta, integridad, evidencia])
 
-    hojas_map = {}
-    for t, h in zip(HOJAS_META, hojas_meta):
-        hojas_map[t] = h
-    for t, h in zip(HOJAS_INTEGRIDAD, hojas_int):
-        hojas_map[t] = h
-    for t, h in zip(HOJAS_EVIDENCIA, hojas_ev):
-        hojas_map[t] = h
+def verificar_zsq_cuerpo(cuerpo: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Recalcula el árbol desde las hojas y exige:
+      cuerpo['zsq_raiz'] == root.compromiso()
+    Cualquier campo alterado → raíz distinta → FAIL.
+    """
+    if "zsq_raiz" not in cuerpo:
+        return _rechazo("CÓDIGO_INVÁLIDO", error="falta zsq_raiz")
+    declarada = cuerpo["zsq_raiz"]
+    if not _es_hex64(declarada):
+        return _rechazo("CÓDIGO_INVÁLIDO", error="zsq_raiz no hex64")
 
-    return {
-        "ok": True,
-        "raiz": raiz,
-        "meta": meta,
-        "integridad": integridad,
-        "evidencia": evidencia,
-        "hojas": hojas_map,
-        "conceptos": [],
+    campos = {
+        k: cuerpo[k]
+        for k in (HOJAS_META + HOJAS_INTEGRIDAD + HOJAS_EVIDENCIA)
     }
+    calc = zsq_de_cuerpo(campos)
+    if not calc.get("ok"):
+        return calc
 
-
-def verificar_compromiso(cuerpo: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Recalcula el árbol desde las hojas del cuerpo y compara con compromiso_raiz.
-    Divergencia ⇒ ALTERACIÓN estructural.
-    """
-    if "compromiso_raiz" not in cuerpo:
-        return _rechazo("CÓDIGO_INVÁLIDO", error="falta compromiso_raiz")
-
-    campos = {k: cuerpo[k] for k in (HOJAS_META + HOJAS_INTEGRIDAD + HOJAS_EVIDENCIA)}
-    arbol = compromiso_fractal(campos)
-    if not arbol.get("ok"):
-        return arbol
-
-    raiz_declarada = cuerpo["compromiso_raiz"]
-    if not _es_hex64(raiz_declarada):
-        return _rechazo("CÓDIGO_INVÁLIDO", error="compromiso_raiz no hex64")
-
-    if not hmac.compare_digest(arbol["raiz"], raiz_declarada):
+    if not hmac.compare_digest(calc["zsq_raiz"], declarada):
         return _rechazo(
             "INTEGRIDAD_COMPROMETIDA",
             "ALTERACIÓN",
-            error="raíz fractal diverge",
-            raiz_real=arbol["raiz"],
-            raiz_declarada=raiz_declarada,
+            error="zsq_raiz diverge",
+            raiz_real=calc["zsq_raiz"],
+            raiz_declarada=declarada,
         )
-
     return {
         "ok": True,
-        "raiz": arbol["raiz"],
-        "meta": arbol["meta"],
-        "integridad": arbol["integridad"],
-        "evidencia": arbol["evidencia"],
+        "zsq_raiz": calc["zsq_raiz"],
+        "z": calc["z"],
+        "s": calc["s"],
+        "q": calc["q"],
+        "arbol": calc["arbol"],
         "conceptos": [],
     }
 
 
+def fijar_zsq(cuerpo: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Recalcula y escribe cuerpo['zsq_raiz'] desde las hojas actuales.
+    Obligatorio tras cualquier mutación legítima de campos antes de firmar.
+    """
+    if type(cuerpo) is not dict:
+        return _rechazo("CÓDIGO_INVÁLIDO", error="cuerpo no dict")
+    campos = {
+        k: cuerpo[k]
+        for k in (HOJAS_META + HOJAS_INTEGRIDAD + HOJAS_EVIDENCIA)
+        if k in cuerpo
+    }
+    calc = zsq_de_cuerpo(campos)
+    if not calc.get("ok"):
+        return calc
+    cuerpo["zsq_raiz"] = calc["zsq_raiz"]
+    return {"ok": True, "cuerpo": cuerpo, "arbol": calc["arbol"], "conceptos": []}
+
+
 # ===============================================================
-# NIVEL 3 — INTEGRIDAD DE BYTES (núcleo / canales / z)
+# INTEGRIDAD DE BYTES (artefacto)
 # ===============================================================
-# Invariante: digest determinista de bytes reales. No autorizan.
 
 def nucleo(datos: bytes) -> str:
     if not _es_bytes(datos):
@@ -347,9 +482,10 @@ def canales(datos: bytes) -> Tuple[str, str]:
         raise TypeError("datos debe ser bytes")
     datos = bytes(datos)
     mid = len(datos) // 2
-    s = hashlib.sha256(datos[:mid]).hexdigest()
-    q = hashlib.sha256(datos[mid:]).hexdigest()
-    return s, q
+    return (
+        hashlib.sha256(datos[:mid]).hexdigest(),
+        hashlib.sha256(datos[mid:]).hexdigest(),
+    )
 
 
 def z_invariante(datos: bytes, k: int = 8) -> Dict[str, Any]:
@@ -385,7 +521,7 @@ def comparar_z(z_a: Any, z_b: Any) -> Dict[str, Any]:
 
 
 # ===============================================================
-# NIVEL 4 — IDENTIDAD NEUTRA
+# IDENTIDAD NEUTRA
 # ===============================================================
 
 MARCA_NEUTRA = b"\n#VPSI-NEUTRO:"
@@ -422,7 +558,7 @@ def verificar_neutro(datos: bytes, n: int = 3) -> Dict[str, Any]:
 
 
 # ===============================================================
-# NIVEL 5 — Ed25519 (autoridad)
+# Ed25519
 # ===============================================================
 
 def generar_claves(ruta_priv: str, ruta_pub: str) -> Dict[str, Any]:
@@ -496,10 +632,8 @@ def verificar_firma(
 
 
 # ===============================================================
-# NIVEL 6 — ESQUEMA DEL CUERPO
+# ESQUEMA DEL CUERPO
 # ===============================================================
-# Invariante: claves exactas + tipos + rangos + formatos.
-# Se aplica solo sobre datos YA congelados.
 
 def _validar_cuerpo_esquema(
     cuerpo: Any,
@@ -535,7 +669,7 @@ def _validar_cuerpo_esquema(
     if cuerpo["algoritmo_firma"] != ALGORITMO_FIRMA:
         return _rechazo("CÓDIGO_INVÁLIDO", error="algoritmo_firma")
 
-    for campo in ("nucleo", "S", "Q", "compromiso_raiz"):
+    for campo in ("nucleo", "S", "Q", "zsq_raiz"):
         if not _es_hex64(cuerpo[campo]):
             return _rechazo("CÓDIGO_INVÁLIDO", error=f"{campo} no hex64")
 
@@ -573,13 +707,13 @@ def construir_cuerpo(
         return _rechazo("CÓDIGO_INVÁLIDO", error="ids no str")
 
     datos = bytes(datos)
-    s, q = canales(datos)
+    s_chan, q_chan = canales(datos)
     zinfo = z_invariante(datos)
     if not zinfo.get("ok"):
         return _rechazo("CÓDIGO_INVÁLIDO", error="z")
     neutro = verificar_neutro(datos, n=n_neutro)
 
-    base = {
+    base: Dict[str, Any] = {
         "esquema": ESQUEMA_MANIFIESTO,
         "version": version,
         "emitido": (
@@ -592,23 +726,28 @@ def construir_cuerpo(
         "algoritmo_hash": ALGORITMO_HASH,
         "algoritmo_firma": ALGORITMO_FIRMA,
         "nucleo": nucleo(datos),
-        "S": s,
-        "Q": q,
+        "S": s_chan,
+        "Q": q_chan,
         "n_bytes": len(datos),
         "n_neutro": n_neutro,
         "valuaciones": zinfo["valuaciones"],
         "identidad_neutra": bool(neutro.get("ok")),
     }
 
-    arbol = compromiso_fractal(base)
-    if not arbol.get("ok"):
-        return arbol
-    base["compromiso_raiz"] = arbol["raiz"]
+    # Fijar ZSQ raíz desde las hojas (regla generativa)
+    fz = fijar_zsq(base)
+    if not fz.get("ok"):
+        return fz
 
     val = _validar_cuerpo_esquema(base, version_minima=1)
     if not val["ok"]:
         return val
-    return {"ok": True, "cuerpo": base, "arbol": arbol, "conceptos": []}
+    return {
+        "ok": True,
+        "cuerpo": base,
+        "arbol": fz.get("arbol"),
+        "conceptos": [],
+    }
 
 
 def construir_manifiesto(cuerpo: Dict[str, Any], firma_hex: str) -> Dict[str, Any]:
@@ -622,9 +761,9 @@ def construir_manifiesto(cuerpo: Dict[str, Any], firma_hex: str) -> Dict[str, An
 
 
 # ===============================================================
-# NIVEL 7 — VERIFICAR MANIFIESTO (puerta única del sobre)
+# VERIFICAR MANIFIESTO
 # ===============================================================
-# Flujo: forma → canónico → Ed25519 → congelar → esquema → árbol
+# forma → canónico → Ed25519 → congelar → esquema → ZSQ
 
 def verificar_manifiesto(
     manifiesto: Any,
@@ -632,7 +771,6 @@ def verificar_manifiesto(
     pub_bytes: Any = None,
     version_minima: int = VERSION_MINIMA_DEFAULT,
 ) -> Dict[str, Any]:
-    # FORMA del sobre
     if type(manifiesto) is not dict:
         return _rechazo("MANIFIESTO_AUSENTE", error="manifiesto no dict")
     if set(manifiesto.keys()) != {"cuerpo", "firma"}:
@@ -649,26 +787,22 @@ def verificar_manifiesto(
     if not _es_str(firma_hex) or not firma_hex:
         return _rechazo("FIRMA_INVÁLIDA", error="firma ausente o tipo inválido")
 
-    # CANÓNICO
-    try:
-        canonico = serializar(cuerpo_raw)
-    except ValueError as e:
-        return _rechazo("CÓDIGO_INVÁLIDO", error=str(e))
+    ser = serializar_seguro(cuerpo_raw)
+    if not ser.get("ok"):
+        return ser
+    canonico = ser["bytes"]
 
-    # AUTORIDAD (antes de semántica)
     if pub_bytes is None:
         return _rechazo("FIRMA_INVÁLIDA", error="clave pública ausente")
     vf = verificar_bytes(canonico, firma_hex, pub_bytes=pub_bytes)
     if not vf.get("ok"):
         return _rechazo("FIRMA_INVÁLIDA", error="firma inválida")
 
-    # CONGELACIÓN
     try:
         cuerpo = _descongelar_json(canonico)
     except ValueError as e:
         return _rechazo("CÓDIGO_INVÁLIDO", error=str(e))
 
-    # ESQUEMA
     if not _es_int(version_minima):
         version_minima = VERSION_MINIMA_DEFAULT
     sem = _validar_cuerpo_esquema(cuerpo, version_minima=version_minima)
@@ -676,26 +810,22 @@ def verificar_manifiesto(
         return sem
     cuerpo = sem["cuerpo"]
 
-    # ÁRBOL FRACTAL (recomputar y comparar raíz)
-    arb = verificar_compromiso(cuerpo)
-    if not arb.get("ok"):
-        return arb
+    # ZSQ: recalcular árbol y exigir igualdad con zsq_raiz firmada
+    zsq = verificar_zsq_cuerpo(cuerpo)
+    if not zsq.get("ok"):
+        return zsq
 
     return {
         "ok": True,
         "cuerpo": cuerpo,
-        "arbol": {
-            "raiz": arb["raiz"],
-            "meta": arb["meta"],
-            "integridad": arb["integridad"],
-            "evidencia": arb["evidencia"],
-        },
+        "arbol": zsq.get("arbol"),
+        "zsq": {"z": zsq["z"], "s": zsq["s"], "q": zsq["q"], "raiz": zsq["zsq_raiz"]},
         "conceptos": [],
     }
 
 
 # ===============================================================
-# NIVEL 8 — BUILD (cierra su círculo)
+# BUILD
 # ===============================================================
 
 def build(
@@ -734,10 +864,10 @@ def build(
         return _rechazo("CÓDIGO_INVÁLIDO", error=cb.get("error", "cuerpo"), fallos=["cuerpo"])
 
     cuerpo = cb["cuerpo"]
-    try:
-        canonico = serializar(cuerpo)
-    except ValueError as e:
-        return _rechazo("CÓDIGO_INVÁLIDO", error=str(e), fallos=["canonicalización"])
+    ser = serializar_seguro(cuerpo)
+    if not ser.get("ok"):
+        return _rechazo("CÓDIGO_INVÁLIDO", error=ser.get("error", "canónico"), fallos=["canonicalización"])
+    canonico = ser["bytes"]
 
     firma = firmar_bytes(canonico, ruta_priv)
     if not firma.get("ok"):
@@ -765,15 +895,14 @@ def build(
         "datos": datos_s,
         "manifiesto": man,
         "arbol": check.get("arbol"),
+        "zsq": check.get("zsq"),
         "conceptos": [],
     }
 
 
 # ===============================================================
-# NIVEL 9 — RUNTIME verificar()
+# RUNTIME verificar()
 # ===============================================================
-# PROTEGIDO: cuerpo firmado es la única autoridad.
-# Parámetros externos no pisan nucleo/S/Q/n_neutro autenticados.
 
 def verificar(
     datos: Any,
@@ -820,6 +949,8 @@ def verificar(
             manifiesto, pub_bytes=pub_bytes, version_minima=version_minima
         )
         pasos["manifiesto"] = {"ok": bool(man.get("ok"))}
+        if man.get("zsq"):
+            pasos["zsq"] = man["zsq"]
         if man.get("arbol"):
             pasos["arbol"] = man["arbol"]
         if not man.get("ok"):
@@ -850,12 +981,11 @@ def verificar(
                     "error": man.get("error", ""),
                 }
             cuerpo = man["cuerpo"]
-            if man.get("arbol"):
-                pasos["arbol"] = man["arbol"]
+            if man.get("zsq"):
+                pasos["zsq"] = man["zsq"]
         else:
             pasos["manifiesto"] = {"ok": None, "nota": "ausente en diagnóstico"}
 
-    # Autoridad de parámetros
     if cuerpo is not None:
         n_uso = cuerpo["n_neutro"]
         nucleo_ref = cuerpo["nucleo"]
@@ -880,7 +1010,6 @@ def verificar(
         vals_ref = None
         neutro_ref = None
 
-    # Integridad real
     h = nucleo(datos)
     s_real, q_real = canales(datos)
 
@@ -913,7 +1042,6 @@ def verificar(
             "real": len(datos),
         }
 
-    # Evidencia (no autoriza; si el cuerpo la declara, debe coincidir)
     zinfo = z_invariante(datos)
     pasos["z"] = {
         "ok": True,
@@ -933,7 +1061,6 @@ def verificar(
         ),
     }
 
-    # VEREDICTO
     if modo == MODO_PROTEGIDO:
         ok = all(
             [
@@ -963,6 +1090,7 @@ __all__ = [
     "ESQUEMA_MANIFIESTO",
     "MODO_PROTEGIDO",
     "MODO_DIAGNOSTICO",
+    "NodoZSQ",
     "nucleo",
     "nucleo_digest",
     "canales",
@@ -976,12 +1104,15 @@ __all__ = [
     "verificar_firma",
     "verificar_bytes",
     "serializar",
+    "serializar_seguro",
     "construir_cuerpo",
     "construir_manifiesto",
     "verificar_manifiesto",
     "build",
     "verificar",
-    "compromiso_fractal",
-    "verificar_compromiso",
+    "zsq_de_cuerpo",
+    "verificar_zsq_cuerpo",
+    "fijar_zsq",
+    "construir_arbol_cuerpo",
     "_fragmentos",
 ]

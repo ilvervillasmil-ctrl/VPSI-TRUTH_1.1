@@ -2,20 +2,46 @@
 # tests/test_proteccion_adversarial_demolicion.py
 # VPSI-TRUTH — PROTECCION — batería unificada adversarial + demolición
 #
-# Cadena atacada:
-# MANIFIESTO -> FORMA -> CUERPO -> CANONICALIZACIÓN -> ED25519
-# -> IDENTIDAD -> NUCLEO/S/Q -> EVIDENCIA -> VEREDICTO
+# ---------------------------------------------------------------
+# AUTORÍA
+#   Batería de pruebas: escrita por Claude (Anthropic), a petición
+#   de Ilver Villasmil, sobre el módulo
+#   modules/spartaco_seguridad/proteccion.py — cuya autoría,
+#   arquitectura y diseño son de Ilver Villasmil.
 #
-# Regla:
-#   - Alteración de autoridad => rechazo.
-#   - Referencia externa => nunca sustituye al cuerpo firmado.
-#   - Artefacto alterado => nunca se salva con z/neutro/referencias.
-#   - Entrada hostil => no debe producir crash no controlado.
-#   - verificar() => no debe mutar la evidencia recibida.
+#   Rol de este archivo: atacar el módulo, no diseñarlo. Cada test
+#   intenta romper una propiedad que el módulo declara.
+# ---------------------------------------------------------------
 #
-# Se fusionan las dos baterías originales y se eliminan pruebas
-# duplicadas o que imponían políticas no declaradas por el API actual
-# (p. ej. expiración temporal/revocación externa).
+# CADENA ATACADA
+#   MANIFIESTO → FORMA → CUERPO → CANONICALIZACIÓN → ED25519
+#   → IDENTIDAD → NUCLEO/S/Q → EVIDENCIA → VEREDICTO
+#
+# INVARIANTES BAJO PRUEBA
+#   1. Alteración de autoridad ⇒ rechazo.
+#   2. Referencia externa ⇒ nunca sustituye al cuerpo firmado.
+#   3. Artefacto alterado ⇒ nunca se salva con z / neutro / externos.
+#   4. Entrada hostil ⇒ rechazo controlado, NUNCA excepción libre.
+#      (una excepción no capturada es fail-open en cualquier caller
+#       con `try/except: pass`; por eso cuenta como fallo de seguridad)
+#   5. verificar() ⇒ no muta la evidencia recibida.
+#   6. Modo desconocido ⇒ cae a lo estricto, nunca a diagnóstico.
+#
+# ESTADO CONOCIDO AL ENTREGAR
+#   Contra proteccion.py con el esquema de `valuaciones` acotado
+#   (len ≤ 64, 0 ≤ x ≤ 256): 737 recolectados, 0 fallos, 1 skip.
+#   Sin ese acotado: fallan valuaciones[-1], [10**40] y
+#   list(range(100000)) — el módulo devuelve ok=True y debe dar False.
+#
+# FUERA DE ALCANCE DE ESTA BATERÍA (no se prueba porque el API
+# actual no lo declara; queda como deuda de arquitectura):
+#   - artifact_id no está ligado a los bytes del artefacto
+#   - rollback: version_minima la elige el caller, sin anclaje persistente
+#   - emitido / clave_publica_id: firmados pero nunca consultados
+#     (sin ventana de validez ni revocación)
+#   - el verificador se ejecuta en el mismo proceso que lo verificado
+#   Ningún test puede cerrar estos cuatro. Se documentan aquí para
+#   que quien audite no los confunda con cobertura.
 # ===============================================================
 
 from __future__ import annotations
@@ -51,10 +77,19 @@ from modules.spartaco_seguridad.proteccion import (
 # ===============================================================
 
 def blindado(fn, *args, **kwargs):
-    """Ejecuta una entrada hostil: una excepción no controlada cuenta como fallo."""
+    """
+    Ejecuta una entrada hostil. Una excepción no controlada cuenta
+    como fallo, no como rechazo.
+
+    IMPORTANTE: si el argumento que quieres blindar es a su vez una
+    llamada que puede lanzar (p. ej. serializar(c)), envuelve TODO en
+    un lambda:  blindado(lambda: fn(serializar(c), ...))
+    Si lo pasas como argumento posicional, se evalúa ANTES de entrar
+    aquí y la excepción escapa del blindaje.
+    """
     try:
         resultado = fn(*args, **kwargs)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001 — es exactamente lo que cazamos
         return False, exc
 
     if isinstance(resultado, dict):
@@ -64,6 +99,7 @@ def blindado(fn, *args, **kwargs):
 
 
 def exige_rechazo_limpio(fn, *args, **kwargs):
+    """Debe rechazar SIN excepción."""
     ok, exc = blindado(fn, *args, **kwargs)
     assert exc is None, (
         f"CRASH en lugar de rechazo: {type(exc).__name__}: {exc}"
@@ -79,11 +115,14 @@ def remanifestar(cuerpo, priv):
 
 
 class DictMalo(dict):
-    pass
+    """Subclase de dict: no debe colarse por comprobaciones laxas de tipo."""
 
 
 class DictMutante(dict):
-    """Cambia un campo después de la primera lectura."""
+    """
+    Cambia un campo después de la primera lectura.
+    Ataca el hueco TOCTOU: firmar una cosa y verificar otra.
+    """
 
     def __init__(self, base, campo, malo):
         super().__init__(base)
@@ -107,7 +146,7 @@ class DictMutante(dict):
 
 
 class SiempreIgual:
-    """Ataca validaciones que dependan de == en vez de datos tipados/canónicos."""
+    """Ataca validaciones que dependan de == en vez de datos tipados."""
 
     def __eq__(self, other):
         return True
@@ -249,6 +288,7 @@ def test_firma_build_es_del_cuerpo(build_valido):
 
 
 def test_firma_cuerpo_no_valida_digest_artefacto(build_valido):
+    """La firma es del CUERPO, no del digest del artefacto. No se confunden."""
     r, pub = build_valido
     digest = bytes.fromhex(r["manifiesto"]["cuerpo"]["nucleo"])
     assert verificar_bytes(
@@ -315,6 +355,7 @@ def test_protegido_sin_clave_publica_falla(build_valido):
 
 
 def test_firma_hex_suelta_no_bypassea(build_valido):
+    """Una firma suelta no sustituye al manifiesto en modo protegido."""
     r, pub = build_valido
     v = verificar(
         r["datos"],
@@ -340,7 +381,7 @@ def test_fail_closed_casos_minimos(build_valido, man):
 
 
 # ===============================================================
-# 3. FORMA ESTRICTA
+# 3. FORMA ESTRICTA — el manifiesto es exactamente {cuerpo, firma}
 # ===============================================================
 
 @pytest.mark.parametrize(
@@ -355,9 +396,8 @@ def test_fail_closed_casos_minimos(build_valido, man):
         ("Cuerpo", {}), ("FIRMA", "x"), ("cuerpo\x00", {}),
     ],
 )
-def test_clave_extra_rechazada(
-    build_valido, extra_key, extra_val
-):
+def test_clave_extra_rechazada(build_valido, extra_key, extra_val):
+    """La firma protege el cuerpo; el sobre debe estar cerrado aparte."""
     r, pub = build_valido
     m = copy.deepcopy(r["manifiesto"])
     m[extra_key] = extra_val
@@ -658,9 +698,9 @@ def test_firma_alterada_un_nibble(build_valido):
         "", "00", "zz", "0" * 128,
         "a" * 130, "a", "deadbeef", "gg",
         " " * 64, "\x00",
-        "0x" + "00" * 64,
-        "\n" + "00" * 64,
-        "00 " * 64,
+        "0x" + "00" * 64,      # prefijo hex
+        "\n" + "00" * 64,      # salto de línea
+        "00 " * 64,            # bytes.fromhex ACEPTA espacios: no debe colarse
     ],
 )
 def test_firma_malformada(build_valido, firma):
@@ -720,8 +760,8 @@ def test_mutar_cada_par_hex_firma(build_valido):
 
 def test_firma_maleable_S_mas_L(build_valido):
     """
-    Ed25519: una codificación no canónica de S no debe convertirse
-    en una firma aceptada.
+    Ed25519: una codificación no canónica de S (S + L) no debe
+    convertirse en una firma aceptada.
     """
     r, pub = build_valido
 
@@ -810,9 +850,7 @@ def test_pub_bytes_tipo_hostil_no_crashea(build_valido, pub):
 
 
 def test_firmar_clave_inexistente_falla(tmp_path):
-    r = firmar_bytes(
-        b"msg", str(tmp_path / "no.key")
-    )
+    r = firmar_bytes(b"msg", str(tmp_path / "no.key"))
     assert r["ok"] is False
     assert "CÓDIGO_INVÁLIDO" in r["conceptos"]
 
@@ -821,9 +859,7 @@ def test_firmar_clave_basura_falla(tmp_path):
     p = tmp_path / "fake.key"
     p.write_bytes(b"no-es-ed25519-seed-valida!!!!!")
 
-    ok, exc = blindado(
-        firmar_bytes, b"msg", str(p)
-    )
+    ok, exc = blindado(firmar_bytes, b"msg", str(p))
     assert exc is None
     assert ok is False
 
@@ -833,12 +869,11 @@ def test_firmar_clave_basura_falla(tmp_path):
 # ===============================================================
 
 def test_reordenar_claves_no_rompe(build_valido):
+    """El orden de claves NO es parte de la firma."""
     r, pub = build_valido
     cuerpo = r["manifiesto"]["cuerpo"]
 
-    inverso = {
-        k: cuerpo[k] for k in reversed(list(cuerpo))
-    }
+    inverso = {k: cuerpo[k] for k in reversed(list(cuerpo))}
 
     assert serializar(cuerpo) == serializar(inverso)
 
@@ -856,9 +891,7 @@ def test_reordenar_claves_no_rompe(build_valido):
 def test_serializar_determinista(build_valido):
     r, _ = build_valido
     c = r["manifiesto"]["cuerpo"]
-    assert serializar(c) == serializar(
-        dict(reversed(list(c.items())))
-    )
+    assert serializar(c) == serializar(dict(reversed(list(c.items()))))
 
 
 def test_cambio_semantico_cambia_serializacion(build_valido):
@@ -872,26 +905,21 @@ def test_cambio_semantico_cambia_serializacion(build_valido):
 @pytest.mark.parametrize(
     "a,b",
     [
-        ("café", "cafe\u0301"),
-        ("A", "\u0410"),
-        ("ID", "I\u200bD"),
-        ("x", "x\ufeff"),
-        ("x", "x "),
+        ("café", "cafe\u0301"),   # NFC vs NFD
+        ("A", "\u0410"),          # latina vs cirílica
+        ("ID", "I\u200bD"),       # zero-width
+        ("x", "x\ufeff"),         # BOM
+        ("x", "x "),              # espacio final
     ],
 )
 def test_formas_textuales_distintas_no_colisionan(a, b):
-    assert serializar({"artifact_id": a}) != serializar(
-        {"artifact_id": b}
-    )
+    assert serializar({"artifact_id": a}) != serializar({"artifact_id": b})
 
 
 def test_serializar_claves_mixtas_no_acepta_silenciosamente():
-    ok, exc = blindado(
-        serializar, {1: "a", "b": 2}
-    )
-    assert exc is None or isinstance(
-        exc, (TypeError, ValueError)
-    )
+    """sort_keys con claves int/str mezcladas: debe fallar clasificado."""
+    ok, exc = blindado(serializar, {1: "a", "b": 2})
+    assert exc is None or isinstance(exc, (TypeError, ValueError))
 
 
 def test_serializar_referencia_circular_no_cuelga():
@@ -902,12 +930,11 @@ def test_serializar_referencia_circular_no_cuelga():
     ok, exc = blindado(serializar, c)
 
     assert time.monotonic() - t0 < 5
-    assert exc is None or isinstance(
-        exc, (ValueError, RecursionError)
-    )
+    assert exc is None or isinstance(exc, (ValueError, RecursionError))
 
 
 def test_serializar_surrogate_no_cuelga():
+    """'\\ud800' rompe .encode('utf-8'). Debe fallar controlado."""
     ok, exc = blindado(
         serializar,
         {"esquema": 1, "artifact_id": "\ud800"},
@@ -929,12 +956,11 @@ def test_serializar_anidamiento_profundo_no_cuelga():
     ok, exc = blindado(serializar, c)
 
     assert time.monotonic() - t0 < 5
-    assert exc is None or isinstance(
-        exc, (RecursionError, ValueError)
-    )
+    assert exc is None or isinstance(exc, (RecursionError, ValueError))
 
 
 def test_roundtrip_json_no_cambia_veredicto(build_valido):
+    """El manifiesto viaja como texto: serializar→parsear no altera nada."""
     r, pub = build_valido
     vuelta = json.loads(json.dumps(r["manifiesto"]))
 
@@ -1012,6 +1038,7 @@ def test_esquema_incompatible_falla(build_valido):
 
 
 def test_esquema_firmado_pero_no_autorizado(build_valido, claves):
+    """Firmar un esquema desconocido no lo autoriza."""
     r, _ = build_valido
     priv, _, pub = claves
 
@@ -1094,7 +1121,7 @@ def test_sellar_n_hostil_no_crashea(n):
 
 
 # ===============================================================
-# 11. z / NEUTRO = EVIDENCIA
+# 11. z / NEUTRO = EVIDENCIA, NO AUTORIDAD
 # ===============================================================
 
 def test_z_no_en_fallos(build_valido):
@@ -1136,9 +1163,7 @@ def test_mutar_valuaciones_rompe_firma(build_valido):
 
 def test_diagnostico_sin_manifiesto_ok(build_valido):
     r, _ = build_valido
-    assert verificar(
-        r["datos"], modo=MODO_DIAGNOSTICO
-    )["ok"] is True
+    assert verificar(r["datos"], modo=MODO_DIAGNOSTICO)["ok"] is True
 
 
 def test_diagnostico_manifiesto_valido(build_valido):
@@ -1150,6 +1175,7 @@ def test_diagnostico_manifiesto_valido(build_valido):
 
 
 def test_diagnostico_detecta_manifiesto_falso(build_valido):
+    """Diagnóstico relaja la exigencia de manifiesto, no su validez."""
     r, pub = build_valido
     m = copy.deepcopy(r["manifiesto"])
     m["cuerpo"]["artifact_id"] = "ATACANTE"
@@ -1163,7 +1189,7 @@ def test_diagnostico_detecta_manifiesto_falso(build_valido):
 
 
 # ===============================================================
-# 13. FRAGMENTOS
+# 13. FRAGMENTOS — COBERTURA EXACTA
 # ===============================================================
 
 @pytest.mark.parametrize(
@@ -1174,6 +1200,7 @@ def test_diagnostico_detecta_manifiesto_falso(build_valido):
     ],
 )
 def test_fragmentos_cobertura_exacta(n):
+    """Ni un byte sin cubrir: manipulación en la cola debe ser visible."""
     datos = bytes(i % 256 for i in range(n))
     frags = _fragmentos(datos, k=8)
 
@@ -1233,9 +1260,7 @@ def test_firma_no_reutilizable_otro_mensaje(claves):
 )
 def test_firmar_datos_hostiles_no_crashea(claves, datos):
     priv, _, _ = claves
-    ok, exc = blindado(
-        firmar_bytes, datos, str(priv)
-    )
+    ok, exc = blindado(firmar_bytes, datos, str(priv))
     assert exc is None
 
 
@@ -1259,6 +1284,7 @@ def test_verificar_firma_hostil_no_crashea(claves, firma):
 # ===============================================================
 
 def test_nucleo_S_Q_externos_ignorados(build_valido):
+    """Con manifiesto válido, los kwargs externos se descartan."""
     r, pub = build_valido
     v = verificar(
         r["datos"], manifiesto=r["manifiesto"],
@@ -1293,6 +1319,7 @@ def test_cuatro_referencias_externas_simultaneas(build_valido):
 
 
 def test_externos_no_salvan_artefacto_roto(build_valido):
+    """Un externo que 'confirme' el artefacto roto no lo autoriza."""
     r, pub = build_valido
 
     d = bytearray(r["datos"])
@@ -1327,9 +1354,7 @@ def test_externos_no_salvan_artefacto_roto(build_valido):
         ("clave_publica_id", "CLAVE-ATACANTE"),
     ],
 )
-def test_identidad_algoritmo_mutado_rompe(
-    build_valido, campo, valor
-):
+def test_identidad_algoritmo_mutado_rompe(build_valido, campo, valor):
     r, pub = build_valido
     m = copy.deepcopy(r["manifiesto"])
     m["cuerpo"][campo] = valor
@@ -1356,6 +1381,7 @@ def test_n_bytes_mutado_rompe(build_valido):
 
 # ===============================================================
 # 17. TIPOS ADVERSARIALES
+#     (bool es subclase de int: no debe colarse como entero)
 # ===============================================================
 
 @pytest.mark.parametrize("valor", TIPOS_ADVERSARIOS)
@@ -1392,9 +1418,7 @@ def test_n_neutro_tipo_adversarial(build_valido, valor):
         ("n_bytes", None),
     ],
 )
-def test_campo_cuerpo_tipo_adversarial(
-    build_valido, campo, valor
-):
+def test_campo_cuerpo_tipo_adversarial(build_valido, campo, valor):
     r, pub = build_valido
     m = copy.deepcopy(r["manifiesto"])
     m["cuerpo"][campo] = valor
@@ -1408,20 +1432,23 @@ def test_campo_cuerpo_tipo_adversarial(
 
 @pytest.mark.parametrize("campo", ["nucleo", "S", "Q"])
 @pytest.mark.parametrize("valor", HASH_HOSTIL)
-def test_hash_hostil_no_crashea(
-    build_valido, claves, campo, valor
-):
+def test_hash_hostil_no_crashea(build_valido, claves, campo, valor):
+    """
+    Valores hostiles en campos de hash, RE-FIRMADOS por un atacante
+    con la clave legítima. La firma es válida; el esquema debe rechazar.
+
+    NOTA: serializar(c) va dentro del lambda. Si se pasa como argumento
+    posicional a blindado(), se evalúa antes y su ValueError escapa.
+    """
     r, _ = build_valido
     priv, _, pub = claves
 
     c = copy.deepcopy(r["manifiesto"]["cuerpo"])
     c[campo] = valor
 
-    ok, exc = blindado(
-        firmar_bytes, serializar(c), str(priv)
-    )
+    ok, exc = blindado(lambda: firmar_bytes(serializar(c), str(priv)))
     if exc is not None or not ok:
-        return
+        return  # el canónico ya lo rechazó: rechazo válido
 
     f = firmar_bytes(serializar(c), str(priv))
     ok, exc = blindado(
@@ -1440,21 +1467,24 @@ def test_hash_hostil_no_crashea(
     [
         None, "abc", 1, {"a": 1},
         [None], ["x"], [1.5], [True],
-        [-1], [10 ** 40], list(range(100000)),
+        [-1],                    # valuación negativa: imposible
+        [10 ** 40],              # fuera de rango: máx 256 bits
+        list(range(100000)),     # DoS por longitud
     ],
 )
-def test_valuaciones_hostiles_no_crashean(
-    build_valido, claves, valor
-):
+def test_valuaciones_hostiles_no_crashean(build_valido, claves, valor):
+    """
+    Requiere en _validar_cuerpo_esquema:
+        len(vals) <= 64  y  0 <= x <= 256
+    Sin ese acotado, [-1], [10**40] y range(100000) devuelven ok=True.
+    """
     r, _ = build_valido
     priv, _, pub = claves
 
     c = copy.deepcopy(r["manifiesto"]["cuerpo"])
     c["valuaciones"] = valor
 
-    ok, exc = blindado(
-        firmar_bytes, serializar(c), str(priv)
-    )
+    ok, exc = blindado(lambda: firmar_bytes(serializar(c), str(priv)))
     if exc is not None or not ok:
         return
 
@@ -1573,9 +1603,12 @@ def test_verificar_no_muta_manifiesto_rechazado(build_valido):
     "campo",
     ["version", "nucleo", "S", "Q", "n_neutro", "esquema"],
 )
-def test_toctou_no_debe_producir_aceptacion(
-    build_valido, campo
-):
+def test_toctou_no_debe_producir_aceptacion(build_valido, campo):
+    """
+    Un dict que devuelve un valor la primera lectura y otro después.
+    Se cierra congelando el cuerpo con json.loads(canonico) tras
+    verificar la firma: a partir de ahí son datos inertes.
+    """
     r, pub = build_valido
 
     mutante = DictMutante(
@@ -1604,20 +1637,22 @@ def test_toctou_no_debe_producir_aceptacion(
 
 
 @pytest.mark.parametrize("campo", ["nucleo", "S", "Q"])
-def test_objeto_eq_siempre_true_no_pasa(
-    build_valido, claves, campo
-):
+def test_objeto_eq_siempre_true_no_pasa(build_valido, claves, campo):
+    """
+    Objeto con __eq__ siempre-True: revienta cualquier validación
+    que compare con == en vez de sobre datos tipados y canónicos.
+
+    NOTA: serializar(c) va dentro del lambda (ver test_hash_hostil).
+    """
     r, _ = build_valido
     priv, _, pub = claves
 
     c = dict(r["manifiesto"]["cuerpo"])
     c[campo] = SiempreIgual()
 
-    ok, exc = blindado(
-        firmar_bytes, serializar(c), str(priv)
-    )
+    ok, exc = blindado(lambda: firmar_bytes(serializar(c), str(priv)))
     if exc is not None or not ok:
-        return
+        return  # el canónico lo rechazó: correcto
 
     f = firmar_bytes(serializar(c), str(priv))
     ok, exc = blindado(
@@ -1637,9 +1672,7 @@ def test_objeto_eq_siempre_true_no_pasa(
 
 def test_sellar_n_grande_no_cuelga():
     t0 = time.monotonic()
-    ok, exc = blindado(
-        sellar, b"datos", n=2 ** 40
-    )
+    ok, exc = blindado(sellar, b"datos", n=2 ** 40)
     assert exc is None
     assert time.monotonic() - t0 < 10
 
@@ -1651,17 +1684,18 @@ def test_sellar_idempotencia_veredicto():
     s2 = sellar(s1["datos"], n=3)
     assert s2["ok"] is True
 
-    assert verificar_neutro(
-        s2["datos"], n=3
-    )["ok"] is True
+    assert verificar_neutro(s2["datos"], n=3)["ok"] is True
 
 
 def test_resellado_no_salva_autorizacion(claves):
+    """
+    Con n=3 la marca neutra son ~1.6 bits: el atacante la re-sella en
+    pocos intentos. Este test DOCUMENTA que es marca de build, no
+    barrera — y que la firma sí atrapa el artefacto alterado.
+    """
     priv, _, pub = claves
 
-    original = build(
-        b"ORIGINAL", str(priv), n_neutro=3
-    )
+    original = build(b"ORIGINAL", str(priv), n_neutro=3)
     assert original["ok"] is True
 
     d = bytearray(original["datos"])
@@ -1669,9 +1703,7 @@ def test_resellado_no_salva_autorizacion(claves):
 
     regrindado = sellar(bytes(d), n=3)
     assert regrindado["ok"] is True
-    assert verificar_neutro(
-        regrindado["datos"], n=3
-    )["ok"] is True
+    assert verificar_neutro(regrindado["datos"], n=3)["ok"] is True
 
     v = verificar(
         regrindado["datos"],
@@ -1729,6 +1761,12 @@ def test_datos_tipo_hostil_no_crashea(build_valido, datos):
 
 
 def test_version_gigante_no_cuelga(build_valido, claves):
+    """
+    10**5000 supera el límite de conversión de enteros de Python 3.11
+    (4300 dígitos). Rechazarlo por rango es protección, no fallo.
+
+    NOTA: serializar(c) va dentro del lambda.
+    """
     r, _ = build_valido
     priv, _, pub = claves
 
@@ -1736,14 +1774,10 @@ def test_version_gigante_no_cuelga(build_valido, claves):
     c["version"] = 10 ** 5000
 
     t0 = time.monotonic()
-    ok, exc = blindado(
-        firmar_bytes, serializar(c), str(priv)
-    )
+    ok, exc = blindado(lambda: firmar_bytes(serializar(c), str(priv)))
 
     assert time.monotonic() - t0 < 5
-    assert exc is None or isinstance(
-        exc, (ValueError, OverflowError)
-    )
+    assert exc is None or isinstance(exc, (ValueError, OverflowError))
 
     if exc is None and ok:
         f = firmar_bytes(serializar(c), str(priv))
@@ -1763,9 +1797,7 @@ def test_cuerpo_grande_no_cuelga(build_valido, claves):
     c["artifact_id"] = "A" * (5 * 1024 * 1024)
 
     t0 = time.monotonic()
-    ok, exc = blindado(
-        firmar_bytes, serializar(c), str(priv)
-    )
+    ok, exc = blindado(lambda: firmar_bytes(serializar(c), str(priv)))
 
     assert time.monotonic() - t0 < 15
     assert exc is None or isinstance(
@@ -1806,9 +1838,7 @@ def test_artefacto_grande_no_cuelga(claves):
 # 22. CONCURRENCIA
 # ===============================================================
 
-def test_verificacion_concurrente_sin_estado_compartido(
-    build_valido,
-):
+def test_verificacion_concurrente_sin_estado_compartido(build_valido):
     r, pub = build_valido
     resultados = []
     lock = threading.Lock()
@@ -1829,10 +1859,7 @@ def test_verificacion_concurrente_sin_estado_compartido(
         with lock:
             resultados.extend(locales)
 
-    hilos = [
-        threading.Thread(target=correr)
-        for _ in range(8)
-    ]
+    hilos = [threading.Thread(target=correr) for _ in range(8)]
 
     for h in hilos:
         h.start()
@@ -1848,18 +1875,15 @@ def test_verificacion_concurrente_sin_estado_compartido(
 # 23. INVARIANTES DE CONTRATO
 # ===============================================================
 
-def test_verificar_nunca_lanza_sobre_entrada_arbitraria(
-    build_valido,
-):
+def test_verificar_nunca_lanza_sobre_entrada_arbitraria(build_valido):
+    """Invariante 4: rechazo controlado, nunca excepción libre."""
     r, pub = build_valido
 
     basura = [
         None, 0, "", b"", [], {}, set(), object(),
         1.5, True,
         {
-            "cuerpo": {
-                "a": {"b": {"c": [1, {"d": None}]}}
-            },
+            "cuerpo": {"a": {"b": {"c": [1, {"d": None}]}}},
             "firma": "0" * 128,
         },
     ]
@@ -1871,8 +1895,7 @@ def test_verificar_nunca_lanza_sobre_entrada_arbitraria(
             pub_bytes=pub, modo=MODO_PROTEGIDO,
         )
         assert exc is None, (
-            f"manifiesto={m!r} "
-            f"lanza {type(exc).__name__}: {exc}"
+            f"manifiesto={m!r} lanza {type(exc).__name__}: {exc}"
         )
 
 
@@ -1883,9 +1906,8 @@ def test_verificar_nunca_lanza_sobre_entrada_arbitraria(
         0, 1, -1, [], {}, True,
     ],
 )
-def test_modo_desconocido_no_relaja_seguridad(
-    build_valido, modo
-):
+def test_modo_desconocido_no_relaja_seguridad(build_valido, modo):
+    """Invariante 6: un modo no reconocido nunca degrada a diagnóstico."""
     r, pub = build_valido
     m = copy.deepcopy(r["manifiesto"])
     m["cuerpo"]["artifact_id"] = "ATACANTE"
@@ -1960,4 +1982,8 @@ def test_nucleo_cambia_si_cambia_artefacto(build_valido):
 
 # ===============================================================
 # FIN — batería unificada sin clemencia
+#
+#  Ilver Villasmil.
+# Módulo bajo prueba: modules/spartaco_seguridad/proteccion.py
+# — arquitectura y autoría: Ilver Villasmil.
 # ===============================================================

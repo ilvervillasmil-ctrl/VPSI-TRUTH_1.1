@@ -1039,6 +1039,94 @@ def verificar(
         "pasos": pasos,
     }
 
+# ---------------------------------------------------------------
+# CONTRATO
+# ---------------------------------------------------------------
+
+ESQUEMA_MANIFIESTO: int = 1
+VERSION_MINIMA_DEFAULT: int = 1
+MAX_VERSION: int = 10_000_000
+
+MODO_PROTEGIDO: str = "PROTEGIDO"
+MODO_DIAGNOSTICO: str = "DIAGNOSTICO"
+
+ALGORITMO_HASH: str = "SHA-256"
+ALGORITMO_FIRMA: str = "Ed25519"
+
+HOJA_MAX_BYTES: int = 32
+PROFUNDIDAD_MAX: int = 12
+
+CLAVES_CUERPO: frozenset = frozenset(
+    {
+        "esquema",
+        "version",
+        "emitido",
+        "artifact_id",
+        "clave_publica_id",
+        "algoritmo_hash",
+        "algoritmo_firma",
+        "nucleo",
+        "S",
+        "Q",
+        "n_bytes",
+        "n_neutro",
+        "valuaciones",
+        "identidad_neutra",
+    }
+)
+
+SEGURIDAD: Dict[str, Any] = {
+    "id": "PROTECCION",
+    "nombre": "proteccion",
+    "hace": (
+        "Autentica artefactos con identidad genealógica: nucleo, canales S/Q, "
+        "valuaciones y árbol ZSQ con node_id/parent_id; autoridad Ed25519."
+    ),
+    "herramienta": "Ed25519 + SHA-256 + NodoZSQ(id) + manifiesto {cuerpo, firma}",
+    "version": "1.0",
+    "clave_declaracion": "capacidades_recurso",
+    "capacidades_recurso": [
+        # identidad / núcleo
+        "nucleo",
+        "nucleo_digest",
+        "canales",
+        "z_invariante",
+        "comparar_z",
+        # genealogía ZSQ
+        "node_id",
+        "construir_arbol",
+        "NodoZSQ",
+        # neutro
+        "sellar",
+        "verificar_neutro",
+        # Ed25519
+        "generar_claves",
+        "firmar",
+        "firmar_bytes",
+        "verificar_firma",
+        "verificar_bytes",
+        # canónico
+        "serializar",
+        "serializar_seguro",
+        # cuerpo / manifiesto
+        "construir_cuerpo",
+        "construir_manifiesto",
+        "verificar_manifiesto",
+        # pipeline
+        "build",
+        "verificar",
+    ],
+    "conceptos": [
+        "FIRMA_INVÁLIDA",
+        "INTEGRIDAD_COMPROMETIDA",
+        "MANIFIESTO_AUSENTE",
+        "CÓDIGO_INVÁLIDO",
+        "VERSIÓN_REGRESIVA",
+        "ALTERACIÓN",
+        "MANIPULACIÓN",
+        "CÓDIGO_COMPROMETIDO",
+    ],
+}
 
 # ---------------------------------------------------------------
 # EXPORTS

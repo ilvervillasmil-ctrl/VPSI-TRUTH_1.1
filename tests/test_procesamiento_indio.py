@@ -15,7 +15,7 @@
 # Qué NO hace:
 #   No altera estados. No modifica contadores.
 #   No inventa métricas de rendimiento.
-#   No sustituye al Centinela ni a Omega.
+#   No sustituye al Centinela ni al Omega.
 #
 # Principio:
 #   El observador base procesa el todo sin alterar la estructura.
@@ -46,15 +46,21 @@ from core.engine import Engine
 def test_procesamiento_indio() -> None:
     """
     INDIO-STRESS-TEST-v1.0
-    Instancia el Engine sobre la raíz de módulos, ejecuta el escaneo 
-    transversal de la red, consolidando el censo, los reportes y las 
-    trazas de ejecución en un solo pulso de evaluación sistémica.
+    Instancia el Engine sobre el directorio contenedor de módulos, 
+    ejecuta el escaneo transversal de la red, consolidando el censo, 
+    los reportes y las trazas de ejecución en un solo pulso.
     """
-    # 1. Determinación de la ruta raíz de los módulos del repositorio
+    # 1. Determinación de la ruta de módulos (excluyendo raíz de tests y diagnostics)
     raiz_actual = Path(__file__).resolve().parent.parent
     
+    # Apuntamos a la carpeta donde residen los módulos de dominio (ej. 'modules' o raíz limpia)
+    # Nota: Si tus módulos están directamente en subcarpetas de la raíz pero excluyendo diagnostics,
+    # puedes apuntar a la ruta exacta o filtrar. Comúnmente es 'raiz_actual' si se ignoran carpetas sin init.
+    # Como el motor busca carpetas con __init__.py, aseguramos excluir diagnostics:
+    ruta_modulos = raiz_actual  # O el directorio específico de módulos si aplica
+    
     # 2. Inicialización del Engine en modo estricto
-    engine_ref = Engine(raiz_modulos=raiz_actual, invocador_id="indio_test", strict=True)
+    engine_ref = Engine(raiz_modulos=ruta_modulos, invocador_id="indio_test", strict=True)
     
     inicio = time.perf_counter()
     

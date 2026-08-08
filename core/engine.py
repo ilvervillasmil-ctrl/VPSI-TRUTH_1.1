@@ -912,6 +912,34 @@ class Engine:
         """Copia inmutable de la evidencia de ejecución."""
         return tuple(dict(t) for t in self._trazas)
 
+    
+    @property
+    def centinela(self) -> Centinela:
+        if self._centinela is None:
+            self._centinela = Centinela(invocador=self)
+        return self._centinela
+
+    def invocar(self, modulo: str, capacidad: str, *args: Any, **kwargs: Any) -> Any:
+        salida = self.ejecutar_capacidad(modulo, capacidad, *args, **kwargs)
+        if isinstance(salida, dict) and salida.get("estado") == "EXITO":
+            return salida.get("resultado")
+        if isinstance(salida, dict) and "error" in salida:
+            raise RuntimeError(str(salida.get("error")))
+        return salida
+
+    def verificar_con_centinela(self, paquete: Dict[str, Any], *, depositar_salida: bool = True) -> Veredicto:
+        inicio = time.perf_counter()
+        ciclo_id = paquete.get(PKG_CICLO_ID) if isinstance(paquete, dict) else None
+        try:
+            veredicto = self.centinela.verificar(paquete, depositar_salida=depositar_salida)
+            duracion = round(time.perf_counter() - inicio, 6)
+            self._registrar_traza(modulo="ENGINE", capacidad="verificar_con_centinela", estado=str(veredicto.estado), duracion_s=duracion, ciclo_id=ciclo_id)
+            return veredicto
+        except Exception as e:
+            duracion = round(time.perf_counter() - inicio, 6)
+            self._registrar_traza(modulo="ENGINE", capacidad="verificar_con_centinela", estado="ERROR_AUDITORIA", duracion_s=duracion, error=f"{type(e).__name__}: {e}", ciclo_id=ciclo_id)
+            raise
+
 # ===============================================================
 # FIN ENGINE
 # ===============================================================

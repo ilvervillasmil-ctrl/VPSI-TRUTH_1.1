@@ -625,6 +625,7 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "metricas": True,
         "diagnostico": True,
+        "reporte": True,
     },
 
     # ----- ESTADOS VÁLIDOS -----

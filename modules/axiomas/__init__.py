@@ -388,24 +388,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    # ----- REPORTING -----
-"reporting": {
-    "estado": True,
-    "salud": True,
-    "inventario": True,
-    "capacidades": True,
-    "errores": True,
-    "advertencias": True,
-    "dependencias": True,
-    "version": True,
-    "contrato": True,
-    "conocimiento": True,
-    "metricas": True,
-    "diagnostico": True,
-    "reporte": True,
-},  # <--- SE PUEDE 
-
-"autoriza_engine": {
+    "autoriza_engine": {
     # --- PERMISOS BASE ---
     "leer": True,
     "ejecutar": True,
@@ -420,7 +403,7 @@ CONTENEDOR: Dict[str, Any] = {
     "alterar": False,
     "reescribir": False,
     "crear": True,
-    "eliminar": True,
+    "eliminar": False,
     "actualizar": True,
 
     # --- PERMISOS DE PROCESAMIENTO ---
@@ -428,7 +411,7 @@ CONTENEDOR: Dict[str, Any] = {
     "procesar": True,
     "analizar": True,
     "generar": True,
-    "transformar": True,
+    "transformar": False,
 
     # --- PERMISOS DE DATOS ---
     "exportar": True,
@@ -439,8 +422,25 @@ CONTENEDOR: Dict[str, Any] = {
 
     # --- PERMISOS DE MONITOREO ---
     "monitorear": True,
-    "alertar": False,
-},  # <--- ESTA COMA TAMBIÉN ES BUENA PONERLA
+    "alertar": True,
+
+    # --- REPORTING ---
+    "metricas": True,
+    "estado": True,
+    "version": True,
+    "salud": True,
+    "inventario": True,
+    "capacidades": True,
+    "errores": True,
+    "advertencias": True,
+    "dependencias": True,
+    "contrato": True,
+    "conocimiento": True,
+    "diagnostico": True,
+    "reporte": True,
+},
+   
+    
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),
 

@@ -195,12 +195,10 @@ class ContratoInvalido(Exception):
 # ===============================================================
 
 
-# ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
-# ===============================================================
-
 CONTENEDOR: Dict[str, Any] = {
-    # ----- ESQUEMA -----
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
@@ -208,7 +206,9 @@ CONTENEDOR: Dict[str, Any] = {
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
 
-    # ----- IDENTIDAD -----
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
@@ -218,7 +218,9 @@ CONTENEDOR: Dict[str, Any] = {
         "oficiales del repositorio."
     ),
 
-    # ----- PROPÓSITO -----
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
     "funcion": (
         "Ser la fuente oficial del conocimiento axiomático: "
         "cargar, normalizar, validar coherencia, responder consultas, "
@@ -232,7 +234,9 @@ CONTENEDOR: Dict[str, Any] = {
         "No modifica declaraciones ajenas",
     ],
 
-    # ----- AUTORIDAD -----
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
     "autoridad": [
         "Exponer cualquier axioma, lema, teorema, corolario o definición",
         "Responder consultas por id, dominio, sujeto, relación, objeto",
@@ -242,7 +246,9 @@ CONTENEDOR: Dict[str, Any] = {
         "Notificar a DiagnosticoGlobal cuando hay choques o errores",
     ],
 
-    # ----- CONOCIMIENTO EXPORTABLE -----
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
     "conocimiento_exportable": [
         "declaraciones",
         "referencias",
@@ -256,10 +262,14 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico",
     ],
 
-    # ----- DEPENDENCIAS -----
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
     "requiere": [],
 
-    # ----- CONSULTAS SOPORTADAS -----
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
     "consultas_soportadas": [
         "buscar_por_id",
         "buscar_por_dominio",
@@ -272,7 +282,9 @@ CONTENEDOR: Dict[str, Any] = {
         "recolectar",
     ],
 
-    # ----- CAPACIDADES -----
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
     "capacidades": {
         "verificar": "barrer",
         "barrer": "barrer",
@@ -289,7 +301,9 @@ CONTENEDOR: Dict[str, Any] = {
         "buscar_por_id": "buscar_por_id",
     },
 
-    # ----- METADATOS DE CAPACIDADES -----
+    # ============================================================
+    # METADATOS DE CAPACIDADES
+    # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
@@ -358,8 +372,11 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    # ----- AUTORIZACIÓN AL ENGINE -----
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -367,44 +384,52 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
         "alterar": False,
         "reescribir": False,
         "crear": True,
         "eliminar": False,
         "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
         "generar": True,
         "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
         "exportar": True,
         "importar": True,
         "respaldar": True,
         "recuperar": True,
         "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
         "alertar": True,
         "metricas": True,
         "diagnostico": True,
-        "reporting": {
-            "estado": True,
-            "salud": True,
-            "inventario": True,
-            "capacidades": True,
-            "errores": True,
-            "advertencias": True,
-            "dependencias": True,
-            "version": True,
-            "contrato": True,
-            "conocimiento": True,
-            "metricas": True,
-            "diagnostico": True,
-            "reporte": True,
-        },
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
 
-    # ----- REPORTING -----
+    # ============================================================
+    # REPORTING (NECESARIO PARA EL CONTRATO)
+    # ============================================================
     "reporting": {
         "estado": True,
         "salud": True,
@@ -421,13 +446,17 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
     },
 
-    # ----- ESTADOS VÁLIDOS -----
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
 
-    # ----- INVARIANTES -----
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
     "invariantes": list(INVARIANTES),
 
-}  # <--- CIERRE FINAL ÚNICO
+}  # <--- CIERRE FINAL
 
 # ===============================================================
 # FIN CONTRATO

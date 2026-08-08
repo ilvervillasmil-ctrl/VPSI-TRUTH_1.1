@@ -271,6 +271,7 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
     ],
+}  # <--- CIERRE FINAL
 
     # ----- DEPENDENCIAS -----
     "requiere": [],

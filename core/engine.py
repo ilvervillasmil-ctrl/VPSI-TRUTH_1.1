@@ -130,33 +130,6 @@ LISTAS_STR_OBLIGATORIAS = (
 # ===============================================================
 # FIN CONSTANTES
 # ===============================================================
-# ===============================================================
-# INICIO: CONFIGURACIÓN DE REQUERIMIENTOS DE DIAGNÓSTICO
-# ===============================================================
-# Este bloque define la lista oficial y ordenada de módulos que 
-# el Engine (Angelina) debe validar, cargar y entregar formalmente 
-# a Diagnostics para que el sistema opere de forma unificada.
-# ===============================================================
-
-    "requiere": [
-        "AX",
-        "CA",
-        "CH",
-        "CIT",
-        "CT",
-        "CX",
-        "FO",
-        "MC",
-        "RE",
-        "SF",
-        "TX",
-        "UI",
-        "VX",
-    ],
-
-# ===============================================================
-# FIN: CONFIGURACIÓN DE REQUERIMIENTOS DE DIAGNÓSTICO
-# ===============================================================
 
 
 # ===============================================================
@@ -247,45 +220,6 @@ class RegistroModulos:
 
 # ===============================================================
 # FIN DEFINICIONES
-# ===============================================================
-# ===============================================================
-# CORRECCIÓN DE SINTAXIS — core/engine.py (Línea 141)
-# ===============================================================
-# Este bloque corrige el error de indentación (SyntaxError) 
-# detectado en el archivo del Engine, asegurando que los bloques 
-# de código mantengan la alineación exacta exigida por Python.
-# ===============================================================
-
-class RegistroModulos:
-    def __init__(self) -> None:
-        self.contenedores: Dict[str, Contenedor] = {}
-        self.por_id: Dict[str, Contenedor] = {}
-        self.por_rol: Dict[str, List[Contenedor]] = {}
-
-    def registrar(self, cont: Contenedor) -> List[str]:
-        errores = []
-        if cont.nombre in self.contenedores:
-            errores.append(f"duplicado de nombre: '{cont.nombre}' ya registrado")
-        if cont.id and cont.id in self.por_id:
-            errores.append(
-                f"duplicado de id: '{cont.id}' ya registrado "
-                f"(módulo {self.por_id[cont.id].nombre})"
-            )
-        if cont.rol in self.por_rol and self.por_rol[cont.rol]:
-            existente = self.por_rol[cont.rol][0].nombre
-            errores.append(
-                f"duplicado de rol: '{cont.rol}' ya ocupado por '{existente}'"
-            )
-        if errores:
-            return errores
-        self.contenedores[cont.nombre] = cont
-        if cont.id:
-            self.por_id[cont.id] = cont
-        self.por_rol.setdefault(cont.rol, []).append(cont)
-        return []
-
-# ===============================================================
-# FIN CORRECCIÓN DE SINTAXIS
 # ===============================================================
 
 

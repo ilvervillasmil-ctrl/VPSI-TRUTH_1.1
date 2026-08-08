@@ -1,22 +1,75 @@
 """
 VPSI-TRUTH --- modules/diagnostics/__init__.py
 
-Rol DGS: diagnóstico sistémico / Omega Report.
+MÓDULO:              diagnostics
+ID:                  DGS
+Rol:                 DG
+Versión módulo:      1.1
+Versión contrato:    1.0
+Esquema contrato:    VPSI-CONTRACT-1.0
+Estabilidad:         ESTABLE
+Compatible desde:   1.0
+API Engine:          >=1.0
 
-Este módulo es reconocido directamente por el Engine como DGS.
+Función:
+    Recibir, validar y presentar información diagnóstica producida
+    por el Engine y por los módulos del sistema.
 
-No calcula Tru.
-No recalcula C, L, K, Tru_Ri ni Tru_total.
-No ejecuta módulos de dominio.
-No modifica el estado del Engine.
-No altera contratos.
-No reconstruye evidencia.
+Qué hace:
+    - Valida la estructura de los datos recibidos.
+    - Lee evidencia persistente de evaluaciones.
+    - Genera el Omega Report a partir de información ya producida.
+    - Expone inventario y estado estructural.
+    - Conserva la estructura de los registros recibidos.
 
-Recibe información ya producida por el Engine y por los módulos,
-valida su integridad estructural y genera el Omega Report.
+Qué no hace:
+    - No calcula Tru.
+    - No recalcula C, L, K, Tru_Ri ni Tru_total.
+    - No vuelve a barrer axiomas.
+    - No ejecuta lógica de dominio.
+    - No modifica el estado del Engine.
+    - No modifica contratos.
+    - No reconstruye registros de evidencia.
 
-La persistencia de evidencia corresponde a diagnostics/evidencia.py.
+Responsabilidad:
+    Diagnóstico sistémico de recepción y presentación.
+    Este módulo observa, valida y presenta información existente.
+
+Autoridad:
+    - Validar la estructura de información diagnóstica recibida.
+    - Presentar información producida por el sistema.
+    - Reportar el estado estructural del diagnóstico.
+    - Inventariar sus capacidades y contrato.
+
+Conocimiento exportable:
+    - inventario
+    - reporte
+    - diagnostico
+    - estado
+    - salud
+    - capacidades
+    - errores
+    - advertencias
+    - dependencias
+    - versión
+    - contrato
+    - conocimiento
+    - métricas
+    - evidencia
+    - omega_report
+
+Relación con Engine:
+    Engine descubre este CONTENEDOR y ejecuta únicamente las
+    capacidades declaradas.
+
+Relación con Omega:
+    Omega recibe información ya producida por Engine.
+    Este módulo no recalcula los valores que presenta.
 """
+
+# ===============================================================
+# IMPORTACIONES
+# ===============================================================
 
 from __future__ import annotations
 
@@ -27,173 +80,89 @@ from typing import Any, Dict, List, Optional
 
 
 # ===============================================================
-# CONTENEDOR — CONTRATO VPSI
+# IDENTIDAD Y VERSIONADO
 # ===============================================================
 
-CONTENEDOR: Dict[str, Any] = {
-    "nombre": "diagnostics",
-    "rol": "DG",
+ID_MODULO = "DGS"
+NOMBRE_MODULO = "diagnostics"
+ROL_MODULO = "DG"
 
-    # -----------------------------------------------------------
-    # IDENTIDAD CONTRACTUAL
-    # -----------------------------------------------------------
-    "esquema": "VPSI-CONTRACT-1.0",
-    "version_contrato": "1.0",
-    "version_modulo": "1.1",
-    "id": "DGS",
+VERSION_MODULO = "1.1"
+VERSION_CONTRATO = "1.0"
+ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
 
-    # -----------------------------------------------------------
-    # FUNCIÓN
-    # -----------------------------------------------------------
-    "funcion": (
-        "Diagnóstico sistémico y generación del Omega Report "
-        "a partir de información real producida por el Engine "
-        "y los módulos del sistema."
-    ),
+COMPATIBLE_DESDE = "1.0"
+API_ENGINE = ">=1.0"
 
-    # -----------------------------------------------------------
-    # LÍMITES
-    # -----------------------------------------------------------
-    "no_hace": [
-        "No calcula Tru.",
-        "No recalcula C, L, K, Tru_Ri ni Tru_total.",
-        "No vuelve a barrer axiomas.",
-        "No ejecuta mecánica de dominio.",
-        "No modifica el estado del Engine.",
-        "No modifica contratos de otros módulos.",
-        "No reconstruye registros de evidencia.",
-        "No elimina claves de los registros recibidos.",
-        "No decide por sí mismo la validez del sistema.",
-    ],
+ESTABILIDAD = "ESTABLE"
 
-    # -----------------------------------------------------------
-    # AUTORIDAD
-    # -----------------------------------------------------------
-    "autoridad": "DG",
 
-    "conocimiento_exportable": {
-        "reportes": True,
-        "evidencia": True,
-        "diagnostico": True,
-        "solo_lectura": True,
-    },
+# ===============================================================
+# ESTADOS
+# ===============================================================
 
-    # -----------------------------------------------------------
-    # AUTORIZACIÓN DEL ENGINE
-    # -----------------------------------------------------------
-    "autoriza_engine": {
-        "registrar": True,
-        "consultar": True,
-        "reportar": True,
-        "generar_reporte": True,
-        "ejecutar": False,
-        "modificar_estado": False,
-        "modificar_contratos": False,
-        "modificar_evidencia": False,
-    },
+ESTADO_NO_INICIADO = "NO_INICIADO"
+ESTADO_OPERATIVO = "OPERATIVO"
+ESTADO_DEGRADADO = "DEGRADADO"
+ESTADO_RECHAZADO = "RECHAZADO"
 
-    # -----------------------------------------------------------
-    # CONSULTAS SOPORTADAS
-    # -----------------------------------------------------------
-    "consultas_soportadas": [
-        "verificar",
-        "inventario",
-        "generar_reporte",
-        "validar_entrada",
-        "leer_evidencia",
-    ],
+ESTADOS_VALIDOS = (
+    ESTADO_NO_INICIADO,
+    ESTADO_OPERATIVO,
+    ESTADO_DEGRADADO,
+    ESTADO_RECHAZADO,
+)
 
-    # -----------------------------------------------------------
-    # CAPACIDADES META
-    # -----------------------------------------------------------
-    "capacidades_meta": {
-        "observacion": True,
-        "diagnostico": True,
-        "presentacion": True,
-        "actuacion": False,
-        "mutacion_engine": False,
-    },
 
-    # -----------------------------------------------------------
-    # REPORTING
-    # -----------------------------------------------------------
-    "reporting": {
-        "produce_reporte": True,
-        "nombre_reporte": "OMEGA REPORT",
-        "solo_presentacion": True,
-        "recalculo": False,
-    },
+# ===============================================================
+# INVARIANTES
+# ===============================================================
 
-    # -----------------------------------------------------------
-    # ESTADOS
-    # -----------------------------------------------------------
-    "estados_validos": [
-        "OPERATIVO",
-        "RECHAZADO",
-        "NO_INICIADO",
-    ],
+INVARIANTES = (
+    "el id del módulo nunca cambia",
+    "el rol nunca cambia",
+    "las capacidades declaradas son siempre callables tras la resolución",
+    "este módulo no modifica el estado de otros módulos",
+    "este módulo no recalcula métricas recibidas",
+    "este módulo conserva la estructura de los registros recibidos",
+    "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+)
 
-    # -----------------------------------------------------------
-    # INVARIANTES
-    # -----------------------------------------------------------
-    "invariantes": [
-        "No modifica el estado del Engine.",
-        "No recalcula métricas.",
-        "No altera evidencia recibida.",
-        "No ejecuta lógica de dominio.",
-        "No modifica contratos.",
-        "Conserva la estructura de los registros recibidos.",
-    ],
 
-    # -----------------------------------------------------------
-    # ESTABILIDAD
-    # -----------------------------------------------------------
-    "estabilidad": {
-        "inmutable": True,
-        "persistencia_externa": True,
-        "compatible": True,
-    },
+# ===============================================================
+# RUTAS
+# ===============================================================
 
-    # -----------------------------------------------------------
-    # COMPATIBILIDAD / API
-    # -----------------------------------------------------------
-    "compatible_desde": "1.0",
-    "api_engine": "1.0",
+_DIR = Path(__file__).resolve()
 
-    # -----------------------------------------------------------
-    # DEPENDENCIAS
-    # -----------------------------------------------------------
-    "requiere": ["CT", "AX", "FO"],
+# modules/diagnostics/__init__.py
+# parents[0] = diagnostics
+# parents[1] = modules
+# parents[2] = raíz del repositorio
+RAIZ_REPO = _DIR.parents[1]
 
-    "descripcion": (
-        "Contenedor de diagnóstico sistémico DGS. "
-        "Recibe los informes reales producidos por el Engine "
-        "y los módulos y genera el Omega Report sin recalcular "
-        "ninguna métrica. Puede leer evidencia persistente, "
-        "pero no la modifica directamente."
-    ),
-
-    # Se rellenan al final con callables reales.
-    "capacidades": {},
-}
+DIAGNOSTICS_DIR = RAIZ_REPO / "diagnostics"
+RUTA_EVIDENCIA = DIAGNOSTICS_DIR / "evaluaciones.json"
 
 
 # ===============================================================
 # ERRORES
 # ===============================================================
 
+class ContratoInvalido(Exception):
+    """El CONTENEDOR no cumple el esquema contractual."""
+
+
 class DiagnosticoError(Exception):
     """Error en la capa de diagnóstico."""
-    pass
 
 
 class EntradaIncompletaError(DiagnosticoError):
     """Faltan informes obligatorios para generar el reporte."""
-    pass
 
 
 # ===============================================================
-# DATOS OBLIGATORIOS DEL ENGINE
+# CAMPOS DEL DIAGNÓSTICO
 # ===============================================================
 
 CAMPOS_OBLIGATORIOS = (
@@ -217,100 +186,408 @@ CAMPOS_OPCIONALES = (
 
 
 # ===============================================================
-# VALIDACIÓN DE ENTRADA
+# CONTRATO OFICIAL
 # ===============================================================
 
-def validar_entrada(datos: Dict[str, Any]) -> List[str]:
+CONTENEDOR: Dict[str, Any] = {
+
+    # -----------------------------------------------------------
+    # ESQUEMA / VERSIONADO
+    # -----------------------------------------------------------
+
+    "esquema": ESQUEMA_CONTRATO,
+    "version_contrato": VERSION_CONTRATO,
+    "version_modulo": VERSION_MODULO,
+    "estabilidad": ESTABILIDAD,
+    "compatible_desde": COMPATIBLE_DESDE,
+    "api_engine": API_ENGINE,
+
+    # -----------------------------------------------------------
+    # IDENTIDAD
+    # -----------------------------------------------------------
+
+    "id": ID_MODULO,
+    "nombre": NOMBRE_MODULO,
+    "rol": ROL_MODULO,
+
+    "descripcion": (
+        "Contenedor de diagnóstico sistémico que recibe, valida y "
+        "presenta información producida por el Engine y los módulos."
+    ),
+
+    # -----------------------------------------------------------
+    # PROPÓSITO
+    # -----------------------------------------------------------
+
+    "funcion": (
+        "Validar estructuralmente información diagnóstica existente "
+        "y generar una representación objetiva del estado del sistema "
+        "sin recalcular sus métricas."
+    ),
+
+    "no_hace": [
+        "No calcula Tru.",
+        "No recalcula C, L, K, Tru_Ri ni Tru_total.",
+        "No vuelve a barrer axiomas.",
+        "No ejecuta lógica de dominio.",
+        "No modifica el estado del Engine.",
+        "No modifica contratos.",
+        "No altera evidencia recibida.",
+        "No reconstruye registros recibidos.",
+    ],
+
+    # -----------------------------------------------------------
+    # AUTORIDAD
+    # -----------------------------------------------------------
+
+    "autoridad": [
+        "Validar la estructura de información diagnóstica recibida.",
+        "Presentar información producida por el sistema.",
+        "Reportar el estado estructural del diagnóstico.",
+        "Inventariar el módulo y sus capacidades.",
+    ],
+
+    # -----------------------------------------------------------
+    # CONOCIMIENTO EXPORTABLE
+    # -----------------------------------------------------------
+
+    "conocimiento_exportable": [
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "estado",
+        "salud",
+        "capacidades",
+        "errores",
+        "advertencias",
+        "dependencias",
+        "version",
+        "contrato",
+        "conocimiento",
+        "metricas",
+        "evidencia",
+        "omega_report",
+    ],
+
+    # -----------------------------------------------------------
+    # DEPENDENCIAS
+    # -----------------------------------------------------------
+
+    "requiere": [
+        "CT",
+        "AX",
+        "FO",
+    ],
+
+    # -----------------------------------------------------------
+    # AUTORIZACIÓN DEL ENGINE
+    #
+    # Se utilizan únicamente permisos reconocidos por el contrato.
+    # -----------------------------------------------------------
+
+    "autoriza_engine": {
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": False,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+        "modificar": False,
+        "alterar": False,
+        "reescribir": False,
+    },
+
+    # -----------------------------------------------------------
+    # CONSULTAS SOPORTADAS
+    # -----------------------------------------------------------
+
+    "consultas_soportadas": [
+        "verificar",
+        "inventario",
+        "generar_reporte",
+        "validar_entrada",
+        "leer_evidencia",
+    ],
+
+    # -----------------------------------------------------------
+    # CAPACIDADES
+    # -----------------------------------------------------------
+
+    "capacidades": {
+        "verificar": "verificar",
+        "inventario": "inventario",
+        "generar_reporte": "generar_reporte",
+        "validar_entrada": "validar_entrada",
+        "leer_evidencia": "leer_evidencia",
+    },
+
+    # -----------------------------------------------------------
+    # METADATOS DE CAPACIDADES
+    #
+    # OBLIGATORIO: correspondencia 1:1.
+    # -----------------------------------------------------------
+
+    "capacidades_meta": {
+
+        "verificar": {
+            "descripcion": (
+                "Valida que la información recibida sea suficiente "
+                "y estructuralmente coherente."
+            ),
+            "entrada": "dict opcional con información del Engine",
+            "salida": "dict con estado, coherente, faltas y evidencia",
+        },
+
+        "inventario": {
+            "descripcion": (
+                "Expone la identidad, contrato, dependencias y "
+                "capacidades declaradas por DGS."
+            ),
+            "entrada": "petición opcional",
+            "salida": "dict con inventario contractual del módulo",
+        },
+
+        "generar_reporte": {
+            "descripcion": (
+                "Genera el Omega Report utilizando únicamente "
+                "información ya producida por el sistema."
+            ),
+            "entrada": "dict con información diagnóstica del Engine",
+            "salida": "dict con Omega Report",
+        },
+
+        "validar_entrada": {
+            "descripcion": (
+                "Comprueba la presencia y estructura de los campos "
+                "obligatorios recibidos."
+            ),
+            "entrada": "dict con información diagnóstica",
+            "salida": "list de faltas estructurales",
+        },
+
+        "leer_evidencia": {
+            "descripcion": (
+                "Lee la evidencia persistente de evaluaciones "
+                "sin modificarla."
+            ),
+            "entrada": "ninguna",
+            "salida": "dict con evidencia persistente",
+        },
+    },
+
+    # -----------------------------------------------------------
+    # REPORTING
+    # -----------------------------------------------------------
+
+    "reporting": {
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
+    },
+
+    # -----------------------------------------------------------
+    # ESTADOS
+    # -----------------------------------------------------------
+
+    "estados_validos": list(ESTADOS_VALIDOS),
+
+    # -----------------------------------------------------------
+    # INVARIANTES
+    # -----------------------------------------------------------
+
+    "invariantes": list(INVARIANTES),
+}
+
+
+# ===============================================================
+# VALIDACIÓN DEL CONTRATO
+# ===============================================================
+
+def _validar_contrato(cont: Dict[str, Any]) -> None:
     """
-    Verifica que el Engine haya pasado la información mínima real.
-
-    No calcula.
-    No modifica.
-    Solo valida presencia y estructura.
+    Autoauditoría del contrato DGS.
+    Fail-closed: cualquier incumplimiento impide cargar el módulo.
     """
-    faltas: List[str] = []
 
-    if not isinstance(datos, dict):
-        return ["entrada no es dict"]
+    obligatorias = (
+        "esquema",
+        "version_contrato",
+        "version_modulo",
+        "id",
+        "nombre",
+        "rol",
+        "descripcion",
+        "funcion",
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "requiere",
+        "autoriza_engine",
+        "consultas_soportadas",
+        "capacidades",
+        "capacidades_meta",
+        "reporting",
+        "estados_validos",
+        "invariantes",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+    )
 
-    for campo in CAMPOS_OBLIGATORIOS:
-        if campo not in datos:
-            faltas.append(
-                "falta campo obligatorio: {0}".format(campo)
+    faltantes = [
+        clave
+        for clave in obligatorias
+        if clave not in cont
+    ]
+
+    if faltantes:
+        raise ContratoInvalido(
+            "{0}: CONTENEDOR incompleto. Faltan: {1}".format(
+                NOMBRE_MODULO,
+                faltantes,
             )
+        )
 
-    if "constantes" in datos:
-        c = datos["constantes"]
-
-        if not isinstance(c, dict):
-            faltas.append(
-                "constantes debe ser dict"
+    if cont.get("esquema") != ESQUEMA_CONTRATO:
+        raise ContratoInvalido(
+            "{0}: esquema incompatible: {1}".format(
+                NOMBRE_MODULO,
+                cont.get("esquema"),
             )
-        elif "ALPHA" not in c or "BETA" not in c:
-            faltas.append(
-                "constantes debe contener ALPHA y BETA"
-            )
+        )
 
-    if "informe_axiomas" in datos:
-        ia = datos["informe_axiomas"]
-
-        if not isinstance(ia, dict):
-            faltas.append(
-                "informe_axiomas debe ser dict"
+    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
+        raise ContratoInvalido(
+            "{0}: version_contrato inválida: {1}".format(
+                NOMBRE_MODULO,
+                cont.get("version_contrato"),
             )
-        elif "coherente" not in ia:
-            faltas.append(
-                "informe_axiomas sin clave 'coherente'"
-            )
+        )
 
-    if "estado_engine" in datos:
-        if datos["estado_engine"] not in (
-            "OPERATIVO",
-            "RECHAZADO",
-            "NO_INICIADO",
-        ):
-            faltas.append(
-                "estado_engine invalido: {0}".format(
-                    datos["estado_engine"]
+    if not isinstance(cont.get("no_hace"), list):
+        raise ContratoInvalido(
+            "{0}: 'no_hace' debe ser list".format(NOMBRE_MODULO)
+        )
+
+    if not isinstance(cont.get("autoridad"), list):
+        raise ContratoInvalido(
+            "{0}: 'autoridad' debe ser list".format(NOMBRE_MODULO)
+        )
+
+    if not isinstance(cont.get("conocimiento_exportable"), list):
+        raise ContratoInvalido(
+            "{0}: 'conocimiento_exportable' debe ser list".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    if not isinstance(cont.get("requiere"), list):
+        raise ContratoInvalido(
+            "{0}: 'requiere' debe ser list".format(NOMBRE_MODULO)
+        )
+
+    if not isinstance(cont.get("capacidades"), dict):
+        raise ContratoInvalido(
+            "{0}: 'capacidades' debe ser dict".format(NOMBRE_MODULO)
+        )
+
+    if not isinstance(cont.get("capacidades_meta"), dict):
+        raise ContratoInvalido(
+            "{0}: 'capacidades_meta' debe ser dict".format(NOMBRE_MODULO)
+        )
+
+    # -----------------------------------------------------------
+    # Regla 1:1 capacidades ↔ capacidades_meta
+    # -----------------------------------------------------------
+
+    for nombre_cap in cont["capacidades"]:
+
+        if nombre_cap not in cont["capacidades_meta"]:
+            raise ContratoInvalido(
+                "{0}: capacidad '{1}' sin capacidades_meta".format(
+                    NOMBRE_MODULO,
+                    nombre_cap,
                 )
             )
 
-    if "resultados_evaluacion" in datos:
-        if not isinstance(datos["resultados_evaluacion"], list):
-            faltas.append(
-                "resultados_evaluacion debe ser list"
+        meta = cont["capacidades_meta"][nombre_cap]
+
+        if not isinstance(meta, dict):
+            raise ContratoInvalido(
+                "{0}: capacidades_meta['{1}'] debe ser dict".format(
+                    NOMBRE_MODULO,
+                    nombre_cap,
+                )
             )
 
-    return faltas
+        for campo in (
+            "descripcion",
+            "entrada",
+            "salida",
+        ):
+            if (
+                campo not in meta
+                or not isinstance(meta[campo], str)
+            ):
+                raise ContratoInvalido(
+                    "{0}: capacidades_meta['{1}'] requiere "
+                    "'{2}: str'".format(
+                        NOMBRE_MODULO,
+                        nombre_cap,
+                        campo,
+                    )
+                )
+
+    # -----------------------------------------------------------
+    # Estados
+    # -----------------------------------------------------------
+
+    if not isinstance(cont.get("estados_validos"), list):
+        raise ContratoInvalido(
+            "{0}: 'estados_validos' debe ser list".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    # -----------------------------------------------------------
+    # Reporting
+    # -----------------------------------------------------------
+
+    if not isinstance(cont.get("reporting"), dict):
+        raise ContratoInvalido(
+            "{0}: 'reporting' debe ser dict".format(
+                NOMBRE_MODULO
+            )
+        )
 
 
 # ===============================================================
-# EVIDENCIA PERSISTENTE
+# LECTURA DE EVIDENCIA
 # ===============================================================
 
 def _ruta_evaluaciones() -> Path:
-    """
-    diagnostics/ en la raíz del repositorio.
-
-    modules/diagnostics/__init__.py
-        parents[2]
-            -> raíz del repo
-
-    Por tanto:
-        raíz/diagnostics/evaluaciones.json
-    """
-    raiz = Path(__file__).resolve().parents[2]
-    return raiz / "diagnostics" / "evaluaciones.json"
+    return RUTA_EVIDENCIA
 
 
 def leer_evidencia() -> Dict[str, Any]:
     """
-    Lee diagnostics/evaluaciones.json si existe.
+    Lee diagnostics/evaluaciones.json.
 
     No escribe.
-    No modifica.
+    No recalcula.
     No fusiona.
     """
+
     vacio: Dict[str, Any] = {
         "tipo": "evidencia_evaluacion",
         "version": None,
@@ -332,26 +609,95 @@ def leer_evidencia() -> Dict[str, Any]:
     except Exception:
         return vacio
 
-    if not isinstance(doc, dict):
-        return vacio
-
-    if not isinstance(doc.get("resultados"), list):
+    if (
+        not isinstance(doc, dict)
+        or not isinstance(doc.get("resultados"), list)
+    ):
         return vacio
 
     return doc
 
 
 # ===============================================================
+# VALIDACIÓN DE ENTRADA
+# ===============================================================
+
+def validar_entrada(
+    datos: Dict[str, Any],
+) -> List[str]:
+    """
+    Comprueba únicamente presencia y estructura.
+    No calcula ningún factor.
+    """
+
+    faltas: List[str] = []
+
+    if not isinstance(datos, dict):
+        return ["entrada no es dict"]
+
+    for campo in CAMPOS_OBLIGATORIOS:
+        if campo not in datos:
+            faltas.append(
+                "falta campo obligatorio: {0}".format(campo)
+            )
+
+    if "constantes" in datos:
+        constantes = datos["constantes"]
+
+        if (
+            not isinstance(constantes, dict)
+            or "ALPHA" not in constantes
+            or "BETA" not in constantes
+        ):
+            faltas.append(
+                "constantes debe contener ALPHA y BETA"
+            )
+
+    if "informe_axiomas" in datos:
+        axiomas = datos["informe_axiomas"]
+
+        if not isinstance(axiomas, dict):
+            faltas.append(
+                "informe_axiomas debe ser dict"
+            )
+
+        elif "coherente" not in axiomas:
+            faltas.append(
+                "informe_axiomas sin clave 'coherente'"
+            )
+
+    if "estado_engine" in datos:
+        if datos["estado_engine"] not in (
+            "OPERATIVO",
+            "RECHAZADO",
+            "NO_INICIADO",
+        ):
+            faltas.append(
+                "estado_engine invalido: {0}".format(
+                    datos["estado_engine"]
+                )
+            )
+
+    if "resultados_evaluacion" in datos:
+        if not isinstance(
+            datos["resultados_evaluacion"],
+            list,
+        ):
+            faltas.append(
+                "resultados_evaluacion debe ser list"
+            )
+
+    return faltas
+
+
+# ===============================================================
 # EXTRACCIÓN DE FACTORES
 # ===============================================================
 
-def _extraer_factores(entrada: Any) -> Dict[str, Any]:
-    """
-    Normaliza una fila de evaluación.
+def _extraer_factores(
+    entrada: Any,
+) -> Dict[str, Any]:
 
-    No calcula ningún valor.
-    Solo lee claves ya existentes.
-    """
     if not isinstance(entrada, dict):
         return {
             "C": None,
@@ -364,19 +710,29 @@ def _extraer_factores(entrada: Any) -> Dict[str, Any]:
             "citas": None,
         }
 
-    r = (
+    resultado = (
         entrada.get("resultado")
-        if isinstance(entrada.get("resultado"), dict)
+        if isinstance(
+            entrada.get("resultado"),
+            dict,
+        )
         else entrada
     )
 
     def _get(*claves: str) -> Any:
-        for k in claves:
-            if k in r and r[k] is not None:
-                return r[k]
+        for clave in claves:
 
-            if k in entrada and entrada[k] is not None:
-                return entrada[k]
+            if (
+                clave in resultado
+                and resultado[clave] is not None
+            ):
+                return resultado[clave]
+
+            if (
+                clave in entrada
+                and entrada[clave] is not None
+            ):
+                return entrada[clave]
 
         return None
 
@@ -420,11 +776,7 @@ def _bloque_calculo(
     titulo: str,
     factores: Dict[str, Any],
 ) -> Dict[str, Any]:
-    """
-    Bloque de presentación.
 
-    No calcula.
-    """
     return {
         "titulo": titulo,
         "C": factores.get("C"),
@@ -467,17 +819,21 @@ def _resumen_evaluaciones(
     origenes = sorted({
         str(e.get("origen"))
         for e in evaluaciones
-        if isinstance(e, dict)
-        and e.get("origen")
+        if (
+            isinstance(e, dict)
+            and e.get("origen")
+        )
     })
 
     sistema_filas = [
         e
         for e in evaluaciones
-        if isinstance(e, dict)
-        and not str(
-            e.get("origen") or ""
-        ).startswith("test_")
+        if (
+            isinstance(e, dict)
+            and not str(
+                e.get("origen") or ""
+            ).startswith("test_")
+        )
     ]
 
     if not sistema_filas:
@@ -490,10 +846,12 @@ def _resumen_evaluaciones(
     test_filas = [
         e
         for e in evaluaciones
-        if isinstance(e, dict)
-        and str(
-            e.get("origen") or ""
-        ).startswith("test_")
+        if (
+            isinstance(e, dict)
+            and str(
+                e.get("origen") or ""
+            ).startswith("test_")
+        )
     ]
 
     ultimo = (
@@ -538,11 +896,12 @@ def generar_reporte(
     """
     Genera el Omega Report.
 
-    No ejecuta barrer().
-    No llama a tru_ri().
-    No llama a tru_total().
-    No recalcula métricas.
+    No calcula Tru.
+    No recalcula C/L/K.
+    No ejecuta barridos.
+    Solo valida, lee y presenta.
     """
+
     faltas = validar_entrada(datos)
 
     if faltas:
@@ -553,138 +912,174 @@ def generar_reporte(
         )
 
     evals_memoria = list(
-        datos.get("resultados_evaluacion") or []
+        datos.get(
+            "resultados_evaluacion"
+        ) or []
     )
 
-    if incluir_evidencia:
-        evidencia = leer_evidencia()
-    else:
-        evidencia = {
+    evidencia = (
+        leer_evidencia()
+        if incluir_evidencia
+        else {
             "n": 0,
             "resultados": [],
             "origenes": [],
         }
-
-    evals_disco = list(
-        evidencia.get("resultados") or []
     )
 
-    todas = evals_memoria + evals_disco
+    evals_disco = list(
+        evidencia.get(
+            "resultados"
+        ) or []
+    )
 
-    resumen = _resumen_evaluaciones(todas)
+    todas = (
+        evals_memoria
+        + evals_disco
+    )
+
+    resumen = _resumen_evaluaciones(
+        todas
+    )
 
     reporte: Dict[str, Any] = {
-        "titulo": "OMEGA REPORT - VPSI-TRUTH",
-        "version_dg": CONTENEDOR["version_modulo"],
-        "id_dg": CONTENEDOR["id"],
-        "generado": datetime.now(
-            timezone.utc
-        ).isoformat(),
 
-        "estado_engine": datos["estado_engine"],
+        "titulo":
+            "OMEGA REPORT - VPSI-TRUTH",
 
-        "constantes": datos["constantes"],
+        "id_modulo":
+            ID_MODULO,
+
+        "version_dg":
+            CONTENEDOR["version_modulo"],
+
+        "generado":
+            datetime.now(
+                timezone.utc
+            ).isoformat(),
+
+        "estado_engine":
+            datos["estado_engine"],
+
+        "constantes":
+            datos["constantes"],
 
         "axiomas": {
-            "coherente": datos[
-                "informe_axiomas"
-            ].get("coherente"),
-
-            "declaraciones": datos[
-                "informe_axiomas"
-            ].get("declaraciones"),
-
-            "choques": len(
+            "coherente":
                 datos[
                     "informe_axiomas"
-                ].get("choques") or []
-            ),
+                ].get("coherente"),
 
-            "errores": len(
+            "declaraciones":
                 datos[
                     "informe_axiomas"
-                ].get("errores") or []
-            ),
+                ].get("declaraciones"),
+
+            "choques":
+                len(
+                    datos[
+                        "informe_axiomas"
+                    ].get("choques") or []
+                ),
+
+            "errores":
+                len(
+                    datos[
+                        "informe_axiomas"
+                    ].get("errores") or []
+                ),
         },
 
-        "formulas": datos.get(
-            "informe_formulas"
-        ),
+        "formulas":
+            datos.get(
+                "informe_formulas"
+            ),
 
-        "mecanica": datos.get(
-            "informe_mecanica"
-        ),
+        "mecanica":
+            datos.get(
+                "informe_mecanica"
+            ),
 
-        "contratos": datos.get(
-            "contratos"
-        ),
+        "contratos":
+            datos.get(
+                "contratos"
+            ),
 
-        "calculo_sistema": resumen[
-            "sistema"
-        ],
+        "calculo_sistema":
+            resumen["sistema"],
 
-        "calculo_ultimo_test": resumen[
-            "ultimo_test"
-        ],
+        "calculo_ultimo_test":
+            resumen["ultimo_test"],
 
         "evaluaciones": {
-            "n": resumen["n"],
-            "origenes": resumen[
-                "origenes"
-            ],
-            "memoria_n": len(
-                evals_memoria
-            ),
-            "disco_n": len(
-                evals_disco
-            ),
-            "filas": todas,
+            "n":
+                resumen["n"],
+
+            "origenes":
+                resumen["origenes"],
+
+            "memoria_n":
+                len(evals_memoria),
+
+            "disco_n":
+                len(evals_disco),
+
+            "filas":
+                todas,
         },
 
         "evidencia_persistente": {
-            "path": str(
-                _ruta_evaluaciones()
-            ),
-            "n": evidencia.get(
-                "n",
-                0,
-            ),
-            "origenes": evidencia.get(
-                "origenes"
-            ) or [],
-            "version": evidencia.get(
-                "version"
-            ),
+            "path":
+                str(_ruta_evaluaciones()),
+
+            "n":
+                evidencia.get("n", 0),
+
+            "origenes":
+                evidencia.get(
+                    "origenes"
+                ) or [],
+
+            "version":
+                evidencia.get(
+                    "version"
+                ),
         },
 
-        "errores_arranque": datos.get(
-            "errores_arranque"
-        ) or [],
+        "errores_arranque":
+            datos.get(
+                "errores_arranque"
+            ) or [],
 
-        "modulos": datos.get(
-            "registro_modulos"
-        ),
+        "modulos":
+            datos.get(
+                "registro_modulos"
+            ),
 
-        "tests": datos.get(
-            "tests"
-        ),
+        "tests":
+            datos.get(
+                "tests"
+            ),
 
-        "citacion": datos.get(
-            "citacion"
-        ),
+        "citacion":
+            datos.get(
+                "citacion"
+            ),
 
-        "taxonomia": datos.get(
-            "taxonomia"
-        ),
+        "taxonomia":
+            datos.get(
+                "taxonomia"
+            ),
 
-        "valido": (
+        "valido":
             datos["estado_engine"]
-            == "OPERATIVO"
-        ),
+            == "OPERATIVO",
     }
 
     if salida is not None:
+
         salida = Path(salida)
+
         salida.parent.mkdir(
             parents=True,
             exist_ok=True,
@@ -704,50 +1099,56 @@ def generar_reporte(
 
 
 # ===============================================================
-# VERIFICACIÓN DEL MÓDULO
+# CAPACIDAD: VERIFICAR
 # ===============================================================
 
 def verificar(
     datos: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
+    """
+    Verificación estructural de DGS.
+
+    No diagnostica todo el sistema.
+    """
 
     if datos is None:
         return {
-            "contenedor": CONTENEDOR["nombre"],
-            "id": CONTENEDOR["id"],
-            "rol": CONTENEDOR["rol"],
+            "id": ID_MODULO,
+            "contenedor": NOMBRE_MODULO,
             "estado": "APROBADO",
             "coherente": True,
             "mensaje": (
-                "DGS listo. Esperando datos reales "
-                "del Engine."
+                "Módulo DGS listo. "
+                "Esperando datos reales del Engine."
             ),
-            "evidencia_disponible": (
-                _ruta_evaluaciones().exists()
-            ),
+            "evidencia_disponible":
+                _ruta_evaluaciones().exists(),
         }
 
-    faltas = validar_entrada(datos)
+    faltas = validar_entrada(
+        datos
+    )
 
     return {
-        "contenedor": CONTENEDOR["nombre"],
-        "id": CONTENEDOR["id"],
-        "rol": CONTENEDOR["rol"],
-        "estado": (
-            "APROBADO"
-            if not faltas
-            else "RECHAZADO"
-        ),
-        "coherente": not faltas,
-        "faltas": faltas,
-        "evidencia_disponible": (
-            _ruta_evaluaciones().exists()
-        ),
+        "id": ID_MODULO,
+        "contenedor": NOMBRE_MODULO,
+        "estado":
+            (
+                "APROBADO"
+                if not faltas
+                else "RECHAZADO"
+            ),
+        "coherente":
+            not faltas,
+        "faltas":
+            faltas,
+        "evidencia_disponible":
+            _ruta_evaluaciones().exists(),
     }
 
 
 # ===============================================================
-# INVENTARIO
+# CAPACIDAD: INVENTARIO
 # ===============================================================
 
 def inventario(
@@ -755,60 +1156,237 @@ def inventario(
 ) -> Dict[str, Any]:
 
     return {
-        "contenedor": CONTENEDOR["nombre"],
-        "id": CONTENEDOR["id"],
-        "version": CONTENEDOR["version_modulo"],
-        "rol": CONTENEDOR["rol"],
-        "esquema": CONTENEDOR["esquema"],
-        "version_contrato": CONTENEDOR[
-            "version_contrato"
-        ],
-        "requiere": list(
-            CONTENEDOR["requiere"]
-        ),
-        "campos_obligatorios": list(
-            CAMPOS_OBLIGATORIOS
-        ),
-        "campos_opcionales": list(
-            CAMPOS_OPCIONALES
-        ),
+        "id":
+            ID_MODULO,
+
+        "nombre":
+            NOMBRE_MODULO,
+
+        "rol":
+            ROL_MODULO,
+
+        "version":
+            VERSION_MODULO,
+
+        "version_contrato":
+            VERSION_CONTRATO,
+
+        "esquema":
+            ESQUEMA_CONTRATO,
+
+        "estabilidad":
+            ESTABILIDAD,
+
+        "capacidades":
+            list(
+                CONTENEDOR[
+                    "capacidades"
+                ].keys()
+            ),
+
+        "requiere":
+            list(
+                CONTENEDOR.get(
+                    "requiere"
+                ) or []
+            ),
+
+        "autoridad":
+            CONTENEDOR.get(
+                "autoridad"
+            ),
+
+        "conocimiento_exportable":
+            CONTENEDOR.get(
+                "conocimiento_exportable"
+            ),
+
+        "consultas_soportadas":
+            CONTENEDOR.get(
+                "consultas_soportadas"
+            ),
+
+        "invariantes":
+            CONTENEDOR.get(
+                "invariantes"
+            ),
+
+        "evidencia_path":
+            str(
+                _ruta_evaluaciones()
+            ),
+    }
+
+
+# ===============================================================
+# REPORTING
+# ===============================================================
+
+def reporte() -> Dict[str, Any]:
+    """
+    Estado actual de DGS.
+    """
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "estado": ESTADO_OPERATIVO,
         "capacidades": list(
             CONTENEDOR[
                 "capacidades"
             ].keys()
         ),
-        "evidencia_path": str(
-            _ruta_evaluaciones()
+        "requiere": list(
+            CONTENEDOR.get(
+                "requiere"
+            ) or []
         ),
+        "autoridad":
+            CONTENEDOR.get(
+                "autoridad"
+            ),
+        "conocimiento_exportable":
+            CONTENEDOR.get(
+                "conocimiento_exportable"
+            ),
+        "consultas_soportadas":
+            CONTENEDOR.get(
+                "consultas_soportadas"
+            ),
+    }
+
+
+def diagnostico() -> Dict[str, Any]:
+    """
+    Estado diagnóstico del propio DGS.
+    """
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "estado": ESTADO_OPERATIVO,
+        "problemas": [],
+        "advertencias": [],
+        "recomendaciones": [],
     }
 
 
 # ===============================================================
-# CONTENEDOR — CAPACIDADES REALES
+# MAPA DE CAPACIDADES
 # ===============================================================
 
-CONTENEDOR["capacidades"] = {
+_CAP_MAP = {
     "verificar": verificar,
     "inventario": inventario,
     "generar_reporte": generar_reporte,
     "validar_entrada": validar_entrada,
     "leer_evidencia": leer_evidencia,
+    "reporte": reporte,
+    "diagnostico": diagnostico,
 }
 
 
 # ===============================================================
-# EXPORTACIÓN
+# RESOLUCIÓN ESTRICTA
+# ===============================================================
+
+def _resolver_capacidades(
+    cont: Dict[str, Any],
+) -> None:
+
+    resueltas: Dict[str, Any] = {}
+
+    for nombre, ref in cont[
+        "capacidades"
+    ].items():
+
+        if callable(ref):
+            resueltas[nombre] = ref
+            continue
+
+        if isinstance(ref, str):
+
+            if ref not in _CAP_MAP:
+                raise ContratoInvalido(
+                    "{0}: capacidad '{1}' "
+                    "referencia inexistente: '{2}'".format(
+                        NOMBRE_MODULO,
+                        nombre,
+                        ref,
+                    )
+                )
+
+            fn = _CAP_MAP[ref]
+
+            if not callable(fn):
+                raise ContratoInvalido(
+                    "{0}: '{1}' no es callable".format(
+                        NOMBRE_MODULO,
+                        ref,
+                    )
+                )
+
+            resueltas[nombre] = fn
+            continue
+
+        raise ContratoInvalido(
+            "{0}: capacidad '{1}' tiene "
+            "tipo inválido: {2}".format(
+                NOMBRE_MODULO,
+                nombre,
+                type(ref).__name__,
+            )
+        )
+
+    cont["capacidades"] = resueltas
+
+
+# ===============================================================
+# VALIDACIÓN + RESOLUCIÓN
+# ===============================================================
+
+_validar_contrato(
+    CONTENEDOR
+)
+
+_resolver_capacidades(
+    CONTENEDOR
+)
+
+
+# ===============================================================
+# EXPORTACIONES
 # ===============================================================
 
 __all__ = [
     "CONTENEDOR",
-    "verificar",
-    "inventario",
-    "generar_reporte",
-    "validar_entrada",
-    "leer_evidencia",
+    "ID_MODULO",
+    "NOMBRE_MODULO",
+    "ROL_MODULO",
+    "VERSION_MODULO",
+    "VERSION_CONTRATO",
+    "ESQUEMA_CONTRATO",
+    "ESTABILIDAD",
+    "ContratoInvalido",
     "DiagnosticoError",
     "EntradaIncompletaError",
     "CAMPOS_OBLIGATORIOS",
     "CAMPOS_OPCIONALES",
+    "verificar",
+    "inventario",
+    "reporte",
+    "diagnostico",
+    "generar_reporte",
+    "validar_entrada",
+    "leer_evidencia",
 ]
+
+
+# ===============================================================
+# FIN DEL MÓDULO DGS
+# ===============================================================

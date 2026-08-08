@@ -405,6 +405,44 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
     },
 
+    "autoriza_engine": {
+    # --- PERMISOS BASE ---
+    "leer": True,
+    "ejecutar": True,
+    "consultar": True,
+    "recombinar": True,
+    "reportar": True,
+    "auditar": True,
+    "inventariar": True,
+
+    # --- PERMISOS DE ESCRITURA ---
+    "modificar": False,
+    "alterar": False,
+    "reescribir": False,
+    "crear": True,
+    "eliminar": True,
+    "actualizar": True,
+
+    # --- PERMISOS DE PROCESAMIENTO ---
+    "validar": True,
+    "procesar": True,
+    "analizar": True,
+    "generar": True,
+    "transformar": True,
+
+    # --- PERMISOS DE DATOS ---
+    "exportar": True,
+    "importar": True,
+    "respaldar": True,
+    "recuperar": True,
+    "sincronizar": True,
+
+    # --- PERMISOS DE MONITOREO ---
+    "monitorear": True,
+    "alertar": False,
+
+   
+}
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),
 

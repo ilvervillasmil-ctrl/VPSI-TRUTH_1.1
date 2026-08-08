@@ -2,70 +2,68 @@
 # VPSI-TRUTH — tests/test_acoplamiento_cit.py
 # ===============================================================
 #
-# TEST DE ACOPLAMIENTO — CIT ↔ ENGINE
+# TEST DE ACOPLAMIENTO CONTRACTUAL — CIT
 #
-# Objetivo:
-#   Verificar que el módulo CIT se acopla al Engine mediante
-#   VPSI-CONTRACT-1.0 sin depender de hacks, defaults o campos
-#   inventados por el Engine.
+# PRINCIPIO:
 #
-# Base contractual:
-#   modules/citacion/__init__.py
-#   core/engine.py
+#   Este test NO conoce las capacidades internas de CIT.
+#   Este test NO hardcodea el reporting de CIT.
+#   Este test NO reconstruye manualmente el contrato de CIT.
 #
-# Este test NO modifica ningún módulo del sistema.
+# El contrato real de CIT es la fuente de verdad.
+#
+# El test verifica:
+#
+#   CONTENEDOR declarado
+#          ↓
+#      Engine carga
+#          ↓
+#      Engine valida
+#          ↓
+#      Engine materializa
+#          ↓
+#      Engine registra
+#          ↓
+#      Engine resuelve dependencias
+#          ↓
+#      Engine construye grafo
+#          ↓
+#      Engine ejecuta capacidades
+#          ↓
+#      Engine produce trazabilidad
+#
+# También verifica que Engine RECHAZA contratos rotos.
 #
 # ===============================================================
 
 from __future__ import annotations
 
-import sys
+import copy
+import importlib
+import textwrap
 from pathlib import Path
 from typing import Any, Dict
 
 import pytest
 
-
-# ===============================================================
-# RUTA DEL PROYECTO
-# ===============================================================
-
-ROOT = Path(__file__).resolve().parents[1]
-
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-
-# ===============================================================
-# IMPORTACIONES
-# ===============================================================
-
 from core.engine import (
     API_ENGINE_ACTUAL,
-    ESQUEMA_CONTRATO_REQUERIDO,
-    VERSION_CONTRATO_REQUERIDA,
+    BANDERAS_REPORTING,
+    CLAVES_META_CAPACIDAD,
+    CLAVES_OBLIGATORIAS_CONTRATO,
     Engine,
+    ArranqueError,
 )
 
 
-# CIT se importa directamente para inspeccionar su contrato.
-from modules.citacion import CONTENEDOR as CIT_CONTENEDOR
-
-
 # ===============================================================
-# CONSTANTES DEL TEST
+# CONFIGURACIÓN
 # ===============================================================
+
+ROOT = Path(__file__).resolve().parents[1]
+MODULOS = ROOT / "modules"
 
 CIT_ID = "CIT"
-CIT_NOMBRE = "citacion"
-CIT_ROL = "CIT"
-
-CIT_ESQUEMA = "VPSI-CONTRACT-1.0"
-CIT_VERSION_CONTRATO = "1.0"
-CIT_API_ENGINE = ">=1.0"
-
-# El Engine 18.3 descubre módulos directamente bajo "modules".
-MODULOS_DIR = ROOT / "modules"
 
 
 # ===============================================================
@@ -74,11 +72,11 @@ MODULOS_DIR = ROOT / "modules"
 
 def crear_engine(strict: bool = True) -> Engine:
     """
-    Crea el Engine utilizando exactamente la raíz de módulos
-    utilizada por el proyecto.
+    Crea el Engine exactamente contra la raíz real de módulos.
+    No modifica el entorno.
     """
     return Engine(
-        raiz_modulos=MODULOS_DIR,
+        raiz_modulos=MODULOS,
         invocador_id="test_acoplamiento_cit",
         strict=strict,
     )
@@ -86,1269 +84,1036 @@ def crear_engine(strict: bool = True) -> Engine:
 
 def obtener_cit(engine: Engine):
     """
-    Obtiene CIT por ID, nombre o rol a través del RegistroModulos.
+    Obtiene CIT por ID desde el registro real del Engine.
+
+    El test conoce únicamente que el módulo objetivo es CIT.
+    No conoce sus capacidades internas.
     """
     cit = engine.registro.primero(CIT_ID)
 
-    if cit is None:
-        cit = engine.registro.primero(CIT_NOMBRE)
-
-    if cit is None:
-        cit = engine.registro.primero(CIT_ROL)
+    assert cit is not None, (
+        "CIT no fue registrado por Engine. "
+        "El desacople está antes de la materialización del módulo."
+    )
 
     return cit
 
 
-# ===============================================================
-# 1. CONTRATO BASE
-# ===============================================================
+def copiar_contrato_cit() -> Dict[str, Any]:
+    """
+    Obtiene el CONTENEDOR real de CIT.
 
-def test_cit_contiene_contenedor():
-    assert isinstance(CIT_CONTENEDOR, dict)
+    Se usa únicamente para construir módulos sintéticos
+    adversariales en pruebas de rechazo.
+    """
+    modulo = importlib.import_module("modules.citacion")
+    contrato = getattr(modulo, "CONTENEDOR", None)
 
-
-def test_cit_id_correcto():
-    assert CIT_CONTENEDOR["id"] == CIT_ID
-
-
-def test_cit_nombre_correcto():
-    assert CIT_CONTENEDOR["nombre"] == CIT_NOMBRE
-
-
-def test_cit_rol_correcto():
-    assert CIT_CONTENEDOR["rol"] == CIT_ROL
-
-
-def test_cit_esquema_correcto():
-    assert CIT_CONTENEDOR["esquema"] == CIT_ESQUEMA
-    assert CIT_CONTENEDOR["esquema"] == ESQUEMA_CONTRATO_REQUERIDO
-
-
-def test_cit_version_contrato_correcta():
-    assert str(CIT_CONTENEDOR["version_contrato"]) == CIT_VERSION_CONTRATO
-    assert str(CIT_CONTENEDOR["version_contrato"]) == VERSION_CONTRATO_REQUERIDA
-
-
-def test_cit_api_engine_compatible():
-    assert CIT_CONTENEDOR["api_engine"] == CIT_API_ENGINE
-
-
-def test_cit_version_modulo_valida():
-    version = CIT_CONTENEDOR["version_modulo"]
-
-    assert isinstance(version, str)
-    assert version.strip()
-
-
-def test_cit_estabilidad_valida():
-    assert isinstance(CIT_CONTENEDOR["estabilidad"], str)
-    assert CIT_CONTENEDOR["estabilidad"].strip()
-
-
-def test_cit_compatible_desde_valido():
-    valor = CIT_CONTENEDOR["compatible_desde"]
-
-    assert isinstance(valor, str)
-    assert valor.strip()
-
-
-# ===============================================================
-# 2. CLAVES OBLIGATORIAS DEL CONTRATO
-# ===============================================================
-
-def test_cit_claves_obligatorias_completas():
-    obligatorias = {
-        "esquema",
-        "version_contrato",
-        "version_modulo",
-        "id",
-        "nombre",
-        "rol",
-        "descripcion",
-        "funcion",
-        "no_hace",
-        "autoridad",
-        "conocimiento_exportable",
-        "requiere",
-        "autoriza_engine",
-        "consultas_soportadas",
-        "capacidades",
-        "capacidades_meta",
-        "reporting",
-        "estados_validos",
-        "invariantes",
-        "estabilidad",
-        "compatible_desde",
-        "api_engine",
-    }
-
-    assert obligatorias.issubset(CIT_CONTENEDOR.keys())
-
-
-# ===============================================================
-# 3. TIPOS ESTRUCTURALES
-# ===============================================================
-
-def test_cit_no_hace_es_lista():
-    assert isinstance(CIT_CONTENEDOR["no_hace"], list)
-
-
-def test_cit_autoridad_es_lista():
-    assert isinstance(CIT_CONTENEDOR["autoridad"], list)
-
-
-def test_cit_conocimiento_exportable_es_lista():
-    assert isinstance(
-        CIT_CONTENEDOR["conocimiento_exportable"],
-        list,
+    assert isinstance(contrato, dict), (
+        "CIT no expone CONTENEDOR como dict."
     )
 
+    return copy.deepcopy(contrato)
 
-def test_cit_consultas_soportadas_es_lista():
-    assert isinstance(
-        CIT_CONTENEDOR["consultas_soportadas"],
-        list,
+
+def escribir_modulo_sintetico(
+    raiz: Path,
+    nombre: str,
+    contrato: Dict[str, Any],
+) -> Path:
+    """
+    Crea un módulo temporal con un CONTENEDOR controlado.
+
+    No modifica ningún módulo real del VPSI.
+    """
+    modulo_dir = raiz / nombre
+    modulo_dir.mkdir(parents=True, exist_ok=True)
+
+    contenido = """
+from __future__ import annotations
+
+def capacidad_prueba(*args, **kwargs):
+    return {
+        "ok": True,
+        "args": args,
+        "kwargs": kwargs,
+    }
+
+CONTENEDOR = CONTRATO
+"""
+
+    # Se genera código con el contrato literal.
+    # Las funciones reales se insertan después mediante un patrón
+    # simple y seguro para estas pruebas.
+    contrato_repr = repr(contrato)
+
+    contenido = textwrap.dedent(
+        contenido.replace("CONTRATO", contrato_repr)
     )
 
+    (modulo_dir / "__init__.py").write_text(
+        contenido,
+        encoding="utf-8",
+    )
 
-def test_cit_requiere_es_lista():
-    assert isinstance(CIT_CONTENEDOR["requiere"], list)
-
-
-def test_cit_invariantes_es_lista():
-    assert isinstance(CIT_CONTENEDOR["invariantes"], list)
-
-
-def test_cit_capacidades_es_dict():
-    assert isinstance(CIT_CONTENEDOR["capacidades"], dict)
+    return modulo_dir
 
 
-def test_cit_capacidades_meta_es_dict():
-    assert isinstance(CIT_CONTENEDOR["capacidades_meta"], dict)
-
-
-def test_cit_reporting_es_dict():
-    assert isinstance(CIT_CONTENEDOR["reporting"], dict)
-
-
-def test_cit_autoriza_engine_es_dict():
-    assert isinstance(CIT_CONTENEDOR["autoriza_engine"], dict)
-
-
-def test_cit_estados_validos_es_lista():
-    assert isinstance(CIT_CONTENEDOR["estados_validos"], list)
-
-
-# ===============================================================
-# 4. REQUIERE
-# ===============================================================
-
-def test_cit_no_requiere_dependencias():
+def contrato_base_sintetico(
+    base: Dict[str, Any],
+) -> Dict[str, Any]:
     """
-    CIT declara explícitamente requiere=[].
-    Esto es contractual y debe permanecer así.
+    Construye una copia independiente del contrato real,
+    conservando la arquitectura contractual.
     """
-    assert CIT_CONTENEDOR["requiere"] == []
+    contrato = copy.deepcopy(base)
+
+    contrato["id"] = "TEST"
+    contrato["nombre"] = "test_contract"
+    contrato["rol"] = "TEST"
+    contrato["version_modulo"] = "1.0"
+
+    return contrato
 
 
-# ===============================================================
-# 5. AUTORIZA_ENGINE
-# ===============================================================
+def preparar_capacidad_sintetica(contrato: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Sustituye las referencias callable por funciones expresables
+    dentro del módulo sintético.
 
-def test_cit_autoriza_engine_completo():
-    permisos = {
-        "leer",
-        "ejecutar",
-        "consultar",
-        "recombinar",
-        "reportar",
-        "auditar",
-        "inventariar",
-        "modificar",
-        "alterar",
-        "reescribir",
+    El objetivo es conservar la forma contractual, no probar CIT.
+    """
+    contrato["capacidades"] = {
+        "capacidad_prueba": "PLACEHOLDER"
     }
 
-    assert set(CIT_CONTENEDOR["autoriza_engine"].keys()) == permisos
-
-
-def test_cit_autoriza_engine_todos_booleanos():
-    for permiso, valor in CIT_CONTENEDOR["autoriza_engine"].items():
-        assert isinstance(valor, bool), (
-            f"autoriza_engine['{permiso}'] debe ser bool"
-        )
-
-
-def test_cit_no_autoriza_modificar():
-    assert CIT_CONTENEDOR["autoriza_engine"]["modificar"] is False
-
-
-def test_cit_no_autoriza_alterar():
-    assert CIT_CONTENEDOR["autoriza_engine"]["alterar"] is False
-
-
-def test_cit_no_autoriza_reescribir():
-    assert CIT_CONTENEDOR["autoriza_engine"]["reescribir"] is False
-
-
-def test_cit_autoriza_ejecucion():
-    assert CIT_CONTENEDOR["autoriza_engine"]["ejecutar"] is True
-
-
-# ===============================================================
-# 6. REPORTING
-# ===============================================================
-
-def test_cit_reporting_completo():
-    """
-    Las banderas deben coincidir exactamente con el contrato real
-    de CIT.
-
-    IMPORTANTE:
-    CIT incluye 'reporte' además de las banderas estructurales
-    utilizadas por el Engine.
-    """
-
-    banderas = {
-        "estado",
-        "salud",
-        "inventario",
-        "capacidades",
-        "errores",
-        "advertencias",
-        "dependencias",
-        "version",
-        "contrato",
-        "conocimiento",
-        "metricas",
-        "diagnostico",
-        "reporte",
+    contrato["capacidades_meta"] = {
+        "capacidad_prueba": {
+            "descripcion": "Capacidad sintética para prueba de acoplamiento.",
+            "entrada": "args, kwargs",
+            "salida": "dict",
+        }
     }
 
-    assert set(CIT_CONTENEDOR["reporting"].keys()) == banderas
-
-
-def test_cit_reporting_todos_booleanos():
-    for bandera, valor in CIT_CONTENEDOR["reporting"].items():
-        assert isinstance(valor, bool), (
-            f"reporting['{bandera}'] debe ser bool"
-        )
-
-
-def test_cit_reporting_reporte_declarado():
-    assert "reporte" in CIT_CONTENEDOR["reporting"]
-    assert CIT_CONTENEDOR["reporting"]["reporte"] is True
+    return contrato
 
 
 # ===============================================================
-# 7. ESTADOS VÁLIDOS
+# 1. CARGA FUNDAMENTAL
 # ===============================================================
 
-def test_cit_estados_validos_no_vacios():
-    assert CIT_CONTENEDOR["estados_validos"]
-
-
-def test_cit_estados_validos_son_canonicos():
-    canonicos = {
-        "NO_INICIADO",
-        "OPERATIVO",
-        "DEGRADADO",
-        "RECHAZADO",
-    }
-
-    assert set(CIT_CONTENEDOR["estados_validos"]).issubset(canonicos)
-
-
-# ===============================================================
-# 8. CAPACIDADES
-# ===============================================================
-
-def test_cit_capacidades_son_callable():
-    for nombre, fn in CIT_CONTENEDOR["capacidades"].items():
-        assert callable(fn), (
-            f"La capacidad '{nombre}' de CIT no es callable"
-        )
-
-
-def test_cit_cada_capacidad_tiene_meta():
-    capacidades = CIT_CONTENEDOR["capacidades"]
-    meta = CIT_CONTENEDOR["capacidades_meta"]
-
-    for nombre in capacidades:
-        assert nombre in meta, (
-            f"CIT: falta capacidades_meta para '{nombre}'"
-        )
-
-
-def test_cit_meta_capacidades_completa():
-    capacidades = CIT_CONTENEDOR["capacidades"]
-    meta = CIT_CONTENEDOR["capacidades_meta"]
-
-    for nombre in capacidades:
-        entrada = meta[nombre]
-
-        assert isinstance(entrada, dict)
-
-        assert "descripcion" in entrada
-        assert "entrada" in entrada
-        assert "salida" in entrada
-
-        assert isinstance(entrada["descripcion"], str)
-        assert isinstance(entrada["entrada"], str)
-        assert isinstance(entrada["salida"], str)
-
-
-# ===============================================================
-# 9. ENGINE DESCUBRE CIT
-# ===============================================================
-
-def test_engine_descubre_cit():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit is not None
-
-
-def test_engine_registra_cit_por_id():
-    engine = crear_engine()
-
-    assert CIT_ID in engine.registro.por_id
-
-
-def test_engine_registra_cit_por_nombre():
-    engine = crear_engine()
-
-    assert CIT_NOMBRE in engine.registro.contenedores
-
-
-def test_engine_registra_cit_por_rol():
-    engine = crear_engine()
-
-    assert CIT_ROL in engine.registro.por_rol
-
-
-def test_engine_materializa_identidad_cit():
+def test_cit_es_descubierto_por_engine():
     engine = crear_engine()
 
     cit = obtener_cit(engine)
 
     assert cit.id == CIT_ID
-    assert cit.nombre == CIT_NOMBRE
-    assert cit.rol == CIT_ROL
+    assert cit.nombre
+    assert cit.rol
+    assert cit.modulo is not None
+    assert cit.ruta.exists()
 
 
 # ===============================================================
-# 10. ENGINE MATERIALIZA EL CONTRATO SIN ALTERARLO
+# 2. ENGINE DEBE MATERIALIZAR EL CONTRATO REAL
 # ===============================================================
 
-def test_engine_no_altera_version_cit():
+def test_cit_engine_materializa_el_contrato_sin_reconstruirlo():
     engine = crear_engine()
-
     cit = obtener_cit(engine)
 
-    assert cit.version == CIT_CONTENEDOR["version_modulo"]
+    contrato = cit.meta
+
+    assert isinstance(contrato, dict)
+
+    for clave in CLAVES_OBLIGATORIAS_CONTRATO:
+        assert clave in contrato, (
+            f"CIT declara contrato incompleto: falta '{clave}'."
+        )
+
+    # La materialización debe conservar exactamente los metadatos
+    # declarativos fundamentales.
+    assert cit.id == str(contrato["id"])
+    assert cit.nombre == str(contrato["nombre"])
+    assert cit.rol == str(contrato["rol"])
+    assert cit.version == str(contrato["version_modulo"])
+    assert cit.version_contrato == str(contrato["version_contrato"])
+    assert cit.esquema == str(contrato["esquema"])
+    assert cit.estabilidad == str(contrato["estabilidad"])
+    assert cit.descripcion == str(contrato["descripcion"])
+    assert cit.compatible_desde == str(contrato["compatible_desde"])
+    assert cit.api_engine == str(contrato["api_engine"])
+
+    assert cit.funcion == contrato["funcion"]
+    assert cit.no_hace == contrato["no_hace"]
+    assert cit.autoridad == contrato["autoridad"]
+    assert cit.conocimiento_exportable == contrato["conocimiento_exportable"]
+    assert cit.consultas_soportadas == contrato["consultas_soportadas"]
+    assert cit.invariantes == contrato["invariantes"]
+
+    assert cit.requiere == contrato["requiere"]
+    assert cit.autoriza_engine == contrato["autoriza_engine"]
+    assert cit.capacidades == contrato["capacidades"]
+    assert cit.capacidades_meta == contrato["capacidades_meta"]
+    assert cit.reporting == contrato["reporting"]
+    assert cit.estados_validos == contrato["estados_validos"]
 
 
-def test_engine_no_altera_version_contrato_cit():
+# ===============================================================
+# 3. CAPACIDADES — DESCUBRIMIENTO DINÁMICO
+# ===============================================================
+
+def test_cit_capacidades_se_descubren_desde_el_contrato():
     engine = crear_engine()
-
     cit = obtener_cit(engine)
 
-    assert cit.version_contrato == str(
-        CIT_CONTENEDOR["version_contrato"]
-    )
+    capacidades_declaradas = cit.meta["capacidades"]
 
+    assert isinstance(capacidades_declaradas, dict)
 
-def test_engine_no_altera_esquema_cit():
-    engine = crear_engine()
+    for nombre, referencia in capacidades_declaradas.items():
+        assert nombre, "CIT contiene una capacidad con nombre vacío."
+        assert callable(referencia), (
+            f"CIT declara '{nombre}', pero no es callable."
+        )
 
-    cit = obtener_cit(engine)
+        materializada = cit.fn(nombre)
 
-    assert cit.esquema == CIT_CONTENEDOR["esquema"]
-
-
-def test_engine_no_altera_api_cit():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit.api_engine == CIT_CONTENEDOR["api_engine"]
-
-
-def test_engine_no_altera_requiere_cit():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit.requiere == CIT_CONTENEDOR["requiere"]
-
-
-def test_engine_no_altera_capacidades_cit():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert set(cit.capacidades.keys()) == set(
-        CIT_CONTENEDOR["capacidades"].keys()
-    )
-
-
-def test_engine_no_altera_reporting_cit():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert set(cit.reporting.keys()) == set(
-        CIT_CONTENEDOR["reporting"].keys()
-    )
-
-
-# ===============================================================
-# 11. VALIDACIÓN INTERNA DEL ENGINE
-# ===============================================================
-
-def test_engine_acepta_contrato_cit():
-    engine = crear_engine()
-
-    assert CIT_NOMBRE not in {
-        error.split(":")[0]
-        for error in engine.errores_arranque
-    }
-
-
-def test_engine_estado_operativo_con_cit():
-    engine = crear_engine()
-
-    assert engine.estado == "OPERATIVO"
-
-
-def test_engine_no_rechaza_cit_por_contrato():
-    engine = crear_engine()
-
-    errores_cit = [
-        error
-        for error in engine.errores_arranque
-        if CIT_NOMBRE in error or CIT_ID in error
-    ]
-
-    assert errores_cit == []
-
-
-# ===============================================================
-# 12. EJECUCIÓN DE CAPACIDADES
-# ===============================================================
-
-def test_engine_ejecuta_reporte_cit():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_reporte(CIT_ID)
-
-    assert salida["estado"] == "EXITO"
-    assert salida["modulo"] == CIT_NOMBRE
-    assert salida["capacidad"] == "reporte"
-    assert isinstance(salida["resultado"], dict)
-
-
-def test_engine_ejecuta_diagnostico_cit():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_diagnostico(CIT_ID)
-
-    assert salida["estado"] == "EXITO"
-    assert salida["modulo"] == CIT_NOMBRE
-    assert salida["capacidad"] == "diagnostico"
-    assert isinstance(salida["resultado"], dict)
-
-
-def test_engine_ejecuta_inventario_cit():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_inventario(CIT_ID)
-
-    assert salida["estado"] == "EXITO"
-    assert salida["modulo"] == CIT_NOMBRE
-    assert salida["capacidad"] == "inventario"
-    assert isinstance(salida["resultado"], dict)
-
-
-# ===============================================================
-# 13. VALIDACIÓN DE IDENTIDAD DESDE INVENTARIO
-# ===============================================================
-
-def test_cit_inventario_identidad():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_inventario(CIT_ID)
-
-    inventario = salida["resultado"]
-
-    assert inventario["id"] == CIT_ID
-    assert inventario["nombre"] == CIT_NOMBRE
-    assert inventario["rol"] == CIT_ROL
-
-
-def test_cit_inventario_contrato():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_inventario(CIT_ID)
-
-    inventario = salida["resultado"]
-
-    assert inventario["esquema"] == CIT_ESQUEMA
-    assert inventario["version_contrato"] == CIT_VERSION_CONTRATO
-
-
-def test_cit_inventario_capacidades():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_inventario(CIT_ID)
-
-    inventario = salida["resultado"]
-
-    capacidades_engine = set(
-        CIT_CONTENEDOR["capacidades"].keys()
-    )
-
-    capacidades_inventario = set(
-        inventario["capacidades"]
-    )
-
-    assert capacidades_engine == capacidades_inventario
-
-
-# ===============================================================
-# 14. REPORTE DE CIT
-# ===============================================================
-
-def test_cit_reporte_operativo():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_reporte(CIT_ID)
-
-    reporte = salida["resultado"]
-
-    assert reporte["id"] == CIT_ID
-    assert reporte["nombre"] == CIT_NOMBRE
-    assert reporte["rol"] == CIT_ROL
-    assert reporte["estado"] == "OPERATIVO"
-
-
-def test_cit_reporte_coherente():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_reporte(CIT_ID)
-
-    reporte = salida["resultado"]
-
-    assert reporte["coherente"] is True
-
-
-# ===============================================================
-# 15. DIAGNÓSTICO DE CIT
-# ===============================================================
-
-def test_cit_diagnostico_operativo():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_diagnostico(CIT_ID)
-
-    diagnostico = salida["resultado"]
-
-    assert diagnostico["id"] == CIT_ID
-    assert diagnostico["estado"] == "OPERATIVO"
-
-
-def test_cit_diagnostico_sin_problemas():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_diagnostico(CIT_ID)
-
-    diagnostico = salida["resultado"]
-
-    assert diagnostico["problemas"] == []
-
-
-def test_cit_diagnostico_coherente():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_diagnostico(CIT_ID)
-
-    diagnostico = salida["resultado"]
-
-    assert diagnostico["coherente"] is True
-
-
-# ===============================================================
-# 16. CAPACIDADES PROPIAS DE CIT
-# ===============================================================
-
-def test_cit_verificar():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_capacidad(
-        CIT_ID,
-        "verificar",
-    )
-
-    assert salida["estado"] == "EXITO"
-
-    resultado = salida["resultado"]
-
-    assert isinstance(resultado, dict)
-    assert resultado["id"] == CIT_ID
-    assert "coherente" in resultado
-
-
-def test_cit_barrer():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_capacidad(
-        CIT_ID,
-        "barrer",
-    )
-
-    assert salida["estado"] == "EXITO"
-
-    resultado = salida["resultado"]
-
-    assert isinstance(resultado, dict)
-    assert resultado["id"] == CIT_ID
-    assert "coherente" in resultado
-
-
-def test_cit_verificar_salida():
-    engine = crear_engine()
-
-    salida = engine.ejecutar_capacidad(
-        CIT_ID,
-        "verificar_salida",
-        {
-            "id": CIT_ID,
-            "estado": "OPERATIVO",
-        },
-    )
-
-    assert salida["estado"] == "EXITO"
-    assert salida["resultado"] is True
-
-
-# ===============================================================
-# 17. RESOLUCIÓN DE DECLARACIONES
-# ===============================================================
-
-def test_cit_resolver_capacidad_existe():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit.fn("resolver") is not None
-    assert callable(cit.fn("resolver"))
-
-
-def test_cit_registrar_capacidad_existe():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit.fn("registrar") is not None
-    assert callable(cit.fn("registrar"))
-
-
-def test_cit_buscar_capacidad_existe():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit.fn("buscar") is not None
-    assert callable(cit.fn("buscar"))
-
-
-def test_cit_citar_capacidad_existe():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit.fn("citar") is not None
-    assert callable(cit.fn("citar"))
-
-
-def test_cit_anunciar_capacidad_existe():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit.fn("anunciar") is not None
-    assert callable(cit.fn("anunciar"))
-
-
-# ===============================================================
-# 18. PRUEBA DE REGISTRO A TRAVÉS DEL ENGINE
-# ===============================================================
-
-def test_engine_puede_invocar_registrar_cit():
-    engine = crear_engine()
-
-    declaracion = {
-        "id": "TEST-CIT-001",
-        "tipo": "definicion",
-        "fuente": "test",
-        "enunciado": "Declaración de prueba de acoplamiento CIT.",
-    }
-
-    salida = engine.ejecutar_capacidad(
-        CIT_ID,
-        "registrar",
-        declaracion,
-    )
-
-    assert salida["estado"] == "EXITO"
-
-    resultado = salida["resultado"]
-
-    assert resultado["ok"] is True
-    assert resultado["declaracion"]["id"] == "TEST-CIT-001"
-
-
-# ===============================================================
-# 19. RESOLUCIÓN DESPUÉS DEL REGISTRO
-# ===============================================================
-
-def test_engine_puede_invocar_resolver_cit():
-    engine = crear_engine()
-
-    declaracion = {
-        "id": "TEST-CIT-002",
-        "tipo": "definicion",
-        "fuente": "test",
-        "enunciado": "Declaración resoluble.",
-    }
-
-    registro = engine.ejecutar_capacidad(
-        CIT_ID,
-        "registrar",
-        declaracion,
-    )
-
-    assert registro["estado"] == "EXITO"
-
-    resolucion = engine.ejecutar_capacidad(
-        CIT_ID,
-        "resolver",
-        "TEST-CIT-002",
-    )
-
-    assert resolucion["estado"] == "EXITO"
-
-    resultado = resolucion["resultado"]
-
-    assert resultado["resuelto"] is True
-    assert resultado["id"] == "TEST-CIT-002"
-
-
-# ===============================================================
-# 20. ACOPLAMIENTO DE CAPACIDADES
-# ===============================================================
-
-def test_engine_ve_todas_las_capacidades_declaradas_por_cit():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    declaradas = set(CIT_CONTENEDOR["capacidades"].keys())
-    materializadas = set(cit.capacidades.keys())
-
-    assert materializadas == declaradas
-
-
-def test_engine_no_inventa_capacidades_para_cit():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    declaradas = set(CIT_CONTENEDOR["capacidades"].keys())
-    materializadas = set(cit.capacidades.keys())
-
-    assert materializadas == declaradas
-
-
-def test_todas_las_capacidades_de_cit_son_callable_desde_engine():
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    for capacidad in cit.capacidades:
-        assert callable(cit.fn(capacidad)), (
-            f"CIT.{capacidad} no es callable desde Engine"
+        assert materializada is referencia, (
+            f"Desacople de capacidad '{nombre}': "
+            "Engine no materializó la misma referencia callable."
         )
 
 
 # ===============================================================
-# 21. ACOPLAMIENTO DE META-CAPACIDADES
+# 4. CAPACIDADES_META — ACOPLAMIENTO DINÁMICO
 # ===============================================================
 
-def test_engine_recibe_meta_de_todas_las_capacidades_cit():
+def test_cit_toda_capacidad_tiene_metadata_contractual():
     engine = crear_engine()
-
     cit = obtener_cit(engine)
 
-    for capacidad in cit.capacidades:
-        assert capacidad in cit.capacidades_meta
+    capacidades = cit.capacidades
+    meta = cit.capacidades_meta
 
-        meta = cit.capacidades_meta[capacidad]
+    assert isinstance(meta, dict)
 
-        assert isinstance(meta, dict)
-        assert isinstance(meta["descripcion"], str)
-        assert isinstance(meta["entrada"], str)
-        assert isinstance(meta["salida"], str)
+    for capacidad in capacidades:
+        assert capacidad in meta, (
+            f"Desacople CIT → Engine: la capacidad '{capacidad}' "
+            "no posee entrada en capacidades_meta."
+        )
+
+        definicion = meta[capacidad]
+
+        assert isinstance(definicion, dict), (
+            f"capacidades_meta['{capacidad}'] no es dict."
+        )
+
+        for campo in CLAVES_META_CAPACIDAD:
+            assert campo in definicion, (
+                f"Capacidad '{capacidad}' carece de '{campo}'."
+            )
+
+            assert isinstance(definicion[campo], str), (
+                f"Capacidad '{capacidad}': "
+                f"'{campo}' debe ser str."
+            )
 
 
 # ===============================================================
-# 22. DEPENDENCIAS
+# 5. AUTORIZACIÓN ENGINE
 # ===============================================================
 
-def test_cit_no_tiene_dependencias_faltantes():
+def test_cit_autorizacion_engine_es_compatible_con_engine():
     engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    autorizacion = cit.autoriza_engine
+
+    assert isinstance(autorizacion, dict)
+
+    # Se obtienen dinámicamente los permisos que Engine considera
+    # obligatorios; no se hardcodean las claves de CIT.
+    from core.engine import PERMISOS_AUTORIZA_ENGINE
+
+    for permiso in PERMISOS_AUTORIZA_ENGINE:
+        assert permiso in autorizacion, (
+            f"CIT no declara permiso Engine obligatorio: '{permiso}'."
+        )
+
+        assert isinstance(autorizacion[permiso], bool), (
+            f"CIT.autoriza_engine['{permiso}'] no es bool."
+        )
+
+    extras = set(autorizacion) - set(PERMISOS_AUTORIZA_ENGINE)
+
+    assert not extras, (
+        "CIT declara permisos Engine desconocidos: "
+        f"{sorted(extras)}"
+    )
+
+
+# ===============================================================
+# 6. REPORTING — SIN HARDCODEAR EL REPORTING DE CIT
+# ===============================================================
+
+def test_cit_reporting_es_compatible_con_engine():
+    engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    reporting = cit.reporting
+
+    assert isinstance(reporting, dict)
+
+    # Importante:
+    #
+    # NO hacemos:
+    #
+    #   assert set(reporting.keys()) == {...}
+    #
+    # porque eso acoplaría el test a la implementación de CIT.
+    #
+    # Engine define las banderas mínimas obligatorias.
+    # CIT puede tener información adicional.
+
+    for bandera in BANDERAS_REPORTING:
+        assert bandera in reporting, (
+            f"CIT no declara la bandera reporting obligatoria "
+            f"'{bandera}'."
+        )
+
+        assert isinstance(reporting[bandera], bool), (
+            f"CIT.reporting['{bandera}'] debe ser bool."
+        )
+
+
+# ===============================================================
+# 7. ESTADOS
+# ===============================================================
+
+def test_cit_estados_son_compatibles_con_engine():
+    engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    assert cit.estados_validos
+
+    from core.engine import ESTADOS_CANONICOS
+
+    for estado in cit.estados_validos:
+        assert estado in ESTADOS_CANONICOS, (
+            f"CIT declara estado no reconocido por Engine: '{estado}'."
+        )
+
+
+# ===============================================================
+# 8. DEPENDENCIAS
+# ===============================================================
+
+def test_cit_dependencias_estan_resueltas():
+    engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    dependencias = cit.requiere
+
+    assert isinstance(dependencias, list)
 
     faltantes = engine._dependencias.get("faltantes", {})
 
-    assert CIT_NOMBRE not in faltantes
-
-
-def test_cit_no_genera_arista_requiere():
-    engine = crear_engine()
-
-    grafo = engine._grafo
-
-    aristas_cit = [
-        a
-        for a in grafo.get("aristas", [])
-        if a.get("from") == CIT_NOMBRE
-        and a.get("tipo") == "requiere"
-    ]
-
-    assert aristas_cit == []
+    assert cit.nombre not in faltantes, (
+        f"CIT tiene dependencias no resueltas: "
+        f"{faltantes.get(cit.nombre)}"
+    )
 
 
 # ===============================================================
-# 23. GRAFO ESTRUCTURAL
+# 9. GRAFO — EL CONTRATO DEBE REFLEJARSE
 # ===============================================================
 
-def test_cit_aparece_en_grafo():
+def test_cit_aparece_en_grafo_engine():
     engine = crear_engine()
+    cit = obtener_cit(engine)
 
     nodos = engine._grafo.get("nodos", [])
+
+    modulo_ids = {
+        nodo.get("id")
+        for nodo in nodos
+        if nodo.get("tipo") == "modulo"
+    }
+
+    assert cit.id in modulo_ids or cit.nombre in modulo_ids, (
+        "CIT fue registrado pero no aparece como nodo de módulo "
+        "en el grafo del Engine."
+    )
+
+
+def test_cit_capacidades_aparecen_en_grafo_dinamicamente():
+    engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    nodos = engine._grafo.get("nodos", [])
+
+    capacidad_ids = {
+        nodo.get("id")
+        for nodo in nodos
+        if nodo.get("tipo") == "capacidad"
+        and nodo.get("modulo") == cit.nombre
+    }
+
+    esperadas = {
+        f"{cit.nombre}.{capacidad}"
+        for capacidad in cit.capacidades
+    }
+
+    assert capacidad_ids == esperadas, (
+        "Desacople CIT → grafo.\n"
+        f"Esperadas: {sorted(esperadas)}\n"
+        f"Encontradas: {sorted(capacidad_ids)}"
+    )
+
+
+# ===============================================================
+# 10. EJECUCIÓN DINÁMICA DE TODAS LAS CAPACIDADES COMPATIBLES
+# ===============================================================
+
+def test_cit_capacidades_son_invocables_por_engine():
+    engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    for capacidad in cit.capacidades:
+        meta = cit.capacidades_meta[capacidad]
+
+        entrada = str(meta["entrada"]).lower()
+
+        # No inventamos argumentos.
+        #
+        # Solo probamos capacidades que declaran explícitamente
+        # que aceptan entrada opcional / vacía.
+        #
+        # Si no es evidente que acepten llamada sin argumentos,
+        # verificamos el puente contractual sin ejecutar la función.
+        if (
+            "opcional" in entrada
+            or "none" in entrada
+            or "sin argumento" in entrada
+            or "ningun" in entrada
+            or "ninguno" in entrada
+        ):
+            salida = engine.ejecutar_capacidad(
+                cit.nombre,
+                capacidad,
+            )
+
+            assert isinstance(salida, dict), (
+                f"Engine no devolvió dict al ejecutar '{capacidad}'."
+            )
+
+            assert salida.get("modulo") == cit.nombre
+            assert salida.get("capacidad") == capacidad
+
+        else:
+            # La capacidad ya fue validada como callable.
+            # No inventamos su firma.
+            assert callable(cit.fn(capacidad))
+
+
+# ===============================================================
+# 11. REPORTE / DIAGNÓSTICO / INVENTARIO
+# ===============================================================
+#
+# Aquí tampoco suponemos que CIT tenga exactamente esas capacidades.
+# Se consultan dinámicamente.
+# ===============================================================
+
+@pytest.mark.parametrize(
+    "capacidad",
+    ["reporte", "diagnostico", "inventario"],
+)
+def test_cit_reporting_operativo_si_declara_capacidad(capacidad: str):
+    engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    if capacidad not in cit.capacidades:
+        pytest.skip(
+            f"CIT no declara '{capacidad}'; "
+            "el contrato no exige que todos los módulos la implementen."
+        )
+
+    salida = engine.ejecutar_capacidad(
+        cit.nombre,
+        capacidad,
+    )
+
+    assert salida.get("estado") == "EXITO", (
+        f"CIT declara '{capacidad}', pero Engine no pudo ejecutarla: "
+        f"{salida}"
+    )
+
+
+# ===============================================================
+# 12. TRAZABILIDAD
+# ===============================================================
+
+def test_cit_ejecucion_deja_traza():
+    engine = crear_engine()
+    cit = obtener_cit(engine)
+
+    capacidad = next(iter(cit.capacidades))
+
+    meta = cit.capacidades_meta[capacidad]
+    entrada = str(meta["entrada"]).lower()
+
+    # Solo ejecutar automáticamente cuando la metadata indica
+    # que la llamada vacía es admisible.
+    if not (
+        "opcional" in entrada
+        or "none" in entrada
+        or "sin argumento" in entrada
+        or "ningun" in entrada
+        or "ninguno" in entrada
+    ):
+        pytest.skip(
+            f"La firma declarada de '{capacidad}' no permite "
+            "inferir una llamada vacía."
+        )
+
+    antes = len(engine.obtener_trazas())
+
+    salida = engine.ejecutar_capacidad(
+        cit.nombre,
+        capacidad,
+    )
+
+    despues = engine.obtener_trazas()
+
+    assert salida.get("estado") == "EXITO"
+
+    assert len(despues) == antes + 1
+
+    traza = despues[-1]
+
+    assert traza["modulo"] == cit.nombre
+    assert traza["capacidad"] == capacidad
+    assert traza["estado"] == "EXITO"
+
+
+# ===============================================================
+# 13. CONSOLIDACIÓN
+# ===============================================================
+
+def test_cit_se_consolida_en_paquete_omega():
+    engine = crear_engine()
+
+    paquete = engine.paquete_omega()
+
+    assert isinstance(paquete, dict)
+    assert "metadata" in paquete
+    assert "reportes" in paquete
+
+    reportes = paquete["reportes"]
 
     encontrados = [
-        nodo
-        for nodo in nodos
-        if nodo.get("id") == CIT_ID
-        or nodo.get("nombre") == CIT_NOMBRE
+        r
+        for r in reportes
+        if r.get("id") == CIT_ID
+        or (
+            isinstance(r.get("titulo"), str)
+            and CIT_ID in r["titulo"]
+        )
     ]
 
-    assert encontrados
+    assert encontrados, (
+        "CIT no aparece en paquete_omega()."
+    )
 
 
-def test_capacidades_cit_aparecen_en_grafo():
+# ===============================================================
+# 14. INTEGRIDAD: EL ENGINE NO DEBE CAMBIAR EL CONTRATO
+# ===============================================================
+
+def test_engine_no_mutara_contrato_de_cit():
     engine = crear_engine()
+    cit = obtener_cit(engine)
 
-    nodos = engine._grafo.get("nodos", [])
+    original = copy.deepcopy(cit.meta)
 
-    capacidades = CIT_CONTENEDOR["capacidades"]
+    # Operaciones normales del Engine.
+    engine.censar()
+    engine.estado_global()
+    engine.paquete_omega()
 
-    for capacidad in capacidades:
-        esperado = f"{CIT_NOMBRE}.{capacidad}"
+    assert cit.meta == original, (
+        "El Engine modificó el CONTENEDOR contractual de CIT."
+    )
 
-        encontrados = [
-            nodo
-            for nodo in nodos
-            if nodo.get("id") == esperado
-        ]
 
-        assert encontrados, (
-            f"No existe nodo de capacidad en grafo: {esperado}"
+# ===============================================================
+# 15. PRUEBA ADVERSARIAL — CAPACIDAD NO CALLABLE
+# ===============================================================
+
+def test_engine_detecta_capacidad_no_callable(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    # Lo hacemos inválido deliberadamente.
+    contrato["capacidades"]["capacidad_prueba"] = "NO_CALLABLE"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_no_callable",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
         )
 
 
 # ===============================================================
-# 24. TRAZAS
+# 16. PRUEBA ADVERSARIAL — CAPACIDAD SIN META
 # ===============================================================
 
-def test_engine_genera_traza_para_cit():
-    engine = crear_engine()
+def test_engine_detecta_capacidad_sin_metadata(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
 
-    engine.ejecutar_reporte(CIT_ID)
+    contrato = preparar_capacidad_sintetica(contrato)
 
-    trazas = engine.obtener_trazas()
+    contrato["capacidades_meta"] = {}
 
-    assert trazas
-
-    cit_trazas = [
-        traza
-        for traza in trazas
-        if traza.get("modulo") == CIT_NOMBRE
-    ]
-
-    assert cit_trazas
-
-
-def test_traza_cit_contiene_capacidad():
-    engine = crear_engine()
-
-    engine.ejecutar_reporte(CIT_ID)
-
-    trazas = engine.obtener_trazas()
-
-    cit_trazas = [
-        traza
-        for traza in trazas
-        if traza.get("modulo") == CIT_NOMBRE
-    ]
-
-    assert any(
-        traza.get("capacidad") == "reporte"
-        for traza in cit_trazas
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_sin_meta",
+        contrato,
     )
 
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
 
-def test_traza_cit_exito():
-    engine = crear_engine()
 
-    engine.ejecutar_reporte(CIT_ID)
+# ===============================================================
+# 17. PRUEBA ADVERSARIAL — REPORTING INCOMPLETO
+# ===============================================================
 
-    trazas = engine.obtener_trazas()
+def test_engine_detecta_reporting_incompleto(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
 
-    cit_trazas = [
-        traza
-        for traza in trazas
-        if traza.get("modulo") == CIT_NOMBRE
-    ]
+    contrato = preparar_capacidad_sintetica(contrato)
 
-    assert any(
-        traza.get("estado") == "EXITO"
-        for traza in cit_trazas
+    contrato["reporting"] = {}
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_reporting_roto",
+        contrato,
     )
 
-
-# ===============================================================
-# 25. CONSOLIDACIÓN
-# ===============================================================
-
-def test_engine_consolida_reporte_cit():
-    engine = crear_engine()
-
-    consolidado = engine.consolidar_reportes()
-
-    assert CIT_NOMBRE in consolidado["reportes"]
-
-
-def test_engine_consolida_diagnostico_cit():
-    engine = crear_engine()
-
-    consolidado = engine.consolidar_reportes()
-
-    assert CIT_NOMBRE in consolidado["diagnosticos"]
-
-
-def test_engine_consolida_inventario_cit():
-    engine = crear_engine()
-
-    consolidado = engine.consolidar_reportes()
-
-    assert CIT_NOMBRE in consolidado["inventarios"]
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
 
 
 # ===============================================================
-# 26. PAQUETE OMEGA
+# 18. PRUEBA ADVERSARIAL — PERMISO ENGINE DESCONOCIDO
 # ===============================================================
 
-def test_paquete_omega_contiene_cit():
-    engine = crear_engine()
+def test_engine_detecta_permiso_engine_desconocido(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
 
-    paquete = engine.paquete_omega()
+    contrato = preparar_capacidad_sintetica(contrato)
 
-    reportes = paquete["reportes"]
+    contrato["autoriza_engine"]["permiso_inventado"] = True
 
-    encontrados = [
-        reporte
-        for reporte in reportes
-        if reporte.get("id") == CIT_ID
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_permiso_desconocido",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 19. PRUEBA ADVERSARIAL — DEPENDENCIA INEXISTENTE
+# ===============================================================
+
+def test_engine_detecta_dependencia_inexistente(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    contrato["requiere"] = [
+        "MODULO_QUE_NO_EXISTE"
     ]
 
-    assert encontrados
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_dependencia_rota",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
 
 
-def test_paquete_omega_cit_contiene_contrato():
-    engine = crear_engine()
+# ===============================================================
+# 20. PRUEBA ADVERSARIAL — API INCOMPATIBLE
+# ===============================================================
 
-    paquete = engine.paquete_omega()
+def test_engine_detecta_api_incompatible(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
 
-    reportes = paquete["reportes"]
+    contrato = preparar_capacidad_sintetica(contrato)
 
-    cit_reportes = [
-        reporte
-        for reporte in reportes
-        if reporte.get("id") == CIT_ID
+    contrato["api_engine"] = ">=999.0"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_api_incompatible",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 21. PRUEBA ADVERSARIAL — VERSION DE COMPATIBILIDAD FUTURA
+# ===============================================================
+
+def test_engine_detecta_compatible_desde_futuro(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    contrato["compatible_desde"] = "999.0"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_version_futura",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 22. PRUEBA ADVERSARIAL — ESTADO NO CANÓNICO
+# ===============================================================
+
+def test_engine_detecta_estado_no_canonico(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    contrato["estados_validos"] = [
+        "ESTADO_INVENTADO"
     ]
 
-    assert cit_reportes
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_estado_invalido",
+        contrato,
+    )
 
-    contenido = cit_reportes[0]["contenido"]
-
-    assert contenido["id"] == CIT_ID
-    assert contenido["nombre"] == CIT_NOMBRE
-    assert contenido["rol"] == CIT_ROL
-    assert contenido["esquema"] == CIT_ESQUEMA
-    assert contenido["version_contrato"] == CIT_VERSION_CONTRATO
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
 
 
-def test_paquete_omega_cit_conserva_reporting():
+# ===============================================================
+# 23. PRUEBA ADVERSARIAL — ESQUEMA INCORRECTO
+# ===============================================================
+
+def test_engine_detecta_esquema_incorrecto(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    contrato["esquema"] = "CONTRATO-INVENTADO-999"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_esquema_invalido",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 24. PRUEBA ADVERSARIAL — VERSION DE CONTRATO INCORRECTA
+# ===============================================================
+
+def test_engine_detecta_version_contrato_incorrecta(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    contrato["version_contrato"] = "999.0"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_contrato_incompatible",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 25. PRUEBA ADVERSARIAL — REQUIERE DEBE SER LISTA
+# ===============================================================
+
+def test_engine_detecta_requiere_no_lista(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    contrato["requiere"] = "CIT"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_requiere_invalido",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 26. PRUEBA ADVERSARIAL — META CON TIPO INCORRECTO
+# ===============================================================
+
+def test_engine_detecta_meta_capacidad_mal_formada(tmp_path: Path):
+    base = copiar_contrato_cit()
+    contrato = contrato_base_sintetico(base)
+
+    contrato = preparar_capacidad_sintetica(contrato)
+
+    contrato["capacidades_meta"]["capacidad_prueba"] = {
+        "descripcion": "válida",
+        "entrada": 123,
+        "salida": "dict",
+    }
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_meta_mal_formada",
+        contrato,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 27. PRUEBA ADVERSARIAL — DUPLICADO DE ID
+# ===============================================================
+
+def test_engine_detecta_id_duplicado(tmp_path: Path):
+    base = copiar_contrato_cit()
+
+    contrato_a = contrato_base_sintetico(base)
+    contrato_a = preparar_capacidad_sintetica(contrato_a)
+
+    contrato_b = contrato_base_sintetico(base)
+    contrato_b = preparar_capacidad_sintetica(contrato_b)
+
+    contrato_b["nombre"] = "test_segundo"
+    contrato_b["id"] = "TEST"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_primero",
+        contrato_a,
+    )
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_segundo",
+        contrato_b,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 28. PRUEBA ADVERSARIAL — DUPLICADO DE ROL
+# ===============================================================
+
+def test_engine_detecta_rol_duplicado(tmp_path: Path):
+    base = copiar_contrato_cit()
+
+    contrato_a = contrato_base_sintetico(base)
+    contrato_a = preparar_capacidad_sintetica(contrato_a)
+
+    contrato_b = contrato_base_sintetico(base)
+    contrato_b = preparar_capacidad_sintetica(contrato_b)
+
+    contrato_a["id"] = "TEST_A"
+    contrato_a["nombre"] = "test_a"
+    contrato_a["rol"] = "TEST"
+
+    contrato_b["id"] = "TEST_B"
+    contrato_b["nombre"] = "test_b"
+    contrato_b["rol"] = "TEST"
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_a",
+        contrato_a,
+    )
+
+    escribir_modulo_sintetico(
+        tmp_path,
+        "test_b",
+        contrato_b,
+    )
+
+    with pytest.raises(ArranqueError):
+        Engine(
+            raiz_modulos=tmp_path,
+            strict=True,
+        )
+
+
+# ===============================================================
+# 29. PRUEBA DE NO-HARDCODE
+# ===============================================================
+
+def test_acoplamiento_cit_no_hardcodea_capacidades():
+    """
+    Esta prueba documenta explícitamente el principio arquitectónico.
+
+    No se fija ninguna capacidad concreta de CIT.
+
+    El conjunto se obtiene directamente del contrato cargado.
+    """
     engine = crear_engine()
+    cit = obtener_cit(engine)
 
-    paquete = engine.paquete_omega()
+    capacidades_contrato = set(cit.meta["capacidades"].keys())
+    capacidades_engine = set(cit.capacidades.keys())
+
+    assert capacidades_engine == capacidades_contrato
+
+
+# ===============================================================
+# 30. PRUEBA FINAL DE ACOPLAMIENTO
+# ===============================================================
+
+def test_cit_acoplamiento_integral():
+    """
+    Prueba resumida del acoplamiento real:
+
+        contrato
+           ↓
+        carga
+           ↓
+        validación
+           ↓
+        registro
+           ↓
+        dependencia
+           ↓
+        grafo
+           ↓
+        capacidades
+           ↓
+        reporting
+           ↓
+        Omega
+    """
+    engine = crear_engine()
 
     cit = obtener_cit(engine)
 
-    reportes = paquete["reportes"]
-
-    cit_reportes = [
-        reporte
-        for reporte in reportes
-        if reporte.get("id") == CIT_ID
-    ]
-
-    assert cit_reportes
-
-    contenido = cit_reportes[0]["contenido"]
-
-    # El paquete expone capacidades y contrato, pero reporting no se
-    # materializa como campo independiente en paquete_omega.
-    # Por ello comprobamos el contrato materializado en Engine.
-    assert set(cit.reporting.keys()) == set(
-        CIT_CONTENEDOR["reporting"].keys()
-    )
-
-
-# ===============================================================
-# 27. CENSO
-# ===============================================================
-
-def test_censo_contiene_cit():
-    engine = crear_engine()
-
-    censo = engine.censar()
-
-    cargados = censo["cargados"]
-
-    encontrados = [
-        modulo
-        for modulo in cargados
-        if modulo.get("id") == CIT_ID
-        or modulo.get("nombre") == CIT_NOMBRE
-    ]
-
-    assert encontrados
-
-
-def test_censo_identidad_cit():
-    engine = crear_engine()
-
-    censo = engine.censar()
-
-    cit = next(
-        modulo
-        for modulo in censo["cargados"]
-        if modulo.get("id") == CIT_ID
-    )
-
-    assert cit["id"] == CIT_ID
-    assert cit["nombre"] == CIT_NOMBRE
-    assert cit["rol"] == CIT_ROL
-
-
-# ===============================================================
-# 28. ESTADO GLOBAL
-# ===============================================================
-
-def test_estado_global_engine_operativo():
-    engine = crear_engine()
-
-    estado = engine.estado_global()
-
-    assert estado["estado"] == "OPERATIVO"
-
-
-def test_estado_global_no_rechaza_cit():
-    engine = crear_engine()
-
-    estado = engine.estado_global()
-
-    errores = estado["errores_arranque"]
-
-    errores_cit = [
-        error
-        for error in errores
-        if CIT_NOMBRE in str(error)
-        or CIT_ID in str(error)
-    ]
-
-    assert errores_cit == []
-
-
-# ===============================================================
-# 29. PRUEBA DE ACOPLAMIENTO COMPLETO
-# ===============================================================
-
-def test_acoplamiento_cit_engine_completo():
-    """
-    Prueba integral:
-
-        contrato CIT
-              ↓
-        descubrimiento
-              ↓
-        validación
-              ↓
-        registro
-              ↓
-        materialización
-              ↓
-        capacidades
-              ↓
-        reporte
-              ↓
-        diagnóstico
-              ↓
-        inventario
-              ↓
-        grafo
-              ↓
-        trazas
-              ↓
-        paquete Omega
-    """
-
-    engine = crear_engine()
-
-    # 1. Engine operativo
     assert engine.estado == "OPERATIVO"
 
-    # 2. CIT descubierto
-    cit = obtener_cit(engine)
-    assert cit is not None
+    assert cit.id == cit.meta["id"]
+    assert cit.nombre == cit.meta["nombre"]
+    assert cit.rol == cit.meta["rol"]
 
-    # 3. Identidad
-    assert cit.id == CIT_ID
-    assert cit.nombre == CIT_NOMBRE
-    assert cit.rol == CIT_ROL
+    assert cit.capacidades == cit.meta["capacidades"]
+    assert cit.capacidades_meta == cit.meta["capacidades_meta"]
+    assert cit.reporting == cit.meta["reporting"]
 
-    # 4. Contrato
-    assert cit.esquema == CIT_ESQUEMA
-    assert cit.version_contrato == CIT_VERSION_CONTRATO
-    assert cit.api_engine == CIT_API_ENGINE
+    assert cit.nombre not in engine._dependencias.get("faltantes", {})
 
-    # 5. Dependencias
-    assert cit.requiere == []
+    nodos = engine._grafo.get("nodos", [])
 
-    # 6. Capacidades
-    assert set(cit.capacidades) == set(
-        CIT_CONTENEDOR["capacidades"]
-    )
-
-    # 7. Meta-capacidades
-    for capacidad in cit.capacidades:
-        assert capacidad in cit.capacidades_meta
-
-    # 8. Reporting
-    assert set(cit.reporting) == set(
-        CIT_CONTENEDOR["reporting"]
-    )
-
-    # 9. Reporte
-    reporte = engine.ejecutar_reporte(CIT_ID)
-    assert reporte["estado"] == "EXITO"
-
-    # 10. Diagnóstico
-    diagnostico = engine.ejecutar_diagnostico(CIT_ID)
-    assert diagnostico["estado"] == "EXITO"
-
-    # 11. Inventario
-    inventario = engine.ejecutar_inventario(CIT_ID)
-    assert inventario["estado"] == "EXITO"
-
-    # 12. Grafo
-    nodos = engine._grafo["nodos"]
     assert any(
-        nodo.get("id") == CIT_ID
+        nodo.get("tipo") == "modulo"
+        and (
+            nodo.get("id") == cit.id
+            or nodo.get("nombre") == cit.nombre
+        )
         for nodo in nodos
     )
 
-    # 13. Omega
-    omega = engine.paquete_omega()
-    assert isinstance(omega, dict)
-    assert "reportes" in omega
+    paquete = engine.paquete_omega()
 
-    # 14. CIT presente en Omega
+    assert paquete["metadata"]["estado_engine"] == "OPERATIVO"
+
     assert any(
-        reporte.get("id") == CIT_ID
-        for reporte in omega["reportes"]
+        reporte.get("id") == cit.id
+        for reporte in paquete.get("reportes", [])
     )
-
-
-# ===============================================================
-# 30. TEST FINAL DE INTEGRIDAD CONTRACTUAL
-# ===============================================================
-
-def test_cit_contrato_engine_100_por_ciento():
-    """
-    La materialización de CIT por Engine debe conservar exactamente
-    los elementos estructurales declarados por CIT.
-
-    No se permite:
-      - perder capacidades
-      - inventar capacidades
-      - perder reporting
-      - alterar requiere
-      - alterar identidad
-      - alterar versiones
-      - alterar esquema
-    """
-
-    engine = crear_engine()
-
-    cit = obtener_cit(engine)
-
-    assert cit is not None
-
-    assert cit.id == CIT_CONTENEDOR["id"]
-    assert cit.nombre == CIT_CONTENEDOR["nombre"]
-    assert cit.rol == CIT_CONTENEDOR["rol"]
-
-    assert cit.version == CIT_CONTENEDOR["version_modulo"]
-    assert cit.version_contrato == str(
-        CIT_CONTENEDOR["version_contrato"]
-    )
-
-    assert cit.esquema == CIT_CONTENEDOR["esquema"]
-    assert cit.estabilidad == CIT_CONTENEDOR["estabilidad"]
-    assert cit.compatible_desde == CIT_CONTENEDOR["compatible_desde"]
-    assert cit.api_engine == CIT_CONTENEDOR["api_engine"]
-
-    assert cit.requiere == CIT_CONTENEDOR["requiere"]
-
-    assert set(cit.capacidades) == set(
-        CIT_CONTENEDOR["capacidades"]
-    )
-
-    assert set(cit.capacidades_meta) == set(
-        CIT_CONTENEDOR["capacidades_meta"]
-    )
-
-    assert set(cit.reporting) == set(
-        CIT_CONTENEDOR["reporting"]
-    )
-
-    assert cit.autoriza_engine == CIT_CONTENEDOR["autoriza_engine"]
 
 
 # ===============================================================

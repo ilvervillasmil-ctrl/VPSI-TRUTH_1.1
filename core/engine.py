@@ -130,6 +130,33 @@ LISTAS_STR_OBLIGATORIAS = (
 # ===============================================================
 # FIN CONSTANTES
 # ===============================================================
+# ===============================================================
+# INICIO: CONFIGURACIÓN DE REQUERIMIENTOS DE DIAGNÓSTICO
+# ===============================================================
+# Este bloque define la lista oficial y ordenada de módulos que 
+# el Engine (Angelina) debe validar, cargar y entregar formalmente 
+# a Diagnostics para que el sistema opere de forma unificada.
+# ===============================================================
+
+    "requiere": [
+        "AX",
+        "CA",
+        "CH",
+        "CIT",
+        "CT",
+        "CX",
+        "FO",
+        "MC",
+        "RE",
+        "SF",
+        "TX",
+        "UI",
+        "VX",
+    ],
+
+# ===============================================================
+# FIN: CONFIGURACIÓN DE REQUERIMIENTOS DE DIAGNÓSTICO
+# ===============================================================
 
 
 # ===============================================================

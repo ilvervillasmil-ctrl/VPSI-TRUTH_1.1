@@ -21,15 +21,163 @@ from core.diagnosticoD import (
 # ===============================================================
 # CONTENEDOR (contrato Engine)
 # ===============================================================
-CONTENEDOR = {
+
+CONTENEDOR: Dict[str, Any] = {
+
+    # -----------------------------------------------------------
+    # ESQUEMA / VERSIONADO
+    # -----------------------------------------------------------
+
+    "esquema": ESQUEMA_CONTRATO,
+    "version_contrato": VERSION_CONTRATO,
+    "version_modulo": "1.0",
+    "estabilidad": ESTABILIDAD,
+    "compatible_desde": COMPATIBLE_DESDE,
+    "api_engine": API_ENGINE,
+
+    # -----------------------------------------------------------
+    # IDENTIDAD
+    # -----------------------------------------------------------
+
+    "id": "DGCO",
     "nombre": "diagnosticoD",
     "rol": "DGCO",
-    "version": "1.0",
-    "requiere": [],
+
     "descripcion": (
         "Enlace al diagnóstico global de core. Solo lectura / recepción de "
         "reportes de módulos. Cero actuación sobre Engine o negocio."
     ),
+
+    # -----------------------------------------------------------
+    # PROPÓSITO
+    # -----------------------------------------------------------
+
+    "funcion": (
+        "Recibir y consolidar reportes de módulos, exponer censo y "
+        "diagnóstico global sin modificar el estado del sistema."
+    ),
+    "no_hace": [
+        "No calcula Tru.",
+        "No recalcula C, L, K, Tru_Ri ni Tru_total.",
+        "No modifica el estado del Engine.",
+        "No modifica contratos.",
+        "No altera evidencia recibida.",
+        "No ejecuta lógica de dominio.",
+    ],
+
+    # -----------------------------------------------------------
+    # AUTORIDAD
+    # -----------------------------------------------------------
+
+    "autoridad": [
+        "Recibir reportes de módulos",
+        "Consolidar censo y diagnóstico global",
+        "Exponer estado general del sistema",
+        "Reportar inventario y diagnóstico propios",
+    ],
+
+    # -----------------------------------------------------------
+    # CONOCIMIENTO EXPORTABLE
+    # -----------------------------------------------------------
+
+    "conocimiento_exportable": [
+        "censo",
+        "verificar",
+        "presentar",
+        "reportar",
+        "inventario",
+        "estado",
+        "salud",
+        "capacidades",
+        "errores",
+        "advertencias",
+        "dependencias",
+        "version",
+        "contrato",
+        "conocimiento",
+        "metricas",
+        "diagnostico",
+        "reporte",
+    ],
+
+    # -----------------------------------------------------------
+    # DEPENDENCIAS
+    # -----------------------------------------------------------
+
+    "requiere": [],
+
+    # -----------------------------------------------------------
+    # AUTORIZACIÓN DEL ENGINE (COMPLETA)
+    # -----------------------------------------------------------
+
+    "autoriza_engine": {
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": False,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
+        "modificar": False,
+        "alterar": False,
+        "reescribir": False,
+        "crear": False,
+        "eliminar": False,
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+    },
+
+    # -----------------------------------------------------------
+    # CONSULTAS SOPORTADAS
+    # -----------------------------------------------------------
+
+    "consultas_soportadas": [
+        "censo",
+        "verificar",
+        "presentar",
+        "reportar",
+        "inventario",
+    ],
+
+    # -----------------------------------------------------------
+    # CAPACIDADES
+    # -----------------------------------------------------------
+
     "capacidades": {
         "censo": "censo",
         "verificar": "verificar",
@@ -38,9 +186,77 @@ CONTENEDOR = {
         "reportar": "reportar",
         "inventario": "inventario",
     },
-}
 
+    # -----------------------------------------------------------
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # -----------------------------------------------------------
 
+    "capacidades_meta": {
+        "censo": {
+            "descripcion": "Censo consolidado de todos los módulos registrados.",
+            "entrada": "ninguna",
+            "salida": "dict con total, modulos, estados",
+        },
+        "verificar": {
+            "descripcion": "Verifica coherencia del diagnóstico global.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, errores, choques",
+        },
+        "barrer": {
+            "descripcion": "Alias de verificar.",
+            "entrada": "ninguna",
+            "salida": "dict con coherente, errores, choques",
+        },
+        "presentar": {
+            "descripcion": "Presenta el diagnóstico global formateado.",
+            "entrada": "peticion opcional",
+            "salida": "dict con diagnostico_global, resumen",
+        },
+        "reportar": {
+            "descripcion": "Reporte interno de estado del módulo DGCO.",
+            "entrada": "ninguna",
+            "salida": "dict con estado, coherente, modulos, capacidades",
+        },
+        "inventario": {
+            "descripcion": "Inventario completo del módulo DGCO.",
+            "entrada": "peticion opcional",
+            "salida": "dict con id, nombre, rol, version, modulos, capacidades",
+        },
+    },
+
+    # -----------------------------------------------------------
+    # REPORTING (COMPLETO)
+    # -----------------------------------------------------------
+
+    "reporting": {
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
+        "reporte": True,
+    },
+
+    # -----------------------------------------------------------
+    # ESTADOS VÁLIDOS
+    # -----------------------------------------------------------
+
+    "estados_validos": list(ESTADOS_VALIDOS),
+
+    # -----------------------------------------------------------
+    # INVARIANTES
+    # -----------------------------------------------------------
+
+    "invariantes": list(INVARIANTES),
+
+}  # <--- CIERRE FINAL
 # ===============================================================
 # Puente (delega en core)
 # ===============================================================

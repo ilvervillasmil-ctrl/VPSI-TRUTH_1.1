@@ -368,7 +368,9 @@ _registro = _RegistroEventos()
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
-    # ----- ESQUEMA -----
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
@@ -376,7 +378,9 @@ CONTENEDOR: Dict[str, Any] = {
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
 
-    # ----- IDENTIDAD -----
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
@@ -386,7 +390,9 @@ CONTENEDOR: Dict[str, Any] = {
         "No interpreta. No deduce. No reconstruye. No calcula."
     ),
 
-    # ----- PROPÓSITO -----
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
     "funcion": (
         "Registrar exactamente lo que ocurrió durante la ejecución "
         "y exponer lecturas filtradas por campos del registro. "
@@ -405,7 +411,9 @@ CONTENEDOR: Dict[str, Any] = {
         "No envía reportes a otros módulos",
     ],
 
-    # ----- AUTORIDAD -----
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
     "autoridad": [
         "Registrar eventos depositados por Engine o Centinela",
         "Entregar lecturas filtradas por campos del registro",
@@ -414,7 +422,9 @@ CONTENEDOR: Dict[str, Any] = {
         "Reportar estado, inventario y diagnóstico propios",
     ],
 
-    # ----- CONOCIMIENTO EXPORTABLE -----
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
     "conocimiento_exportable": [
         "depositar",
         "leer",
@@ -436,11 +446,16 @@ CONTENEDOR: Dict[str, Any] = {
         "backend_para_centinela",
     ],
 
-    # ----- DEPENDENCIAS -----
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
     "requiere": [],
 
-    # ----- AUTORIZACIÓN AL ENGINE -----
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # ============================================================
     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -448,12 +463,52 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
         "alterar": False,
         "reescribir": False,
+        "crear": True,
+        "eliminar": False,
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": False,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
 
-    # ----- CONSULTAS SOPORTADAS -----
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
     "consultas_soportadas": [
         "depositar_evento",
         "leer_eventos",
@@ -465,7 +520,9 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_integridad_registro",
     ],
 
-    # ----- CAPACIDADES -----
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
     "capacidades": {
         "verificar": "barrer",
         "barrer": "barrer",
@@ -490,7 +547,9 @@ CONTENEDOR: Dict[str, Any] = {
         "backend_para_centinela": "backend_para_centinela",
     },
 
-    # ----- METADATOS DE CAPACIDADES (1:1 obligatorio) -----
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Integridad formal del registro.",
@@ -611,7 +670,9 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    # ----- REPORTING -----
+    # ============================================================
+    # REPORTING
+    # ============================================================
     "reporting": {
         "estado": True,
         "salud": True,
@@ -628,17 +689,21 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
     },
 
-    # ----- ESTADOS VÁLIDOS -----
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
 
-    # ----- INVARIANTES -----
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
     "invariantes": list(INVARIANTES),
-}
+
+}  # <--- CIERRE FINAL
 
 # ===============================================================
 # FIN CONTRATO
 # ===============================================================
-
 
 # ===============================================================
 # FUNCIONES PRIVADAS

@@ -1,5 +1,5 @@
 """
-VPSI-TRUTH --- modules/diagnostico
+VPSI-TRUTH --- modules/diagnosticoD
 
 Rol DG: fachada / enlace a core.diagnostico.
 
@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from core.diagnostico import (
+from core.diagnosticoD import (
     DiagnosticoGlobal,
     DiagnosticoError,
     PESOS,
@@ -22,8 +22,8 @@ from core.diagnostico import (
 # CONTENEDOR (contrato Engine)
 # ===============================================================
 CONTENEDOR = {
-    "nombre": "diagnostico",
-    "rol": "DG",
+    "nombre": "diagnosticoD",
+    "rol": "DGCO",
     "version": "1.0",
     "requiere": [],
     "descripcion": (
@@ -90,13 +90,13 @@ def inventario() -> Dict[str, Any]:
     }
 
 
-# Reexport explícito (quien importe el módulo DG ve el core)
+# Reexport explícito (quien importe el módulo DGCO ve el core)
 __all__ = [
     "CONTENEDOR",
     "DiagnosticoGlobal",
     "DiagnosticoError",
     "PESOS",
-    "barrer_diagnostico",
+    "barrer_diagnosticoD",
     "censo",
     "verificar",
     "presentar",

@@ -270,6 +270,7 @@ class Engine:
                 )
         else:
             self.estado = ESTADO_OPERATIVO
+            self._ejecutar_contratos_automaticos()
 
     # ----------------------------------------------------------
     # DESCUBRIMIENTO
@@ -360,13 +361,13 @@ class Engine:
             if actual != requerida:
                 return (
                     f"api_engine exige exactamente {ver_str}, "
-                    f"Engine es {API_ENGINE_ACTUAL}"
+                    f"Engine is {API_ENGINE_ACTUAL}"
                 )
         else:
             if actual < requerida:
                 return (
                     f"api_engine exige >={ver_str}, "
-                    f"Engine es {API_ENGINE_ACTUAL}"
+                    f"Engine is {API_ENGINE_ACTUAL}"
                 )
         return None
 
@@ -664,6 +665,31 @@ class Engine:
         self._grafo = {"nodos": nodos, "aristas": aristas}
 
     # ----------------------------------------------------------
+    # EJECUCIÓN AUTOMÁTICA DE CONTRATOS
+    # ----------------------------------------------------------
+    def _ejecutar_contratos_automaticos(self) -> None:
+        """
+        Recorre los módulos cargados y ejecuta automáticamente
+        aquellas capacidades declaradas para el arranque (ej. 'ejecutar_contrato', 'inicializar').
+        """
+        for nombre, cont in self.registro.contenedores.items():
+            if cont.autoriza_engine.get("ejecutar") is False:
+                continue
+            
+            capacidad_arranque = None
+            for posible_cap in ["ejecutar_contrato", "inicializar", "arrancar"]:
+                if posible_cap in cont.capacidades:
+                    capacidad_arranque = posible_cap
+                    break
+            
+            if capacidad_arranque:
+                resultado_ejecucion = self.ejecutar_capacidad(nombre, capacidad_arranque)
+                if resultado_ejecucion.get("estado") != "EXITO":
+                    self.advertencias.append(
+                        f"Módulo '{nombre}' falló en su ejecución automática de contrato: {resultado_ejecucion.get('error')}"
+                    )
+
+    # ----------------------------------------------------------
     # TRAZA
     # ----------------------------------------------------------
     def _registrar_traza(
@@ -673,6 +699,7 @@ class Engine:
         estado: str,
         duracion_s: float,
         error: Optional[str] = None,
+        **extras: Any,
     ) -> None:
         self._traza_seq += 1
         entrada: Dict[str, Any] = {
@@ -685,6 +712,9 @@ class Engine:
         }
         if error:
             entrada["error"] = error
+        for clave, valor in extras.items():
+            if valor is not None:
+                entrada[clave] = valor
         self._trazas.append(entrada)
 
     # ----------------------------------------------------------
@@ -933,31 +963,6 @@ class Engine:
 # 4) Añadir property centinela + invocar + verificar_con_centinela
 #    (después de obtener_trazas / antes de FIN ENGINE).
 # ===============================================================
-
-    def _registrar_traza(
-        self,
-        modulo: str,
-        capacidad: str,
-        estado: str,
-        duracion_s: float,
-        error: Optional[str] = None,
-        **extras: Any,
-    ) -> None:
-        self._traza_seq += 1
-        entrada: Dict[str, Any] = {
-            "id_traza": self._traza_seq,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "modulo": modulo,
-            "capacidad": capacidad,
-            "estado": estado,
-            "duracion_s": duracion_s,
-        }
-        if error:
-            entrada["error"] = error
-        for clave, valor in extras.items():
-            if valor is not None:
-                entrada[clave] = valor
-        self._trazas.append(entrada)
 
     @property
     def centinela(self) -> Centinela:

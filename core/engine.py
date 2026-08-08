@@ -173,6 +173,7 @@ class Contenedor:
         self.capacidades: Dict[str, Any] = dict(meta.get("capacidades") or {})
         self.capacidades_meta: Dict[str, Any] = dict(meta.get("capacidades_meta") or {})
         self.reporting: Dict[str, Any] = dict(meta.get("reporting") or {})
+        self.reporting: Dict[str, Any] = dict(meta.get("reporte") or {})
         self.estados_validos = list(meta.get("estados_validos") or [])
 
     def fn(self, clave: str) -> Any:

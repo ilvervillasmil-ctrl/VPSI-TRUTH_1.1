@@ -223,7 +223,6 @@ CONTENEDOR: Dict[str, Any] = {
     "estabilidad": ESTABILIDAD,
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
-}
 
     # ----- IDENTIDAD -----
     "id": ID_MODULO,

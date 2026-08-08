@@ -203,19 +203,57 @@ CONTENEDOR: Dict[str, Any] = {
     # ----- DEPENDENCIAS -----
     "requiere": [],
 
-    # ----- AUTORIZACIÓN AL ENGINE -----
     "autoriza_engine": {
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-        "modificar": False,
-        "alterar": False,
-        "reescribir": False,
-    },
+    # --- PERMISOS BASE ---
+    "leer": True,
+    "ejecutar": True,
+    "consultar": True,
+    "recombinar": False,
+    "reportar": True,
+    "auditar": True,
+    "inventariar": True,
+
+    # --- PERMISOS DE ESCRITURA ---
+    "modificar": False,
+    "alterar": False,
+    "reescribir": True,
+    "crear": True,
+    "eliminar": False,
+    "actualizar": True,
+
+    # --- PERMISOS DE PROCESAMIENTO ---
+    "validar": True,
+    "procesar": True,
+    "analizar": True,
+    "generar": True,
+    "transformar": True,
+
+    # --- PERMISOS DE DATOS ---
+    "exportar": True,
+    "importar": True,
+    "respaldar": True,
+    "recuperar": True,
+    "sincronizar": True,
+
+    # --- PERMISOS DE MONITOREO ---
+    "monitorear": True,
+    "alertar": True,
+
+    # --- REPORTING ---
+    "metricas": True,
+    "estado": True,
+    "version": True,
+    "salud": True,
+    "inventario": True,
+    "capacidades": True,
+    "errores": True,
+    "advertencias": True,
+    "dependencias": True,
+    "contrato": True,
+    "conocimiento": True,
+    "diagnostico": True,
+    "reporte": True,
+},
 
     # ----- CONSULTAS SOPORTADAS -----
     "consultas_soportadas": [

@@ -269,63 +269,6 @@ def _descubrir() -> None:
 def _asegurar() -> None:
     _descubrir()
 
-
-def _validar_contrato(cont: Dict[str, Any]) -> None:
-    obligatorias = (
-        "esquema", "version_contrato", "version_modulo",
-        "id", "nombre", "rol", "descripcion",
-        "funcion", "no_hace", "autoridad",
-        "conocimiento_exportable", "requiere",
-        "autoriza_engine", "consultas_soportadas",
-        "capacidades", "capacidades_meta",
-        "reporting", "estados_validos", "invariantes",
-        "estabilidad", "compatible_desde", "api_engine",
-    )
-    faltantes = [k for k in obligatorias if k not in cont]
-    if faltantes:
-        raise ContratoInvalido(
-            "{0}: CONTENEDOR incompleto. Faltan: {1}".format(
-                NOMBRE_MODULO, faltantes
-            )
-        )
-
-    if cont.get("esquema") != ESQUEMA_CONTRATO:
-        raise ContratoInvalido(
-            "{0}: esquema incompatible: {1}".format(
-                NOMBRE_MODULO, cont.get("esquema")
-            )
-        )
-
-    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
-        raise ContratoInvalido(
-            "{0}: version_contrato inválida: {1}".format(
-                NOMBRE_MODULO, cont.get("version_contrato")
-            )
-        )
-
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
-            raise ContratoInvalido(
-                "{0}: capacidad '{1}' sin capacidades_meta".format(
-                    NOMBRE_MODULO, nombre_cap
-                )
-            )
-        entrada = meta_caps[nombre_cap]
-        if not isinstance(entrada, dict):
-            raise ContratoInvalido(
-                "{0}: capacidades_meta['{1}'] debe ser dict".format(
-                    NOMBRE_MODULO, nombre_cap
-                )
-            )
-        for campo in ("descripcion", "entrada", "salida"):
-            if campo not in entrada or not isinstance(entrada[campo], str):
-                raise ContratoInvalido(
-                    "{0}: capacidades_meta['{1}'] requiere '{2}: str'".format(
-                        NOMBRE_MODULO, nombre_cap, campo
-                    )
-                )
-
 # ===============================================================
 # FIN FUNCIONES PRIVADAS
 # ===============================================================
@@ -823,6 +766,42 @@ CONTENEDOR: Dict[str, Any] = {
         "modificar": False,
         "alterar": False,
         "reescribir": False,
+        "crear": False,
+        "eliminar": False,
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": False,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
 
     # ============================================================
@@ -1036,8 +1015,16 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     cont["capacidades"] = resueltas
 
 
+# ===============================================================
+# VALIDACIÓN AL IMPORTAR
+# ===============================================================
+
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# EXPORTACIONES PÚBLICAS
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",

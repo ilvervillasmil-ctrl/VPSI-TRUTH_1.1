@@ -289,19 +289,26 @@ def verificar_salida(salida: Any) -> bool:
 
 
 # ===============================================================
-# SECCIÓN 5 — CONTENEDOR (VPSI-CONTRACT-1.0)
+# SECCIÓN 5 VPSI-CONTRACTo
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": _ESQUEMA,
     "version_contrato": _VERSION_CONTRATO,
     "version_modulo": _VERSION,
-    "id": _ID,
-    "nombre": _NOMBRE,
-    "rol": _ROL,
     "estabilidad": _ESTABILIDAD,
     "compatible_desde": _COMPATIBLE_DESDE,
     "api_engine": _API_ENGINE,
+
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
+    "id": _ID,
+    "nombre": _NOMBRE,
+    "rol": _ROL,
     "descripcion": (
         "Autoridad exclusiva de verificación estructural. "
         "Determina si una estructura satisface o viola un conjunto "
@@ -311,6 +318,10 @@ CONTENEDOR: Dict[str, Any] = {
         "No interpreta, no calcula Tru, no decide, no corrige, "
         "no modifica, no ejecuta. No sustituye a AX ni a Diagnóstico."
     ),
+
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
     "funcion": (
         "Contrastar estructuras contra reglas formales y generar "
         "evidencia de verificación. El algoritmo operativo actual "
@@ -332,6 +343,10 @@ CONTENEDOR: Dict[str, Any] = {
         "No sustituye a Diagnóstico",
         "No declara conocimiento axiomático oficial",
     ],
+
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
     "autoridad": [
         "Verificar estructuras",
         "Contrastar estructuras contra reglas formales",
@@ -341,6 +356,10 @@ CONTENEDOR: Dict[str, Any] = {
         "Reportar inventario",
         "Reportar diagnóstico propio",
     ],
+
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
     "conocimiento_exportable": [
         "verificar",
         "barrer",
@@ -350,8 +369,17 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida",
         "evidencia",
     ],
+
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
     "requiere": [],
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # ============================================================
     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -359,10 +387,52 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
         "alterar": False,
         "reescribir": False,
+        "crear": False,
+        "eliminar": False,
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": False,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
+
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
     "consultas_soportadas": [
         "verificar_estructura",
         "barrer",
@@ -371,6 +441,10 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_diagnostico",
         "verificar_salida",
     ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
     "capacidades": {
         "verificar": verificar,
         "barrer": barrer,
@@ -380,6 +454,10 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida": verificar_salida,
         "axiomas": axiomas,
     },
+
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": (
@@ -434,6 +512,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "list vacía (conocimiento oficial en AX)",
         },
     },
+
+    # ============================================================
+    # REPORTING
+    # ============================================================
     "reporting": {
         "estado": True,
         "salud": True,
@@ -449,12 +531,20 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
         "reporte": True,
     },
+
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
     "estados_validos": [
         "NO_INICIADO",
         "OPERATIVO",
         "DEGRADADO",
         "RECHAZADO",
     ],
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
     "invariantes": [
         "el id del módulo nunca cambia",
         "el rol nunca cambia",
@@ -471,9 +561,8 @@ CONTENEDOR: Dict[str, Any] = {
         "este módulo siempre puede reportar su propio estado",
         "inventario() siempre incluye id, nombre, rol, version del CONTENEDOR",
     ],
-}
 
-
+}  # <--- CIERRE FINAL
 # ===============================================================
 # SECCIÓN 6 — EXPORTS
 # ===============================================================

@@ -51,7 +51,6 @@ def _sincronizar_arbol() -> Dict[str, Dict[str, Any]]:
             reg[rel] = {"ruta": rel, "error": "declaración sin id válido"}
             continue
 
-        # Copia íntegra (incl. conceptos u otras claves del recurso).
         entrada: Dict[str, Any] = {"ruta": rel, "id": oid.strip()}
         for k, v in meta.items():
             if k != "id":
@@ -78,10 +77,7 @@ def _particion(
 
 
 def _conceptos_descubiertos(ok: Dict[str, Dict[str, Any]]) -> List[str]:
-    """
-    Unión de conceptos declarados por los recursos del árbol.
-    Sin vocabulario fijo en el adaptador.
-    """
+    """Unión de conceptos declarados por los recursos del árbol."""
     hallados = set()
     for meta in ok.values():
         raw = meta.get("conceptos")
@@ -182,7 +178,7 @@ CONTENEDOR: Dict[str, Any] = {
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
     "descripcion": (
-        "Adaptador del módulo seguridad. "
+        "Adaptador Spartaco (SC). "
         "Mantiene sincronizado el catálogo con el estado real del árbol."
     ),
     "funcion": (

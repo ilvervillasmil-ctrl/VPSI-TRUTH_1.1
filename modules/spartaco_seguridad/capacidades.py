@@ -4,19 +4,20 @@
 #
 # RECURSO:             CAPACIDADES
 # Módulo contenedor:   spartaco_seguridad (SC)
-# Versión recurso:     1.0
+# Versión recurso:     1.1
 #
 # Función:
 #   Reportar, por cada recurso descubierto en el árbol del
 #   módulo, las capacidades que ese recurso declara y el estado
-#   estructural de cada una.
+#   estructural de cada una. Todo en números exactos.
 #
 # Qué hace:
 #   - Recorre el árbol con el mismo criterio que el adaptador.
 #   - Por cada recurso, lee su declaración de capacidades.
 #   - Para cada capacidad declarada comprueba existencia y
 #     callabilidad en el módulo real.
-#   - Produce reporte por recurso, por capacidad y total.
+#   - Produce conteos exactos: por recurso, por capacidad,
+#     por estado, por procedencia y totales del árbol.
 #
 # Qué NO hace:
 #   - No infiere capacidades (ni de dir(), ni de __all__).
@@ -33,12 +34,10 @@
 #       "capacidades_recurso": ["nucleo", "canales", "build", ...]
 #
 #   La clave es "capacidades_recurso" y NO "capacidades", para no
-#   colisionar con CONTENEDOR["capacidades"] del adaptador, que
-#   tiene significado propio y lo resuelve el Engine. Son capas
-#   distintas y se auditan por separado.
+#   colisionar con CONTENEDOR["capacidades"] del adaptador.
 #
-#   Un recurso que no la declare produce SIN_DECLARAR. Eso NO es
-#   error: es ausencia de declaración.
+#   Un recurso que no la declare produce SIN_DECLARAR.
+#   Eso NO es error: es ausencia de declaración.
 #
 # ---------------------------------------------------------------
 # QUÉ DEMUESTRA CADA COLUMNA
@@ -48,19 +47,16 @@
 #       callable   → callable(getattr(modulo, nombre))
 #       funciona   → NO SE DETERMINA AQUÍ
 #
-#   El campo "ok" de este recurso es ESTRUCTURAL, no funcional.
-#   Significa: declarado, existe y es callable. No significa que
-#   la capacidad funcione. Eso lo demuestra el pipeline de tests,
-#   que sí ejecuta con argumentos válidos.
+#   "ok" es ESTRUCTURAL: declarado + existe + callable.
+#   No significa que la capacidad funcione.
 #
 # ---------------------------------------------------------------
 # CRECIMIENTO DEL ÁRBOL
 # ---------------------------------------------------------------
-#   Este archivo no conoce anticipadamente ningún recurso. Al
-#   añadir un archivo nuevo con SEGURIDAD y su declaración de
-#   capacidades, el adaptador lo descubre y este reporte lo
-#   incorpora. No hay que modificar este archivo, ni el adaptador,
-#   ni el Engine.
+#   Este archivo no conoce anticipadamente ningún recurso.
+#   Al añadir un archivo nuevo con SEGURIDAD y su declaración,
+#   el adaptador lo descubre y este reporte lo incorpora.
+#   No hay que modificar este archivo.
 #
 # ===============================================================
 
@@ -89,12 +85,12 @@ SEGURIDAD: Dict[str, Any] = {
     "hace": (
         "Reporta las capacidades declaradas por cada recurso del árbol "
         "y el estado estructural de cada una: existe y es callable. "
-        "No las ejecuta."
+        "Cuantifica exacto. No las ejecuta."
     ),
     "herramienta": (
         "Introspección hasattr + callable sobre los recursos descubiertos"
     ),
-    "version": "1.0",
+    "version": "1.1",
     "clave_declaracion": "capacidades_recurso",
     "capacidades_recurso": [
         "auditar",
@@ -124,17 +120,15 @@ SEGURIDAD: Dict[str, Any] = {
 _DIR = Path(__file__).parent
 
 CLAVE_DECLARACION = "capacidades_recurso"
-
-# Prefijo con el que el adaptador registra los módulos del árbol.
 PREFIJO_ADAPTADOR = "sc_"
 
-# --- estado por capacidad ---
+# estado por capacidad
 OK = "OK"
 AUSENTE = "AUSENTE_EN_MODULO"
 NO_CALLABLE = "NO_CALLABLE"
 NOMBRE_INVALIDO = "NOMBRE_INVALIDO"
 
-# --- estado por recurso ---
+# estado por recurso
 OPERATIVO = "OPERATIVO"
 DEGRADADO = "DEGRADADO"
 SIN_DECLARAR = "SIN_DECLARAR"
@@ -142,7 +136,7 @@ ID_AUSENTE = "ID_AUSENTE"
 ID_DUPLICADO = "ID_DUPLICADO"
 NO_CARGABLE = "NO_CARGABLE"
 
-# --- procedencia de la instancia inspeccionada ---
+# procedencia
 YA_CARGADO = "YA_CARGADO"
 CARGADO_AQUI = "CARGADO_AQUI"
 
@@ -168,9 +162,10 @@ def _recursos_del_arbol() -> List[Tuple[str, Any, str, Optional[str]]]:
     """
     Devuelve [(ruta_rel, modulo|None, procedencia, error|None)].
 
-    Mismo criterio de exclusión que el adaptador. Se excluye a sí mismo.
-    Reutiliza la instancia que el adaptador dejó registrada; solo carga
-    si no la encuentra, y lo marca en 'procedencia'.
+    Mismo criterio de exclusión que el adaptador.
+    Se excluye a sí mismo.
+    Reutiliza la instancia registrada por el adaptador;
+    solo carga si no la encuentra.
     """
     yo = Path(__file__).resolve()
     salida: List[Tuple[str, Any, str, Optional[str]]] = []
@@ -210,7 +205,8 @@ def _recursos_del_arbol() -> List[Tuple[str, Any, str, Optional[str]]]:
 
 def _declaradas(meta: Dict[str, Any]) -> Optional[List[str]]:
     """
-    Lee SOLO la clave contractual. None si el recurso no la declara.
+    Lee SOLO la clave contractual.
+    None si el recurso no la declara.
     No busca claves alternativas. No infiere.
     """
     raw = meta.get(CLAVE_DECLARACION)
@@ -259,6 +255,12 @@ def _estado_capacidad(mod: Any, nombre: str) -> Dict[str, Any]:
     base["estado"] = OK
     return base
 
+
+def _ratio(num: int, den: int) -> str:
+    """Fracción exacta en texto. 0/0 → '0/0'."""
+    return f"{num}/{den}"
+
+
 # ===============================================================
 # FIN FUNCIONES PRIVADAS
 # ===============================================================
@@ -268,24 +270,46 @@ def _estado_capacidad(mod: Any, nombre: str) -> Dict[str, Any]:
 # ===============================================================
 
 def auditar() -> Dict[str, Any]:
-    """Estado estructural de cada capacidad declarada, por recurso."""
+    """
+    Estado estructural de cada capacidad declarada, por recurso.
+    Todo contado en enteros exactos.
+    """
     recursos: Dict[str, Any] = {}
     problemas: List[str] = []
     duplicados: Dict[str, List[str]] = {}
     cargados_aqui: List[str] = []
 
+    # contadores globales
     n_declaradas = 0
     n_ok = 0
     n_fallidas = 0
     n_auditados = 0
     n_sin_declarar = 0
+    n_no_cargable = 0
+    n_id_ausente = 0
+    n_operativo = 0
+    n_degradado = 0
+    n_ya_cargado = 0
+    n_cargado_aqui = 0
+
+    # distribución de estados de capacidad
+    dist_cap: Dict[str, int] = {
+        OK: 0,
+        AUSENTE: 0,
+        NO_CALLABLE: 0,
+        NOMBRE_INVALIDO: 0,
+    }
 
     for rel, mod, procedencia, error in _recursos_del_arbol():
 
         if procedencia == CARGADO_AQUI:
             cargados_aqui.append(rel)
+            n_cargado_aqui += 1
+        elif procedencia == YA_CARGADO:
+            n_ya_cargado += 1
 
         if mod is None:
+            n_no_cargable += 1
             recursos[f"<{rel}>"] = {
                 "ruta": rel,
                 "estado": NO_CARGABLE,
@@ -294,6 +318,8 @@ def auditar() -> Dict[str, Any]:
                 "auditado": False,
                 "error": error,
                 "n_capacidades": 0,
+                "n_ok": 0,
+                "n_fallidas": 0,
                 "capacidades": [],
             }
             problemas.append(f"{rel}: {NO_CARGABLE} — {error}")
@@ -305,6 +331,7 @@ def auditar() -> Dict[str, Any]:
 
         rid_raw = meta.get("id")
         if not (isinstance(rid_raw, str) and rid_raw.strip()):
+            n_id_ausente += 1
             recursos[f"<{rel}>"] = {
                 "ruta": rel,
                 "id": None,
@@ -314,6 +341,8 @@ def auditar() -> Dict[str, Any]:
                 "auditado": False,
                 "motivo": "SEGURIDAD sin id válido",
                 "n_capacidades": 0,
+                "n_ok": 0,
+                "n_fallidas": 0,
                 "capacidades": [],
             }
             problemas.append(f"{rel}: SEGURIDAD sin id válido")
@@ -347,24 +376,37 @@ def auditar() -> Dict[str, Any]:
         else:
             detalle = [_estado_capacidad(mod, n) for n in declaradas]
             fallidas = [d for d in detalle if not d["ok"]]
+            ok_count = len(detalle) - len(fallidas)
 
             n_auditados += 1
             n_declaradas += len(detalle)
-            n_ok += len(detalle) - len(fallidas)
+            n_ok += ok_count
             n_fallidas += len(fallidas)
+
+            for d in detalle:
+                est = d["estado"]
+                if est in dist_cap:
+                    dist_cap[est] += 1
 
             for d in fallidas:
                 problemas.append(
                     f"{rid} ({rel}) :: {d['nombre']} → {d['estado']} — {d['motivo']}"
                 )
 
+            estado_rec = OPERATIVO if not fallidas else DEGRADADO
+            if estado_rec == OPERATIVO:
+                n_operativo += 1
+            else:
+                n_degradado += 1
+
             entrada.update({
-                "estado": OPERATIVO if not fallidas else DEGRADADO,
+                "estado": estado_rec,
                 "ok": not fallidas,
                 "auditado": True,
                 "n_capacidades": len(detalle),
-                "n_ok": len(detalle) - len(fallidas),
+                "n_ok": ok_count,
                 "n_fallidas": len(fallidas),
+                "ratio_ok": _ratio(ok_count, len(detalle)),
                 "capacidades": detalle,
             })
 
@@ -380,25 +422,50 @@ def auditar() -> Dict[str, Any]:
         else:
             recursos[rid] = entrada
 
+    n_recursos = len(recursos)
+
     return {
         "recurso": "CAPACIDADES",
         "version": SEGURIDAD["version"],
         "clave_declaracion": CLAVE_DECLARACION,
+
+        # veredicto global
         "ok": not problemas,
         "coherente": not problemas,
-        "n_recursos": len(recursos),
+
+        # cuantificación de recursos
+        "n_recursos": n_recursos,
         "n_auditados": n_auditados,
         "n_sin_declarar": n_sin_declarar,
+        "n_operativo": n_operativo,
+        "n_degradado": n_degradado,
+        "n_no_cargable": n_no_cargable,
+        "n_id_ausente": n_id_ausente,
+
+        # cuantificación de capacidades
         "capacidades_declaradas": n_declaradas,
         "capacidades_ok": n_ok,
         "capacidades_fallidas": n_fallidas,
+        "ratio_capacidades": _ratio(n_ok, n_declaradas),
+        "distribucion_estados": dict(dist_cap),
+
+        # procedencia
+        "n_ya_cargado": n_ya_cargado,
+        "n_cargado_aqui": n_cargado_aqui,
+        "cargados_por_auditor": list(cargados_aqui),
+
+        # colisiones
+        "n_ids_duplicados": len(duplicados),
         "ids_duplicados": {k: sorted(v) for k, v in sorted(duplicados.items())},
-        "cargados_por_auditor": cargados_aqui,
+
+        # detalle
         "recursos": recursos,
         "problemas": problemas,
+        "n_problemas": len(problemas),
         "conceptos": [] if not problemas else ["CÓDIGO_INVÁLIDO"],
+
         "nota": (
-            "'ok' es ESTRUCTURAL: declarado, existe y callable. "
+            "'ok' es ESTRUCTURAL: declarado + existe + callable. "
             "No significa que la capacidad funcione: eso lo demuestra "
             "el pipeline de tests."
         ),
@@ -425,6 +492,7 @@ def capacidades_de(recurso_id: str) -> Dict[str, Any]:
             "ok": False,
             "error": f"recurso '{clave}' no encontrado",
             "disponibles": sorted(r["recursos"].keys()),
+            "n_disponibles": len(r["recursos"]),
             "conceptos": [],
         }
 
@@ -434,24 +502,52 @@ def capacidades_de(recurso_id: str) -> Dict[str, Any]:
         "ok": bool(entrada.get("ok")),
         "auditado": bool(entrada.get("auditado")),
         "estado": entrada.get("estado"),
+        "n_capacidades": entrada.get("n_capacidades", 0),
+        "n_ok": entrada.get("n_ok", 0),
+        "n_fallidas": entrada.get("n_fallidas", 0),
+        "ratio_ok": entrada.get("ratio_ok", _ratio(0, 0)),
         "detalle": entrada,
         "conceptos": [] if entrada.get("ok") else ["CÓDIGO_INVÁLIDO"],
     }
 
 
 def resumen() -> Dict[str, Any]:
-    """Totales y una línea por recurso."""
+    """Totales numéricos y una línea por recurso."""
     r = auditar()
     return {
         "recurso": "CAPACIDADES",
         "version": SEGURIDAD["version"],
         "ok": r["ok"],
+        "coherente": r["coherente"],
+
+        # recursos
         "n_recursos": r["n_recursos"],
         "n_auditados": r["n_auditados"],
         "n_sin_declarar": r["n_sin_declarar"],
+        "n_operativo": r["n_operativo"],
+        "n_degradado": r["n_degradado"],
+        "n_no_cargable": r["n_no_cargable"],
+        "n_id_ausente": r["n_id_ausente"],
+
+        # capacidades
         "capacidades_declaradas": r["capacidades_declaradas"],
         "capacidades_ok": r["capacidades_ok"],
         "capacidades_fallidas": r["capacidades_fallidas"],
+        "ratio_capacidades": r["ratio_capacidades"],
+        "distribucion_estados": r["distribucion_estados"],
+
+        # procedencia
+        "n_ya_cargado": r["n_ya_cargado"],
+        "n_cargado_aqui": r["n_cargado_aqui"],
+        "cargados_por_auditor": r["cargados_por_auditor"],
+
+        # colisiones y problemas
+        "n_ids_duplicados": r["n_ids_duplicados"],
+        "ids_duplicados": r["ids_duplicados"],
+        "n_problemas": r["n_problemas"],
+        "problemas": r["problemas"],
+
+        # por recurso
         "por_recurso": {
             rid: {
                 "ruta": e.get("ruta"),
@@ -460,17 +556,15 @@ def resumen() -> Dict[str, Any]:
                 "n_capacidades": e.get("n_capacidades", 0),
                 "n_ok": e.get("n_ok", 0),
                 "n_fallidas": e.get("n_fallidas", 0),
+                "ratio_ok": e.get("ratio_ok", _ratio(0, 0)),
             }
             for rid, e in sorted(r["recursos"].items())
         },
-        "ids_duplicados": r["ids_duplicados"],
-        "cargados_por_auditor": r["cargados_por_auditor"],
-        "problemas": r["problemas"],
     }
 
 
 def tabla() -> str:
-    """Reporte en texto plano, para el log del pipeline."""
+    """Reporte en texto plano con conteos exactos, para el log del pipeline."""
     r = auditar()
     lineas: List[str] = []
 
@@ -492,7 +586,9 @@ def tabla() -> str:
             continue
 
         n = e.get("n_capacidades", 0)
-        lineas.append(f"{rid} — {n} capacidades")
+        n_ok = e.get("n_ok", 0)
+        n_f = e.get("n_fallidas", 0)
+        lineas.append(f"{rid} — {n} capacidades  ({_ratio(n_ok, n)} OK)")
         lineas.append("-" * 44)
 
         for c in e.get("capacidades", []):
@@ -501,8 +597,6 @@ def tabla() -> str:
             else:
                 lineas.append(f"  FALLA  {c['nombre']}  -> {c['estado']}")
 
-        n_ok = e.get("n_ok", 0)
-        n_f = e.get("n_fallidas", 0)
         lineas.append(f"  {n_ok}/{n} OK")
         if n_f:
             nombres = [c["nombre"] for c in e["capacidades"] if not c["ok"]]
@@ -511,11 +605,31 @@ def tabla() -> str:
 
     lineas.append("=" * 44)
     lineas.append(
-        f"TOTAL: {r['capacidades_ok']}/{r['capacidades_declaradas']} OK "
-        f"en {r['n_auditados']} recursos auditados "
-        f"({r['n_sin_declarar']} sin declarar)"
+        f"TOTAL CAPACIDADES: {r['capacidades_ok']}/{r['capacidades_declaradas']} OK "
+        f"({r['ratio_capacidades']})"
+    )
+    lineas.append(
+        f"RECURSOS: {r['n_operativo']} operativo | "
+        f"{r['n_degradado']} degradado | "
+        f"{r['n_sin_declarar']} sin declarar | "
+        f"{r['n_no_cargable']} no cargable | "
+        f"{r['n_id_ausente']} id ausente"
+    )
+    lineas.append(
+        f"AUDITADOS: {r['n_auditados']}  |  "
+        f"PROCEDENCIA: {r['n_ya_cargado']} ya_cargado + "
+        f"{r['n_cargado_aqui']} cargado_aqui"
     )
     lineas.append("ok estructural: declarado + existe + callable")
+
+    dist = r["distribucion_estados"]
+    lineas.append(
+        f"DISTRIBUCIÓN CAPACIDADES: "
+        f"OK={dist.get(OK, 0)}  "
+        f"AUSENTE={dist.get(AUSENTE, 0)}  "
+        f"NO_CALLABLE={dist.get(NO_CALLABLE, 0)}  "
+        f"NOMBRE_INVALIDO={dist.get(NOMBRE_INVALIDO, 0)}"
+    )
 
     if r["cargados_por_auditor"]:
         lineas.append("")
@@ -526,6 +640,7 @@ def tabla() -> str:
 
     if r["problemas"]:
         lineas.append("")
+        lineas.append(f"PROBLEMAS ({r['n_problemas']}):")
         for p in r["problemas"]:
             lineas.append(f"  ! {p}")
 

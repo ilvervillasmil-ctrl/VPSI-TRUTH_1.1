@@ -211,7 +211,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ----- DEPENDENCIAS -----
-    "requiere": ["CT", "AX", "FO", "MC", "SF", "DG", "CA", "CX", "DI", "RE", "VX", "TX", "CH", "CIT", "UI", "GL", "CT", "AX", "FO", "MC", "SF"],
+    "requiere": ["CT", "AX", "MC", "SF", "CA", "CX", "RE", "VX", "TX", "CH", "CIT", "GL", "CT", "AX", "MC", "SF"],
 
     # ----- AUTORIZACIÓN AL ENGINE -----
     "autoriza_engine": {

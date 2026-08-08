@@ -4,7 +4,7 @@
     "estado_engine": "OPERATIVO",
     "esquema_contrato": "VPSI-CONTRACT-1.0",
     "total_modulos": 16,
-    "timestamp": "2026-08-08T06:08:39.265159+00:00"
+    "timestamp": "2026-08-08T06:27:46.816919+00:00"
   },
   "reportes": [
     {
@@ -22,7 +22,7 @@
         "errores_arranque": [],
         "advertencias": [],
         "trazas_n": 46,
-        "timestamp": "2026-08-08T06:08:39.265087+00:00"
+        "timestamp": "2026-08-08T06:27:46.816871+00:00"
       }
     },
     {
@@ -1286,37 +1286,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-08T06:08:28.254239+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764444+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             }
           },
           "historial_n": 0,
@@ -1399,37 +1399,37 @@
               "archivo": "__init__.py",
               "sha256": "a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe",
               "tamano": 51021,
-              "timestamp_mtime": "2026-08-08T06:08:28.254239+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764444+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313",
               "tamano": 6153,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-08T06:08:28.254649+00:00"
+              "timestamp_mtime": "2026-08-08T06:27:30.764633+00:00"
             }
           },
           "factores_api": [
@@ -9849,9 +9849,9 @@
             "CAPACIDADES": {
               "ruta": "capacidades.py",
               "nombre": "capacidades",
-              "hace": "Reporta las capacidades declaradas por cada recurso del árbol y el estado estructural de cada una: existe y es callable. Cuantifica exacto. No elimina evidencia. No ejecuta.",
+              "hace": "Reporta las capacidades declaradas por cada recurso del árbol (incluido este) y el estado estructural de cada una: existe y es callable. Cuantifica exacto. No elimina evidencia. No ejecuta.",
               "herramienta": "Introspección hasattr + callable sobre los recursos descubiertos",
-              "version": "1.2",
+              "version": "1.3",
               "clave_declaracion": "capacidades_recurso",
               "capacidades_recurso": [
                 "auditar",
@@ -12888,119 +12888,119 @@
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-08T06:08:39.182002+00:00",
+          "timestamp": "2026-08-08T06:27:46.749106+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.011324
+          "duracion_s": 0.008426
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-08T06:08:39.193026+00:00",
+          "timestamp": "2026-08-08T06:27:46.757141+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.010989
+          "duracion_s": 0.008011
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-08T06:08:39.202622+00:00",
+          "timestamp": "2026-08-08T06:27:46.764095+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.009567
+          "duracion_s": 0.006935
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-08T06:08:39.202683+00:00",
+          "timestamp": "2026-08-08T06:27:46.764125+00:00",
           "modulo": "cache",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 2.4e-05
+          "duracion_s": 1.7e-05
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-08T06:08:39.202697+00:00",
+          "timestamp": "2026-08-08T06:27:46.764134+00:00",
           "modulo": "cache",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 7e-06
+          "duracion_s": 5e-06
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-08T06:08:39.202707+00:00",
+          "timestamp": "2026-08-08T06:27:46.764141+00:00",
           "modulo": "cache",
           "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 6e-06
-        },
-        {
-          "id_traza": 7,
-          "timestamp": "2026-08-08T06:08:39.203201+00:00",
-          "modulo": "calculator",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000486
-        },
-        {
-          "id_traza": 8,
-          "timestamp": "2026-08-08T06:08:39.203537+00:00",
-          "modulo": "calculator",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000323
-        },
-        {
-          "id_traza": 9,
-          "timestamp": "2026-08-08T06:08:39.203877+00:00",
-          "modulo": "calculator",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000332
-        },
-        {
-          "id_traza": 10,
-          "timestamp": "2026-08-08T06:08:39.204170+00:00",
-          "modulo": "capacidades_engine",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000284
-        },
-        {
-          "id_traza": 11,
-          "timestamp": "2026-08-08T06:08:39.205553+00:00",
-          "modulo": "catalogo_citaciones",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.00137
-        },
-        {
-          "id_traza": 12,
-          "timestamp": "2026-08-08T06:08:39.206889+00:00",
-          "modulo": "catalogo_citaciones",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.001319
-        },
-        {
-          "id_traza": 13,
-          "timestamp": "2026-08-08T06:08:39.208143+00:00",
-          "modulo": "catalogo_citaciones",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.001241
-        },
-        {
-          "id_traza": 14,
-          "timestamp": "2026-08-08T06:08:39.208157+00:00",
-          "modulo": "citacion",
-          "capacidad": "reporte",
           "estado": "EXITO",
           "duracion_s": 4e-06
         },
         {
+          "id_traza": 7,
+          "timestamp": "2026-08-08T06:27:46.764508+00:00",
+          "modulo": "calculator",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000362
+        },
+        {
+          "id_traza": 8,
+          "timestamp": "2026-08-08T06:27:46.764732+00:00",
+          "modulo": "calculator",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000215
+        },
+        {
+          "id_traza": 9,
+          "timestamp": "2026-08-08T06:27:46.764973+00:00",
+          "modulo": "calculator",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000236
+        },
+        {
+          "id_traza": 10,
+          "timestamp": "2026-08-08T06:27:46.765187+00:00",
+          "modulo": "capacidades_engine",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000209
+        },
+        {
+          "id_traza": 11,
+          "timestamp": "2026-08-08T06:27:46.766153+00:00",
+          "modulo": "catalogo_citaciones",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.00096
+        },
+        {
+          "id_traza": 12,
+          "timestamp": "2026-08-08T06:27:46.767034+00:00",
+          "modulo": "catalogo_citaciones",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000872
+        },
+        {
+          "id_traza": 13,
+          "timestamp": "2026-08-08T06:27:46.767875+00:00",
+          "modulo": "catalogo_citaciones",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000834
+        },
+        {
+          "id_traza": 14,
+          "timestamp": "2026-08-08T06:27:46.767884+00:00",
+          "modulo": "citacion",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 2e-06
+        },
+        {
           "id_traza": 15,
-          "timestamp": "2026-08-08T06:08:39.208162+00:00",
+          "timestamp": "2026-08-08T06:27:46.767889+00:00",
           "modulo": "citacion",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -13008,239 +13008,239 @@
         },
         {
           "id_traza": 16,
-          "timestamp": "2026-08-08T06:08:39.208170+00:00",
+          "timestamp": "2026-08-08T06:27:46.767895+00:00",
           "modulo": "citacion",
           "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 3e-06
+        },
+        {
+          "id_traza": 17,
+          "timestamp": "2026-08-08T06:27:46.768030+00:00",
+          "modulo": "constante",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000132
+        },
+        {
+          "id_traza": 18,
+          "timestamp": "2026-08-08T06:27:46.768108+00:00",
+          "modulo": "constante",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 7.3e-05
+        },
+        {
+          "id_traza": 19,
+          "timestamp": "2026-08-08T06:27:46.768147+00:00",
+          "modulo": "constante",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 3.5e-05
+        },
+        {
+          "id_traza": 20,
+          "timestamp": "2026-08-08T06:27:46.768277+00:00",
+          "modulo": "contexto",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000124
+        },
+        {
+          "id_traza": 21,
+          "timestamp": "2026-08-08T06:27:46.768383+00:00",
+          "modulo": "contexto",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000101
+        },
+        {
+          "id_traza": 22,
+          "timestamp": "2026-08-08T06:27:46.768472+00:00",
+          "modulo": "contexto",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 8.4e-05
+        },
+        {
+          "id_traza": 23,
+          "timestamp": "2026-08-08T06:27:46.774763+00:00",
+          "modulo": "correlacion_mecanica",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.006282
+        },
+        {
+          "id_traza": 24,
+          "timestamp": "2026-08-08T06:27:46.782220+00:00",
+          "modulo": "correlacion_mecanica",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.007441
+        },
+        {
+          "id_traza": 25,
+          "timestamp": "2026-08-08T06:27:46.783531+00:00",
+          "modulo": "correlacion_mecanica",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.001292
+        },
+        {
+          "id_traza": 26,
+          "timestamp": "2026-08-08T06:27:46.783969+00:00",
+          "modulo": "formulas",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000421
+        },
+        {
+          "id_traza": 27,
+          "timestamp": "2026-08-08T06:27:46.784303+00:00",
+          "modulo": "formulas",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000319
+        },
+        {
+          "id_traza": 28,
+          "timestamp": "2026-08-08T06:27:46.784475+00:00",
+          "modulo": "formulas",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000159
+        },
+        {
+          "id_traza": 29,
+          "timestamp": "2026-08-08T06:27:46.785693+00:00",
+          "modulo": "realidad",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.001205
+        },
+        {
+          "id_traza": 30,
+          "timestamp": "2026-08-08T06:27:46.786456+00:00",
+          "modulo": "realidad",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000746
+        },
+        {
+          "id_traza": 31,
+          "timestamp": "2026-08-08T06:27:46.798522+00:00",
+          "modulo": "realidad",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.01205
+        },
+        {
+          "id_traza": 32,
+          "timestamp": "2026-08-08T06:27:46.802360+00:00",
+          "modulo": "self",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.00382
+        },
+        {
+          "id_traza": 33,
+          "timestamp": "2026-08-08T06:27:46.805599+00:00",
+          "modulo": "self",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.003222
+        },
+        {
+          "id_traza": 34,
+          "timestamp": "2026-08-08T06:27:46.805615+00:00",
+          "modulo": "self",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 7e-06
+        },
+        {
+          "id_traza": 35,
+          "timestamp": "2026-08-08T06:27:46.814201+00:00",
+          "modulo": "spartaco_seguridad",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.008578
+        },
+        {
+          "id_traza": 36,
+          "timestamp": "2026-08-08T06:27:46.814668+00:00",
+          "modulo": "spartaco_seguridad",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000456
+        },
+        {
+          "id_traza": 37,
+          "timestamp": "2026-08-08T06:27:46.815221+00:00",
+          "modulo": "spartaco_seguridad",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000544
+        },
+        {
+          "id_traza": 38,
+          "timestamp": "2026-08-08T06:27:46.815407+00:00",
+          "modulo": "taxonomia",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000178
+        },
+        {
+          "id_traza": 39,
+          "timestamp": "2026-08-08T06:27:46.815539+00:00",
+          "modulo": "taxonomia",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000126
+        },
+        {
+          "id_traza": 40,
+          "timestamp": "2026-08-08T06:27:46.815658+00:00",
+          "modulo": "taxonomia",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000113
+        },
+        {
+          "id_traza": 41,
+          "timestamp": "2026-08-08T06:27:46.816119+00:00",
+          "modulo": "tru_totales",
+          "capacidad": "reporte",
+          "estado": "EXITO",
+          "duracion_s": 0.000455
+        },
+        {
+          "id_traza": 42,
+          "timestamp": "2026-08-08T06:27:46.816487+00:00",
+          "modulo": "tru_totales",
+          "capacidad": "diagnostico",
+          "estado": "EXITO",
+          "duracion_s": 0.000363
+        },
+        {
+          "id_traza": 43,
+          "timestamp": "2026-08-08T06:27:46.816849+00:00",
+          "modulo": "tru_totales",
+          "capacidad": "inventario",
+          "estado": "EXITO",
+          "duracion_s": 0.000357
+        },
+        {
+          "id_traza": 44,
+          "timestamp": "2026-08-08T06:27:46.816858+00:00",
+          "modulo": "verificacion",
+          "capacidad": "reporte",
           "estado": "EXITO",
           "duracion_s": 4e-06
         },
         {
-          "id_traza": 17,
-          "timestamp": "2026-08-08T06:08:39.208369+00:00",
-          "modulo": "constante",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000193
-        },
-        {
-          "id_traza": 18,
-          "timestamp": "2026-08-08T06:08:39.208488+00:00",
-          "modulo": "constante",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000112
-        },
-        {
-          "id_traza": 19,
-          "timestamp": "2026-08-08T06:08:39.208549+00:00",
-          "modulo": "constante",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 5.4e-05
-        },
-        {
-          "id_traza": 20,
-          "timestamp": "2026-08-08T06:08:39.208748+00:00",
-          "modulo": "contexto",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000189
-        },
-        {
-          "id_traza": 21,
-          "timestamp": "2026-08-08T06:08:39.208910+00:00",
-          "modulo": "contexto",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000154
-        },
-        {
-          "id_traza": 22,
-          "timestamp": "2026-08-08T06:08:39.209043+00:00",
-          "modulo": "contexto",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000125
-        },
-        {
-          "id_traza": 23,
-          "timestamp": "2026-08-08T06:08:39.217399+00:00",
-          "modulo": "correlacion_mecanica",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.008343
-        },
-        {
-          "id_traza": 24,
-          "timestamp": "2026-08-08T06:08:39.225240+00:00",
-          "modulo": "correlacion_mecanica",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.00782
-        },
-        {
-          "id_traza": 25,
-          "timestamp": "2026-08-08T06:08:39.226448+00:00",
-          "modulo": "correlacion_mecanica",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.00119
-        },
-        {
-          "id_traza": 26,
-          "timestamp": "2026-08-08T06:08:39.226830+00:00",
-          "modulo": "formulas",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000369
-        },
-        {
-          "id_traza": 27,
-          "timestamp": "2026-08-08T06:08:39.227135+00:00",
-          "modulo": "formulas",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000296
-        },
-        {
-          "id_traza": 28,
-          "timestamp": "2026-08-08T06:08:39.227285+00:00",
-          "modulo": "formulas",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000142
-        },
-        {
-          "id_traza": 29,
-          "timestamp": "2026-08-08T06:08:39.228415+00:00",
-          "modulo": "realidad",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.00112
-        },
-        {
-          "id_traza": 30,
-          "timestamp": "2026-08-08T06:08:39.229072+00:00",
-          "modulo": "realidad",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000644
-        },
-        {
-          "id_traza": 31,
-          "timestamp": "2026-08-08T06:08:39.241316+00:00",
-          "modulo": "realidad",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.012228
-        },
-        {
-          "id_traza": 32,
-          "timestamp": "2026-08-08T06:08:39.246775+00:00",
-          "modulo": "self",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.005434
-        },
-        {
-          "id_traza": 33,
-          "timestamp": "2026-08-08T06:08:39.250899+00:00",
-          "modulo": "self",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.004104
-        },
-        {
-          "id_traza": 34,
-          "timestamp": "2026-08-08T06:08:39.250921+00:00",
-          "modulo": "self",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 8e-06
-        },
-        {
-          "id_traza": 35,
-          "timestamp": "2026-08-08T06:08:39.261502+00:00",
-          "modulo": "spartaco_seguridad",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.010569
-        },
-        {
-          "id_traza": 36,
-          "timestamp": "2026-08-08T06:08:39.262129+00:00",
-          "modulo": "spartaco_seguridad",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000609
-        },
-        {
-          "id_traza": 37,
-          "timestamp": "2026-08-08T06:08:39.262814+00:00",
-          "modulo": "spartaco_seguridad",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000671
-        },
-        {
-          "id_traza": 38,
-          "timestamp": "2026-08-08T06:08:39.263066+00:00",
-          "modulo": "taxonomia",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000241
-        },
-        {
-          "id_traza": 39,
-          "timestamp": "2026-08-08T06:08:39.263243+00:00",
-          "modulo": "taxonomia",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000168
-        },
-        {
-          "id_traza": 40,
-          "timestamp": "2026-08-08T06:08:39.263400+00:00",
-          "modulo": "taxonomia",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.00015
-        },
-        {
-          "id_traza": 41,
-          "timestamp": "2026-08-08T06:08:39.264014+00:00",
-          "modulo": "tru_totales",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 0.000605
-        },
-        {
-          "id_traza": 42,
-          "timestamp": "2026-08-08T06:08:39.264542+00:00",
-          "modulo": "tru_totales",
-          "capacidad": "diagnostico",
-          "estado": "EXITO",
-          "duracion_s": 0.000519
-        },
-        {
-          "id_traza": 43,
-          "timestamp": "2026-08-08T06:08:39.265057+00:00",
-          "modulo": "tru_totales",
-          "capacidad": "inventario",
-          "estado": "EXITO",
-          "duracion_s": 0.000507
-        },
-        {
-          "id_traza": 44,
-          "timestamp": "2026-08-08T06:08:39.265070+00:00",
-          "modulo": "verificacion",
-          "capacidad": "reporte",
-          "estado": "EXITO",
-          "duracion_s": 5e-06
-        },
-        {
           "id_traza": 45,
-          "timestamp": "2026-08-08T06:08:39.265075+00:00",
+          "timestamp": "2026-08-08T06:27:46.816862+00:00",
           "modulo": "verificacion",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -13248,7 +13248,7 @@
         },
         {
           "id_traza": 46,
-          "timestamp": "2026-08-08T06:08:39.265079+00:00",
+          "timestamp": "2026-08-08T06:27:46.816865+00:00",
           "modulo": "verificacion",
           "capacidad": "inventario",
           "estado": "EXITO",

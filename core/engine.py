@@ -745,7 +745,7 @@ class Engine:
     def ejecutar_inventario(self, modulo_o_rol: str) -> Dict[str, Any]:
         return self.ejecutar_capacidad(modulo_o_rol, "inventario")
 
-            def ejecutar_con_contexto_unificado(self, modulo_o_rol: str, capacidad: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    def ejecutar_con_contexto_unificado(self, modulo_o_rol: str, capacidad: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         cont = self.registro.primero(modulo_o_rol)
         if cont is None:
             return {

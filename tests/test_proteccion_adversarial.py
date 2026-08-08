@@ -1,8 +1,33 @@
 # ===============================================================
 # tests/test_proteccion_adversarial.py
 # VPSI-TRUTH — PROTECCION 3.1
-# Batería adversarial: integridad, autenticidad, manifiesto y
-# fail-closed.
+#
+# BATERÍA ADVERSARIAL
+#
+# Importante:
+#   La implementación real vive en:
+#
+#       modules/spartaco_seguridad/proteccion.py
+#
+#   El manifiesto autorizado es EXCLUSIVAMENTE:
+#
+#       {
+#           "cuerpo": {...},
+#           "firma": "..."
+#       }
+#
+#   No se aceptan:
+#       - manifiestos ausentes
+#       - firmas sueltas en PROTEGIDO
+#       - cuerpos alterados
+#       - firmas alteradas
+#       - artefactos alterados
+#       - claves públicas incorrectas
+#       - versiones regresivas
+#       - campos paralelos
+#       - campos extra
+#       - referencias externas que contradigan el cuerpo autenticado
+#
 # ===============================================================
 
 from __future__ import annotations
@@ -12,7 +37,7 @@ from pathlib import Path
 
 import pytest
 
-from modules.seguridad.proteccion import (
+from modules.spartaco_seguridad.proteccion import (
     MODO_DIAGNOSTICO,
     MODO_PROTEGIDO,
     _fragmentos,
@@ -20,6 +45,7 @@ from modules.seguridad.proteccion import (
     firmar_bytes,
     generar_claves,
     serializar,
+    sellar,
     verificar,
     verificar_bytes,
     verificar_manifiesto,
@@ -103,16 +129,8 @@ def test_build_produce_formato_unico(build_valido):
         "firma",
     }
 
-    assert isinstance(
-        manifiesto["cuerpo"],
-        dict,
-    )
-
-    assert isinstance(
-        manifiesto["firma"],
-        str,
-    )
-
+    assert isinstance(manifiesto["cuerpo"], dict)
+    assert isinstance(manifiesto["firma"], str)
     assert manifiesto["firma"]
 
 
@@ -140,18 +158,9 @@ def test_protegido_sin_manifiesto_falla(build_valido):
         {},
         {"firma": "00"},
         {"cuerpo": {}},
-        {
-            "cuerpo": {},
-            "firma": "",
-        },
-        {
-            "cuerpo": "no-dict",
-            "firma": "00",
-        },
-        {
-            "cuerpo": {},
-            "firma": None,
-        },
+        {"cuerpo": {}, "firma": ""},
+        {"cuerpo": "no-dict", "firma": "00"},
+        {"cuerpo": {}, "firma": None},
     ],
 )
 def test_protegido_manifiesto_malformado_falla(
@@ -233,31 +242,22 @@ CAMPOS_ATACABLES = [
 ]
 
 
-@pytest.mark.parametrize(
-    "campo",
-    CAMPOS_ATACABLES,
-)
+@pytest.mark.parametrize("campo", CAMPOS_ATACABLES)
 def test_modificar_cualquier_campo_del_cuerpo_rompe_firma(
     build_valido,
     campo,
 ):
     resultado, pub = build_valido
 
-    manifiesto = copy.deepcopy(
-        resultado["manifiesto"]
-    )
-
+    manifiesto = copy.deepcopy(resultado["manifiesto"])
     original = manifiesto["cuerpo"][campo]
 
     if isinstance(original, bool):
         ataque = not original
-
     elif isinstance(original, int):
         ataque = original + 999
-
     elif isinstance(original, list):
         ataque = list(original) + [999999]
-
     else:
         ataque = "ATAQUE"
 
@@ -342,10 +342,7 @@ def test_firma_de_otro_cuerpo_no_es_reutilizable(
 def test_modificar_un_byte_rompe_integridad(build_valido):
     resultado, pub = build_valido
 
-    datos = bytearray(
-        resultado["datos"]
-    )
-
+    datos = bytearray(resultado["datos"])
     datos[0] ^= 0x01
 
     verificacion = verificar(
@@ -358,10 +355,7 @@ def test_modificar_un_byte_rompe_integridad(build_valido):
     assert verificacion["ok"] is False
     assert "nucleo" in verificacion["fallos"]
     assert "canales" in verificacion["fallos"]
-    assert (
-        "INTEGRIDAD_COMPROMETIDA"
-        in verificacion["conceptos"]
-    )
+    assert "INTEGRIDAD_COMPROMETIDA" in verificacion["conceptos"]
 
 
 def test_modificar_byte_en_mitad_rompe_integridad(
@@ -369,10 +363,7 @@ def test_modificar_byte_en_mitad_rompe_integridad(
 ):
     resultado, pub = build_valido
 
-    datos = bytearray(
-        resultado["datos"]
-    )
-
+    datos = bytearray(resultado["datos"])
     datos[len(datos) // 2] ^= 0x80
 
     verificacion = verificar(
@@ -416,13 +407,7 @@ def test_eliminar_byte_rompe_integridad(build_valido):
 
 @pytest.mark.parametrize(
     "posicion",
-    [
-        0,
-        1,
-        2,
-        -1,
-        -2,
-    ],
+    [0, 1, 2, -1, -2],
 )
 def test_mutaciones_en_extremos_del_artefacto(
     build_valido,
@@ -430,10 +415,7 @@ def test_mutaciones_en_extremos_del_artefacto(
 ):
     resultado, pub = build_valido
 
-    datos = bytearray(
-        resultado["datos"]
-    )
-
+    datos = bytearray(resultado["datos"])
     datos[posicion] ^= 0xFF
 
     verificacion = verificar(
@@ -461,10 +443,7 @@ def test_firma_alterada_falla(build_valido):
         + firma[1:]
     )
 
-    manifiesto = copy.deepcopy(
-        resultado["manifiesto"]
-    )
-
+    manifiesto = copy.deepcopy(resultado["manifiesto"])
     manifiesto["firma"] = alterada
 
     verificacion = verificar(
@@ -497,10 +476,7 @@ def test_firma_malformada_falla(
 ):
     resultado, pub = build_valido
 
-    manifiesto = copy.deepcopy(
-        resultado["manifiesto"]
-    )
-
+    manifiesto = copy.deepcopy(resultado["manifiesto"])
     manifiesto["firma"] = firma
 
     verificacion = verificar(
@@ -574,19 +550,15 @@ def test_clave_publica_atacante_no_valida_manifiesto(
 # 7. CANONICALIZACIÓN
 # ===============================================================
 
-def test_reordenar_cuerpo_no_rompe_firma(
-    build_valido,
-):
+def test_reordenar_cuerpo_no_rompe_firma(build_valido):
     resultado, pub = build_valido
 
     cuerpo = resultado["manifiesto"]["cuerpo"]
 
-    reordenado = {}
-
-    for clave in reversed(
-        list(cuerpo.keys())
-    ):
-        reordenado[clave] = cuerpo[clave]
+    reordenado = {
+        clave: cuerpo[clave]
+        for clave in reversed(list(cuerpo.keys()))
+    }
 
     manifiesto = {
         "cuerpo": reordenado,
@@ -608,13 +580,9 @@ def test_cambiar_valor_por_mismo_tipo_rompe_firma(
 ):
     resultado, pub = build_valido
 
-    manifiesto = copy.deepcopy(
-        resultado["manifiesto"]
-    )
+    manifiesto = copy.deepcopy(resultado["manifiesto"])
 
-    manifiesto["cuerpo"]["artifact_id"] = (
-        "TEST-002"
-    )
+    manifiesto["cuerpo"]["artifact_id"] = "TEST-002"
 
     verificacion = verificar(
         resultado["datos"],
@@ -634,11 +602,7 @@ def test_serializar_es_determinista(build_valido):
     a = serializar(cuerpo)
 
     b = serializar(
-        dict(
-            reversed(
-                list(cuerpo.items())
-            )
-        )
+        dict(reversed(list(cuerpo.items())))
     )
 
     assert a == b
@@ -698,9 +662,8 @@ def test_version_regresiva_firmada_es_rechazada(
     )
 
     assert resultado_verificacion["ok"] is False
-    assert (
-        "VERSIÓN_REGRESIVA"
-        in resultado_verificacion["conceptos"]
+    assert "VERSIÓN_REGRESIVA" in (
+        resultado_verificacion["conceptos"]
     )
 
 
@@ -803,9 +766,7 @@ def test_z_no_aparece_en_fallos(build_valido):
     assert "z" not in verificacion["fallos"]
 
 
-def test_neutro_no_aparece_en_fallos(
-    build_valido,
-):
+def test_neutro_no_aparece_en_fallos(build_valido):
     resultado, pub = build_valido
 
     verificacion = verificar(
@@ -815,15 +776,8 @@ def test_neutro_no_aparece_en_fallos(
         modo=MODO_PROTEGIDO,
     )
 
-    assert (
-        "identidad_neutra"
-        in verificacion["pasos"]
-    )
-
-    assert (
-        "identidad_neutra"
-        not in verificacion["fallos"]
-    )
+    assert "identidad_neutra" in verificacion["pasos"]
+    assert "identidad_neutra" not in verificacion["fallos"]
 
 
 def test_mutar_valuaciones_rompe_autenticacion_del_cuerpo(
@@ -831,13 +785,9 @@ def test_mutar_valuaciones_rompe_autenticacion_del_cuerpo(
 ):
     resultado, pub = build_valido
 
-    manifiesto = copy.deepcopy(
-        resultado["manifiesto"]
-    )
+    manifiesto = copy.deepcopy(resultado["manifiesto"])
 
-    manifiesto["cuerpo"]["valuaciones"] = [
-        999999
-    ]
+    manifiesto["cuerpo"]["valuaciones"] = [999999]
 
     verificacion = verificar(
         resultado["datos"],
@@ -884,21 +834,20 @@ def test_diagnostico_acepta_manifiesto_valido(
 
 def test_diagnostico_detecta_manifiesto_falso(
     build_valido,
+    pub=None,
 ):
-    resultado, pub = build_valido
+    resultado, pub_real = build_valido
 
     manifiesto = copy.deepcopy(
         resultado["manifiesto"]
     )
 
-    manifiesto["cuerpo"]["artifact_id"] = (
-        "ATACANTE"
-    )
+    manifiesto["cuerpo"]["artifact_id"] = "ATACANTE"
 
     verificacion = verificar(
         resultado["datos"],
         manifiesto=manifiesto,
-        pub_bytes=pub,
+        pub_bytes=pub_real,
         modo=MODO_DIAGNOSTICO,
     )
 
@@ -927,29 +876,18 @@ def test_diagnostico_detecta_manifiesto_falso(
         257,
     ],
 )
-def test_fragmentos_cubren_exactamente_todos_los_bytes(
-    n,
-):
-    datos = bytes(
-        i % 256
-        for i in range(n)
-    )
+def test_fragmentos_cubren_exactamente_todos_los_bytes(n):
+    datos = bytes(i % 256 for i in range(n))
 
     fragmentos = _fragmentos(
         datos,
         k=8,
     )
 
-    assert (
-        b"".join(fragmentos)
-        == datos
-    )
+    assert b"".join(fragmentos) == datos
 
     assert (
-        sum(
-            len(fragmento)
-            for fragmento in fragmentos
-        )
+        sum(len(fragmento) for fragmento in fragmentos)
         == len(datos)
     )
 
@@ -969,9 +907,7 @@ def test_fragmentos_cubren_exactamente_todos_los_bytes(
         32,
     ],
 )
-def test_fragmentos_cubren_datos_para_distintos_k(
-    k,
-):
+def test_fragmentos_cubren_datos_para_distintos_k(k):
     datos = b"0123456789" * 37
 
     fragmentos = _fragmentos(
@@ -979,10 +915,7 @@ def test_fragmentos_cubren_datos_para_distintos_k(
         k=k,
     )
 
-    assert (
-        b"".join(fragmentos)
-        == datos
-    )
+    assert b"".join(fragmentos) == datos
 
 
 # ===============================================================
@@ -1010,9 +943,7 @@ def test_firmar_y_verificar_bytes(claves):
     assert verificacion["ok"] is True
 
 
-def test_firma_no_es_reutilizable_para_otro_mensaje(
-    claves,
-):
+def test_firma_no_es_reutilizable_para_otro_mensaje(claves):
     priv, _, pub = claves
 
     firma = firmar_bytes(
@@ -1031,12 +962,8 @@ def test_firma_no_es_reutilizable_para_otro_mensaje(
     assert verificacion["ok"] is False
 
 
-def test_firma_con_clave_privada_inexistente_falla(
-    tmp_path,
-):
-    inexistente = (
-        tmp_path / "no-existe.key"
-    )
+def test_firma_con_clave_privada_inexistente_falla(tmp_path):
+    inexistente = tmp_path / "no-existe.key"
 
     resultado = firmar_bytes(
         b"mensaje",
@@ -1044,19 +971,14 @@ def test_firma_con_clave_privada_inexistente_falla(
     )
 
     assert resultado["ok"] is False
-    assert (
-        "CÓDIGO_INVÁLIDO"
-        in resultado["conceptos"]
-    )
+    assert "CÓDIGO_INVÁLIDO" in resultado["conceptos"]
 
 
 # ===============================================================
 # 14. MANIFIESTO DIRECTO
 # ===============================================================
 
-def test_verificar_manifiesto_valido(
-    build_valido,
-):
+def test_verificar_manifiesto_valido(build_valido):
     resultado, pub = build_valido
 
     verificacion = verificar_manifiesto(
@@ -1085,9 +1007,7 @@ def test_verificar_manifiesto_valido(
 def test_verificar_manifiesto_rechaza_tipos_invalidos(
     manifiesto,
 ):
-    resultado = verificar_manifiesto(
-        manifiesto
-    )
+    resultado = verificar_manifiesto(manifiesto)
 
     assert resultado["ok"] is False
 
@@ -1126,6 +1046,15 @@ def test_verificar_manifiesto_no_acepta_firma_ausente(
     assert verificacion["ok"] is False
 
 
+# ===============================================================
+# IMPORTANTE:
+# EL CONTRATO DICE:
+#
+#   SOLO {cuerpo, firma}
+#
+# Por tanto estos ataques DEBEN fallar.
+# ===============================================================
+
 def test_verificar_manifiesto_no_acepta_campo_plano(
     build_valido,
 ):
@@ -1135,23 +1064,13 @@ def test_verificar_manifiesto_no_acepta_campo_plano(
         resultado["manifiesto"]
     )
 
-    manifiesto["artifact_id"] = (
-        "CAMPO_PLANO_ATACANTE"
-    )
+    manifiesto["artifact_id"] = "CAMPO_PLANO_ATACANTE"
 
     verificacion = verificar_manifiesto(
         manifiesto,
         pub_bytes=pub,
     )
 
-    # Contrato:
-    #
-    # {
-    #     "cuerpo": {...},
-    #     "firma": "..."
-    # }
-    #
-    # No debe aceptar campos paralelos.
     assert verificacion["ok"] is False
 
 
@@ -1164,9 +1083,7 @@ def test_agregar_campo_extra_al_manifiesto_falla_en_protegido(
         resultado["manifiesto"]
     )
 
-    manifiesto["campo_extra"] = (
-        "NO_AUTORIZADO"
-    )
+    manifiesto["campo_extra"] = "NO_AUTORIZADO"
 
     verificacion = verificar(
         resultado["datos"],
@@ -1183,9 +1100,7 @@ def test_agregar_campo_extra_al_manifiesto_falla_en_protegido(
 # 15. ESTRUCTURA DEL MANIFIESTO
 # ===============================================================
 
-def test_eliminar_cuerpo_falla(
-    build_valido,
-):
+def test_eliminar_cuerpo_falla(build_valido):
     resultado, pub = build_valido
 
     manifiesto = {
@@ -1202,9 +1117,7 @@ def test_eliminar_cuerpo_falla(
     assert verificacion["ok"] is False
 
 
-def test_eliminar_firma_falla(
-    build_valido,
-):
+def test_eliminar_firma_falla(build_valido):
     resultado, pub = build_valido
 
     manifiesto = {
@@ -1221,9 +1134,7 @@ def test_eliminar_firma_falla(
     assert verificacion["ok"] is False
 
 
-def test_cuerpo_no_dict_falla(
-    build_valido,
-):
+def test_cuerpo_no_dict_falla(build_valido):
     resultado, pub = build_valido
 
     manifiesto = {
@@ -1241,9 +1152,7 @@ def test_cuerpo_no_dict_falla(
     assert verificacion["ok"] is False
 
 
-def test_firma_no_string_falla(
-    build_valido,
-):
+def test_firma_no_string_falla(build_valido):
     resultado, pub = build_valido
 
     manifiesto = {
@@ -1334,7 +1243,7 @@ def test_n_neutro_autenticado_no_puede_modificarse(
 
 
 # ===============================================================
-# 17. MANIFIESTO A ≠ ARTEFACTO B
+# 17. MANIFIESTO A != ARTEFACTO B
 # ===============================================================
 
 def test_manifiesto_de_artefacto_A_no_autentica_B(
@@ -1342,10 +1251,7 @@ def test_manifiesto_de_artefacto_A_no_autentica_B(
 ):
     resultado, pub = build_valido
 
-    datos_b = (
-        resultado["datos"]
-        + b"ATAQUE"
-    )
+    datos_b = resultado["datos"] + b"ATAQUE"
 
     verificacion = verificar(
         datos_b,
@@ -1401,7 +1307,7 @@ def test_la_firma_del_cuerpo_no_valida_el_digest_del_artefacto(
 # 19. REFERENCIAS EXTERNAS CONFLICTIVAS
 # ===============================================================
 
-def test_protegido_ignora_referencias_externas_conflictivas(
+def test_protegido_usa_el_cuerpo_autenticado_como_autoridad(
     build_valido,
 ):
     resultado, pub = build_valido
@@ -1416,7 +1322,6 @@ def test_protegido_ignora_referencias_externas_conflictivas(
         modo=MODO_PROTEGIDO,
     )
 
-    # El cuerpo autenticado es la autoridad.
     assert verificacion["ok"] is True
 
 
@@ -1429,9 +1334,7 @@ def test_mutaciones_individuales_del_artefacto(
 ):
     resultado, pub = build_valido
 
-    original = bytearray(
-        resultado["datos"]
-    )
+    original = bytearray(resultado["datos"])
 
     posiciones = {
         0,
@@ -1445,7 +1348,6 @@ def test_mutaciones_individuales_del_artefacto(
 
     for posicion in posiciones:
         datos = bytearray(original)
-
         datos[posicion] ^= 0xFF
 
         verificacion = verificar(
@@ -1475,18 +1377,13 @@ def test_atacante_no_puede_firmar_sin_clave_privada(
     resultado, _ = build_valido
 
     fake_key = tmp_path / "fake.key"
-
-    fake_key.write_bytes(
-        b"clave-falsa"
-    )
+    fake_key.write_bytes(b"clave-falsa")
 
     cuerpo = copy.deepcopy(
         resultado["manifiesto"]["cuerpo"]
     )
 
-    cuerpo["artifact_id"] = (
-        "ATACANTE"
-    )
+    cuerpo["artifact_id"] = "ATACANTE"
 
     firma = firmar_bytes(
         serializar(cuerpo),
@@ -1557,8 +1454,6 @@ def test_datos_extremos_no_rompen_build(
     ],
 )
 def test_n_neutro_invalido_falla(n):
-    from modules.seguridad.proteccion import sellar
-
     resultado = sellar(
         b"datos",
         n=n,
@@ -1566,9 +1461,8 @@ def test_n_neutro_invalido_falla(n):
 
     assert resultado["ok"] is False
 
-    assert (
-        "CÓDIGO_INVÁLIDO"
-        in resultado["conceptos"]
+    assert "CÓDIGO_INVÁLIDO" in (
+        resultado["conceptos"]
     )
 
 
@@ -1611,9 +1505,7 @@ def test_cambiar_algoritmo_hash_rompe_firma(
         resultado["manifiesto"]
     )
 
-    manifiesto["cuerpo"]["algoritmo_hash"] = (
-        "MD5"
-    )
+    manifiesto["cuerpo"]["algoritmo_hash"] = "MD5"
 
     verificacion = verificar(
         resultado["datos"],
@@ -1635,9 +1527,7 @@ def test_cambiar_algoritmo_firma_rompe_firma(
         resultado["manifiesto"]
     )
 
-    manifiesto["cuerpo"]["algoritmo_firma"] = (
-        "RSA"
-    )
+    manifiesto["cuerpo"]["algoritmo_firma"] = "RSA"
 
     verificacion = verificar(
         resultado["datos"],
@@ -1663,9 +1553,7 @@ def test_artifact_id_no_puede_ser_reemplazado(
         resultado["manifiesto"]
     )
 
-    manifiesto["cuerpo"]["artifact_id"] = (
-        "OTRO-ARTEFACTO"
-    )
+    manifiesto["cuerpo"]["artifact_id"] = "OTRO-ARTEFACTO"
 
     verificacion = verificar(
         resultado["datos"],
@@ -1675,10 +1563,7 @@ def test_artifact_id_no_puede_ser_reemplazado(
     )
 
     assert verificacion["ok"] is False
-    assert (
-        "FIRMA_INVÁLIDA"
-        in verificacion["conceptos"]
-    )
+    assert "FIRMA_INVÁLIDA" in verificacion["conceptos"]
 
 
 def test_clave_publica_id_no_puede_ser_reemplazada(
@@ -1723,10 +1608,7 @@ def test_cadena_completa_original_y_tamper(
     assert original["ok"] is True
     assert original["fallos"] == []
 
-    datos = bytearray(
-        resultado["datos"]
-    )
-
+    datos = bytearray(resultado["datos"])
     datos[-1] ^= 1
 
     alterado = verificar(
@@ -1765,9 +1647,7 @@ def test_firma_hex_suelta_no_sustituye_manifiesto_en_protegido(
 # 29. DOS ARTEFACTOS NO COMPARTEN AUTORIZACIÓN
 # ===============================================================
 
-def test_dos_builds_no_comparten_autorizacion(
-    claves,
-):
+def test_dos_builds_no_comparten_autorizacion(claves):
     priv, _, pub = claves
 
     artefacto_a = build(
@@ -1819,19 +1699,17 @@ def test_dos_builds_no_comparten_autorizacion(
 # 30. FAIL-CLOSED FINAL
 # ===============================================================
 
-def test_contrato_protegido_fail_closed(
-    build_valido,
-):
+def test_contrato_protegido_fail_closed(build_valido):
     resultado, pub = build_valido
 
     casos = [
         None,
         {},
         {
-            "cuerpo": resultado["manifiesto"]["cuerpo"]
+            "cuerpo": resultado["manifiesto"]["cuerpo"],
         },
         {
-            "firma": resultado["manifiesto"]["firma"]
+            "firma": resultado["manifiesto"]["firma"],
         },
     ]
 
@@ -1847,7 +1725,7 @@ def test_contrato_protegido_fail_closed(
 
 
 # ===============================================================
-# 31. FIRMA DE CUERPO CON MODIFICACIÓN DE ORDEN SOLAMENTE
+# 31. ORDEN JSON
 # ===============================================================
 
 def test_orden_json_no_es_parte_de_la_firma(
@@ -1859,14 +1737,10 @@ def test_orden_json_no_es_parte_de_la_firma(
 
     invertido = {
         clave: cuerpo[clave]
-        for clave in reversed(
-            list(cuerpo.keys())
-        )
+        for clave in reversed(list(cuerpo.keys()))
     }
 
-    assert serializar(cuerpo) == serializar(
-        invertido
-    )
+    assert serializar(cuerpo) == serializar(invertido)
 
     verificacion = verificar_bytes(
         serializar(invertido),
@@ -1881,9 +1755,7 @@ def test_orden_json_no_es_parte_de_la_firma(
 # 32. FIRMA NO SE PUEDE TRASPLANTAR
 # ===============================================================
 
-def test_firma_de_A_no_valida_cuerpo_de_B(
-    claves,
-):
+def test_firma_de_A_no_valida_cuerpo_de_B(claves):
     priv, _, pub = claves
 
     cuerpo_a = {
@@ -1915,7 +1787,7 @@ def test_firma_de_A_no_valida_cuerpo_de_B(
 
 
 # ===============================================================
-# 33. MUTACIÓN DE CADA BYTE DE LA FIRMA
+# 33. MUTACIÓN DE CADA POSICIÓN DE LA FIRMA
 # ===============================================================
 
 def test_mutar_cada_posicion_de_la_firma_falla(
@@ -1923,15 +1795,9 @@ def test_mutar_cada_posicion_de_la_firma_falla(
 ):
     resultado, pub = build_valido
 
-    firma_original = (
-        resultado["manifiesto"]["firma"]
-    )
+    firma_original = resultado["manifiesto"]["firma"]
 
-    for i in range(
-        0,
-        len(firma_original),
-        2,
-    ):
+    for i in range(0, len(firma_original), 2):
         firma = list(firma_original)
 
         firma[i] = (
@@ -1959,7 +1825,7 @@ def test_mutar_cada_posicion_de_la_firma_falla(
 
 
 # ===============================================================
-# 34. CLAVE PÚBLICA CON LONGITUD CORRECTA PERO DIFERENTE
+# 34. CLAVE PÚBLICA CON LONGITUD CORRECTA PERO DISTINTA
 # ===============================================================
 
 def test_clave_publica_distinta_de_32_bytes_falla(
@@ -1967,11 +1833,7 @@ def test_clave_publica_distinta_de_32_bytes_falla(
 ):
     resultado, _ = build_valido
 
-    # 32 bytes válidos sintácticamente,
-    # pero no corresponden a la clave que firmó.
-    pub_falsa = bytes(
-        range(32)
-    )
+    pub_falsa = bytes(range(32))
 
     verificacion = verificar(
         resultado["datos"],
@@ -1981,33 +1843,16 @@ def test_clave_publica_distinta_de_32_bytes_falla(
     )
 
     assert verificacion["ok"] is False
-    assert "FIRMA_INVÁLIDA" in (
-        verificacion["conceptos"]
-    )
+    assert "FIRMA_INVÁLIDA" in verificacion["conceptos"]
 
 
 # ===============================================================
-# 35. CUERPO FIRMADO NO PUEDE OMITIR CAMPOS AUTENTICADOS
+# 35. ELIMINACIÓN DE CUALQUIER CAMPO AUTENTICADO
 # ===============================================================
 
 @pytest.mark.parametrize(
     "campo",
-    [
-        "esquema",
-        "version",
-        "emitido",
-        "artifact_id",
-        "clave_publica_id",
-        "algoritmo_hash",
-        "algoritmo_firma",
-        "nucleo",
-        "S",
-        "Q",
-        "n_bytes",
-        "n_neutro",
-        "valuaciones",
-        "identidad_neutra",
-    ],
+    CAMPOS_ATACABLES,
 )
 def test_eliminar_cualquier_campo_del_cuerpo_rompe_firma(
     build_valido,
@@ -2037,5 +1882,151 @@ def test_eliminar_cualquier_campo_del_cuerpo_rompe_firma(
 
 
 # ===============================================================
-# FIN
+# 36. ATAQUES ESTRUCTURALES ADICIONALES
+# ===============================================================
+
+def test_manifiesto_con_claves_extra_no_es_equivalente(
+    build_valido,
+):
+    resultado, pub = build_valido
+
+    manifiesto = copy.deepcopy(
+        resultado["manifiesto"]
+    )
+
+    manifiesto["firma_extra"] = manifiesto["firma"]
+
+    verificacion = verificar_manifiesto(
+        manifiesto,
+        pub_bytes=pub,
+    )
+
+    assert verificacion["ok"] is False
+
+
+def test_manifiesto_con_cuerpo_extra_no_es_equivalente(
+    build_valido,
+):
+    resultado, pub = build_valido
+
+    manifiesto = copy.deepcopy(
+        resultado["manifiesto"]
+    )
+
+    manifiesto["cuerpo_extra"] = {
+        "artifact_id": "ATACANTE"
+    }
+
+    verificacion = verificar_manifiesto(
+        manifiesto,
+        pub_bytes=pub,
+    )
+
+    assert verificacion["ok"] is False
+
+
+def test_firma_no_puede_ser_lista(
+    build_valido,
+):
+    resultado, pub = build_valido
+
+    manifiesto = {
+        "cuerpo": resultado["manifiesto"]["cuerpo"],
+        "firma": [],
+    }
+
+    verificacion = verificar(
+        resultado["datos"],
+        manifiesto=manifiesto,
+        pub_bytes=pub,
+        modo=MODO_PROTEGIDO,
+    )
+
+    assert verificacion["ok"] is False
+
+
+def test_cuerpo_no_puede_ser_lista(
+    build_valido,
+):
+    resultado, pub = build_valido
+
+    manifiesto = {
+        "cuerpo": [],
+        "firma": resultado["manifiesto"]["firma"],
+    }
+
+    verificacion = verificar(
+        resultado["datos"],
+        manifiesto=manifiesto,
+        pub_bytes=pub,
+        modo=MODO_PROTEGIDO,
+    )
+
+    assert verificacion["ok"] is False
+
+
+# ===============================================================
+# 37. TIPO DE MODO
+# ===============================================================
+
+def test_modo_protegido_es_fail_closed(
+    build_valido,
+):
+    resultado, pub = build_valido
+
+    verificacion = verificar(
+        resultado["datos"],
+        pub_bytes=pub,
+        firma_hex=resultado["manifiesto"]["firma"],
+        modo=MODO_PROTEGIDO,
+    )
+
+    assert verificacion["ok"] is False
+    assert "manifiesto" in verificacion["fallos"]
+
+
+# ===============================================================
+# 38. AUTENTICACIÓN CRUZADA
+# ===============================================================
+
+def test_firma_correcta_con_datos_incorrectos_no_autoriza(
+    build_valido,
+):
+    resultado, pub = build_valido
+
+    datos = resultado["datos"] + b"::MODIFICADO"
+
+    verificacion = verificar(
+        datos,
+        manifiesto=resultado["manifiesto"],
+        pub_bytes=pub,
+        modo=MODO_PROTEGIDO,
+    )
+
+    assert verificacion["ok"] is False
+    assert "nucleo" in verificacion["fallos"]
+    assert "canales" in verificacion["fallos"]
+
+
+def test_mismo_cuerpo_firmado_con_datos_diferentes_falla(
+    build_valido,
+):
+    resultado, pub = build_valido
+
+    datos = bytearray(resultado["datos"])
+    datos[0] ^= 0xAA
+
+    verificacion = verificar(
+        bytes(datos),
+        manifiesto=resultado["manifiesto"],
+        pub_bytes=pub,
+        modo=MODO_PROTEGIDO,
+    )
+
+    assert verificacion["ok"] is False
+    assert "nucleo" in verificacion["fallos"]
+
+
+# ===============================================================
+# FIN DE LA BATERÍA ADVERSARIAL
 # ===============================================================

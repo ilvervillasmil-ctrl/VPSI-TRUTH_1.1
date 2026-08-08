@@ -4,24 +4,23 @@
 #
 # RECURSO:             CAPACIDADES
 # Módulo contenedor:   spartaco_seguridad (SC)
-# Versión recurso:     1.2
+# Versión recurso:     1.3
 #
 # Función:
-#   Reportar, por cada recurso descubierto en el árbol del
-#   módulo, las capacidades que ese recurso declara y el estado
-#   estructural de cada una. Todo en números exactos.
-#   No se elimina evidencia. No se filtra la declaración.
+#   Reportar, por cada recurso del árbol (incluido este archivo),
+#   las capacidades que declara y el estado estructural de cada una.
+#   Números exactos. Sin filtrar evidencia.
 #
 # Qué hace:
 #   - Recorre el árbol con el mismo criterio que el adaptador.
-#   - Por cada archivo descubierto produce una entrada.
-#   - Si declara capacidades_recurso, evalúa cada elemento
-#     tal como viene (válido o no).
+#   - Se incluye a sí mismo (auto-referencia, sin re-ejecutar).
+#   - Por cada archivo produce una entrada.
+#   - Si declara capacidades_recurso, evalúa cada elemento tal cual.
 #   - Cuenta existe / callable sin invocar.
-#   - Los contadores reflejan el estado FINAL del diccionario.
+#   - Contadores = estado FINAL del diccionario.
 #
 # Qué NO hace:
-#   - No infiere capacidades.
+#   - No infiere capacidades de dir() ni de __all__.
 #   - No invoca ninguna capacidad.
 #   - No modifica recursos, adaptador ni Engine.
 #   - No descarta elementos inválidos de la declaración.
@@ -62,13 +61,14 @@ SEGURIDAD: Dict[str, Any] = {
     "nombre": "capacidades",
     "hace": (
         "Reporta las capacidades declaradas por cada recurso del árbol "
-        "y el estado estructural de cada una: existe y es callable. "
-        "Cuantifica exacto. No elimina evidencia. No ejecuta."
+        "(incluido este) y el estado estructural de cada una: "
+        "existe y es callable. Cuantifica exacto. No elimina evidencia. "
+        "No ejecuta."
     ),
     "herramienta": (
         "Introspección hasattr + callable sobre los recursos descubiertos"
     ),
-    "version": "1.2",
+    "version": "1.3",
     "clave_declaracion": "capacidades_recurso",
     "capacidades_recurso": [
         "auditar",
@@ -120,6 +120,7 @@ NO_CARGABLE = "NO_CARGABLE"
 # procedencia
 YA_CARGADO = "YA_CARGADO"
 CARGADO_AQUI = "CARGADO_AQUI"
+AUTO_REFERENCIA = "AUTO_REFERENCIA"
 
 # ===============================================================
 # FIN CONSTANTES
@@ -139,14 +140,24 @@ def _clave_modulo(rel: str) -> str:
     return clave
 
 
+def _resolver_self(yo: Path) -> Optional[Any]:
+    """Localiza el módulo en ejecución sin re-ejecutarlo."""
+    mod = sys.modules.get(__name__)
+    if mod is not None:
+        return mod
+    for m in list(sys.modules.values()):
+        f = getattr(m, "__file__", None)
+        if f and Path(f).resolve() == yo:
+            return m
+    return None
+
+
 def _recursos_del_arbol() -> List[Tuple[str, Any, str, Optional[str]]]:
     """
     Devuelve [(ruta_rel, modulo|None, procedencia, error|None)].
 
-    Mismo criterio de exclusión que el adaptador.
-    Se excluye a sí mismo.
-    Reutiliza la instancia registrada por el adaptador;
-    solo carga si no la encuentra.
+    Mismo criterio de exclusión que el adaptador, EXCEPTO que
+    este archivo se incluye a sí mismo por auto-referencia.
     """
     yo = Path(__file__).resolve()
     salida: List[Tuple[str, Any, str, Optional[str]]] = []
@@ -154,13 +165,20 @@ def _recursos_del_arbol() -> List[Tuple[str, Any, str, Optional[str]]]:
     for path in sorted(_DIR.rglob("*.py")):
         if path.name.startswith("_") or path.name == "__init__.py":
             continue
-        if path.resolve() == yo:
-            continue
 
         try:
             rel = str(path.relative_to(_DIR))
         except ValueError:
             rel = path.name
+
+        # --- auto-referencia: no re-ejecutar este archivo ---
+        if path.resolve() == yo:
+            mod = _resolver_self(yo)
+            if mod is not None:
+                salida.append((rel, mod, AUTO_REFERENCIA, None))
+            else:
+                salida.append((rel, None, NO_CARGABLE, "self no resoluble"))
+            continue
 
         clave = _clave_modulo(rel)
         mod = sys.modules.get(clave)
@@ -186,9 +204,9 @@ def _recursos_del_arbol() -> List[Tuple[str, Any, str, Optional[str]]]:
 
 def _elementos_declaracion(meta: Dict[str, Any]) -> Optional[List[Any]]:
     """
-    Devuelve la lista cruda de la declaración, sin filtrar.
+    Lista cruda de la declaración, sin filtrar.
     None si la clave no existe o no es list/tuple/str.
-    Cada elemento se conserva tal cual para no perder evidencia.
+    Cada elemento se conserva tal cual.
     """
     raw = meta.get(CLAVE_DECLARACION)
 
@@ -202,8 +220,7 @@ def _elementos_declaracion(meta: Dict[str, Any]) -> Optional[List[Any]]:
 def _estado_capacidad(mod: Any, elemento: Any) -> Dict[str, Any]:
     """
     Evalúa un elemento de la declaración tal como viene.
-    No se descarta. Si no es str identificador válido → NOMBRE_INVALIDO.
-    NUNCA invoca la capacidad.
+    No se descarta. NUNCA invoca la capacidad.
     """
     base: Dict[str, Any] = {
         "nombre": None,
@@ -266,15 +283,14 @@ def _fraccion(num: int, den: int) -> str:
 def auditar() -> Dict[str, Any]:
     """
     Estado estructural de cada capacidad declarada, por recurso.
-    Contadores = estado FINAL del diccionario de recursos.
-    No se elimina evidencia.
+    Incluye a CAPACIDADES. Contadores = estado FINAL.
     """
-    # Fase 1: recolectar entradas sin consolidar contadores finales
     entradas: List[Dict[str, Any]] = []
     problemas: List[str] = []
     cargados_aqui: List[str] = []
     n_ya_cargado = 0
     n_cargado_aqui = 0
+    n_auto_referencia = 0
 
     dist_cap: Dict[str, int] = {
         OK: 0,
@@ -290,8 +306,9 @@ def auditar() -> Dict[str, Any]:
             n_cargado_aqui += 1
         elif procedencia == YA_CARGADO:
             n_ya_cargado += 1
+        elif procedencia == AUTO_REFERENCIA:
+            n_auto_referencia += 1
 
-        # --- no cargable ---
         if mod is None:
             entradas.append({
                 "clave": f"<{rel}>",
@@ -312,7 +329,6 @@ def auditar() -> Dict[str, Any]:
 
         meta = getattr(mod, "SEGURIDAD", None)
 
-        # --- sin SEGURIDAD: se reporta, no se oculta ---
         if not isinstance(meta, dict):
             entradas.append({
                 "clave": f"<{rel}>",
@@ -332,7 +348,6 @@ def auditar() -> Dict[str, Any]:
 
         rid_raw = meta.get("id")
 
-        # --- id ausente ---
         if not (isinstance(rid_raw, str) and rid_raw.strip()):
             entradas.append({
                 "clave": f"<{rel}>",
@@ -362,7 +377,6 @@ def auditar() -> Dict[str, Any]:
             "procedencia": procedencia,
         }
 
-        # --- sin declaración de capacidades ---
         if elementos is None:
             entrada.update({
                 "estado": SIN_DECLARAR,
@@ -378,7 +392,6 @@ def auditar() -> Dict[str, Any]:
                 ),
             })
         else:
-            # cada elemento se evalúa; ninguno se descarta
             detalle = [_estado_capacidad(mod, el) for el in elementos]
             fallidas = [d for d in detalle if not d["ok"]]
             ok_count = len(detalle) - len(fallidas)
@@ -406,7 +419,7 @@ def auditar() -> Dict[str, Any]:
 
         entradas.append(entrada)
 
-    # Fase 2: consolidar por id (detectar duplicados)
+    # consolidar por id
     recursos: Dict[str, Any] = {}
     duplicados: Dict[str, List[str]] = {}
 
@@ -415,7 +428,6 @@ def auditar() -> Dict[str, Any]:
         ruta = entrada.get("ruta")
 
         if clave in recursos:
-            # colisión de id
             prev = recursos[clave]
             duplicados.setdefault(clave, [prev.get("ruta")]).append(ruta)
             problemas.append(
@@ -428,7 +440,7 @@ def auditar() -> Dict[str, Any]:
         else:
             recursos[clave] = entrada
 
-    # Fase 3: contadores desde el estado FINAL
+    # contadores desde estado FINAL
     n_recursos = len(recursos)
     n_auditados = 0
     n_sin_declarar = 0
@@ -461,7 +473,6 @@ def auditar() -> Dict[str, Any]:
             n_id_ausente += 1
         elif estado == ID_DUPLICADO:
             n_id_duplicado += 1
-            # un duplicado puede haber sido auditado antes de la colisión
             if e.get("auditado"):
                 n_auditados += 1
 
@@ -478,7 +489,6 @@ def auditar() -> Dict[str, Any]:
         "ok": not problemas,
         "coherente": not problemas,
 
-        # recursos (estado final)
         "n_recursos": n_recursos,
         "n_auditados": n_auditados,
         "n_sin_declarar": n_sin_declarar,
@@ -489,19 +499,17 @@ def auditar() -> Dict[str, Any]:
         "n_id_ausente": n_id_ausente,
         "n_id_duplicado": n_id_duplicado,
 
-        # capacidades
         "capacidades_declaradas": n_declaradas,
         "capacidades_ok": n_ok,
         "capacidades_fallidas": n_fallidas,
         "fraccion_capacidades": _fraccion(n_ok, n_declaradas),
         "distribucion_estados": dict(dist_cap),
 
-        # procedencia
         "n_ya_cargado": n_ya_cargado,
         "n_cargado_aqui": n_cargado_aqui,
+        "n_auto_referencia": n_auto_referencia,
         "cargados_por_auditor": list(cargados_aqui),
 
-        # colisiones
         "n_ids_duplicados": len(duplicados),
         "ids_duplicados": {k: sorted(v) for k, v in sorted(duplicados.items())},
 
@@ -513,7 +521,8 @@ def auditar() -> Dict[str, Any]:
         "nota": (
             "'ok' es ESTRUCTURAL: declarado + existe + callable. "
             "No significa que la capacidad funcione. "
-            "Contadores = estado final. No se elimina evidencia."
+            "Contadores = estado final. Incluye auto-referencia. "
+            "No se elimina evidencia."
         ),
     }
 
@@ -584,6 +593,7 @@ def resumen() -> Dict[str, Any]:
 
         "n_ya_cargado": r["n_ya_cargado"],
         "n_cargado_aqui": r["n_cargado_aqui"],
+        "n_auto_referencia": r["n_auto_referencia"],
         "cargados_por_auditor": r["cargados_por_auditor"],
 
         "n_ids_duplicados": r["n_ids_duplicados"],
@@ -669,7 +679,8 @@ def tabla() -> str:
     lineas.append(
         f"AUDITADOS: {r['n_auditados']}  |  "
         f"PROCEDENCIA: {r['n_ya_cargado']} ya_cargado + "
-        f"{r['n_cargado_aqui']} cargado_aqui"
+        f"{r['n_cargado_aqui']} cargado_aqui + "
+        f"{r['n_auto_referencia']} auto_referencia"
     )
     lineas.append("ok estructural: declarado + existe + callable")
 
@@ -725,6 +736,7 @@ __all__ = [
     "NO_CARGABLE",
     "YA_CARGADO",
     "CARGADO_AQUI",
+    "AUTO_REFERENCIA",
 ]
 
 # ===============================================================

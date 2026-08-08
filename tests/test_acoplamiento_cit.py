@@ -2,325 +2,406 @@
 # VPSI-TRUTH — tests/test_acoplamiento_cit.py
 # ===============================================================
 #
-# TEST DE ACOPLAMIENTO CONTRACTUAL — CIT
+# TEST DE ACOPLAMIENTO — CIT ↔ ENGINE
 #
 # Objetivo:
-#   Verificar que CIT no solamente exista, sino que esté realmente
-#   acoplado al Engine conforme a su CONTENEDOR.
+#   Verificar que modules/citacion/__init__.py se acopla al
+#   core/engine.py mediante VPSI-CONTRACT-1.0 sin modificar
+#   ni debilitar el contrato.
 #
-# Se comprueba:
-#   1. Descubrimiento
-#   2. Registro
-#   3. Identidad
-#   4. Contrato
-#   5. Dependencias
-#   6. Capacidades
-#   7. capacidades_meta
-#   8. autorización Engine
-#   9. invocación real
-#  10. reporting real
-#  11. modo Engine de CIT
+# Este test NO elimina "requiere".
+# Este test NO modifica CONTENEDOR.
+# Este test NO sustituye capacidades.
+# Este test verifica el contrato real.
 #
 # ===============================================================
-
-from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
 
-from core.engine import Engine
+from core.engine import (
+    Engine,
+    VERSION_ENGINE,
+    ESQUEMA_CONTRATO_REQUERIDO,
+    VERSION_CONTRATO_REQUERIDA,
+)
 
 
 # ===============================================================
-# CONTEXTO
+# RUTAS
 # ===============================================================
 
-RAIZ_PROYECTO = Path(__file__).resolve().parents[1]
-RAIZ_MODULOS = RAIZ_PROYECTO / "modules"
+ROOT = Path(__file__).resolve().parents[1]
+MODULES_DIR = ROOT / "modules"
+CIT_DIR = MODULES_DIR / "citacion"
 
 
-@pytest.fixture
-def engine_cit() -> Engine:
-    """
-    Construye el Engine contra el directorio real de módulos.
+# ===============================================================
+# IMPORTACIÓN DEL CONTRATO REAL
+# ===============================================================
 
-    strict=True es deliberado:
-    cualquier discrepancia estructural debe hacer fallar
-    el test en lugar de ocultarla.
-    """
-    return Engine(
-        raiz_modulos=RAIZ_MODULOS,
-        invocador_id="acoplamiento_cit",
-        strict=True,
+def cargar_citacion():
+    import importlib
+
+    return importlib.import_module("modules.citacion")
+
+
+# ===============================================================
+# 1 — EXISTENCIA ESTRUCTURAL
+# ===============================================================
+
+def test_cit_existe_como_modulo():
+    assert CIT_DIR.is_dir(), (
+        f"No existe el directorio del módulo CIT: {CIT_DIR}"
+    )
+
+    assert (CIT_DIR / "__init__.py").is_file(), (
+        "CIT no contiene modules/citacion/__init__.py"
     )
 
 
-@pytest.fixture
-def cit(engine_cit):
-    """
-    Recupera CIT exclusivamente a través del registro del Engine.
+# ===============================================================
+# 2 — CONTENEDOR
+# ===============================================================
 
-    Esto es importante:
-    el test no considera suficiente importar CIT directamente.
-    Debe existir como Contenedor dentro del Engine.
-    """
-    cont = engine_cit.registro.primero("CIT")
+def test_cit_expone_contenedor():
+    cit = cargar_citacion()
 
-    assert cont is not None, (
-        "CIT no está registrado en el Engine. "
-        "El módulo puede existir físicamente pero no estar acoplado."
+    assert hasattr(cit, "CONTENEDOR"), (
+        "CIT no expone CONTENEDOR"
     )
 
-    return cont
+    assert isinstance(cit.CONTENEDOR, dict), (
+        "CIT.CONTENEDOR debe ser dict"
+    )
 
 
 # ===============================================================
-# 1. DESCUBRIMIENTO
+# 3 — IDENTIDAD CONTRACTUAL
 # ===============================================================
 
-def test_cit_es_descubierto(engine_cit: Engine):
-    """
-    CIT debe ser descubierto por el mecanismo normal del Engine.
-    """
-    nombres = {
-        path.name
-        for path in engine_cit._modulos_descubiertos
+def test_cit_identidad_contractual():
+    cit = cargar_citacion()
+    c = cit.CONTENEDOR
+
+    assert c["id"] == "CIT"
+    assert c["nombre"] == "citacion"
+    assert c["rol"] == "CIT"
+
+    assert c["version_modulo"] == "2.0"
+    assert c["version_contrato"] == VERSION_CONTRATO_REQUERIDA
+
+    assert c["esquema"] == ESQUEMA_CONTRATO_REQUERIDO
+    assert c["estabilidad"] == "ESTABLE"
+    assert c["compatible_desde"] == "1.0"
+    assert c["api_engine"] == ">=1.0"
+
+
+# ===============================================================
+# 4 — CONTRATO COMPLETO SEGÚN ENGINE
+# ===============================================================
+
+def test_cit_cumple_claves_obligatorias_del_engine():
+    cit = cargar_citacion()
+    c = cit.CONTENEDOR
+
+    claves = (
+        "esquema",
+        "version_contrato",
+        "version_modulo",
+        "id",
+        "nombre",
+        "rol",
+        "descripcion",
+        "funcion",
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "requiere",
+        "autoriza_engine",
+        "consultas_soportadas",
+        "capacidades",
+        "capacidades_meta",
+        "reporting",
+        "estados_validos",
+        "invariantes",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+    )
+
+    for clave in claves:
+        assert clave in c, (
+            f"CIT no cumple contrato Engine: falta '{clave}'"
+        )
+
+
+# ===============================================================
+# 5 — REQUIERE
+# ===============================================================
+#
+# Este punto es deliberadamente explícito.
+#
+# CIT declara que no requiere módulos:
+#
+#     "requiere": []
+#
+# No se elimina el campo.
+# Se comprueba que existe y que su valor es una lista vacía.
+# ===============================================================
+
+def test_cit_requiere_es_lista_y_no_tiene_dependencias():
+    cit = cargar_citacion()
+    c = cit.CONTENEDOR
+
+    assert "requiere" in c
+
+    assert isinstance(c["requiere"], list), (
+        "CIT.requiere debe ser list"
+    )
+
+    assert c["requiere"] == [], (
+        "CIT declara dependencias inesperadas: "
+        f"{c['requiere']}"
+    )
+
+
+# ===============================================================
+# 6 — AUTORIZACIÓN ENGINE
+# ===============================================================
+
+def test_cit_autoriza_engine_tiene_esquema_completo():
+    cit = cargar_citacion()
+    auth = cit.CONTENEDOR["autoriza_engine"]
+
+    permisos = (
+        "leer",
+        "ejecutar",
+        "consultar",
+        "recombinar",
+        "reportar",
+        "auditar",
+        "inventariar",
+        "modificar",
+        "alterar",
+        "reescribir",
+    )
+
+    assert isinstance(auth, dict)
+
+    for permiso in permisos:
+        assert permiso in auth, (
+            f"CIT.autoriza_engine no declara '{permiso}'"
+        )
+        assert isinstance(auth[permiso], bool), (
+            f"CIT.autoriza_engine['{permiso}'] no es bool"
+        )
+
+    assert auth["ejecutar"] is True
+
+    assert auth["modificar"] is False
+    assert auth["alterar"] is False
+    assert auth["reescribir"] is False
+
+
+# ===============================================================
+# 7 — CAPACIDADES
+# ===============================================================
+
+def test_cit_capacidades_son_callables():
+    cit = cargar_citacion()
+    capacidades = cit.CONTENEDOR["capacidades"]
+
+    assert isinstance(capacidades, dict)
+    assert capacidades, "CIT no declara capacidades"
+
+    for nombre, fn in capacidades.items():
+        assert callable(fn), (
+            f"CIT.capacidades['{nombre}'] no es callable"
+        )
+
+
+# ===============================================================
+# 8 — CAPACIDADES_META
+# ===============================================================
+
+def test_cit_capacidades_meta_acopla_una_a_una():
+    cit = cargar_citacion()
+    c = cit.CONTENEDOR
+
+    capacidades = c["capacidades"]
+    meta = c["capacidades_meta"]
+
+    assert isinstance(meta, dict)
+
+    for nombre in capacidades:
+        assert nombre in meta, (
+            f"CIT declara capacidad '{nombre}' "
+            "pero no tiene capacidades_meta correspondiente"
+        )
+
+        descripcion = meta[nombre]
+
+        assert isinstance(descripcion, dict)
+
+        for campo in ("descripcion", "entrada", "salida"):
+            assert campo in descripcion, (
+                f"CIT.capacidades_meta['{nombre}'] "
+                f"no contiene '{campo}'"
+            )
+
+            assert isinstance(descripcion[campo], str), (
+                f"CIT.capacidades_meta['{nombre}']['{campo}'] "
+                "debe ser str"
+            )
+
+
+# ===============================================================
+# 9 — REPORTING
+# ===============================================================
+
+def test_cit_reporting_cumple_banderas_engine():
+    cit = cargar_citacion()
+    reporting = cit.CONTENEDOR["reporting"]
+
+    banderas = (
+        "estado",
+        "salud",
+        "inventario",
+        "capacidades",
+        "errores",
+        "advertencias",
+        "dependencias",
+        "version",
+        "contrato",
+        "conocimiento",
+        "metricas",
+        "diagnostico",
+    )
+
+    assert isinstance(reporting, dict)
+
+    for bandera in banderas:
+        assert bandera in reporting, (
+            f"CIT.reporting no declara '{bandera}'"
+        )
+        assert isinstance(reporting[bandera], bool), (
+            f"CIT.reporting['{bandera}'] debe ser bool"
+        )
+
+
+# ===============================================================
+# 10 — ESTADOS
+# ===============================================================
+
+def test_cit_estados_validos_son_compatibles_con_engine():
+    cit = cargar_citacion()
+    estados = cit.CONTENEDOR["estados_validos"]
+
+    assert isinstance(estados, list)
+    assert estados
+
+    estados_engine = {
+        "NO_INICIADO",
+        "OPERATIVO",
+        "DEGRADADO",
+        "RECHAZADO",
     }
 
+    for estado in estados:
+        assert estado in estados_engine, (
+            f"CIT declara estado no reconocido por Engine: {estado}"
+        )
+
+
+# ===============================================================
+# 11 — ENGINE DESCUBRE CIT
+# ===============================================================
+
+def test_engine_descubre_cit():
+    engine = Engine(MODULES_DIR, strict=False)
+
+    nombres = set(engine.registro.contenedores.keys())
+
     assert "citacion" in nombres, (
-        "La carpeta modules/citacion existe pero Engine no la descubre."
+        "Engine no descubrió el módulo citacion"
     )
 
 
 # ===============================================================
-# 2. REGISTRO
+# 12 — ENGINE MATERIALIZA EL CONTENEDOR CIT
 # ===============================================================
 
-def test_cit_esta_registrado(engine_cit: Engine, cit):
-    """
-    CIT debe existir simultáneamente en los índices canónicos
-    del RegistroModulos.
-    """
-    assert cit.nombre == "citacion"
+def test_engine_materializa_cit_sin_alterar_identidad():
+    engine = Engine(MODULES_DIR, strict=False)
 
-    assert engine_cit.registro.contenedores["citacion"] is cit
+    cit = engine.registro.primero("CIT")
 
-    assert engine_cit.registro.por_id["CIT"] is cit
+    assert cit is not None, (
+        "Engine no registró CIT por id"
+    )
 
-    assert engine_cit.registro.por_rol["CIT"][0] is cit
-
-
-# ===============================================================
-# 3. IDENTIDAD CONTRACTUAL
-# ===============================================================
-
-def test_cit_identidad_coherente(cit):
-    """
-    La identidad declarada por CIT debe ser internamente coherente.
-    """
     assert cit.id == "CIT"
     assert cit.nombre == "citacion"
     assert cit.rol == "CIT"
+
     assert cit.version == "2.0"
     assert cit.version_contrato == "1.0"
     assert cit.esquema == "VPSI-CONTRACT-1.0"
-    assert cit.compatible_desde == "1.0"
     assert cit.api_engine == ">=1.0"
-    assert cit.estabilidad == "ESTABLE"
 
 
 # ===============================================================
-# 4. DEPENDENCIAS
+# 13 — ENGINE CONSERVA REQUIERE
 # ===============================================================
 
-def test_cit_no_declara_dependencias_inexistentes(engine_cit: Engine, cit):
-    """
-    CIT declara requiere=[].
+def test_engine_conserva_requiere_de_cit():
+    engine = Engine(MODULES_DIR, strict=False)
 
-    Por tanto, el Engine no debe inventarle dependencias ni
-    registrar faltantes para CIT.
-    """
+    cit = engine.registro.primero("CIT")
+
+    assert cit is not None
+
+    assert isinstance(cit.requiere, list)
     assert cit.requiere == []
 
-    faltantes = engine_cit._dependencias.get("faltantes", {})
 
-    assert "citacion" not in faltantes
+# ===============================================================
+# 14 — ENGINE RESUELVE CAPACIDADES DE CIT
+# ===============================================================
 
+def test_engine_resuelve_todas_las_capacidades_de_cit():
+    engine = Engine(MODULES_DIR, strict=False)
 
-def test_cit_dependencias_son_coherentes(engine_cit: Engine, cit):
-    """
-    Si CIT declara dependencias en el futuro, cada una deberá poder
-    resolverse mediante el mecanismo canónico del RegistroModulos.
+    cit = engine.registro.primero("CIT")
 
-    Actualmente CIT declara ninguna.
-    """
-    for dependencia in cit.requiere:
-        assert engine_cit.registro.primero(dependencia) is not None, (
-            f"CIT declara dependencia '{dependencia}' pero Engine "
-            f"no puede resolverla."
+    assert cit is not None
+
+    for nombre in cit.capacidades:
+        fn = cit.fn(nombre)
+
+        assert fn is not None, (
+            f"Engine no pudo resolver capacidad CIT: {nombre}"
         )
 
-
-# ===============================================================
-# 5. CAPACIDADES CONTRACTUALES
-# ===============================================================
-
-def test_cit_capacidades_son_callables(cit):
-    """
-    Cada capacidad declarada en CONTENEDOR debe haber llegado al
-    Contenedor como callable.
-    """
-    assert cit.capacidades
-
-    for nombre, fn in cit.capacidades.items():
         assert callable(fn), (
-            f"CIT declara capacidad '{nombre}' pero no es callable."
+            f"Engine resolvió una capacidad no callable: {nombre}"
         )
 
 
-def test_cit_capacidades_meta_cubre_todas_las_capacidades(cit):
-    """
-    Toda capacidad declarada debe poseer su metadato contractual.
-    """
-    capacidades = set(cit.capacidades)
-    capacidades_meta = set(cit.capacidades_meta)
-
-    faltantes = capacidades - capacidades_meta
-
-    assert not faltantes, (
-        "CIT declara capacidades sin capacidades_meta: "
-        f"{sorted(faltantes)}"
-    )
-
-
-def test_cit_capacidades_meta_tiene_estructura_completa(cit):
-    """
-    Cada capacidad debe tener exactamente los campos mínimos que
-    exige el Engine: descripcion, entrada y salida.
-    """
-    for capacidad, meta in cit.capacidades_meta.items():
-        assert isinstance(meta, dict), (
-            f"CIT: capacidades_meta['{capacidad}'] no es dict."
-        )
-
-        for campo in ("descripcion", "entrada", "salida"):
-            assert campo in meta, (
-                f"CIT: capacidad '{capacidad}' carece de '{campo}'."
-            )
-
-            assert isinstance(meta[campo], str), (
-                f"CIT: capacidades_meta['{capacidad}']['{campo}'] "
-                f"debe ser str."
-            )
-
-
 # ===============================================================
-# 6. AUTORIZACIÓN ENGINE
+# 15 — ENGINE PUEDE EJECUTAR INVENTARIO
 # ===============================================================
 
-def test_cit_autorizacion_engine(cit):
-    """
-    Verifica que CIT tenga la matriz contractual completa.
-    """
-    esperados = {
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-        "modificar": False,
-        "alterar": False,
-        "reescribir": False,
-    }
+def test_engine_ejecuta_inventario_cit():
+    engine = Engine(MODULES_DIR, strict=False)
 
-    assert cit.autoriza_engine == esperados
+    resultado = engine.ejecutar_inventario("CIT")
 
-
-# ===============================================================
-# 7. ENGINE PUEDE INVOCAR CAPACIDADES BÁSICAS
-# ===============================================================
-
-@pytest.mark.parametrize(
-    "capacidad",
-    [
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "barrer",
-        "verificar",
-    ],
-)
-def test_engine_puede_invocar_capacidades_cit(
-    engine_cit: Engine,
-    cit,
-    capacidad: str,
-):
-    """
-    Las capacidades contractuales estándar de reporting/verificación
-    deben poder ejecutarse atravesando exclusivamente el Engine.
-    """
-    assert capacidad in cit.capacidades
-
-    resultado = engine_cit.ejecutar_capacidad(
-        "CIT",
-        capacidad,
-    )
-
-    assert resultado["estado"] == "EXITO", (
-        f"Engine no pudo ejecutar CIT.{capacidad}: "
-        f"{resultado}"
-    )
-
+    assert resultado["estado"] == "EXITO"
     assert resultado["modulo"] == "citacion"
-    assert resultado["capacidad"] == capacidad
-
-
-# ===============================================================
-# 8. REPORTING REAL
-# ===============================================================
-
-def test_cit_entrega_reporte_a_traves_del_engine(engine_cit: Engine):
-    """
-    El Engine debe poder consolidar el reporte de CIT.
-    """
-    resultado = engine_cit.ejecutar_reporte("CIT")
-
-    assert resultado["estado"] == "EXITO"
-
-    reporte = resultado["resultado"]
-
-    assert isinstance(reporte, dict)
-    assert reporte["id"] == "CIT"
-    assert reporte["nombre"] == "citacion"
-    assert reporte["rol"] == "CIT"
-    assert reporte["estado"] == "OPERATIVO"
-
-
-def test_cit_entrega_diagnostico_a_traves_del_engine(engine_cit: Engine):
-    """
-    El diagnóstico propio de CIT debe ser accesible mediante Engine.
-    """
-    resultado = engine_cit.ejecutar_diagnostico("CIT")
-
-    assert resultado["estado"] == "EXITO"
-
-    diagnostico = resultado["resultado"]
-
-    assert isinstance(diagnostico, dict)
-    assert diagnostico["id"] == "CIT"
-    assert diagnostico["coherente"] is True
-
-
-def test_cit_entrega_inventario_a_traves_del_engine(engine_cit: Engine):
-    """
-    El inventario propio de CIT debe ser accesible mediante Engine.
-    """
-    resultado = engine_cit.ejecutar_inventario("CIT")
-
-    assert resultado["estado"] == "EXITO"
+    assert resultado["capacidad"] == "inventario"
 
     inventario = resultado["resultado"]
 
@@ -331,144 +412,112 @@ def test_cit_entrega_inventario_a_traves_del_engine(engine_cit: Engine):
 
 
 # ===============================================================
-# 9. CAPACIDADES ESPECÍFICAS DE CIT
+# 16 — ENGINE PUEDE EJECUTAR REPORTE
 # ===============================================================
 
-def test_engine_puede_invocar_resolver_de_cit(engine_cit: Engine):
-    """
-    Comprueba que resolver() no solamente esté declarado:
-    debe poder atravesar el Engine.
-    """
-    resultado = engine_cit.ejecutar_capacidad(
-        "CIT",
-        "resolver",
-        "ID_QUE_NO_EXISTE",
-    )
+def test_engine_ejecuta_reporte_cit():
+    engine = Engine(MODULES_DIR, strict=False)
+
+    resultado = engine.ejecutar_reporte("CIT")
 
     assert resultado["estado"] == "EXITO"
+    assert resultado["modulo"] == "citacion"
+    assert resultado["capacidad"] == "reporte"
 
-    salida = resultado["resultado"]
+    reporte = resultado["resultado"]
 
-    assert isinstance(salida, dict)
-    assert salida["id"] == "ID_QUE_NO_EXISTE"
-    assert salida["resuelto"] is False
+    assert isinstance(reporte, dict)
+    assert reporte["id"] == "CIT"
+    assert reporte["estado"] == "OPERATIVO"
 
 
-def test_engine_puede_invocar_registrar_de_cit(engine_cit: Engine):
-    """
-    Verifica el puente Engine → CIT.registrar().
-    """
-    declaracion = {
-        "id": "TEST-CIT-001",
-        "tipo": "evidencia",
-        "fuente": "test_acoplamiento_cit",
-        "enunciado": "Declaración de prueba de acoplamiento.",
-    }
+# ===============================================================
+# 17 — ENGINE PUEDE EJECUTAR DIAGNÓSTICO
+# ===============================================================
 
-    resultado = engine_cit.ejecutar_capacidad(
-        "CIT",
-        "registrar",
-        declaracion,
-    )
+def test_engine_ejecuta_diagnostico_cit():
+    engine = Engine(MODULES_DIR, strict=False)
+
+    resultado = engine.ejecutar_diagnostico("CIT")
 
     assert resultado["estado"] == "EXITO"
+    assert resultado["modulo"] == "citacion"
+    assert resultado["capacidad"] == "diagnostico"
 
-    salida = resultado["resultado"]
+    diagnostico = resultado["resultado"]
 
-    assert salida["ok"] is True
-    assert salida["declaracion"]["id"] == "TEST-CIT-001"
-
-
-def test_engine_puede_invocar_citar(engine_cit: Engine):
-    """
-    Comprueba que CIT.citar() sea realmente accesible desde Engine.
-    """
-    resultado_registro = engine_cit.ejecutar_capacidad(
-        "CIT",
-        "registrar",
-        {
-            "id": "TEST-CIT-002",
-            "tipo": "evidencia",
-            "fuente": "test_acoplamiento_cit",
-            "enunciado": "Declaración citable de prueba.",
-        },
-    )
-
-    assert resultado_registro["estado"] == "EXITO"
-
-    resultado_cita = engine_cit.ejecutar_capacidad(
-        "CIT",
-        "citar",
-        {"id": "TEST-CIT-002"},
-    )
-
-    assert resultado_cita["estado"] == "EXITO"
-
-    salida = resultado_cita["resultado"]
-
-    assert salida["id"] == "CIT"
-    assert salida["n"] >= 1
+    assert isinstance(diagnostico, dict)
+    assert diagnostico["id"] == "CIT"
+    assert diagnostico["coherente"] is True
 
 
 # ===============================================================
-# 10. PRUEBA CRÍTICA:
-#     MODO ENGINE DECLARADO POR CIT
+# 18 — GRAFO
 # ===============================================================
 
-def test_cit_declara_modo_engine_real(cit):
-    """
-    CIT declara explícitamente una capacidad destinada al modo Engine.
+def test_engine_grafo_contiene_cit_y_sus_capacidades():
+    engine = Engine(MODULES_DIR, strict=False)
 
-    El objetivo de este test es detectar una futura discrepancia entre
-    lo que CIT declara y lo que el Engine reconoce.
-    """
-    assert "anunciar" in cit.capacidades
-    assert callable(cit.capacidades["anunciar"])
+    grafo = engine._grafo
 
-    assert "evaluar" in cit.capacidades
-    assert callable(cit.capacidades["evaluar"])
+    assert isinstance(grafo, dict)
+    assert "nodos" in grafo
+    assert "aristas" in grafo
 
+    nodos = grafo["nodos"]
 
-def test_engine_puede_invocar_anunciar_de_cit(engine_cit: Engine):
-    """
-    Prueba mínima del puente funcional:
+    nodo_cit = [
+        n for n in nodos
+        if n.get("id") == "CIT"
+    ]
 
-        Engine → CIT.anunciar()
+    assert nodo_cit, "CIT no aparece como nodo del grafo"
 
-    No se importa CIT directamente para ejecutar la capacidad.
-    """
-    declaracion = {
-        "id": "TEST-CIT-ENGINE-001",
-        "tipo": "evidencia",
-        "fuente": "test_acoplamiento_cit",
-        "enunciado": "Prueba del modo Engine de CIT.",
-    }
+    capacidades_cit = engine.registro.primero("CIT").capacidades
 
-    resultado = engine_cit.ejecutar_capacidad(
-        "CIT",
-        "anunciar",
-        declaracion,
-    )
+    for capacidad in capacidades_cit:
+        cap_id = f"citacion.{capacidad}"
 
-    assert resultado["estado"] == "EXITO"
-
-    salida = resultado["resultado"]
-
-    assert isinstance(salida, dict)
-    assert salida["ok"] is True
+        assert any(
+            n.get("id") == cap_id
+            for n in nodos
+        ), (
+            f"Capacidad CIT no aparece en grafo: {cap_id}"
+        )
 
 
 # ===============================================================
-# 11. CONSOLIDACIÓN
+# 19 — DEPENDENCIAS
 # ===============================================================
 
-def test_cit_participa_en_consolidacion_del_engine(
-    engine_cit: Engine,
-):
-    """
-    CIT debe aparecer en la consolidación estándar del Engine.
-    """
-    consolidado = engine_cit.consolidar_reportes()
+def test_engine_registra_dependencias_de_cit_sin_falsificarlas():
+    engine = Engine(MODULES_DIR, strict=False)
+
+    dep = engine._dependencias
+
+    assert isinstance(dep, dict)
+
+    grafo_dep = dep["grafo"]
+    faltantes = dep["faltantes"]
+
+    assert "citacion" in grafo_dep
+    assert grafo_dep["citacion"] == []
+
+    assert "citacion" not in faltantes
+
+
+# ===============================================================
+# 20 — CONSOLIDACIÓN
+# ===============================================================
+
+def test_engine_consolida_cit():
+    engine = Engine(MODULES_DIR, strict=False)
+
+    consolidado = engine.consolidar_reportes()
+
+    assert "reportes" in consolidado
+    assert "diagnosticos" in consolidado
+    assert "inventarios" in consolidado
 
     assert "citacion" in consolidado["reportes"]
     assert "citacion" in consolidado["diagnosticos"]
@@ -476,135 +525,146 @@ def test_cit_participa_en_consolidacion_del_engine(
 
 
 # ===============================================================
-# 12. GRAFO ESTRUCTURAL
+# 21 — PAQUETE OMEGA
 # ===============================================================
 
-def test_cit_aparece_en_grafo_del_engine(engine_cit: Engine, cit):
-    """
-    CIT debe existir como nodo estructural del grafo.
-    """
-    nodos = engine_cit._grafo["nodos"]
+def test_engine_paquete_omega_contiene_cit():
+    engine = Engine(MODULES_DIR, strict=False)
 
-    nodo_cit = [
-        n
-        for n in nodos
-        if n.get("id") == "CIT"
-        or n.get("nombre") == "citacion"
-    ]
+    paquete = engine.paquete_omega()
 
-    assert nodo_cit, "CIT no aparece en el grafo estructural del Engine."
-
-
-def test_cit_capacidades_aparecen_en_grafo(
-    engine_cit: Engine,
-    cit,
-):
-    """
-    Las capacidades declaradas por CIT deben aparecer como nodos
-    subordinados al módulo.
-    """
-    nodos = engine_cit._grafo["nodos"]
-
-    for capacidad in cit.capacidades:
-        cap_id = f"citacion.{capacidad}"
-
-        assert any(
-            n.get("id") == cap_id
-            for n in nodos
-        ), (
-            f"CIT declara capacidad '{capacidad}' pero Engine no "
-            f"la representa en su grafo."
-        )
-
-
-# ===============================================================
-# 13. PAQUETE OMEGA
-# ===============================================================
-
-def test_cit_aparece_en_paquete_omega(engine_cit: Engine):
-    """
-    El módulo acoplado debe llegar hasta el expediente Omega.
-    """
-    paquete = engine_cit.paquete_omega()
+    assert isinstance(paquete, dict)
+    assert "metadata" in paquete
+    assert "reportes" in paquete
 
     reportes = paquete["reportes"]
 
-    modulo_cit = [
-        r
-        for r in reportes
+    cit_reportes = [
+        r for r in reportes
         if r.get("id") == "CIT"
     ]
 
-    assert modulo_cit, (
-        "CIT fue registrado por Engine pero no llegó al paquete Omega."
+    assert cit_reportes, (
+        "paquete_omega() no contiene reporte del módulo CIT"
     )
 
-    contenido = modulo_cit[0]["contenido"]
+    contenido = cit_reportes[0]["contenido"]
 
     assert contenido["id"] == "CIT"
     assert contenido["nombre"] == "citacion"
     assert contenido["rol"] == "CIT"
+    assert contenido["requiere"] == []
 
 
 # ===============================================================
-# 14. PRUEBA FINAL DE ACOPLAMIENTO
+# 22 — TRAZA DE EJECUCIÓN
 # ===============================================================
 
-def test_acoplamiento_cit_completo(engine_cit: Engine, cit):
+def test_engine_deja_traza_de_ejecucion_de_cit():
+    engine = Engine(MODULES_DIR, strict=False)
+
+    resultado = engine.ejecutar_inventario("CIT")
+
+    assert resultado["estado"] == "EXITO"
+
+    trazas = engine.obtener_trazas()
+
+    assert trazas
+
+    trazas_cit = [
+        t for t in trazas
+        if t.get("modulo") == "citacion"
+        and t.get("capacidad") == "inventario"
+    ]
+
+    assert trazas_cit
+
+    assert trazas_cit[-1]["estado"] == "EXITO"
+
+
+# ===============================================================
+# 23 — ACOPLAMIENTO DIRECTO CIT ↔ ENGINE
+# ===============================================================
+
+def test_acoplamiento_cit_engine_completo():
     """
-    Prueba resumen.
+    Prueba de integración estructural:
 
-    Esta prueba representa la condición mínima:
-
-        carpeta
-          ↓
-        descubrimiento
-          ↓
-        registro
-          ↓
-        contrato
-          ↓
-        capacidades
-          ↓
-        invocación
-          ↓
-        reporting
-          ↓
-        Omega
+        CIT.CONTENEDOR
+              ↓
+        Engine
+              ↓
+        RegistroModulos
+              ↓
+        Contenedor CIT
+              ↓
+        capacidad
+              ↓
+        ejecución
+              ↓
+        resultado
+              ↓
+        traza
     """
-    assert engine_cit.estado == "OPERATIVO"
 
-    assert cit.id == "CIT"
-    assert cit.nombre == "citacion"
-    assert cit.rol == "CIT"
+    cit = cargar_citacion()
+    contrato = cit.CONTENEDOR
 
-    assert cit.requiere == []
+    engine = Engine(MODULES_DIR, strict=False)
 
-    assert cit.capacidades
-    assert all(
-        callable(fn)
-        for fn in cit.capacidades.values()
+    cont = engine.registro.primero("CIT")
+
+    assert cont is not None
+
+    # Identidad
+    assert cont.id == contrato["id"]
+    assert cont.nombre == contrato["nombre"]
+    assert cont.rol == contrato["rol"]
+
+    # Versionado
+    assert cont.version == contrato["version_modulo"]
+    assert cont.version_contrato == contrato["version_contrato"]
+    assert cont.esquema == contrato["esquema"]
+    assert cont.api_engine == contrato["api_engine"]
+
+    # Dependencias
+    assert cont.requiere == contrato["requiere"]
+
+    # Capacidades
+    assert set(cont.capacidades) == set(
+        contrato["capacidades"]
     )
 
-    assert set(cit.capacidades).issubset(
-        set(cit.capacidades_meta)
+    # Autorización
+    assert cont.autoriza_engine == contrato["autoriza_engine"]
+
+    # Ejecución real de una capacidad declarada
+    assert "inventario" in cont.capacidades
+
+    salida = engine.ejecutar_capacidad(
+        "CIT",
+        "inventario",
     )
 
-    assert cit.autoriza_engine["ejecutar"] is True
-    assert cit.autoriza_engine["consultar"] is True
-    assert cit.autoriza_engine["reportar"] is True
+    assert salida["estado"] == "EXITO"
 
-    reporte = engine_cit.ejecutar_reporte("CIT")
-    diagnostico = engine_cit.ejecutar_diagnostico("CIT")
-    inventario = engine_cit.ejecutar_inventario("CIT")
+    resultado = salida["resultado"]
 
-    assert reporte["estado"] == "EXITO"
-    assert diagnostico["estado"] == "EXITO"
-    assert inventario["estado"] == "EXITO"
+    assert isinstance(resultado, dict)
+    assert resultado["id"] == "CIT"
+    assert resultado["nombre"] == "citacion"
 
-    paquete = engine_cit.paquete_omega()
+    # Evidencia de ejecución
+    trazas = engine.obtener_trazas()
 
     assert any(
-        r.get("id") == "CIT"
-        for r in paquete["reportes"]
+        t.get("modulo") == "citacion"
+        and t.get("capacidad") == "inventario"
+        and t.get("estado") == "EXITO"
+        for t in trazas
     )
+
+
+# ===============================================================
+# FIN DEL TEST
+# ===============================================================

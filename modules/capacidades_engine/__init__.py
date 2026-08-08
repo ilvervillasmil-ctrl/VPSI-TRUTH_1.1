@@ -428,21 +428,27 @@ def verificar_salida(salida: Any) -> bool:
         return False
     return "id" in salida or "coherente" in salida or "ids" in salida
 
-
 # ===============================================================
 # SECCIÓN 6 — CONTENEDOR (contrato exclusivo de Engine)
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": _ESQUEMA,
     "version_contrato": _VERSION_CONTRATO,
     "version_modulo": _VERSION,
-    "id": _ID,
-    "nombre": _NOMBRE,
-    "rol": _ROL,
     "estabilidad": _ESTABILIDAD,
     "compatible_desde": _COMPATIBLE_DESDE,
     "api_engine": _API_ENGINE,
+
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
+    "id": _ID,
+    "nombre": _NOMBRE,
+    "rol": _ROL,
     "descripcion": (
         "Capacidad estructural del Engine: órgano único que agrupa "
         "múltiples skills nativos. Así como un brazo posee varias "
@@ -453,6 +459,10 @@ CONTENEDOR: Dict[str, Any] = {
         "los skills forman parte de su propia estructura. "
         "CE mantiene el inventario operativo de esas capacidades nativas."
     ),
+
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
     "funcion": (
         "Mantener el inventario operativo de skills nativos del Engine. "
         "El descubrimiento automático de *.py actualiza ese inventario. "
@@ -470,12 +480,20 @@ CONTENEDOR: Dict[str, Any] = {
         "No orquesta el sistema",
         "No compite con módulos de dominio (AX, CA, CH, TT, SF, …)",
     ],
+
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
     "autoridad": [
         "Mantener el inventario operativo de skills nativos del Engine",
         "Descubrir y validar forma mínima de cada skill",
         "Exponer ids y skills a Engine",
         "Reportar estado e inventario propios",
     ],
+
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
     "conocimiento_exportable": [
         "skills",
         "ids",
@@ -485,8 +503,17 @@ CONTENEDOR: Dict[str, Any] = {
         "barrer",
         "verificar",
     ],
+
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
     "requiere": [],
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # ============================================================
     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -494,10 +521,52 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
         "alterar": False,
         "reescribir": False,
+        "crear": False,
+        "eliminar": False,
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": False,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
+
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
     "consultas_soportadas": [
         "listar_skills",
         "listar_ids",
@@ -506,6 +575,10 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_inventario",
         "verificar_coherencia",
     ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
     "capacidades": {
         "verificar": verificar,
         "barrer": barrer,
@@ -516,6 +589,10 @@ CONTENEDOR: Dict[str, Any] = {
         "listar_archivos": listar_archivos,
         "verificar_salida": verificar_salida,
     },
+
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": (
@@ -578,6 +655,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
         },
     },
+
+    # ============================================================
+    # REPORTING
+    # ============================================================
     "reporting": {
         "estado": True,
         "salud": True,
@@ -593,12 +674,20 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
         "reporte": True,
     },
+
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
     "estados_validos": [
         "NO_INICIADO",
         "OPERATIVO",
         "DEGRADADO",
         "RECHAZADO",
     ],
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
     "invariantes": [
         "el id del módulo nunca cambia",
         "el rol nunca cambia",
@@ -614,21 +703,9 @@ CONTENEDOR: Dict[str, Any] = {
         "CE debe figurar en ROLES de core/engine.py",
         "inventario() siempre incluye id, nombre, rol, version del CONTENEDOR",
     ],
-}
 
+}  # <--- CIERRE FINAL
 
 # ===============================================================
-# SECCIÓN 7 — EXPORTS
+# FIN CONTENEDOR
 # ===============================================================
-
-__all__ = [
-    "CONTENEDOR",
-    "barrer",
-    "verificar",
-    "inventario",
-    "skills",
-    "ids",
-    "por_id",
-    "listar_archivos",
-    "verificar_salida",
-]

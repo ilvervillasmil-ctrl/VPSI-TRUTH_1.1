@@ -221,18 +221,36 @@ CONTENEDOR: Dict[str, Any] = {
 
     "requiere": [],
 
-    "autoriza_engine": {
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-        "modificar": False,
-        "alterar": False,
-        "reescribir": False,
-    },
+    # ----- REPORTING -----
+"reporting": {
+    "estado": True,
+    "salud": True,
+    "inventario": True,
+    "capacidades": True,
+    "errores": True,
+    "advertencias": True,
+    "dependencias": True,
+    "version": True,
+    "contrato": True,
+    "conocimiento": True,
+    "metricas": True,
+    "diagnostico": True,
+    "reporte": True,
+},
+
+# ----- AUTORIZACIONES -----
+"autoriza_engine": {
+    "leer": True,
+    "ejecutar": True,
+    "consultar": True,
+    "recombinar": True,
+    "reportar": True,
+    "auditar": True,
+    "inventariar": True,
+    "modificar": False,
+    "alterar": False,
+    "reescribir": False,
+},
 
     "consultas_soportadas": [
         "calcular", "calcular_C", "calcular_L", "calcular_K",
@@ -358,20 +376,6 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    "reporting": {
-        "estado": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "version": True,
-        "contrato": True,
-        "conocimiento": True,
-        "metricas": True,
-        "diagnostico": True,
-    },
 
     "estados_validos": list(ESTADOS_VALIDOS),
     "invariantes": list(INVARIANTES),

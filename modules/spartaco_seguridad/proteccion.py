@@ -632,17 +632,20 @@ def _validar_cuerpo_esquema(
     if not _es_int(cuerpo["n_neutro"]) or cuerpo["n_neutro"] < 2:
         return _rechazo("CÓDIGO_INVÁLIDO", error="n_neutro")
 
-        vals = cuerpo["valuaciones"]
-    # Dominio: bits de ceros en digest SHA-256 → [0, 256]
-    # Cardinalidad: _fragmentos produce ≤ k (tope contractual 64)
-    if (
-        type(vals) is not list
-        or len(vals) > 64
-        or not all(_es_int(x) and 0 <= x <= 256 for x in vals)
-    ):
+    # Cada valuación es un conteo de bits nulos iniciales de un SHA-256
+    # (0..256), y _fragmentos emite a lo sumo 64 tramos.
+    vals = cuerpo["valuaciones"]
+    if type(vals) is not list or len(vals) > 64:
         return _rechazo("CÓDIGO_INVÁLIDO", error="valuaciones")
+    for x in vals:
+        if not _es_int(x) or x < 0 or x > 256:
+            return _rechazo("CÓDIGO_INVÁLIDO", error="valuaciones")
+
+    if not _es_bool(cuerpo["identidad_neutra"]):
+        return _rechazo("CÓDIGO_INVÁLIDO", error="identidad_neutra")
 
     return {"ok": True, "cuerpo": cuerpo, "conceptos": []}
+
 
 
 def construir_cuerpo(

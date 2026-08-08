@@ -423,7 +423,7 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
         "reporte": True,
     },
-}
+},
 
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),

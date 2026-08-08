@@ -389,23 +389,23 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ----- REPORTING -----
-    "reporting": {
-        "estado": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "version": True,
-        "contrato": True,
-        "conocimiento": True,
-        "metricas": True,
-        "diagnostico": True,
-        "reporte": True,
-    },
+"reporting": {
+    "estado": True,
+    "salud": True,
+    "inventario": True,
+    "capacidades": True,
+    "errores": True,
+    "advertencias": True,
+    "dependencias": True,
+    "version": True,
+    "contrato": True,
+    "conocimiento": True,
+    "metricas": True,
+    "diagnostico": True,
+    "reporte": True,
+},  # <--- SE PUEDE 
 
-    "autoriza_engine": {
+"autoriza_engine": {
     # --- PERMISOS BASE ---
     "leer": True,
     "ejecutar": True,
@@ -440,9 +440,7 @@ CONTENEDOR: Dict[str, Any] = {
     # --- PERMISOS DE MONITOREO ---
     "monitorear": True,
     "alertar": False,
-
-   
-}
+},  # <--- ESTA COMA TAMBIÉN ES BUENA PONERLA
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),
 

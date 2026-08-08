@@ -184,7 +184,6 @@ CAMPOS_OPCIONALES = (
     "taxonomia",
 )
 
-
 # ===============================================================
 # CONTRATO OFICIAL
 # ===============================================================
@@ -273,16 +272,14 @@ CONTENEDOR: Dict[str, Any] = {
     # DEPENDENCIAS
     # -----------------------------------------------------------
 
-        "requiere": [],
-
+    "requiere": [],
 
     # -----------------------------------------------------------
-    # AUTORIZACIÓN DEL ENGINE
-    #
-    # Se utilizan únicamente permisos reconocidos por el contrato.
+    # AUTORIZACIÓN DEL ENGINE (COMPLETA)
     # -----------------------------------------------------------
 
     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -290,9 +287,47 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
         "alterar": False,
         "reescribir": False,
+        "crear": False,
+        "eliminar": False,
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        "transformar": False,
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": True,
+        "sincronizar": False,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "alertar": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
     },
 
     # -----------------------------------------------------------
@@ -320,9 +355,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # -----------------------------------------------------------
-    # METADATOS DE CAPACIDADES
-    #
-    # OBLIGATORIO: correspondencia 1:1.
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # -----------------------------------------------------------
 
     "capacidades_meta": {
@@ -374,7 +407,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # -----------------------------------------------------------
-    # REPORTING
+    # REPORTING (COMPLETO)
     # -----------------------------------------------------------
 
     "reporting": {
@@ -390,6 +423,7 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "metricas": True,
         "diagnostico": True,
+        "reporte": True,
     },
 
     # -----------------------------------------------------------
@@ -403,13 +437,13 @@ CONTENEDOR: Dict[str, Any] = {
     # -----------------------------------------------------------
 
     "invariantes": list(INVARIANTES),
-}
+
+}  # <--- CIERRE FINAL
 
 
 # ===============================================================
 # VALIDACIÓN DEL CONTRATO
 # ===============================================================
-
 def _validar_contrato(cont: Dict[str, Any]) -> None:
     """
     Autoauditoría del contrato DGS.

@@ -219,7 +219,7 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario", "estado", "reporte", "diagnostico",
     ],
 
-    "requiere": ["ENGINE"],
+    "requiere": [],
 
     "autoriza_engine": {
         "leer": True,

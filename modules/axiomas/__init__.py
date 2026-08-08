@@ -289,7 +289,7 @@ CONTENEDOR: Dict[str, Any] = {
         "buscar_por_id": "buscar_por_id",
     },
 
-    # ----- METADATOS DE CAPACIDADES (1:1 OBLIGATORIO — 13/13) -----
+    # ----- METADATOS DE CAPACIDADES -----
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
@@ -358,9 +358,8 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    # ----- AUTORIZACIÓN AL ENGINE (UN SOLO BLOQUE) -----
+    # ----- AUTORIZACIÓN AL ENGINE -----
     "autoriza_engine": {
-        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -368,36 +367,26 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
-
-        # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
         "alterar": False,
         "reescribir": False,
         "crear": True,
         "eliminar": False,
         "actualizar": False,
-
-        # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
         "generar": True,
         "transformar": False,
-
-        # --- PERMISOS DE DATOS ---
         "exportar": True,
         "importar": True,
         "respaldar": True,
         "recuperar": True,
         "sincronizar": True,
-
-        # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
         "alertar": True,
         "metricas": True,
         "diagnostico": True,
-
-        # --- REPORTING ---
         "reporting": {
             "estado": True,
             "salud": True,
@@ -415,7 +404,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    # ----- REPORTING (NECESARIO PARA EL CONTRATO) -----
+    # ----- REPORTING -----
     "reporting": {
         "estado": True,
         "salud": True,
@@ -431,14 +420,14 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
         "reporte": True,
     },
-}  # <--- CIERRE FINAL (sin coma)
 
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),
 
     # ----- INVARIANTES -----
     "invariantes": list(INVARIANTES),
-}
+
+}  # <--- CIERRE FINAL ÚNICO
 
 # ===============================================================
 # FIN CONTRATO

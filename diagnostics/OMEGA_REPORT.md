@@ -11,7 +11,7 @@
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
   total_modulos: 16
-  timestamp: 2026-08-07T23:59:59.167734+00:00
+  timestamp: 2026-08-08T04:04:33.144149+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -28,7 +28,7 @@
   advertencias:
     []
   trazas_n: 46
-  timestamp: 2026-08-07T23:59:59.167670+00:00
+  timestamp: 2026-08-08T04:04:33.144067+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1190,32 +1190,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T23:59:53.745336+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.571762+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1292,32 +1292,32 @@
         archivo: __init__.py
         sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
         tamano: 51021
-        timestamp_mtime: 2026-08-07T23:59:53.745336+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.571762+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-07T23:59:53.745826+00:00
+        timestamp_mtime: 2026-08-08T04:04:23.572283+00:00
     factores_api:
       • C
       • K
@@ -9784,10 +9784,10 @@
       • este módulo siempre puede reportar su propio estado
 
 ══════════════════════════════════════════════════════════════════════
-  MÓDULO SC/spartaco
+  MÓDULO SC/spartaco_seguridad
 ══════════════════════════════════════════════════════════════════════
   id: SC
-  nombre: spartaco
+  nombre: spartaco_seguridad
   rol: SC
   version: 1.7
   version_contrato: 1.0
@@ -9795,16 +9795,17 @@
   estabilidad: ESTABLE
   compatible_desde: 1.0
   api_engine: >=1.0
-  descripcion: Adaptador del módulo seguridad. Mantiene sincronizado el catálogo con el estado real del árbol.
+  descripcion: Adaptador Spartaco (SC). Mantiene sincronizado el catálogo con el estado real del árbol de directorios.
   funcion: Mantener sincronizado el catálogo del módulo con el estado real del árbol de directorios.
   no_hace:
     • No implementa la lógica de los archivos del árbol
     • No calcula C/L/K/Tru
-    • No orquesta Engine
+    • No orquesta ciclos
     • No define vocabulario fijo de conceptos de seguridad
   autoridad:
     • Sincronizar el catálogo con el árbol
-    • Exponer recursos y conceptos descubiertos a Engine
+    • Exponer recursos y conceptos descubiertos
+    • Reportar el estado estructural del módulo
   conocimiento_exportable:
     • inventario
     • reporte
@@ -9842,31 +9843,31 @@
     • verificar_salida
   capacidades_meta:
     verificar:
-      descripcion: Coherencia del catálogo.
+      descripcion: Garantiza la coherencia del catálogo sincronizado.
       entrada: ninguna
-      salida: dict
+      salida: dict con coherente, errores, choques, recursos
     barrer:
       descripcion: Sincroniza el árbol y reporta coherencia.
       entrada: ninguna
-      salida: dict
+      salida: dict con coherente, recursos, conceptos
     inventario:
-      descripcion: Catálogo sincronizado (recursos + conceptos).
+      descripcion: Garantiza la enumeración de recursos y conceptos.
       entrada: opcional
-      salida: dict
+      salida: dict con id, version, recursos, conceptos
     reporte:
-      descripcion: Estado del módulo.
+      descripcion: Garantiza el estado actual del módulo.
       entrada: ninguna
-      salida: dict
+      salida: dict con estado, version, recursos
     diagnostico:
-      descripcion: Problemas del catálogo.
+      descripcion: Garantiza problemas y advertencias del catálogo.
       entrada: ninguna
-      salida: dict
+      salida: dict con estado, problemas, advertencias
     catalogo:
       descripcion: Recursos y conceptos descubiertos en el árbol.
       entrada: ninguna
-      salida: dict
+      salida: dict con n, recursos, conceptos
     verificar_salida:
-      descripcion: Forma mínima.
+      descripcion: Forma mínima de una salida del módulo.
       entrada: dict
       salida: bool
   estados_validos:
@@ -9875,37 +9876,134 @@
     • DEGRADADO
     • RECHAZADO
   invariantes:
-    • el id no cambia
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • las capacidades declaradas son siempre callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
     • este archivo no ejecuta la lógica del árbol
     • el catálogo refleja el árbol en tiempo de ejecución
     • los conceptos de seguridad los declaran los recursos, no el adaptador
   reporte:
     id: SC
-    modulo: spartaco
-    version: 1.7
-    estado: DEGRADADO
-    recursos:
-      []
-    conceptos:
-      []
-    total_validos: 0
-  diagnostico:
-    id: SC
-    estado: DEGRADADO
-    problemas:
-      • proteccion.py: ModuleNotFoundError: No module named 'cryptography'
-    advertencias:
-      []
-  inventario:
-    id: SC
-    nombre: spartaco
+    modulo: spartaco_seguridad
+    nombre: spartaco_seguridad
     rol: SC
     version: 1.7
-    recursos:
-    conceptos:
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    estado: OPERATIVO
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • reporte
+      • diagnostico
+      • catalogo
+      • verificar_salida
+    requiere:
       []
-    total_validos: 0
-    coherente: False
+    recursos:
+      • PROTECCION
+    conceptos:
+      • ALTERACIÓN
+      • CÓDIGO_COMPROMETIDO
+      • CÓDIGO_INVÁLIDO
+      • FIRMA_INVÁLIDA
+      • INTEGRIDAD_COMPROMETIDA
+      • MANIFIESTO_AUSENTE
+      • MANIPULACIÓN
+      • VERSIÓN_REGRESIVA
+    total_validos: 1
+    errores:
+      []
+    choques:
+      []
+  diagnostico:
+    id: SC
+    modulo: spartaco_seguridad
+    estado: OPERATIVO
+    problemas:
+      []
+    advertencias:
+      []
+    recomendaciones:
+      []
+    salud: True
+  inventario:
+    id: SC
+    nombre: spartaco_seguridad
+    rol: SC
+    version: 1.7
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • reporte
+      • diagnostico
+      • catalogo
+      • verificar_salida
+    requiere:
+      []
+    autoridad:
+      • Sincronizar el catálogo con el árbol
+      • Exponer recursos y conceptos descubiertos
+      • Reportar el estado estructural del módulo
+    conocimiento_exportable:
+      • inventario
+      • reporte
+      • diagnostico
+      • catalogo
+      • conceptos
+    consultas_soportadas:
+      • verificar
+      • barrer
+      • inventario
+      • reporte
+      • diagnostico
+      • catalogo
+      • verificar_salida
+    invariantes:
+      • el id del módulo nunca cambia
+      • el rol nunca cambia
+      • las capacidades declaradas son siempre callables tras la resolución
+      • este módulo no modifica el estado de otros módulos
+      • este módulo no inventa capacidades no declaradas en CONTENEDOR
+      • este archivo no ejecuta la lógica del árbol
+      • el catálogo refleja el árbol en tiempo de ejecución
+      • los conceptos de seguridad los declaran los recursos, no el adaptador
+    recursos:
+      PROTECCION:
+        ruta: proteccion.py
+        nombre: proteccion
+        hace: Autentica artefactos con identidad genealógica: nucleo, canales S/Q, valuaciones y árbol ZSQ con node_id/parent_id; autoridad Ed25519.
+        herramienta: Ed25519 + SHA-256 + NodoZSQ(id) + manifiesto {cuerpo, firma}
+        conceptos:
+          • FIRMA_INVÁLIDA
+          • INTEGRIDAD_COMPROMETIDA
+          • MANIFIESTO_AUSENTE
+          • CÓDIGO_INVÁLIDO
+          • VERSIÓN_REGRESIVA
+          • ALTERACIÓN
+          • MANIPULACIÓN
+          • CÓDIGO_COMPROMETIDO
+    conceptos:
+      • ALTERACIÓN
+      • CÓDIGO_COMPROMETIDO
+      • CÓDIGO_INVÁLIDO
+      • FIRMA_INVÁLIDA
+      • INTEGRIDAD_COMPROMETIDA
+      • MANIFIESTO_AUSENTE
+      • MANIPULACIÓN
+      • VERSIÓN_REGRESIVA
+    total_validos: 1
+    archivos:
+      • proteccion.py
+    coherente: True
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO TX/taxonomia
@@ -10690,7 +10788,7 @@
     • formulas
     • realidad
     • self
-    • spartaco
+    • spartaco_seguridad
     • taxonomia
     • tru_totales
     • verificacion
@@ -11483,44 +11581,44 @@
       modulo: self
     [156]
       id: SC
-      nombre: spartaco
+      nombre: spartaco_seguridad
       rol: SC
       tipo: modulo
     [157]
-      id: spartaco.verificar
+      id: spartaco_seguridad.verificar
       nombre: verificar
       tipo: capacidad
-      modulo: spartaco
+      modulo: spartaco_seguridad
     [158]
-      id: spartaco.barrer
+      id: spartaco_seguridad.barrer
       nombre: barrer
       tipo: capacidad
-      modulo: spartaco
+      modulo: spartaco_seguridad
     [159]
-      id: spartaco.inventario
+      id: spartaco_seguridad.inventario
       nombre: inventario
       tipo: capacidad
-      modulo: spartaco
+      modulo: spartaco_seguridad
     [160]
-      id: spartaco.reporte
+      id: spartaco_seguridad.reporte
       nombre: reporte
       tipo: capacidad
-      modulo: spartaco
+      modulo: spartaco_seguridad
     [161]
-      id: spartaco.diagnostico
+      id: spartaco_seguridad.diagnostico
       nombre: diagnostico
       tipo: capacidad
-      modulo: spartaco
+      modulo: spartaco_seguridad
     [162]
-      id: spartaco.catalogo
+      id: spartaco_seguridad.catalogo
       nombre: catalogo
       tipo: capacidad
-      modulo: spartaco
+      modulo: spartaco_seguridad
     [163]
-      id: spartaco.verificar_salida
+      id: spartaco_seguridad.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
-      modulo: spartaco
+      modulo: spartaco_seguridad
     [164]
       id: TX
       nombre: taxonomia
@@ -12238,32 +12336,32 @@
       to: self.diagnostico
       tipo: declara_capacidad
     [145]
-      from: spartaco
-      to: spartaco.verificar
+      from: spartaco_seguridad
+      to: spartaco_seguridad.verificar
       tipo: declara_capacidad
     [146]
-      from: spartaco
-      to: spartaco.barrer
+      from: spartaco_seguridad
+      to: spartaco_seguridad.barrer
       tipo: declara_capacidad
     [147]
-      from: spartaco
-      to: spartaco.inventario
+      from: spartaco_seguridad
+      to: spartaco_seguridad.inventario
       tipo: declara_capacidad
     [148]
-      from: spartaco
-      to: spartaco.reporte
+      from: spartaco_seguridad
+      to: spartaco_seguridad.reporte
       tipo: declara_capacidad
     [149]
-      from: spartaco
-      to: spartaco.diagnostico
+      from: spartaco_seguridad
+      to: spartaco_seguridad.diagnostico
       tipo: declara_capacidad
     [150]
-      from: spartaco
-      to: spartaco.catalogo
+      from: spartaco_seguridad
+      to: spartaco_seguridad.catalogo
       tipo: declara_capacidad
     [151]
-      from: spartaco
-      to: spartaco.verificar_salida
+      from: spartaco_seguridad
+      to: spartaco_seguridad.verificar_salida
       tipo: declara_capacidad
     [152]
       from: taxonomia
@@ -12367,322 +12465,322 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-07T23:59:59.094422+00:00
+    timestamp: 2026-08-08T04:04:33.061717+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.012633
+    duracion_s: 0.012614
   [1]
     id_traza: 2
-    timestamp: 2026-08-07T23:59:59.106404+00:00
+    timestamp: 2026-08-08T04:04:33.073425+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.011959
+    duracion_s: 0.011682
   [2]
     id_traza: 3
-    timestamp: 2026-08-07T23:59:59.116971+00:00
+    timestamp: 2026-08-08T04:04:33.083704+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.010546
+    duracion_s: 0.01026
   [3]
     id_traza: 4
-    timestamp: 2026-08-07T23:59:59.117019+00:00
+    timestamp: 2026-08-08T04:04:33.083738+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 3.3e-05
+    duracion_s: 1.9e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-07T23:59:59.117034+00:00
+    timestamp: 2026-08-08T04:04:33.083753+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 7e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-07T23:59:59.117046+00:00
+    timestamp: 2026-08-08T04:04:33.083763+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 5e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-07T23:59:59.117629+00:00
+    timestamp: 2026-08-08T04:04:33.084344+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000576
+    duracion_s: 0.000574
   [7]
     id_traza: 8
-    timestamp: 2026-08-07T23:59:59.118110+00:00
+    timestamp: 2026-08-08T04:04:33.084772+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000466
+    duracion_s: 0.000415
   [8]
     id_traza: 9
-    timestamp: 2026-08-07T23:59:59.118553+00:00
+    timestamp: 2026-08-08T04:04:33.085160+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000433
+    duracion_s: 0.000381
   [9]
     id_traza: 10
-    timestamp: 2026-08-07T23:59:59.118907+00:00
+    timestamp: 2026-08-08T04:04:33.085519+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000344
+    duracion_s: 0.00035
   [10]
     id_traza: 11
-    timestamp: 2026-08-07T23:59:59.120390+00:00
+    timestamp: 2026-08-08T04:04:33.086952+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001472
+    duracion_s: 0.001422
   [11]
     id_traza: 12
-    timestamp: 2026-08-07T23:59:59.121799+00:00
+    timestamp: 2026-08-08T04:04:33.088348+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001397
+    duracion_s: 0.001382
   [12]
     id_traza: 13
-    timestamp: 2026-08-07T23:59:59.123221+00:00
+    timestamp: 2026-08-08T04:04:33.089690+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001411
+    duracion_s: 0.001331
   [13]
     id_traza: 14
-    timestamp: 2026-08-07T23:59:59.123233+00:00
+    timestamp: 2026-08-08T04:04:33.089703+00:00
     modulo: citacion
     capacidad: reporte
     estado: EXITO
     duracion_s: 3e-06
   [14]
     id_traza: 15
-    timestamp: 2026-08-07T23:59:59.123240+00:00
+    timestamp: 2026-08-08T04:04:33.089710+00:00
     modulo: citacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [15]
     id_traza: 16
-    timestamp: 2026-08-07T23:59:59.123250+00:00
+    timestamp: 2026-08-08T04:04:33.089716+00:00
     modulo: citacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 3e-06
   [16]
     id_traza: 17
-    timestamp: 2026-08-07T23:59:59.123475+00:00
+    timestamp: 2026-08-08T04:04:33.089940+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000219
+    duracion_s: 0.000218
   [17]
     id_traza: 18
-    timestamp: 2026-08-07T23:59:59.123649+00:00
+    timestamp: 2026-08-08T04:04:33.090089+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000164
+    duracion_s: 0.000141
   [18]
     id_traza: 19
-    timestamp: 2026-08-07T23:59:59.123736+00:00
+    timestamp: 2026-08-08T04:04:33.090163+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 7.8e-05
+    duracion_s: 6.8e-05
   [19]
     id_traza: 20
-    timestamp: 2026-08-07T23:59:59.123937+00:00
+    timestamp: 2026-08-08T04:04:33.090353+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000191
+    duracion_s: 0.000181
   [20]
     id_traza: 21
-    timestamp: 2026-08-07T23:59:59.124157+00:00
+    timestamp: 2026-08-08T04:04:33.090552+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00021
+    duracion_s: 0.00019
   [21]
     id_traza: 22
-    timestamp: 2026-08-07T23:59:59.124337+00:00
+    timestamp: 2026-08-08T04:04:33.090706+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00017
+    duracion_s: 0.000145
   [22]
     id_traza: 23
-    timestamp: 2026-08-07T23:59:59.134738+00:00
+    timestamp: 2026-08-08T04:04:33.100268+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.010391
+    duracion_s: 0.00955
   [23]
     id_traza: 24
-    timestamp: 2026-08-07T23:59:59.144626+00:00
+    timestamp: 2026-08-08T04:04:33.109126+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.009875
+    duracion_s: 0.008841
   [24]
     id_traza: 25
-    timestamp: 2026-08-07T23:59:59.145878+00:00
+    timestamp: 2026-08-08T04:04:33.110332+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001241
+    duracion_s: 0.001193
   [25]
     id_traza: 26
-    timestamp: 2026-08-07T23:59:59.146344+00:00
+    timestamp: 2026-08-08T04:04:33.110747+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000454
+    duracion_s: 0.000404
   [26]
     id_traza: 27
-    timestamp: 2026-08-07T23:59:59.146760+00:00
+    timestamp: 2026-08-08T04:04:33.111094+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000406
+    duracion_s: 0.000338
   [27]
     id_traza: 28
-    timestamp: 2026-08-07T23:59:59.146973+00:00
+    timestamp: 2026-08-08T04:04:33.111265+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000203
+    duracion_s: 0.000162
   [28]
     id_traza: 29
-    timestamp: 2026-08-07T23:59:59.148269+00:00
+    timestamp: 2026-08-08T04:04:33.112523+00:00
     modulo: realidad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001287
+    duracion_s: 0.001249
   [29]
     id_traza: 30
-    timestamp: 2026-08-07T23:59:59.148969+00:00
+    timestamp: 2026-08-08T04:04:33.113207+00:00
     modulo: realidad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000689
+    duracion_s: 0.000673
   [30]
     id_traza: 31
-    timestamp: 2026-08-07T23:59:59.153217+00:00
+    timestamp: 2026-08-08T04:04:33.117550+00:00
     modulo: realidad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.004238
+    duracion_s: 0.004331
   [31]
     id_traza: 32
-    timestamp: 2026-08-07T23:59:59.158649+00:00
+    timestamp: 2026-08-08T04:04:33.123098+00:00
     modulo: self
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.005418
+    duracion_s: 0.005533
   [32]
     id_traza: 33
-    timestamp: 2026-08-07T23:59:59.163170+00:00
+    timestamp: 2026-08-08T04:04:33.127458+00:00
     modulo: self
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.004508
+    duracion_s: 0.004347
   [33]
     id_traza: 34
-    timestamp: 2026-08-07T23:59:59.163188+00:00
+    timestamp: 2026-08-08T04:04:33.127477+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
     duracion_s: 8e-06
   [34]
     id_traza: 35
-    timestamp: 2026-08-07T23:59:59.163800+00:00
-    modulo: spartaco
+    timestamp: 2026-08-08T04:04:33.139516+00:00
+    modulo: spartaco_seguridad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000604
+    duracion_s: 0.012029
   [35]
     id_traza: 36
-    timestamp: 2026-08-07T23:59:59.164204+00:00
-    modulo: spartaco
+    timestamp: 2026-08-08T04:04:33.139940+00:00
+    modulo: spartaco_seguridad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000394
+    duracion_s: 0.000411
   [36]
     id_traza: 37
-    timestamp: 2026-08-07T23:59:59.164568+00:00
-    modulo: spartaco
+    timestamp: 2026-08-08T04:04:33.140326+00:00
+    modulo: spartaco_seguridad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000354
+    duracion_s: 0.000376
   [37]
     id_traza: 38
-    timestamp: 2026-08-07T23:59:59.164824+00:00
+    timestamp: 2026-08-08T04:04:33.140627+00:00
     modulo: taxonomia
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000246
+    duracion_s: 0.000291
   [38]
     id_traza: 39
-    timestamp: 2026-08-07T23:59:59.165067+00:00
+    timestamp: 2026-08-08T04:04:33.140971+00:00
     modulo: taxonomia
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000233
+    duracion_s: 0.000333
   [39]
     id_traza: 40
-    timestamp: 2026-08-07T23:59:59.165271+00:00
+    timestamp: 2026-08-08T04:04:33.141162+00:00
     modulo: taxonomia
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000195
+    duracion_s: 0.000183
   [40]
     id_traza: 41
-    timestamp: 2026-08-07T23:59:59.166101+00:00
+    timestamp: 2026-08-08T04:04:33.141943+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00082
+    duracion_s: 0.000772
   [41]
     id_traza: 42
-    timestamp: 2026-08-07T23:59:59.166860+00:00
+    timestamp: 2026-08-08T04:04:33.143033+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000749
+    duracion_s: 0.001078
   [42]
     id_traza: 43
-    timestamp: 2026-08-07T23:59:59.167632+00:00
+    timestamp: 2026-08-08T04:04:33.144031+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000763
+    duracion_s: 0.000986
   [43]
     id_traza: 44
-    timestamp: 2026-08-07T23:59:59.167650+00:00
+    timestamp: 2026-08-08T04:04:33.144047+00:00
     modulo: verificacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 6e-06
   [44]
     id_traza: 45
-    timestamp: 2026-08-07T23:59:59.167655+00:00
+    timestamp: 2026-08-08T04:04:33.144054+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [45]
     id_traza: 46
-    timestamp: 2026-08-07T23:59:59.167663+00:00
+    timestamp: 2026-08-08T04:04:33.144059+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO

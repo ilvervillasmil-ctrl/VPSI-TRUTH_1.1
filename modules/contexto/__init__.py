@@ -245,7 +245,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ----- DEPENDENCIAS (clave obligatoria del esquema) -----
-    "requiere": [],
+    "requiere": ["DG", "DGCO"],
 
     # ----- DOMINIO -----
     "modos_entrada": [

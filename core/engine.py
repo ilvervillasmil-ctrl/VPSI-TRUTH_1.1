@@ -745,12 +745,7 @@ class Engine:
     def ejecutar_inventario(self, modulo_o_rol: str) -> Dict[str, Any]:
         return self.ejecutar_capacidad(modulo_o_rol, "inventario")
 
-        def ejecutar_con_contexto_unificado(
-        self,
-        modulo_o_rol: str,
-        capacidad: str,
-        payload: Dict[str, Any],
-    ) -> Dict[str, Any]:
+            def ejecutar_con_contexto_unificado(self, modulo_o_rol: str, capacidad: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         cont = self.registro.primero(modulo_o_rol)
         if cont is None:
             return {
@@ -766,26 +761,17 @@ class Engine:
         if not callable(fn):
             return {
                 "estado": "ERROR",
-                "error": (
-                    f"Capacidad '{capacidad}' "
-                    f"no es ejecutable en {cont.nombre}"
-                ),
+                "error": f"Capacidad '{capacidad}' no es ejecutable en {cont.nombre}",
             }
         if not isinstance(payload, dict):
             return {
                 "estado": "ERROR",
-                "error": (
-                    f"payload debe ser dict, "
-                    f"es {type(payload).__name__}"
-                ),
+                "error": f"payload debe ser dict, es {type(payload).__name__}",
             }
         inicio = time.perf_counter()
         try:
             resultado = fn(payload)
-            duracion = round(
-                time.perf_counter() - inicio,
-                6,
-            )
+            duracion = round(time.perf_counter() - inicio, 6)
             self._registrar_traza(
                 modulo=cont.nombre,
                 capacidad=capacidad,
@@ -802,10 +788,7 @@ class Engine:
             self.resultados_evaluacion.append(salida)
             return salida
         except Exception as e:
-            duracion = round(
-                time.perf_counter() - inicio,
-                6,
-            )
+            duracion = round(time.perf_counter() - inicio, 6)
             error = f"{type(e).__name__}: {e}"
             self._registrar_traza(
                 modulo=cont.nombre,
@@ -823,7 +806,6 @@ class Engine:
             }
             self.resultados_evaluacion.append(salida)
             return salida
-
         
     # ----------------------------------------------------------
     # CONSOLIDACIÓN

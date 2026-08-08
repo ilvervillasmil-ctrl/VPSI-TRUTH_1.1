@@ -62,26 +62,10 @@
 
 from __future__ import annotations
 
-import os
-import sys
-import json
-import math
-import copy
-import time
-import types
-import logging
-import hashlib
-import inspect
-import itertools
-import functools
-import traceback
-import importlib
 import importlib.util
+import sys
 from pathlib import Path
-
-from dataclasses import dataclass, field
-from collections import defaultdict, deque
-from typing import Any, Dict, List, Tuple, Set, Optional, Iterable, Callable
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     from core.diagnostico import DiagnosticoGlobal  # type: ignore
@@ -273,8 +257,8 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ----- DEPENDENCIAS -----
-    "requiere": [],  # <--- 4 espacios exactos (misma indentación que las demás claves)
-}
+    "requiere": [],
+
     # ----- AUTORIZACIÓN AL ENGINE -----
     "autoriza_engine": {
         "leer": True,
@@ -388,72 +372,22 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    "autoriza_engine": {
-    # --- PERMISOS BASE ---
-    "leer": True,
-    "ejecutar": True,
-    "consultar": True,
-    "recombinar": True,
-    "reportar": True,
-    "auditar": True,
-    "inventariar": True,
+    # ----- REPORTING -----
+    "reporting": {
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
+    },
 
-    # --- PERMISOS DE ESCRITURA ---
-    "modificar": False,
-    "alterar": False,
-    "reescribir": False,
-    "crear": True,
-    "eliminar": False,
-    "actualizar": True,
-
-    # --- PERMISOS DE PROCESAMIENTO ---
-    "validar": True,
-    "procesar": True,
-    "analizar": True,
-    "generar": True,
-    "transformar": False,
-
-    # --- PERMISOS DE DATOS ---
-    "exportar": True,
-    "importar": True,
-    "respaldar": True,
-    "recuperar": True,
-    "sincronizar": True,
-
-    # --- PERMISOS DE MONITOREO ---
-    "monitorear": True,
-    "alertar": True,
-
-    # --- REPORTING ---
-"reporting": {
-    "metricas": True,
-    "estado": True,
-    "version": True,
-    "salud": True,
-    "inventario": True,
-    "capacidades": True,
-    "errores": True,
-    "advertencias": True,
-    "dependencias": True,
-    "contrato": True,
-    "conocimiento": True,
-    "diagnostico": True,
-    "reporte": True,
-    "estado": True,
-    "salud": True,
-    "inventario": True,
-    "capacidades": True,
-    "errores": True,
-    "advertencias": True,
-    "dependencias": True,
-    "version": True,
-    "contrato": True,
-    "conocimiento": True,
-    "metricas": True,
-    "diagnostico": True,
-},
-   
-    
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),
 

@@ -745,120 +745,85 @@ class Engine:
     def ejecutar_inventario(self, modulo_o_rol: str) -> Dict[str, Any]:
         return self.ejecutar_capacidad(modulo_o_rol, "inventario")
 
-    def ejecutar_con_contexto_unificado(
-    self,
-    modulo_o_rol: str,
-    capacidad: str,
-    payload: Dict[str, Any],
-) -> Dict[str, Any]:
-    """
-    Punto de entrada genérico para capacidades que reciben
-    un contexto/payload unificado.
+        def ejecutar_con_contexto_unificado(
+        self,
+        modulo_o_rol: str,
+        capacidad: str,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        cont = self.registro.primero(modulo_o_rol)
+        if cont is None:
+            return {
+                "estado": "ERROR",
+                "error": f"Módulo/rol no encontrado: {modulo_o_rol}",
+            }
+        if cont.autoriza_engine.get("ejecutar") is False:
+            return {
+                "estado": "ERROR",
+                "error": f"{cont.nombre}: contrato no autoriza ejecutar",
+            }
+        fn = cont.fn(capacidad)
+        if not callable(fn):
+            return {
+                "estado": "ERROR",
+                "error": (
+                    f"Capacidad '{capacidad}' "
+                    f"no es ejecutable en {cont.nombre}"
+                ),
+            }
+        if not isinstance(payload, dict):
+            return {
+                "estado": "ERROR",
+                "error": (
+                    f"payload debe ser dict, "
+                    f"es {type(payload).__name__}"
+                ),
+            }
+        inicio = time.perf_counter()
+        try:
+            resultado = fn(payload)
+            duracion = round(
+                time.perf_counter() - inicio,
+                6,
+            )
+            self._registrar_traza(
+                modulo=cont.nombre,
+                capacidad=capacidad,
+                estado="EXITO",
+                duracion_s=duracion,
+            )
+            salida = {
+                "estado": "EXITO",
+                "modulo": cont.nombre,
+                "capacidad": capacidad,
+                "resultado": resultado,
+                "duracion_s": duracion,
+            }
+            self.resultados_evaluacion.append(salida)
+            return salida
+        except Exception as e:
+            duracion = round(
+                time.perf_counter() - inicio,
+                6,
+            )
+            error = f"{type(e).__name__}: {e}"
+            self._registrar_traza(
+                modulo=cont.nombre,
+                capacidad=capacidad,
+                estado="ERROR_EJECUCION",
+                duracion_s=duracion,
+                error=error,
+            )
+            salida = {
+                "estado": "ERROR_EJECUCION",
+                "modulo": cont.nombre,
+                "capacidad": capacidad,
+                "error": error,
+                "duracion_s": duracion,
+            }
+            self.resultados_evaluacion.append(salida)
+            return salida
 
-    El Engine:
-      - resuelve el módulo;
-      - verifica autorización;
-      - verifica que la capacidad exista;
-      - entrega el payload íntegro;
-      - registra la ejecución;
-      - devuelve el resultado.
-
-    El Engine NO interpreta, transforma ni completa el payload.
-    El significado del payload pertenece al contrato del módulo.
-    """
-
-    cont = self.registro.primero(modulo_o_rol)
-
-    if cont is None:
-        return {
-            "estado": "ERROR",
-            "error": f"Módulo/rol no encontrado: {modulo_o_rol}",
-        }
-
-    if cont.autoriza_engine.get("ejecutar") is False:
-        return {
-            "estado": "ERROR",
-            "error": f"{cont.nombre}: contrato no autoriza ejecutar",
-        }
-
-    fn = cont.fn(capacidad)
-
-    if not callable(fn):
-        return {
-            "estado": "ERROR",
-            "error": (
-                f"Capacidad '{capacidad}' "
-                f"no es ejecutable en {cont.nombre}"
-            ),
-        }
-
-    if not isinstance(payload, dict):
-        return {
-            "estado": "ERROR",
-            "error": (
-                f"payload debe ser dict, "
-                f"es {type(payload).__name__}"
-            ),
-        }
-
-    inicio = time.perf_counter()
-
-    try:
-        # El Engine NO interpreta el contenido.
-        # Lo entrega íntegramente al módulo.
-        resultado = fn(payload)
-
-        duracion = round(
-            time.perf_counter() - inicio,
-            6,
-        )
-
-        self._registrar_traza(
-            modulo=cont.nombre,
-            capacidad=capacidad,
-            estado="EXITO",
-            duracion_s=duracion,
-        )
-
-        salida = {
-            "estado": "EXITO",
-            "modulo": cont.nombre,
-            "capacidad": capacidad,
-            "resultado": resultado,
-            "duracion_s": duracion,
-        }
-
-        self.resultados_evaluacion.append(salida)
-
-        return salida
-
-    except Exception as e:
-        duracion = round(
-            time.perf_counter() - inicio,
-            6,
-        )
-
-        error = f"{type(e).__name__}: {e}"
-
-        self._registrar_traza(
-            modulo=cont.nombre,
-            capacidad=capacidad,
-            estado="ERROR_EJECUCION",
-            duracion_s=duracion,
-            error=error,
-        )
-
-        salida = {
-            "estado": "ERROR_EJECUCION",
-            "modulo": cont.nombre,
-            "capacidad": capacidad,
-            "error": error,
-            "duracion_s": duracion,
-        }
-
-        self.resultados_evaluacion.append(salida)
-
-        return salida
         
     # ----------------------------------------------------------
     # CONSOLIDACIÓN

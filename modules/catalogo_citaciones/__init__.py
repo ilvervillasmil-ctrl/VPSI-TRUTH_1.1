@@ -232,7 +232,7 @@ CONTENEDOR: Dict[str, Any] = {
     # ----- DEPENDENCIAS -----
     # Si en el futuro necesitara algo de otro módulo, se declara aquí.
     # Engine es quien resuelve y entrega esa capacidad.
-    "requiere": ["CT", "AX", "FO", "MC", "DG", "CA", "CX", "DI", "RE", "VX", "TX", "CH", "MC", "SF"],
+    "requiere": ["CT", "AX", "FO", "MC", "DG", "CA", "CX", "RE", "VX", "TX", "CH", "MC", "SF"],
 
     # ----- AUTORIZACIÓN AL ENGINE -----
     "autoriza_engine": {

@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 ID_MODULO = "SC"
-NOMBRE_MODULO = "spartaco"
+NOMBRE_MODULO = "spartaco_seguridad"
 ROL_MODULO = "SC"
 VERSION_MODULO = "1.7"
 VERSION_CONTRATO = "1.0"
@@ -19,8 +19,12 @@ ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
 _DIR = Path(__file__).parent
 
 
+# ---------------------------------------------------------------
+# Descubrimiento del árbol
+# ---------------------------------------------------------------
+
 def _sincronizar_arbol() -> Dict[str, Dict[str, Any]]:
-    """Carga el árbol y registra recursos con declaración válida."""
+    """Carga el árbol y registra recursos con declaración SEGURIDAD válida."""
     reg: Dict[str, Dict[str, Any]] = {}
     for path in sorted(_DIR.rglob("*.py")):
         if path.name.startswith("_") or path.name == "__init__.py":
@@ -62,7 +66,6 @@ def _sincronizar_arbol() -> Dict[str, Dict[str, Any]]:
 def _particion(
     reg: Dict[str, Dict[str, Any]],
 ) -> Tuple[Dict[str, Dict[str, Any]], List[str], List[str]]:
-    """Separa recursos válidos, errores y choques de id."""
     ok: Dict[str, Dict[str, Any]] = {}
     errores: List[str] = []
     por_id: Dict[str, List[str]] = {}
@@ -77,7 +80,6 @@ def _particion(
 
 
 def _conceptos_descubiertos(ok: Dict[str, Dict[str, Any]]) -> List[str]:
-    """Unión de conceptos declarados por los recursos del árbol."""
     hallados = set()
     for meta in ok.values():
         raw = meta.get("conceptos")
@@ -90,20 +92,28 @@ def _conceptos_descubiertos(ok: Dict[str, Dict[str, Any]]) -> List[str]:
     return sorted(hallados)
 
 
+# ---------------------------------------------------------------
+# Capacidades públicas
+# ---------------------------------------------------------------
+
 def barrer() -> Dict[str, Any]:
     ok, errores, choques = _particion(_sincronizar_arbol())
     return {
         "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
         "coherente": not (errores or choques),
         "errores": errores,
         "choques": choques,
         "recursos": sorted(v["id"] for v in ok.values()),
         "conceptos": _conceptos_descubiertos(ok),
         "total_validos": len(ok),
+        "archivos": sorted(ok.keys()),
     }
 
 
-def verificar() -> Dict[str, Any]:
+def verificar(peticion: Any = None) -> Dict[str, Any]:
     return barrer()
 
 
@@ -111,6 +121,7 @@ def catalogo() -> Dict[str, Any]:
     ok, _, _ = _particion(_sincronizar_arbol())
     return {
         "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
         "n": len(ok),
         "recursos": {
             v["id"]: {k: val for k, val in v.items() if k != "id"}
@@ -127,12 +138,16 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "nombre": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": "ESTABLE",
         "recursos": {
             v["id"]: {k: val for k, val in v.items() if k != "id"}
             for v in ok.values()
         },
         "conceptos": _conceptos_descubiertos(ok),
         "total_validos": len(ok),
+        "archivos": sorted(ok.keys()),
         "coherente": not (errores or choques),
     }
 
@@ -142,22 +157,28 @@ def reporte() -> Dict[str, Any]:
     coherente = not (errores or choques)
     return {
         "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
         "modulo": NOMBRE_MODULO,
         "version": VERSION_MODULO,
         "estado": "OPERATIVO" if coherente else "DEGRADADO",
         "recursos": sorted(v["id"] for v in ok.values()),
         "conceptos": _conceptos_descubiertos(ok),
         "total_validos": len(ok),
+        "errores": errores,
+        "choques": choques,
     }
 
 
 def diagnostico() -> Dict[str, Any]:
     _, errores, choques = _particion(_sincronizar_arbol())
+    limpio = not (errores or choques)
     return {
         "id": ID_MODULO,
-        "estado": "OPERATIVO" if not (errores or choques) else "DEGRADADO",
+        "nombre": NOMBRE_MODULO,
+        "estado": "OPERATIVO" if limpio else "DEGRADADO",
         "problemas": errores + choques,
         "advertencias": [],
+        "salud": limpio,
     }
 
 
@@ -166,6 +187,10 @@ def verificar_salida(salida: Any) -> bool:
         "coherente" in salida or "id" in salida or "recursos" in salida
     )
 
+
+# ---------------------------------------------------------------
+# Contrato
+# ---------------------------------------------------------------
 
 CONTENEDOR: Dict[str, Any] = {
     "esquema": ESQUEMA_CONTRATO,
@@ -196,18 +221,33 @@ CONTENEDOR: Dict[str, Any] = {
         "Exponer recursos y conceptos descubiertos a Engine",
     ],
     "conocimiento_exportable": [
-        "inventario", "reporte", "diagnostico", "catalogo", "conceptos",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "catalogo",
+        "conceptos",
     ],
     "requiere": [],
     "autoriza_engine": {
-        "leer": True, "ejecutar": True, "consultar": True,
-        "recombinar": True, "reportar": True, "auditar": True,
-        "inventariar": True, "modificar": False,
-        "alterar": False, "reescribir": False,
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+        "modificar": False,
+        "alterar": False,
+        "reescribir": False,
     },
     "consultas_soportadas": [
-        "verificar", "barrer", "inventario", "reporte",
-        "diagnostico", "catalogo", "verificar_salida",
+        "verificar",
+        "barrer",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "catalogo",
+        "verificar_salida",
     ],
     "capacidades": {
         "verificar": verificar,
@@ -220,8 +260,8 @@ CONTENEDOR: Dict[str, Any] = {
     },
     "capacidades_meta": {
         "verificar": {
-            "descripcion": "Coherencia del catálogo.",
-            "entrada": "ninguna",
+            "descripcion": "Coherencia del catálogo sincronizado.",
+            "entrada": "opcional",
             "salida": "dict",
         },
         "barrer": {
@@ -250,16 +290,24 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict",
         },
         "verificar_salida": {
-            "descripcion": "Forma mínima.",
+            "descripcion": "Forma mínima de salida.",
             "entrada": "dict",
             "salida": "bool",
         },
     },
     "reporting": {
-        "estado": True, "salud": True, "inventario": True,
-        "capacidades": True, "errores": True, "advertencias": True,
-        "dependencias": True, "version": True, "contrato": True,
-        "conocimiento": True, "metricas": True, "diagnostico": True,
+        "estado": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "version": True,
+        "contrato": True,
+        "conocimiento": True,
+        "metricas": True,
+        "diagnostico": True,
     },
     "estados_validos": ["NO_INICIADO", "OPERATIVO", "DEGRADADO", "RECHAZADO"],
     "invariantes": [
@@ -271,7 +319,15 @@ CONTENEDOR: Dict[str, Any] = {
 }
 
 __all__ = [
-    "CONTENEDOR", "ID_MODULO", "NOMBRE_MODULO", "ROL_MODULO",
-    "verificar", "barrer", "inventario", "reporte", "diagnostico",
-    "catalogo", "verificar_salida",
+    "CONTENEDOR",
+    "ID_MODULO",
+    "NOMBRE_MODULO",
+    "ROL_MODULO",
+    "verificar",
+    "barrer",
+    "inventario",
+    "reporte",
+    "diagnostico",
+    "catalogo",
+    "verificar_salida",
 ]

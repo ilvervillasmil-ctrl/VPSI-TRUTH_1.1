@@ -31,6 +31,7 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import re
 import sys
 import time
@@ -38,6 +39,9 @@ from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+from core.centinela import Centinela, Veredicto
+from core.paquete_contrato import PKG_CICLO_ID
 
 # ===============================================================
 # FIN IMPORTACIONES
@@ -290,6 +294,11 @@ class Engine:
         self._cargar_y_validar()
         self._resolver_dependencias()
         self._construir_grafo()
+
+        self._mapa_ruta: List[Dict[str, Any]] = []
+        self._ruta_seq: int = 0
+        self._centinela: Optional[Centinela] = None
+
 
         if self.errores_arranque:
             self.estado = ESTADO_RECHAZADO
@@ -1757,6 +1766,10 @@ def obtener_mapa_ruta(
 #    (después de obtener_trazas / antes de FIN ENGINE).
 # ===============================================================
 
+        def obtener_trazas(self) -> Tuple[Dict[str, Any], ...]:
+        """Copia inmutable de la evidencia de ejecución."""
+        return tuple(dict(t) for t in self._trazas)
+
     def _registrar_traza(
         self,
         modulo: str,
@@ -1801,8 +1814,6 @@ def obtener_mapa_ruta(
     ) -> Any:
         """
         Puente InvocadorCapacidades para core/centinela.py.
-        Centinela no importa módulos de dominio: reproduce
-        capacidades autorizadas solo a través de este método.
         """
         salida = self.ejecutar_capacidad(modulo, capacidad, *args, **kwargs)
         if isinstance(salida, dict) and salida.get("estado") == "EXITO":
@@ -1819,12 +1830,6 @@ def obtener_mapa_ruta(
     ) -> Veredicto:
         """
         Cierre oficial del ciclo.
-
-        Engine ejecuta → consolida → genera paquete →
-        verificar_con_centinela() → Veredicto.
-
-        Usa self.centinela (instancia única, creación diferida).
-        Traza con ciclo_id para correlacionar expediente.
         """
         inicio = time.perf_counter()
         ciclo_id = None
@@ -1846,7 +1851,7 @@ def obtener_mapa_ruta(
             return veredicto
         except Exception as e:
             duracion = round(time.perf_counter() - inicio, 6)
-            err = "{0}: {1}".format(type(e).__name__, e)
+            err = f"{type(e).__name__}: {e}"
             self._registrar_traza(
                 modulo="ENGINE",
                 capacidad="verificar_con_centinela",
@@ -1856,6 +1861,7 @@ def obtener_mapa_ruta(
                 ciclo_id=ciclo_id,
             )
             raise
+
 
 # ===============================================================
 # FIN: CENTINELA

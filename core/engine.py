@@ -70,36 +70,91 @@ ESTADOS_CANONICOS = (ESTADO_NO_INICIADO, ESTADO_OPERATIVO, ESTADO_DEGRADADO, EST
 # CLAVES OBLIGATORIAS DEL CONTRATO
 # ===============================================================
 
-CLAVES_OBLIGATORIAS_CONTRATO = ("esquema", "version_contrato", "version_modulo", "id", "nombre", "rol", "descripcion", "funcion", "no_hace", "autoridad", "conocimiento_exportable", "requiere", "autoriza_engine", "consultas_soportadas", "capacidades", "capacidades_meta", "reporting", "estados_validos", "invariantes", "estabilidad", "compatible_desde", "api_engine")
-
+CLAVES_OBLIGATORIAS_CONTRATO = (
+    "esquema",
+    "version_contrato",
+    "version_modulo",
+    "id",
+    "nombre",
+    "rol",
+    "descripcion",
+    "funcion",
+    "no_hace",
+    "autoridad",
+    "conocimiento_exportable",
+    "requiere",
+    "autoriza_engine",
+    "consultas_soportadas",
+    "capacidades",
+    "capacidades_meta",
+    "reporting",
+    "estados_validos",
+    "invariantes",
+    "estabilidad",
+    "compatible_desde",
+    "api_engine",
+)
 
 # ===============================================================
 # PERMISOS AUTORIZADOS POR ENGINE
 # ===============================================================
 
-PERMISOS_AUTORIZA_ENGINE = ("leer", "ejecutar", "consultar", "recombinar", "reportar", "auditar", "inventariar", "modificar", "alterar", "reescribir", "metricas", "estado", "version", "salud", "inventario", "capacidades", "errores", "advertencias", "dependencias", "contrato", "conocimiento", "diagnostico", "reporte", "crear", "eliminar", "actualizar", "validar", "procesar", "analizar", "generar", "transformar", "exportar", "importar", "respaldar", "recuperar", "sincronizar", "monitorear", "alertar")
+PERMISOS_AUTORIZA_ENGINE = (
+    "leer", "ejecutar",
+    "consultar", "recombinar",
+    "reportar", "auditar",
+    "inventariar", "modificar",
+    "alterar", "reescribir",
+    "metricas", "estado",
+    "version", "salud",
+    "inventario", "capacidades",
+    "errores", "advertencias",
+    "dependencias", "contrato",
+    "conocimiento", "diagnostico",
+    "reporte", "crear",
+    "eliminar", "actualizar",
+    "validar", "procesar",
+    "analizar", "generar",
+    "transformar", "exportar",
+    "importar", "respaldar",
+    "recuperar", "sincronizar",
+    "monitorear", "alertar",
+)
+
 
 
 # ===============================================================
 # BANDERAS DE REPORTING
 # ===============================================================
 
-BANDERAS_REPORTING = ("estado", "salud", "inventario", "capacidades", "errores", "advertencias", "dependencias", "version", "contrato", "conocimiento", "metricas", "diagnostico", "reporte")
-
+BANDERAS_REPORTING = (
+    "estado", "salud",
+    "inventario", "capacidades",
+    "errores", "advertencias",
+    "dependencias", "version",
+    "contrato", "conocimiento",
+    "metricas", "diagnostico",
+    "reporte",
+)
 
 # ===============================================================
 # METADATOS DE CAPACIDADES
 # ===============================================================
 
-CLAVES_META_CAPACIDAD = ("descripcion", "entrada", "salida")
-
+CLAVES_META_CAPACIDAD = (
+    "descripcion", "entrada",
+    "salida",
+)
 
 # ===============================================================
 # LISTAS OBLIGATORIAS DE STR
 # ===============================================================
 
-LISTAS_STR_OBLIGATORIAS = ("no_hace", "autoridad", "conocimiento_exportable", "consultas_soportadas", "invariantes")
-
+LISTAS_STR_OBLIGATORIAS = (
+    "no_hace", "autoridad",
+    "conocimiento_exportable", "consultas_soportadas",
+    "invariantes",
+)
 
 # ===============================================================
 # DEFINICIONES

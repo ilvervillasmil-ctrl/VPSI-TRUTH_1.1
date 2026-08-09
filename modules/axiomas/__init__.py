@@ -162,6 +162,9 @@ DOMINIO_CANONICO = {
 # ===============================================================
 # CONFIGURACIÓN
 # ===============================================================
+
+_DIR = Path(__file__).parent  # ← DEFINIR PRIMERO
+
 def _rutas_py() -> List[Path]:
     """Retorna todos los archivos .py del módulo excepto __init__.py"""
     return sorted(

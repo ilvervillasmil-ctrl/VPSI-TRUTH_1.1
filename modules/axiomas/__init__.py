@@ -924,77 +924,61 @@ def recolectar(
                     })
                     continue
 
-    # ===========================================================
+# ===========================================================
+# 4. RESOLUCIÓN POR REPERTORIO DECLARATIVO
+# ===========================================================
 
-    # 4. DECLARACIÓN DE PROTECCIÓN
+def resolver_por_repertorio(
+    consulta: Dict,
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> Dict:
 
-    # ===========================================================
-
-    # La declaración 4 se incorpora al mismo registro declarativo.
-    # No conoce tests concretos, marcas concretas ni comandos concretos.
-    # Su cuerpo pertenece al dominio real de axiomas cargado por el módulo.
-    declaracion_4 = {
-
-        "id": "AX-FRONTERA-4",
-        "tipo": "axioma",
-        "cuerpo": "axiomas",
-        "sujeto": "declaracion",
-        "objeto": "inconsistencia_externa",
-        "enunciado": (
-
-            "Una inconsistencia atribuida desde una exigencia externa "
-            "debe ser evaluada conforme al cuerpo declarativo, "
-            "sujeto, objeto, dominio y capacidades disponibles, "
-            "y no puede considerarse inconsistencia del cuerpo "
-            "axiomático únicamente por una condición externa "
-            "no declarada."
-
-        ),
-
-        "gobierna": [
-
-            "declaracion",
-
-            "contrato",
-
-            "capacidad",
-
-            "frontera_engine",
-
-            "inconsistencia_externa",
-
-        ],
-
-    }
-
-    decls.append(
-
-        normalizar(
-
-            declaracion_4,
-
-            "axiomas",
-
-        )
-
+    decls, errores = recolectar(
+        declaraciones_externas
     )
 
-    return decls, errores
-    # ==========================================================
-    # 1. CARGAR ARCHIVOS EN LA CARPETA DEL MÓDULO
-    # ==========================================================
-    for archivo in sorted(_DIR.glob("**/*.py")):
-        if archivo.name == "__init__.py":
-            continue
-        try:
-            for d in _cargar_declaraciones_desde_archivo(archivo):
-                decls.append(normalizar(d, archivo.stem))
-        except Exception as e:
-            errores.append({
-                "archivo": archivo.name,
-                "error": f"{type(e).__name__}: {e}",
-            })
+    if errores:
+        return {
+            "coherente": False,
+            "estado": "ERROR_REPERTORIO",
+            "errores": errores,
+        }
 
+    resultado = barrer(
+        declaraciones_externas
+    )
+
+    if not resultado["coherente"]:
+        return {
+            "coherente": False,
+            "estado": "INCONSISTENTE",
+            "resultado": resultado,
+        }
+
+    # X representa cualquier objeto de la demanda.
+    # No se codifica ningún X concreto.
+
+    encontrada = correlacionar(
+        consulta,
+        decls,
+    )
+
+    if encontrada is not None:
+        return {
+            "coherente": True,
+            "estado": "RESUELTA",
+            "respuesta": encontrada,
+        }
+
+    # X no pertenece al repertorio.
+    # No se inventa X.
+    # La respuesta se deriva del propio repertorio AX.
+
+    return {
+        "coherente": True,
+        "estado": "NO_SUSTENTADA",
+        "respuesta": decls,
+    }
     # ==========================================================
     # 2. CARGAR ARCHIVOS EN LA RAÍZ DEL PROYECTO
     # ==========================================================

@@ -722,14 +722,14 @@ def recolectar(
             })
 
     for archivo in _rutas_py():
-    try:
-        for d in _cargar_declaraciones_desde_archivo(archivo):
-            decls.append(normalizar(d, archivo.stem))
-    except Exception as e:
-        errores.append({
-            "archivo": archivo.name,
-            "error": f"{type(e).__name__}: {e}",
-        })
+       try:
+           for d in _cargar_declaraciones_desde_archivo(archivo):
+               decls.append(normalizar(d, archivo.stem))
+       except Exception as e:
+           errores.append({
+               "archivo": archivo.name,
+               "error": f"{type(e).__name__}: {e}",
+           })
 # ===============================================================
 # CAPACIDADES PÚBLICAS
 # ===============================================================

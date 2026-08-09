@@ -162,7 +162,12 @@ DOMINIO_CANONICO = {
 # ===============================================================
 # CONFIGURACIÓN
 # ===============================================================
-
+def _rutas_py() -> List[Path]:
+    """Retorna todos los archivos .py del módulo excepto __init__.py"""
+    return sorted(
+        p for p in _DIR.glob("**/*.py")
+        if p.name != "__init__.py"
+    )
 
 # ===============================================================
 # FIN CONFIGURACIÓN

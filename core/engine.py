@@ -837,6 +837,15 @@ class Engine:
         # =========================================================================
         norm_errs: List[Dict] = []
 
+        # Conservamos la peticion original si el caller pasó un dict como primer arg
+        # o en kwargs['peticion'] — lo usamos después para garantizar que el contenido
+        # no se pierda si el módulo no lo incorpora.
+        original_payload = None
+        if len(args) >= 1 and isinstance(args[0], dict):
+            original_payload = args[0]
+        elif "peticion" in kwargs and isinstance(kwargs.get("peticion"), dict):
+            original_payload = kwargs.get("peticion")
+
         # Intentamos ligar los args/kwargs a nombres de parámetros para detectar
         # si el parámetro 'declaraciones_externas' fue pasado por posición o por nombre.
         try:
@@ -945,6 +954,29 @@ class Engine:
             # -- FIN SECCIÓN 3
             # =========================================================================
 
+            # =========================================================================
+            # ========== SECCIÓN 4: GARANTIZAR RETORNO DE LA PETICIÓN ORIGINAL ========
+            # =========================================================================
+            # Si había una peticion original (args[0] dict o kwargs['peticion']) y el
+            # módulo no la incorporó en su resultado, la añadimos bajo una clave
+            # no invasiva para que la evidencia de la transferencia quede disponible.
+            if original_payload is not None:
+                try:
+                    # Si el resultado es dict, añadimos en clave reservada si no existe
+                    if isinstance(resultado, dict):
+                        # No sobreescribir: solo añadir si la marca no está ya presente
+                        if not any(contiene := False for _ in () ):  # placeholder para legibilidad
+                            # Añadimos en una clave clara y poco probable de colisión
+                            resultado.setdefault("_peticion_pasada_por_engine", original_payload)
+                    else:
+                        # Si el módulo devuelve algo distinto a dict, envolvemos
+                        resultado = {"valor": resultado, "_peticion_pasada_por_engine": original_payload}
+                except Exception:
+                    # nunca bloquear la devolución si el merge falla
+                    pass
+            # -- FIN SECCIÓN 4
+            # =========================================================================
+
             salida = {"estado": "EXITO", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "resultado": resultado, "duracion_s": duracion}
             self.resultados_evaluacion.append(salida)
             return salida
@@ -960,6 +992,10 @@ class Engine:
             # Adjuntar errores de normalización también en caso de excepción para diagnóstico
             if norm_errs:
                 salida.setdefault("errores_normalizacion", []).extend(norm_errs)
+
+            # Adjuntar peticion original para diagnóstico si existe
+            if original_payload is not None:
+                salida.setdefault("peticion_pasada_por_engine", original_payload)
 
             self.resultados_evaluacion.append(salida)
             return salida

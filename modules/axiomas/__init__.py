@@ -924,61 +924,6 @@ def recolectar(
                     })
                     continue
 
-# ===========================================================
-# 4. RESOLUCIÓN POR REPERTORIO DECLARATIVO
-# ===========================================================
-
-def resolver_por_repertorio(
-    consulta: Dict,
-    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
-) -> Dict:
-
-    decls, errores = recolectar(
-        declaraciones_externas
-    )
-
-    if errores:
-        return {
-            "coherente": False,
-            "estado": "ERROR_REPERTORIO",
-            "errores": errores,
-        }
-
-    resultado = barrer(
-        declaraciones_externas
-    )
-
-    if not resultado["coherente"]:
-        return {
-            "coherente": False,
-            "estado": "INCONSISTENTE",
-            "resultado": resultado,
-        }
-
-    # X representa cualquier objeto de la demanda.
-    # No se codifica ningún X concreto.
-
-    encontrada = correlacionar(
-        consulta,
-        decls,
-    )
-
-    if encontrada is not None:
-        return {
-            "coherente": True,
-            "estado": "RESUELTA",
-            "respuesta": encontrada,
-        }
-
-    # X no pertenece al repertorio.
-    # No se inventa X.
-    # La respuesta se deriva del propio repertorio AX.
-
-    return {
-        "coherente": True,
-        "estado": "NO_SUSTENTADA",
-        "respuesta": decls,
-    }
     # ==========================================================
     # 2. CARGAR ARCHIVOS EN LA RAÍZ DEL PROYECTO
     # ==========================================================
@@ -1180,7 +1125,60 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
 
 def verificar(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict[str, Any]:
     return barrer(declaraciones_externas)
+# ===========================================================
+# 4. RESOLUCIÓN POR REPERTORIO DECLARATIVO
+# ===========================================================
 
+def resolver_por_repertorio(
+    consulta: Dict,
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> Dict:
+    decls, errores = recolectar(
+        declaraciones_externas
+    )
+
+    if errores:
+        return {
+            "coherente": False,
+            "estado": "ERROR_REPERTORIO",
+            "errores": errores,
+        }
+
+    resultado = barrer(
+        declaraciones_externas
+    )
+
+    if not resultado["coherente"]:
+        return {
+            "coherente": False,
+            "estado": "INCONSISTENTE",
+            "resultado": resultado,
+        }
+
+    # X representa cualquier objeto de la demanda.
+    # No se codifica ningún X concreto.
+
+    encontrada = correlacionar(
+        consulta,
+        decls,
+    )
+
+    if encontrada is not None:
+        return {
+            "coherente": True,
+            "estado": "RESUELTA",
+            "respuesta": encontrada,
+        }
+
+    # X no pertenece al repertorio.
+    # No se inventa X.
+    # La respuesta se deriva del propio repertorio AX.
+
+    return {
+        "coherente": True,
+        "estado": "NO_SUSTENTADA",
+        "respuesta": decls,
+    }
 # ===============================================================
 # DECLARACIONES EXTERNAS - EXTRACCIÓN COMPLETA
 # ===============================================================

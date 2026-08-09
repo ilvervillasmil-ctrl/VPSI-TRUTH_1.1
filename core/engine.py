@@ -723,7 +723,7 @@ class Engine:
 
     def ejecutar_contrato(
         self,
-        modulo_o_rol: str,
+        modulo_o_rol: str | Contenedor,
         capacidad: str,
         *args: Any,
         **kwargs: Any,
@@ -732,7 +732,19 @@ class Engine:
         Ejecuta una capacidad exclusivamente a través del contrato
         declarado por el módulo.
 
-        Flujo contractual único:
+        El primer argumento puede ser:
+
+            - nombre del módulo
+            - id del módulo
+            - rol del módulo
+            - Contenedor ya resuelto
+
+        Una vez obtenido el Contenedor, la ejecución utiliza
+        directamente la capacidad declarada en:
+
+            cont.capacidades[capacidad]
+
+        Flujo:
 
             Engine
                 ↓
@@ -740,21 +752,23 @@ class Engine:
                 ↓
             Contenedor
                 ↓
-            CONTENEDOR["capacidades"]
+            contrato CONTENEDOR
                 ↓
-            función real
+            capacidad declarada
+                ↓
+            función real del módulo
                 ↓
             resultado
-
-        El Engine no inventa capacidades ni resuelve nombres fuera
-        del contrato declarado.
         """
 
         # ------------------------------------------------------
         # 1. RESOLVER CONTENEDOR
         # ------------------------------------------------------
 
-        cont = self.registro.primero(modulo_o_rol)
+        if isinstance(modulo_o_rol, Contenedor):
+            cont = modulo_o_rol
+        else:
+            cont = self.registro.primero(modulo_o_rol)
 
         if cont is None:
             return {
@@ -783,7 +797,7 @@ class Engine:
             }
 
         # ------------------------------------------------------
-        # 3. VERIFICAR QUE LA CAPACIDAD ESTÉ DECLARADA
+        # 3. VERIFICAR CAPACIDAD DECLARADA
         # ------------------------------------------------------
 
         if capacidad not in cont.capacidades:
@@ -800,7 +814,7 @@ class Engine:
             }
 
         # ------------------------------------------------------
-        # 4. OBTENER LA FUNCIÓN DIRECTAMENTE DEL CONTRATO
+        # 4. RESOLVER FUNCIÓN DESDE EL CONTRATO
         # ------------------------------------------------------
 
         fn = cont.capacidades[capacidad]
@@ -819,7 +833,7 @@ class Engine:
             }
 
         # ------------------------------------------------------
-        # 5. EJECUTAR LA CAPACIDAD REAL
+        # 5. EJECUTAR CAPACIDAD REAL
         # ------------------------------------------------------
 
         inicio = time.perf_counter()
@@ -891,13 +905,13 @@ class Engine:
 
     def ejecutar_capacidad(
         self,
-        modulo_o_rol: str,
+        modulo_o_rol: str | Contenedor,
         capacidad: str,
         *args: Any,
         **kwargs: Any,
     ) -> Dict[str, Any]:
         """
-        Punto público único de ejecución.
+        Punto público único de ejecución del Engine.
 
         Toda capacidad ejecutada por el Engine atraviesa
         ejecutar_contrato().
@@ -913,7 +927,7 @@ class Engine:
 
     def ejecutar_reporte(
         self,
-        modulo_o_rol: str,
+        modulo_o_rol: str | Contenedor,
     ) -> Dict[str, Any]:
         return self.ejecutar_capacidad(
             modulo_o_rol,
@@ -923,7 +937,7 @@ class Engine:
 
     def ejecutar_diagnostico(
         self,
-        modulo_o_rol: str,
+        modulo_o_rol: str | Contenedor,
     ) -> Dict[str, Any]:
         return self.ejecutar_capacidad(
             modulo_o_rol,
@@ -933,7 +947,7 @@ class Engine:
 
     def ejecutar_inventario(
         self,
-        modulo_o_rol: str,
+        modulo_o_rol: str | Contenedor,
     ) -> Dict[str, Any]:
         return self.ejecutar_capacidad(
             modulo_o_rol,
@@ -943,7 +957,7 @@ class Engine:
 
     def ejecutar_con_contexto_unificado(
         self,
-        modulo_o_rol: str,
+        modulo_o_rol: str | Contenedor,
         capacidad: str,
         payload: Dict[str, Any],
     ) -> Dict[str, Any]:
@@ -951,9 +965,13 @@ class Engine:
         Ejecuta una capacidad contractual recibiendo un único
         payload de contexto.
 
-        Esta ruta conserva su semántica específica: la capacidad
-        recibe exactamente el payload como primer argumento.
+        El payload se entrega directamente a la capacidad real
+        declarada por el contrato.
         """
+
+        # ------------------------------------------------------
+        # 1. VALIDAR PAYLOAD
+        # ------------------------------------------------------
 
         if not isinstance(payload, dict):
             return {
@@ -963,6 +981,10 @@ class Engine:
                     f"es {type(payload).__name__}"
                 ),
             }
+
+        # ------------------------------------------------------
+        # 2. EJECUCIÓN CONTRACTUAL ÚNICA
+        # ------------------------------------------------------
 
         return self.ejecutar_contrato(
             modulo_o_rol,

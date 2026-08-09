@@ -832,24 +832,87 @@ class Engine:
             return {"estado": "ERROR", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error}
 
         # =========================================================================
-        # ========== SECCIÓN 2: NORMALIZACIÓN EN LA FRONTERA DE INVOCACIÓN ========
+        # ========== SECCIÓN 2 (MEJORADA): Normalización en frontera que maneja =
+        # ========== tanto kwargs como args posicionales (bind_partial)       ======
         # =========================================================================
-        # -- INICIO: Normalizar inputs previsibles (p.ej. 'declaraciones_externas')
-        # Recolectamos norm_errs (lista de dicts) para anexarlas al resultado luego.
         norm_errs: List[Dict] = []
-        if "declaraciones_externas" in kwargs:
+
+        # Intentamos ligar los args/kwargs a nombres de parámetros para detectar
+        # si el parámetro 'declaraciones_externas' fue pasado por posición o por nombre.
+        try:
+            sig = inspect.signature(fn)
+            bound = sig.bind_partial(*args, **kwargs)  # no exige todos los params
+        except Exception:
+            # si fallara por cualquier motivo, no rompemos: dejamos args/kwargs tal cual
+            bound = None
+
+        # Si se ligó, normalizamos el campo si está presente
+        if bound is not None and "declaraciones_externas" in bound.arguments:
+            raw = bound.arguments.get("declaraciones_externas")
             try:
-                norm, errs = self._normalizar_declaraciones_externas(kwargs.get("declaraciones_externas"))
-                kwargs["declaraciones_externas"] = norm
+                norm, errs = self._normalizar_declaraciones_externas(raw)
+                bound.arguments["declaraciones_externas"] = norm
                 if errs:
                     norm_errs.extend(errs)
             except Exception:
-                # En caso raro de fallo en el normalizador, no rompemos la invocación:
                 norm_errs.append({"modulo": cont.nombre, "error": "error en normalizador interno", "cuerpo": cont.nombre, "razon": "excepcion en normalizador"})
-        # -- FIN: Normalizar inputs ------------------------------------------------
+
+            # Reconstruimos args2 y kwargs2 a partir de bound.arguments respetando
+            # la clasificación de parámetros para invocar la función exactamente.
+            params = list(sig.parameters.values())
+            args2: List[Any] = []
+            kwargs2: Dict[str, Any] = {}
+
+            for p in params:
+                if p.name in bound.arguments:
+                    val = bound.arguments[p.name]
+                    if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD):
+                        args2.append(val)
+                    elif p.kind == inspect.Parameter.VAR_POSITIONAL:
+                        # expandir si es iterable
+                        if isinstance(val, (list, tuple)):
+                            args2.extend(val)
+                        else:
+                            args2.append(val)
+                    elif p.kind in (inspect.Parameter.KEYWORD_ONLY, inspect.Parameter.VAR_KEYWORD):
+                        # KEYWORD_ONLY: p.name as key
+                        if p.kind == inspect.Parameter.KEYWORD_ONLY:
+                            kwargs2[p.name] = val
+                        else:
+                            # VAR_KEYWORD: esperable un dict
+                            if isinstance(val, dict):
+                                kwargs2.update(val)
+                            else:
+                                kwargs2[p.name] = val
+            # Añadir cualquier argumento ligado no presente en parameters (defensive)
+            for name, value in bound.arguments.items():
+                if name not in [p.name for p in params]:
+                    kwargs2[name] = value
+
+            # Usaremos args2/kwargs2 para la validación y la llamada
+            args_for_validation = tuple(args2)
+            kwargs_for_validation = dict(kwargs2)
+
+        else:
+            # no se ligó o no había declaraciones_externas → usar los originales
+            args_for_validation = args
+            kwargs_for_validation = dict(kwargs)
+
+            # si el campo estaba en kwargs originalmente, intentemos normalizarlo también
+            if "declaraciones_externas" in kwargs_for_validation:
+                try:
+                    norm, errs = self._normalizar_declaraciones_externas(kwargs_for_validation.get("declaraciones_externas"))
+                    kwargs_for_validation["declaraciones_externas"] = norm
+                    if errs:
+                        norm_errs.extend(errs)
+                except Exception:
+                    norm_errs.append({"modulo": cont.nombre, "error": "error en normalizador interno", "cuerpo": cont.nombre, "razon": "excepcion en normalizador"})
+
+        # -- FIN SECCIÓN 2 mejorada
         # =========================================================================
 
-        error_entrada = self._validar_entrada_capacidad(cont, capacidad, args, kwargs)
+        # Validamos ahora la entrada con la forma normalizada (si hubo)
+        error_entrada = self._validar_entrada_capacidad(cont, capacidad, args_for_validation, kwargs_for_validation)
         if error_entrada:
             return {"estado": "ERROR_ENTRADA", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error_entrada}
 
@@ -858,7 +921,8 @@ class Engine:
 
         try:
             funcion_invocada = True
-            resultado = fn(*args, **kwargs)
+            # Invocamos usando los args/kwargs reconstruidos
+            resultado = fn(*args_for_validation, **kwargs_for_validation)
             duracion = round(time.perf_counter() - inicio, 6)
 
             # Registrar traza de éxito
@@ -867,23 +931,18 @@ class Engine:
             # =========================================================================
             # ========== SECCIÓN 3: ANEXAR ERRORES DE NORMALIZACIÓN ===================
             # =========================================================================
-            # -- INICIO: Si hubo norm_errs, integrarlos en el 'resultado' devuelto
             if norm_errs:
-                # Preparamos una lista simple compatible con los módulos existentes
                 mapped = [{"modulo": e.get("modulo"), "error": e.get("error")} for e in norm_errs]
-                # Si resultado es dict y tiene 'errores' -> anexar
                 if isinstance(resultado, dict):
                     if "errores" in resultado and isinstance(resultado["errores"], list):
                         resultado["errores"].extend(mapped)
                     elif "resultado" in resultado and isinstance(resultado["resultado"], dict):
                         resultado["resultado"].setdefault("errores", []).extend(mapped)
                     else:
-                        # Añadir 'errores' en la raíz del resultado para compatibilidad
                         resultado.setdefault("errores", []).extend(mapped)
                 else:
-                    # Si el módulo devuelve algo no-dict, envolver e informar errores
                     resultado = {"coherente": False, "valor": resultado, "errores": mapped}
-            # -- FIN: anexión de errores ------------------------------------------------
+            # -- FIN SECCIÓN 3
             # =========================================================================
 
             salida = {"estado": "EXITO", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "resultado": resultado, "duracion_s": duracion}

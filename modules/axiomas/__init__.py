@@ -863,12 +863,15 @@ def recolectar(
                 "error": f"{type(e).__name__}: {e}",
             })
 
-    # 3. Manejo de declaraciones externas
+        # 3. Manejo de declaraciones externas con recuperación y reporte de excepciones
     if declaraciones_externas:
         for nombre, lista in declaraciones_externas.items():
-            # Si no es lista, genera la lista leyendo axiomas y teoremas de la carpeta
-            if not isinstance(lista, list):
-                lista_auto = []
+            elementos_a_procesar = []
+
+            if isinstance(lista, list):
+                elementos_a_procesar = lista
+            else:
+                # Si no es una lista, escaneamos las declaraciones reales de la carpeta
                 for archivo in sorted(_DIR.glob("**/*.py")):
                     if archivo.name == "__init__.py":
                         continue
@@ -876,24 +879,52 @@ def recolectar(
                         for d in _cargar_declaraciones_desde_archivo(archivo):
                             tipo = str(d.get("tipo", "")).lower()
                             if tipo in ("axioma", "teorema", "axiom", "theorem"):
-                                lista_auto.append(normalizar(d, nombre))
+                                elementos_a_procesar.append(d)
                     except Exception as e:  # noqa: BLE001
                         errores.append({
                             "modulo": nombre,
-                            "error": f"Error extrayendo de carpeta para no-lista: {e}",
+                            "error": f"Error extrayendo axiomas de carpeta: {e}",
                         })
-                lista = lista_auto
+                
+                # Si el valor no-lista es un diccionario individual, lo sumamos para evaluar
+                if isinstance(lista, dict):
+                    elementos_a_procesar.append(lista)
 
-            # Procesar elementos de la lista
-            for d in lista:
+            # Evaluación de cada declaración / marca recibida
+            for d in elementos_a_procesar:
+                if not isinstance(d, dict):
+                    errores.append({
+                        "modulo": nombre,
+                        "error": f"Declaración no válida (tipo incorrecto: {type(d).__name__})"
+                    })
+                    continue
+
                 try:
-                    if d in decls:
-                        continue
-                    decls.append(d if "cuerpo" in d else normalizar(d, nombre))
-                except ValueError as e:
-                    errores.append({"modulo": nombre, "error": str(e)})
+                    # Intento de normalización/verificación de existencia
+                    decl_norm = d if "cuerpo" in d else normalizar(d, nombre)
+                    
+                    # Verificamos si la declaración posee un cuerpo/ID válido dentro del dominio
+                    if not decl_norm.get("id") or not decl_norm.get("cuerpo"):
+                        # Captura de excepción: Axioma/Declaración no existe en el sistema
+                        errores.append({
+                            "modulo": nombre,
+                            "tipo_excepcion": "axioma_no_existente",
+                            "detalle": f"El axioma o marca '{decl_norm.get('id', 'desconocido')}' no existe en el registro.",
+                            "declaracion_omitida": decl_norm
+                        })
+                        continue  # Salta y continúa con el siguiente sin tumbar el pipeline
 
-    return decls, errores
+                    # Si existe y es válida, la añade a la lista de declaraciones principales
+                    decls.append(decl_norm)
+
+                except ValueError as e:
+                    # Manejo de la excepción cuando la normalización determina que no existe
+                    errores.append({
+                        "modulo": nombre,
+                        "tipo_excepcion": "declaracion_invalida_omitida",
+                        "error": str(e),
+                    })
+                    continue  # Continúa la recolección
 
     # ==========================================================
     # 1. CARGAR ARCHIVOS EN LA CARPETA DEL MÓDULO

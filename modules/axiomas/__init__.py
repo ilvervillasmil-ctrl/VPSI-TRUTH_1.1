@@ -260,6 +260,7 @@ CONTENEDOR: Dict[str, Any] = {
         "estado",
         "reporte",
         "diagnostico",
+        "declaraciones_externas",
     ],
 
     # ============================================================

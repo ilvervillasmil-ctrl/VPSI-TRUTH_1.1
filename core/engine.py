@@ -458,6 +458,252 @@ class Engine:
                     self.errores_arranque.append(
                         f"{nombre}: {error}"
                     )
+
+    # ===========================================================
+# DECLARACIÓN 4 — RESOLUCIÓN POR EXISTENCIA CONTRACTUAL
+# ===========================================================
+
+def resolver_existencia(self, peticion: Any) -> Dict[str, Any]:
+    """
+    Determina si una petición X puede ser resuelta utilizando
+    el repertorio contractual real de todos los módulos
+    registrados en Engine.
+
+    Regla universal:
+
+        X existe
+            si el repertorio contractual contiene una vía
+            declarada para atender X.
+
+        X no existe
+            si ninguna capacidad contractual disponible
+            permite resolver X.
+
+    La ausencia de X NO es un error.
+
+    Engine no inventa:
+        - capacidades
+        - módulos
+        - identificadores
+        - declaraciones
+        - respuestas
+
+    Engine utiliza únicamente aquello que los contratos
+    realmente ponen a su disposición.
+    """
+
+    if not isinstance(peticion, str):
+        return {
+            "estado": "NO_EXISTE",
+            "existe": False,
+            "peticion": peticion,
+        }
+
+    x = peticion.strip()
+
+    if not x:
+        return {
+            "estado": "NO_EXISTE",
+            "existe": False,
+            "peticion": peticion,
+        }
+
+    coincidencias: List[Dict[str, Any]] = []
+
+    # -------------------------------------------------------
+    # UNIÓN DEL REPERTORIO CONTRACTUAL
+    # -------------------------------------------------------
+
+    for nombre, cont in self.registro.contenedores.items():
+
+        # ---------------------------------------------------
+        # CAPACIDADES
+        # ---------------------------------------------------
+
+        for capacidad in cont.capacidades.keys():
+
+            if str(capacidad).strip() == x:
+
+                coincidencias.append({
+                    "modulo": cont.nombre,
+                    "rol": cont.rol,
+                    "id": cont.id,
+                    "tipo": "capacidad",
+                    "nombre": capacidad,
+                })
+
+        # ---------------------------------------------------
+        # CONOCIMIENTO EXPORTABLE
+        # ---------------------------------------------------
+
+        for declaracion in cont.conocimiento_exportable:
+
+            if isinstance(declaracion, str):
+                if declaracion.strip() == x:
+
+                    coincidencias.append({
+                        "modulo": cont.nombre,
+                        "rol": cont.rol,
+                        "id": cont.id,
+                        "tipo": "conocimiento_exportable",
+                        "nombre": declaracion,
+                    })
+
+        # ---------------------------------------------------
+        # CONSULTAS SOPORTADAS
+        # ---------------------------------------------------
+
+        for consulta in cont.consultas_soportadas:
+
+            if isinstance(consulta, str):
+                if consulta.strip() == x:
+
+                    coincidencias.append({
+                        "modulo": cont.nombre,
+                        "rol": cont.rol,
+                        "id": cont.id,
+                        "tipo": "consulta_soportada",
+                        "nombre": consulta,
+                    })
+
+        # ---------------------------------------------------
+        # AUTORIDAD
+        # ---------------------------------------------------
+
+        for autoridad in cont.autoridad:
+
+            if isinstance(autoridad, str):
+                if autoridad.strip() == x:
+
+                    coincidencias.append({
+                        "modulo": cont.nombre,
+                        "rol": cont.rol,
+                        "id": cont.id,
+                        "tipo": "autoridad",
+                        "nombre": autoridad,
+                    })
+
+        # ---------------------------------------------------
+        # INVARIANTES
+        # ---------------------------------------------------
+
+        for invariante in cont.invariantes:
+
+            if isinstance(invariante, str):
+                if invariante.strip() == x:
+
+                    coincidencias.append({
+                        "modulo": cont.nombre,
+                        "rol": cont.rol,
+                        "id": cont.id,
+                        "tipo": "invariante",
+                        "nombre": invariante,
+                    })
+
+    # -------------------------------------------------------
+    # X EXISTE EN EL REPERTORIO
+    # -------------------------------------------------------
+
+    if coincidencias:
+
+        return {
+            "estado": "EXISTE",
+            "existe": True,
+            "peticion": x,
+            "coincidencias": coincidencias,
+        }
+
+    # -------------------------------------------------------
+    # X NO EXISTE
+    # -------------------------------------------------------
+
+    return {
+        "estado": "NO_EXISTE",
+        "existe": False,
+        "peticion": x,
+        "coincidencias": [],
+        "razon": "NO_EXISTE",
+    }
+
+
+# ===========================================================
+# DECLARACIÓN 4 — RESOLUCIÓN Y EJERCICIO
+# ===========================================================
+
+def resolver_peticion(
+    self,
+    peticion: Any,
+    *args: Any,
+    **kwargs: Any,
+) -> Dict[str, Any]:
+    """
+    Resuelve X utilizando el repertorio contractual completo.
+
+    Si existe una capacidad declarada capaz de atender X,
+    Engine la ejerce mediante ejecutar_capacidad().
+
+    Si no existe ninguna capacidad contractual para X,
+    devuelve literalmente:
+
+        NO_EXISTE
+
+    No transforma X.
+    No inventa otra capacidad.
+    No obliga a un módulo a responder algo que no posee.
+    """
+
+    existencia = self.resolver_existencia(peticion)
+
+    # -------------------------------------------------------
+    # NO EXISTE
+    # -------------------------------------------------------
+
+    if existencia["estado"] == "NO_EXISTE":
+
+        return {
+            "estado": "NO_EXISTE",
+            "existe": False,
+            "peticion": existencia.get("peticion"),
+            "coincidencias": [],
+            "razon": "NO_EXISTE",
+        }
+
+    # -------------------------------------------------------
+    # EXISTE
+    # -------------------------------------------------------
+
+    capacidades = [
+        item
+        for item in existencia["coincidencias"]
+        if item["tipo"] == "capacidad"
+    ]
+
+    # -------------------------------------------------------
+    # EXISTE COMO DECLARACIÓN PERO NO COMO CAPACIDAD
+    # -------------------------------------------------------
+
+    if not capacidades:
+
+        return {
+            "estado": "EXISTE",
+            "existe": True,
+            "resoluble": False,
+            "peticion": existencia["peticion"],
+            "coincidencias": existencia["coincidencias"],
+        }
+
+    # -------------------------------------------------------
+    # EJERCER CAPACIDAD REAL
+    # -------------------------------------------------------
+
+    objetivo = capacidades[0]
+
+    return self.ejecutar_capacidad(
+        objetivo["modulo"],
+        objetivo["nombre"],
+        *args,
+        **kwargs,
+    )
     # ===========================================================
     # VALIDACIÓN DE LISTAS STR
     # ===========================================================

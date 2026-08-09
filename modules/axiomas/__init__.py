@@ -163,7 +163,18 @@ DOMINIO_CANONICO = {
 # CONFIGURACIÓN
 # ===============================================================
 
-_DIR = Path(__file__).parent  # ← DEFINIR PRIMERO
+_DIR = Path(__file__).parent
+
+def _ruta_vpsi() -> Optional[Path]:
+    candidatos = [
+        _DIR.parent.parent / "VPSI.py",
+        _DIR.parent / "VPSI.py",
+        _DIR / "VPSI.py",
+    ]
+    for p in candidatos:
+        if p.exists():
+            return p
+    return None
 
 def _rutas_py() -> List[Path]:
     """Retorna todos los archivos .py del módulo excepto __init__.py"""

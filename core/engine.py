@@ -716,10 +716,26 @@ class Engine:
         if error:
             entrada["error"] = error
         self._trazas.append(entrada)
-
 # ==========================================================
 # EJECUCIÓN
 # ==========================================================
+
+def censar(self) -> Dict[str, Any]:
+    """
+    Retorna la vista de censo e inspección del estado interno del Engine.
+    Requerido para pruebas de censo y validación de roles/contenedores.
+    """
+    return {
+        "total_contenedores": self.registro.total(),
+        "roles": getattr(self.registro, "por_rol", {}),
+        "contenedores": getattr(self.registro, "contenedores", {}),
+        "rechazados": list(
+            getattr(self, "rechazados", [])
+            or getattr(self, "contenedores_rechazados", [])
+        ),
+        "errores_arranque": list(getattr(self, "errores_arranque", [])),
+    }
+
 
 def _registrar_ruta(
     self,
@@ -823,7 +839,7 @@ def _validar_entrada_capacidad(
     El contrato sigue siendo la autoridad sobre la capacidad.
     """
 
-    fn = cont.fn(capacidad)
+    fn = cont.fn(capacidad) if hasattr(cont, "fn") else cont.capacidades.get(capacidad)
 
     if not callable(fn):
         return (
@@ -893,6 +909,7 @@ def ejecutar_capacidad(
             capacidad=capacidad,
             estado="ERROR",
             detalle=error,
+            contenedor_resuelto=False,
         )
 
         return {
@@ -907,6 +924,7 @@ def ejecutar_capacidad(
         capacidad=capacidad,
         estado="OK",
         detalle="Contenedor resuelto",
+        contenedor_resuelto=True,
     )
 
     # ------------------------------------------------------
@@ -927,6 +945,7 @@ def ejecutar_capacidad(
             capacidad=capacidad,
             estado="RECHAZADO",
             detalle=error,
+            contrato_resuelto=False,
         )
 
         return {
@@ -945,13 +964,14 @@ def ejecutar_capacidad(
         capacidad=capacidad,
         estado="AUTORIZADO",
         detalle="Contrato autoriza ejecución",
+        contrato_resuelto=True,
     )
 
     # ------------------------------------------------------
     # 3. RESOLUCIÓN DE CAPACIDAD
     # ------------------------------------------------------
 
-    fn = cont.fn(capacidad)
+    fn = cont.fn(capacidad) if hasattr(cont, "fn") else cont.capacidades.get(capacidad)
 
     if not callable(fn):
         error = (
@@ -966,6 +986,7 @@ def ejecutar_capacidad(
             capacidad=capacidad,
             estado="RECHAZADO",
             detalle=error,
+            capacidad_resuelta=False,
         )
 
         return {
@@ -984,6 +1005,7 @@ def ejecutar_capacidad(
         capacidad=capacidad,
         estado="RESUELTA",
         detalle="Capacidad declarada y callable",
+        capacidad_resuelta=True,
     )
 
     # ------------------------------------------------------
@@ -1016,6 +1038,8 @@ def ejecutar_capacidad(
             "error": error_entrada,
         }
 
+    contenido_entregado = bool(args) or bool(kwargs)
+
     self._registrar_ruta(
         etapa="ENTRADA",
         modulo=cont.nombre,
@@ -1024,6 +1048,7 @@ def ejecutar_capacidad(
         estado="VALIDADA",
         argumentos_n=len(args),
         argumentos_kw=list(kwargs.keys()),
+        contenido_entregado=contenido_entregado,
     )
 
     # ------------------------------------------------------
@@ -1037,6 +1062,7 @@ def ejecutar_capacidad(
         capacidad=capacidad,
         estado="ENTREGANDO",
         detalle="Engine entrega argumentos a la capacidad",
+        funcion_invocada=True,
     )
 
     inicio = time.perf_counter()
@@ -1060,13 +1086,14 @@ def ejecutar_capacidad(
             capacidad=capacidad,
             estado="RECIBIDO",
             detalle="El módulo devolvió un resultado al Engine",
+            contenido_recibido=contenido_entregado,
         )
 
         self._registrar_traza(
-            cont.nombre,
-            capacidad,
-            "EXITO",
-            duracion,
+            modulo=cont.nombre,
+            capacidad=capacidad,
+            estado="EXITO",
+            duracion_s=duracion,
         )
 
         salida = {
@@ -1087,9 +1114,21 @@ def ejecutar_capacidad(
             etapa="RESULTADO",
             modulo=cont.nombre,
             rol=cont.rol,
+            id_modulo=cont.id,
             capacidad=capacidad,
+            entrada={
+                "args": args,
+                "kwargs": kwargs,
+            },
+            resultado=resultado,
             estado="EXITO",
             detalle="Resultado consolidado por Engine",
+            contenedor_resuelto=True,
+            contrato_resuelto=True,
+            capacidad_resuelta=True,
+            funcion_invocada=True,
+            contenido_entregado=contenido_entregado,
+            contenido_recibido=contenido_entregado,
         )
 
         self.resultados_evaluacion.append(salida)
@@ -1115,11 +1154,33 @@ def ejecutar_capacidad(
         )
 
         self._registrar_traza(
-            cont.nombre,
-            capacidad,
-            "ERROR_EJECUCION",
-            duracion,
-            err,
+            modulo=cont.nombre,
+            capacidad=capacidad,
+            estado="ERROR_EJECUCION",
+            duracion_s=duracion,
+            error=err,
+        )
+
+        self._registrar_ruta(
+            etapa="RESULTADO",
+            modulo=cont.nombre,
+            rol=cont.rol,
+            id_modulo=cont.id,
+            capacidad=capacidad,
+            entrada={
+                "args": args,
+                "kwargs": kwargs,
+            },
+            resultado=None,
+            estado="ERROR_EJECUCION",
+            detalle=err,
+            contenedor_resuelto=True,
+            contrato_resuelto=True,
+            capacidad_resuelta=True,
+            funcion_invocada=True,
+            contenido_entregado=contenido_entregado,
+            contenido_recibido=contenido_entregado,
+            error=err,
         )
 
         salida = {
@@ -1210,7 +1271,8 @@ def obtener_mapa_ruta(
         for item in self._mapa_ruta
     )
 
-    # ----------------------------------------------------------
+
+# ----------------------------------------------------------
 # MAPA DE RUTA DE EJECUCIÓN
 # ----------------------------------------------------------
 

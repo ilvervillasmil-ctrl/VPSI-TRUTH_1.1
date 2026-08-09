@@ -720,106 +720,152 @@ class Engine:
     # ----------------------------------------------------------
     # EJECUCIÓN
     # ----------------------------------------------------------
-    def ejecutar_capacidad(
-        self, modulo_o_rol: str, capacidad: str, *args, **kwargs
+
+    def ejecutar_contrato(
+        self,
+        modulo_o_rol: str,
+        capacidad: str,
+        *args: Any,
+        **kwargs: Any,
     ) -> Dict[str, Any]:
+        """
+        Ejecuta una capacidad exclusivamente a través del contrato
+        declarado por el módulo.
+
+        Flujo contractual único:
+
+            Engine
+                ↓
+            Registro
+                ↓
+            Contenedor
+                ↓
+            CONTENEDOR["capacidades"]
+                ↓
+            función real
+                ↓
+            resultado
+
+        El Engine no inventa capacidades ni resuelve nombres fuera
+        del contrato declarado.
+        """
+
+        # ------------------------------------------------------
+        # 1. RESOLVER CONTENEDOR
+        # ------------------------------------------------------
+
         cont = self.registro.primero(modulo_o_rol)
+
         if cont is None:
-            return {"error": f"Módulo/rol no encontrado: {modulo_o_rol}"}
-
-        if cont.autoriza_engine.get("ejecutar") is False:
-            return {"error": f"{cont.nombre}: contrato no autoriza ejecutar"}
-
-        fn = cont.fn(capacidad)
-        if not callable(fn):
             return {
-                "error": f"Capacidad '{capacidad}' no es ejecutable en {cont.nombre}"
+                "estado": "ERROR",
+                "error": (
+                    f"Módulo/rol no encontrado: "
+                    f"{modulo_o_rol}"
+                ),
             }
 
+        # ------------------------------------------------------
+        # 2. VERIFICAR AUTORIZACIÓN CONTRACTUAL
+        # ------------------------------------------------------
+
+        if cont.autoriza_engine.get("ejecutar") is not True:
+            return {
+                "estado": "ERROR",
+                "modulo": cont.nombre,
+                "rol": cont.rol,
+                "id": cont.id,
+                "capacidad": capacidad,
+                "error": (
+                    f"{cont.nombre}: el contrato no autoriza "
+                    "la ejecución por Engine"
+                ),
+            }
+
+        # ------------------------------------------------------
+        # 3. VERIFICAR QUE LA CAPACIDAD ESTÉ DECLARADA
+        # ------------------------------------------------------
+
+        if capacidad not in cont.capacidades:
+            return {
+                "estado": "ERROR",
+                "modulo": cont.nombre,
+                "rol": cont.rol,
+                "id": cont.id,
+                "capacidad": capacidad,
+                "error": (
+                    f"{cont.nombre}: capacidad '{capacidad}' "
+                    "no declarada en CONTENEDOR"
+                ),
+            }
+
+        # ------------------------------------------------------
+        # 4. OBTENER LA FUNCIÓN DIRECTAMENTE DEL CONTRATO
+        # ------------------------------------------------------
+
+        fn = cont.capacidades[capacidad]
+
+        if not callable(fn):
+            return {
+                "estado": "ERROR",
+                "modulo": cont.nombre,
+                "rol": cont.rol,
+                "id": cont.id,
+                "capacidad": capacidad,
+                "error": (
+                    f"{cont.nombre}: la capacidad '{capacidad}' "
+                    "declarada en CONTENEDOR no es callable"
+                ),
+            }
+
+        # ------------------------------------------------------
+        # 5. EJECUTAR LA CAPACIDAD REAL
+        # ------------------------------------------------------
+
         inicio = time.perf_counter()
+
         try:
             resultado = fn(*args, **kwargs)
-            duracion = round(time.perf_counter() - inicio, 6)
-            self._registrar_traza(cont.nombre, capacidad, "EXITO", duracion)
-            salida = {
-                "estado": "EXITO",
-                "modulo": cont.nombre,
-                "capacidad": capacidad,
-                "resultado": resultado,
-                "duracion_s": duracion,
-            }
-            self.resultados_evaluacion.append(salida)
-            return salida
-        except Exception as e:
-            duracion = round(time.perf_counter() - inicio, 6)
-            err = f"{type(e).__name__}: {e}"
-            self._registrar_traza(
-                cont.nombre, capacidad, "ERROR_EJECUCION", duracion, err
+
+            duracion = round(
+                time.perf_counter() - inicio,
+                6,
             )
-            salida = {
-                "estado": "ERROR_EJECUCION",
-                "modulo": cont.nombre,
-                "capacidad": capacidad,
-                "error": err,
-                "duracion_s": duracion,
-            }
-            self.resultados_evaluacion.append(salida)
-            return salida
 
-    def ejecutar_reporte(self, modulo_o_rol: str) -> Dict[str, Any]:
-        return self.ejecutar_capacidad(modulo_o_rol, "reporte")
-
-    def ejecutar_diagnostico(self, modulo_o_rol: str) -> Dict[str, Any]:
-        return self.ejecutar_capacidad(modulo_o_rol, "diagnostico")
-
-    def ejecutar_inventario(self, modulo_o_rol: str) -> Dict[str, Any]:
-        return self.ejecutar_capacidad(modulo_o_rol, "inventario")
-
-    def ejecutar_con_contexto_unificado(self, modulo_o_rol: str, capacidad: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-        cont = self.registro.primero(modulo_o_rol)
-        if cont is None:
-            return {
-                "estado": "ERROR",
-                "error": f"Módulo/rol no encontrado: {modulo_o_rol}",
-            }
-        if cont.autoriza_engine.get("ejecutar") is False:
-            return {
-                "estado": "ERROR",
-                "error": f"{cont.nombre}: contrato no autoriza ejecutar",
-            }
-        fn = cont.fn(capacidad)
-        if not callable(fn):
-            return {
-                "estado": "ERROR",
-                "error": f"Capacidad '{capacidad}' no es ejecutable en {cont.nombre}",
-            }
-        if not isinstance(payload, dict):
-            return {
-                "estado": "ERROR",
-                "error": f"payload debe ser dict, es {type(payload).__name__}",
-            }
-        inicio = time.perf_counter()
-        try:
-            resultado = fn(payload)
-            duracion = round(time.perf_counter() - inicio, 6)
             self._registrar_traza(
                 modulo=cont.nombre,
                 capacidad=capacidad,
                 estado="EXITO",
                 duracion_s=duracion,
             )
+
             salida = {
                 "estado": "EXITO",
                 "modulo": cont.nombre,
+                "rol": cont.rol,
+                "id": cont.id,
                 "capacidad": capacidad,
                 "resultado": resultado,
                 "duracion_s": duracion,
             }
+
             self.resultados_evaluacion.append(salida)
+
             return salida
+
+        # ------------------------------------------------------
+        # 6. ERROR REAL DE EJECUCIÓN
+        # ------------------------------------------------------
+
         except Exception as e:
-            duracion = round(time.perf_counter() - inicio, 6)
+
+            duracion = round(
+                time.perf_counter() - inicio,
+                6,
+            )
+
             error = f"{type(e).__name__}: {e}"
+
             self._registrar_traza(
                 modulo=cont.nombre,
                 capacidad=capacidad,
@@ -827,15 +873,102 @@ class Engine:
                 duracion_s=duracion,
                 error=error,
             )
+
             salida = {
                 "estado": "ERROR_EJECUCION",
                 "modulo": cont.nombre,
+                "rol": cont.rol,
+                "id": cont.id,
                 "capacidad": capacidad,
                 "error": error,
                 "duracion_s": duracion,
             }
+
             self.resultados_evaluacion.append(salida)
+
             return salida
+
+
+    def ejecutar_capacidad(
+        self,
+        modulo_o_rol: str,
+        capacidad: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """
+        Punto público único de ejecución.
+
+        Toda capacidad ejecutada por el Engine atraviesa
+        ejecutar_contrato().
+        """
+
+        return self.ejecutar_contrato(
+            modulo_o_rol,
+            capacidad,
+            *args,
+            **kwargs,
+        )
+
+
+    def ejecutar_reporte(
+        self,
+        modulo_o_rol: str,
+    ) -> Dict[str, Any]:
+        return self.ejecutar_capacidad(
+            modulo_o_rol,
+            "reporte",
+        )
+
+
+    def ejecutar_diagnostico(
+        self,
+        modulo_o_rol: str,
+    ) -> Dict[str, Any]:
+        return self.ejecutar_capacidad(
+            modulo_o_rol,
+            "diagnostico",
+        )
+
+
+    def ejecutar_inventario(
+        self,
+        modulo_o_rol: str,
+    ) -> Dict[str, Any]:
+        return self.ejecutar_capacidad(
+            modulo_o_rol,
+            "inventario",
+        )
+
+
+    def ejecutar_con_contexto_unificado(
+        self,
+        modulo_o_rol: str,
+        capacidad: str,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Ejecuta una capacidad contractual recibiendo un único
+        payload de contexto.
+
+        Esta ruta conserva su semántica específica: la capacidad
+        recibe exactamente el payload como primer argumento.
+        """
+
+        if not isinstance(payload, dict):
+            return {
+                "estado": "ERROR",
+                "error": (
+                    f"payload debe ser dict, "
+                    f"es {type(payload).__name__}"
+                ),
+            }
+
+        return self.ejecutar_contrato(
+            modulo_o_rol,
+            capacidad,
+            payload,
+        )
         
     # ----------------------------------------------------------
     # CONSOLIDACIÓN

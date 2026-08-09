@@ -374,7 +374,60 @@ class Engine:
         except Exception as e:
             self.errores_arranque.append(f"{path_dir.name}: error al cargar → {type(e).__name__}: {e}")
             return None
+# ===========================================================
+# CARGA Y REGISTRO
+# ===========================================================
 
+def _cargar_y_validar(self) -> None:
+    for path_dir in self._modulos_descubiertos:
+        # ---------------------------------------------------
+        # LEER CONTRATO Y MATERIALIZAR MÓDULO
+        # ---------------------------------------------------
+        leido = self._leer_contrato(path_dir)
+        if leido is None:
+            continue
+
+        meta = leido["meta"]
+        nombre = meta.get("nombre") or leido["nombre_carpeta"]
+        mod = leido["modulo"]
+
+        # ---------------------------------------------------
+        # ARCHIVOS PY
+        # ---------------------------------------------------
+        archivos_py = sorted(
+            p for p in path_dir.rglob("*.py")
+            if p.is_file()
+        )
+
+        # ---------------------------------------------------
+        # CONTEXTO ESTRUCTURAL DEL MÓDULO
+        # ---------------------------------------------------
+        setattr(mod, "ARCHIVOS_PY", archivos_py)
+
+        # ---------------------------------------------------
+        # VALIDACIÓN DEL CONTRATO
+        # ---------------------------------------------------
+        errores = self._validar_esquema(meta, nombre)
+        if errores:
+            self.errores_arranque.extend(errores)
+            continue
+
+        # ---------------------------------------------------
+        # MATERIALIZACIÓN DEL CONTENEDOR
+        # ---------------------------------------------------
+        cont = Contenedor(
+            meta=meta,
+            modulo=mod,
+            ruta=leido["ruta"],
+        )
+
+        # ---------------------------------------------------
+        # REGISTRO DEL MÓDULO
+        # ---------------------------------------------------
+        errores_dup = self.registro.registrar(cont)
+        if errores_dup:
+            for error in errores_dup:
+                self.errores_arranque.append(f"{nombre}: {error}")
     # ===========================================================
     # VALIDACIÓN DE LISTAS STR
     # ===========================================================

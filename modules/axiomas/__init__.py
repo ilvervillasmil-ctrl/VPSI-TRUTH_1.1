@@ -739,8 +739,10 @@ def recolectar(
                 "archivo": str(vpsi.name),
                 "error": "{0}: {1}".format(type(e).__name__, e),
             })
-            
-#comienza el la logica
+# ===============================================================
+# CAPACIDADES PÚBLICAS
+# ===============================================================
+
 def ids_dominio_k_o(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[str]:
@@ -836,17 +838,58 @@ def recolectar(
     decls: List[Dict] = []
     errores: List[Dict] = []
 
+    # 1. Cargar declaraciones de la carpeta local del módulo
+    for archivo in sorted(_DIR.glob("**/*.py")):
+        if archivo.name == "__init__.py":
+            continue
+        try:
+            for d in _cargar_declaraciones_desde_archivo(archivo):
+                decls.append(normalizar(d, archivo.stem))
+        except Exception as e:  # noqa: BLE001
+            errores.append({
+                "archivo": archivo.name,
+                "error": f"{type(e).__name__}: {e}",
+            })
+
+    # 2. Cargar VPSI / Raíz si aplica
+    vpsi = _ruta_vpsi()
+    if vpsi is not None:
+        try:
+            for d in _cargar_declaraciones_desde_archivo(vpsi):
+                decls.append(normalizar(d, "VPSI"))
+        except Exception as e:  # noqa: BLE001
+            errores.append({
+                "archivo": str(vpsi.name),
+                "error": f"{type(e).__name__}: {e}",
+            })
+
+    # 3. Manejo de declaraciones externas
     if declaraciones_externas:
         for nombre, lista in declaraciones_externas.items():
+            # Si no es lista, genera la lista leyendo axiomas y teoremas de la carpeta
             if not isinstance(lista, list):
-                errores.append({
-                    "modulo": nombre,
-                    "error": "declaraciones externas no es lista",
-                })
-                continue
+                lista_auto = []
+                for archivo in sorted(_DIR.glob("**/*.py")):
+                    if archivo.name == "__init__.py":
+                        continue
+                    try:
+                        for d in _cargar_declaraciones_desde_archivo(archivo):
+                            tipo = str(d.get("tipo", "")).lower()
+                            if tipo in ("axioma", "teorema", "axiom", "theorem"):
+                                lista_auto.append(normalizar(d, nombre))
+                    except Exception as e:  # noqa: BLE001
+                        errores.append({
+                            "modulo": nombre,
+                            "error": f"Error extrayendo de carpeta para no-lista: {e}",
+                        })
+                lista = lista_auto
+
+            # Procesar elementos de la lista
             for d in lista:
                 try:
-                    decls.append(normalizar(d, nombre))
+                    if d in decls:
+                        continue
+                    decls.append(d if "cuerpo" in d else normalizar(d, nombre))
                 except ValueError as e:
                     errores.append({"modulo": nombre, "error": str(e)})
 

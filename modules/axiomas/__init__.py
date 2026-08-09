@@ -1179,6 +1179,53 @@ def resolver_por_repertorio(
         "estado": "NO_SUSTENTADA",
         "respuesta": decls,
     }
+
+def verificar(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict[str, Any]:
+    # ==========================================================
+    # INTENTAR USAR BARRER
+    # ==========================================================
+    try:
+        resultado = barrer(declaraciones_externas)
+        if resultado.get("coherente"):
+            # Si barrer funciona y es coherente, devolver su resultado
+            return resultado
+    except Exception:
+        # Si barrer falla, no inventamos X
+        pass
+
+    # ==========================================================
+    # SI BARRER NO EXISTE O FALLA: USAR LÓGICA DEL REPO
+    # ==========================================================
+    # Recolectar declaraciones directamente (sin barrer)
+    decls, errores = recolectar(declaraciones_externas)
+
+    # Verificar coherencia con lógica propia (no barrer)
+    choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
+
+    # Si hay errores o choques, reportarlos
+    if errores or choques:
+        return {
+            "coherente": False,
+            "choques": choques,
+            "errores": errores,
+            "declaraciones": len(decls),
+            "cuerpos": sorted({d["cuerpo"] for d in decls}),
+            "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
+            "ids_dominio_k_o": [],
+            "nota": "Barrer no disponible. Se usó lógica alternativa."
+        }
+
+    # Si no hay errores ni choques, es coherente
+    return {
+        "coherente": True,
+        "choques": [],
+        "errores": [],
+        "declaraciones": len(decls),
+        "cuerpos": sorted({d["cuerpo"] for d in decls}),
+        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
+        "ids_dominio_k_o": ids_dominio_k_o(declaraciones_externas),
+        "nota": "Barrer no disponible. Se usó lógica alternativa."
+    }
 # ===============================================================
 # DECLARACIONES EXTERNAS - EXTRACCIÓN COMPLETA
 # ===============================================================

@@ -844,6 +844,75 @@ def declaraciones(
         return []
     decls, _ = recolectar(declaraciones_externas)
     return decls
+    
+def recolectar(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None
+) -> Tuple[List[Dict], List[Dict]]:
+    decls: List[Dict] = []
+    errores: List[Dict] = []
+
+    # ==========================================================
+    # 1. CARGAR ARCHIVOS EN LA CARPETA DEL MÓDULO
+    # ==========================================================
+    for archivo in sorted(_DIR.glob("**/*.py")):
+        if archivo.name == "__init__.py":
+            continue
+        try:
+            for d in _cargar_declaraciones_desde_archivo(archivo):
+                decls.append(normalizar(d, archivo.stem))
+        except Exception as e:
+            errores.append({
+                "archivo": archivo.name,
+                "error": f"{type(e).__name__}: {e}",
+            })
+
+    # ==========================================================
+    # 2. CARGAR ARCHIVOS EN LA RAÍZ DEL PROYECTO
+    # ==========================================================
+    # Buscar en la raíz del proyecto (donde está VPSI.py)
+    raiz_proyecto = _DIR.parent.parent
+    for archivo in sorted(raiz_proyecto.glob("*.py")):
+        if archivo.name in ("__init__.py", "setup.py", "conftest.py"):
+            continue
+        try:
+            for d in _cargar_declaraciones_desde_archivo(archivo):
+                decls.append(normalizar(d, archivo.stem))
+        except Exception as e:
+            errores.append({
+                "archivo": archivo.name,
+                "error": f"{type(e).__name__}: {e}",
+            })
+
+    # ==========================================================
+    # 3. CARGAR ARCHIVOS EN EL DIRECTORIO PADRE
+    # ==========================================================
+    directorio_padre = _DIR.parent
+    for archivo in sorted(directorio_padre.glob("*.py")):
+        if archivo.name in ("__init__.py", "setup.py", "conftest.py"):
+            continue
+        try:
+            for d in _cargar_declaraciones_desde_archivo(archivo):
+                decls.append(normalizar(d, archivo.stem))
+        except Exception as e:
+            errores.append({
+                "archivo": archivo.name,
+                "error": f"{type(e).__name__}: {e}",
+            })
+
+    # ==========================================================
+    # 4. SI SE PASARON EXTERNAS, LAS PROCESAMOS
+    # ==========================================================
+    if declaraciones_externas:
+        for nombre, lista in declaraciones_externas.items():
+            if not isinstance(lista, list):
+                lista = []
+            for d in lista:
+                try:
+                    decls.append(normalizar(d, nombre))
+                except ValueError as e:
+                    errores.append({"modulo": nombre, "error": str(e)})
+
+    return decls, errores
 # ===============================================================
 # DECLARACIONES EXTERNAS AUTO-GENERADAS
 # ===============================================================

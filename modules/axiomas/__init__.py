@@ -1069,6 +1069,173 @@ def verificar(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) ->
     return barrer(declaraciones_externas)
 
 # ===============================================================
+# DECLARACIONES EXTERNAS - EXTRACCIÓN COMPLETA
+# ===============================================================
+
+def extraer_todas_declaraciones() -> Dict[str, List[Dict]]:
+    """
+    Extrae TODAS las declaraciones de TODOS los archivos del módulo.
+    
+    Returns:
+        Dict[str, List[Dict]]: Diccionario con:
+            - "declaraciones": Lista de todas las declaraciones válidas
+            - "por_cuerpo": Diccionario con declaraciones agrupadas por cuerpo
+            - "ids": Lista de todos los IDs
+            - "totales": Conteo por tipo
+    """
+    declaraciones_validas: List[Dict] = []
+    errores: List[Dict] = []
+    ids_encontrados: List[str] = []
+    
+    # ==========================================================
+    # RECORRER TODOS LOS ARCHIVOS
+    # ==========================================================
+    for archivo in sorted(_DIR.glob("**/*.py")):
+        if archivo.name == "__init__.py":
+            continue
+        
+        try:
+            declaraciones_raw = _cargar_declaraciones_desde_archivo(archivo)
+            if not declaraciones_raw:
+                continue
+                
+            for d in declaraciones_raw:
+                # ==============================================
+                # VALIDAR CAMPOS OBLIGATORIOS
+                # ==============================================
+                id_decl = d.get("id")
+                if not id_decl:
+                    errores.append({
+                        "archivo": archivo.name,
+                        "error": f"Declaración sin ID: {d}"
+                    })
+                    continue
+                
+                # Validar que el ID sea string
+                if not isinstance(id_decl, str):
+                    errores.append({
+                        "archivo": archivo.name,
+                        "error": f"ID no es string: {id_decl}"
+                    })
+                    continue
+                
+                # Validar campos obligatorios
+                campos_obligatorios = ["sujeto", "relacion", "objeto", "polaridad", "tipo"]
+                faltan = [c for c in campos_obligatorios if c not in d]
+                if faltan:
+                    errores.append({
+                        "archivo": archivo.name,
+                        "id": id_decl,
+                        "error": f"Faltan campos: {faltan}"
+                    })
+                    continue
+                
+                # ==============================================
+                # NORMALIZAR Y AGREGAR
+                # ==============================================
+                try:
+                    decl_normalizada = normalizar(d, archivo.stem)
+                    declaraciones_validas.append(decl_normalizada)
+                    if id_decl not in ids_encontrados:
+                        ids_encontrados.append(id_decl)
+                except Exception as e:
+                    errores.append({
+                        "archivo": archivo.name,
+                        "id": id_decl,
+                        "error": f"Error al normalizar: {e}"
+                    })
+                    
+        except Exception as e:
+            errores.append({
+                "archivo": archivo.name,
+                "error": f"Error al cargar archivo: {e}"
+            })
+    
+    # ==========================================================
+    # AGRUPAR POR CUERPO
+    # ==========================================================
+    por_cuerpo: Dict[str, List[Dict]] = {}
+    for d in declaraciones_validas:
+        cuerpo = d.get("cuerpo", "desconocido")
+        if cuerpo not in por_cuerpo:
+            por_cuerpo[cuerpo] = []
+        por_cuerpo[cuerpo].append(d)
+    
+    # ==========================================================
+    # CONTAR POR TIPO
+    # ==========================================================
+    totales = {
+        "axioma": sum(1 for d in declaraciones_validas if d.get("tipo") == "axioma"),
+        "lema": sum(1 for d in declaraciones_validas if d.get("tipo") == "lema"),
+        "teorema": sum(1 for d in declaraciones_validas if d.get("tipo") == "teorema"),
+        "corolario": sum(1 for d in declaraciones_validas if d.get("tipo") == "corolario"),
+        "definicion": sum(1 for d in declaraciones_validas if d.get("tipo") == "definicion"),
+    }
+    
+    return {
+        "declaraciones": declaraciones_validas,
+        "por_cuerpo": por_cuerpo,
+        "ids": sorted(ids_encontrados),
+        "totales": totales,
+        "total_general": len(declaraciones_validas),
+        "errores": errores,
+    }
+
+
+# ===============================================================
+# BUSCAR DECLARACIÓN POR ID
+# ===============================================================
+
+def buscar_por_id(id_buscado: str) -> Dict[str, Any]:
+    """
+    Busca una declaración por su ID.
+    
+    Args:
+        id_buscado: ID de la declaración a buscar
+    
+    Returns:
+        Dict con:
+            - "encontrado": True/False
+            - "declaracion": La declaración si existe, o None
+            - "error": Mensaje de error si no existe
+    """
+    todas = extraer_todas_declaraciones()
+    
+    for d in todas["declaraciones"]:
+        if d.get("id") == id_buscado:
+            return {
+                "encontrado": True,
+                "declaracion": d,
+                "error": None
+            }
+    
+    return {
+        "encontrado": False,
+        "declaracion": None,
+        "error": f"No se encontró declaración con ID '{id_buscado}'"
+    }
+
+
+# ===============================================================
+# LISTAR TODOS LOS IDS
+# ===============================================================
+
+def listar_todos_ids() -> List[str]:
+    """Retorna todos los IDs de declaraciones existentes."""
+    todas = extraer_todas_declaraciones()
+    return todas["ids"]
+
+
+# ===============================================================
+# VERIFICAR SI ID EXISTE
+# ===============================================================
+
+def id_existe(id_buscado: str) -> bool:
+    """Verifica si un ID existe en las declaraciones."""
+    todas = extraer_todas_declaraciones()
+    return id_buscado in todas["ids"]
+
+# ===============================================================
 # FIN CAPACIDADES PÚBLICAS
 # ===============================================================
 

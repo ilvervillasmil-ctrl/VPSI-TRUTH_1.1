@@ -1141,7 +1141,7 @@ def extraer_todas_declaraciones() -> Dict[str, List[Dict]]:
                     })
                     continue
                 
-                # Validar que el ID sea string
+                                # Validar que el ID sea string
                 if not isinstance(id_decl, str):
                     errores.append({
                         "archivo": archivo.name,
@@ -1159,6 +1159,33 @@ def extraer_todas_declaraciones() -> Dict[str, List[Dict]]:
                         "error": f"Faltan campos: {faltan}"
                     })
                     continue
+
+                # ==========================================================
+                # OBTENER TODAS LAS DECLARACIONES
+                # ==========================================================
+                todas = extraer_todas_declaraciones()
+
+                print(f"Total declaraciones: {todas['total_general']}")
+                print(f"IDs: {todas['ids']}")
+                print(f"Por tipo: {todas['totales']}")
+
+                # ==========================================================
+                # BUSCAR POR ID
+                # ==========================================================
+                resultado = buscar_por_id("A1")
+                if resultado["encontrado"]:
+                    print(f"Declaración encontrada: {resultado['declaracion']}")
+                else:
+                    print(f"Error: {resultado['error']}")
+
+                # ==========================================================
+                # VERIFICAR SI ID EXISTE
+                # ==========================================================
+                if id_existe("Z99"):
+                    print("ID Z99 existe")
+                else:
+                    print("ID Z99 NO existe")
+
                 
                 # ==============================================
                 # NORMALIZAR Y AGREGAR

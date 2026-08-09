@@ -740,12 +740,7 @@ def recolectar(
                 "error": "{0}: {1}".format(type(e).__name__, e),
             })
             
-
-# ==========================================================
-# LISTAR TODOS LOS IDS
-# ==========================================================
-print(f"Todos los IDs: {listar_todos_ids()}")
-
+#comienza el la logica
 def ids_dominio_k_o(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[str]:
@@ -819,12 +814,7 @@ def declaraciones(
         return []
     decls, _ = recolectar(declaraciones_externas)
     return decls
-    
-def recolectar(
-    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None
-) -> Tuple[List[Dict], List[Dict]]:
-    decls: List[Dict] = []
-    errores: List[Dict] = []
+
 
 def por_dominio(
     dominio: str,
@@ -839,7 +829,14 @@ def por_dominio(
             out.append(d)
     return out
 
-       if declaraciones_externas:
+
+def recolectar(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> Tuple[List[Dict], List[Dict]]:
+    decls: List[Dict] = []
+    errores: List[Dict] = []
+
+    if declaraciones_externas:
         for nombre, lista in declaraciones_externas.items():
             if not isinstance(lista, list):
                 errores.append({
@@ -854,6 +851,7 @@ def por_dominio(
                     errores.append({"modulo": nombre, "error": str(e)})
 
     return decls, errores
+
     # ==========================================================
     # 1. CARGAR ARCHIVOS EN LA CARPETA DEL MÓDULO
     # ==========================================================

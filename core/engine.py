@@ -28,6 +28,10 @@
 # ===============================================================
 
 
+# ===============================================================
+# IMPORTACIONES
+# ===============================================================
+
 from __future__ import annotations
 import importlib.util
 import inspect
@@ -41,11 +45,19 @@ from typing import Any, Dict, List, Optional, Tuple
 from core.centinela import Centinela, Veredicto
 
 
+# ===============================================================
+# CONSTANTES
+# ===============================================================
+
 VERSION_ENGINE = "18.3"
 ESQUEMA_CONTRATO_REQUERIDO = "VPSI-CONTRACT-1.0"
 VERSION_CONTRATO_REQUERIDA = "1.0"
 API_ENGINE_ACTUAL = "1.0"
 
+
+# ===============================================================
+# ESTADOS CANÓNICOS
+# ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
@@ -54,20 +66,44 @@ ESTADO_RECHAZADO = "RECHAZADO"
 ESTADOS_CANONICOS = (ESTADO_NO_INICIADO, ESTADO_OPERATIVO, ESTADO_DEGRADADO, ESTADO_RECHAZADO)
 
 
+# ===============================================================
+# CLAVES OBLIGATORIAS DEL CONTRATO
+# ===============================================================
+
 CLAVES_OBLIGATORIAS_CONTRATO = ("esquema", "version_contrato", "version_modulo", "id", "nombre", "rol", "descripcion", "funcion", "no_hace", "autoridad", "conocimiento_exportable", "requiere", "autoriza_engine", "consultas_soportadas", "capacidades", "capacidades_meta", "reporting", "estados_validos", "invariantes", "estabilidad", "compatible_desde", "api_engine")
 
+
+# ===============================================================
+# PERMISOS AUTORIZADOS POR ENGINE
+# ===============================================================
 
 PERMISOS_AUTORIZA_ENGINE = ("leer", "ejecutar", "consultar", "recombinar", "reportar", "auditar", "inventariar", "modificar", "alterar", "reescribir", "metricas", "estado", "version", "salud", "inventario", "capacidades", "errores", "advertencias", "dependencias", "contrato", "conocimiento", "diagnostico", "reporte", "crear", "eliminar", "actualizar", "validar", "procesar", "analizar", "generar", "transformar", "exportar", "importar", "respaldar", "recuperar", "sincronizar", "monitorear", "alertar")
 
 
+# ===============================================================
+# BANDERAS DE REPORTING
+# ===============================================================
+
 BANDERAS_REPORTING = ("estado", "salud", "inventario", "capacidades", "errores", "advertencias", "dependencias", "version", "contrato", "conocimiento", "metricas", "diagnostico", "reporte")
 
+
+# ===============================================================
+# METADATOS DE CAPACIDADES
+# ===============================================================
 
 CLAVES_META_CAPACIDAD = ("descripcion", "entrada", "salida")
 
 
+# ===============================================================
+# LISTAS OBLIGATORIAS DE STR
+# ===============================================================
+
 LISTAS_STR_OBLIGATORIAS = ("no_hace", "autoridad", "conocimiento_exportable", "consultas_soportadas", "invariantes")
 
+
+# ===============================================================
+# DEFINICIONES
+# ===============================================================
 
 class ArranqueError(Exception):
     """Fallo estructural durante el arranque del Engine."""
@@ -86,9 +122,17 @@ class Contenedor:
         self.modulo = modulo
         self.ruta = ruta
 
+        # -------------------------------------------------------
+        # IDENTIDAD
+        # -------------------------------------------------------
+
         self.id: str = str(meta.get("id", ""))
         self.nombre: str = str(meta.get("nombre", ""))
         self.rol: str = str(meta.get("rol", ""))
+
+        # -------------------------------------------------------
+        # VERSIONES
+        # -------------------------------------------------------
 
         self.version: str = str(meta.get("version_modulo", meta.get("version", "")))
         self.version_contrato: str = str(meta.get("version_contrato", ""))
@@ -97,6 +141,10 @@ class Contenedor:
         self.compatible_desde: str = str(meta.get("compatible_desde", ""))
         self.api_engine: str = str(meta.get("api_engine", ""))
 
+        # -------------------------------------------------------
+        # DESCRIPCIÓN Y AUTORIDAD
+        # -------------------------------------------------------
+
         self.descripcion: str = str(meta.get("descripcion", ""))
         self.funcion = meta.get("funcion")
         self.no_hace = list(meta.get("no_hace") or [])
@@ -104,6 +152,10 @@ class Contenedor:
         self.conocimiento_exportable = list(meta.get("conocimiento_exportable") or [])
         self.consultas_soportadas = list(meta.get("consultas_soportadas") or [])
         self.invariantes = list(meta.get("invariantes") or [])
+
+        # -------------------------------------------------------
+        # CONTRATO OPERATIVO
+        # -------------------------------------------------------
 
         self.requiere: List[str] = list(meta.get("requiere") or [])
         self.autoriza_engine: Dict[str, Any] = dict(meta.get("autoriza_engine") or {})
@@ -156,15 +208,27 @@ class RegistroModulos:
         return len(self.contenedores)
 
 
+# ===============================================================
+# ENGINE
+# ===============================================================
+
 class Engine:
 
     VERSION = VERSION_ENGINE
 
     def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
 
+        # =======================================================
+        # CONFIGURACIÓN BÁSICA
+        # =======================================================
+
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
+
+        # =======================================================
+        # ESTADO
+        # =======================================================
 
         self.estado = ESTADO_NO_INICIADO
         self.registro = RegistroModulos()
@@ -173,13 +237,29 @@ class Engine:
         self.fallos: List[Dict[str, Any]] = []
         self.resultados_evaluacion: List[Any] = []
 
+        # =======================================================
+        # TRAZAS
+        # =======================================================
+
         self._trazas: List[Dict[str, Any]] = []
         self._traza_seq: int = 0
+
+        # =======================================================
+        # MAPA DE RUTA
+        # =======================================================
 
         self._mapa_ruta: List[Dict[str, Any]] = []
         self._ruta_seq: int = 0
 
+        # =======================================================
+        # CENTINELA — PRIORIDAD ABSOLUTA
+        # =======================================================
+
         self._centinela: Optional[Centinela] = None
+
+        # =======================================================
+        # ESTRUCTURAS INTERNAS
+        # =======================================================
 
         self._modulos_descubiertos: List[Path] = []
         self._reportes_modulos: Dict[str, Any] = {}
@@ -188,10 +268,18 @@ class Engine:
         self._dependencias: Dict[str, Any] = {}
         self._grafo: Dict[str, Any] = {}
 
+        # =======================================================
+        # ARRANQUE
+        # =======================================================
+
         self._modulos_descubiertos = self._descubrir_modulos()
         self._cargar_y_validar()
         self._resolver_dependencias()
         self._construir_grafo()
+
+        # =======================================================
+        # ESTADO FINAL
+        # =======================================================
 
         if self.errores_arranque:
             self.estado = ESTADO_RECHAZADO
@@ -200,10 +288,18 @@ class Engine:
         else:
             self.estado = ESTADO_OPERATIVO
 
+    # ===========================================================
+    # DESCUBRIMIENTO
+    # ===========================================================
+
     def _descubrir_modulos(self) -> List[Path]:
         if not self.raiz.is_dir():
             return []
         return [p for p in sorted(self.raiz.iterdir()) if p.is_dir() and (p / "__init__.py").is_file()]
+
+    # ===========================================================
+    # LECTURA DEL CONTRATO
+    # ===========================================================
 
     def _leer_contrato(self, path_dir: Path) -> Optional[Dict[str, Any]]:
         init_path = path_dir / "__init__.py"
@@ -224,6 +320,10 @@ class Engine:
             self.errores_arranque.append(f"{path_dir.name}: error al cargar → {type(e).__name__}: {e}")
             return None
 
+    # ===========================================================
+    # VALIDACIÓN DE LISTAS STR
+    # ===========================================================
+
     def _validar_lista_str(self, meta: Dict[str, Any], clave: str, nombre: str) -> List[str]:
         errores: List[str] = []
         val = meta.get(clave)
@@ -234,6 +334,10 @@ class Engine:
             if not isinstance(item, str):
                 errores.append(f"{nombre}: '{clave}[{i}]' debe ser str, es {type(item).__name__}")
         return errores
+
+    # ===========================================================
+    # VERSIONES
+    # ===========================================================
 
     @staticmethod
     def _parse_version(s: str) -> Optional[Tuple[int, ...]]:
@@ -282,27 +386,55 @@ class Engine:
             return f"{nombre}: compatible_desde={raw} pero Engine es {VERSION_ENGINE}"
         return None
 
+    # ===========================================================
+    # VALIDACIÓN COMPLETA DEL CONTRATO
+    # ===========================================================
+
     def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
         errores: List[str] = []
 
+        # -------------------------------------------------------
+        # ESQUEMA
+        # -------------------------------------------------------
+
         if meta.get("esquema") != ESQUEMA_CONTRATO_REQUERIDO:
             errores.append(f"{nombre}: esquema '{meta.get('esquema')}' != '{ESQUEMA_CONTRATO_REQUERIDO}'")
+
+        # -------------------------------------------------------
+        # VERSIÓN DEL CONTRATO
+        # -------------------------------------------------------
 
         vc = meta.get("version_contrato")
         if str(vc) != VERSION_CONTRATO_REQUERIDA:
             errores.append(f"{nombre}: version_contrato '{vc}' != '{VERSION_CONTRATO_REQUERIDA}'")
 
+        # -------------------------------------------------------
+        # VERSIÓN DEL MÓDULO
+        # -------------------------------------------------------
+
         vm = meta.get("version_modulo")
         if not isinstance(vm, str) or not vm.strip():
             errores.append(f"{nombre}: version_modulo debe ser str no vacío, es {type(vm).__name__}")
+
+        # -------------------------------------------------------
+        # CLAVES OBLIGATORIAS
+        # -------------------------------------------------------
 
         for clave in CLAVES_OBLIGATORIAS_CONTRATO:
             if clave not in meta:
                 errores.append(f"{nombre}: falta clave obligatoria '{clave}'")
 
+        # -------------------------------------------------------
+        # LISTAS DE STR
+        # -------------------------------------------------------
+
         for clave in LISTAS_STR_OBLIGATORIAS:
             if clave in meta:
                 errores.extend(self._validar_lista_str(meta, clave, nombre))
+
+        # -------------------------------------------------------
+        # DEPENDENCIAS
+        # -------------------------------------------------------
 
         requiere = meta.get("requiere")
         if not isinstance(requiere, list):
@@ -312,6 +444,10 @@ class Engine:
                 if not isinstance(item, str):
                     errores.append(f"{nombre}: 'requiere[{i}]' debe ser str, es {type(item).__name__}")
 
+        # -------------------------------------------------------
+        # CAPACIDADES
+        # -------------------------------------------------------
+
         caps = meta.get("capacidades")
         if not isinstance(caps, dict):
             errores.append(f"{nombre}: 'capacidades' debe ser dict")
@@ -320,6 +456,10 @@ class Engine:
             for k, v in caps.items():
                 if not callable(v):
                     errores.append(f"{nombre}: capacidad '{k}' no es callable (tipo={type(v).__name__})")
+
+        # -------------------------------------------------------
+        # METADATOS DE CAPACIDADES
+        # -------------------------------------------------------
 
         meta_caps = meta.get("capacidades_meta")
         if not isinstance(meta_caps, dict):
@@ -339,6 +479,10 @@ class Engine:
                     elif not isinstance(entrada_meta[campo], str):
                         errores.append(f"{nombre}: capacidades_meta['{k}']['{campo}'] debe ser str")
 
+        # -------------------------------------------------------
+        # AUTORIZACIÓN ENGINE
+        # -------------------------------------------------------
+
         auth = meta.get("autoriza_engine")
         if not isinstance(auth, dict):
             errores.append(f"{nombre}: 'autoriza_engine' debe ser dict")
@@ -352,6 +496,10 @@ class Engine:
             if extras:
                 errores.append(f"{nombre}: autoriza_engine permisos desconocidos: {sorted(extras)}")
 
+        # -------------------------------------------------------
+        # REPORTING
+        # -------------------------------------------------------
+
         reporting = meta.get("reporting")
         if not isinstance(reporting, dict):
             errores.append(f"{nombre}: 'reporting' debe ser dict")
@@ -361,6 +509,10 @@ class Engine:
                     errores.append(f"{nombre}: reporting falta bandera '{bandera}'")
                 elif not isinstance(reporting[bandera], bool):
                     errores.append(f"{nombre}: reporting['{bandera}'] debe ser bool, es {type(reporting[bandera]).__name__}")
+
+        # -------------------------------------------------------
+        # ESTADOS VÁLIDOS
+        # -------------------------------------------------------
 
         ev = meta.get("estados_validos")
         if not isinstance(ev, list):
@@ -374,15 +526,27 @@ class Engine:
                 elif est not in ESTADOS_CANONICOS:
                     errores.append(f"{nombre}: estados_validos[{i}]='{est}' no es canónico. Admitidos: {ESTADOS_CANONICOS}")
 
+        # -------------------------------------------------------
+        # API ENGINE
+        # -------------------------------------------------------
+
         err_api = self._comparar_api(str(meta.get("api_engine", "")))
         if err_api:
             errores.append(f"{nombre}: {err_api}")
+
+        # -------------------------------------------------------
+        # COMPATIBILIDAD
+        # -------------------------------------------------------
 
         err_cd = self._comparar_compatible_desde(str(meta.get("compatible_desde", "")), nombre)
         if err_cd:
             errores.append(err_cd)
 
         return errores
+
+    # ===========================================================
+    # CARGA Y REGISTRO
+    # ===========================================================
 
     def _cargar_y_validar(self) -> None:
         for path_dir in self._modulos_descubiertos:
@@ -401,10 +565,18 @@ class Engine:
                 for error in errores_dup:
                     self.errores_arranque.append(f"{nombre}: {error}")
 
+    # ===========================================================
+    # DEPENDENCIAS
+    # ===========================================================
+
     def _resolver_dependencias(self) -> None:
         presentes = set(self.registro.por_rol.keys()) | set(self.registro.por_id.keys()) | set(self.registro.contenedores.keys())
         faltantes: Dict[str, List[str]] = defaultdict(list)
         grafo_dep: Dict[str, List[str]] = defaultdict(list)
+
+        # -------------------------------------------------------
+        # DETECCIÓN DE DEPENDENCIAS
+        # -------------------------------------------------------
 
         for nombre, cont in self.registro.contenedores.items():
             for dep in cont.requiere:
@@ -412,6 +584,10 @@ class Engine:
                 if dep not in presentes:
                     faltantes[nombre].append(dep)
                     self.errores_arranque.append(f"{cont.rol}/{nombre}: dependencia inexistente → '{dep}'")
+
+        # -------------------------------------------------------
+        # RESOLUCIÓN TOPOLÓGICA
+        # -------------------------------------------------------
 
         in_degree = {n: 0 for n in self.registro.contenedores}
         for src, dests in grafo_dep.items():
@@ -429,28 +605,67 @@ class Engine:
                     if in_degree[d] == 0:
                         cola.append(d)
 
+        # -------------------------------------------------------
+        # DETECCIÓN DE CICLOS
+        # -------------------------------------------------------
+
         ciclos = [n for n, deg in in_degree.items() if deg > 0]
         if ciclos:
             self.errores_arranque.append(f"Ciclos de dependencia detectados: {ciclos}")
 
+        # -------------------------------------------------------
+        # REGISTRO DE DEPENDENCIAS
+        # -------------------------------------------------------
+
         self._dependencias = {"grafo": dict(grafo_dep), "faltantes": dict(faltantes), "orden_topologico": orden, "ciclos": ciclos}
+
+    # ===========================================================
+    # GRAFO
+    # ===========================================================
 
     def _construir_grafo(self) -> None:
         nodos: List[Dict[str, Any]] = []
         aristas: List[Dict[str, Any]] = []
 
+        # -------------------------------------------------------
+        # NODOS DE MÓDULOS
+        # -------------------------------------------------------
+
         for nombre, cont in self.registro.contenedores.items():
             nodos.append({"id": cont.id or nombre, "nombre": nombre, "rol": cont.rol, "tipo": "modulo"})
+
+            # ---------------------------------------------------
+            # ARISTAS DE DEPENDENCIAS
+            # ---------------------------------------------------
+
             for dep in cont.requiere:
                 aristas.append({"from": nombre, "to": dep, "tipo": "requiere"})
+
+            # ---------------------------------------------------
+            # NODOS Y ARISTAS DE CAPACIDADES
+            # ---------------------------------------------------
+
             for cap in cont.capacidades:
                 cap_id = f"{nombre}.{cap}"
                 nodos.append({"id": cap_id, "nombre": cap, "tipo": "capacidad", "modulo": nombre})
                 aristas.append({"from": nombre, "to": cap_id, "tipo": "declara_capacidad"})
+
+        # -------------------------------------------------------
+        # CONSOLIDACIÓN DEL GRAFO
+        # -------------------------------------------------------
+
         self._grafo = {"nodos": nodos, "aristas": aristas}
 
+    # ===========================================================
+    # CENSO
+    # ===========================================================
+
     def censar(self) -> Dict[str, Any]:
-        return {"total": self.registro.total(), "roles": {rol: [c.nombre for c in lista] for rol, lista in self.registro.por_rol.items()}, "roles_vacios": [], "rechazados": list(self.errores_arranque)}
+        return {"total": self.registro.total(), "roles": {rol: [c.nombre for c in lista] for rol, lista in self.registro.por_rol.items()}, "roles_vacios": [], "rechazados": list(self.errores_arranque), "cargados": [{"id": c.id, "nombre": c.nombre, "rol": c.rol, "version": c.version, "esquema": c.esquema, "estabilidad": c.estabilidad, "capacidades": list(c.capacidades.keys())} for c in self.registro.contenedores.values()]}
+
+    # ===========================================================
+    # TRAZAS DE EJECUCIÓN
+    # ===========================================================
 
     def _registrar_traza(self, modulo: str, capacidad: str, estado: str, duracion_s: float, error: Optional[str] = None, **extras: Any) -> None:
         self._traza_seq += 1
@@ -465,8 +680,16 @@ class Engine:
     def obtener_trazas(self) -> Tuple[Dict[str, Any], ...]:
         return tuple(dict(traza) for traza in self._trazas)
 
+    # ===========================================================
+    # MAPA DE RUTA DE EJECUCIÓN
+    # ===========================================================
+
     def obtener_mapa_ruta(self) -> Tuple[Dict[str, Any], ...]:
         return tuple(dict(ruta) for ruta in self._mapa_ruta)
+
+    # ===========================================================
+    # RESOLUCIÓN DE CONTENEDOR
+    # ===========================================================
 
     def _resolver_contenedor(self, modulo_o_rol: Any) -> Tuple[Optional[Contenedor], Optional[str]]:
         if isinstance(modulo_o_rol, Contenedor):
@@ -475,6 +698,10 @@ class Engine:
         if cont is None:
             return None, f"Módulo/rol no encontrado: {modulo_o_rol}"
         return cont, None
+
+    # ===========================================================
+    # VALIDACIÓN DE ENTRADA DE CAPACIDAD
+    # ===========================================================
 
     def _validar_entrada_capacidad(self, cont: Contenedor, capacidad: str, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> Optional[str]:
         fn = cont.fn(capacidad)
@@ -489,93 +716,19 @@ class Engine:
             return f"Entrada incompatible con capacidad '{capacidad}': {e}"
         return None
 
-    # ===========================================================================
-    # ===================== SECCIÓN 1: NORMALIZACIÓN FRONTERA =====================
-    # ===========================================================================
-    # -- INICIO: Normalizador de entradas específicas que vienen del Engine -----
-    #
-    # Propósito:
-    #  - Normalizar 'declaraciones_externas' en la frontera Engine → Módulo
-    #  - Evitar que formatos inesperados (str, None, dict único, tupla, set) rompan
-    #    las funciones de los módulos (ej. axiomas) y reportar errores en un
-    #    formato compatible.
-    #
-    # Regla por defecto (conservadora):
-    #  - None -> {}
-    #  - top-level no dict -> error global
-    #  - list -> se usa tal cual
-    #  - dict -> [dict]
-    #  - tuple/set -> list(...)
-    #  - otros -> registrar error por módulo (no lanzar)
-    #
-    # Salida:
-    #  - (normalized_dict, errores_list)
-    #  - cada item en errores_list tiene claves para compatibilidad:
-    #      {'modulo': <nombre|None>, 'error': <mensaje>, 'cuerpo': <nombre|None>, 'razon': <mensaje>}
-    #
-    # -- FIN: Normalizador de entradas -----------------------------------------
-    # ===========================================================================
-    def _normalizar_declaraciones_externas(self, raw) -> Tuple[Dict[str, List[Dict]], List[Dict]]:
-        if raw is None:
-            return {}, []
-
-        errores: List[Dict] = []
-        normalized: Dict[str, List[Dict]] = {}
-
-        if not isinstance(raw, dict):
-            e = {
-                "modulo": None,
-                "error": "declaraciones_externas no es dict",
-                "cuerpo": None,
-                "razon": "declaraciones_externas no es dict",
-            }
-            return {}, [e]
-
-        for nombre, valor in raw.items():
-            if valor is None:
-                normalized[nombre] = []
-                continue
-            if isinstance(valor, list):
-                normalized[nombre] = valor
-                continue
-            if isinstance(valor, dict):
-                normalized[nombre] = [valor]
-                continue
-            if isinstance(valor, (tuple, set)):
-                try:
-                    normalized[nombre] = list(valor)
-                except Exception:
-                    e = {
-                        "modulo": nombre,
-                        "error": "no se pudo convertir tuple/set a lista",
-                        "cuerpo": nombre,
-                        "razon": "no se pudo convertir tuple/set a lista",
-                    }
-                    errores.append(e)
-                continue
-            e = {
-                "modulo": nombre,
-                "error": "declaraciones externas no es lista",
-                "cuerpo": nombre,
-                "razon": "declaraciones externas no es lista",
-            }
-            errores.append(e)
-
-        return normalized, errores
-    # ===========================================================================
-    # =================== FIN SECCIÓN 1: NORMALIZACIÓN FRONTERA ==================
-    # ===========================================================================
+    # ===========================================================
+    # EJECUCIÓN CONTRACTUAL
+    # ===========================================================
 
     def ejecutar_capacidad(self, modulo_o_rol: Any, capacidad: str, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         """
-        Ejecuta una capacidad declarada por el contrato del módulo.
+        Ejecuta exclusivamente una capacidad declarada por el contrato del módulo.
 
-        Comportamiento de frontera:
-          - normaliza declaraciones_externas
-          - si la invocación llega con un único dict posicional (peticion),
-            mapea sus claves a parámetros de la firma de la capacidad por nombre
-            (fuentes: payload, payload.get('entrada'), payload.get('peticion')).
-          - no modifica módulos; no inventa valores.
+        Frontera:
+            Engine → Contenedor → Contrato → Capacidad → Entrada → Función real → Módulo → Resultado → Engine
+
+        No se inventan capacidades.
+        No se transforma semánticamente el contenido.
         """
 
         cont, error = self._resolver_contenedor(modulo_o_rol)
@@ -591,124 +744,19 @@ class Engine:
             error = f"{cont.nombre}: la capacidad '{capacidad}' no es callable"
             return {"estado": "ERROR", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error}
 
-        norm_errs: List[Dict] = []
-
-        # Guardamos la petición original (si existe) para añadirla al resultado si el módulo no la devuelve.
-        original_payload = None
-        if len(args) >= 1 and isinstance(args[0], dict):
-            original_payload = args[0]
-        elif "peticion" in kwargs and isinstance(kwargs.get("peticion"), dict):
-            original_payload = kwargs.get("peticion")
-
-        # bind_partial para inspeccionar parámetros y detectar 'declaraciones_externas'
-        try:
-            sig = inspect.signature(fn)
-            bound = sig.bind_partial(*args, **kwargs)
-        except Exception:
-            bound = None
-
-        # Normalizar declaraciones_externas si aparece en el bound o en kwargs
-        if bound is not None and "declaraciones_externas" in bound.arguments:
-            raw = bound.arguments.get("declaraciones_externas")
-            try:
-                norm, errs = self._normalizar_declaraciones_externas(raw)
-                bound.arguments["declaraciones_externas"] = norm
-                if errs:
-                    norm_errs.extend(errs)
-            except Exception:
-                norm_errs.append({"modulo": cont.nombre, "error": "error en normalizador interno", "cuerpo": cont.nombre, "razon": "excepcion en normalizador"})
-
-        elif "declaraciones_externas" in kwargs:
-            try:
-                norm, errs = self._normalizar_declaraciones_externas(kwargs.get("declaraciones_externas"))
-                kwargs["declaraciones_externas"] = norm
-                if errs:
-                    norm_errs.extend(errs)
-            except Exception:
-                norm_errs.append({"modulo": cont.nombre, "error": "error en normalizador interno", "cuerpo": cont.nombre, "razon": "excepcion en normalizador"})
-
-        # Preparar args_for_validation / kwargs_for_validation iniciales
-        args_for_validation = args
-        kwargs_for_validation = dict(kwargs)
-
-        # Si la invocación llegó con un único dict posicional, intentar mapear sus claves
-        # a parámetros nombrados esperados por la función (sin hardcodear nombres).
-        if len(args) == 1 and isinstance(args[0], dict):
-            payload = args[0]
-            # fuente secundaria: payload['entrada'] si es dict
-            entrada_sub = payload.get("entrada") if isinstance(payload.get("entrada"), dict) else None
-            peticion_sub = payload.get("peticion") if isinstance(payload.get("peticion"), dict) else None
-
-            # Recolectar parámetros pos/kw de la firma que pueden recibir valores por nombre
-            params = [p for p in sig.parameters.values() if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)]
-
-            # Construimos candidate_kwargs sin tocar la semántica si la función realmente espera un solo 'peticion'.
-            # Si la función tiene exactamente un parámetro y su nombre es 'peticion' (o similar), NO desempaquetamos.
-            if not (len(params) == 1 and params[0].name in ("peticion", "payload", "peticion_base", "request")):
-                candidate_kwargs: Dict[str, Any] = {}
-                for p in params:
-                    name = p.name
-                    # Si el caller ya proporcionó ese nombre en kwargs, respetarlo
-                    if name in kwargs_for_validation:
-                        continue
-                    # Prefer payload direct key
-                    if name in payload:
-                        candidate_kwargs[name] = payload[name]
-                        continue
-                    # Luego buscar en payload['entrada']
-                    if entrada_sub and name in entrada_sub:
-                        candidate_kwargs[name] = entrada_sub[name]
-                        continue
-                    # Luego buscar en payload['peticion']
-                    if peticion_sub and name in peticion_sub:
-                        candidate_kwargs[name] = peticion_sub[name]
-                        continue
-                    # No forzamos valores por defecto ni inventamos: si falta, la validación puede fallar más abajo.
-                # Si encontramos al menos un mapping, aplicamos: quitamos el dict posicional y usamos kwargs
-                if candidate_kwargs:
-                    # merge candidate en kwargs_for_validation
-                    kwargs_for_validation.update(candidate_kwargs)
-                    # quitar el dict posicional para que bind() vea los parámetros inyectados por nombre
-                    args_for_validation = tuple()
-
-        # Validamos entrada (con la forma intentada)
-        error_entrada = self._validar_entrada_capacidad(cont, capacidad, args_for_validation, kwargs_for_validation)
+        error_entrada = self._validar_entrada_capacidad(cont, capacidad, args, kwargs)
         if error_entrada:
             return {"estado": "ERROR_ENTRADA", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error_entrada}
 
         inicio = time.perf_counter()
+        funcion_invocada = False
 
         try:
-            resultado = fn(*args_for_validation, **kwargs_for_validation)
+            funcion_invocada = True
+            resultado = fn(*args, **kwargs)
             duracion = round(time.perf_counter() - inicio, 6)
+
             self._registrar_traza(modulo=cont.nombre, capacidad=capacidad, estado="EXITO", duracion_s=duracion)
-
-            # Anexar errores de normalización si los hubo
-            if norm_errs:
-                mapped = [{"modulo": e.get("modulo"), "error": e.get("error")} for e in norm_errs]
-                if isinstance(resultado, dict):
-                    if "errores" in resultado and isinstance(resultado["errores"], list):
-                        resultado["errores"].extend(mapped)
-                    elif "resultado" in resultado and isinstance(resultado["resultado"], dict):
-                        resultado["resultado"].setdefault("errores", []).extend(mapped)
-                    else:
-                        resultado.setdefault("errores", []).extend(mapped)
-                else:
-                    resultado = {"coherente": False, "valor": resultado, "errores": mapped}
-
-            # Si había una peticion original y el módulo no la incorporó en el resultado,
-            # la añadimos en clave no invasiva para que la evidencia de transferencia exista.
-            if original_payload is not None:
-                try:
-                    if isinstance(resultado, dict):
-                        # No sobreescribir si el módulo ya incluyó la misma estructura
-                        if "_peticion_pasada_por_engine" not in resultado:
-                            resultado.setdefault("_peticion_pasada_por_engine", original_payload)
-                    else:
-                        resultado = {"valor": resultado, "_peticion_pasada_por_engine": original_payload}
-                except Exception:
-                    # nunca bloquear la devolución si el merge falla
-                    pass
 
             salida = {"estado": "EXITO", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "resultado": resultado, "duracion_s": duracion}
             self.resultados_evaluacion.append(salida)
@@ -717,15 +765,16 @@ class Engine:
         except Exception as e:
             duracion = round(time.perf_counter() - inicio, 6)
             error_msg = f"{type(e).__name__}: {e}"
+
             self._registrar_traza(modulo=cont.nombre, capacidad=capacidad, estado="ERROR_EJECUCION", duracion_s=duracion, error=error_msg)
 
             salida = {"estado": "ERROR_EJECUCION", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error_msg, "duracion_s": duracion}
-            if norm_errs:
-                salida.setdefault("errores_normalizacion", []).extend(norm_errs)
-            if original_payload is not None:
-                salida.setdefault("peticion_pasada_por_engine", original_payload)
             self.resultados_evaluacion.append(salida)
             return salida
+
+    # ===========================================================
+    # ATAJOS DE CAPACIDADES
+    # ===========================================================
 
     def ejecutar_reporte(self, modulo_o_rol: Any) -> Dict[str, Any]:
         return self.ejecutar_capacidad(modulo_o_rol, "reporte")
@@ -741,6 +790,10 @@ class Engine:
             return {"estado": "ERROR", "error": f"payload debe ser dict, es {type(payload).__name__}"}
         return self.ejecutar_capacidad(modulo_o_rol, capacidad, payload)
 
+    # ===========================================================
+    # INVOCADOR
+    # ===========================================================
+
     def invocar(self, modulo: Any, capacidad: str, *args: Any, **kwargs: Any) -> Any:
         salida = self.ejecutar_capacidad(modulo, capacidad, *args, **kwargs)
         if isinstance(salida, dict) and salida.get("estado") == "EXITO":
@@ -748,6 +801,10 @@ class Engine:
         if isinstance(salida, dict) and "error" in salida:
             raise RuntimeError(str(salida.get("error")))
         return salida
+
+    # ===========================================================
+    # CONSOLIDACIÓN
+    # ===========================================================
 
     def consolidar_reportes(self) -> Dict[str, Any]:
         for nombre, cont in self.registro.contenedores.items():
@@ -764,16 +821,22 @@ class Engine:
                     self._inventarios[nombre] = inv.get("resultado")
         return {"reportes": self._reportes_modulos, "diagnosticos": self._diagnosticos, "inventarios": self._inventarios}
 
+    # ===========================================================
+    # PAQUETE OMEGA
+    # ===========================================================
+
     def paquete_omega(self) -> Dict[str, Any]:
         if not self._reportes_modulos:
             self.consolidar_reportes()
 
         reportes_lista: List[Dict[str, Any]] = []
-        reportes_lista.append({"id": "metadata", "titulo": "INFORMACIÓN DEL RUN", "orden": 0, "contenido": {"version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "version_contrato": VERSION_CONTRATO_REQUERIDA}})
+
+        reportes_lista.append({"id": "metadata", "titulo": "INFORMACIÓN DEL RUN", "orden": 0, "contenido": {"version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "version_contrato_requerida": VERSION_CONTRATO_REQUERIDA, "api_engine": API_ENGINE_ACTUAL, "estado_engine": self.estado, "invocador_id": self.invocador_id, "total_modulos": self.registro.total(), "errores_arranque": list(self.errores_arranque), "advertencias": list(self.advertencias), "trazas_n": len(self._trazas), "rutas_n": len(self._mapa_ruta), "timestamp": datetime.now(timezone.utc).isoformat()}})
+
         orden = 1
         for nombre in sorted(self.registro.contenedores.keys()):
             cont = self.registro.contenedores[nombre]
-            reportes_lista.append({"id": cont.id or nombre, "titulo": f"MÓDULO {cont.rol}/{nombre}", "orden": orden, "contenido": {"id": cont.id, "nombre": cont.nombre, "rol": cont.rol, "version": cont.version}})
+            reportes_lista.append({"id": cont.id or nombre, "titulo": f"MÓDULO {cont.rol}/{nombre}", "orden": orden, "contenido": {"id": cont.id, "nombre": cont.nombre, "rol": cont.rol, "version": cont.version, "version_contrato": cont.version_contrato, "esquema": cont.esquema, "estabilidad": cont.estabilidad, "compatible_desde": cont.compatible_desde, "api_engine": cont.api_engine, "descripcion": cont.descripcion, "funcion": cont.funcion, "no_hace": cont.no_hace, "autoridad": cont.autoridad, "conocimiento_exportable": cont.conocimiento_exportable, "consultas_soportadas": cont.consultas_soportadas, "requiere": cont.requiere, "autoriza_engine": cont.autoriza_engine, "capacidades": list(cont.capacidades.keys()), "capacidades_meta": cont.capacidades_meta, "estados_validos": cont.estados_validos, "invariantes": cont.invariantes, "reporte": self._reportes_modulos.get(nombre), "diagnostico": self._diagnosticos.get(nombre), "inventario": self._inventarios.get(nombre)}})
             orden += 1
 
         reportes_lista.append({"id": "dependencias", "titulo": "DEPENDENCIAS", "orden": orden, "contenido": self._dependencias})
@@ -786,10 +849,19 @@ class Engine:
         orden += 1
 
         reportes_lista.append({"id": "mapa_ruta", "titulo": "MAPA DE RUTA DE EJECUCIÓN", "orden": orden, "contenido": list(self._mapa_ruta)})
-        return {"metadata": {"version_engine": self.VERSION, "estado_engine": self.estado, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "total_modulos": self.registro.total(), "trazas_n": len(self._trazas)}, "reportes": reportes_lista}
+
+        return {"metadata": {"version_engine": self.VERSION, "estado_engine": self.estado, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "total_modulos": self.registro.total(), "trazas_n": len(self._trazas), "rutas_n": len(self._mapa_ruta), "timestamp": datetime.now(timezone.utc).isoformat()}, "reportes": reportes_lista}
+
+    # ===========================================================
+    # ESTADO GLOBAL
+    # ===========================================================
 
     def estado_global(self) -> Dict[str, Any]:
-        return {"tipo": "estado_global", "version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "estado": self.estado, "timestamp": datetime.now(timezone.utc).isoformat()}
+        return {"tipo": "estado_global", "version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "estado": self.estado, "timestamp": datetime.now(timezone.utc).isoformat(), "total_contenedores": self.registro.total(), "errores_arranque": list(self.errores_arranque), "advertencias": list(self.advertencias), "trazas_n": len(self._trazas), "rutas_n": len(self._mapa_ruta), "dependencias": self._dependencias, "grafo": self._grafo}
+
+    # ===========================================================
+    # CENTINELA
+    # ===========================================================
 
     @property
     def centinela(self) -> Centinela:
@@ -811,4 +883,13 @@ class Engine:
             raise
 
 
+# ===========================================================
+# EXPORTACIONES
+# ===========================================================
+
 __all__ = ["Engine", "ArranqueError", "Contenedor", "RegistroModulos", "VERSION_ENGINE", "ESQUEMA_CONTRATO_REQUERIDO", "VERSION_CONTRATO_REQUERIDA"]
+
+
+# ===========================================================
+# FIN DEL MÓDULO ENGINE
+# ===========================================================

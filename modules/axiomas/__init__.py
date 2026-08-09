@@ -163,13 +163,6 @@ DOMINIO_CANONICO = {
 # CONFIGURACIÓN
 # ===============================================================
 
-_DIR = Path(__file__).parent
-
-def _rutas_py() -> List[Path]:
-    return sorted(
-        p for p in _DIR.glob("**/*.py")
-        if p.name != "__init__.py"
-    )
 
 # ===============================================================
 # FIN CONFIGURACIÓN
@@ -702,7 +695,233 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # ===============================================================
 # CAPACIDADES PÚBLICAS
 # ===============================================================
+# ===============================================================
+# Capacidades de contrato
+# ===============================================================
+def barrer(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict:
+    """Capacidad principal: coherencia axiomática del cuerpo."""
+    decls, errores = recolectar(declaraciones_externas)
+    choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
 
+    if (choques or errores) and DiagnosticoGlobal is not None:
+        try:
+            DiagnosticoGlobal.recibir_reporte(
+                modulo="axiomas",
+                errores=(
+                    [{"tipo": "choque", "detalle": c} for c in choques]
+                    + [{"tipo": "error_carga", "detalle": e} for e in errores]
+                ),
+            )
+        except Exception:  # noqa: BLE001
+            pass
+
+    cuerpos = sorted({d["cuerpo"] for d in decls})
+    por_tipo = {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS}
+
+    return {
+        "coherente": not (choques or errores),
+        "choques": choques,
+        "errores": errores,
+        "declaraciones": len(decls),
+        "cuerpos": cuerpos,
+        "por_tipo": por_tipo,
+        "ids_dominio_k_o": ids_dominio_k_o(declaraciones_externas)
+        if not (choques or errores)
+        else [],
+    }
+
+
+def verificar_salida(salida: Dict) -> bool:
+    return bool(salida.get("coherente", False))
+
+
+def declaraciones(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> List[Dict]:
+    """Lista normalizada si el cuerpo es coherente; si no → []."""
+    resultado = barrer(declaraciones_externas)
+    if not resultado["coherente"]:
+        return []
+    decls, _ = recolectar(declaraciones_externas)
+    return decls
+
+
+def axiomas(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> List[Dict]:
+    """Alias de contrato: misma semántica que declaraciones()."""
+    return declaraciones(declaraciones_externas)
+
+
+def inventario(peticion=None) -> Dict:
+    decls, errores = recolectar()
+    return {
+        "contenedor": "axiomas",
+        "version": "9.5",
+        "tipos": list(TIPOS),
+        "declaraciones": len(decls),
+        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
+        "cuerpos": sorted({d["cuerpo"] for d in decls}),
+        "errores": errores,
+        "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
+        "ids_dominio_k_o": ids_dominio_k_o(),
+        "nota": (
+            "Def-5.3.1 y dominio O viven en los cuerpos cargados; "
+            "este módulo los vigila y expone, no los clasifica en entrada."
+        ),
+    }
+
+
+# --- ids canónicos del paper (TR1, |Θ|=24) ---
+THETA_CANONICO = frozenset({
+    "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10",
+    "T11", "T12", "T13", "T14", "T15", "T16", "T17",
+    "U0", "U1", "M1", "M.1", "B-Canonical", "TT.6.1", "TR1",
+})
+
+DOMINIO_CANONICO = {
+    "ontologia": "ONT",
+    "ont": "ONT",
+    "informacion": "INF",
+    "info": "INF",
+    "logica": "LOG",
+    "log": "LOG",
+    "epistemologia": "EPI",
+    "epi": "EPI",
+    "semantica": "SEM",
+    "sem": "SEM",
+    "temporal": "TMP",
+    "tmp": "TMP",
+    "meta": "MET",
+    "met": "MET",
+    "constantes": "MET",
+    "self": "EPI",
+    "inferencia_causal": "INF",
+    "verificacion": "EPI",
+    "ver": "VER",
+    "contexto": "SEM",
+}
+
+
+def _dominios_canonicos(gobierna) -> set:
+    out = set()
+    for g in gobierna or []:
+        key = str(g).lower().strip()
+        out.add(DOMINIO_CANONICO.get(key, key.upper()[:3]))
+    return out
+
+
+def _medir_pares(theta: list) -> dict:
+    n = len(theta)
+    pares_tot = n * (n - 1) // 2 if n >= 2 else 0
+    compatibles = 0
+    novedosos = 0
+    for i in range(n):
+        Di = theta[i]["dominios"]
+        for j in range(i + 1, n):
+            Dj = theta[j]["dominios"]
+            if not (Di & Dj):
+                continue
+            compatibles += 1
+            union = Di | Dj
+            if union > Di and union > Dj:
+                novedosos += 1
+    return {
+        "theta_n": n,
+        "pares_totales": pares_tot,
+        "pares_compatibles": compatibles,
+        "pares_novedosos": novedosos,
+        "im_vs_theta": (
+            "GENERATIVO" if n > 0 and novedosos > n
+            else ("ESTANCADO" if n > 0 else "SIN_DATOS")
+        ),
+    }
+
+
+def generatividad() -> dict:
+    """
+    TR1 en dos capas (saber, no creer):
+
+    1) operativa  — todo axioma/teorema con gobierna (grafo del repo)
+    2) canonica   — solo los 24 ids del paper + dominios normalizados
+
+    No inventa candidatos. No calcula Tru. Una sola definición (sin duplicar).
+    """
+    decls, errores = recolectar()
+
+    oper = []
+    for d in decls:
+        if d.get("tipo") not in ("teorema", "axioma"):
+            continue
+        gob = d.get("gobierna") or []
+        if not gob:
+            continue
+        oper.append({
+            "id": d["id"],
+            "tipo": d["tipo"],
+            "dominios": set(gob),
+        })
+    m_op = _medir_pares(oper)
+    dominios_op = sorted({g for n in oper for g in n["dominios"]})
+
+    por_id = {}
+    for d in decls:
+        i = str(d.get("id", ""))
+        if i in THETA_CANONICO:
+            cand = {
+                "id": i,
+                "tipo": d.get("tipo"),
+                "dominios": _dominios_canonicos(d.get("gobierna")),
+            }
+            prev = por_id.get(i)
+            if prev is None or len(cand["dominios"]) >= len(prev["dominios"]):
+                por_id[i] = cand
+
+    can = [por_id[i] for i in sorted(por_id.keys()) if por_id[i]["dominios"]]
+    m_can = _medir_pares(can)
+    dominios_can = sorted({g for n in can for g in n["dominios"]})
+    faltan = sorted(THETA_CANONICO - set(por_id.keys()))
+    sin_dominio = sorted(i for i, n in por_id.items() if not n["dominios"])
+
+    u1_proxy = (
+        "NO_STAGNANT"
+        if m_can.get("pares_novedosos", 0) > 0 or m_op.get("pares_novedosos", 0) > 0
+        else "REVISAR"
+    )
+
+    return {
+        "contenedor": "axiomas",
+        "theta_n": m_op["theta_n"],
+        "pares_totales": m_op["pares_totales"],
+        "pares_compatibles": m_op["pares_compatibles"],
+        "pares_novedosos": m_op["pares_novedosos"],
+        "im_vs_theta": m_op["im_vs_theta"],
+        "dominios": dominios_op,
+        "u1_proxy": u1_proxy,
+        "errores_recoleccion": len(errores),
+        "por_tipo_theta": {
+            "axioma": sum(1 for n in oper if n["tipo"] == "axioma"),
+            "teorema": sum(1 for n in oper if n["tipo"] == "teorema"),
+        },
+        "canonica": {
+            **m_can,
+            "ids_presentes": sorted(por_id.keys()),
+            "ids_faltantes": faltan,
+            "ids_sin_dominio": sin_dominio,
+            "dominios": dominios_can,
+            "objetivo_paper": {
+                "theta_n": 24,
+                "im_esperada": 153,
+                "nota": "|Im(⊕)|=153 > 24=|Θ| en enumeración del texto",
+            },
+        },
+        "ids_dominio_k_o": ids_dominio_k_o(),
+        "nota": (
+            "Capa operativa = grafo del repo. "
+            "Capa canonica = solo ids TR1 del paper. "
+            "Dominio O/K: ver ids_dominio_k_o y cuerpos (no se clasifica entrada aquí)."
+        ),
+    }
 def recolectar(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Tuple[List[Dict], List[Dict]]:

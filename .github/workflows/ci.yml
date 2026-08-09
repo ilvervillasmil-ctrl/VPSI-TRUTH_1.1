@@ -776,7 +776,18 @@ jobs:
           if-no-files-found: warn
 
       # ==========================================================
-      # 14. COMMIT AUTOMÁTICO DE HISTORIA DE COHERENCIA
+      # 14. EJECUCIÓN DE PRUEBAS UNITARIAS
+      # ==========================================================
+      - name: Run Tests
+        env:
+          PYTHONPATH: .
+        run: |
+          mkdir -p diagnostics
+          pytest
+
+
+      # ==========================================================
+      # 15. COMMIT AUTOMÁTICO DE HISTORIA DE COHERENCIA
       # ==========================================================
       - name: Commit coherence history
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

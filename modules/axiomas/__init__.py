@@ -922,31 +922,64 @@ def recolectar(
                         "tipo_excepcion": "declaracion_invalida_omitida",
                         "error": str(e),
                     })
-                    continue  # Continúa la recolección
+                    continue
 
-# ===========================================================
-# DECLARACIÓN DE PROTECCIÓN CONTRA INCONSISTENCIA EXTERNA
-# ===========================================================
+    # ===========================================================
 
-{
-    "id": "AX-FRONTERA-C1",
-    "tipo": "axioma",
-    "cuerpo": "VPSI_AX",
-    "sujeto": "contrato",
-    "objeto": "exigencia_externa",
-    "enunciado": (
-        "Una exigencia externa que no se encuentre declarada "
-        "en el contrato, capacidades o alcance de una capacidad "
-        "no constituye por sí misma una inconsistencia del módulo."
-    ),
-    "gobierna": [
-        "contrato",
-        "capacidad",
-        "frontera_engine",
-        "exigencia_externa",
-        "consistencia",
-    ],
-}
+    # 4. DECLARACIÓN DE PROTECCIÓN
+
+    # ===========================================================
+
+    # La declaración 4 se incorpora al mismo registro declarativo.
+    # No conoce tests concretos, marcas concretas ni comandos concretos.
+    # Su cuerpo pertenece al dominio real de axiomas cargado por el módulo.
+    declaracion_4 = {
+
+        "id": "AX-FRONTERA-4",
+        "tipo": "axioma",
+        "cuerpo": "axiomas",
+        "sujeto": "declaracion",
+        "objeto": "inconsistencia_externa",
+        "enunciado": (
+
+            "Una inconsistencia atribuida desde una exigencia externa "
+            "debe ser evaluada conforme al cuerpo declarativo, "
+            "sujeto, objeto, dominio y capacidades disponibles, "
+            "y no puede considerarse inconsistencia del cuerpo "
+            "axiomático únicamente por una condición externa "
+            "no declarada."
+
+        ),
+
+        "gobierna": [
+
+            "declaracion",
+
+            "contrato",
+
+            "capacidad",
+
+            "frontera_engine",
+
+            "inconsistencia_externa",
+
+        ],
+
+    }
+
+    decls.append(
+
+        normalizar(
+
+            declaracion_4,
+
+            "axiomas",
+
+        )
+
+    )
+
+    return decls, errores
     # ==========================================================
     # 1. CARGAR ARCHIVOS EN LA CARPETA DEL MÓDULO
     # ==========================================================

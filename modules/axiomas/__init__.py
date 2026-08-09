@@ -739,6 +739,36 @@ def recolectar(
                 "archivo": str(vpsi.name),
                 "error": "{0}: {1}".format(type(e).__name__, e),
             })
+# ==========================================================
+# OBTENER TODAS LAS DECLARACIONES
+# ==========================================================
+todas = extraer_todas_declaraciones()
+
+print(f"Total declaraciones: {todas['total_general']}")
+print(f"IDs: {todas['ids']}")
+print(f"Por tipo: {todas['totales']}")
+
+# ==========================================================
+# BUSCAR POR ID
+# ==========================================================
+resultado = buscar_por_id("A1")
+if resultado["encontrado"]:
+    print(f"Declaración encontrada: {resultado['declaracion']}")
+else:
+    print(f"Error: {resultado['error']}")
+
+# ==========================================================
+# VERIFICAR SI ID EXISTE
+# ==========================================================
+if id_existe("Z99"):
+    print("ID Z99 existe")
+else:
+    print("ID Z99 NO existe")  # ← Esto se ejecutará
+
+# ==========================================================
+# LISTAR TODOS LOS IDS
+# ==========================================================
+print(f"Todos los IDs: {listar_todos_ids()}")
 
     if declaraciones_externas:
         for nombre, lista in declaraciones_externas.items():

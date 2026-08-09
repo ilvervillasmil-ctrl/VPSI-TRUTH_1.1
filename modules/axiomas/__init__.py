@@ -165,17 +165,11 @@ DOMINIO_CANONICO = {
 
 _DIR = Path(__file__).parent
 
-
-def _ruta_vpsi() -> Optional[Path]:
-    candidatos = [
-        _DIR.parent.parent / "VPSI.py",
-        _DIR.parent / "VPSI.py",
-        _DIR / "VPSI.py",
-    ]
-    for p in candidatos:
-        if p.exists():
-            return p
-    return None
+def _rutas_py() -> List[Path]:
+    return sorted(
+        p for p in _DIR.glob("**/*.py")
+        if p.name != "__init__.py"
+    )
 
 # ===============================================================
 # FIN CONFIGURACIÓN

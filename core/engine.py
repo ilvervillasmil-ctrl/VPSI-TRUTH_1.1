@@ -55,7 +55,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from core.centinela import Centinela, Veredicto
-from core.paquete_contrato import PKG_CICLO_ID
 
 
 # ===============================================================
@@ -2726,22 +2725,167 @@ class Engine:
                 self._grafo,
         }
 
-    # ===========================================================
-    # CENTINELA
-    # ===========================================================
+# ==========================================================
+# TRAZAS, INVOCACIÓN Y CENTINELA
+# ==========================================================
+
+    # ----------------------------------------------------------
+    # REGISTRO DE TRAZAS
+    # ----------------------------------------------------------
+
+    def _registrar_traza(
+        self,
+        modulo: str,
+        capacidad: str,
+        estado: str,
+        duracion_s: float,
+        error: Optional[str] = None,
+        **extras: Any,
+    ) -> None:
+        """
+        Registra evidencia temporal de una ejecución.
+
+        La traza conserva:
+
+            - identificador
+            - timestamp
+            - módulo
+            - capacidad
+            - estado
+            - duración
+            - error, si existe
+            - metadatos adicionales
+
+        No ejecuta lógica del módulo.
+        No interpreta resultados.
+        """
+
+        self._traza_seq += 1
+
+        entrada: Dict[str, Any] = {
+            "id_traza": self._traza_seq,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "modulo": modulo,
+            "capacidad": capacidad,
+            "estado": estado,
+            "duracion_s": duracion_s,
+        }
+
+        if error is not None:
+            entrada["error"] = error
+
+        for clave, valor in extras.items():
+            if valor is not None:
+                entrada[clave] = valor
+
+        self._trazas.append(entrada)
+
+    # ----------------------------------------------------------
+    # CONSULTA DE TRAZAS
+    # ----------------------------------------------------------
+
+    def obtener_trazas(
+        self,
+    ) -> Tuple[Dict[str, Any], ...]:
+        """
+        Devuelve una copia inmutable de la evidencia
+        registrada por el Engine.
+        """
+
+        return tuple(
+            dict(traza)
+            for traza in self._trazas
+        )
+
+    # ----------------------------------------------------------
+    # CENTINELA — PRIORIDAD ABSOLUTA
+    # ----------------------------------------------------------
 
     @property
-    def centinela(
-        self,
-    ) -> Centinela:
+    def centinela(self) -> Centinela:
+        """
+        Acceso al Centinela estructural del Engine.
+
+        CENTINELA ES COMPONENTE DE PRIORIDAD ABSOLUTA.
+
+        No es una capacidad opcional ni un módulo accesorio.
+        Constituye la frontera de verificación del Engine.
+
+        La instancia se crea de forma diferida únicamente
+        para evitar que Centinela reciba un Engine parcialmente
+        construido durante __init__.
+
+        La creación diferida NO significa opcionalidad.
+        Una vez requerido por el ciclo de auditoría, Centinela
+        debe existir y responder.
+        """
 
         if self._centinela is None:
-
             self._centinela = Centinela(
                 invocador=self
             )
 
         return self._centinela
+
+    # ----------------------------------------------------------
+    # INVOCACIÓN DE CAPACIDADES
+    # ----------------------------------------------------------
+
+    def invocar(
+        self,
+        modulo: str,
+        capacidad: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        """
+        Puente oficial de invocación de capacidades.
+
+        Toda capacidad debe atravesar:
+
+            Engine
+                ↓
+            resolución del contenedor
+                ↓
+            contrato
+                ↓
+            capacidad declarada
+                ↓
+            función real
+                ↓
+            módulo
+                ↓
+            resultado
+
+        No existe ejecución paralela fuera de esta frontera.
+        """
+
+        salida = self.ejecutar_capacidad(
+            modulo,
+            capacidad,
+            *args,
+            **kwargs,
+        )
+
+        if (
+            isinstance(salida, dict)
+            and salida.get("estado") == "EXITO"
+        ):
+            return salida.get("resultado")
+
+        if (
+            isinstance(salida, dict)
+            and "error" in salida
+        ):
+            raise RuntimeError(
+                str(salida.get("error"))
+            )
+
+        return salida
+
+    # ----------------------------------------------------------
+    # VERIFICACIÓN CON CENTINELA
+    # ----------------------------------------------------------
 
     def verificar_con_centinela(
         self,
@@ -2749,48 +2893,47 @@ class Engine:
         *,
         depositar_salida: bool = True,
     ) -> Veredicto:
+        """
+        Cierre oficial y obligatorio del ciclo de auditoría.
+
+        Flujo estructural:
+
+            Engine
+                ↓
+            paquete
+                ↓
+            Centinela
+                ↓
+            verificación
+                ↓
+            Veredicto
+
+        Centinela constituye la frontera de verificación
+        del Engine.
+
+        Si la verificación falla por una excepción, el error
+        no se oculta ni se transforma silenciosamente:
+        se registra en la traza y se propaga.
+        """
 
         inicio = time.perf_counter()
 
-        ciclo_id = None
-
-        if isinstance(
-            paquete,
-            dict,
-        ):
-
-            ciclo_id = paquete.get(
-                PKG_CICLO_ID
-            )
-
         try:
-
-            veredicto = (
-                self.centinela.verificar(
-                    paquete,
-                    depositar_salida=
-                        depositar_salida,
-                )
+            veredicto = self.centinela.verificar(
+                paquete,
+                depositar_salida=depositar_salida,
             )
 
             duracion = round(
-                time.perf_counter()
-                - inicio,
+                time.perf_counter() - inicio,
                 6,
             )
 
             self._registrar_traza(
                 modulo="ENGINE",
-                capacidad=
-                    "verificar_con_centinela",
-                estado=
-                    str(
-                        veredicto.estado
-                    ),
-                duracion_s=
-                    duracion,
-                ciclo_id=
-                    ciclo_id,
+                capacidad="verificar_con_centinela",
+                estado=str(veredicto.estado),
+                duracion_s=duracion,
             )
 
             return veredicto
@@ -2798,8 +2941,7 @@ class Engine:
         except Exception as e:
 
             duracion = round(
-                time.perf_counter()
-                - inicio,
+                time.perf_counter() - inicio,
                 6,
             )
 
@@ -2809,21 +2951,17 @@ class Engine:
 
             self._registrar_traza(
                 modulo="ENGINE",
-                capacidad=
-                    "verificar_con_centinela",
-                estado=
-                    "ERROR_AUDITORIA",
-                duracion_s=
-                    duracion,
-                error=
-                    error,
-                ciclo_id=
-                    ciclo_id,
+                capacidad="verificar_con_centinela",
+                estado="ERROR_AUDITORIA",
+                duracion_s=duracion,
+                error=error,
             )
 
             raise
 
-
+# ==========================================================
+# FIN TRAZAS, INVOCACIÓN Y CENTINELA
+# ==========================================================
 # ===============================================================
 # EXPORTACIONES
 # ===============================================================

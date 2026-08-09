@@ -924,6 +924,29 @@ def recolectar(
                     })
                     continue  # Continúa la recolección
 
+# ===========================================================
+# DECLARACIÓN DE PROTECCIÓN CONTRA INCONSISTENCIA EXTERNA
+# ===========================================================
+
+{
+    "id": "AX-FRONTERA-C1",
+    "tipo": "axioma",
+    "cuerpo": "VPSI_AX",
+    "sujeto": "contrato",
+    "objeto": "exigencia_externa",
+    "enunciado": (
+        "Una exigencia externa que no se encuentre declarada "
+        "en el contrato, capacidades o alcance de una capacidad "
+        "no constituye por sí misma una inconsistencia del módulo."
+    ),
+    "gobierna": [
+        "contrato",
+        "capacidad",
+        "frontera_engine",
+        "exigencia_externa",
+        "consistencia",
+    ],
+}
     # ==========================================================
     # 1. CARGAR ARCHIVOS EN LA CARPETA DEL MÓDULO
     # ==========================================================

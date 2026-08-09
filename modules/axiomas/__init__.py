@@ -762,21 +762,6 @@ print(f"Todos los IDs: {listar_todos_ids()}")
 
     return decls, errores
 
-
-def por_dominio(
-    dominio: str,
-    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
-) -> List[Dict]:
-    dom = str(dominio).lower().strip()
-    decls, _ = recolectar(declaraciones_externas)
-    out = []
-    for d in decls:
-        gobs = [str(g).lower().strip() for g in (d.get("gobierna") or [])]
-        if dom in gobs or any(dom in g for g in gobs):
-            out.append(d)
-    return out
-
-
 def ids_dominio_k_o(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[str]:
@@ -856,6 +841,20 @@ def recolectar(
 ) -> Tuple[List[Dict], List[Dict]]:
     decls: List[Dict] = []
     errores: List[Dict] = []
+
+def por_dominio(
+    dominio: str,
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> List[Dict]:
+    dom = str(dominio).lower().strip()
+    decls, _ = recolectar(declaraciones_externas)
+    out = []
+    for d in decls:
+        gobs = [str(g).lower().strip() for g in (d.get("gobierna") or [])]
+        if dom in gobs or any(dom in g for g in gobs):
+            out.append(d)
+    return out
+
 
     # ==========================================================
     # 1. CARGAR ARCHIVOS EN LA CARPETA DEL MÓDULO

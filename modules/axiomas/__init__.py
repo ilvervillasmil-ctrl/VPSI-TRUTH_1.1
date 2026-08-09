@@ -938,8 +938,8 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
     return None
 
 
-def verificar() -> Dict[str, Any]:
-    return barrer()
+def verificar(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict[str, Any]:
+    return barrer(declaraciones_externas)
 
 # ===============================================================
 # FIN CAPACIDADES PÚBLICAS

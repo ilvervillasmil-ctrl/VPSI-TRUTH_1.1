@@ -1,310 +1,179 @@
+# test_citacion.py
 # ===============================================================
-# VPSI-TRUTH — modules/citacion/__init__.py
-# ===============================================================
-
-from __future__ import annotations
-
-from typing import Any, Dict, List
-
-# ===============================================================
-# CONSTANTES DEL MÓDULO
+# PRUEBAS UNITARIAS PARA EL MÓDULO CITACIÓN (CIT)
 # ===============================================================
 
-ID_MODULO = "CIT"
-NOMBRE_MODULO = "citacion"
-ROL_MODULO = "CIT"
-
-VERSION_MODULO = "2.0"
-VERSION_CONTRATO = "1.0"
-ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-ESTABILIDAD = "ESTABLE"
-COMPATIBLE_DESDE = "1.0"
-API_ENGINE = ">=1.0"
-
-ESTADOS_VALIDOS = (
-    "NO_INICIADO",
-    "OPERATIVO",
-    "DEGRADADO",
-    "RECHAZADO",
-)
-
-INVARIANTES = (
-    "el id del módulo nunca cambia",
-    "el rol nunca cambia",
-    "CIT solo gestiona citas y anuncios",
-    "las capacidades declaradas son callables tras la resolución",
-    "este módulo no modifica el estado de otros módulos",
-    "este módulo no inventa capacidades no declaradas en CONTENEDOR",
-    "este módulo siempre puede reportar su propio estado",
+import pytest
+from modules.citacion import (
+    CONTENEDOR,
+    anunciar,
+    anunciar_todo,
+    barrer,
+    buscar,
+    cadena,
+    citar,
+    diagnostico,
+    explicar,
+    inventario,
+    limpiar_ciclo,
+    registrar,
+    relacionar,
+    reporte,
+    resolver,
+    verificar,
+    verificar_salida,
 )
 
 
-# ===============================================================
-# CAPACIDADES (funciones reales)
-# ===============================================================
-
-def anunciar() -> Dict[str, Any]:
-    return {"id": "CIT", "anuncio": "anuncio_registrado"}
-
-
-def anunciar_todo() -> Dict[str, Any]:
-    return {"id": "CIT", "anuncios": [], "n": 0}
-
-
-def buscar() -> Dict[str, Any]:
-    return {"id": "CIT", "declaraciones": [], "n": 0}
-
-
-def citar() -> Dict[str, Any]:
-    return {"id": "CIT", "citas": [], "n": 0}
-
-
-def limpiar_ciclo() -> Dict[str, Any]:
-    return {"ok": True, "id": "CIT"}
-
-
-def inventario() -> Dict[str, Any]:
-    return {
-        "id": "CIT",
-        "nombre": "citacion",
-        "rol": "CIT",
-        "version": "2.0",
-        "version_contrato": "1.0",
-        "esquema": "VPSI-CONTRACT-1.0",
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-    }
-
-
-def reporte() -> Dict[str, Any]:
-    return {
-        "id": "CIT",
-        "nombre": "citacion",
-        "rol": "CIT",
-        "estado": "OPERATIVO",
-        "coherente": True,
-        "version": "2.0",
-    }
-
-
-def diagnostico() -> Dict[str, Any]:
-    return {
-        "id": "CIT",
-        "nombre": "citacion",
-        "rol": "CIT",
-        "estado": "OPERATIVO",
-        "coherente": True,
-        "problemas": [],
-        "advertencias": [],
-        "recomendaciones": [],
-    }
-
-
-def verificar() -> Dict[str, Any]:
-    return {
-        "id": "CIT",
-        "coherente": True,
-        "errores": [],
-        "choques": [],
-    }
-
-
-def barrer() -> Dict[str, Any]:
-    return verificar()
-
-
-def verificar_salida(salida: Dict) -> bool:
-    return bool(salida.get("coherente", False))
+@pytest.fixture(autouse=True)
+def preparar_entorno():
+    """Limpia el registro operativo antes de cada test."""
+    limpiar_ciclo()
+    yield
+    limpiar_ciclo()
 
 
 # ===============================================================
-# CONTENEDOR (CONTRATO EXACTO)
+# 1. PRUEBAS DE REGISTRO Y RESOLUCIÓN
 # ===============================================================
 
-CONTENEDOR: Dict[str, Any] = {
+def test_registrar_y_resolver_declaracion():
+    decl = {
+        "id": "AX-101",
+        "tipo": "axioma",
+        "fuente": "modulo_base",
+        "enunciado": "El orden del ciclo no afecta el resultado.",
+        "descripcion": "Axioma de estabilidad"
+    }
+    
+    # 1. Registrar
+    res_reg = registrar(decl)
+    assert res_reg["ok"] is True
+    assert res_reg["n"] == 1
+    assert res_reg["id"] == "CIT"
 
-    # ----- ESQUEMA -----
-    "esquema": ESQUEMA_CONTRATO,
-    "version_contrato": VERSION_CONTRATO,
-    "version_modulo": VERSION_MODULO,
-    "estabilidad": ESTABILIDAD,
-    "compatible_desde": COMPATIBLE_DESDE,
-    "api_engine": API_ENGINE,
+    # 2. Resolver por ID
+    res_sol = resolver("AX-101")
+    assert res_sol["resuelto"] is True
+    assert res_sol["origen"] == "registro_ciclo"
+    assert res_sol["declaracion"]["id"] == "AX-101"
+    assert res_sol["declaracion"]["enunciado"] == "El orden del ciclo no afecta el resultado."
 
-    # ----- IDENTIDAD -----
-    "id": ID_MODULO,
-    "nombre": NOMBRE_MODULO,
-    "rol": ROL_MODULO,
-    "descripcion": (
-        "Sistema de citación y anuncios. Gestiona el registro "
-        "de citas y anuncios del sistema."
-    ),
 
-    # ----- PROPÓSITO -----
-    "funcion": (
-        "Gestionar citas y anuncios del sistema, "
-        "mantener registro de citaciones."
-    ),
-    "no_hace": [
-        "No calcula Tru_total ni Tru_Ri",
-        "No clasifica entrada de usuario",
-        "No orquesta el sistema",
-        "No modifica otros módulos",
-    ],
+def test_registrar_declaracion_invalida():
+    decl_invalida = {
+        "id": "AX-102",
+        "tipo": "tipo_desconocido_no_existente",
+        # Falta 'fuente' y 'enunciado'
+    }
+    
+    res = registrar(decl_invalida)
+    assert res["ok"] is False
+    assert "errores" in res
+    assert len(res["errores"]) > 0
 
-    # ----- AUTORIDAD -----
-    "autoridad": [
-        "Gestionar citas y anuncios",
-        "Mantener registro de citaciones",
-        "Reportar estado, inventario y diagnóstico propios",
-    ],
 
-    # ----- CONOCIMIENTO EXPORTABLE -----
-    "conocimiento_exportable": [
-        "anunciar",
-        "anunciar_todo",
-        "buscar",
-        "citar",
-        "limpiar_ciclo",
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "verificar",
-        "barrer",
-        "verificar_salida",
-    ],
+# ===============================================================
+# 2. PRUEBAS DE BÚSQUEDA Y CITACIÓN (USO DE PETICIÓN DICI)
+# ===============================================================
 
-    # ----- DEPENDENCIAS -----
-    "requiere": [],
+def test_buscar_con_filtros():
+    registrar({
+        "id": "DEF-1",
+        "tipo": "definicion",
+        "fuente": "modulo_a",
+        "enunciado": "Definicion A"
+    })
+    registrar({
+        "id": "DEF-2",
+        "tipo": "teorema",
+        "fuente": "modulo_b",
+        "enunciado": "Teorema B"
+    })
 
-    # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS BÁSICOS)
-    # ============================================================
-    "autoriza_engine": {
-        # --- PERMISOS BASE ---
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
+    # Filtrar por tipo
+    res_tipo = buscar({"tipo": "definicion"})
+    assert res_tipo["n"] == 1
+    assert res_tipo["declaraciones"][0]["id"] == "DEF-1"
 
-        # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
-        "alterar": False,
-        "reescribir": False,
-    },
+    # Filtrar por texto
+    res_texto = buscar({"texto": "Teorema"})
+    assert res_texto["n"] == 1
+    assert res_texto["declaraciones"][0]["id"] == "DEF-2"
 
-    # ----- CONSULTAS SOPORTADAS -----
-    "consultas_soportadas": [
-        "anunciar",
-        "anunciar_todo",
-        "buscar",
-        "citar",
-        "limpiar_ciclo",
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "verificar",
-        "barrer",
-    ],
 
-    # ----- CAPACIDADES -----
-    "capacidades": {
-        "anunciar": anunciar,
-        "anunciar_todo": anunciar_todo,
-        "buscar": buscar,
-        "citar": citar,
-        "limpiar_ciclo": limpiar_ciclo,
-        "inventario": inventario,
-        "reporte": reporte,
-        "diagnostico": diagnostico,
-        "verificar": verificar,
-        "barrer": barrer,
-        "verificar_salida": verificar_salida,
-    },
+def test_citar_estructura_diccionario():
+    registrar({
+        "id": "AX-1",
+        "tipo": "axioma",
+        "fuente": "AX",
+        "enunciado": "Axioma base"
+    })
 
-    # ----- METADATOS DE CAPACIDADES (1:1 OBLIGATORIO) -----
-    "capacidades_meta": {
-        "anunciar": {
-            "descripcion": "Registra un anuncio en el sistema.",
-            "entrada": "ninguna",
-            "salida": "dict con id, anuncio",
-        },
-        "anunciar_todo": {
-            "descripcion": "Lista todos los anuncios registrados.",
-            "entrada": "ninguna",
-            "salida": "dict con id, anuncios, n",
-        },
-        "buscar": {
-            "descripcion": "Busca declaraciones en el sistema.",
-            "entrada": "ninguna",
-            "salida": "dict con id, declaraciones, n",
-        },
-        "citar": {
-            "descripcion": "Lista todas las citas registradas.",
-            "entrada": "ninguna",
-            "salida": "dict con id, citas, n",
-        },
-        "limpiar_ciclo": {
-            "descripcion": "Limpia el ciclo actual de citaciones.",
-            "entrada": "ninguna",
-            "salida": "dict con ok, id",
-        },
-        "inventario": {
-            "descripcion": "Inventario del módulo CIT.",
-            "entrada": "ninguna",
-            "salida": "dict con id, nombre, rol, version, capacidades",
-        },
-        "reporte": {
-            "descripcion": "Reporte interno de estado del módulo CIT.",
-            "entrada": "ninguna",
-            "salida": "dict con id, estado, coherente, version",
-        },
-        "diagnostico": {
-            "descripcion": "Diagnóstico del módulo CIT.",
-            "entrada": "ninguna",
-            "salida": "dict con id, estado, coherente, problemas",
-        },
-        "verificar": {
-            "descripcion": "Verifica coherencia interna del módulo CIT.",
-            "entrada": "ninguna",
-            "salida": "dict con id, coherente, errores, choques",
-        },
-        "barrer": {
-            "descripcion": "Alias de verificar.",
-            "entrada": "ninguna",
-            "salida": "dict con id, coherente, errores, choques",
-        },
-        "verificar_salida": {
-            "descripcion": "Comprueba forma mínima de una salida de CIT.",
-            "entrada": "salida: dict",
-            "salida": "bool",
-        },
-    },
+    # La función 'citar' espera una petición dict (opcional) y devuelve un dict
+    res_citas = citar({"tipo": "axioma"})
+    
+    assert isinstance(res_citas, dict)
+    assert res_citas["id"] == "CIT"
+    assert "citas" in res_citas
+    assert res_citas["n"] == 1
+    assert res_citas["citas"][0]["id"] == "AX-1"
 
-    # ============================================================
-    # REPORTING (COMPLETO CON 12 BANDERAS)
-    # ============================================================
-    "reporting": {
-        "estado": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "version": True,
-        "contrato": True,
-        "conocimiento": True,
-        "metricas": True,
-        "diagnostico": True,
-    },
 
-    # ----- ESTADOS VÁLIDOS -----
-    "estados_validos": list(ESTADOS_VALIDOS),
+# ===============================================================
+# 3. PRUEBAS DE RELACIONES Y CADENAS NORMATIVAS
+# ===============================================================
 
-    # ----- INVARIANTES -----
-    "invariantes": list(INVARIANTES),
+def test_relacionar_declaraciones():
+    registrar({"id": "AX-1", "tipo": "axioma", "fuente": "AX", "enunciado": "Base 1"})
+    registrar({"id": "TEO-1", "tipo": "teorema", "fuente": "TEO", "enunciado": "Derivado 1"})
 
-}  # <--- CIERRE FINAL
+    res_rel = relacionar("TEO-1", "deriva_de", "AX-1")
+    assert res_rel["ok"] is True
+    assert res_rel["declaracion"]["id"] == "REL-TEO-1-deriva_de-AX-1"
+
+
+def test_cadena_normativa():
+    registrar({"id": "AX-1", "tipo": "axioma", "fuente": "AX", "enunciado": "Paso 1"})
+    registrar({"id": "AX-2", "tipo": "axioma", "fuente": "AX", "enunciado": "Paso 2"})
+
+    # Cadena completa
+    res_cadena = cadena(["AX-1", "AX-2"])
+    assert res_cadena["completa"] is True
+    assert res_cadena["n"] == 2
+    assert len(res_cadena["faltantes"]) == 0
+
+    # Cadena incompleta
+    res_incompleta = cadena(["AX-1", "NO_EXISTE"])
+    assert res_incompleta["completa"] is False
+    assert "NO_EXISTE" in res_incompleta["faltantes"]
+
+
+# ===============================================================
+# 4. PRUEBAS DE INTEGRIDAD DEL CONTRATO Y BARRIDO
+# ===============================================================
+
+def test_verificar_e_invariantes():
+    res_barrer = barrer()
+    assert res_barrer["coherente"] is True
+    assert len(res_barrer["errores"]) == 0
+    assert len(res_barrer["choques"]) == 0
+
+
+def test_verificar_salida():
+    salida_valida = {"id": "CIT", "coherente": True}
+    salida_invalida = "Esto no es un diccionario"
+    
+    assert verificar_salida(salida_valida) is True
+    assert verificar_salida(salida_invalida) is False
+
+
+def test_inventario_y_reporte():
+    inv = inventario()
+    rep = reporte()
+    diag = diagnostico()
+
+    assert inv["id"] == "CIT"
+    assert "capacidades" in inv
+    assert rep["estado"] == "OPERATIVO"
+    assert diag["coherente"] is True

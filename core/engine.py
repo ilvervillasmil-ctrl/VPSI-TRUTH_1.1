@@ -661,7 +661,7 @@ class Engine:
     # ===========================================================
 
     def censar(self) -> Dict[str, Any]:
-        return {"total": self.registro.total(), "roles": {rol: [c.nombre for c in lista] for rol, lista in self.registro.por_rol.items()}, "roles_vacios": [], "rechazados": list(self.errores_arranque), "cargados": [{"id": c.id, "nombre": c.nombre, "rol": c.rol, "version": c.version, "esquema": c.esquema, "estabilidad": c.estabilidad, "capacidades": list(c.capacidades.keys())} for c in self.registro.contenedores.values()]}
+        return {"total": self.registro.total(), "roles": {rol: [c.nombre for c in lista] for rol, lista in self.registro.por_rol.items()}, "roles_vacios": [], "rechazados": list(self.errores_arranque)}
 
     # ===========================================================
     # TRAZAS DE EJECUCIÓN
@@ -716,6 +716,93 @@ class Engine:
             return f"Entrada incompatible con capacidad '{capacidad}': {e}"
         return None
 
+    # ===========================================================================
+    # ===================== SECCIÓN 1: NORMALIZACIÓN FRONTERA =====================
+    # ===========================================================================
+    # -- INICIO: Normalizador de entradas específicas que vienen del Engine -----
+    #
+    # Propósito:
+    #  - Normalizar 'declaraciones_externas' en la frontera Engine → Módulo
+    #  - Evitar que formatos inesperados (str, None, dict único, tupla, set) rompan
+    #    las funciones de los módulos (ej. axiomas) y reportar errores en un
+    #    formato compatible.
+    #
+    # Regla por defecto (conservadora):
+    #  - None -> {}
+    #  - top-level no dict -> error global
+    #  - list -> se usa tal cual
+    #  - dict -> [dict]
+    #  - tuple/set -> list(...)
+    #  - otros -> registrar error por módulo (no lanzar)
+    #
+    # Salida:
+    #  - (normalized_dict, errores_list)
+    #  - cada item en errores_list tiene claves para compatibilidad:
+    #      {'modulo': <nombre|None>, 'error': <mensaje>, 'cuerpo': <nombre|None>, 'razon': <mensaje>}
+    #
+    # -- FIN: Normalizador de entradas -----------------------------------------
+    # ===========================================================================
+    def _normalizar_declaraciones_externas(self, raw) -> Tuple[Dict[str, List[Dict]], List[Dict]]:
+        if raw is None:
+            return {}, []
+
+        errores: List[Dict] = []
+        normalized: Dict[str, List[Dict]] = {}
+
+        # Top-level tiene que ser un dict (mapeo nombre -> lista/declaracion)
+        if not isinstance(raw, dict):
+            e = {
+                "modulo": None,
+                "error": "declaraciones_externas no es dict",
+                "cuerpo": None,
+                "razon": "declaraciones_externas no es dict",
+            }
+            return {}, [e]
+
+        for nombre, valor in raw.items():
+            # None -> lista vacía (aceptable)
+            if valor is None:
+                normalized[nombre] = []
+                continue
+
+            # Listas se aceptan tal cual
+            if isinstance(valor, list):
+                normalized[nombre] = valor
+                continue
+
+            # Un solo dict -> envolver en lista
+            if isinstance(valor, dict):
+                normalized[nombre] = [valor]
+                continue
+
+            # Tuplas/sets -> convertir a lista
+            if isinstance(valor, (tuple, set)):
+                try:
+                    normalized[nombre] = list(valor)
+                except Exception:
+                    e = {
+                        "modulo": nombre,
+                        "error": "no se pudo convertir tuple/set a lista",
+                        "cuerpo": nombre,
+                        "razon": "no se pudo convertir tuple/set a lista",
+                    }
+                    errores.append(e)
+                continue
+
+            # Cualquier otro tipo (str, int, objeto) -> registrar error y omitimos
+            e = {
+                "modulo": nombre,
+                "error": "declaraciones externas no es lista",
+                "cuerpo": nombre,
+                "razon": "declaraciones externas no es lista",
+            }
+            errores.append(e)
+
+        return normalized, errores
+    # ===========================================================================
+    # =================== FIN SECCIÓN 1: NORMALIZACIÓN FRONTERA ==================
+    # ===========================================================================
+
     # ===========================================================
     # EJECUCIÓN CONTRACTUAL
     # ===========================================================
@@ -728,7 +815,7 @@ class Engine:
             Engine → Contenedor → Contrato → Capacidad → Entrada → Función real → Módulo → Resultado → Engine
 
         No se inventan capacidades.
-        No se transforma semánticamente el contenido.
+        No se transforma semánticamente el contenido (salvo normalización mínima y segura).
         """
 
         cont, error = self._resolver_contenedor(modulo_o_rol)
@@ -744,6 +831,24 @@ class Engine:
             error = f"{cont.nombre}: la capacidad '{capacidad}' no es callable"
             return {"estado": "ERROR", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error}
 
+        # =========================================================================
+        # ========== SECCIÓN 2: NORMALIZACIÓN EN LA FRONTERA DE INVOCACIÓN ========
+        # =========================================================================
+        # -- INICIO: Normalizar inputs previsibles (p.ej. 'declaraciones_externas')
+        # Recolectamos norm_errs (lista de dicts) para anexarlas al resultado luego.
+        norm_errs: List[Dict] = []
+        if "declaraciones_externas" in kwargs:
+            try:
+                norm, errs = self._normalizar_declaraciones_externas(kwargs.get("declaraciones_externas"))
+                kwargs["declaraciones_externas"] = norm
+                if errs:
+                    norm_errs.extend(errs)
+            except Exception:
+                # En caso raro de fallo en el normalizador, no rompemos la invocación:
+                norm_errs.append({"modulo": cont.nombre, "error": "error en normalizador interno", "cuerpo": cont.nombre, "razon": "excepcion en normalizador"})
+        # -- FIN: Normalizar inputs ------------------------------------------------
+        # =========================================================================
+
         error_entrada = self._validar_entrada_capacidad(cont, capacidad, args, kwargs)
         if error_entrada:
             return {"estado": "ERROR_ENTRADA", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error_entrada}
@@ -756,7 +861,30 @@ class Engine:
             resultado = fn(*args, **kwargs)
             duracion = round(time.perf_counter() - inicio, 6)
 
+            # Registrar traza de éxito
             self._registrar_traza(modulo=cont.nombre, capacidad=capacidad, estado="EXITO", duracion_s=duracion)
+
+            # =========================================================================
+            # ========== SECCIÓN 3: ANEXAR ERRORES DE NORMALIZACIÓN ===================
+            # =========================================================================
+            # -- INICIO: Si hubo norm_errs, integrarlos en el 'resultado' devuelto
+            if norm_errs:
+                # Preparamos una lista simple compatible con los módulos existentes
+                mapped = [{"modulo": e.get("modulo"), "error": e.get("error")} for e in norm_errs]
+                # Si resultado es dict y tiene 'errores' -> anexar
+                if isinstance(resultado, dict):
+                    if "errores" in resultado and isinstance(resultado["errores"], list):
+                        resultado["errores"].extend(mapped)
+                    elif "resultado" in resultado and isinstance(resultado["resultado"], dict):
+                        resultado["resultado"].setdefault("errores", []).extend(mapped)
+                    else:
+                        # Añadir 'errores' en la raíz del resultado para compatibilidad
+                        resultado.setdefault("errores", []).extend(mapped)
+                else:
+                    # Si el módulo devuelve algo no-dict, envolver e informar errores
+                    resultado = {"coherente": False, "valor": resultado, "errores": mapped}
+            # -- FIN: anexión de errores ------------------------------------------------
+            # =========================================================================
 
             salida = {"estado": "EXITO", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "resultado": resultado, "duracion_s": duracion}
             self.resultados_evaluacion.append(salida)
@@ -769,6 +897,11 @@ class Engine:
             self._registrar_traza(modulo=cont.nombre, capacidad=capacidad, estado="ERROR_EJECUCION", duracion_s=duracion, error=error_msg)
 
             salida = {"estado": "ERROR_EJECUCION", "modulo": cont.nombre, "rol": cont.rol, "id": cont.id, "capacidad": capacidad, "error": error_msg, "duracion_s": duracion}
+
+            # Adjuntar errores de normalización también en caso de excepción para diagnóstico
+            if norm_errs:
+                salida.setdefault("errores_normalizacion", []).extend(norm_errs)
+
             self.resultados_evaluacion.append(salida)
             return salida
 
@@ -831,12 +964,11 @@ class Engine:
 
         reportes_lista: List[Dict[str, Any]] = []
 
-        reportes_lista.append({"id": "metadata", "titulo": "INFORMACIÓN DEL RUN", "orden": 0, "contenido": {"version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "version_contrato_requerida": VERSION_CONTRATO_REQUERIDA, "api_engine": API_ENGINE_ACTUAL, "estado_engine": self.estado, "invocador_id": self.invocador_id, "total_modulos": self.registro.total(), "errores_arranque": list(self.errores_arranque), "advertencias": list(self.advertencias), "trazas_n": len(self._trazas), "rutas_n": len(self._mapa_ruta), "timestamp": datetime.now(timezone.utc).isoformat()}})
-
+        reportes_lista.append({"id": "metadata", "titulo": "INFORMACIÓN DEL RUN", "orden": 0, "contenido": {"version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "version_contrato": VERSION_CONTRATO_REQUERIDA}})
         orden = 1
         for nombre in sorted(self.registro.contenedores.keys()):
             cont = self.registro.contenedores[nombre]
-            reportes_lista.append({"id": cont.id or nombre, "titulo": f"MÓDULO {cont.rol}/{nombre}", "orden": orden, "contenido": {"id": cont.id, "nombre": cont.nombre, "rol": cont.rol, "version": cont.version, "version_contrato": cont.version_contrato, "esquema": cont.esquema, "estabilidad": cont.estabilidad, "compatible_desde": cont.compatible_desde, "api_engine": cont.api_engine, "descripcion": cont.descripcion, "funcion": cont.funcion, "no_hace": cont.no_hace, "autoridad": cont.autoridad, "conocimiento_exportable": cont.conocimiento_exportable, "consultas_soportadas": cont.consultas_soportadas, "requiere": cont.requiere, "autoriza_engine": cont.autoriza_engine, "capacidades": list(cont.capacidades.keys()), "capacidades_meta": cont.capacidades_meta, "estados_validos": cont.estados_validos, "invariantes": cont.invariantes, "reporte": self._reportes_modulos.get(nombre), "diagnostico": self._diagnosticos.get(nombre), "inventario": self._inventarios.get(nombre)}})
+            reportes_lista.append({"id": cont.id or nombre, "titulo": f"MÓDULO {cont.rol}/{nombre}", "orden": orden, "contenido": {"id": cont.id, "nombre": cont.nombre, "rol": cont.rol, "version": cont.version}})
             orden += 1
 
         reportes_lista.append({"id": "dependencias", "titulo": "DEPENDENCIAS", "orden": orden, "contenido": self._dependencias})
@@ -850,14 +982,14 @@ class Engine:
 
         reportes_lista.append({"id": "mapa_ruta", "titulo": "MAPA DE RUTA DE EJECUCIÓN", "orden": orden, "contenido": list(self._mapa_ruta)})
 
-        return {"metadata": {"version_engine": self.VERSION, "estado_engine": self.estado, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "total_modulos": self.registro.total(), "trazas_n": len(self._trazas), "rutas_n": len(self._mapa_ruta), "timestamp": datetime.now(timezone.utc).isoformat()}, "reportes": reportes_lista}
+        return {"metadata": {"version_engine": self.VERSION, "estado_engine": self.estado, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "total_modulos": self.registro.total(), "trazas_n": len(self._trazas)}, "reportes": reportes_lista}
 
     # ===========================================================
     # ESTADO GLOBAL
     # ===========================================================
 
     def estado_global(self) -> Dict[str, Any]:
-        return {"tipo": "estado_global", "version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "estado": self.estado, "timestamp": datetime.now(timezone.utc).isoformat(), "total_contenedores": self.registro.total(), "errores_arranque": list(self.errores_arranque), "advertencias": list(self.advertencias), "trazas_n": len(self._trazas), "rutas_n": len(self._mapa_ruta), "dependencias": self._dependencias, "grafo": self._grafo}
+        return {"tipo": "estado_global", "version_engine": self.VERSION, "esquema_contrato": ESQUEMA_CONTRATO_REQUERIDO, "estado": self.estado, "timestamp": datetime.now(timezone.utc).isoformat()}
 
     # ===========================================================
     # CENTINELA

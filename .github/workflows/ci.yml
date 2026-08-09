@@ -265,17 +265,7 @@ jobs:
           print("    contenedores:", eng.registro.total())
           EOF
 
-      # ==========================================================
-      # 9. EJECUCIÓN DE PRUEBAS UNITARIAS (PYTEST)
-      # ==========================================================
-      - name: Run tests
-        run: |
-          mkdir -p diagnostics
-          pytest tests/ -v --tb=short --junit-xml=diagnostics/test_results.xml
-        env:
-          BEAL_Z3_HEAVY: "1"
-          COLLATZ_HEAVY: "1"
-
+    
       # ==========================================================
       # 10. AUDITORÍA ESTRUCTURAL Y FORENSE DE CONTRATOS (v2.0)
       # ==========================================================
@@ -756,9 +746,22 @@ jobs:
               print(f"REGRESIÓN: {entrada['previo']} -> {passed}")
               raise SystemExit(1)
           EOF
+      
+      # ==========================================================
+      # 13. EJECUCIÓN DE PRUEBAS UNITARIAS (PYTEST)
+      # ==========================================================
+      - name: Run tests
+        run: |
+          mkdir -p diagnostics
+          pytest tests/ -v --tb=short --junit-xml=diagnostics/test_results.xml
+        env:
+          PYTHONPATH: "."
+          BEAL_Z3_HEAVY: "1"
+          COLLATZ_HEAVY: "1"
+
 
       # ==========================================================
-      # 13. SUBIDA DE ARTEFACTOS DE DIAGNÓSTICO
+      # 14. SUBIDA DE ARTEFACTOS DE DIAGNÓSTICO
       # ==========================================================
       - name: Upload diagnostics
         if: always()
@@ -774,16 +777,6 @@ jobs:
             diagnostics/contratos_report.json
             diagnostics/evaluaciones.json
           if-no-files-found: warn
-
-      # ==========================================================
-      # 14. EJECUCIÓN DE PRUEBAS UNITARIAS
-      # ==========================================================
-      - name: Run Tests
-        env:
-          PYTHONPATH: .
-        run: |
-          mkdir -p diagnostics
-          pytest
 
 
       # ==========================================================
@@ -811,4 +804,4 @@ jobs:
 
           git commit -m "ci: historia de coherencia [skip ci]"
           git pull --rebase -X ours origin main || true
-          git push origin HEAD:main
+          git push origin HEAD:maini

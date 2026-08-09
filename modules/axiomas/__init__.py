@@ -844,7 +844,64 @@ def declaraciones(
         return []
     decls, _ = recolectar(declaraciones_externas)
     return decls
+# ===============================================================
+# DECLARACIONES EXTERNAS AUTO-GENERADAS
+# ===============================================================
 
+def obtener_declaraciones_externas(
+    incluir_cuerpos: Optional[List[str]] = None,
+    excluir_cuerpos: Optional[List[str]] = None,
+) -> Dict[str, List[Dict]]:
+    """
+    Genera declaraciones_externas a partir de las declaraciones internas.
+    
+    Args:
+        incluir_cuerpos: Si se pasa, solo incluye estos cuerpos.
+        excluir_cuerpos: Si se pasa, excluye estos cuerpos.
+    
+    Returns:
+        Dict[str, List[Dict]]: Diccionario con declaraciones por cuerpo.
+    
+    Raises:
+        ValueError: Si no se encuentran declaraciones.
+    """
+    decls, errores = recolectar()
+    
+    # Si hay errores de carga, los registramos pero no fallamos
+    if errores:
+        # Opcional: imprimir advertencia o registrar en diagnóstico
+        print(f"[AXIOMAS] Advertencia: {len(errores)} errores al recolectar declaraciones internas")
+    
+    if not decls:
+        raise ValueError(
+            "No se encontraron declaraciones internas en el módulo axiomas. "
+            "Verifica que los cuerpos tengan DECLARACIONES."
+        )
+    
+    # Filtrar por cuerpos si se especifica
+    cuerpos_permitidos = set(incluir_cuerpos) if incluir_cuerpos else None
+    cuerpos_excluidos = set(excluir_cuerpos) if excluir_cuerpos else set()
+    
+    externas: Dict[str, List[Dict]] = {}
+    for d in decls:
+        cuerpo = d.get("cuerpo", "desconocido")
+        
+        # Aplicar filtros
+        if cuerpos_permitidos and cuerpo not in cuerpos_permitidos:
+            continue
+        if cuerpo in cuerpos_excluidos:
+            continue
+            
+        if cuerpo not in externas:
+            externas[cuerpo] = []
+        externas[cuerpo].append(d)
+    
+    if not externas:
+        raise ValueError(
+            f"No se encontraron declaraciones en los cuerpos especificados: {incluir_cuerpos}"
+        )
+    
+    return externas
 
 def axiomas(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,

@@ -270,43 +270,102 @@ class Engine:
         invocador_id: str = "core",
         strict: bool = True,
     ) -> None:
+
+        # ======================================================
+        # CONFIGURACIÓN BÁSICA
+        # ======================================================
+
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
 
+        # ======================================================
+        # ESTADO DEL ENGINE
+        # ======================================================
+
         self.estado = ESTADO_NO_INICIADO
+
         self.registro = RegistroModulos()
+
         self.errores_arranque: List[str] = []
         self.advertencias: List[str] = []
         self.fallos: List[Dict[str, Any]] = []
         self.resultados_evaluacion: List[Any] = []
+
+        # ======================================================
+        # TRAZAS DE EJECUCIÓN
+        # ======================================================
+
         self._trazas: List[Dict[str, Any]] = []
         self._traza_seq: int = 0
 
+        # ======================================================
+        # MAPA DE RUTA DE EJECUCIÓN
+        #
+        # Evidencia estructural de:
+        #
+        # Engine
+        #   ↓
+        # Contenedor
+        #   ↓
+        # Contrato
+        #   ↓
+        # Capacidad
+        #   ↓
+        # Módulo
+        #   ↓
+        # Resultado
+        # ======================================================
+
+        self._mapa_ruta: List[Dict[str, Any]] = []
+        self._ruta_seq: int = 0
+
+        # ======================================================
+        # CENTINELA
+        #
+        # Creación diferida.
+        # No se instancia durante la construcción del Engine.
+        # ======================================================
+
+        self._centinela: Optional[Centinela] = None
+
+        # ======================================================
+        # ESTRUCTURAS INTERNAS
+        # ======================================================
+
         self._modulos_descubiertos: List[Path] = []
+
         self._reportes_modulos: Dict[str, Any] = {}
         self._diagnosticos: Dict[str, Any] = {}
         self._inventarios: Dict[str, Any] = {}
         self._dependencias: Dict[str, Any] = {}
         self._grafo: Dict[str, Any] = {}
 
+        # ======================================================
+        # ARRANQUE DEL ENGINE
+        # ======================================================
+
         self._modulos_descubiertos = self._descubrir_modulos()
+
         self._cargar_y_validar()
+
         self._resolver_dependencias()
+
         self._construir_grafo()
 
-        self._mapa_ruta: List[Dict[str, Any]] = []
-        self._ruta_seq: int = 0
-        self._centinela: Optional[Centinela] = None
-
+        # ======================================================
+        # ESTADO FINAL DE ARRANQUE
+        # ======================================================
 
         if self.errores_arranque:
             self.estado = ESTADO_RECHAZADO
+
             if self.strict:
                 raise ArranqueError(
                     "Engine no pudo arrancar:\n  - "
                     + "\n  - ".join(self.errores_arranque)
                 )
+
         else:
             self.estado = ESTADO_OPERATIVO
 
@@ -1765,108 +1824,296 @@ def obtener_mapa_ruta(
 # 4) Añadir property centinela + invocar + verificar_con_centinela
 #    (después de obtener_trazas / antes de FIN ENGINE).
 # ===============================================================
+# ==========================================================
+# TRAZAS Y AUDITORÍA DE EJECUCIÓN
+# ==========================================================
+# ==========================================================
+# TRAZAS Y AUDITORÍA DE EJECUCIÓN
+# ==========================================================
 
-        def obtener_trazas(self) -> Tuple[Dict[str, Any], ...]:
-        """Copia inmutable de la evidencia de ejecución."""
-        return tuple(dict(t) for t in self._trazas)
+def _registrar_traza(
+    self,
+    modulo: str,
+    capacidad: str,
+    estado: str,
+    duracion_s: float,
+    error: Optional[str] = None,
+    **extras: Any,
+) -> None:
+    """
+    Registra evidencia temporal de una ejecución.
 
-    def _registrar_traza(
-        self,
-        modulo: str,
-        capacidad: str,
-        estado: str,
-        duracion_s: float,
-        error: Optional[str] = None,
-        **extras: Any,
-    ) -> None:
-        self._traza_seq += 1
-        entrada: Dict[str, Any] = {
-            "id_traza": self._traza_seq,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "modulo": modulo,
-            "capacidad": capacidad,
-            "estado": estado,
-            "duracion_s": duracion_s,
-        }
-        if error:
-            entrada["error"] = error
-        for clave, valor in extras.items():
-            if valor is not None:
-                entrada[clave] = valor
-        self._trazas.append(entrada)
+    La traza registra:
+        - módulo
+        - capacidad
+        - estado
+        - duración
+        - error, si existe
+        - metadatos adicionales
 
-    @property
-    def centinela(self) -> Centinela:
-        """
-        Auditor perezoso: se crea solo cuando el Engine ya terminó
-        de construirse. Evita que Centinela vea un Engine parcial.
-        """
-        if self._centinela is None:
-            self._centinela = Centinela(invocador=self)
-        return self._centinela
+    No ejecuta lógica del módulo.
+    """
 
-    def invocar(
-        self,
-        modulo: str,
-        capacidad: str,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Any:
-        """
-        Puente InvocadorCapacidades para core/centinela.py.
-        """
-        salida = self.ejecutar_capacidad(modulo, capacidad, *args, **kwargs)
-        if isinstance(salida, dict) and salida.get("estado") == "EXITO":
-            return salida.get("resultado")
-        if isinstance(salida, dict) and "error" in salida:
-            raise RuntimeError(str(salida.get("error")))
-        return salida
+    self._traza_seq += 1
 
-    def verificar_con_centinela(
-        self,
-        paquete: Dict[str, Any],
-        *,
-        depositar_salida: bool = True,
-    ) -> Veredicto:
-        """
-        Cierre oficial del ciclo.
-        """
-        inicio = time.perf_counter()
-        ciclo_id = None
-        if isinstance(paquete, dict):
-            ciclo_id = paquete.get(PKG_CICLO_ID)
-        try:
-            veredicto = self.centinela.verificar(
-                paquete,
-                depositar_salida=depositar_salida,
-            )
-            duracion = round(time.perf_counter() - inicio, 6)
-            self._registrar_traza(
-                modulo="ENGINE",
-                capacidad="verificar_con_centinela",
-                estado=str(veredicto.estado),
-                duracion_s=duracion,
-                ciclo_id=ciclo_id,
-            )
-            return veredicto
-        except Exception as e:
-            duracion = round(time.perf_counter() - inicio, 6)
-            err = f"{type(e).__name__}: {e}"
-            self._registrar_traza(
-                modulo="ENGINE",
-                capacidad="verificar_con_centinela",
-                estado="ERROR_AUDITORIA",
-                duracion_s=duracion,
-                error=err,
-                ciclo_id=ciclo_id,
-            )
-            raise
+    entrada: Dict[str, Any] = {
+        "id_traza": self._traza_seq,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "modulo": modulo,
+        "capacidad": capacidad,
+        "estado": estado,
+        "duracion_s": duracion_s,
+    }
+
+    if error:
+        entrada["error"] = error
+
+    for clave, valor in extras.items():
+        if valor is not None:
+            entrada[clave] = valor
+
+    self._trazas.append(entrada)
 
 
-# ===============================================================
-# FIN: CENTINELA
-# ===============================================================
+def obtener_trazas(
+    self,
+) -> Tuple[Dict[str, Any], ...]:
+    """
+    Devuelve una copia inmutable de la evidencia
+    de ejecución.
+    """
 
+    return tuple(
+        dict(traza)
+        for traza in self._trazas
+    )
+
+
+# ==========================================================
+# MAPA DE RUTA DE EJECUCIÓN
+# ==========================================================
+
+def _registrar_ruta(
+    self,
+    *,
+    modulo: str,
+    rol: str,
+    id_modulo: str,
+    capacidad: str,
+    entrada: Any,
+    resultado: Any = None,
+    estado: str,
+    contenedor_resuelto: bool,
+    contrato_resuelto: bool,
+    capacidad_resuelta: bool,
+    funcion_invocada: bool,
+    contenido_entregado: bool,
+    contenido_recibido: bool,
+    error: Optional[str] = None,
+) -> None:
+    """
+    Registra evidencia estructural del recorrido real de una
+    invocación.
+
+    No ejecuta lógica adicional.
+    No interpreta el resultado.
+
+    Solo registra qué atravesó realmente el Engine:
+
+        Engine
+          ↓
+        Contenedor
+          ↓
+        Contrato
+          ↓
+        Capacidad
+          ↓
+        Función
+          ↓
+        Módulo
+          ↓
+        Resultado
+    """
+
+    self._ruta_seq += 1
+
+    entrada_ruta: Dict[str, Any] = {
+        "id_ruta": self._ruta_seq,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+
+        "modulo": modulo,
+        "rol": rol,
+        "id_modulo": id_modulo,
+        "capacidad": capacidad,
+
+        "estado": estado,
+
+        "frontera": {
+            "engine": True,
+            "contenedor_resuelto": contenedor_resuelto,
+            "contrato_resuelto": contrato_resuelto,
+            "capacidad_resuelta": capacidad_resuelta,
+            "funcion_invocada": funcion_invocada,
+            "contenido_entregado": contenido_entregado,
+            "contenido_recibido": contenido_recibido,
+            "resultado_producido": resultado is not None,
+        },
+
+        "entrada": entrada,
+        "resultado": resultado,
+    }
+
+    if error is not None:
+        entrada_ruta["error"] = error
+
+    self._mapa_ruta.append(entrada_ruta)
+
+
+def obtener_mapa_ruta(
+    self,
+) -> Tuple[Dict[str, Any], ...]:
+    """
+    Devuelve una copia inmutable del mapa de ruta.
+    """
+
+    return tuple(
+        dict(ruta)
+        for ruta in self._mapa_ruta
+    )
+
+
+# ==========================================================
+# CENTINELA
+# ==========================================================
+
+@property
+def centinela(self) -> Centinela:
+    """
+    Auditor perezoso.
+
+    Centinela se crea únicamente cuando el Engine ya terminó
+    de construirse, evitando que reciba una instancia parcial
+    del Engine.
+    """
+
+    if self._centinela is None:
+        self._centinela = Centinela(
+            invocador=self
+        )
+
+    return self._centinela
+
+
+def invocar(
+    self,
+    modulo: str,
+    capacidad: str,
+    *args: Any,
+    **kwargs: Any,
+) -> Any:
+    """
+    Puente InvocadorCapacidades para core/centinela.py.
+
+    Centinela no importa directamente módulos de dominio.
+    La ejecución atraviesa el Engine mediante ejecutar_capacidad().
+    """
+
+    salida = self.ejecutar_capacidad(
+        modulo,
+        capacidad,
+        *args,
+        **kwargs,
+    )
+
+    if (
+        isinstance(salida, dict)
+        and salida.get("estado") == "EXITO"
+    ):
+        return salida.get("resultado")
+
+    if (
+        isinstance(salida, dict)
+        and "error" in salida
+    ):
+        raise RuntimeError(
+            str(salida.get("error"))
+        )
+
+    return salida
+
+
+def verificar_con_centinela(
+    self,
+    paquete: Dict[str, Any],
+    *,
+    depositar_salida: bool = True,
+) -> Veredicto:
+    """
+    Cierre oficial del ciclo:
+
+        Engine ejecuta
+             ↓
+        consolida
+             ↓
+        genera paquete
+             ↓
+        Centinela verifica
+             ↓
+        Veredicto
+
+    La instancia de Centinela es única y de creación diferida.
+    """
+
+    inicio = time.perf_counter()
+
+    ciclo_id = None
+
+    if isinstance(paquete, dict):
+        ciclo_id = paquete.get(
+            PKG_CICLO_ID
+        )
+
+    try:
+
+        veredicto = self.centinela.verificar(
+            paquete,
+            depositar_salida=depositar_salida,
+        )
+
+        duracion = round(
+            time.perf_counter() - inicio,
+            6,
+        )
+
+        self._registrar_traza(
+            modulo="ENGINE",
+            capacidad="verificar_con_centinela",
+            estado=str(veredicto.estado),
+            duracion_s=duracion,
+            ciclo_id=ciclo_id,
+        )
+
+        return veredicto
+
+    except Exception as e:
+
+        duracion = round(
+            time.perf_counter() - inicio,
+            6,
+        )
+
+        err = f"{type(e).__name__}: {e}"
+
+        self._registrar_traza(
+            modulo="ENGINE",
+            capacidad="verificar_con_centinela",
+            estado="ERROR_AUDITORIA",
+            duracion_s=duracion,
+            error=err,
+            ciclo_id=ciclo_id,
+        )
+
+        raise
 # ===============================================================
 # EXPORTACIONES
 # ===============================================================

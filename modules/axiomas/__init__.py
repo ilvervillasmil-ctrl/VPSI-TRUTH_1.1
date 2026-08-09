@@ -197,7 +197,7 @@ class ContratoInvalido(Exception):
 
 CONTENEDOR: Dict[str, Any] = {
     # ============================================================
-    # ESQUEMA
+    # ESQUEMA CONTRATO ABIERTO
     # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
@@ -273,18 +273,20 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "consultas_soportadas": [
         "buscar_por_id",
-        "buscar_por_dominio",
-        "obtener_generatividad",
-        "obtener_inventario",
-        "obtener_reporte",
-        "obtener_diagnostico",
-        "verificar_coherencia",
+        "por_dominio",
+        "generatividad",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "verificar",
         "ids_dominio_k_o",
         "recolectar",
+        "extraer_todas_declaraciones",
+        "obtener_declaraciones_externas",
     ],
 
     # ============================================================
-    # CAPACIDADES
+    # CAPACIDADES EXPOSICIÓN AL ENGINE
     # ============================================================
     "capacidades": {
         "verificar": "barrer",
@@ -300,6 +302,8 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": "reporte",
         "diagnostico": "diagnostico",
         "buscar_por_id": "buscar_por_id",
+        "extraer_todas_declaraciones": "extraer_todas_declaraciones",
+        "obtener_declaraciones_externas": "obtener_declaraciones_externas",
     },
 
     # ============================================================
@@ -307,7 +311,7 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "capacidades_meta": {
         "verificar": {
-            "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
+            "descripcion": "Alias de barrer. Verifica coherencia interna del módulo procesando declaraciones internas y externas.",
             "entrada": "declaraciones_externas opcional (dict)",
             "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo",
         },
@@ -352,7 +356,7 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "list[str] de ids ordenados",
         },
         "recolectar": {
-            "descripcion": "Carga y normaliza todas las declaraciones de los cuerpos del módulo.",
+            "descripcion": "Carga, recolecta y procesa declaraciones internas y externas que atraviesan la frontera del Engine.",
             "entrada": "declaraciones_externas opcional (dict)",
             "salida": "tuple[list[dict], list[dict]] → (declaraciones, errores)",
         },
@@ -369,15 +373,25 @@ CONTENEDOR: Dict[str, Any] = {
         "buscar_por_id": {
             "descripcion": "Busca y cita una declaración por su id.",
             "entrada": "id_decl: str",
-            "salida": "dict de la declaración o None",
+            "salida": "dict con resultado de búsqueda",
+        },
+        "extraer_todas_declaraciones": {
+            "descripcion": "Extrae e inventaría todas las declaraciones del módulo sin filtrar.",
+            "entrada": "ninguna",
+            "salida": "dict con declaraciones, por_cuerpo, ids, totales, total_general, errores",
+        },
+        "obtener_declaraciones_externas": {
+            "descripcion": "Genera estructura de declaraciones externas para exportación o consulta entre módulos.",
+            "entrada": "incluir_cuerpos opcional, excluir_cuerpos opcional",
+            "salida": "dict con declaraciones agrupadas por cuerpo",
         },
     },
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # AUTORIZACIÓN EXPLÍCITA AL ENGINE (HERRAMIENTAS Y CAPACIDADES)
     # ============================================================
     "autoriza_engine": {
-        # --- PERMISOS BASE ---
+        # --- PERMISOS BASE Y HERRAMIENTAS ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -385,6 +399,9 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+        "usar_herramientas_axiomas": True,
+        "usar_capacidades_axiomas": True,
+        "recibir_declaraciones_externas": True,
 
         # --- PERMISOS DE ESCRITURA ---
         "modificar": False,
@@ -429,7 +446,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # REPORTING (NECESARIO PARA EL CONTRATO)
+    # REPORTING Y CONFIGURACIÓN
     # ============================================================
     "reporting": {
         "estado": True,
@@ -446,18 +463,9 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": True,
         "reporte": True,
     },
-
-    # ============================================================
-    # ESTADOS VÁLIDOS
-    # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ============================================================
-    # INVARIANTES
-    # ============================================================
     "invariantes": list(INVARIANTES),
-
-}  # <--- CIERRE FINAL
+}
 
 # ===============================================================
 # FIN CONTRATO

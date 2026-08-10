@@ -55,7 +55,7 @@ API_ENGINE_ACTUAL = "1.0"
 
 
 # ===============================================================
-# ESTADOS CANÓNICOS
+# III — Tercera parte ESTADOS CANÓNICOS
 # ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
@@ -66,7 +66,7 @@ ESTADOS_CANONICOS = (ESTADO_NO_INICIADO, ESTADO_OPERATIVO, ESTADO_DEGRADADO, EST
 
 
 # ===============================================================
-# III — Tercera parte CLAVES OBLIGATORIAS DEL CONTRATO
+#  IV — Cuarta parte CLAVES OBLIGATORIAS DEL CONTRATO
 # ===============================================================
 
 CLAVES_OBLIGATORIAS_CONTRATO = (
@@ -95,7 +95,7 @@ CLAVES_OBLIGATORIAS_CONTRATO = (
 )
 
 # ===============================================================
-# IV — Cuarta parte PERMISOS AUTORIZADOS POR ENGINE
+#   V — Quinta parte PERMISOS AUTORIZADOS POR ENGINE
 # ===============================================================
 
 PERMISOS_AUTORIZA_ENGINE = (
@@ -122,7 +122,7 @@ PERMISOS_AUTORIZA_ENGINE = (
 
 
 # ===============================================================
-# V — Quinta parte BANDERAS DE REPORTING
+#  VI — Sexta parte BANDERAS DE REPORTING
 # ===============================================================
 
 BANDERAS_REPORTING = (
@@ -137,7 +137,7 @@ BANDERAS_REPORTING = (
 )
 
 # ===============================================================
-# VI — Sexta parte METADATOS DE CAPACIDADES
+#  METADATOS DE CAPACIDADES
 # ===============================================================
 
 CLAVES_META_CAPACIDAD = (
@@ -308,7 +308,111 @@ class RegistroModulos:
     def total(self) -> int:
         return len(self.contenedores)
 
+# ===============================================================
+# REGISTRO DE MÓDULOS
+# ===============================================================
 
+from typing import Any, Dict, List, Optional
+from collections import defaultdict
+
+
+class RegistroModulos:
+    """
+    Registro central de Contenedores.
+    Mantiene índices por nombre, por rol y por id.
+    No inventa datos. Solo almacena lo que el Engine le entrega
+    tras la validación contractual.
+    """
+
+    def __init__(self) -> None:
+        # Índice principal: nombre → Contenedor
+        self.contenedores: Dict[str, Contenedor] = {}
+
+        # Índice por rol: rol → lista de Contenedores
+        self.por_rol: Dict[str, List[Contenedor]] = defaultdict(list)
+
+        # Índice por id: id → Contenedor
+        self.por_id: Dict[str, Contenedor] = {}
+
+    # -----------------------------------------------------------
+    # REGISTRO
+    # -----------------------------------------------------------
+
+    def registrar(self, cont: Contenedor) -> List[str]:
+        """
+        Intenta registrar un Contenedor.
+        Devuelve lista de errores de duplicidad.
+        Si la lista está vacía, el registro fue exitoso.
+        """
+        errores: List[str] = []
+
+        nombre = cont.nombre
+        id_mod = cont.id
+        rol = cont.rol
+
+        # -------------------------------------------------------
+        # Validación de duplicados
+        # -------------------------------------------------------
+
+        if not nombre:
+            errores.append("nombre vacío o nulo")
+            return errores
+
+        if nombre in self.contenedores:
+            errores.append(f"nombre duplicado: '{nombre}'")
+
+        if id_mod and id_mod in self.por_id:
+            errores.append(f"id duplicado: '{id_mod}'")
+
+        if errores:
+            return errores
+
+        # -------------------------------------------------------
+        # Materialización en los índices
+        # -------------------------------------------------------
+
+        self.contenedores[nombre] = cont
+
+        if id_mod:
+            self.por_id[id_mod] = cont
+
+        if rol:
+            self.por_rol[rol].append(cont)
+
+        return []
+
+    # -----------------------------------------------------------
+    # CONSULTAS
+    # -----------------------------------------------------------
+
+    def primero(self, clave: Any) -> Optional[Contenedor]:
+        """
+        Resuelve un Contenedor por nombre, por id o por rol.
+        Si se pasa un rol y existen varios, devuelve el primero.
+        """
+        if not isinstance(clave, str):
+            return None
+
+        clave = clave.strip()
+
+        # 1. Búsqueda por nombre
+        if clave in self.contenedores:
+            return self.contenedores[clave]
+
+        # 2. Búsqueda por id
+        if clave in self.por_id:
+            return self.por_id[clave]
+
+        # 3. Búsqueda por rol
+        if clave in self.por_rol and self.por_rol[clave]:
+            return self.por_rol[clave][0]
+
+        return None
+
+    def total(self) -> int:
+        """Número total de Contenedores registrados."""
+        return len(self.contenedores)
+        
 # ===============================================================
 # ENGINE AQUI SE DEFINEN LAS DECLARACIONES
 # ===============================================================

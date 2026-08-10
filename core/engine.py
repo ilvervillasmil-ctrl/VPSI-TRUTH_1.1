@@ -25,8 +25,6 @@
 #   Agencia limitada por la unión coherente de los contratos.
 #
 # ===============================================================
-
-
 # ===============================================================
 # I — Primera parte IMPORTACIONES
 # ===============================================================
@@ -45,9 +43,9 @@ from core.centinela import Centinela, Veredicto
 
 
 # ===============================================================
-# II — Segunda parte CONSTANTES
+# II — Segunda parte CONSTANTES /el esquema de contrato requerido,
+#  la versión de contrato exigida y la API actual del Engine
 # ===============================================================
-
 VERSION_ENGINE = "19"
 ESQUEMA_CONTRATO_REQUERIDO = "VPSI-CONTRACT-1.0"
 VERSION_CONTRATO_REQUERIDA = ">=1.0"
@@ -55,7 +53,8 @@ API_ENGINE_ACTUAL = "1.0"
 
 
 # ===============================================================
-# III — Tercera parte ESTADOS CANÓNICOS
+# III — Tercera parte ESTADOS CANÓNICOS/
+#
 # ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
@@ -67,6 +66,8 @@ ESTADOS_CANONICOS = (ESTADO_NO_INICIADO, ESTADO_OPERATIVO, ESTADO_DEGRADADO, EST
 
 # ===============================================================
 #  IV — Cuarta parte CLAVES OBLIGATORIAS DEL CONTRATO
+# Enumera el conjunto de claves que todo contrato de módulo debe contener obligatoriamente.
+# Sirve como referencia para la validación estructural posterior.
 # ===============================================================
 
 CLAVES_OBLIGATORIAS_CONTRATO = (
@@ -96,6 +97,8 @@ CLAVES_OBLIGATORIAS_CONTRATO = (
 
 # ===============================================================
 #   V — Quinta parte PERMISOS AUTORIZADOS POR ENGINE
+#  El Engine solo puede ejercer las acciones que el 
+#  contrato autorice explícitamente.
 # ===============================================================
 
 PERMISOS_AUTORIZA_ENGINE = (
@@ -122,7 +125,9 @@ PERMISOS_AUTORIZA_ENGINE = (
 
 
 # ===============================================================
-#  VI — Sexta parte BANDERAS DE REPORTING
+#  VI — Sexta parte BANDERAS DE REPORTING/ Define las banderas booleanas
+# que controlan qué información puede devolver un módulo cuando 
+# se le solicita un reporte, diagnóstico o inventario.
 # ===============================================================
 
 BANDERAS_REPORTING = (
@@ -137,7 +142,9 @@ BANDERAS_REPORTING = (
 )
 
 # ===============================================================
-#  METADATOS DE CAPACIDADES
+#  METADATOS DE CAPACIDADES/Especifica los campos obligatorios 
+# que debe tener cada entrada dentro de capacidades meta
+# descripción, entrada, salida, etc.
 # ===============================================================
 
 CLAVES_META_CAPACIDAD = (
@@ -174,7 +181,9 @@ CLAVES_META_CAPACIDAD = (
 #
 # ===============================================================
 # ===============================================================
-# LISTAS OBLIGATORIAS DE STR obligaciones de CONTRATO  estan abajo en autorida de engine
+# LISTAS OBLIGATORIAS DE STR obligaciones de CONTRATO  
+# estan abajo en autorida de engine/Define qué campos del contrato
+# deben ser listas de cadenas de texto.
 # ===============================================================
 
 LISTAS_STR_OBLIGATORIAS = (
@@ -184,7 +193,11 @@ LISTAS_STR_OBLIGATORIAS = (
 )
 
 # ===============================================================
-# DEFINICIONES
+# DEFINICIONES/Una vez validado, lo convierte 
+# en un objeto Contenedor. Todas las operaciones posteriores (registro,
+# resolución de dependencias, ejecución de capacidades, construcción del grafo, etc.)
+# operan sobre instancias de esta clase. En resumen: la sección 
+# DEFINICIONES crea las dos piezas que permiten al Engine pasar de “contrato validado” a “objeto operativo interno”
 # ===============================================================
 
 class ArranqueError(Exception):

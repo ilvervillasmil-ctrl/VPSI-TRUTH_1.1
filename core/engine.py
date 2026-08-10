@@ -90,7 +90,7 @@ CLAVES_OBLIGATORIAS_CONTRATO = (
     "estados_validos",
     "invariantes",
     "estabilidad",
-    "compatible_desde", "acceso_archivos"
+    "compatible_desde", "acceso_archivos",
     "api_engine", "validar_esquema",
 )
 

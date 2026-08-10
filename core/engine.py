@@ -421,9 +421,9 @@ class Engine:
             # VALIDACIÓN DEL CONTRATO
             # ---------------------------------------------------
 
-            errores = self._validar_contrato_completo(
-                 meta,
-                 nombre,
+            errores = self._validar_esquema(
+                meta,
+                nombre,
             )
 
             if errores:

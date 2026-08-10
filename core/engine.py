@@ -889,6 +889,14 @@ def resolver_peticion(
     # VALIDACIÓN COMPLETA DEL CONTRATO
     # ===========================================================
 
+        def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
+    errores: List[str] = []
+    if meta.get("esquema") != ESQUEMA_CONTRATO_REQUERIDO:
+        errores.append(
+            f"{nombre}: esquema '{meta.get('esquema')}' != '{ESQUEMA_CONTRATO_REQUERIDO}'"
+        )
+    return errores
+
         def _validar_contrato_completo(self, meta: Dict[str, Any], nombre: str) -> List[str]:
         errores: List[str] = []
 

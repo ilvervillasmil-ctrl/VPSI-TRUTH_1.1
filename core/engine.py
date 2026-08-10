@@ -146,6 +146,34 @@ CLAVES_META_CAPACIDAD = (
 )
 
 # ===============================================================
+# MAPA ESTRUCTURAL — CAPACIDADES Y CAPACIDADES META
+# ===============================================================
+#
+# REPOSITORIO
+#     │
+#     ├── módulo A
+#     │      └── capacidades
+#     │
+#     ├── módulo B
+#     │      └── capacidades
+#     │
+#     └── axiomas
+#            └── capacidades META
+#                   │
+#                   ├── detectan declaraciones
+#                   ├── verifican capacidades
+#                   ├── clasifican dominios
+#                   └── verifican estructuras
+#
+# Las capacidades META no sustituyen las capacidades de los módulos.
+# Actúan sobre las declaraciones, capacidades y estructuras existentes.
+#
+# Engine no inventa capacidades.
+# Engine descubre, valida y ejerce únicamente lo declarado
+# contractualmente por los módulos.
+#
+# ===============================================================
+# ===============================================================
 # LISTAS OBLIGATORIAS DE STR obligaciones de CONTRATO  estan abajo en autorida de engine
 # ===============================================================
 

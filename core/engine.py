@@ -420,18 +420,15 @@ class Engine:
             # VALIDACIÓN DEL CONTRATO
             # ---------------------------------------------------
 
-            errores = self._validar_esquema(
-                meta,
-                nombre,
+            errores = self._validar_contrato_completo(
+                 meta,
+                 nombre,
             )
 
             if errores:
-
-                self.errores_arranque.extend(
-                    errores
-                )
-
+                self.errores_arranque.extend(errores)
                 continue
+
 
             # ---------------------------------------------------
             # MATERIALIZACIÓN DEL CONTENEDOR
@@ -892,15 +889,130 @@ def resolver_peticion(
     # VALIDACIÓN COMPLETA DEL CONTRATO
     # ===========================================================
 
-    def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
+        def _validar_contrato_completo(self, meta: Dict[str, Any], nombre: str) -> List[str]:
         errores: List[str] = []
 
-        # -------------------------------------------------------
-        # ESQUEMA
-        # -------------------------------------------------------
+        # ===========================================================
+        # 1. VALIDAR ESQUEMA
+        # ===========================================================
+        esquema = meta.get("esquema")
+        if esquema != ESQUEMA_CONTRATO_REQUERIDO:
+            errores.append(f"{nombre}: esquema '{esquema}' != '{ESQUEMA_CONTRATO_REQUERIDO}'")
 
-        if meta.get("esquema") != ESQUEMA_CONTRATO_REQUERIDO:
-            errores.append(f"{nombre}: esquema '{meta.get('esquema')}' != '{ESQUEMA_CONTRATO_REQUERIDO}'")
+        # ===========================================================
+        # 2. VALIDAR CLAVES OBLIGATORIAS
+        # ===========================================================
+        for clave in CLAVES_OBLIGATORIAS_CONTRATO:
+            if clave not in meta:
+                errores.append(f"{nombre}: falta clave obligatoria '{clave}'")
+
+        # ===========================================================
+        # 3. VALIDAR VERSIONES
+        # ===========================================================
+        ver_contrato = meta.get("version_contrato")
+        if ver_contrato != VERSION_CONTRATO_REQUERIDA:
+            errores.append(f"{nombre}: version_contrato '{ver_contrato}' != '{VERSION_CONTRATO_REQUERIDA}'")
+
+        ver_modulo = meta.get("version_modulo")
+        if not isinstance(ver_modulo, str) or not ver_modulo.strip():
+            errores.append(f"{nombre}: version_modulo inválida")
+
+        api_err = self._comparar_api(meta.get("api_engine", ""))
+        if api_err:
+            errores.append(f"{nombre}: {api_err}")
+
+        comp_err = self._comparar_compatible_desde(meta.get("compatible_desde", ""), nombre)
+        if comp_err:
+            errores.append(comp_err)
+
+        # ===========================================================
+        # 4. VALIDAR LISTAS STR OBLIGATORIAS
+        # ===========================================================
+        for clave in LISTAS_STR_OBLIGATORIAS:
+            val = meta.get(clave)
+            if not isinstance(val, list):
+                errores.append(f"{nombre}: '{clave}' debe ser list")
+                continue
+            for i, item in enumerate(val):
+                if not isinstance(item, str):
+                    errores.append(f"{nombre}: '{clave}[{i}]' debe ser str, es {type(item).__name__}")
+
+        # ===========================================================
+        # 5. VALIDAR ESTADOS VÁLIDOS
+        # ===========================================================
+        estados = meta.get("estados_validos", [])
+        if not isinstance(estados, list):
+            errores.append(f"{nombre}: estados_validos debe ser list")
+        else:
+            for est in estados:
+                if est not in ESTADOS_CANONICOS:
+                    errores.append(f"{nombre}: estado inválido '{est}' (no está en ESTADOS_CANONICOS)")
+
+        # ===========================================================
+        # 6. VALIDAR REPORTING
+        # ===========================================================
+        reporting = meta.get("reporting", {})
+        if not isinstance(reporting, dict):
+            errores.append(f"{nombre}: reporting debe ser dict")
+        else:
+            for bandera in reporting.keys():
+                if bandera not in BANDERAS_REPORTING:
+                    errores.append(f"{nombre}: bandera de reporting inválida '{bandera}'")
+
+        # ===========================================================
+        # 7. VALIDAR PERMISOS AUTORIZADOS
+        # ===========================================================
+        permisos = meta.get("autoriza_engine", {})
+        if not isinstance(permisos, dict):
+            errores.append(f"{nombre}: autoriza_engine debe ser dict")
+        else:
+            for permiso in permisos.keys():
+                if permiso not in PERMISOS_AUTORIZA_ENGINE:
+                    errores.append(f"{nombre}: permiso inválido '{permiso}'")
+
+        # ===========================================================
+        # 8. VALIDAR CAPACIDADES
+        # ===========================================================
+        capacidades = meta.get("capacidades", {})
+        if not isinstance(capacidades, dict):
+            errores.append(f"{nombre}: capacidades debe ser dict")
+        else:
+            for cap, fn in capacidades.items():
+                if not isinstance(cap, str):
+                    errores.append(f"{nombre}: capacidad '{cap}' debe ser str")
+                if not callable(fn):
+                    errores.append(f"{nombre}: capacidad '{cap}' no es callable")
+
+        # ===========================================================
+        # 9. VALIDAR METADATOS DE CAPACIDADES
+        # ===========================================================
+        capacidades_meta = meta.get("capacidades_meta", {})
+        if not isinstance(capacidades_meta, dict):
+            errores.append(f"{nombre}: capacidades_meta debe ser dict")
+        else:
+            for cap, meta_cap in capacidades_meta.items():
+                if cap not in capacidades:
+                    errores.append(f"{nombre}: capacidades_meta declara '{cap}' pero no existe en capacidades")
+                if not isinstance(meta_cap, dict):
+                    errores.append(f"{nombre}: capacidades_meta['{cap}'] debe ser dict")
+                    continue
+                for clave in CLAVES_META_CAPACIDAD:
+                    if clave not in meta_cap:
+                        errores.append(f"{nombre}: capacidades_meta['{cap}'] falta clave '{clave}'")
+
+        # ===========================================================
+        # 10. VALIDAR INVARIANTES
+        # ===========================================================
+        invariantes = meta.get("invariantes", [])
+        if not isinstance(invariantes, list):
+            errores.append(f"{nombre}: invariantes debe ser list")
+        else:
+            for inv in invariantes:
+                if not isinstance(inv, str):
+                    errores.append(f"{nombre}: invariante '{inv}' debe ser str")
+
+        return errores
+
 
         # -------------------------------------------------------
         # VERSIÓN DEL CONTRATO

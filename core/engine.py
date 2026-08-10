@@ -459,37 +459,25 @@ class Engine:
                         f"{nombre}: {error}"
                     )
 
-    # ===========================================================
-# DECLARACIÓN 4 — RESOLUCIÓN POR EXISTENCIA CONTRACTUAL
+# ===========================================================
+# DECLARACIÓN 1 — RESOLUCIÓN POR EXISTENCIA CONTRACTUAL
 # ===========================================================
 
 def resolver_existencia(self, peticion: Any) -> Dict[str, Any]:
     """
-    Determina si una petición X puede ser resuelta utilizando
-    el repertorio contractual real de todos los módulos
-    registrados en Engine.
+    Determina si X puede resolverse utilizando el repertorio
+    contractual completo registrado por Engine.
 
-    Regla universal:
+    El repertorio es la unión de las declaraciones y capacidades
+    existentes en todos los Contenedor registrados.
 
-        X existe
-            si el repertorio contractual contiene una vía
-            declarada para atender X.
+    Si X puede ser atendida por las capacidades disponibles:
+        EXISTE
 
-        X no existe
-            si ninguna capacidad contractual disponible
-            permite resolver X.
+    Si ninguna capacidad disponible puede atender X:
+        NO_EXISTE
 
-    La ausencia de X NO es un error.
-
-    Engine no inventa:
-        - capacidades
-        - módulos
-        - identificadores
-        - declaraciones
-        - respuestas
-
-    Engine utiliza únicamente aquello que los contratos
-    realmente ponen a su disposición.
+    NO_EXISTE no es un error.
     """
 
     if not isinstance(peticion, str):
@@ -508,7 +496,137 @@ def resolver_existencia(self, peticion: Any) -> Dict[str, Any]:
             "peticion": peticion,
         }
 
-    coincidencias: List[Dict[str, Any]] = []
+    # -------------------------------------------------------
+    # REPERTORIO CONTRACTUAL COMPLETO
+    # -------------------------------------------------------
+
+    for cont in self.registro.contenedores.values():
+
+        # ---------------------------------------------------
+        # CAPACIDADES DECLARADAS
+        # ---------------------------------------------------
+
+        for capacidad in cont.capacidades:
+
+            if str(capacidad).strip() == x:
+                return {
+                    "estado": "EXISTE",
+                    "existe": True,
+                    "peticion": x,
+                    "modulo": cont.nombre,
+                    "rol": cont.rol,
+                    "id": cont.id,
+                    "capacidad": capacidad,
+                }
+
+        # ---------------------------------------------------
+        # DECLARACIONES CONTRACTUALES
+        # ---------------------------------------------------
+
+        for declaracion in cont.conocimiento_exportable:
+            if isinstance(declaracion, str) and declaracion.strip() == x:
+                return {
+                    "estado": "EXISTE",
+                    "existe": True,
+                    "peticion": x,
+                    "modulo": cont.nombre,
+                    "rol": cont.rol,
+                    "id": cont.id,
+                    "tipo": "conocimiento_exportable",
+                }
+
+        for consulta in cont.consultas_soportadas:
+            if isinstance(consulta, str) and consulta.strip() == x:
+                return {
+                    "estado": "EXISTE",
+                    "existe": True,
+                    "peticion": x,
+                    "modulo": cont.nombre,
+                    "rol": cont.rol,
+                    "id": cont.id,
+                    "tipo": "consulta_soportada",
+                }
+
+        for autoridad in cont.autoridad:
+            if isinstance(autoridad, str) and autoridad.strip() == x:
+                return {
+                    "estado": "EXISTE",
+                    "existe": True,
+                    "peticion": x,
+                    "modulo": cont.nombre,
+                    "rol": cont.rol,
+                    "id": cont.id,
+                    "tipo": "autoridad",
+                }
+
+        for invariante in cont.invariantes:
+            if isinstance(invariante, str) and invariante.strip() == x:
+                return {
+                    "estado": "EXISTE",
+                    "existe": True,
+                    "peticion": x,
+                    "modulo": cont.nombre,
+                    "rol": cont.rol,
+                    "id": cont.id,
+                    "tipo": "invariante",
+                }
+
+    # -------------------------------------------------------
+    # X NO EXISTE
+    # -------------------------------------------------------
+
+    return {
+        "estado": "NO_EXISTE",
+        "existe": False,
+        "peticion": x,
+        "razon": "NO_EXISTE",
+    }
+
+
+# ===========================================================
+# DECLARACIÓN 2 — RESOLUCIÓN DE PETICIÓN
+# ===========================================================
+
+def resolver_peticion(
+    self,
+    peticion: Any,
+    *args: Any,
+    **kwargs: Any,
+) -> Dict[str, Any]:
+    """
+    Resuelve X utilizando únicamente capacidades reales
+    declaradas por los módulos registrados.
+
+    No existe:
+        devuelve NO_EXISTE.
+
+    Existe como capacidad:
+        ejecuta la capacidad mediante ejecutar_capacidad().
+
+    Una declaración que no sea capacidad no se ejecuta.
+    """
+
+    existencia = self.resolver_existencia(peticion)
+
+    if existencia["estado"] == "NO_EXISTE":
+        return existencia
+
+    capacidad = existencia.get("capacidad")
+
+    if capacidad is None:
+        return {
+            "estado": "NO_EXISTE",
+            "existe": False,
+            "peticion": existencia.get("peticion"),
+            "razon": "NO_EXISTE",
+        }
+
+    return self.ejecutar_capacidad(
+        existencia["modulo"],
+        capacidad,
+        *args,
+        **kwargs,
+    )
 
     # -------------------------------------------------------
     # UNIÓN DEL REPERTORIO CONTRACTUAL
@@ -627,7 +745,7 @@ def resolver_existencia(self, peticion: Any) -> Dict[str, Any]:
 
 
 # ===========================================================
-# DECLARACIÓN 4 — RESOLUCIÓN Y EJERCICIO
+# DECLARACIÓN 3 — RESOLUCIÓN Y EJERCICIO
 # ===========================================================
 
 def resolver_peticion(

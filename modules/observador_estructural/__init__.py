@@ -83,7 +83,7 @@ INVARIANTES = (
 #
 # ===============================================================
 
-def validar_contexto(
+def validar_context(
     contexto: Dict[str, Any]
 ) -> Dict[str, Any]:
 
@@ -118,7 +118,7 @@ def determinar_coherencia(
 
         return {
             "coherente": False,
-            "razon": "contexto no validado",
+            "razon": "contexto unvalido",
         }
 
     return {
@@ -258,7 +258,7 @@ CONTENEDOR: Dict[str, Any] = {
         "respaldar": False,
         "recuperar": False,
         "sincronizar": False,
-        "monitorear": True,
+        "monitorear": False,
         "acceso_archivos": False,
     },
 

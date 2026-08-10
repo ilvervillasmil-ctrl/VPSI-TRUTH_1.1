@@ -1,5 +1,5 @@
 # ===============================================================
-# VPSI-TRUTH — core/engine.py
+# VPSI-TRUTH — core/engine.py DIRECTOR ARQUITECTO SIMBIOSIS MECANICA
 # ===============================================================
 #
 # ENGINE
@@ -28,7 +28,7 @@
 
 
 # ===============================================================
-# IMPORTACIONES
+# I — Primera parte IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
@@ -45,7 +45,7 @@ from core.centinela import Centinela, Veredicto
 
 
 # ===============================================================
-# CONSTANTES
+# II — Segunda parte CONSTANTES
 # ===============================================================
 
 VERSION_ENGINE = "19"
@@ -66,7 +66,7 @@ ESTADOS_CANONICOS = (ESTADO_NO_INICIADO, ESTADO_OPERATIVO, ESTADO_DEGRADADO, EST
 
 
 # ===============================================================
-# CLAVES OBLIGATORIAS DEL CONTRATO
+# III — Tercera parte CLAVES OBLIGATORIAS DEL CONTRATO
 # ===============================================================
 
 CLAVES_OBLIGATORIAS_CONTRATO = (
@@ -95,7 +95,7 @@ CLAVES_OBLIGATORIAS_CONTRATO = (
 )
 
 # ===============================================================
-# PERMISOS AUTORIZADOS POR ENGINE
+# IV — Cuarta parte PERMISOS AUTORIZADOS POR ENGINE
 # ===============================================================
 
 PERMISOS_AUTORIZA_ENGINE = (
@@ -122,7 +122,7 @@ PERMISOS_AUTORIZA_ENGINE = (
 
 
 # ===============================================================
-# BANDERAS DE REPORTING
+# V — Quinta parte BANDERAS DE REPORTING
 # ===============================================================
 
 BANDERAS_REPORTING = (
@@ -137,7 +137,7 @@ BANDERAS_REPORTING = (
 )
 
 # ===============================================================
-# METADATOS DE CAPACIDADES
+# VI — Sexta parte METADATOS DE CAPACIDADES
 # ===============================================================
 
 CLAVES_META_CAPACIDAD = (
@@ -265,78 +265,7 @@ class Contenedor:
 
     pass
     
-# ===============================================================
-# LIBRERIAS DEL SISTEMA PARA CONTRATOS MODULOS
-# ===============================================================
 
-class Contenedor:
-    """
-    Materialización de un CONTENEDOR.
-
-    El Engine no completa ni inventa campos del contrato.
-    """
-
-    def __init__(self, meta: Dict[str, Any], modulo: Any, ruta: Path) -> None:
-        self.meta = meta
-        self.modulo = modulo
-        self.ruta = ruta
-
-        # -------------------------------------------------------
-        # IDENTIDAD DE CADA MODULO EN EL CONTRATO
-        # -------------------------------------------------------
-
-        self.id: str = str(meta.get("id", ""))
-        self.nombre: str = str(meta.get("nombre", ""))
-        self.rol: str = str(meta.get("rol", ""))
-
-        # -------------------------------------------------------
-        # VERSIONES Y PALABRAS CLAVE DEL CONTRATO
-        # -------------------------------------------------------
-
-        self.version: str = str(meta.get("version_modulo", meta.get("version", "")))
-        self.version_contrato: str = str(meta.get("version_contrato", ""))
-        self.esquema: str = str(meta.get("esquema", ""))
-        self.estabilidad: str = str(meta.get("estabilidad", ""))
-        self.compatible_desde: str = str(meta.get("compatible_desde", ""))
-        self.api_engine: str = str(meta.get("api_engine", ""))
-
-        # -------------------------------------------------------
-        # DESCRIPCIÓN Y AUTORIDAD DE ENGINE EN CADA CONTRATO
-        # -------------------------------------------------------
-
-        self.descripcion: str = str(meta.get("descripcion", ""))
-        self.funcion = meta.get("funcion")
-        self.no_hace: List[str] = list(meta.get("no_hace") or [])
-        self.autoridad: List[str] = list(meta.get("autoridad") or [])
-        self.conocimiento_exportable: List[str] = list(meta.get("conocimiento_exportable") or [])
-        self.consultas_soportadas: List[str] = list(meta.get("consultas_soportadas") or [])
-        self.invariantes: List[str] = list(meta.get("invariantes") or [])
-        self.acceso_archivos: List[str] = list(meta.get("acceso_archivos") or [])
-
-        # -------------------------------------------------------
-        # CONTRATO OPERATIVO Y UTILIZACIÓN VARIABLE
-        # -------------------------------------------------------
-
-        self.requiere: List[str] = list(meta.get("requiere") or [])
-        self.autoriza_engine: Dict[str, Any] = dict(meta.get("autoriza_engine") or {})
-        self.capacidades: Dict[str, Any] = dict(meta.get("capacidades") or {})
-        self.capacidades_meta: Dict[str, Any] = dict(meta.get("capacidades_meta") or {})
-        self.reporting: Dict[str, Any] = dict(meta.get("reporting") or {})
-        self.estados_validos: List[str] = list(meta.get("estados_validos") or [])
-        self.validar_esquema: List[str] = list(meta.get("validar_esquema") or [])
-
-        # -------------------------------------------------------
-        # FIN DE CLAVES DE CONTRATO
-        # -------------------------------------------------------
-
-    # -----------------------------------------------------------
-    # RESOLUCIÓN DE CAPACIDADES
-    # -----------------------------------------------------------
-
-    def fn(self, clave: str) -> Any:
-        """Devuelve únicamente la capacidad declarada y callable."""
-        ref = self.capacidades.get(clave)
-        return ref if callable(ref) else None
 
 # ===============================================================
 # DEF DE REGISTROS CONTRATOS

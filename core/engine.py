@@ -887,15 +887,15 @@ def resolver_peticion(
         return None
 
 # ===========================================================
-# VALIDACIÓN DEL ESQUEMA DEL CONTRATO
-# ===========================================================
+    # VALIDACIÓN DEL ESQUEMA DEL CONTRATO
+    # ===========================================================
 
-def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
-    """
-    Valida completamente el contrato de un módulo.
-    Utiliza todas las constantes y comandos existentes en Engine.
-    """
-    errores: List[str] = []
+    def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
+        """
+        Valida completamente el contrato de un módulo.
+        Utiliza todas las constantes y comandos existentes en Engine.
+        """
+        errores: List[str] = []
 
 
         # ===========================================================

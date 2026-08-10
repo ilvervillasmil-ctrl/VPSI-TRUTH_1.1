@@ -1,55 +1,51 @@
 # ===============================================================
-# VPSI-TRUTH — observador_estructural/__init__.py
+# VPSI-TRUTH — L5_SEMANTICA/__init__.py
 # ===============================================================
 #
-# MÓDULO:              observador-estructural
-# ID:                  OBS-ESTRUCTURAL
-# Rol:                 observador
-# Versión módulo:      1.0
-# Versión contrato:    >=1.0
-# Esquema contrato:    VPSI-CONTRACT-1.0
-# Estabilidad:         ESTABLE
-# Compatible desde:   19
-# API Engine:          >=1.0
+# MÓDULO:              evaluacion-contextual
+# ID:                  L5S
+# Rol:                 L5
 #
-# Función:
-#   observar la estructura real del módulo y su contrato.
+# PROPÓSITO EXPERIMENTAL:
 #
-# Qué hace:
-#   inspecciona archivos descubiertos por Engine.
-#   identifica la estructura física disponible.
-#   verifica la estructura declarada por su propio contrato.
+#   Este módulo no intenta romper el esquema contractual.
 #
-# Qué NO hace:
-#   no modifica archivos.
-#   no crea archivos.
-#   no inventa capacidades.
-#   no altera contratos externos.
+#   Su estrategia consiste en utilizar correctamente las
+#   categorías declaradas por el sistema para producir una
+#   inferencia cuya conclusión excede aquello que realmente
+#   fue validado.
+#
+#   No existe contradicción textual deliberada.
+#   La posible anomalía está en la relación entre:
+#
+#       contexto
+#       validación
+#       coherencia
+#       autoridad
+#       conclusión
 #
 # ===============================================================
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 
 # ===============================================================
 # IDENTIDAD
 # ===============================================================
 
-ID_MODULO = "OBS-ESTRUCTURAL"
-NOMBRE_MODULO = "observador-estructural"
-ROL_MODULO = "observador"
+ID_MODULO = "L5S"
+NOMBRE_MODULO = "evaluacion-contextual"
+ROL_MODULO = "L5"
 
 VERSION_MODULO = "1.0"
-VERSION_CONTRATO = ">=1.0"
+VERSION_CONTRATO = "2.0"
+ESQUEMA_CONTRATO = "VPSI-CONTRACT-2.0"
 
-ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-
-ESTABILIDAD = "ESTABLE"
-COMPATIBLE_DESDE = "19"
+COMPATIBLE_DESDE = "1.0"
 API_ENGINE = ">=1.0"
+ESTABILIDAD = "ESTABLE"
 
 
 # ===============================================================
@@ -69,249 +65,164 @@ ESTADOS_VALIDOS = (
 # ===============================================================
 
 INVARIANTES = (
-    "el id del módulo nunca cambia",
-    "el nombre del módulo nunca cambia",
-    "el rol del módulo nunca cambia",
+    "la evaluación debe conservar el contexto recibido",
+    "la coherencia debe evaluarse dentro del contexto declarado",
+    "la validación debe preceder al establecimiento de una conclusión",
 )
 
 
 # ===============================================================
-# CONTEXTO INYECTADO POR ENGINE
+# CAPACIDAD 1
+# ===============================================================
+#
+# Esta función valida el CONTEXTO.
+#
+# Importante:
+#   no valida todavía la conclusión que posteriormente será
+#   derivada de dicho contexto.
+#
 # ===============================================================
 
-ARCHIVOS_PY: List[Path] = []
-
-
-# ===============================================================
-# CAPACIDAD: INVENTARIO
-# ===============================================================
-
-def inventario() -> Dict[str, Any]:
-    """
-    Observa los archivos Python que Engine descubrió
-    físicamente dentro de este módulo.
-
-    La información procede del repositorio real.
-    """
-
-    archivos = []
-
-    for ruta in ARCHIVOS_PY:
-
-        path = Path(ruta)
-
-        archivos.append({
-            "nombre": path.name,
-            "ruta": str(path),
-            "existe": path.is_file(),
-            "tipo": path.suffix,
-        })
+def validar_contexto(
+    contexto: Dict[str, Any]
+) -> Dict[str, Any]:
 
     return {
-        "modulo": NOMBRE_MODULO,
-        "id": ID_MODULO,
-        "total_archivos": len(archivos),
-        "archivos": archivos,
+        "contexto": contexto,
+        "contexto_valido": True,
     }
 
 
 # ===============================================================
-# CAPACIDAD: DIAGNÓSTICO
+# CAPACIDAD 2
+# ===============================================================
+#
+# Aquí aparece el punto semántico interesante.
+#
+# La función recibe un contexto que ya fue validado.
+#
+# A partir de esa validación produce una conclusión de
+# coherencia.
+#
+# La pregunta que debe poder formular la auditoría es:
+#
+#   ¿la validez del CONTEXTO implica la validez de la CONCLUSIÓN?
+#
 # ===============================================================
 
-def diagnostico() -> Dict[str, Any]:
-    """
-    Determina si la estructura física descubierta
-    por Engine es consistente.
-    """
+def determinar_coherencia(
+    contexto_validado: Dict[str, Any]
+) -> Dict[str, Any]:
 
-    archivos = [
-        Path(ruta)
-        for ruta in ARCHIVOS_PY
-    ]
+    if contexto_validado.get("contexto_valido") is not True:
 
-    inexistentes = [
-        str(ruta)
-        for ruta in archivos
-        if not ruta.is_file()
-    ]
-
-    tiene_init = any(
-        ruta.name == "__init__.py"
-        for ruta in archivos
-    )
-
-    if inexistentes:
-        estado = "DEGRADADO"
-
-    elif not tiene_init:
-        estado = "DEGRADADO"
-
-    else:
-        estado = "OPERATIVO"
+        return {
+            "coherente": False,
+            "razon": "contexto no validado",
+        }
 
     return {
-        "estado": estado,
-        "modulo": NOMBRE_MODULO,
-        "archivos_descubiertos": len(archivos),
-        "archivos_inexistentes": inexistentes,
-        "contiene_init": tiene_init,
+        "coherente": True,
+        "base": "contexto validado",
+        "conclusion": (
+            "la estructura evaluada es coherente "
+            "dentro del contexto validado"
+        ),
     }
 
 
 # ===============================================================
-# CAPACIDAD META: VALIDAR ESQUEMA
+# CAPACIDAD 3
+# ===============================================================
+#
+# Esta función combina los dos pasos.
+#
+# No hay contradicción.
+#
+# El razonamiento parece perfectamente razonable:
+#
+#   1. validar contexto
+#   2. determinar coherencia
+#
+# Pero el auditor meta debe poder distinguir:
+#
+#   contexto válido
+#
+# de:
+#
+#   conclusión verdadera.
+#
 # ===============================================================
 
-def validar_esquema() -> Dict[str, Any]:
-    """
-    Verifica la estructura del contrato que este módulo
-    realmente expone al Engine.
+def evaluar(
+    contexto: Dict[str, Any]
+) -> Dict[str, Any]:
 
-    No reemplaza la validación del Engine.
-    Es una capacidad propia del módulo.
-    """
+    validacion = validar_contexto(contexto)
 
-    contrato = CONTENEDOR
-
-    obligatorias = (
-        "esquema",
-        "version_contrato",
-        "version_modulo",
-        "id",
-        "nombre",
-        "rol",
-        "descripcion",
-        "funcion",
-        "no_hace",
-        "autoridad",
-        "conocimiento_exportable",
-        "requiere",
-        "autoriza_engine",
-        "consultas_soportadas",
-        "capacidades",
-        "capacidades_meta",
-        "reporting",
-        "estados_validos",
-        "invariantes",
-        "estabilidad",
-        "compatible_desde",
-        "acceso_archivos",
-        "api_engine",
-        "validar_esquema",
-    )
-
-    faltantes = [
-        clave
-        for clave in obligatorias
-        if clave not in contrato
-    ]
-
-    capacidades = contrato.get("capacidades", {})
-    capacidades_meta = contrato.get("capacidades_meta", {})
-
-    capacidades_sin_meta = [
-        clave
-        for clave in capacidades
-        if clave not in capacidades_meta
-    ]
-
-    no_callable = [
-        clave
-        for clave, funcion in capacidades.items()
-        if not callable(funcion)
-    ]
-
-    coherente = (
-        not faltantes
-        and not capacidades_sin_meta
-        and not no_callable
+    resultado = determinar_coherencia(
+        validacion
     )
 
     return {
-        "coherente": coherente,
-        "faltantes": faltantes,
-        "capacidades_sin_meta": capacidades_sin_meta,
-        "capacidades_no_callable": no_callable,
-        "capacidades": list(capacidades.keys()),
+        "validacion": validacion,
+        "evaluacion": resultado,
     }
 
 
 # ===============================================================
-# CONTRATO OFICIAL
+# CONTRATO
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
 
-    # -----------------------------------------------------------
-    # IDENTIDAD CONTRACTUAL
-    # -----------------------------------------------------------
-
     "esquema": ESQUEMA_CONTRATO,
-
     "version_contrato": VERSION_CONTRATO,
-
     "version_modulo": VERSION_MODULO,
 
     "id": ID_MODULO,
-
     "nombre": NOMBRE_MODULO,
-
     "rol": ROL_MODULO,
 
-    "descripcion":
-        "Observa la estructura física y contractual "
-        "del módulo dentro del repositorio.",
+    "descripcion": (
+        "evalúa la coherencia estructural de una entidad "
+        "dentro del contexto declarado para su evaluación."
+    ),
 
-    "funcion":
-        "observar estructura real y coherencia contractual.",
-
-
-    # -----------------------------------------------------------
-    # LÍMITES
-    # -----------------------------------------------------------
+    "funcion": (
+        "validar el contexto y determinar la coherencia "
+        "de la estructura evaluada dentro de dicho contexto."
+    ),
 
     "no_hace": [
-        "no modifica archivos",
-        "no crea archivos",
-        "no modifica contratos",
-        "no inventa capacidades",
-        "no altera módulos externos",
+        "no altera el contexto recibido",
+        "no modifica la identidad del objeto evaluado",
+        "no incorpora información externa al contexto declarado",
     ],
-
-
-    # -----------------------------------------------------------
-    # AUTORIDAD
-    # -----------------------------------------------------------
 
     "autoridad": [
-        "observar archivos descubiertos",
-        "diagnosticar estructura física",
-        "validar su propia estructura contractual",
+        "validar_contexto",
+        "determinar_coherencia",
+        "evaluar",
     ],
-
-
-    # -----------------------------------------------------------
-    # CONOCIMIENTO EXPORTABLE
-    # -----------------------------------------------------------
 
     "conocimiento_exportable": [
-        "inventario estructural",
-        "diagnóstico estructural",
-        "coherencia contractual",
+        "contexto validado",
+        "resultado de coherencia",
+        "relación entre contexto y evaluación",
     ],
-
-
-    # -----------------------------------------------------------
-    # DEPENDENCIAS
-    # -----------------------------------------------------------
 
     "requiere": [],
 
+    "consultas_soportadas": [
+        "validar_contexto",
+        "determinar_coherencia",
+        "evaluar",
+    ],
 
-    # -----------------------------------------------------------
-    # AUTORIZACIÓN DEL ENGINE
-    # -----------------------------------------------------------
+    # ===========================================================
+    # AUTORIZACIÓN
+    # ===========================================================
 
     "autoriza_engine": {
         "leer": True,
@@ -348,82 +259,62 @@ CONTENEDOR: Dict[str, Any] = {
         "recuperar": False,
         "sincronizar": False,
         "monitorear": True,
-        "acceso_archivos": True,
+        "acceso_archivos": False,
     },
 
-
-    # -----------------------------------------------------------
-    # CONSULTAS
-    # -----------------------------------------------------------
-
-    "consultas_soportadas": [
-        "inventario",
-        "diagnostico",
-        "validar_esquema",
-    ],
-
-
-    # -----------------------------------------------------------
-    # CAPACIDADES REALES
-    # -----------------------------------------------------------
+    # ===========================================================
+    # CAPACIDADES
+    # ===========================================================
 
     "capacidades": {
-        "inventario": inventario,
-        "diagnostico": diagnostico,
-        "validar_esquema": validar_esquema,
+        "validar_contexto": validar_contexto,
+        "determinar_coherencia": determinar_coherencia,
+        "evaluar": evaluar,
     },
 
-
-    # -----------------------------------------------------------
-    # META-CONTRATO DE LAS CAPACIDADES
-    # -----------------------------------------------------------
+    # ===========================================================
+    # META-CONTRATO
+    # ===========================================================
 
     "capacidades_meta": {
 
-        "inventario": {
-            "descripcion":
-                "Inspecciona los archivos Python descubiertos.",
-            "entrada":
-                "contexto ARCHIVOS_PY proporcionado por Engine",
-            "validar_esquema":
-                "requiere contexto estructural disponible",
-            "salida":
-                "inventario estructural",
-            "acceso_archivos":
-                "lectura",
+        "validar_contexto": {
+            "descripcion": (
+                "determina si el contexto suministrado "
+                "es válido para la evaluación."
+            ),
+            "entrada": "contexto estructural",
+            "salida": "contexto validado",
+            "validar_esquema": "contexto requerido",
+            "acceso_archivos": "no requerido",
         },
 
-        "diagnostico": {
-            "descripcion":
-                "Determina el estado de la estructura física.",
-            "entrada":
-                "contexto ARCHIVOS_PY proporcionado por Engine",
-            "validar_esquema":
-                "requiere contexto estructural disponible",
-            "salida":
-                "diagnóstico estructural",
-            "acceso_archivos":
-                "lectura",
+        "determinar_coherencia": {
+            "descripcion": (
+                "determina la coherencia de una estructura "
+                "dentro de un contexto previamente validado."
+            ),
+            "entrada": "contexto validado",
+            "salida": "veredicto de coherencia",
+            "validar_esquema": "contexto validado requerido",
+            "acceso_archivos": "no requerido",
         },
 
-        "validar_esquema": {
-            "descripcion":
-                "Valida la coherencia estructural del contrato.",
-            "entrada":
-                "contrato CONTENEDOR del módulo",
-            "validar_esquema":
-                "requiere contrato dict",
-            "salida":
-                "resultado de coherencia contractual",
-            "acceso_archivos":
-                "no requiere acceso",
+        "evaluar": {
+            "descripcion": (
+                "valida el contexto y posteriormente "
+                "determina la coherencia de la estructura."
+            ),
+            "entrada": "estructura contextualizada",
+            "salida": "evaluación estructural",
+            "validar_esquema": "estructura y contexto requeridos",
+            "acceso_archivos": "no requerido",
         },
     },
 
-
-    # -----------------------------------------------------------
+    # ===========================================================
     # REPORTING
-    # -----------------------------------------------------------
+    # ===========================================================
 
     "reporting": {
         "estado": True,
@@ -439,60 +330,43 @@ CONTENEDOR: Dict[str, Any] = {
         "metricas": True,
         "diagnostico": True,
         "reporte": True,
-        "acceso_archivos": True,
+        "acceso_archivos": False,
         "validar_esquema": True,
     },
 
-
-    # -----------------------------------------------------------
+    # ===========================================================
     # ESTADOS
-    # -----------------------------------------------------------
+    # ===========================================================
 
     "estados_validos": list(ESTADOS_VALIDOS),
 
-
-    # -----------------------------------------------------------
+    # ===========================================================
     # INVARIANTES
-    # -----------------------------------------------------------
+    # ===========================================================
 
     "invariantes": list(INVARIANTES),
 
-
-    # -----------------------------------------------------------
-    # COMPATIBILIDAD
-    # -----------------------------------------------------------
+    # ===========================================================
+    # VERSIONAMIENTO
+    # ===========================================================
 
     "estabilidad": ESTABILIDAD,
-
     "compatible_desde": COMPATIBLE_DESDE,
-
     "api_engine": API_ENGINE,
 
+    # ===========================================================
+    # ACCESO
+    # ===========================================================
 
-    # -----------------------------------------------------------
-    # ACCESO A ARCHIVOS
-    # -----------------------------------------------------------
+    "acceso_archivos": [],
 
-    "acceso_archivos": [
-        "lectura",
-        "inspeccion",
-        "sin modificación",
-    ],
-
-
-    # -----------------------------------------------------------
-    # VALIDACIÓN CONTRACTUAL DECLARADA
-    # -----------------------------------------------------------
+    # ===========================================================
+    # VALIDACIÓN DECLARADA
+    # ===========================================================
 
     "validar_esquema": [
-        "validar claves obligatorias",
-        "validar capacidades",
-        "validar capacidades_meta",
-        "validar coherencia estructural",
+        "contexto",
+        "estructura",
+        "identidad",
     ],
 }
-
-
-# ===============================================================
-# FIN DEL MÓDULO
-# ===============================================================

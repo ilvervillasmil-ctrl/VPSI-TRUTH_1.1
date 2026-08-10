@@ -890,44 +890,23 @@ def resolver_peticion(
 # VALIDACIÓN COMPLETA DEL CONTRATO
 # ===========================================================
 
-def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
+def _validar_contrato_completo(self, meta: Dict[str, Any], nombre: str) -> List[str]:
     """
     Valida completamente el contrato de un módulo.
-
-    Evalúa:
-        1. Esquema
-        2. Claves obligatorias
-        3. Versiones (contrato, módulo, API, compatibilidad)
-        4. Listas de strings obligatorias
-        5. Estados válidos
-        6. Reporting
-        7. Permisos autorizados
-        8. Capacidades (callable)
-        9. Metadatos de capacidades
-        10. Invariantes
+    Utiliza todas las constantes y comandos existentes en Engine.
     """
     errores: List[str] = []
 
     # ===========================================================
-    # 1. VALIDAR ESQUEMA
+    # 1. ESQUEMA
     # ===========================================================
-    esquema = meta.get("esquema")
-    if esquema != ESQUEMA_CONTRATO_REQUERIDO:
+    if meta.get("esquema") != ESQUEMA_CONTRATO_REQUERIDO:
         errores.append(
-            f"{nombre}: esquema '{esquema}' != '{ESQUEMA_CONTRATO_REQUERIDO}'"
+            f"{nombre}: esquema '{meta.get('esquema')}' != '{ESQUEMA_CONTRATO_REQUERIDO}'"
         )
 
     # ===========================================================
-    # 2. VALIDAR CLAVES OBLIGATORIAS
-    # ===========================================================
-    for clave in CLAVES_OBLIGATORIAS_CONTRATO:
-        if clave not in meta:
-            errores.append(
-                f"{nombre}: falta clave obligatoria '{clave}'"
-            )
-
-    # ===========================================================
-    # 3. VALIDAR VERSIONES
+    # 2. VERSIÓN DEL CONTRATO
     # ===========================================================
     vc = meta.get("version_contrato")
     if str(vc) != VERSION_CONTRATO_REQUERIDA:
@@ -935,24 +914,24 @@ def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
             f"{nombre}: version_contrato '{vc}' != '{VERSION_CONTRATO_REQUERIDA}'"
         )
 
+    # ===========================================================
+    # 3. VERSIÓN DEL MÓDULO
+    # ===========================================================
     vm = meta.get("version_modulo")
     if not isinstance(vm, str) or not vm.strip():
         errores.append(
             f"{nombre}: version_modulo debe ser str no vacío, es {type(vm).__name__}"
         )
 
-    api_err = self._comparar_api(str(meta.get("api_engine", "")))
-    if api_err:
-        errores.append(f"{nombre}: {api_err}")
-
-    comp_err = self._comparar_compatible_desde(
-        str(meta.get("compatible_desde", "")), nombre
-    )
-    if comp_err:
-        errores.append(comp_err)
+    # ===========================================================
+    # 4. CLAVES OBLIGATORIAS
+    # ===========================================================
+    for clave in CLAVES_OBLIGATORIAS_CONTRATO:
+        if clave not in meta:
+            errores.append(f"{nombre}: falta clave obligatoria '{clave}'")
 
     # ===========================================================
-    # 4. VALIDAR LISTAS STR OBLIGATORIAS
+    # 5. LISTAS DE STR OBLIGATORIAS
     # ===========================================================
     for clave in LISTAS_STR_OBLIGATORIAS:
         val = meta.get(clave)
@@ -962,82 +941,41 @@ def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
         for i, item in enumerate(val):
             if not isinstance(item, str):
                 errores.append(
-                    f"{nombre}: '{clave}[{i}]' debe ser str, "
-                    f"es {type(item).__name__}"
+                    f"{nombre}: '{clave}[{i}]' debe ser str, es {type(item).__name__}"
                 )
 
     # ===========================================================
-    # 5. VALIDAR ESTADOS VÁLIDOS
+    # 6. DEPENDENCIAS (requiere)
     # ===========================================================
-    ev = meta.get("estados_validos", [])
-    if not isinstance(ev, list):
-        errores.append(f"{nombre}: estados_validos debe ser list")
-    elif not ev:
-        errores.append(f"{nombre}: estados_validos no puede estar vacío")
+    requiere = meta.get("requiere")
+    if not isinstance(requiere, list):
+        errores.append(f"{nombre}: 'requiere' debe ser list")
     else:
-        for est in ev:
-            if est not in ESTADOS_CANONICOS:
+        for i, item in enumerate(requiere):
+            if not isinstance(item, str):
                 errores.append(
-                    f"{nombre}: estado inválido '{est}'. "
-                    f"Admitidos: {ESTADOS_CANONICOS}"
+                    f"{nombre}: 'requiere[{i}]' debe ser str, es {type(item).__name__}"
                 )
 
     # ===========================================================
-    # 6. VALIDAR REPORTING
+    # 7. CAPACIDADES
     # ===========================================================
-    reporting = meta.get("reporting", {})
-    if not isinstance(reporting, dict):
-        errores.append(f"{nombre}: reporting debe ser dict")
-    else:
-        for bandera in reporting.keys():
-            if bandera not in BANDERAS_REPORTING:
-                errores.append(
-                    f"{nombre}: bandera de reporting inválida '{bandera}'"
-                )
-
-    # ===========================================================
-    # 7. VALIDAR PERMISOS AUTORIZADOS (autoriza_engine)
-    # ===========================================================
-    auth = meta.get("autoriza_engine", {})
-    if not isinstance(auth, dict):
-        errores.append(f"{nombre}: autoriza_engine debe ser dict")
-    else:
-        for permiso in PERMISOS_AUTORIZA_ENGINE:
-            if permiso not in auth:
-                errores.append(
-                    f"{nombre}: autoriza_engine falta permiso '{permiso}'"
-                )
-            elif not isinstance(auth[permiso], bool):
-                errores.append(
-                    f"{nombre}: autoriza_engine['{permiso}'] "
-                    f"debe ser bool, es {type(auth[permiso]).__name__}"
-                )
-        extras = set(auth) - set(PERMISOS_AUTORIZA_ENGINE)
-        if extras:
-            errores.append(
-                f"{nombre}: autoriza_engine permisos desconocidos: {sorted(extras)}"
-            )
-
-    # ===========================================================
-    # 8. VALIDAR CAPACIDADES
-    # ===========================================================
-    caps = meta.get("capacidades", {})
+    caps = meta.get("capacidades")
     if not isinstance(caps, dict):
-        errores.append(f"{nombre}: capacidades debe ser dict")
+        errores.append(f"{nombre}: 'capacidades' debe ser dict")
     else:
         for k, v in caps.items():
             if not callable(v):
                 errores.append(
-                    f"{nombre}: capacidad '{k}' no es callable "
-                    f"(tipo={type(v).__name__})"
+                    f"{nombre}: capacidad '{k}' no es callable (tipo={type(v).__name__})"
                 )
 
     # ===========================================================
-    # 9. VALIDAR METADATOS DE CAPACIDADES
+    # 8. METADATOS DE CAPACIDADES
     # ===========================================================
-    meta_caps = meta.get("capacidades_meta", {})
+    meta_caps = meta.get("capacidades_meta")
     if not isinstance(meta_caps, dict):
-        errores.append(f"{nombre}: capacidades_meta debe ser dict")
+        errores.append(f"{nombre}: 'capacidades_meta' debe ser dict")
     else:
         for k in caps:
             if k not in meta_caps:
@@ -1048,8 +986,7 @@ def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
             entrada_meta = meta_caps[k]
             if not isinstance(entrada_meta, dict):
                 errores.append(
-                    f"{nombre}: capacidades_meta['{k}'] debe ser dict, "
-                    f"es {type(entrada_meta).__name__}"
+                    f"{nombre}: capacidades_meta['{k}'] debe ser dict, es {type(entrada_meta).__name__}"
                 )
                 continue
             for campo in CLAVES_META_CAPACIDAD:
@@ -1063,17 +1000,78 @@ def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
                     )
 
     # ===========================================================
-    # 10. VALIDAR INVARIANTES
+    # 9. AUTORIZACIÓN ENGINE
     # ===========================================================
-    invariantes = meta.get("invariantes", [])
-    if not isinstance(invariantes, list):
-        errores.append(f"{nombre}: invariantes debe ser list")
+    auth = meta.get("autoriza_engine")
+    if not isinstance(auth, dict):
+        errores.append(f"{nombre}: 'autoriza_engine' debe ser dict")
     else:
-        for inv in invariantes:
-            if not isinstance(inv, str):
+        for permiso in PERMISOS_AUTORIZA_ENGINE:
+            if permiso not in auth:
                 errores.append(
-                    f"{nombre}: invariante debe ser str, es {type(inv).__name__}"
+                    f"{nombre}: autoriza_engine falta permiso '{permiso}'"
                 )
+            elif not isinstance(auth[permiso], bool):
+                errores.append(
+                    f"{nombre}: autoriza_engine['{permiso}'] debe ser bool, es {type(auth[permiso]).__name__}"
+                )
+        extras = set(auth) - set(PERMISOS_AUTORIZA_ENGINE)
+        if extras:
+            errores.append(
+                f"{nombre}: autoriza_engine permisos desconocidos: {sorted(extras)}"
+            )
+
+    # ===========================================================
+    # 10. REPORTING
+    # ===========================================================
+    reporting = meta.get("reporting")
+    if not isinstance(reporting, dict):
+        errores.append(f"{nombre}: 'reporting' debe ser dict")
+    else:
+        for bandera in BANDERAS_REPORTING:
+            if bandera not in reporting:
+                errores.append(
+                    f"{nombre}: reporting falta bandera '{bandera}'"
+                )
+            elif not isinstance(reporting[bandera], bool):
+                errores.append(
+                    f"{nombre}: reporting['{bandera}'] debe ser bool, es {type(reporting[bandera]).__name__}"
+                )
+
+    # ===========================================================
+    # 11. ESTADOS VÁLIDOS
+    # ===========================================================
+    ev = meta.get("estados_validos")
+    if not isinstance(ev, list):
+        errores.append(f"{nombre}: 'estados_validos' debe ser list")
+    elif not ev:
+        errores.append(f"{nombre}: 'estados_validos' no puede estar vacío")
+    else:
+        for i, est in enumerate(ev):
+            if not isinstance(est, str):
+                errores.append(
+                    f"{nombre}: estados_validos[{i}] debe ser str"
+                )
+            elif est not in ESTADOS_CANONICOS:
+                errores.append(
+                    f"{nombre}: estados_validos[{i}]='{est}' no es canónico. Admitidos: {ESTADOS_CANONICOS}"
+                )
+
+    # ===========================================================
+    # 12. API ENGINE
+    # ===========================================================
+    err_api = self._comparar_api(str(meta.get("api_engine", "")))
+    if err_api:
+        errores.append(f"{nombre}: {err_api}")
+
+    # ===========================================================
+    # 13. COMPATIBILIDAD
+    # ===========================================================
+    err_cd = self._comparar_compatible_desde(
+        str(meta.get("compatible_desde", "")), nombre
+    )
+    if err_cd:
+        errores.append(err_cd)
 
     return errores
 

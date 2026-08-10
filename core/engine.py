@@ -3,8 +3,8 @@
 # ===============================================================
 #
 # ENGINE
-# Versión:            18.3
-# Esquema contrato:   VPSI-CONTRACT-1.0
+# Versión:            19.0
+# Esquema contrato:   VPSI-CONTRACT-2.0
 # API Engine:         1.0
 #
 # Función:
@@ -48,9 +48,9 @@ from core.centinela import Centinela, Veredicto
 # CONSTANTES
 # ===============================================================
 
-VERSION_ENGINE = "18.3"
+VERSION_ENGINE = "19"
 ESQUEMA_CONTRATO_REQUERIDO = "VPSI-CONTRACT-1.0"
-VERSION_CONTRATO_REQUERIDA = "1.0"
+VERSION_CONTRATO_REQUERIDA = ">=1.0"
 API_ENGINE_ACTUAL = "1.0"
 
 

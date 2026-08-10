@@ -89,7 +89,7 @@ CLAVES_OBLIGATORIAS_CONTRATO = (
     "reporting",
     "estados_validos",
     "invariantes",
-    "estabilidad",
+    "estabilidad", "acceso",
     "compatible_desde", "acceso_archivos",
     "api_engine", "validar_esquema",
 )

@@ -54,7 +54,7 @@ ESTABILIDAD = "ESTABLE"
 
 ESTADOS_VALIDOS = (
     "NO_INICIADO",
-    "OPERATIVO",
+    "activo",
     "DEGRADADO",
     "RECHAZADO",
 )
@@ -165,7 +165,7 @@ def evaluar(
     )
 
     return {
-        "validacion": validacion,
+        "validacion": ax,
         "evaluacion": resultado,
     }
 

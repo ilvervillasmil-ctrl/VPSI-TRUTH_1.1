@@ -13,10 +13,10 @@
 # API Engine:          >=1.0
 #
 # Función:
-#   ignorar
+#   observar
 #
 # Qué hace:
-#   nada
+#   observa
 #
 # ===============================================================
 
@@ -109,8 +109,8 @@ CONTENEDOR: Dict[str, Any] = {
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
-    "descripcion": "ignorar",
-    "funcion": "ignorar",
+    "descripcion": "observar",
+    "funcion": "observar",
     "no_hace": [],
     "autoridad": [],
     "conocimiento_exportable": [],

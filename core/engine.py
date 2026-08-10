@@ -887,193 +887,193 @@ def resolver_peticion(
         return None
 
 # ===========================================================
-    # VALIDACIÓN DEL ESQUEMA DEL CONTRATO
+# VALIDACIÓN DEL ESQUEMA DEL CONTRATO
+# ===========================================================
+
+def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
+    """
+    Valida completamente el contrato de un módulo.
+    Utiliza todas las constantes y comandos existentes en Engine.
+    """
+    errores: List[str] = []
+
     # ===========================================================
+    # 1. ESQUEMA
+    # ===========================================================
+    if meta.get("esquema") != ESQUEMA_CONTRATO_REQUERIDO:
+        errores.append(
+            f"{nombre}: esquema '{meta.get('esquema')}' != '{ESQUEMA_CONTRATO_REQUERIDO}'"
+        )
 
-    def _validar_esquema(self, meta: Dict[str, Any], nombre: str) -> List[str]:
-        """
-        Valida completamente el contrato de un módulo.
-        Utiliza todas las constantes y comandos existentes en Engine.
-        """
-        errores: List[str] = []
+    # ===========================================================
+    # 2. VERSIÓN DEL CONTRATO
+    # ===========================================================
+    vc = meta.get("version_contrato")
+    if str(vc) != VERSION_CONTRATO_REQUERIDA:
+        errores.append(
+            f"{nombre}: version_contrato '{vc}' != '{VERSION_CONTRATO_REQUERIDA}'"
+        )
 
-        # ===========================================================
-        # 1. ESQUEMA
-        # ===========================================================
-        if meta.get("esquema") != ESQUEMA_CONTRATO_REQUERIDO:
-            errores.append(
-                f"{nombre}: esquema '{meta.get('esquema')}' != '{ESQUEMA_CONTRATO_REQUERIDO}'"
-            )
+    # ===========================================================
+    # 3. VERSIÓN DEL MÓDULO
+    # ===========================================================
+    vm = meta.get("version_modulo")
+    if not isinstance(vm, str) or not vm.strip():
+        errores.append(
+            f"{nombre}: version_modulo debe ser str no vacío, es {type(vm).__name__}"
+        )
 
-        # ===========================================================
-        # 2. VERSIÓN DEL CONTRATO
-        # ===========================================================
-        vc = meta.get("version_contrato")
-        if str(vc) != VERSION_CONTRATO_REQUERIDA:
-            errores.append(
-                f"{nombre}: version_contrato '{vc}' != '{VERSION_CONTRATO_REQUERIDA}'"
-            )
+    # ===========================================================
+    # 4. CLAVES OBLIGATORIAS
+    # ===========================================================
+    for clave in CLAVES_OBLIGATORIAS_CONTRATO:
+        if clave not in meta:
+            errores.append(f"{nombre}: falta clave obligatoria '{clave}'")
 
-        # ===========================================================
-        # 3. VERSIÓN DEL MÓDULO
-        # ===========================================================
-        vm = meta.get("version_modulo")
-        if not isinstance(vm, str) or not vm.strip():
-            errores.append(
-                f"{nombre}: version_modulo debe ser str no vacío, es {type(vm).__name__}"
-            )
-
-        # ===========================================================
-        # 4. CLAVES OBLIGATORIAS
-        # ===========================================================
-        for clave in CLAVES_OBLIGATORIAS_CONTRATO:
-            if clave not in meta:
-                errores.append(f"{nombre}: falta clave obligatoria '{clave}'")
-
-        # ===========================================================
-        # 5. LISTAS DE STR OBLIGATORIAS
-        # ===========================================================
-        for clave in LISTAS_STR_OBLIGATORIAS:
-            val = meta.get(clave)
-            if not isinstance(val, list):
-                errores.append(f"{nombre}: '{clave}' debe ser list")
-                continue
-            for i, item in enumerate(val):
-                if not isinstance(item, str):
-                    errores.append(
-                        f"{nombre}: '{clave}[{i}]' debe ser str, es {type(item).__name__}"
-                    )
-
-        # ===========================================================
-        # 6. DEPENDENCIAS (requiere)
-        # ===========================================================
-        requiere = meta.get("requiere")
-        if not isinstance(requiere, list):
-            errores.append(f"{nombre}: 'requiere' debe ser list")
-        else:
-            for i, item in enumerate(requiere):
-                if not isinstance(item, str):
-                    errores.append(
-                        f"{nombre}: 'requiere[{i}]' debe ser str, es {type(item).__name__}"
-                    )
-
-        # ===========================================================
-        # 7. CAPACIDADES
-        # ===========================================================
-        caps = meta.get("capacidades")
-        if not isinstance(caps, dict):
-            errores.append(f"{nombre}: 'capacidades' debe ser dict")
-        else:
-            for k, v in caps.items():
-                if not callable(v):
-                    errores.append(
-                        f"{nombre}: capacidad '{k}' no es callable (tipo={type(v).__name__})"
-                    )
-
-        # ===========================================================
-        # 8. METADATOS DE CAPACIDADES
-        # ===========================================================
-        meta_caps = meta.get("capacidades_meta")
-        if not isinstance(meta_caps, dict):
-            errores.append(f"{nombre}: 'capacidades_meta' debe ser dict")
-        else:
-            for k in caps:
-                if k not in meta_caps:
-                    errores.append(
-                        f"{nombre}: capacidad '{k}' sin entrada en capacidades_meta"
-                    )
-                    continue
-                entrada_meta = meta_caps[k]
-                if not isinstance(entrada_meta, dict):
-                    errores.append(
-                        f"{nombre}: capacidades_meta['{k}'] debe ser dict, es {type(entrada_meta).__name__}"
-                    )
-                    continue
-                for campo in CLAVES_META_CAPACIDAD:
-                    if campo not in entrada_meta:
-                        errores.append(
-                            f"{nombre}: capacidades_meta['{k}'] falta '{campo}'"
-                        )
-                    elif not isinstance(entrada_meta[campo], str):
-                        errores.append(
-                            f"{nombre}: capacidades_meta['{k}']['{campo}'] debe ser str"
-                        )
-
-        # ===========================================================
-        # 9. AUTORIZACIÓN ENGINE
-        # ===========================================================
-        auth = meta.get("autoriza_engine")
-        if not isinstance(auth, dict):
-            errores.append(f"{nombre}: 'autoriza_engine' debe ser dict")
-        else:
-            for permiso in PERMISOS_AUTORIZA_ENGINE:
-                if permiso not in auth:
-                    errores.append(
-                        f"{nombre}: autoriza_engine falta permiso '{permiso}'"
-                    )
-                elif not isinstance(auth[permiso], bool):
-                    errores.append(
-                        f"{nombre}: autoriza_engine['{permiso}'] debe ser bool, es {type(auth[permiso]).__name__}"
-                    )
-            extras = set(auth) - set(PERMISOS_AUTORIZA_ENGINE)
-            if extras:
+    # ===========================================================
+    # 5. LISTAS DE STR OBLIGATORIAS
+    # ===========================================================
+    for clave in LISTAS_STR_OBLIGATORIAS:
+        val = meta.get(clave)
+        if not isinstance(val, list):
+            errores.append(f"{nombre}: '{clave}' debe ser list")
+            continue
+        for i, item in enumerate(val):
+            if not isinstance(item, str):
                 errores.append(
-                    f"{nombre}: autoriza_engine permisos desconocidos: {sorted(extras)}"
+                    f"{nombre}: '{clave}[{i}]' debe ser str, es {type(item).__name__}"
                 )
 
-        # ===========================================================
-        # 10. REPORTING
-        # ===========================================================
-        reporting = meta.get("reporting")
-        if not isinstance(reporting, dict):
-            errores.append(f"{nombre}: 'reporting' debe ser dict")
-        else:
-            for bandera in BANDERAS_REPORTING:
-                if bandera not in reporting:
+    # ===========================================================
+    # 6. DEPENDENCIAS (requiere)
+    # ===========================================================
+    requiere = meta.get("requiere")
+    if not isinstance(requiere, list):
+        errores.append(f"{nombre}: 'requiere' debe ser list")
+    else:
+        for i, item in enumerate(requiere):
+            if not isinstance(item, str):
+                errores.append(
+                    f"{nombre}: 'requiere[{i}]' debe ser str, es {type(item).__name__}"
+                )
+
+    # ===========================================================
+    # 7. CAPACIDADES
+    # ===========================================================
+    caps = meta.get("capacidades")
+    if not isinstance(caps, dict):
+        errores.append(f"{nombre}: 'capacidades' debe ser dict")
+    else:
+        for k, v in caps.items():
+            if not callable(v):
+                errores.append(
+                    f"{nombre}: capacidad '{k}' no es callable (tipo={type(v).__name__})"
+                )
+
+    # ===========================================================
+    # 8. METADATOS DE CAPACIDADES
+    # ===========================================================
+    meta_caps = meta.get("capacidades_meta")
+    if not isinstance(meta_caps, dict):
+        errores.append(f"{nombre}: 'capacidades_meta' debe ser dict")
+    else:
+        for k in caps:
+            if k not in meta_caps:
+                errores.append(
+                    f"{nombre}: capacidad '{k}' sin entrada en capacidades_meta"
+                )
+                continue
+            entrada_meta = meta_caps[k]
+            if not isinstance(entrada_meta, dict):
+                errores.append(
+                    f"{nombre}: capacidades_meta['{k}'] debe ser dict, es {type(entrada_meta).__name__}"
+                )
+                continue
+            for campo in CLAVES_META_CAPACIDAD:
+                if campo not in entrada_meta:
                     errores.append(
-                        f"{nombre}: reporting falta bandera '{bandera}'"
+                        f"{nombre}: capacidades_meta['{k}'] falta '{campo}'"
                     )
-                elif not isinstance(reporting[bandera], bool):
+                elif not isinstance(entrada_meta[campo], str):
                     errores.append(
-                        f"{nombre}: reporting['{bandera}'] debe ser bool, es {type(reporting[bandera]).__name__}"
+                        f"{nombre}: capacidades_meta['{k}']['{campo}'] debe ser str"
                     )
 
-        # ===========================================================
-        # 11. ESTADOS VÁLIDOS
-        # ===========================================================
-        ev = meta.get("estados_validos")
-        if not isinstance(ev, list):
-            errores.append(f"{nombre}: 'estados_validos' debe ser list")
-        elif not ev:
-            errores.append(f"{nombre}: 'estados_validos' no puede estar vacío")
-        else:
-            for i, est in enumerate(ev):
-                if not isinstance(est, str):
-                    errores.append(
-                        f"{nombre}: estados_validos[{i}] debe ser str"
-                    )
-                elif est not in ESTADOS_CANONICOS:
-                    errores.append(
-                        f"{nombre}: estados_validos[{i}]='{est}' no es canónico. Admitidos: {ESTADOS_CANONICOS}"
-                    )
+    # ===========================================================
+    # 9. AUTORIZACIÓN ENGINE
+    # ===========================================================
+    auth = meta.get("autoriza_engine")
+    if not isinstance(auth, dict):
+        errores.append(f"{nombre}: 'autoriza_engine' debe ser dict")
+    else:
+        for permiso in PERMISOS_AUTORIZA_ENGINE:
+            if permiso not in auth:
+                errores.append(
+                    f"{nombre}: autoriza_engine falta permiso '{permiso}'"
+                )
+            elif not isinstance(auth[permiso], bool):
+                errores.append(
+                    f"{nombre}: autoriza_engine['{permiso}'] debe ser bool, es {type(auth[permiso]).__name__}"
+                )
+        extras = set(auth) - set(PERMISOS_AUTORIZA_ENGINE)
+        if extras:
+            errores.append(
+                f"{nombre}: autoriza_engine permisos desconocidos: {sorted(extras)}"
+            )
 
-        # ===========================================================
-        # 12. API ENGINE
-        # ===========================================================
-        err_api = self._comparar_api(str(meta.get("api_engine", "")))
-        if err_api:
-            errores.append(f"{nombre}: {err_api}")
+    # ===========================================================
+    # 10. REPORTING
+    # ===========================================================
+    reporting = meta.get("reporting")
+    if not isinstance(reporting, dict):
+        errores.append(f"{nombre}: 'reporting' debe ser dict")
+    else:
+        for bandera in BANDERAS_REPORTING:
+            if bandera not in reporting:
+                errores.append(
+                    f"{nombre}: reporting falta bandera '{bandera}'"
+                )
+            elif not isinstance(reporting[bandera], bool):
+                errores.append(
+                    f"{nombre}: reporting['{bandera}'] debe ser bool, es {type(reporting[bandera]).__name__}"
+                )
 
-        # ===========================================================
-        # 13. COMPATIBILIDAD
-        # ===========================================================
-        err_cd = self._comparar_compatible_desde(
-            str(meta.get("compatible_desde", "")), nombre
-        )
-        if err_cd:
-            errores.append(err_cd)
+    # ===========================================================
+    # 11. ESTADOS VÁLIDOS
+    # ===========================================================
+    ev = meta.get("estados_validos")
+    if not isinstance(ev, list):
+        errores.append(f"{nombre}: 'estados_validos' debe ser list")
+    elif not ev:
+        errores.append(f"{nombre}: 'estados_validos' no puede estar vacío")
+    else:
+        for i, est in enumerate(ev):
+            if not isinstance(est, str):
+                errores.append(
+                    f"{nombre}: estados_validos[{i}] debe ser str"
+                )
+            elif est not in ESTADOS_CANONICOS:
+                errores.append(
+                    f"{nombre}: estados_validos[{i}]='{est}' no es canónico. Admitidos: {ESTADOS_CANONICOS}"
+                )
 
-        return errores
+    # ===========================================================
+    # 12. API ENGINE
+    # ===========================================================
+    err_api = self._comparar_api(str(meta.get("api_engine", "")))
+    if err_api:
+        errores.append(f"{nombre}: {err_api}")
+
+    # ===========================================================
+    # 13. COMPATIBILIDAD
+    # ===========================================================
+    err_cd = self._comparar_compatible_desde(
+        str(meta.get("compatible_desde", "")), nombre
+    )
+    if err_cd:
+        errores.append(err_cd)
+
+    return errores
 
         # -------------------------------------------------------
         # VERSIÓN DEL CONTRATO

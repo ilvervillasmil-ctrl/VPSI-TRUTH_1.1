@@ -745,6 +745,14 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
     # DEPENDENCIAS
     # ============================================================
     "requiere": ["*"],
@@ -760,7 +768,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
     
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -773,34 +781,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -812,6 +819,47 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
+
+
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
+    "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
+        "estado": True,
+        "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+        "inventario": True,
+        "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+        "errores": True,
+        "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+        "dependencias": True,
+        "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+        "contrato": True,
+        "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
+        "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================
@@ -858,84 +906,173 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
+
     "capacidades_meta": {
         "verificar": {
-            "descripcion": "Alias de barrer. Verifica coherencia del diccionario.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, errores, diccionarios, total",
+            "descripcion": (
+                "Alias de barrer. Verifica coherencia del diccionario."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, errores, diccionarios, total"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
             "descripcion": (
                 "Centinela de DI: valida forma de las fuentes, "
                 "reporta errores de carga. No calcula Tru."
             ),
-            "entrada": "ninguna",
-            "salida": "dict con coherente, errores, diccionarios, total, por_idioma",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, errores, diccionarios, "
+                "total, por_idioma"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
-            "descripcion": "Inventario de diccionarios descubiertos.",
-            "entrada": "ninguna",
-            "salida": "dict con id, version, total, diccionarios, por_idioma",
+            "descripcion": (
+                "Inventario de diccionarios descubiertos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, version, total, diccionarios, por_idioma"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
-            "descripcion": "Reporte interno de estado del módulo DI.",
-            "entrada": "ninguna",
-            "salida": "dict con id, estado, coherente, diccionarios, capacidades",
+            "descripcion": (
+                "Reporte interno de estado del módulo DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, coherente, diccionarios, capacidades"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
-            "descripcion": "Diagnóstico del módulo DI.",
-            "entrada": "ninguna",
-            "salida": "dict con id, estado, problemas, advertencias, recomendaciones",
+            "descripcion": (
+                "Diagnóstico del módulo DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, problemas, advertencias, "
+                "recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "axiomas": {
-            "descripcion": "Declaraciones axiomáticas del módulo DI.",
-            "entrada": "ninguna",
+            "descripcion": (
+                "Declaraciones axiomáticas del módulo DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list[dict] de declaraciones",
+            "acceso_archivos": ["*"],
         },
+
         "resolver": {
-            "descripcion": "Entrega definiciones según palabra, idioma o fuente.",
-            "entrada": "dict con palabra, idioma, diccionarios opcionales",
-            "salida": "dict con definiciones o materia prima",
+            "descripcion": (
+                "Entrega definiciones según palabra, idioma o fuente."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con definiciones o materia prima"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "listar": {
-            "descripcion": "Nombres de todos los diccionarios descubiertos.",
-            "entrada": "ninguna",
+            "descripcion": (
+                "Nombres de todos los diccionarios descubiertos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list[str]",
+            "acceso_archivos": ["*"],
         },
+
         "cargar": {
-            "descripcion": "Carga un diccionario por nombre.",
-            "entrada": "nombre: str",
+            "descripcion": (
+                "Carga un diccionario por nombre."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con el DICCIONARIO",
+            "acceso_archivos": ["*"],
         },
+
         "cargar_todos": {
-            "descripcion": "Carga todos los diccionarios descubiertos.",
-            "entrada": "ninguna",
+            "descripcion": (
+                "Carga todos los diccionarios descubiertos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict nombre → datos",
+            "acceso_archivos": ["*"],
         },
+
         "definir": {
-            "descripcion": "Busca definición de una palabra en fuentes.",
-            "entrada": "palabra: str, *nombres",
-            "salida": "dict con definicion, significado, fuente o None",
+            "descripcion": (
+                "Busca definición de una palabra en fuentes."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con definicion, significado, fuente o None"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "significado": {
-            "descripcion": "Atajo para obtener significado/definición de una palabra.",
-            "entrada": "palabra: str, *nombres",
+            "descripcion": (
+                "Atajo para obtener significado/definición de una palabra."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "str o None",
+            "acceso_archivos": ["*"],
         },
+
         "palabras": {
-            "descripcion": "Conjunto de lemas de las fuentes indicadas.",
-            "entrada": "*nombres",
+            "descripcion": (
+                "Conjunto de lemas de las fuentes indicadas."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "set[str]",
+            "acceso_archivos": ["*"],
         },
+
         "inyectar_en_peticion": {
-            "descripcion": "Entrega lemas a una petición para el ciclo.",
-            "entrada": "peticion opcional, *nombres, clave='diccionario'",
+            "descripcion": (
+                "Entrega lemas a una petición para el ciclo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "peticion con lemas inyectados",
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
-            "descripcion": "Comprueba forma mínima de una salida de DI.",
-            "entrada": "salida: dict",
+            "descripcion": (
+                "Comprueba forma mínima de una salida de DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
     },
 

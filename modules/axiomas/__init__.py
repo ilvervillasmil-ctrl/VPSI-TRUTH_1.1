@@ -437,11 +437,11 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        "eliminar": False,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
@@ -449,7 +449,7 @@ CONTENEDOR: Dict[str, Any] = {
         "procesar": True,
         "analizar": True,
         "generar": True,
-        "transformar": False,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
@@ -460,11 +460,11 @@ CONTENEDOR: Dict[str, Any] = {
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
+        "alertar": True,            # ← SE MANTIENE (es permitido)
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -476,6 +476,11 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
     },
 
     # ============================================================

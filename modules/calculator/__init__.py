@@ -1601,6 +1601,188 @@ def verificar_salida(salida: Any) -> bool:
         return False
     return True
 
+# ===============================================================
+# VERIFICACIÓN DE CÁLCULO DE C, L, K (DOBLE VERIFICACIÓN)
+# ===============================================================
+
+def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Verifica la integridad y coherencia del cálculo de C, L y K.
+    
+    Args:
+        calculo: Diccionario con los resultados de C, L, K (salida de calcular())
+    
+    Returns:
+        Dict con:
+            - valido: bool
+            - errores: List[str]
+            - advertencias: List[str]
+            - C: dict o None
+            - L: dict o None
+            - K: dict o None
+            - verificacion: dict con detalles por factor
+    """
+    if not isinstance(calculo, dict):
+        return {
+            "valido": False,
+            "errores": ["El calculo debe ser un dict"],
+            "advertencias": [],
+            "C": None,
+            "L": None,
+            "K": None,
+            "verificacion": {}
+        }
+    
+    errores: List[str] = []
+    advertencias: List[str] = []
+    verificacion: Dict[str, Any] = {}
+    
+    # ==========================================================
+    # 1. VERIFICAR C
+    # ==========================================================
+    C = calculo.get("C")
+    if C is None:
+        errores.append("C no está presente en el cálculo")
+        verificacion["C"] = {"presente": False, "ok": False}
+    elif not isinstance(C, dict):
+        errores.append("C debe ser un dict")
+        verificacion["C"] = {"presente": True, "ok": False, "tipo": type(C).__name__}
+    else:
+        ok_c = True
+        detalles = {}
+        
+        # Verificar campos obligatorios
+        for campo in ["fraccion", "decimal", "display", "numerador", "denominador"]:
+            if campo not in C:
+                errores.append(f"C falta campo '{campo}'")
+                ok_c = False
+                detalles[campo] = "FALTANTE"
+            else:
+                detalles[campo] = C.get(campo)
+        
+        # Verificar que fraccion = numerador/denominador
+        if "fraccion" in C and "numerador" in C and "denominador" in C:
+            fraccion = C.get("fraccion")
+            num = C.get("numerador")
+            den = C.get("denominador")
+            if fraccion and num is not None and den is not None:
+                esperado = f"{num}/{den}"
+                if str(fraccion) != esperado:
+                    advertencias.append(
+                        f"C: fraccion '{fraccion}' no coincide con numerador/denominador '{esperado}'"
+                    )
+        
+        verificacion["C"] = {"presente": True, "ok": ok_c, "detalles": detalles}
+    
+    # ==========================================================
+    # 2. VERIFICAR L
+    # ==========================================================
+    L = calculo.get("L")
+    if L is None:
+        advertencias.append("L no está presente en el cálculo (puede ser UNDEFINED)")
+        verificacion["L"] = {"presente": False, "ok": True, "nota": "L puede ser UNDEFINED si p=0"}
+    elif not isinstance(L, dict):
+        errores.append("L debe ser un dict")
+        verificacion["L"] = {"presente": True, "ok": False, "tipo": type(L).__name__}
+    else:
+        ok_l = True
+        detalles = {}
+        
+        # Verificar si es UNDEFINED
+        if L.get("undefined"):
+            verificacion["L"] = {
+                "presente": True,
+                "ok": True,
+                "undefined": True,
+                "detalles": {"display": L.get("display")}
+            }
+        else:
+            # Verificar campos obligatorios
+            for campo in ["fraccion", "decimal", "display"]:
+                if campo not in L:
+                    errores.append(f"L falta campo '{campo}'")
+                    ok_l = False
+                    detalles[campo] = "FALTANTE"
+                else:
+                    detalles[campo] = L.get(campo)
+            
+            verificacion["L"] = {"presente": True, "ok": ok_l, "detalles": detalles}
+    
+    # ==========================================================
+    # 3. VERIFICAR K
+    # ==========================================================
+    K = calculo.get("K")
+    if K is None:
+        advertencias.append("K no está presente en el cálculo (puede ser None sin contexto/O)")
+        verificacion["K"] = {"presente": False, "ok": True, "nota": "K=None es legitimo sin contexto/O (Def-5.3.1)"}
+    elif not isinstance(K, dict):
+        errores.append("K debe ser un dict")
+        verificacion["K"] = {"presente": True, "ok": False, "tipo": type(K).__name__}
+    else:
+        ok_k = True
+        detalles = {}
+        
+        # Verificar si es None (representado como dict con None)
+        if K.get("valor") is None and K.get("fraccion") is None:
+            verificacion["K"] = {
+                "presente": True,
+                "ok": True,
+                "none": True,
+                "detalles": {"display": K.get("display")}
+            }
+        else:
+            # Verificar campos obligatorios
+            for campo in ["fraccion", "decimal", "display"]:
+                if campo not in K:
+                    errores.append(f"K falta campo '{campo}'")
+                    ok_k = False
+                    detalles[campo] = "FALTANTE"
+                else:
+                    detalles[campo] = K.get(campo)
+            
+            verificacion["K"] = {"presente": True, "ok": ok_k, "detalles": detalles}
+    
+    # ==========================================================
+    # 4. VERIFICACIÓN ADICIONAL
+    # ==========================================================
+    
+    # Verificar id_calculo
+    if "id_calculo" not in calculo:
+        advertencias.append("Falta 'id_calculo' en el resultado")
+    
+    # Verificar centinela
+    centinela = calculo.get("centinela")
+    if centinela is None:
+        advertencias.append("Falta 'centinela' en el resultado")
+    elif not centinela.get("ok"):
+        errores.extend(centinela.get("problemas") or [])
+    
+    # Verificar errores
+    if calculo.get("errores"):
+        errores.extend(calculo.get("errores") or [])
+    
+    # ==========================================================
+    # 5. RESULTADO FINAL
+    # ==========================================================
+    
+    valido = len(errores) == 0
+    
+    return {
+        "valido": valido,
+        "errores": errores,
+        "advertencias": advertencias,
+        "C": C,
+        "L": L,
+        "K": K,
+        "verificacion": verificacion,
+        "resumen": {
+            "C_ok": verificacion.get("C", {}).get("ok", False),
+            "L_ok": verificacion.get("L", {}).get("ok", False),
+            "K_ok": verificacion.get("K", {}).get("ok", False),
+            "centinela_ok": centinela.get("ok") if centinela else False
+        }
+    }
+
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     b = barrer()

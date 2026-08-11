@@ -1243,37 +1243,98 @@ class Engine:
         # -------------------------------------------------------
         # El comodín "*" en "requiere" significa que el módulo
         # depende de TODOS los módulos disponibles.
-        # Se resuelve automáticamente sin generar errores.
-        
-        # Reemplazar "*" por todos los módulos presentes
-        # para que el grafo refleje las dependencias reales
-        # nuevos_grafo: Dict[str, List[str]] = {}
-        
-        for modulo, dependencias in grafo_dep.items():
+        #
+        # No representa un módulo llamado "*".
+        # Se expande contra el conjunto real de módulos registrados.
+        #
+        # El propio módulo se excluye de la expansión para evitar
+        # crear una dependencia autorreferente.
+        # -------------------------------------------------------
+
+        for modulo, dependencias in list(grafo_dep.items()):
+
             nuevas_deps: List[str] = []
+
             for dep in dependencias:
+
+                # ---------------------------------------------------
+                # 18.5.1 COMODÍN GLOBAL
+                # ---------------------------------------------------
+
                 if dep == "*":
-                    # Agregar TODOS los módulos excepto sí mismo
-                    for otro in self.registro.contenedores.keys():
+
+                    for otro in sorted(presentes):
+
                         if otro != modulo and otro not in nuevas_deps:
                             nuevas_deps.append(otro)
+
+                # ---------------------------------------------------
+                # 18.5.2 DEPENDENCIA EXPLÍCITA
+                # ---------------------------------------------------
+
                 else:
-                    nuevas_deps.append(dep)
-            nuevos_grafo[modulo] = nuevas_deps
-        
-        grafo_dep = nuevos_grafo
-        
-        # Recalcular dependencias faltantes con el grafo expandido
+
+                    if dep not in nuevas_deps:
+                        nuevas_deps.append(dep)
+
+            # -------------------------------------------------------
+            # 18.5.3 MATERIALIZAR DEPENDENCIAS EXPANDIDAS
+            # -------------------------------------------------------
+
+            grafo_dep[modulo] = nuevas_deps
+
+        # -------------------------------------------------------
+        # Parte 18.6 RECALCULAR DEPENDENCIAS FALTANTES
+        # -------------------------------------------------------
+        # Después de expandir "*", ninguna dependencia legítima
+        # debe conservar el literal "*".
+        #
+        # Solo se reportan como inexistentes las dependencias
+        # explícitas que realmente no existen en el registro.
+        # -------------------------------------------------------
+
         faltantes.clear()
+
         for nombre, dependencias in grafo_dep.items():
+
             for dep in dependencias:
+
                 if dep not in presentes:
+
                     faltantes.setdefault(nombre, []).append(dep)
-                    if dep != "*":  # "*" ya fue expandido
-                        self.errores_arranque.append(
-                            f"{self.registro.contenedores[nombre].rol}/{nombre}: dependencia inexistente → '{dep}'"
+
+                    # "*" ya fue expandido.
+                    # Si aparece aquí, no se genera un error
+                    # por dependencia inexistente.
+                    if dep != "*":
+
+                        contenedor = self.registro.contenedores.get(nombre)
+
+                        rol = (
+                            contenedor.rol
+                            if contenedor is not None
+                            else nombre
                         )
 
+                        self.errores_arranque.append(
+                            f"{rol}/{nombre}: "
+                            f"dependencia inexistente → '{dep}'"
+                        )
+
+        # -------------------------------------------------------
+        # Parte 18.7 GUARDAR RESULTADO DE RESOLUCIÓN
+        # -------------------------------------------------------
+        # El grafo almacenado ya contiene las dependencias reales.
+        # Por tanto, un módulo con ["*"] aparecerá conectado con
+        # todos los demás módulos registrados, excepto consigo mismo.
+        # -------------------------------------------------------
+
+        self._dependencias = {
+            "grafo": dict(grafo_dep),
+            "faltantes": dict(faltantes),
+            "orden_topologico": orden,
+            "ciclos": ciclos,
+        }
     # ===========================================================
     # Parte 19 GRAFO
     # ===========================================================

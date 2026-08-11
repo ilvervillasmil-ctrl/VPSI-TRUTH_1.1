@@ -48,7 +48,7 @@ from core.centinela import Centinela, Veredicto
 # ===============================================================
 VERSION_ENGINE = "19"
 ESQUEMA_CONTRATO_REQUERIDO = "VPSI-CONTRACT-1.0"
-VERSION_CONTRATO_REQUERIDA = ">=1.0"
+VERSION_CONTRATO_REQUERIDA = "1.0"
 API_ENGINE_ACTUAL = "1.0"
 
 

@@ -303,6 +303,37 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
+    "consultas_soportadas": [
+        "alpha",
+        "beta",
+        "descubrir_constantes",
+        "listar_constantes",
+        "buscar_constante",
+        "verificar_constantes",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "verificar",
+    ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
+    "capacidades": {
+        "alpha": "get_alpha",
+        "beta": "get_beta",
+        "descubrir_constantes": "descubrir_constantes",
+        "listar_constantes": "listar_constantes",
+        "buscar_constante": "buscar_constante",
+        "verificar_constantes": "verificar_constantes",
+        "inventario": "inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
+        "verificar": "verificar",
+    },
+    # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {

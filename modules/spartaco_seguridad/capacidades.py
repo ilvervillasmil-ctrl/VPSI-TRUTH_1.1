@@ -88,7 +88,28 @@ SEGURIDAD: Dict[str, Any] = {
         "No oculta archivos sin SEGURIDAD",
     ],
 }
+    # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
 
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
+    "requiere": ["*"],
+
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
+
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
 # ===============================================================
 # FIN DECLARACIÓN
 # ===============================================================
@@ -121,6 +142,7 @@ NO_CARGABLE = "NO_CARGABLE"
 YA_CARGADO = "YA_CARGADO"
 CARGADO_AQUI = "CARGADO_AQUI"
 AUTO_REFERENCIA = "AUTO_REFERENCIA"
+
 
 # ===============================================================
 # FIN CONSTANTES

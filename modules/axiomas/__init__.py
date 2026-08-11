@@ -271,17 +271,17 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # DEPENDENCIAS
     # ============================================================
-    "requiere": [],
+    "requiere": [*],
 
     # ============================================================
     # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
     # ============================================================
-    "acceso_archivos": [],
+    "acceso_archivos": [*],
 
     # ============================================================
     # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
     # ============================================================
-    "validar_esquema": [],
+    "validar_esquema": [*],
 
     # ============================================================
     # CONSULTAS SOPORTADAS

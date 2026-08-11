@@ -639,7 +639,7 @@ CONTENEDOR: Dict[str, Any] = {
                 "dict con id, nombre, rol, version, coherente, "
                 "ids, n, archivos"
             ),
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["acceso_archivos"],
         },
 
         "inventario": {

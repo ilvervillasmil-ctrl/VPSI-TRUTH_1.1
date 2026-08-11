@@ -447,6 +447,14 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
     # DEPENDENCIAS
     # ============================================================
     "requiere": ["*"],
@@ -462,9 +470,23 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # CONSULTAS SOPORTADAS
     # ============================================================
-   
+    "consultas_soportadas": [
+        "buscar_por_id",
+        "buscar_por_dominio",
+        "obtener_generatividad",
+        "obtener_inventario",
+        "obtener_reporte",
+        "obtener_diagnostico",
+        "verificar_coherencia",
+        "ids_dominio_k_o",
+        "recolectar",
+    ],
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
         "leer": True,
@@ -476,34 +498,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        "eliminar": False,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
+        "importar": True,
         "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -515,6 +536,10 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # ============================================================
@@ -559,145 +584,227 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
-    # ============================================================
-    "capacidades_meta": {
-        "verificar": {
-            "descripcion": "Alias de barrer. Integridad formal del registro.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, inmutable, errores, resumen",
-        },
-        "barrer": {
-            "descripcion": (
-                "Verifica forma del registro: seq creciente, timestamps, "
-                "payload dict. No interpreta contenido."
-            ),
-            "entrada": "ninguna",
-            "salida": "dict con coherente, inmutable, errores, resumen",
-        },
-        "depositar": {
-            "descripcion": (
-                "Registra un evento neutro. Única vía de escritura. "
-                "Append-only. Categorías se descubren al depositar."
-            ),
-            "entrada": (
-                "tipo, payload, ciclo_id?, run_id?, origen?, destino?, "
-                "modulo?, capacidad?, categoria?, estado?"
-            ),
-            "salida": "dict del evento registrado",
-        },
-        "leer": {
-            "descripcion": "Lectura genérica con filtros opcionales por campo.",
-            "entrada": "filtros opcionales por campo del registro",
-            "salida": "list[dict]",
-        },
-        "leer_eventos": {
-            "descripcion": "Alias de leer sin filtros (todos los eventos).",
-            "entrada": "ninguna",
-            "salida": "list[dict]",
-        },
-        "leer_por_ciclo": {
-            "descripcion": "Eventos de un ciclo_id.",
-            "entrada": "ciclo_id: str",
-            "salida": "list[dict]",
-        },
-        "leer_por_modulo": {
-            "descripcion": "Eventos de un módulo.",
-            "entrada": "modulo: str, ciclo_id?",
-            "salida": "list[dict]",
-        },
-        "leer_por_tipo": {
-            "descripcion": "Eventos de un tipo.",
-            "entrada": "tipo: str, ciclo_id?",
-            "salida": "list[dict]",
-        },
-        "leer_por_categoria": {
-            "descripcion": "Eventos de una categoría (dinámica).",
-            "entrada": "categoria: str, ciclo_id?",
-            "salida": "list[dict]",
-        },
-        "leer_por_capacidad": {
-            "descripcion": "Eventos de una capacidad.",
-            "entrada": "capacidad: str, ciclo_id?",
-            "salida": "list[dict]",
-        },
-        "leer_por_origen": {
-            "descripcion": "Eventos con un origen dado.",
-            "entrada": "origen: str, ciclo_id?",
-            "salida": "list[dict]",
-        },
-        "leer_por_destino": {
-            "descripcion": "Eventos con un destino dado.",
-            "entrada": "destino: str, ciclo_id?",
-            "salida": "list[dict]",
-        },
-        "leer_por_estado": {
-            "descripcion": "Eventos con un estado dado.",
-            "entrada": "estado: str, ciclo_id?",
-            "salida": "list[dict]",
-        },
-        "leer_por_seq": {
-            "descripcion": "Eventos en un rango de seq.",
-            "entrada": "desde_seq?, hasta_seq?",
-            "salida": "list[dict]",
-        },
-        "leer_por_timestamp": {
-            "descripcion": "Eventos en un rango de timestamp.",
-            "entrada": "desde_timestamp?, hasta_timestamp?",
-            "salida": "list[dict]",
-        },
-        "categorias": {
-            "descripcion": "Categorías descubiertas dinámicamente hasta ahora.",
-            "entrada": "ninguna",
-            "salida": "list[str]",
-        },
-        "inventario": {
-            "descripcion": "Inventario del módulo y resumen del registro.",
-            "entrada": "ninguna",
-            "salida": "dict con id, version, memoria, categorias, capacidades",
-        },
-        "reporte": {
-            "descripcion": "Reporte interno de estado del módulo CH.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, memoria, capacidades",
-        },
-        "diagnostico": {
-            "descripcion": "Diagnóstico de integridad formal del registro.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
-        },
-        "verificar_salida": {
-            "descripcion": "Comprueba forma de una salida de barrer o depósito.",
-            "entrada": "salida: dict",
-            "salida": "bool",
-        },
-        "backend_para_centinela": {
-            "descripcion": (
-                "Adaptador estable CacheBackend para Centinela. "
-                "Centinela no conoce la implementación interna."
-            ),
-            "entrada": "ninguna",
-            "salida": "CacheBackend",
-        },
+# METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+# ============================================================
+"capacidades_meta": {
+
+    "verificar": {
+        "descripcion": "Alias de barrer. Integridad formal del registro.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "dict con coherente, inmutable, errores, resumen",
+        "acceso_archivos": ["*"],
     },
 
+    "barrer": {
+        "descripcion": (
+            "Verifica forma del registro: seq creciente, timestamps, "
+            "payload dict. No interpreta contenido."
+        ),
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "dict con coherente, inmutable, errores, resumen",
+        "acceso_archivos": ["*"],
+    },
+
+    "depositar": {
+        "descripcion": (
+            "Registra un evento neutro. Única vía de escritura. "
+            "Append-only. Categorías se descubren al depositar."
+        ),
+        "entrada": (
+            "tipo, payload, ciclo_id?, run_id?, origen?, destino?, "
+            "modulo?, capacidad?, categoria?, estado?"
+        ),
+        "validar_esquema": ["*"],
+        "salida": "dict del evento registrado",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer": {
+        "descripcion": "Lectura genérica con filtros opcionales por campo.",
+        "entrada": "filtros opcionales por campo del registro",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_eventos": {
+        "descripcion": "Alias de leer sin filtros (todos los eventos).",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_ciclo": {
+        "descripcion": "Eventos de un ciclo_id.",
+        "entrada": "ciclo_id: str",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_modulo": {
+        "descripcion": "Eventos de un módulo.",
+        "entrada": "modulo: str, ciclo_id?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_tipo": {
+        "descripcion": "Eventos de un tipo.",
+        "entrada": "tipo: str, ciclo_id?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_categoria": {
+        "descripcion": "Eventos de una categoría (dinámica).",
+        "entrada": "categoria: str, ciclo_id?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_capacidad": {
+        "descripcion": "Eventos de una capacidad.",
+        "entrada": "capacidad: str, ciclo_id?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_origen": {
+        "descripcion": "Eventos con un origen dado.",
+        "entrada": "origen: str, ciclo_id?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_destino": {
+        "descripcion": "Eventos con un destino dado.",
+        "entrada": "destino: str, ciclo_id?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_estado": {
+        "descripcion": "Eventos con un estado dado.",
+        "entrada": "estado: str, ciclo_id?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_seq": {
+        "descripcion": "Eventos en un rango de seq.",
+        "entrada": "desde_seq?, hasta_seq?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "leer_por_timestamp": {
+        "descripcion": "Eventos en un rango de timestamp.",
+        "entrada": "desde_timestamp?, hasta_timestamp?",
+        "validar_esquema": ["*"],
+        "salida": "list[dict]",
+        "acceso_archivos": ["*"],
+    },
+
+    "categorias": {
+        "descripcion": "Categorías descubiertas dinámicamente hasta ahora.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "list[str]",
+        "acceso_archivos": ["*"],
+    },
+
+    "inventario": {
+        "descripcion": "Inventario del módulo y resumen del registro.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "dict con id, version, memoria, categorias, capacidades",
+        "acceso_archivos": ["*"],
+    },
+
+    "reporte": {
+        "descripcion": "Reporte interno de estado del módulo CH.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "dict con estado, coherente, memoria, capacidades",
+        "acceso_archivos": ["*"],
+    },
+
+    "diagnostico": {
+        "descripcion": "Diagnóstico de integridad formal del registro.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "dict con estado, problemas, advertencias, recomendaciones",
+        "acceso_archivos": ["*"],
+    },
+
+    "verificar_salida": {
+        "descripcion": "Comprueba forma de una salida de barrer o depósito.",
+        "entrada": "salida: dict",
+        "validar_esquema": ["*"],
+        "salida": "bool",
+        "acceso_archivos": ["*"],
+    },
+
+    "backend_para_centinela": {
+        "descripcion": (
+            "Adaptador estable CacheBackend para Centinela. "
+            "Centinela no conoce la implementación interna."
+        ),
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "CacheBackend",
+        "acceso_archivos": ["*"],
+    },
+},
+
+    REPORTING (OBLIGATORIO EN EL ESQUEMA)
+
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================

@@ -748,8 +748,6 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    REPORTING (OBLIGATORIO EN EL ESQUEMA)
-
     # ============================================================
     # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================

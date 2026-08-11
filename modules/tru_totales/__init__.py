@@ -201,6 +201,14 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+    
+    # ============================================================
     # DEPENDENCIAS
     # ============================================================
     "requiere": ["*"],
@@ -215,57 +223,63 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "validar_esquema": ["*"],
 
+    #============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
     "autoriza_engine": {
-    # --- PERMISOS BASE ---
-    "leer": True,
-    "ejecutar": True,
-    "consultar": True,
-    "recombinar": False,
-    "reportar": True,
-    "auditar": True,
-    "inventariar": True,
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
 
-    # --- PERMISOS DE ESCRITURA ---
-    "modificar": False,
-    "alterar": False,
-    "reescribir": True,
-    "crear": True,
-    "eliminar": False,
-    "actualizar": True,
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
 
-    # --- PERMISOS DE PROCESAMIENTO ---
-    "validar": True,
-    "procesar": True,
-    "analizar": True,
-    "generar": True,
-    "transformar": True,
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
-    # --- PERMISOS DE DATOS ---
-    "exportar": True,
-    "importar": True,
-    "respaldar": True,
-    "recuperar": True,
-    "sincronizar": True,
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
 
-    # --- PERMISOS DE MONITOREO ---
-    "monitorear": True,
-    "alertar": True,
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "metricas": True,
+        "diagnostico": True,
 
-    # --- REPORTING ---
-    "metricas": True,
-    "estado": True,
-    "version": True,
-    "salud": True,
-    "inventario": True,
-    "capacidades": True,
-    "errores": True,
-    "advertencias": True,
-    "dependencias": True,
-    "contrato": True,
-    "conocimiento": True,
-    "diagnostico": True,
-    "reporte": True,
-},
+        # --- PERMISOS DE ESTADO ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
 
     # ----- CONSULTAS SOPORTADAS -----
     "consultas_soportadas": [
@@ -290,74 +304,114 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida": "verificar_salida",
     },
 
-    # ----- METADATOS DE CAPACIDADES (1:1 obligatorio) -----
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia del catálogo.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con coherente, categorias, ids, errores",
+            "acceso_archivos": ["*"],
         },
         "barrer": {
             "descripcion": "Evalúa coherencia del catálogo. No calcula Tru.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con coherente, categorias, ids, errores, version",
+            "acceso_archivos": ["*"],
         },
         "inventario": {
             "descripcion": "Inventario completo del módulo y del catálogo.",
-            "entrada": "peticion opcional",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con id, version, capacidades, extension",
+            "acceso_archivos": ["*"],
         },
         "capacidades": {
             "descripcion": "Vista explícita del catálogo para Engine/Omega.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con categorias resumidas, total, coherente",
+            "acceso_archivos": ["*"],
         },
         "categorias": {
             "descripcion": "Lista del catálogo si coherente; si no, lista vacía.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list[dict] de categorías normalizadas",
+            "acceso_archivos": ["*"],
         },
         "resolver_pedido": {
             "descripcion": (
                 "Normaliza un pedido de Omega/Engine a una categoría. "
                 "No calcula. No orquesta."
             ),
-            "entrada": "dict con escala_id|categoria|pedido|texto|...",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con ok, categoria, unidad, factores_evaluables, ...",
+            "acceso_archivos": ["*"],
         },
         "reporte": {
             "descripcion": "Reporte interno de estado del módulo TT.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con estado, coherente, categorias, errores",
+            "acceso_archivos": ["*"],
         },
         "diagnostico": {
             "descripcion": "Diagnóstico: qué falta o está mal en el catálogo.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "acceso_archivos": ["*"],
         },
         "verificar_salida": {
             "descripcion": "Comprueba si una salida de barrer o resolver es válida.",
-            "entrada": "salida: dict",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
     },
 
-    # ----- REPORTING -----
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
+
 
     # ----- ESTADOS VÁLIDOS -----
     "estados_validos": list(ESTADOS_VALIDOS),

@@ -481,7 +481,6 @@ CONTENEDOR: Dict[str, Any] = {
         "validar_esquema": True,     # ← AGREGADO
         "acceso_archivos": True,     # ← AGREGADO
     },
-    },
 
     # ============================================================
     # REPORTING (OBLIGATORIO EN EL ESQUEMA)

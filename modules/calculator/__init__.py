@@ -233,6 +233,14 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario", "estado", "reporte", "diagnostico",
     ],
 
+    #============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
     # ============================================================
     # DEPENDENCIAS
     # ============================================================
@@ -248,8 +256,9 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "validar_esquema": ["*"],
 
+
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -262,34 +271,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -301,8 +309,11 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
-    },
 
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
     # ============================================================
     # CONSULTAS SOPORTADAS
     # ============================================================
@@ -311,7 +322,7 @@ CONTENEDOR: Dict[str, Any] = {
         "calcular_factor", "representar", "validar_evidencia",
         "explicar_calculo", "verificar_coherencia",
         "obtener_inventario", "obtener_reporte", "obtener_diagnostico",
-        "leer_ids_escala", "historial",
+        "leer_ids_escala", "historial", "verificar_calculo_de_C_L_K",
     ],
 
     # ============================================================
@@ -334,10 +345,11 @@ CONTENEDOR: Dict[str, Any] = {
         "leer_ids_escala": "leer_ids_escala",
         "verificar_salida": "verificar_salida",
         "historial": "historial",
+        "verificar_calculo_de_C_L_K": "verificar_calculo_de_C_L_K"
     },
 
     # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # META CALCULOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
         "calcular": {
@@ -346,113 +358,202 @@ CONTENEDOR: Dict[str, Any] = {
                 "fraccion+decimal (ej display: 7/9 = 0.778)."
             ),
             "entrada": "peticion: dict",
+            "validar_esquema": ["*"],
             "salida": (
                 "dict con id_calculo, C, L, K, evidencia, "
                 "versiones_utilizadas, centinela, errores"
             ),
+            "acceso_archivos": ["*"],
         },
+
         "calcular_C": {
             "descripcion": "Factor C como objeto fraccion+decimal.",
             "entrada": "peticion: dict",
+            "validar_esquema": ["*"],
             "salida": "dict con C, ruta, notas, evidencia",
+            "acceso_archivos": ["*"],
         },
+
         "calcular_L": {
             "descripcion": "Factor L como objeto (o UNDEFINED).",
             "entrada": "peticion: dict",
+            "validar_esquema": ["*"],
             "salida": "dict con L, p, r, ruta, notas, evidencia",
+            "acceso_archivos": ["*"],
         },
+
         "calcular_K": {
             "descripcion": "Factor K como objeto (o None sin O).",
             "entrada": "peticion: dict",
+            "validar_esquema": ["*"],
             "salida": "dict con K, ruta, notas, evidencia",
+            "acceso_archivos": ["*"],
         },
+
         "calcular_factor": {
             "descripcion": "Factor por nombre C|L|K.",
             "entrada": "factor: str, peticion: dict",
+            "validar_esquema": ["*"],
             "salida": "dict del factor",
+            "acceso_archivos": ["*"],
         },
+
         "representar": {
             "descripcion": (
                 "Fraction -> objeto con fraccion, numerador, denominador, "
                 "decimal, display (7/9 = 0.778). Sin float."
             ),
             "entrada": "valor: Fraction|UNDEFINED|None, precision: int=3",
+            "validar_esquema": ["*"],
             "salida": "dict valor completo",
+            "acceso_archivos": ["*"],
         },
+
         "validar_evidencia": {
             "descripcion": (
                 "Valida lista de evidencia sin calcular: estructura, "
                 "rechazados, conflicto de versiones del mismo modulo."
             ),
             "entrada": "evidencia: list[dict]",
-            "salida": "dict con ok, problemas, advertencias, evidencia_normalizada",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, problemas, advertencias, "
+                "evidencia_normalizada"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "explicar_calculo": {
             "descripcion": (
                 "Explica un calculo por id usando evidencia real almacenada."
             ),
             "entrada": "id_calculo: str",
+            "validar_esquema": ["*"],
             "salida": "dict explicativo dinamico o None",
+            "acceso_archivos": ["*"],
         },
+
         "verificar": {
             "descripcion": "Centinela de integridad (APIs, hashes, choques).",
             "entrada": "ninguna",
+            "validar_esquema": ["*"],
             "salida": "dict con coherente, errores, choques, hashes",
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
             "descripcion": "Alias de verificar.",
             "entrada": "ninguna",
+            "validar_esquema": ["*"],
             "salida": "dict con coherente, errores, choques, hashes",
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
             "descripcion": "Inventario del dominio de calculo.",
             "entrada": "peticion opcional",
-            "salida": "dict con capacidades, factores, archivos, hashes",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con capacidades, factores, archivos, hashes"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
             "descripcion": "Reporte de estado de CA.",
             "entrada": "ninguna",
+            "validar_esquema": ["*"],
             "salida": "dict con estado, coherente, factores_api",
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
             "descripcion": "Diagnostico de problemas y recomendaciones.",
             "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, "
+                "recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "leer_ids_escala": {
             "descripcion": "Ids de escala reconocidos.",
             "entrada": "ninguna",
+            "validar_esquema": ["*"],
             "salida": "dict con ids, n, origenes",
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
-            "descripcion": "Forma minima: C, L, K, id_calculo; cada factor con display.",
+            "descripcion": (
+                "Forma minima: C, L, K, id_calculo; "
+                "cada factor con display."
+            ),
             "entrada": "salida: dict",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
+
         "historial": {
             "descripcion": "Buffer liviano de ultimos calculos.",
             "entrada": "limite opcional: int",
+            "validar_esquema": ["*"],
             "salida": "list[dict]",
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar_calculo_de_C_L_K": {
+            "descripcion": (
+                "Verifica la integridad y coherencia del calculo "
+                "de C, L y K."
+            ),
+            "entrada": "calculo: dict",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con valido, errores, advertencias, "
+                "C, L, K y verificacion"
+            ),
+            "acceso_archivos": ["*"],
         },
     },
-
+    
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================

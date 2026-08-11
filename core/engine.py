@@ -393,7 +393,7 @@ class RegistroModulos:
         return len(self.contenedores)
         
 # ===============================================================
-# ENGINE AQUI SE DEFINEN LAS DECLARACIONES
+# Parte 12 ENGINE AQUI SE DEFINEN LAS DECLARACIONES
 # ===============================================================
 
 class Engine:
@@ -403,7 +403,7 @@ class Engine:
     def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
 
         # =======================================================
-        # CONFIGURACIÓN BÁSICA
+        # Parte 12.1 CONFIGURACIÓN BÁSICA
         # =======================================================
 
         self.raiz = Path(raiz_modulos).resolve()
@@ -411,7 +411,7 @@ class Engine:
         self.strict = strict
 
         # =======================================================
-        # ESTADO
+        # Parte 12.2 ESTADO
         # =======================================================
 
         self.estado = ESTADO_NO_INICIADO
@@ -422,27 +422,27 @@ class Engine:
         self.resultados_evaluacion: List[Any] = []
 
         # =======================================================
-        # TRAZAS
+        # Parte 12.2 TRAZAS
         # =======================================================
 
         self._trazas: List[Dict[str, Any]] = []
         self._traza_seq: int = 0
 
         # =======================================================
-        # MAPA DE RUTA
+        # Parte 12.3 MAPA DE RUTA
         # =======================================================
 
         self._mapa_ruta: List[Dict[str, Any]] = []
         self._ruta_seq: int = 0
 
         # =======================================================
-        # CENTINELA — PRIORIDAD ABSOLUTA
+        # Parte 12.4 CENTINELA — PRIORIDAD ABSOLUTA
         # =======================================================
 
         self._centinela: Optional[Centinela] = None
 
         # =======================================================
-        # ESTRUCTURAS INTERNAS
+        # Parte 12.5 ESTRUCTURAS INTERNAS
         # =======================================================
 
         self._modulos_descubiertos: List[Path] = []
@@ -453,7 +453,7 @@ class Engine:
         self._grafo: Dict[str, Any] = {}
 
         # =======================================================
-        # ARRANQUE
+        # Parte 12.6 ARRANQUE
         # =======================================================
 
         self._modulos_descubiertos = self._descubrir_modulos()
@@ -462,7 +462,7 @@ class Engine:
         self._construir_grafo()
 
         # =======================================================
-        # ESTADO FINAL
+        # Parte 12.7 ESTADO FINAL
         # =======================================================
 
         if self.errores_arranque:
@@ -473,7 +473,7 @@ class Engine:
             self.estado = ESTADO_OPERATIVO
 
     # ===========================================================
-    # DESCUBRIMIENTO
+    # Parte 12.8 DESCUBRIMIENTO
     # ===========================================================
 
     def _descubrir_modulos(self) -> List[Path]:
@@ -481,7 +481,7 @@ class Engine:
         return [p for p in sorted(self.raiz.iterdir()) if p.is_dir() and (p / "__init__.py").is_file()]
 
     # ===========================================================
-    # LECTURA DEL CONTRATO
+    # Parte 13 LECTURA DEL CONTRATO
     # ===========================================================
 
     def _leer_contrato(self, path_dir: Path) -> Optional[Dict[str, Any]]:
@@ -524,7 +524,7 @@ class Engine:
             return None
 
     # ===========================================================
-    # CARGA Y REGISTRO
+    # Parte 13.1 CARGA VALIDACION DEL REGISTRO
     # ===========================================================
 
     def _cargar_y_validar(self) -> None:
@@ -532,7 +532,7 @@ class Engine:
         for path_dir in self._modulos_descubiertos:
 
             # ---------------------------------------------------
-            # LEER CONTRATO Y MATERIALIZAR MÓDULO
+            # Parte 13.1.1 LEER CONTRATO Y MATERIALIZAR MÓDULO
             # ---------------------------------------------------
 
             leido = self._leer_contrato(path_dir)
@@ -545,7 +545,7 @@ class Engine:
             mod = leido["modulo"]
 
             # ---------------------------------------------------
-            # ARCHIVOS PY
+            # Parte 13.1.3 ARCHIVOS PY
             # ---------------------------------------------------
 
             archivos_py = sorted(
@@ -554,7 +554,7 @@ class Engine:
             )
 
             # ---------------------------------------------------
-            # CONTEXTO ESTRUCTURAL DEL MÓDULO
+            # Parte 13.1.4 CONTEXTO ESTRUCTURAL DEL MÓDULO
             # ---------------------------------------------------
 
             setattr(
@@ -564,7 +564,7 @@ class Engine:
             )
 
             # ---------------------------------------------------
-            # VALIDACIÓN DEL CONTRATO
+            # Parte 13.1.5 VALIDACIÓN DEL CONTRATO
             # ---------------------------------------------------
 
             errores = self._validar_esquema(
@@ -577,7 +577,7 @@ class Engine:
                 continue
 
             # ---------------------------------------------------
-            # MATERIALIZACIÓN DEL CONTENEDOR
+            # Parte 13.1.7 MATERIALIZACIÓN DEL CONTENEDOR
             # ---------------------------------------------------
 
             cont = Contenedor(
@@ -587,7 +587,7 @@ class Engine:
             )
 
             # ---------------------------------------------------
-            # REGISTRO DEL MÓDULO
+            # Parte 13.1.8 REGISTRO DEL MÓDULO
             # ---------------------------------------------------
 
             errores_dup = self.registro.registrar(cont)
@@ -596,7 +596,7 @@ class Engine:
                     self.errores_arranque.append(f"{nombre}: {error}")
 
     # ===========================================================
-    # DECLARACIÓN 1 — RESOLUCIÓN POR EXISTENCIA CONTRACTUAL
+    # Parte 14 DECLARACIÓN 1 — RESOLUCIÓN POR EXISTENCIA CONTRACTUAL
     # Esta capacidad determina si un elemento X está presente en 
     # el repertorio completo de declaraciones disponibles en el sistema.
     # ===========================================================
@@ -635,13 +635,13 @@ class Engine:
             }
 
         # -------------------------------------------------------
-        # REPERTORIO CONTRACTUAL COMPLETO
+        # Parte 14.1 REPERTORIO CONTRACTUAL COMPLETO
         # -------------------------------------------------------
 
         for cont in self.registro.contenedores.values():
 
             # ---------------------------------------------------
-            # CAPACIDADES DECLARADAS/EXISTE → X está registrado 
+            # Parte 14.1.1 CAPACIDADES DECLARADAS/EXISTE → X está registrado 
             # en alguna capacidad, declaración, consulta, 
             # autoridad o invariante de algún Contenedor.
             # ---------------------------------------------------
@@ -660,7 +660,7 @@ class Engine:
                     }
 
             # ---------------------------------------------------
-            # DECLARACIONES CONTRACTUALES
+            # Parte 14.1.2 DECLARACIONES CONTRACTUALES
             # ---------------------------------------------------
 
             for declaracion in cont.conocimiento_exportable:
@@ -712,7 +712,7 @@ class Engine:
                     }
 
         # -------------------------------------------------------
-        # X NO EXISTE/NO_EXISTE → X no está registrado en ningún lugar.
+        # Parte 14.1.3 X NO EXISTE/NO_EXISTE → X no está registrado en ningún lugar.
         # -------------------------------------------------------
 
         return {
@@ -723,7 +723,7 @@ class Engine:
         }
 
     # ===========================================================
-    # DECLARACIÓN 2 — RESOLUCIÓN DE PETICIÓN
+    # Parte 14.2 DECLARACIÓN 2 — RESOLUCIÓN DE PETICIÓN
     # ===========================================================
 
     def resolver_peticion(
@@ -783,7 +783,7 @@ class Engine:
         return errores
 
     # ===========================================================
-    # VERSIONES
+    # VERSIONES capacidad de identificar las versiones de casa modulo
     # ===========================================================
 
     @staticmethod

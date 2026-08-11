@@ -254,7 +254,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -267,34 +267,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -306,6 +305,10 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # ============================================================
@@ -340,74 +343,122 @@ CONTENEDOR: Dict[str, Any] = {
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
-        "verificar": {
-            "descripcion": "Alias de barrer. Verifica coherencia mecánica.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, choques, errores, mecanica, archivos",
-        },
-        "barrer": {
-            "descripcion": (
-                "Lee todas las MECANICA de la carpeta, calcula orden, "
-                "detecta contradicciones o ciclos y notifica a DiagnosticoGlobal."
-            ),
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, choques, errores, mecanica, archivos",
-        },
-        "evaluar": {
-            "descripcion": "Alias de barrer. Evalúa coherencia del núcleo MC.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, choques, errores, mecanica",
-        },
-        "axiomas": {
-            "descripcion": "Declaraciones internas de correlación (CORR_SEQ_01, CORR_SEQ_02).",
-            "entrada": "ninguna",
-            "salida": "list[dict] de declaraciones",
-        },
-        "inventario": {
-            "descripcion": "Inventario objetivo de mecánicas declaradas en la carpeta.",
-            "entrada": "ninguna",
-            "salida": "dict con total_mecanicas, archivos, declaran",
-        },
-        "verificar_salida": {
-            "descripcion": "Comprueba si una salida de barrer es coherente.",
-            "entrada": "salida: dict",
-            "salida": "bool",
-        },
-        "reporte": {
-            "descripcion": "Reporte interno de estado del módulo MC.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, choques, errores, capacidades",
-        },
-        "diagnostico": {
-            "descripcion": "Diagnóstico: qué falta, qué está mal en MC.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
-        },
-        "listar_mecanicas": {
-            "descripcion": "Lista todas las MECANICA descubiertas en la carpeta.",
-            "entrada": "ninguna",
-            "salida": "dict archivo → meta MECANICA",
-        },
+    "verificar": {
+        "descripcion": "Alias de barrer. Verifica coherencia mecánica.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "dict con coherente, choques, errores, mecanica, archivos",
+        "acceso_archivos": ["*"],
     },
 
+    "barrer": {
+        "descripcion": (
+            "Lee todas las MECANICA de la carpeta, calcula orden, "
+            "detecta contradicciones o ciclos y notifica a DiagnosticoGlobal."
+        ),
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": (
+            "dict con estado, coherente, choques, errores, "
+            "mecanica, archivos"
+        ),
+        "acceso_archivos": ["*"],
+    },
+
+    "evaluar": {
+        "descripcion": "Alias de barrer. Evalúa coherencia del núcleo MC.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": (
+            "dict con estado, coherente, choques, errores, mecanica"
+        ),
+        "acceso_archivos": ["*"],
+    },
+
+    "axiomas": {
+        "descripcion": (
+            "Declaraciones internas de correlación "
+            "(CORR_SEQ_01, CORR_SEQ_02)."
+        ),
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "list[dict] de declaraciones",
+        "acceso_archivos": ["*"],
+    },
+
+    "inventario": {
+        "descripcion": "Inventario objetivo de mecánicas declaradas en la carpeta.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": "dict con total_mecanicas, archivos, declaran",
+        "acceso_archivos": ["*"],
+    },
+
+    "verificar_salida": {
+        "descripcion": "Comprueba si una salida de barrer es coherente.",
+        "entrada": "salida: dict",
+        "validar_esquema": ["*"],
+        "salida": "bool",
+        "acceso_archivos": ["*"],
+    },
+
+    "reporte": {
+        "descripcion": "Reporte interno de estado del módulo MC.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": (
+            "dict con estado, coherente, choques, errores, capacidades"
+        ),
+        "acceso_archivos": ["*"],
+    },
+
+    "diagnostico": {
+        "descripcion": "Diagnóstico: qué falta, qué está mal en MC.",
+        "entrada": "ninguna",
+        "validar_esquema": ["*"],
+        "salida": (
+            "dict con estado, problemas, advertencias, recomendaciones"
+        ),
+        "acceso_archivos": ["*"],
+    },
+},
+    
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
+
 
     # ============================================================
     # ESTADOS VÁLIDOS

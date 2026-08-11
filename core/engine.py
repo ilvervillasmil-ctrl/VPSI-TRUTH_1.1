@@ -1237,6 +1237,42 @@ class Engine:
             "orden_topologico": orden,
             "ciclos": ciclos
         }
+        
+        # -------------------------------------------------------
+        # Parte 18.5 RESOLUCIÓN DE COMODÍN "*"
+        # -------------------------------------------------------
+        # El comodín "*" en "requiere" significa que el módulo
+        # depende de TODOS los módulos disponibles.
+        # Se resuelve automáticamente sin generar errores.
+        
+        # Reemplazar "*" por todos los módulos presentes
+        # para que el grafo refleje las dependencias reales
+        # nuevos_grafo: Dict[str, List[str]] = {}
+        
+        for modulo, dependencias in grafo_dep.items():
+            nuevas_deps: List[str] = []
+            for dep in dependencias:
+                if dep == "*":
+                    # Agregar TODOS los módulos excepto sí mismo
+                    for otro in self.registro.contenedores.keys():
+                        if otro != modulo and otro not in nuevas_deps:
+                            nuevas_deps.append(otro)
+                else:
+                    nuevas_deps.append(dep)
+            nuevos_grafo[modulo] = nuevas_deps
+        
+        grafo_dep = nuevos_grafo
+        
+        # Recalcular dependencias faltantes con el grafo expandido
+        faltantes.clear()
+        for nombre, dependencias in grafo_dep.items():
+            for dep in dependencias:
+                if dep not in presentes:
+                    faltantes.setdefault(nombre, []).append(dep)
+                    if dep != "*":  # "*" ya fue expandido
+                        self.errores_arranque.append(
+                            f"{self.registro.contenedores[nombre].rol}/{nombre}: dependencia inexistente → '{dep}'"
+                        )
 
     # ===========================================================
     # Parte 19 GRAFO

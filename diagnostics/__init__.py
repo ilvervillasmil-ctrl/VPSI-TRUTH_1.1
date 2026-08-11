@@ -268,32 +268,48 @@ CONTENEDOR: Dict[str, Any] = {
         "omega_report",
     ],
 
-    # -----------------------------------------------------------
+    # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
     # DEPENDENCIAS
-    # -----------------------------------------------------------
+    # ============================================================
+    "requiere": ["*"],
 
-    "requiere": [],
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
 
-    # -----------------------------------------------------------
-    # AUTORIZACIÓN DEL ENGINE (COMPLETA)
-    # -----------------------------------------------------------
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
 
+    #============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
-        "recombinar": False,
+        "recombinar": True,
         "reportar": True,
         "auditar": True,
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
@@ -301,22 +317,21 @@ CONTENEDOR: Dict[str, Any] = {
         "procesar": True,
         "analizar": True,
         "generar": True,
-        "transformar": False,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -328,6 +343,10 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # -----------------------------------------------------------
@@ -354,9 +373,9 @@ CONTENEDOR: Dict[str, Any] = {
         "leer_evidencia": "leer_evidencia",
     },
 
-    # -----------------------------------------------------------
+    # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
-    # -----------------------------------------------------------
+    # ============================================================
 
     "capacidades_meta": {
 
@@ -365,8 +384,10 @@ CONTENEDOR: Dict[str, Any] = {
                 "Valida que la información recibida sea suficiente "
                 "y estructuralmente coherente."
             ),
-            "entrada": "dict opcional con información del Engine",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con estado, coherente, faltas y evidencia",
+            "acceso_archivos": ["*"],
         },
 
         "inventario": {
@@ -374,8 +395,10 @@ CONTENEDOR: Dict[str, Any] = {
                 "Expone la identidad, contrato, dependencias y "
                 "capacidades declaradas por DGS."
             ),
-            "entrada": "petición opcional",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con inventario contractual del módulo",
+            "acceso_archivos": ["*"],
         },
 
         "generar_reporte": {
@@ -383,8 +406,10 @@ CONTENEDOR: Dict[str, Any] = {
                 "Genera el Omega Report utilizando únicamente "
                 "información ya producida por el sistema."
             ),
-            "entrada": "dict con información diagnóstica del Engine",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con Omega Report",
+            "acceso_archivos": ["*"],
         },
 
         "validar_entrada": {
@@ -392,8 +417,10 @@ CONTENEDOR: Dict[str, Any] = {
                 "Comprueba la presencia y estructura de los campos "
                 "obligatorios recibidos."
             ),
-            "entrada": "dict con información diagnóstica",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list de faltas estructurales",
+            "acceso_archivos": ["*"],
         },
 
         "leer_evidencia": {
@@ -401,29 +428,47 @@ CONTENEDOR: Dict[str, Any] = {
                 "Lee la evidencia persistente de evaluaciones "
                 "sin modificarla."
             ),
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con evidencia persistente",
+            "acceso_archivos": ["*"],
         },
     },
 
-    # -----------------------------------------------------------
-    # REPORTING (COMPLETO)
-    # -----------------------------------------------------------
-
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # -----------------------------------------------------------

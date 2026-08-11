@@ -204,7 +204,7 @@ class ArranqueError(Exception):
     """Fallo estructural durante el arranque del Engine."""
     pass
 # ===============================================================
-# Parte 10 LIBRERIAS DEL SISTEMA PARA CONTRATOS MODULOS
+# Parte 10 CONTENEDOR LIBRERIAS Y CONTRATO Y ESPECIDICACIONES 
 # ===============================================================
 
 class Contenedor:
@@ -281,7 +281,7 @@ class Contenedor:
 
 
 # ===============================================================
-# Parte 11 — DEF DE REGISTROS CONTRATOS
+# Parte 11 — DEF/ REGISTROS DE MODULOS EN  CONTRATOS
 # ===============================================================
 
 from typing import Any, Dict, List, Optional
@@ -328,7 +328,7 @@ class RegistroModulos:
             return errores
 
         # -------------------------------------------------------
-        # Parte 11.2.2 — Validación de duplicados
+        # Parte 11.2.2 — NO SE ACEPTAN duplicados DE MODULO
         # -------------------------------------------------------
         if nombre in self.contenedores:
             errores.append(f"duplicado de nombre: '{nombre}' ya registrado")
@@ -465,20 +465,17 @@ class Engine:
         # ESTADO FINAL
         # =======================================================
 
-        if self.errores_arranque:
-            self.estado = ESTADO_RECHAZADO
+        if self.errores_arranque: self.estado = ESTADO_RECHAZADO
             if self.strict:
                 raise ArranqueError("Engine no pudo arrancar:\n  - " + "\n  - ".join(self.errores_arranque))
-        else:
-            self.estado = ESTADO_OPERATIVO
+        else: self.estado = ESTADO_OPERATIVO
 
     # ===========================================================
     # DESCUBRIMIENTO
     # ===========================================================
 
     def _descubrir_modulos(self) -> List[Path]:
-        if not self.raiz.is_dir():
-            return []
+        if not self.raiz.is_dir(): return []
         return [p for p in sorted(self.raiz.iterdir()) if p.is_dir() and (p / "__init__.py").is_file()]
 
     # ===========================================================
@@ -598,6 +595,8 @@ class Engine:
 
     # ===========================================================
     # DECLARACIÓN 1 — RESOLUCIÓN POR EXISTENCIA CONTRACTUAL
+    # Esta capacidad determina si un elemento X está presente en 
+    # el repertorio completo de declaraciones disponibles en el sistema.
     # ===========================================================
 
     def resolver_existencia(self, peticion: Any) -> Dict[str, Any]:
@@ -640,7 +639,9 @@ class Engine:
         for cont in self.registro.contenedores.values():
 
             # ---------------------------------------------------
-            # CAPACIDADES DECLARADAS
+            # CAPACIDADES DECLARADAS/EXISTE → X está registrado 
+            # en alguna capacidad, declaración, consulta, 
+            # autoridad o invariante de algún Contenedor.
             # ---------------------------------------------------
 
             for capacidad in cont.capacidades:
@@ -709,7 +710,7 @@ class Engine:
                     }
 
         # -------------------------------------------------------
-        # X NO EXISTE
+        # X NO EXISTE/NO_EXISTE → X no está registrado en ningún lugar.
         # -------------------------------------------------------
 
         return {

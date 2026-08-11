@@ -1717,6 +1717,7 @@ _CAP_MAP = {
     "leer_ids_escala": leer_ids_escala,
     "verificar_salida": verificar_salida,
     "historial": historial,
+    "verificar_calculo_de_C_L_K": verificar_calculo_de_C_L_K
 }
 
 

@@ -465,10 +465,12 @@ class Engine:
         # ESTADO FINAL
         # =======================================================
 
-        if self.errores_arranque: self.estado = ESTADO_RECHAZADO
-         if self.strict: raise 
-                ArranqueError("Engine no pudo arrancar:\n  - " + "\n  - ".join(self.errores_arranque))
-        else: self.estado = ESTADO_OPERATIVO
+        if self.errores_arranque:
+            self.estado = ESTADO_RECHAZADO
+            if self.strict:
+                raise ArranqueError("Engine no pudo arrancar:\n  - " + "\n  - ".join(self.errores_arranque))
+        else:
+            self.estado = ESTADO_OPERATIVO
 
     # ===========================================================
     # DESCUBRIMIENTO

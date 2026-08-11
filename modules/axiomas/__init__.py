@@ -421,76 +421,7 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
     },
-    # ============================================================
-    # METADATOS DE CAPACIDADES
-    # ============================================================
-    "capacidades_meta": {
-        "verificar": {
-            "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
-            "entrada": "declaraciones_externas opcional (dict)",
-            "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo",
-        },
-        "barrer": {
-            "descripcion": "Analiza coherencia de todas las declaraciones (contradicción directa y de cota).",
-            "entrada": "declaraciones_externas opcional (dict)",
-            "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo, ids_dominio_k_o",
-        },
-        "verificar_salida": {
-            "descripcion": "Comprueba si una salida de barrer/verificar es coherente.",
-            "entrada": "salida: dict",
-            "salida": "bool",
-        },
-        "inventario": {
-            "descripcion": "Inventario completo del módulo (declaraciones, cuerpos, capacidades).",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, nombre, rol, version, declaraciones, cuerpos, capacidades",
-        },
-        "axiomas": {
-            "descripcion": "Devuelve las declaraciones si el módulo es coherente; lista vacía si no.",
-            "entrada": "declaraciones_externas opcional (dict)",
-            "salida": "list[dict] de declaraciones normalizadas",
-        },
-        "declaraciones": {
-            "descripcion": "Igual que axiomas: declaraciones normalizadas si coherente.",
-            "entrada": "declaraciones_externas opcional (dict)",
-            "salida": "list[dict] de declaraciones normalizadas",
-        },
-        "generatividad": {
-            "descripcion": "Mide generatividad operativa y canónica (TR1).",
-            "entrada": "ninguna",
-            "salida": "dict con theta_n, pares, im_vs_theta, capa canonica, dominios, u1_proxy",
-        },
-        "por_dominio": {
-            "descripcion": "Filtra declaraciones por dominio en gobierna.",
-            "entrada": "dominio: str; declaraciones_externas opcional",
-            "salida": "list[dict] de declaraciones del dominio",
-        },
-        "ids_dominio_k_o": {
-            "descripcion": "Ids de declaraciones ligadas a dominios K/O o Def-5.3.1.",
-            "entrada": "declaraciones_externas opcional (dict)",
-            "salida": "list[str] de ids ordenados",
-        },
-        "recolectar": {
-            "descripcion": "Carga y normaliza todas las declaraciones de los cuerpos del módulo.",
-            "entrada": "declaraciones_externas opcional (dict)",
-            "salida": "tuple[list[dict], list[dict]] → (declaraciones, errores)",
-        },
-        "reporte": {
-            "descripcion": "Reporte interno de estado del módulo.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, declaraciones, choques, errores, capacidades",
-        },
-        "diagnostico": {
-            "descripcion": "Diagnóstico: qué me sucede, qué falta, qué está mal, qué necesito.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
-        },
-        "buscar_por_id": {
-            "descripcion": "Busca y cita una declaración por su id.",
-            "entrada": "id_decl: str",
-            "salida": "dict de la declaración o None",
-        },
-    },
+    
 
     # ============================================================
     # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)

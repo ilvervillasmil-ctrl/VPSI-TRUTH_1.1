@@ -449,6 +449,7 @@ class Engine:
         self._cargar_y_validar()
         self._resolver_dependencias()
         self._construir_grafo()
+        self._extraer_y_entregar_comentarios()
 
         # =======================================================
         # Parte 12.7 ESTADO FINAL

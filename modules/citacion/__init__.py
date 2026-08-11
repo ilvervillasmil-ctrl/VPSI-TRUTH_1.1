@@ -187,6 +187,20 @@ CAMPOS_OPCIONALES = (
     "relaciones",
     "fuente_modulo",  # legado
 )
+
+    "conocimiento_exportable": [
+        "declaraciones",
+        "resolver",
+        "buscar",
+        "cadena",
+        "explicar",
+        "citar",
+        "anunciar",
+        "relacionar",
+        "inventario",
+        "reporte",
+        "diagnostico",
+    ],
 # ===============================================================
 #  — CONTENEDOR (VPSI-CONTRACT-1.0)
 # ===============================================================
@@ -241,19 +255,7 @@ CONTENEDOR: Dict[str, Any] = {
         "Puede producir evidencia documental fuera del Engine",
         "Puede citar cualquier conocimiento declarado",
     ],
-    "conocimiento_exportable": [
-        "declaraciones",
-        "resolver",
-        "buscar",
-        "cadena",
-        "explicar",
-        "citar",
-        "anunciar",
-        "relacionar",
-        "inventario",
-        "reporte",
-        "diagnostico",
-    ],
+    
     # ============================================================
     # ACCESO (obligatorio en el esquema)
     # ============================================================
@@ -276,12 +278,15 @@ CONTENEDOR: Dict[str, Any] = {
     # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
     # ============================================================
     "validar_esquema": ["*"],
+
 "estados_validos": [
         "NO_INICIADO",
         "OPERATIVO",
         "DEGRADADO",
         "RECHAZADO",
     ],
+
+    
     "invariantes": [
         "CIT conserva conocimiento declarativo universal resoluble",
         "CIT puede resolver cualquier declaración registrada",

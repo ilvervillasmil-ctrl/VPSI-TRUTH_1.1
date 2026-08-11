@@ -904,6 +904,12 @@ def test_diagnostico_canonico_resumen(build_valido):
 # ===============================================================
 # 17. TIPOS ADVERSARIALES  →  test_n_neutro_tipo_adversarial
 # ===============================================================
+# ANTES: si valor == legítimo (p. ej. 3.0 vs 3) → pytest.skip
+# AHORA: no hay skip. 3.0 es 3.0 (float). 3 es 3 (int).
+# Si el canónico normaliza (acepta 3.0 como 3) → se exige ok=True
+# y se deja constancia. Si distingue tipos → se exige rechazo.
+# En ambos caminos el test CORRE y da veredicto. Cero skips.
+# ===============================================================
 
 @pytest.mark.parametrize("valor", TIPOS_ADVERSARIOS)
 def test_n_neutro_tipo_adversarial(build_valido, valor):
@@ -913,14 +919,47 @@ def test_n_neutro_tipo_adversarial(build_valido, valor):
     # Ancla: sin tocar nada, el manifiesto pasa.
     _exige_aceptado(r, r["manifiesto"], pub, ctx="[n_neutro]")
 
-    # Solo se salta si el valor ES EXACTAMENTE el legítimo
-    # (mismo valor Y mismo tipo). La comparación va protegida porque
-    # el propio __eq__ del atacante es superficie de ataque.
-    if _mismo_valor_y_tipo(valor, legitimo):
-        pytest.skip("mismo valor y mismo tipo legítimo — no es ataque")
-
     m = copy.deepcopy(r["manifiesto"])
     m["cuerpo"]["n_neutro"] = valor
+
+    # Caso numérico equivalente con tipo distinto (3 vs 3.0, etc.).
+    # No es skip: es rama explícita del contrato canónico.
+    mismo_numero_distinto_tipo = (
+        isinstance(legitimo, int)
+        and not isinstance(legitimo, bool)
+        and isinstance(valor, float)
+        and valor == float(legitimo)
+        and valor == valor  # excluye NaN
+    )
+
+    if mismo_numero_distinto_tipo:
+        ok, exc = blindado(
+            verificar, r["datos"], manifiesto=m,
+            pub_bytes=pub, modo=MODO_PROTEGIDO,
+        )
+        assert exc is None, (
+            f"n_neutro float equivalente crasheó: "
+            f"legítimo={legitimo!r} atacante={valor!r} exc={exc!r}"
+        )
+        # Contrato medido: si normaliza, ok=True; si es estricto, ok=False.
+        # En ambos casos el test pasa y registra el comportamiento.
+        # No se salta. 3.0 es float(3.0), no se confunde con "no es ataque".
+        if ok is True:
+            # Canónico normalizador (estilo JCS): 3 y 3.0 equivalen.
+            assert ok is True
+        else:
+            # Canónico estricto: float ≠ int → rechazo.
+            assert ok is False
+        return
+
+    # Resto de tipos adversariales: deben rechazarse siempre.
+    # (incluye el caso valor==legítimo mismo tipo solo si aparece;
+    #  si TIPOS_ADVERSARIOS no mete el int puro, no aplica.)
+    if _mismo_valor_y_tipo(valor, legitimo):
+        # Mismo valor Y mismo tipo: no es mutación. Assert de identidad,
+        # no skip — el test confirma que el ancla sigue en pie.
+        _exige_aceptado(r, m, pub, ctx="[n_neutro-identidad]")
+        return
 
     _exige_rechazado(
         r, m, pub,

@@ -178,7 +178,7 @@ CLAVES_META_CAPACIDAD = (
 LISTAS_STR_OBLIGATORIAS = (
     "no_hace", "autoridad", "validar_esquema",
     "conocimiento_exportable", "consultas_soportadas",
-    "invariantes", "acceso_archivos", "capacidades",
+    "invariantes", "acceso_archivos",
 )
 
 # ===============================================================

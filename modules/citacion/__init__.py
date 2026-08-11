@@ -243,6 +243,20 @@ CONTENEDOR: Dict[str, Any] = {
         "Puede producir evidencia documental fuera del Engine",
         "Puede citar cualquier conocimiento declarado",
     ],
+
+    "conocimiento_exportable": [
+        "declaraciones",
+        "resolver",
+        "buscar",
+        "cadena",
+        "explicar",
+        "citar",
+        "anunciar",
+        "relacionar",
+        "inventario",
+        "reporte",
+        "diagnostico",
+    ],
     
     # ============================================================
     # ACCESO (obligatorio en el esquema)
@@ -297,19 +311,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     
-    "conocimiento_exportable": [
-        "declaraciones",
-        "resolver",
-        "buscar",
-        "cadena",
-        "explicar",
-        "citar",
-        "anunciar",
-        "relacionar",
-        "inventario",
-        "reporte",
-        "diagnostico",
-    ],
+    
     
     "consultas_soportadas": [
         "resolver",

@@ -222,6 +222,14 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
     # DEPENDENCIAS
     # ============================================================
     "requiere": ["*"],
@@ -234,10 +242,10 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
     # ============================================================
-    "validar_esquema": ["*"],
+    "validar_esquema": ["*"]
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -250,34 +258,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -289,38 +296,10 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
-    },
 
-    # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "obtener_alpha",
-        "obtener_beta",
-        "descubrir_constantes",
-        "listar_constantes",
-        "buscar_constante",
-        "verificar_constantes",
-        "obtener_inventario",
-        "obtener_reporte",
-        "obtener_diagnostico",
-        "verificar_coherencia",
-    ],
-
-    # ============================================================
-    # CAPACIDADES
-    # ============================================================
-    "capacidades": {
-        "alpha": "get_alpha",
-        "beta": "get_beta",
-        "descubrir_constantes": "descubrir_constantes",
-        "listar_constantes": "listar_constantes",
-        "buscar_constante": "buscar_constante",
-        "verificar_constantes": "verificar_constantes",
-        "inventario": "inventario",
-        "reporte": "reporte",
-        "diagnostico": "diagnostico",
-        "verificar": "verificar",
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # ============================================================
@@ -328,83 +307,161 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "capacidades_meta": {
         "alpha": {
-            "descripcion": "Devuelve la constante fundacional ALPHA = 26/27.",
-            "entrada": "peticion opcional (ignorada)",
+            "descripcion": (
+                "Devuelve la constante fundacional ALPHA = 26/27."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "Fraction(26, 27)",
+            "acceso_archivos": ["*"],
         },
+
         "beta": {
-            "descripcion": "Devuelve la constante fundacional BETA = 1/27.",
-            "entrada": "peticion opcional (ignorada)",
+            "descripcion": (
+                "Devuelve la constante fundacional BETA = 1/27."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "Fraction(1, 27)",
+            "acceso_archivos": ["*"],
         },
+
         "descubrir_constantes": {
             "descripcion": (
                 "Descubre todas las constantes oficiales declaradas "
                 "dentro del modulo."
             ),
-            "entrada": "ninguna",
-            "salida": "dict nombre -> meta de constante + errores_carga + total",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict nombre -> meta de constante + "
+                "errores_carga + total"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "listar_constantes": {
-            "descripcion": "Lista nombres de constantes fundacionales y auxiliares.",
-            "entrada": "ninguna",
-            "salida": "dict con fundacionales, auxiliares, total",
+            "descripcion": (
+                "Lista nombres de constantes fundacionales y auxiliares."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con fundacionales, auxiliares, total"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "buscar_constante": {
-            "descripcion": "Busca una constante oficial por nombre.",
-            "entrada": "nombre: str",
+            "descripcion": (
+                "Busca una constante oficial por nombre."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict de la constante o None",
+            "acceso_archivos": ["*"],
         },
+
         "verificar_constantes": {
             "descripcion": (
                 "Audita el dominio de constantes: invariante fundacional, "
                 "duplicados, tipos, campos obligatorios, conflictos y carga."
             ),
-            "entrada": "ninguna",
-            "salida": "dict con coherente, problemas, advertencias, total_constantes",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, problemas, advertencias, "
+                "total_constantes"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
-            "descripcion": "Inventario completo de constantes del modulo.",
-            "entrada": "peticion opcional",
+            "descripcion": (
+                "Inventario completo de constantes del modulo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": (
                 "dict con total, fundacionales, auxiliares, "
                 "constantes descubiertas"
             ),
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
-            "descripcion": "Reporte interno de estado del modulo CT.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, ALPHA, BETA, total_constantes, capacidades",
+            "descripcion": (
+                "Reporte interno de estado del modulo CT."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, ALPHA, BETA, "
+                "total_constantes, capacidades"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
-            "descripcion": "Diagnostico de coherencia del dominio de constantes.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "descripcion": (
+                "Diagnostico de coherencia del dominio de constantes."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, "
+                "recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "verificar": {
-            "descripcion": "Verifica la invariante fundacional ALPHA + BETA == 1.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, ALPHA, BETA, suma",
+            "descripcion": (
+                "Verifica la invariante fundacional ALPHA + BETA == 1."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, ALPHA, BETA, suma"
+            ),
+            "acceso_archivos": ["*"],
         },
     },
 
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================

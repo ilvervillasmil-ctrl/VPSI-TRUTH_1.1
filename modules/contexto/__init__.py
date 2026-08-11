@@ -1304,6 +1304,7 @@ _CAP_MAP = {
     "diagnostico": diagnostico,
     "axiomas": axiomas,
     "verificar_salida": verificar_salida,
+    "recibir_comentarios": recibir_comentarios,
 }
 
 

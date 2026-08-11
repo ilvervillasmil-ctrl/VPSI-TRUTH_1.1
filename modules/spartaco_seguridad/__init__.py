@@ -210,6 +210,10 @@ def _conceptos_descubiertos(ok: Dict[str, Dict[str, Any]]) -> List[str]:
 # CONTRATO OFICIAL DEL MÓDULO
 # ===============================================================
 
+# ===============================================================
+# CONTRATO OFICIAL DEL MÓDULO
+# ===============================================================
+
 CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # ESQUEMA
@@ -231,8 +235,6 @@ CONTENEDOR: Dict[str, Any] = {
         "Adaptador Spartaco (SC). Mantiene sincronizado el catálogo "
         "con el estado real del árbol de directorios."
     ),
-    # ... TODAS las demás claves ...
-}  # ← EL CIERRE VA AL FINAL
 
     # ============================================================
     # PROPÓSITO
@@ -274,7 +276,8 @@ CONTENEDOR: Dict[str, Any] = {
     "acceso": {
         "nivel": "completo",
         "descripcion": "Acceso total a recursos del módulo"
-    }
+    },
+
     # ============================================================
     # DEPENDENCIAS
     # ============================================================
@@ -289,6 +292,8 @@ CONTENEDOR: Dict[str, Any] = {
     # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
     # ============================================================
     "validar_esquema": ["*"],
+
+    # 
 
     # ============================================================
     # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)

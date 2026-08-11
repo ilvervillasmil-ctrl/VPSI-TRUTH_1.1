@@ -7,28 +7,31 @@
 ══════════════════════════════════════════════════════════════════════
   ▶️  INFORMACIÓN DEL RUN
 ══════════════════════════════════════════════════════════════════════
-  version_engine: 18.3
+  version_engine: 19
   estado_engine: OPERATIVO
   esquema_contrato: VPSI-CONTRACT-1.0
-  total_modulos: 16
-  timestamp: 2026-08-08T10:49:47.331219+00:00
+  total_modulos: 18
+  trazas_n: 50
+  rutas_n: 0
+  timestamp: 2026-08-11T20:00:30.884082+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
 ══════════════════════════════════════════════════════════════════════
-  version_engine: 18.3
+  version_engine: 19
   esquema_contrato: VPSI-CONTRACT-1.0
   version_contrato_requerida: 1.0
   api_engine: 1.0
   estado_engine: OPERATIVO
   invocador_id: omega_report
-  total_modulos: 16
+  total_modulos: 18
   errores_arranque:
     []
   advertencias:
     []
-  trazas_n: 46
-  timestamp: 2026-08-08T10:49:47.331149+00:00
+  trazas_n: 50
+  rutas_n: 0
+  timestamp: 2026-08-11T20:00:30.883950+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -79,7 +82,7 @@
     • ids_dominio_k_o
     • recolectar
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -88,9 +91,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -109,55 +137,107 @@
     verificar:
       descripcion: Alias de barrer. Verifica coherencia interna del módulo.
       entrada: declaraciones_externas opcional (dict)
+      validar_esquema:
+        • *
       salida: dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Analiza coherencia de todas las declaraciones (contradicción directa y de cota).
       entrada: declaraciones_externas opcional (dict)
+      validar_esquema:
+        • *
       salida: dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo, ids_dominio_k_o
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba si una salida de barrer/verificar es coherente.
       entrada: salida: dict
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario completo del módulo (declaraciones, cuerpos, capacidades).
       entrada: peticion opcional
+      validar_esquema:
+        • *
       salida: dict con id, nombre, rol, version, declaraciones, cuerpos, capacidades
+      acceso_archivos:
+        • *
     axiomas:
       descripcion: Devuelve las declaraciones si el módulo es coherente; lista vacía si no.
       entrada: declaraciones_externas opcional (dict)
+      validar_esquema:
+        • *
       salida: list[dict] de declaraciones normalizadas
+      acceso_archivos:
+        • *
     declaraciones:
       descripcion: Igual que axiomas: declaraciones normalizadas si coherente.
       entrada: declaraciones_externas opcional (dict)
+      validar_esquema:
+        • *
       salida: list[dict] de declaraciones normalizadas
+      acceso_archivos:
+        • *
     generatividad:
       descripcion: Mide generatividad operativa y canónica (TR1).
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con theta_n, pares, im_vs_theta, capa canonica, dominios, u1_proxy
+      acceso_archivos:
+        • *
     por_dominio:
       descripcion: Filtra declaraciones por dominio en gobierna.
       entrada: dominio: str; declaraciones_externas opcional
+      validar_esquema:
+        • *
       salida: list[dict] de declaraciones del dominio
+      acceso_archivos:
+        • *
     ids_dominio_k_o:
       descripcion: Ids de declaraciones ligadas a dominios K/O o Def-5.3.1.
       entrada: declaraciones_externas opcional (dict)
+      validar_esquema:
+        • *
       salida: list[str] de ids ordenados
+      acceso_archivos:
+        • *
     recolectar:
       descripcion: Carga y normaliza todas las declaraciones de los cuerpos del módulo.
       entrada: declaraciones_externas opcional (dict)
+      validar_esquema:
+        • *
       salida: tuple[list[dict], list[dict]] → (declaraciones, errores)
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado del módulo.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, declaraciones, choques, errores, capacidades
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico: qué me sucede, qué falta, qué está mal, qué necesito.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     buscar_por_id:
       descripcion: Busca y cita una declaración por su id.
       entrada: id_decl: str
+      validar_esquema:
+        • *
       salida: dict de la declaración o None
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -220,7 +300,7 @@
       • diagnostico
       • buscar_por_id
     requiere:
-      []
+      • *
     autoridad:
       • Exponer cualquier axioma, lema, teorema, corolario o definición
       • Responder consultas por id, dominio, sujeto, relación, objeto
@@ -317,7 +397,7 @@
       • diagnostico
       • buscar_por_id
     requiere:
-      []
+      • *
     autoridad:
       • Exponer cualquier axioma, lema, teorema, corolario o definición
       • Responder consultas por id, dominio, sujeto, relación, objeto
@@ -687,7 +767,7 @@
     • obtener_diagnostico
     • verificar_integridad_registro
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -696,9 +776,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -725,87 +830,171 @@
     verificar:
       descripcion: Alias de barrer. Integridad formal del registro.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con coherente, inmutable, errores, resumen
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Verifica forma del registro: seq creciente, timestamps, payload dict. No interpreta contenido.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con coherente, inmutable, errores, resumen
+      acceso_archivos:
+        • *
     depositar:
       descripcion: Registra un evento neutro. Única vía de escritura. Append-only. Categorías se descubren al depositar.
       entrada: tipo, payload, ciclo_id?, run_id?, origen?, destino?, modulo?, capacidad?, categoria?, estado?
+      validar_esquema:
+        • *
       salida: dict del evento registrado
+      acceso_archivos:
+        • *
     leer:
       descripcion: Lectura genérica con filtros opcionales por campo.
       entrada: filtros opcionales por campo del registro
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_eventos:
       descripcion: Alias de leer sin filtros (todos los eventos).
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_ciclo:
       descripcion: Eventos de un ciclo_id.
       entrada: ciclo_id: str
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_modulo:
       descripcion: Eventos de un módulo.
       entrada: modulo: str, ciclo_id?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_tipo:
       descripcion: Eventos de un tipo.
       entrada: tipo: str, ciclo_id?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_categoria:
       descripcion: Eventos de una categoría (dinámica).
       entrada: categoria: str, ciclo_id?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_capacidad:
       descripcion: Eventos de una capacidad.
       entrada: capacidad: str, ciclo_id?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_origen:
       descripcion: Eventos con un origen dado.
       entrada: origen: str, ciclo_id?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_destino:
       descripcion: Eventos con un destino dado.
       entrada: destino: str, ciclo_id?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_estado:
       descripcion: Eventos con un estado dado.
       entrada: estado: str, ciclo_id?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_seq:
       descripcion: Eventos en un rango de seq.
       entrada: desde_seq?, hasta_seq?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     leer_por_timestamp:
       descripcion: Eventos en un rango de timestamp.
       entrada: desde_timestamp?, hasta_timestamp?
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     categorias:
       descripcion: Categorías descubiertas dinámicamente hasta ahora.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: list[str]
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario del módulo y resumen del registro.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con id, version, memoria, categorias, capacidades
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado del módulo CH.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, memoria, capacidades
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico de integridad formal del registro.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba forma de una salida de barrer o depósito.
       entrada: salida: dict
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     backend_para_centinela:
       descripcion: Adaptador estable CacheBackend para Centinela. Centinela no conoce la implementación interna.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: CacheBackend
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -874,7 +1063,7 @@
       • verificar_salida
       • backend_para_centinela
     requiere:
-      []
+      • *
     autoridad:
       • Registrar eventos depositados por Engine o Centinela
       • Entregar lecturas filtradas por campos del registro
@@ -981,7 +1170,7 @@
       • verificar_salida
       • backend_para_centinela
     requiere:
-      []
+      • *
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
@@ -1055,8 +1244,9 @@
     • obtener_diagnostico
     • leer_ids_escala
     • historial
+    • verificar_calculo_de_C_L_K
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -1065,9 +1255,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • calcular
     • calcular_C
@@ -1085,71 +1300,144 @@
     • leer_ids_escala
     • verificar_salida
     • historial
+    • verificar_calculo_de_C_L_K
   capacidades_meta:
     calcular:
       descripcion: Pipeline completo. C/L/K son objetos unicos con fraccion+decimal (ej display: 7/9 = 0.778).
       entrada: peticion: dict
+      validar_esquema:
+        • *
       salida: dict con id_calculo, C, L, K, evidencia, versiones_utilizadas, centinela, errores
+      acceso_archivos:
+        • *
     calcular_C:
       descripcion: Factor C como objeto fraccion+decimal.
       entrada: peticion: dict
+      validar_esquema:
+        • *
       salida: dict con C, ruta, notas, evidencia
+      acceso_archivos:
+        • *
     calcular_L:
       descripcion: Factor L como objeto (o UNDEFINED).
       entrada: peticion: dict
+      validar_esquema:
+        • *
       salida: dict con L, p, r, ruta, notas, evidencia
+      acceso_archivos:
+        • *
     calcular_K:
       descripcion: Factor K como objeto (o None sin O).
       entrada: peticion: dict
+      validar_esquema:
+        • *
       salida: dict con K, ruta, notas, evidencia
+      acceso_archivos:
+        • *
     calcular_factor:
       descripcion: Factor por nombre C|L|K.
       entrada: factor: str, peticion: dict
+      validar_esquema:
+        • *
       salida: dict del factor
+      acceso_archivos:
+        • *
     representar:
       descripcion: Fraction -> objeto con fraccion, numerador, denominador, decimal, display (7/9 = 0.778). Sin float.
       entrada: valor: Fraction|UNDEFINED|None, precision: int=3
+      validar_esquema:
+        • *
       salida: dict valor completo
+      acceso_archivos:
+        • *
     validar_evidencia:
       descripcion: Valida lista de evidencia sin calcular: estructura, rechazados, conflicto de versiones del mismo modulo.
       entrada: evidencia: list[dict]
+      validar_esquema:
+        • *
       salida: dict con ok, problemas, advertencias, evidencia_normalizada
+      acceso_archivos:
+        • *
     explicar_calculo:
       descripcion: Explica un calculo por id usando evidencia real almacenada.
       entrada: id_calculo: str
+      validar_esquema:
+        • *
       salida: dict explicativo dinamico o None
+      acceso_archivos:
+        • *
     verificar:
       descripcion: Centinela de integridad (APIs, hashes, choques).
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con coherente, errores, choques, hashes
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Alias de verificar.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con coherente, errores, choques, hashes
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario del dominio de calculo.
       entrada: peticion opcional
+      validar_esquema:
+        • *
       salida: dict con capacidades, factores, archivos, hashes
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte de estado de CA.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, factores_api
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnostico de problemas y recomendaciones.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     leer_ids_escala:
       descripcion: Ids de escala reconocidos.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con ids, n, origenes
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Forma minima: C, L, K, id_calculo; cada factor con display.
       entrada: salida: dict
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     historial:
       descripcion: Buffer liviano de ultimos calculos.
       entrada: limite opcional: int
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
+    verificar_calculo_de_C_L_K:
+      descripcion: Verifica la integridad y coherencia del calculo de C, L y K.
+      entrada: calculo: dict
+      validar_esquema:
+        • *
+      salida: dict con valido, errores, advertencias, C, L, K y verificacion
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -1188,34 +1476,34 @@
     hashes:
       __init__.py:
         archivo: __init__.py
-        sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
-        tamano: 51021
-        timestamp_mtime: 2026-08-08T10:49:36.063046+00:00
+        sha256: d5de89ffc4bd45a00e51e98b700a03a49efdc65cc940b2c8ed9ecf2328d3ced8
+        tamano: 64546
+        timestamp_mtime: 2026-08-11T20:00:22.728235+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1236,6 +1524,7 @@
       • leer_ids_escala
       • verificar_salida
       • historial
+      • verificar_calculo_de_C_L_K
     regla_salida: un objeto por factor: fraccion = decimal (7/9 = 0.778)
     autoridad:
       • Unica autoridad para calcular C, L, K
@@ -1290,34 +1579,34 @@
     hashes:
       __init__.py:
         archivo: __init__.py
-        sha256: a310236c3ceacc83a43c6f96924394eaa8651b1aa5c2f978e951b7fe2de341fe
-        tamano: 51021
-        timestamp_mtime: 2026-08-08T10:49:36.063046+00:00
+        sha256: d5de89ffc4bd45a00e51e98b700a03a49efdc65cc940b2c8ed9ecf2328d3ced8
+        tamano: 64546
+        timestamp_mtime: 2026-08-11T20:00:22.728235+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-08T10:49:36.063537+00:00
+        timestamp_mtime: 2026-08-11T20:00:22.728984+00:00
     factores_api:
       • C
       • K
@@ -1354,8 +1643,9 @@
       • leer_ids_escala
       • verificar_salida
       • historial
+      • verificar_calculo_de_C_L_K
     requiere:
-      []
+      • *
     invariantes:
       • CA es la unica autoridad del dominio de calculo estructural
       • todo calculo interno utiliza Fraction como valor oficial
@@ -1414,7 +1704,7 @@
     • obtener_inventario
     • verificar_coherencia
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -1423,9 +1713,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -1438,36 +1753,68 @@
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. ¿El inventario operativo de skills de CE es coherente?
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, nombre, rol, version, coherente, ids, errores
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Centinela de CE: valida forma de skills nativos. No decide, no ejecuta, no restringe uso.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, nombre, rol, version, coherente, ids, n, archivos
+      acceso_archivos:
+        • acceso_archivos
     inventario:
       descripcion: Inventario operativo de skills nativos del Engine expuestos por la capacidad CE. Incluye encabezado contractual completo (id, nombre, rol, version, …).
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, nombre, rol, version, version_contrato, esquema, estabilidad, ids, n, archivos, skills, coherente
+      acceso_archivos:
+        • *
     skills:
       descripcion: Lista de skills válidos (nombre histórico de la API). Futuro: podrá coexistir con procedimientos()/competencias() como alias. Preparación: resolver(id)/existe(id).
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[dict] con id, nombre, version, descripcion, archivo
+      acceso_archivos:
+        • *
     ids:
       descripcion: Ids de todos los skills válidos de CE.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[str]
+      acceso_archivos:
+        • *
     por_id:
       descripcion: Resuelve un skill por id.
-      entrada: skill_id: str
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict del skill o None
+      acceso_archivos:
+        • *
     listar_archivos:
       descripcion: Nombres de *.py del directorio CE (implementación física de los skills).
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[str]
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba forma mínima de una salida de CE.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -1573,18 +1920,7 @@
     • obtener_diagnostico
     • verificar_coherencia
   requiere:
-    • CT
-    • AX
-    • FO
-    • MC
-    • CA
-    • CX
-    • RE
-    • VX
-    • TX
-    • CH
-    • MC
-    • SF
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -1593,9 +1929,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -1610,44 +1971,84 @@
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia del glosario.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, categorias, ids, errores
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Evalúa coherencia del glosario de IDs. No calcula.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, categorias, ids, errores, esquema
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario completo del módulo y de los IDs.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, version, categorias, ids, total, errores
+      acceso_archivos:
+        • *
     categorias:
       descripcion: Lista del catálogo si coherente; si no, lista vacía.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[dict] de categorías normalizadas
+      acceso_archivos:
+        • *
     por_id:
       descripcion: Devuelve la categoría normalizada de un id, o None.
-      entrada: cat_id: str
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict | None
+      acceso_archivos:
+        • *
     ids:
       descripcion: Lista de todos los ids del catálogo coherente.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[str]
+      acceso_archivos:
+        • *
     esquema:
       descripcion: Esquema de forma de una categoría (obligatorios, opcionales, prohibidos).
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict ESQUEMA_CATEGORIA
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado del módulo CC.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, categorias, ids, errores
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico: qué falta o está mal en el glosario.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba forma de una salida de barrer: coherente bool, errores list, ids list, categorias int.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -2233,18 +2634,7 @@
       • diagnostico
       • verificar_salida
     requiere:
-      • CT
-      • AX
-      • FO
-      • MC
-      • CA
-      • CX
-      • RE
-      • VX
-      • TX
-      • CH
-      • MC
-      • SF
+      • *
     autoridad:
       • Declarar los IDs disponibles en el catálogo
       • Resolver consulta por_id / ids / esquema
@@ -7868,18 +8258,7 @@
       • diagnostico
       • verificar_salida
     requiere:
-      • CT
-      • AX
-      • FO
-      • MC
-      • CA
-      • CX
-      • RE
-      • VX
-      • TX
-      • CH
-      • MC
-      • SF
+      • *
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
@@ -7942,7 +8321,7 @@
     • obtener_reporte
     • obtener_diagnostico
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -7951,9 +8330,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -7976,76 +8380,148 @@
   capacidades_meta:
     verificar:
       descripcion: Centinela del oficio de fundamentación.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, coherente, errores, choques
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Alias de verificar.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, coherente, errores, choques
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario contractual de CIT.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, nombre, rol, version, capacidades, tipos_declaracion
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte de estado de CIT.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, estado, coherente, registro_n
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico propio de CIT.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, estado, problemas, advertencias
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Forma mínima de salida de CIT.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     anunciar:
       descripcion: Modo Engine (paquete) o Consulta (declaración). Fundamentación documental sin recálculo.
-      entrada: paquete de ciclo | declaración | None
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con anuncios / cadena documental
+      acceso_archivos:
+        • *
     anunciar_todo:
       descripcion: Anuncia todas las declaraciones del registro operativo.
-      entrada: filtro opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con anuncios, n
+      acceso_archivos:
+        • *
     citar:
       descripcion: Representación citable de declaraciones.
-      entrada: peticion opcional (filtros)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con citas, n
+      acceso_archivos:
+        • *
     registrar:
       descripcion: Incorpora declaración al registro operativo. No altera origen.
-      entrada: declaracion: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con ok, declaracion
+      acceso_archivos:
+        • *
     resolver:
       descripcion: Resuelve una declaración por id.
-      entrada: id_decl: str
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con resuelto, declaracion
+      acceso_archivos:
+        • *
     resolver_enunciado:
       descripcion: Alias de resolución orientado a enunciado.
-      entrada: id_norma: str
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con resuelto, enunciado
+      acceso_archivos:
+        • *
     buscar:
       descripcion: Consulta declaraciones del registro operativo.
-      entrada: peticion con filtros opcionales
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con declaraciones, n
+      acceso_archivos:
+        • *
     cadena:
       descripcion: Construye cadena normativa a partir de ids resolubles.
-      entrada: ids: list[str]
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con cadena, faltantes, completa
+      acceso_archivos:
+        • *
     explicar:
       descripcion: Explicación documental solo con declaraciones existentes.
-      entrada: peticion opcional (ids/filtros)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con explicacion, n, completa
+      acceso_archivos:
+        • *
     relacionar:
       descripcion: Documenta relación entre dos declaraciones resolubles.
-      entrada: id_a, relacion, id_b
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con ok, declaracion de enlace
+      acceso_archivos:
+        • *
     limpiar_ciclo:
       descripcion: Limpia registro operativo del ciclo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con ok, limpiadas
+      acceso_archivos:
+        • *
     evaluar:
       descripcion: Alias de anunciar (compatibilidad Engine).
-      entrada: paquete | declaración | None
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict de anuncio / fundamentación
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -8232,18 +8708,18 @@
     • reporte
     • diagnostico
   consultas_soportadas:
-    • obtener_alpha
-    • obtener_beta
+    • alpha
+    • beta
     • descubrir_constantes
     • listar_constantes
     • buscar_constante
     • verificar_constantes
-    • obtener_inventario
-    • obtener_reporte
-    • obtener_diagnostico
-    • verificar_coherencia
+    • inventario
+    • reporte
+    • diagnostico
+    • verificar
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -8252,9 +8728,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • alpha
     • beta
@@ -8269,44 +8770,84 @@
   capacidades_meta:
     alpha:
       descripcion: Devuelve la constante fundacional ALPHA = 26/27.
-      entrada: peticion opcional (ignorada)
+      entrada: *
+      validar_esquema:
+        • *
       salida: Fraction(26, 27)
+      acceso_archivos:
+        • *
     beta:
       descripcion: Devuelve la constante fundacional BETA = 1/27.
-      entrada: peticion opcional (ignorada)
+      entrada: *
+      validar_esquema:
+        • *
       salida: Fraction(1, 27)
+      acceso_archivos:
+        • *
     descubrir_constantes:
       descripcion: Descubre todas las constantes oficiales declaradas dentro del modulo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict nombre -> meta de constante + errores_carga + total
+      acceso_archivos:
+        • *
     listar_constantes:
       descripcion: Lista nombres de constantes fundacionales y auxiliares.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con fundacionales, auxiliares, total
+      acceso_archivos:
+        • *
     buscar_constante:
       descripcion: Busca una constante oficial por nombre.
-      entrada: nombre: str
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict de la constante o None
+      acceso_archivos:
+        • *
     verificar_constantes:
       descripcion: Audita el dominio de constantes: invariante fundacional, duplicados, tipos, campos obligatorios, conflictos y carga.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, problemas, advertencias, total_constantes
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario completo de constantes del modulo.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con total, fundacionales, auxiliares, constantes descubiertas
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado del modulo CT.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, ALPHA, BETA, total_constantes, capacidades
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnostico de coherencia del dominio de constantes.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     verificar:
       descripcion: Verifica la invariante fundacional ALPHA + BETA == 1.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, ALPHA, BETA, suma
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -8349,7 +8890,7 @@
       • diagnostico
       • verificar
     requiere:
-      []
+      • *
     autoridad:
       • Unica autoridad del dominio de constantes
       • Exponer ALPHA = 26/27 y BETA = 1/27
@@ -8367,16 +8908,16 @@
       • reporte
       • diagnostico
     consultas_soportadas:
-      • obtener_alpha
-      • obtener_beta
+      • alpha
+      • beta
       • descubrir_constantes
       • listar_constantes
       • buscar_constante
       • verificar_constantes
-      • obtener_inventario
-      • obtener_reporte
-      • obtener_diagnostico
-      • verificar_coherencia
+      • inventario
+      • reporte
+      • diagnostico
+      • verificar
   diagnostico:
     id: CT
     modulo: constante
@@ -8425,7 +8966,7 @@
       • diagnostico
       • verificar
     requiere:
-      []
+      • *
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
@@ -8481,7 +9022,7 @@
     • verificar
     • axiomas
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -8490,9 +9031,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • resolver
     • evaluar
@@ -8507,44 +9073,84 @@
   capacidades_meta:
     resolver:
       descripcion: Garantiza el marco O clasificado a partir de la petición.
-      entrada: peticion: dict | None
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con O_context, registro, permite_k, coherente, errores
+      acceso_archivos:
+        • *
     evaluar:
       descripcion: Alias de resolver.
-      entrada: peticion: dict | None
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con O_context, registro, permite_k, coherente
+      acceso_archivos:
+        • *
     centinela:
       descripcion: Garantiza la coherencia estructural del dominio.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, total, choques, detalle, errores
+      acceso_archivos:
+        • *
     verificar:
       descripcion: Alias de barrer.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, errores, reglas_internas
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Garantiza la coherencia de los clasificadores internos.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, errores, reglas_internas
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Garantiza la enumeración de lo que existe en el módulo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, version, reglas_internas, modos, estados, capacidades
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Garantiza el estado actual del módulo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, version, reglas_n
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Garantiza problemas, advertencias y recomendaciones.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     axiomas:
       descripcion: Garantiza las declaraciones operativas del dominio.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[dict]
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Garantiza la validez estructural de una salida del módulo.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -8570,7 +9176,7 @@
     estabilidad: ESTABLE
     estado: OPERATIVO
     coherente: True
-    reglas_n: 1
+    reglas_n: 8
     capacidades:
       • resolver
       • evaluar
@@ -8583,7 +9189,7 @@
       • axiomas
       • verificar_salida
     requiere:
-      []
+      • *
     autoridad:
       • Declarar el registro O y permite_k
       • Clasificar el contexto evaluable
@@ -8619,7 +9225,7 @@
       []
     coherente: True
     errores_n: 0
-    reglas_n: 1
+    reglas_n: 8
   inventario:
     id: CX
     nombre: contexto
@@ -8642,7 +9248,14 @@
       • verificar_salida
     reglas_internas:
       • auto_auditoria
-    total_reglas: 1
+      • declaracion_O
+      • entendimiento_fractal
+      • entrada_natural
+      • marco_desde_repositorio
+      • nucleo_sm_CX
+      • peticion_anuncio
+      • secuencia_conversacion
+    total_reglas: 8
     modos_entrada:
       • conversacion
       • afirmacion
@@ -8667,7 +9280,7 @@
       • dame_limites
       • dame_cadena_completa
     requiere:
-      []
+      • *
     autoridad:
       • Declarar el registro O y permite_k
       • Clasificar el contexto evaluable
@@ -8744,7 +9357,7 @@
     • listar_mecanicas
     • listar_declaraciones
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -8753,9 +9366,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -8770,39 +9408,75 @@
     verificar:
       descripcion: Alias de barrer. Verifica coherencia mecánica.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con coherente, choques, errores, mecanica, archivos
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Lee todas las MECANICA de la carpeta, calcula orden, detecta contradicciones o ciclos y notifica a DiagnosticoGlobal.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, choques, errores, mecanica, archivos
+      acceso_archivos:
+        • *
     evaluar:
       descripcion: Alias de barrer. Evalúa coherencia del núcleo MC.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, choques, errores, mecanica
+      acceso_archivos:
+        • *
     axiomas:
       descripcion: Declaraciones internas de correlación (CORR_SEQ_01, CORR_SEQ_02).
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: list[dict] de declaraciones
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario objetivo de mecánicas declaradas en la carpeta.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con total_mecanicas, archivos, declaran
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba si una salida de barrer es coherente.
       entrada: salida: dict
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado del módulo MC.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, choques, errores, capacidades
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico: qué falta, qué está mal en MC.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     listar_mecanicas:
       descripcion: Lista todas las MECANICA descubiertas en la carpeta.
       entrada: ninguna
+      validar_esquema:
+        • *
       salida: dict archivo → meta MECANICA
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -8997,7 +9671,7 @@
       • diagnostico
       • listar_mecanicas
     requiere:
-      []
+      • *
     autoridad:
       • Exponer todos los órdenes mecánicos declarados en la carpeta
       • Detectar choques de orden y ciclos
@@ -9101,13 +9775,395 @@
       • diagnostico
       • listar_mecanicas
     requiere:
-      []
+      • *
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
       • las capacidades declaradas son siempre callables tras la resolución
       • este módulo no modifica el estado de otros módulos
       • este módulo no inventa mecánicas no declaradas en archivos
+      • este módulo siempre puede reportar su propio estado
+
+══════════════════════════════════════════════════════════════════════
+  MÓDULO DI/diccionario
+══════════════════════════════════════════════════════════════════════
+  id: DI
+  nombre: diccionario
+  rol: DI
+  version: 1.0
+  version_contrato: 1.0
+  esquema: VPSI-CONTRACT-1.0
+  estabilidad: ESTABLE
+  compatible_desde: 1.0
+  api_engine: >=1.0
+  descripcion: Biblioteca de definiciones. Rol DI. Materia prima léxica: palabra → definición → significado. Herramienta para contrastar y correlacionar a nivel de significado. Auto-carga todos los archivos debajo del módulo. Engine puede solicitar y distribuir definiciones según contexto. No calcula Tru. No clasifica O. No trae dominios externos.
+  funcion: Biblioteca de definiciones para contrastar y correlacionar a nivel léxico-significado. Materia prima: palabra → definición → significado. Auto-carga todo lo que está debajo del módulo.
+  no_hace:
+    • No calcula C, L, K, Tru_Ri ni Tru_total
+    • No clasifica O_context (eso es CX)
+    • No trae material externo de dominios (eso es RE)
+    • No orquesta el ciclo (eso es Engine)
+    • No sustituye AX, MC, CA, FO, CIT
+  autoridad:
+    • Exponer definiciones y significados
+    • Auto-cargar todos los archivos que declaren DICCIONARIO
+    • Entregar materia prima léxica a Engine y otros módulos
+    • Reportar estado, inventario y diagnóstico propios
+  conocimiento_exportable:
+    • inventario
+    • reporte
+    • diagnostico
+    • listar
+    • cargar
+    • cargar_todos
+    • definir
+    • significado
+    • palabras
+    • inyectar_en_peticion
+    • verificar
+    • barrer
+    • resolver
+    • axiomas
+  consultas_soportadas:
+    • listar
+    • cargar
+    • cargar_todos
+    • definir
+    • significado
+    • palabras
+    • inyectar_en_peticion
+    • inventario
+    • reporte
+    • diagnostico
+    • verificar
+    • barrer
+    • resolver
+    • axiomas
+  requiere:
+    • *
+  autoriza_engine:
+    leer: True
+    ejecutar: True
+    consultar: True
+    recombinar: True
+    reportar: True
+    auditar: True
+    inventariar: True
+    alterar: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
+  capacidades:
+    • verificar
+    • barrer
+    • inventario
+    • reporte
+    • diagnostico
+    • axiomas
+    • resolver
+    • listar
+    • cargar
+    • cargar_todos
+    • definir
+    • significado
+    • palabras
+    • inyectar_en_peticion
+    • verificar_salida
+  capacidades_meta:
+    verificar:
+      descripcion: Alias de barrer. Verifica coherencia del diccionario.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con coherente, errores, diccionarios, total
+      acceso_archivos:
+        • *
+    barrer:
+      descripcion: Centinela de DI: valida forma de las fuentes, reporta errores de carga. No calcula Tru.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con coherente, errores, diccionarios, total, por_idioma
+      acceso_archivos:
+        • *
+    inventario:
+      descripcion: Inventario de diccionarios descubiertos.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con id, version, total, diccionarios, por_idioma
+      acceso_archivos:
+        • *
+    reporte:
+      descripcion: Reporte interno de estado del módulo DI.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con id, estado, coherente, diccionarios, capacidades
+      acceso_archivos:
+        • *
+    diagnostico:
+      descripcion: Diagnóstico del módulo DI.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con id, estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
+    axiomas:
+      descripcion: Declaraciones axiomáticas del módulo DI.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: list[dict] de declaraciones
+      acceso_archivos:
+        • *
+    resolver:
+      descripcion: Entrega definiciones según palabra, idioma o fuente.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con definiciones o materia prima
+      acceso_archivos:
+        • *
+    listar:
+      descripcion: Nombres de todos los diccionarios descubiertos.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: list[str]
+      acceso_archivos:
+        • *
+    cargar:
+      descripcion: Carga un diccionario por nombre.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con el DICCIONARIO
+      acceso_archivos:
+        • *
+    cargar_todos:
+      descripcion: Carga todos los diccionarios descubiertos.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict nombre → datos
+      acceso_archivos:
+        • *
+    definir:
+      descripcion: Busca definición de una palabra en fuentes.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: dict con definicion, significado, fuente o None
+      acceso_archivos:
+        • *
+    significado:
+      descripcion: Atajo para obtener significado/definición de una palabra.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: str o None
+      acceso_archivos:
+        • *
+    palabras:
+      descripcion: Conjunto de lemas de las fuentes indicadas.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: set[str]
+      acceso_archivos:
+        • *
+    inyectar_en_peticion:
+      descripcion: Entrega lemas a una petición para el ciclo.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: peticion con lemas inyectados
+      acceso_archivos:
+        • *
+    verificar_salida:
+      descripcion: Comprueba forma mínima de una salida de DI.
+      entrada: *
+      validar_esquema:
+        • *
+      salida: bool
+      acceso_archivos:
+        • *
+  estados_validos:
+    • NO_INICIADO
+    • OPERATIVO
+    • DEGRADADO
+    • RECHAZADO
+  invariantes:
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • DI es una herramienta de definiciones, no calcula Tru
+    • DI no clasifica O_context (eso es CX)
+    • DI auto-carga todo lo que está debajo del módulo
+    • las capacidades declaradas son siempre callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
+    • este módulo siempre puede reportar su propio estado
+  reporte:
+    id: DI
+    modulo: diccionario
+    rol: DI
+    version: 1.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    estado: OPERATIVO
+    coherente: True
+    diccionarios: 2
+    errores: 0
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • reporte
+      • diagnostico
+      • axiomas
+      • resolver
+      • listar
+      • cargar
+      • cargar_todos
+      • definir
+      • significado
+      • palabras
+      • inyectar_en_peticion
+      • verificar_salida
+    requiere:
+      • *
+  diagnostico:
+    id: DI
+    modulo: diccionario
+    estado: OPERATIVO
+    coherente: True
+    problemas:
+      []
+    advertencias:
+      []
+    recomendaciones:
+      []
+    diccionarios: 2
+    errores_n: 0
+  inventario:
+    id: DI
+    nombre: diccionario
+    rol: DI
+    version: 1.0
+    version_contrato: 1.0
+    esquema: VPSI-CONTRACT-1.0
+    estabilidad: ESTABLE
+    total: 2
+    diccionarios:
+      [0]
+        nombre: en
+        idioma: en
+        tipo: registro_wordnet
+        size: 0
+        version: 2.0
+        archivo: en.py
+      [1]
+        nombre: es
+        idioma: es
+        tipo: registro_wordnet
+        size: 0
+        version: 2.0
+        archivo: es.py
+    por_idioma:
+      en:
+        • en
+      es:
+        • es
+    coherente: True
+    capacidades:
+      • verificar
+      • barrer
+      • inventario
+      • reporte
+      • diagnostico
+      • axiomas
+      • resolver
+      • listar
+      • cargar
+      • cargar_todos
+      • definir
+      • significado
+      • palabras
+      • inyectar_en_peticion
+      • verificar_salida
+    requiere:
+      • *
+    autoridad:
+      • Exponer definiciones y significados
+      • Auto-cargar todos los archivos que declaren DICCIONARIO
+      • Entregar materia prima léxica a Engine y otros módulos
+      • Reportar estado, inventario y diagnóstico propios
+    conocimiento_exportable:
+      • inventario
+      • reporte
+      • diagnostico
+      • listar
+      • cargar
+      • cargar_todos
+      • definir
+      • significado
+      • palabras
+      • inyectar_en_peticion
+      • verificar
+      • barrer
+      • resolver
+      • axiomas
+    consultas_soportadas:
+      • listar
+      • cargar
+      • cargar_todos
+      • definir
+      • significado
+      • palabras
+      • inyectar_en_peticion
+      • inventario
+      • reporte
+      • diagnostico
+      • verificar
+      • barrer
+      • resolver
+      • axiomas
+    invariantes:
+      • el id del módulo nunca cambia
+      • el rol nunca cambia
+      • DI es una herramienta de definiciones, no calcula Tru
+      • DI no clasifica O_context (eso es CX)
+      • DI auto-carga todo lo que está debajo del módulo
+      • las capacidades declaradas son siempre callables tras la resolución
+      • este módulo no modifica el estado de otros módulos
+      • este módulo no inventa capacidades no declaradas en CONTENEDOR
       • este módulo siempre puede reportar su propio estado
 
 ══════════════════════════════════════════════════════════════════════
@@ -9153,21 +10209,7 @@
     • listar_formulas
     • listar_declaraciones
   requiere:
-    • CT
-    • AX
-    • MC
-    • SF
-    • CA
-    • CX
-    • RE
-    • VX
-    • TX
-    • CH
-    • CIT
-    • CT
-    • AX
-    • MC
-    • SF
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -9176,9 +10218,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -9194,48 +10261,92 @@
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia de fórmulas.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, faltas, reglas, formulas
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Ejecuta todas las reglas y reporta faltas de coherencia.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, faltas, reglas, formulas
+      acceso_archivos:
+        • *
     evaluar:
       descripcion: Alias de barrer. Evalúa coherencia del módulo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, faltas, reglas, formulas
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba si una salida de barrer es coherente.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario de fórmulas descubiertas y registradas.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con formulas, formulas_registradas, reglas, declaraciones
+      acceso_archivos:
+        • *
     axiomas:
       descripcion: Declaraciones FO registradas (FO-1..FO-4).
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[dict] de declaraciones
+      acceso_archivos:
+        • *
     tru_ri:
       descripcion: Calcula Tru_Ri = C * L * K. Sin límites artificiales sobre los valores de C, L, K.
-      entrada: C, L, K (numéricos o Fraction)
+      entrada: *
+      validar_esquema:
+        • *
       salida: resultado de C * L * K
+      acceso_archivos:
+        • *
     tru_total:
       descripcion: Calcula Tru_total = (Tru_Ri * ALPHA) + BETA. Sin límites artificiales sobre C, L, K.
-      entrada: C, L, K (numéricos o Fraction)
+      entrada: *
+      validar_esquema:
+        • *
       salida: resultado de (C*L*K)*ALPHA + BETA
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado del módulo FO.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, formulas, faltas, capacidades
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico: qué falta, qué está mal en FO.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     listar_formulas:
       descripcion: Lista todas las fórmulas descubiertas y registradas.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con descubiertas y registradas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -9278,21 +10389,7 @@
       • diagnostico
       • listar_formulas
     requiere:
-      • CT
-      • AX
-      • MC
-      • SF
-      • CA
-      • CX
-      • RE
-      • VX
-      • TX
-      • CH
-      • CIT
-      • CT
-      • AX
-      • MC
-      • SF
+      • *
     autoridad:
       • Ejecutar cualquier fórmula registrada o descubierta en el módulo
       • Calcular tru_ri y tru_total para cualquier C, L, K válidos
@@ -9364,27 +10461,215 @@
       • diagnostico
       • listar_formulas
     requiere:
-      • CT
-      • AX
-      • MC
-      • SF
-      • CA
-      • CX
-      • RE
-      • VX
-      • TX
-      • CH
-      • CIT
-      • CT
-      • AX
-      • MC
-      • SF
+      • *
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
       • las capacidades declaradas son siempre callables tras la resolución
       • este módulo no modifica el estado de otros módulos
       • tru_ri y tru_total no imponen límites artificiales sobre C, L, K
+
+══════════════════════════════════════════════════════════════════════
+  MÓDULO UI/interfaz
+══════════════════════════════════════════════════════════════════════
+  id: UI
+  nombre: interfaz
+  rol: UI
+  version: 1.0
+  version_contrato: 1.0
+  esquema: VPSI-CONTRACT-1.0
+  estabilidad: ESTABLE
+  compatible_desde: 1.0
+  api_engine: >=1.0
+  descripcion: Diseño de presentación del sistema. Compone descripciones de interfaz bajo un pedido explícito y lo observable (CACHE). Cero actuación sobre evaluación.
+  funcion: Diseña descripciones de interfaz correlacionadas al mecanismo; vela sus paquetes; no calcula Tru.
+  no_hace:
+    • No calcula Tru_total ni Tru_Ri
+    • No escribe C/L/K
+    • No orquesta el ciclo Engine
+    • No aprueba su propia salida de diseño
+    • No inventa controles sin componente real
+  autoridad:
+    • Componer descripciones de interfaz
+    • Inventariar paquetes de diseño
+    • Observar pedido + evidencia CACHE
+    • Verificar coherencia interna de paquetes y contrato
+    • Reportar estado propio
+  conocimiento_exportable:
+    • componer
+    • observar
+    • inventario
+    • inventario_paquetes
+    • barrer
+    • verificar
+    • axiomas
+  consultas_soportadas:
+    • componer
+    • observar
+    • inventario
+    • inventario_paquetes
+    • barrer
+    • verificar
+  requiere:
+    []
+  autoriza_engine:
+    leer: True
+    ejecutar: True
+    consultar: True
+    recombinar: False
+    reportar: True
+    auditar: True
+    inventariar: True
+    alterar: False
+    metricas: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    diagnostico: True
+    reporte: True
+    crear: False
+    actualizar: False
+    validar_esquema: True
+    validar: True
+    procesar: False
+    analizar: False
+    generar: True
+    exportar: True
+    importar: False
+    respaldar: False
+    recuperar: False
+    sincronizar: False
+    monitorear: True
+    acceso_archivos: True
+  capacidades:
+    • verificar
+    • barrer
+    • componer
+    • inventario
+    • inventario_paquetes
+    • observar
+    • axiomas
+  capacidades_meta:
+    verificar:
+      descripcion: Alias de barrer. Verifica coherencia interna del módulo.
+      entrada: ninguna
+      salida: dict con id, nombre, rol, coherente, choques, errores, advertencias, paquetes
+      validar_esquema:
+        • *
+      acceso_archivos:
+        • *
+    barrer:
+      descripcion: Centinela de carpeta + verificación estructural del CONTENEDOR.
+      entrada: ninguna
+      salida: dict con id, nombre, rol, coherente, choques, errores, advertencias, paquetes_n
+      validar_esquema:
+        • *
+      acceso_archivos:
+        • *
+    componer:
+      descripcion: Genera descripción de interfaz (esquema). No inventa controles.
+      entrada: peticion: dict con O_uso, superficie, zonas, layout
+      salida: dict con id, nombre, rol, estado (PROPUESTO|PARCIAL|RETENIDO), esquema, observacion, auditable_por_centinela
+      validar_esquema:
+        • *
+      acceso_archivos:
+        • *
+    inventario:
+      descripcion: Inventario estructural del módulo UI.
+      entrada: peticion opcional
+      salida: dict con id, nombre, rol, version, superficies, zonas, paquetes, capacidades
+      validar_esquema:
+        • *
+      acceso_archivos:
+        • *
+    inventario_paquetes:
+      descripcion: Lista los paquetes descubiertos bajo paquetes/.
+      entrada: ninguna
+      salida: dict con id, nombre, rol, dir, n, paquetes
+      validar_esquema:
+        • *
+      acceso_archivos:
+        • *
+    observar:
+      descripcion: Reúne pedido + evidencia CACHE (solo lectura).
+      entrada: pedido y cache_snapshot opcionales
+      salida: dict con id, nombre, rol, pedido, evidencia_cache
+      validar_esquema:
+        • *
+      acceso_archivos:
+        • *
+    axiomas:
+      descripcion: Declaraciones operativas del módulo UI.
+      entrada: ninguna
+      salida: list[dict] de axiomas operativos
+      validar_esquema:
+        • *
+      acceso_archivos:
+        • *
+  estados_validos:
+    • NO_INICIADO
+    • OPERATIVO
+    • DEGRADADO
+    • RECHAZADO
+  invariantes:
+    • el id del módulo nunca cambia
+    • el rol nunca cambia
+    • las capacidades declaradas son siempre callables tras la resolución
+    • este módulo no modifica el estado de otros módulos
+    • este módulo no inventa capacidades no declaradas en CONTENEDOR
+    • no calcula ni modifica C, L, K ni Tru
+    • no orquesta el ciclo Engine
+    • toda salida de componer es auditable por Centinela (declaración)
+    • presentar no forma parte de v1.0
+    • los estados de operación de componer (PROPUESTO|PARCIAL|RETENIDO) son distintos de los estados del módulo
+  reporte: NO ENTREGADO POR ENGINE
+  diagnostico: NO ENTREGADO POR ENGINE
+  inventario:
+    id: UI
+    nombre: interfaz
+    rol: UI
+    version: 1.0
+    superficies:
+      • web
+      • desktop
+      • mobile
+      • cli
+      • embebido
+    zonas_canonicas:
+      • contexto
+      • estado_marco
+      • reporte_simple
+      • reporte_detalle
+      • sistema
+      • centinela
+      • correlacion
+    paquetes:
+      id: UI
+      nombre: interfaz
+      rol: UI
+      dir: /home/runner/work/VPSI-TRUTH_1.1/VPSI-TRUTH_1.1/modules/interfaz/paquetes
+      n: 0
+      paquetes:
+    capacidades:
+      • verificar
+      • barrer
+      • componer
+      • inventario
+      • inventario_paquetes
+      • observar
+      • axiomas
+    estados_operacion:
+      • PROPUESTO
+      • PARCIAL
+      • RETENIDO
+    nota: presentar no forma parte de v1.0
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO RE/realidad
@@ -9430,7 +10715,7 @@
     • diagnostico
     • registrar_resultado_dominio
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -9439,9 +10724,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -9453,32 +10763,60 @@
   capacidades_meta:
     verificar:
       descripcion: Garantiza la coherencia interna de RE (alias de barrer).
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, choques, errores, funciones
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Centinela de no-contradicción entre dominios/funciones y registro de simbiosis dominio↔Engine.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, choques, errores, funciones, dominios_simbiosis, estados_material, notas
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Enumeración de funciones, simbiosis y canal.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, version, funciones, coherente, acceso, contrato_simbiosis
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Estado actual del módulo RE.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, version, capacidades, coherente
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Problemas, advertencias y recomendaciones de RE.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     registrar_resultado_dominio:
       descripcion: Cierra el tramo de simbiosis para un material: registra aprobación o rechazo del dominio tras resultado de Engine. No recalcula Tru.
-      entrada: nombre_dominio: str, material_id: str, resultado_engine: dict, aprobacion_dominio: bool
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con ok, estado, nota
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Forma mínima de una salida de RE.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -9512,7 +10850,7 @@
       • registrar_resultado_dominio
       • verificar_salida
     requiere:
-      []
+      • *
     funciones:
       • astronomia
       • fisica
@@ -9562,7 +10900,7 @@
       • registrar_resultado_dominio
       • verificar_salida
     requiere:
-      []
+      • *
     funciones:
       astronomia:
         archivo: conocimiento_humano/astronomia.py
@@ -9671,7 +11009,7 @@
     • obtener_diagnostico
     • verificar_coherencia
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -9680,9 +11018,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -9698,48 +11061,92 @@
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia interna de SF.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, capa_activa, modo, errores
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Centinela de SF: identidad y estado interno.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, identidad_disponible, capa_activa, modo, errores
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba forma mínima de una salida de SF.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     yo_funcional:
       descripcion: Identidad de fase anclada en cuerpo axiomático self.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con capa_activa, modo, ax_self, identidad_disponible, perspectivas
+      acceso_archivos:
+        • *
     oscilar:
       descripcion: Cambia o reporta la altura operativa del Self (L1…L6).
-      entrada: hacia opcional (str); contexto opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con ok, capa_activa, altura_operativa, modo, cambio
+      acceso_archivos:
+        • *
     desde_donde:
       descripcion: Reporta altura y modo actuales del Self.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con capa_activa, altura_operativa, modo, en_casa, perspectivas
+      acceso_archivos:
+        • *
     estado_self:
       descripcion: Clasifica lucidez: REACTIVE|MECHANICAL|CONSCIOUS|META|INTEGRATED.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con modo, capa_activa, en_casa, coherente
+      acceso_archivos:
+        • *
     elegir:
       descripcion: Registra un acto de agency sin ejecutar efectos externos.
-      entrada: dict con opciones, eleccion, criterio, desde (opcionales)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con ok, eleccion, desde, modo, n_elecciones
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario estructural del módulo SF.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, capacidades, capas_validas, modos_validos, perspectivas
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte de estado del módulo SF.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, capa_activa, modo, errores
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico: problemas, advertencias, recomendaciones.
-      entrada: peticion opcional (dict)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -9896,7 +11303,7 @@
     • catalogo
     • verificar_salida
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -9905,9 +11312,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -9919,32 +11351,60 @@
   capacidades_meta:
     verificar:
       descripcion: Garantiza la coherencia del catálogo sincronizado.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, errores, choques, recursos
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Sincroniza el árbol y reporta coherencia.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, recursos, conceptos
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Garantiza la enumeración de recursos y conceptos.
-      entrada: opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, version, recursos, conceptos
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Garantiza el estado actual del módulo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, version, recursos
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Garantiza problemas y advertencias del catálogo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias
+      acceso_archivos:
+        • *
     catalogo:
       descripcion: Recursos y conceptos descubiertos en el árbol.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con n, recursos, conceptos
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Forma mínima de una salida del módulo.
-      entrada: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -9978,7 +11438,7 @@
       • catalogo
       • verificar_salida
     requiere:
-      []
+      • *
     recursos:
       • CAPACIDADES
       • PROTECCION
@@ -10024,7 +11484,7 @@
       • catalogo
       • verificar_salida
     requiere:
-      []
+      • *
     autoridad:
       • Sincronizar el catálogo con el árbol
       • Exponer recursos y conceptos descubiertos
@@ -10162,14 +11622,13 @@
   consultas_soportadas:
     • verificar
     • barrer
-    • aplicar
     • inventario
     • reporte
     • diagnostico
-    • axiomas
+    • catalogo
     • verificar_salida
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -10178,9 +11637,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -10193,36 +11677,68 @@
   capacidades_meta:
     verificar:
       descripcion: Coherencia interna de TX (alias de barrer).
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, choques, errores, tacticas
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Audita tácticas, detecta choques y filtra inválidas.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, choques, errores, tacticas, total_declaradas, total_validas, notas
+      acceso_archivos:
+        • *
     aplicar:
       descripcion: Aplica coincidencia estructural de tácticas válidas sobre una descripción. No calcula Tru.
-      entrada: descripcion: dict, contexto: dict opcional (O_context)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con aplicadas, total, tacticas_disponibles, O_context
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Enumeración de tácticas que pasaron el filtro.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, version, tacticas, total_validas
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Estado actual del módulo TX.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, version, capacidades, coherente
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Problemas, advertencias y recomendaciones de TX.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     axiomas:
       descripcion: Declaraciones axiomáticas del oficio TX.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: lista de dicts axiomáticos
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Forma mínima de una salida de TX.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -10257,7 +11773,7 @@
       • axiomas
       • verificar_salida
     requiere:
-      []
+      • *
     tacticas:
       • T1
       • T10
@@ -10315,7 +11831,7 @@
       • axiomas
       • verificar_salida
     requiere:
-      []
+      • *
     tacticas:
       T1:
         nombre: Concession-pivot
@@ -10456,7 +11972,7 @@
     • obtener_diagnostico
     • verificar_coherencia
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -10465,9 +11981,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -10481,40 +12022,76 @@
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia del catálogo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, categorias, ids, errores
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Evalúa coherencia del catálogo. No calcula Tru.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con coherente, categorias, ids, errores, version
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario completo del módulo y del catálogo.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, version, capacidades, extension
+      acceso_archivos:
+        • *
     capacidades:
       descripcion: Vista explícita del catálogo para Engine/Omega.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con categorias resumidas, total, coherente
+      acceso_archivos:
+        • *
     categorias:
       descripcion: Lista del catálogo si coherente; si no, lista vacía.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list[dict] de categorías normalizadas
+      acceso_archivos:
+        • *
     resolver_pedido:
       descripcion: Normaliza un pedido de Omega/Engine a una categoría. No calcula. No orquesta.
-      entrada: dict con escala_id|categoria|pedido|texto|...
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con ok, categoria, unidad, factores_evaluables, ...
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado del módulo TT.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, coherente, categorias, errores
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico: qué falta o está mal en el catálogo.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba si una salida de barrer o resolver es válida.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -10558,7 +12135,7 @@
       • diagnostico
       • verificar_salida
     requiere:
-      []
+      • *
     autoridad:
       • Declarar las categorías disponibles en el catálogo
       • Resolver un pedido de Omega/Engine a una categoría
@@ -10682,7 +12259,7 @@
       errores:
         []
     requiere:
-      []
+      • *
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
@@ -10746,7 +12323,7 @@
     • obtener_diagnostico
     • verificar_salida
   requiere:
-    []
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -10755,9 +12332,34 @@
     reportar: True
     auditar: True
     inventariar: True
-    modificar: False
     alterar: False
-    reescribir: False
+    crear: True
+    actualizar: False
+    validar: True
+    procesar: True
+    analizar: True
+    generar: True
+    exportar: True
+    importar: True
+    respaldar: True
+    recuperar: True
+    sincronizar: True
+    monitorear: True
+    metricas: True
+    diagnostico: True
+    estado: True
+    version: True
+    salud: True
+    inventario: True
+    capacidades: True
+    errores: True
+    advertencias: True
+    dependencias: True
+    contrato: True
+    conocimiento: True
+    reporte: True
+    validar_esquema: True
+    acceso_archivos: True
   capacidades:
     • verificar
     • barrer
@@ -10769,32 +12371,60 @@
   capacidades_meta:
     verificar:
       descripcion: Verifica una estructura contra reglas formales. Produce evidencia. No interpreta ni corrige.
-      entrada: peticion opcional: dict con codigo_fuente, declaraciones_axiomaticas, estructura (futuro)
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, coherente, errores, evidencia, detalle
+      acceso_archivos:
+        • *
     barrer:
       descripcion: Alias de verificar. Centinela de coherencia estructural.
-      entrada: peticion opcional: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, coherente, errores, evidencia, detalle
+      acceso_archivos:
+        • *
     inventario:
       descripcion: Inventario contractual del módulo VX.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, nombre, rol, version, version_contrato, esquema, estabilidad, capacidades, jurisdiccion
+      acceso_archivos:
+        • *
     reporte:
       descripcion: Reporte interno de estado de VX.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, estado, coherente, capacidades, jurisdiccion
+      acceso_archivos:
+        • *
     diagnostico:
       descripcion: Diagnóstico propio de VX. No consulta DiagnosticoGlobal.
-      entrada: peticion opcional
+      entrada: *
+      validar_esquema:
+        • *
       salida: dict con id, estado, problemas, advertencias, recomendaciones
+      acceso_archivos:
+        • *
     verificar_salida:
       descripcion: Comprueba forma mínima de una salida de VX.
-      entrada: salida: dict
+      entrada: *
+      validar_esquema:
+        • *
       salida: bool
+      acceso_archivos:
+        • *
     axiomas:
       descripcion: Alias temporal de compatibilidad. AX es la única autoridad del conocimiento. No declara corpus oficial.
-      entrada: ninguna
+      entrada: *
+      validar_esquema:
+        • *
       salida: list vacía (conocimiento oficial en AX)
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -10895,35 +12525,618 @@
   DEPENDENCIAS
 ══════════════════════════════════════════════════════════════════════
   grafo:
-    catalogo_citaciones:
-      • CT
+    axiomas:
       • AX
-      • FO
-      • MC
       • CA
-      • CX
-      • RE
-      • VX
-      • TX
-      • CH
-      • MC
-      • SF
-    formulas:
-      • CT
-      • AX
-      • MC
-      • SF
-      • CA
-      • CX
-      • RE
-      • VX
-      • TX
+      • CC
+      • CE
       • CH
       • CIT
       • CT
-      • AX
+      • CX
+      • DI
+      • FO
       • MC
+      • RE
+      • SC
       • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    cache:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    calculator:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    capacidades_engine:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    catalogo_citaciones:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    citacion:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    constante:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    contexto:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    correlacion_mecanica:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    diccionario:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    formulas:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    realidad:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    self:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
+    spartaco_seguridad:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • taxonomia
+      • tru_totales
+      • verificacion
+    taxonomia:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • tru_totales
+      • verificacion
+    tru_totales:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • verificacion
+    verificacion:
+      • AX
+      • CA
+      • CC
+      • CE
+      • CH
+      • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
+      • TT
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • catalogo_citaciones
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
   faltantes:
   orden_topologico:
     • axiomas
@@ -10935,7 +13148,9 @@
     • constante
     • contexto
     • correlacion_mecanica
+    • diccionario
     • formulas
+    • interfaz
     • realidad
     • self
     • spartaco_seguridad
@@ -11215,691 +13430,816 @@
       tipo: capacidad
       modulo: calculator
     [53]
+      id: calculator.verificar_calculo_de_C_L_K
+      nombre: verificar_calculo_de_C_L_K
+      tipo: capacidad
+      modulo: calculator
+    [54]
       id: CE
       nombre: capacidades_engine
       rol: CE
       tipo: modulo
-    [54]
+    [55]
       id: capacidades_engine.verificar
       nombre: verificar
       tipo: capacidad
       modulo: capacidades_engine
-    [55]
+    [56]
       id: capacidades_engine.barrer
       nombre: barrer
       tipo: capacidad
       modulo: capacidades_engine
-    [56]
+    [57]
       id: capacidades_engine.inventario
       nombre: inventario
       tipo: capacidad
       modulo: capacidades_engine
-    [57]
+    [58]
       id: capacidades_engine.skills
       nombre: skills
       tipo: capacidad
       modulo: capacidades_engine
-    [58]
+    [59]
       id: capacidades_engine.ids
       nombre: ids
       tipo: capacidad
       modulo: capacidades_engine
-    [59]
+    [60]
       id: capacidades_engine.por_id
       nombre: por_id
       tipo: capacidad
       modulo: capacidades_engine
-    [60]
+    [61]
       id: capacidades_engine.listar_archivos
       nombre: listar_archivos
       tipo: capacidad
       modulo: capacidades_engine
-    [61]
+    [62]
       id: capacidades_engine.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: capacidades_engine
-    [62]
+    [63]
       id: CC
       nombre: catalogo_citaciones
       rol: CC
       tipo: modulo
-    [63]
+    [64]
       id: catalogo_citaciones.verificar
       nombre: verificar
       tipo: capacidad
       modulo: catalogo_citaciones
-    [64]
+    [65]
       id: catalogo_citaciones.barrer
       nombre: barrer
       tipo: capacidad
       modulo: catalogo_citaciones
-    [65]
+    [66]
       id: catalogo_citaciones.inventario
       nombre: inventario
       tipo: capacidad
       modulo: catalogo_citaciones
-    [66]
+    [67]
       id: catalogo_citaciones.categorias
       nombre: categorias
       tipo: capacidad
       modulo: catalogo_citaciones
-    [67]
+    [68]
       id: catalogo_citaciones.por_id
       nombre: por_id
       tipo: capacidad
       modulo: catalogo_citaciones
-    [68]
+    [69]
       id: catalogo_citaciones.ids
       nombre: ids
       tipo: capacidad
       modulo: catalogo_citaciones
-    [69]
+    [70]
       id: catalogo_citaciones.esquema
       nombre: esquema
       tipo: capacidad
       modulo: catalogo_citaciones
-    [70]
+    [71]
       id: catalogo_citaciones.reporte
       nombre: reporte
       tipo: capacidad
       modulo: catalogo_citaciones
-    [71]
+    [72]
       id: catalogo_citaciones.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: catalogo_citaciones
-    [72]
+    [73]
       id: catalogo_citaciones.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: catalogo_citaciones
-    [73]
+    [74]
       id: CIT
       nombre: citacion
       rol: CIT
       tipo: modulo
-    [74]
+    [75]
       id: citacion.verificar
       nombre: verificar
       tipo: capacidad
       modulo: citacion
-    [75]
+    [76]
       id: citacion.barrer
       nombre: barrer
       tipo: capacidad
       modulo: citacion
-    [76]
+    [77]
       id: citacion.inventario
       nombre: inventario
       tipo: capacidad
       modulo: citacion
-    [77]
+    [78]
       id: citacion.reporte
       nombre: reporte
       tipo: capacidad
       modulo: citacion
-    [78]
+    [79]
       id: citacion.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: citacion
-    [79]
+    [80]
       id: citacion.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: citacion
-    [80]
+    [81]
       id: citacion.anunciar
       nombre: anunciar
       tipo: capacidad
       modulo: citacion
-    [81]
+    [82]
       id: citacion.anunciar_todo
       nombre: anunciar_todo
       tipo: capacidad
       modulo: citacion
-    [82]
+    [83]
       id: citacion.citar
       nombre: citar
       tipo: capacidad
       modulo: citacion
-    [83]
+    [84]
       id: citacion.registrar
       nombre: registrar
       tipo: capacidad
       modulo: citacion
-    [84]
+    [85]
       id: citacion.resolver
       nombre: resolver
       tipo: capacidad
       modulo: citacion
-    [85]
+    [86]
       id: citacion.resolver_enunciado
       nombre: resolver_enunciado
       tipo: capacidad
       modulo: citacion
-    [86]
+    [87]
       id: citacion.buscar
       nombre: buscar
       tipo: capacidad
       modulo: citacion
-    [87]
+    [88]
       id: citacion.cadena
       nombre: cadena
       tipo: capacidad
       modulo: citacion
-    [88]
+    [89]
       id: citacion.explicar
       nombre: explicar
       tipo: capacidad
       modulo: citacion
-    [89]
+    [90]
       id: citacion.relacionar
       nombre: relacionar
       tipo: capacidad
       modulo: citacion
-    [90]
+    [91]
       id: citacion.limpiar_ciclo
       nombre: limpiar_ciclo
       tipo: capacidad
       modulo: citacion
-    [91]
+    [92]
       id: citacion.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: citacion
-    [92]
+    [93]
       id: CT
       nombre: constante
       rol: CT
       tipo: modulo
-    [93]
+    [94]
       id: constante.alpha
       nombre: alpha
       tipo: capacidad
       modulo: constante
-    [94]
+    [95]
       id: constante.beta
       nombre: beta
       tipo: capacidad
       modulo: constante
-    [95]
+    [96]
       id: constante.descubrir_constantes
       nombre: descubrir_constantes
       tipo: capacidad
       modulo: constante
-    [96]
+    [97]
       id: constante.listar_constantes
       nombre: listar_constantes
       tipo: capacidad
       modulo: constante
-    [97]
+    [98]
       id: constante.buscar_constante
       nombre: buscar_constante
       tipo: capacidad
       modulo: constante
-    [98]
+    [99]
       id: constante.verificar_constantes
       nombre: verificar_constantes
       tipo: capacidad
       modulo: constante
-    [99]
+    [100]
       id: constante.inventario
       nombre: inventario
       tipo: capacidad
       modulo: constante
-    [100]
+    [101]
       id: constante.reporte
       nombre: reporte
       tipo: capacidad
       modulo: constante
-    [101]
+    [102]
       id: constante.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: constante
-    [102]
+    [103]
       id: constante.verificar
       nombre: verificar
       tipo: capacidad
       modulo: constante
-    [103]
+    [104]
       id: CX
       nombre: contexto
       rol: CX
       tipo: modulo
-    [104]
+    [105]
       id: contexto.resolver
       nombre: resolver
       tipo: capacidad
       modulo: contexto
-    [105]
+    [106]
       id: contexto.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: contexto
-    [106]
+    [107]
       id: contexto.centinela
       nombre: centinela
       tipo: capacidad
       modulo: contexto
-    [107]
+    [108]
       id: contexto.verificar
       nombre: verificar
       tipo: capacidad
       modulo: contexto
-    [108]
+    [109]
       id: contexto.barrer
       nombre: barrer
       tipo: capacidad
       modulo: contexto
-    [109]
+    [110]
       id: contexto.inventario
       nombre: inventario
       tipo: capacidad
       modulo: contexto
-    [110]
+    [111]
       id: contexto.reporte
       nombre: reporte
       tipo: capacidad
       modulo: contexto
-    [111]
+    [112]
       id: contexto.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: contexto
-    [112]
+    [113]
       id: contexto.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: contexto
-    [113]
+    [114]
       id: contexto.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: contexto
-    [114]
+    [115]
       id: MC
       nombre: correlacion_mecanica
       rol: MC
       tipo: modulo
-    [115]
+    [116]
       id: correlacion_mecanica.verificar
       nombre: verificar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [116]
+    [117]
       id: correlacion_mecanica.barrer
       nombre: barrer
       tipo: capacidad
       modulo: correlacion_mecanica
-    [117]
+    [118]
       id: correlacion_mecanica.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [118]
+    [119]
       id: correlacion_mecanica.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [119]
+    [120]
       id: correlacion_mecanica.inventario
       nombre: inventario
       tipo: capacidad
       modulo: correlacion_mecanica
-    [120]
+    [121]
       id: correlacion_mecanica.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: correlacion_mecanica
-    [121]
+    [122]
       id: correlacion_mecanica.reporte
       nombre: reporte
       tipo: capacidad
       modulo: correlacion_mecanica
-    [122]
+    [123]
       id: correlacion_mecanica.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: correlacion_mecanica
-    [123]
+    [124]
       id: correlacion_mecanica.listar_mecanicas
       nombre: listar_mecanicas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [124]
+    [125]
+      id: DI
+      nombre: diccionario
+      rol: DI
+      tipo: modulo
+    [126]
+      id: diccionario.verificar
+      nombre: verificar
+      tipo: capacidad
+      modulo: diccionario
+    [127]
+      id: diccionario.barrer
+      nombre: barrer
+      tipo: capacidad
+      modulo: diccionario
+    [128]
+      id: diccionario.inventario
+      nombre: inventario
+      tipo: capacidad
+      modulo: diccionario
+    [129]
+      id: diccionario.reporte
+      nombre: reporte
+      tipo: capacidad
+      modulo: diccionario
+    [130]
+      id: diccionario.diagnostico
+      nombre: diagnostico
+      tipo: capacidad
+      modulo: diccionario
+    [131]
+      id: diccionario.axiomas
+      nombre: axiomas
+      tipo: capacidad
+      modulo: diccionario
+    [132]
+      id: diccionario.resolver
+      nombre: resolver
+      tipo: capacidad
+      modulo: diccionario
+    [133]
+      id: diccionario.listar
+      nombre: listar
+      tipo: capacidad
+      modulo: diccionario
+    [134]
+      id: diccionario.cargar
+      nombre: cargar
+      tipo: capacidad
+      modulo: diccionario
+    [135]
+      id: diccionario.cargar_todos
+      nombre: cargar_todos
+      tipo: capacidad
+      modulo: diccionario
+    [136]
+      id: diccionario.definir
+      nombre: definir
+      tipo: capacidad
+      modulo: diccionario
+    [137]
+      id: diccionario.significado
+      nombre: significado
+      tipo: capacidad
+      modulo: diccionario
+    [138]
+      id: diccionario.palabras
+      nombre: palabras
+      tipo: capacidad
+      modulo: diccionario
+    [139]
+      id: diccionario.inyectar_en_peticion
+      nombre: inyectar_en_peticion
+      tipo: capacidad
+      modulo: diccionario
+    [140]
+      id: diccionario.verificar_salida
+      nombre: verificar_salida
+      tipo: capacidad
+      modulo: diccionario
+    [141]
       id: FO
       nombre: formulas
       rol: FO
       tipo: modulo
-    [125]
+    [142]
       id: formulas.verificar
       nombre: verificar
       tipo: capacidad
       modulo: formulas
-    [126]
+    [143]
       id: formulas.barrer
       nombre: barrer
       tipo: capacidad
       modulo: formulas
-    [127]
+    [144]
       id: formulas.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: formulas
-    [128]
+    [145]
       id: formulas.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: formulas
-    [129]
+    [146]
       id: formulas.inventario
       nombre: inventario
       tipo: capacidad
       modulo: formulas
-    [130]
+    [147]
       id: formulas.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: formulas
-    [131]
+    [148]
       id: formulas.tru_ri
       nombre: tru_ri
       tipo: capacidad
       modulo: formulas
-    [132]
+    [149]
       id: formulas.tru_total
       nombre: tru_total
       tipo: capacidad
       modulo: formulas
-    [133]
+    [150]
       id: formulas.reporte
       nombre: reporte
       tipo: capacidad
       modulo: formulas
-    [134]
+    [151]
       id: formulas.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: formulas
-    [135]
+    [152]
       id: formulas.listar_formulas
       nombre: listar_formulas
       tipo: capacidad
       modulo: formulas
-    [136]
+    [153]
+      id: UI
+      nombre: interfaz
+      rol: UI
+      tipo: modulo
+    [154]
+      id: interfaz.verificar
+      nombre: verificar
+      tipo: capacidad
+      modulo: interfaz
+    [155]
+      id: interfaz.barrer
+      nombre: barrer
+      tipo: capacidad
+      modulo: interfaz
+    [156]
+      id: interfaz.componer
+      nombre: componer
+      tipo: capacidad
+      modulo: interfaz
+    [157]
+      id: interfaz.inventario
+      nombre: inventario
+      tipo: capacidad
+      modulo: interfaz
+    [158]
+      id: interfaz.inventario_paquetes
+      nombre: inventario_paquetes
+      tipo: capacidad
+      modulo: interfaz
+    [159]
+      id: interfaz.observar
+      nombre: observar
+      tipo: capacidad
+      modulo: interfaz
+    [160]
+      id: interfaz.axiomas
+      nombre: axiomas
+      tipo: capacidad
+      modulo: interfaz
+    [161]
       id: RE
       nombre: realidad
       rol: RE
       tipo: modulo
-    [137]
+    [162]
       id: realidad.verificar
       nombre: verificar
       tipo: capacidad
       modulo: realidad
-    [138]
+    [163]
       id: realidad.barrer
       nombre: barrer
       tipo: capacidad
       modulo: realidad
-    [139]
+    [164]
       id: realidad.inventario
       nombre: inventario
       tipo: capacidad
       modulo: realidad
-    [140]
+    [165]
       id: realidad.reporte
       nombre: reporte
       tipo: capacidad
       modulo: realidad
-    [141]
+    [166]
       id: realidad.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: realidad
-    [142]
+    [167]
       id: realidad.registrar_resultado_dominio
       nombre: registrar_resultado_dominio
       tipo: capacidad
       modulo: realidad
-    [143]
+    [168]
       id: realidad.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: realidad
-    [144]
+    [169]
       id: SF
       nombre: self
       rol: SF
       tipo: modulo
-    [145]
+    [170]
       id: self.verificar
       nombre: verificar
       tipo: capacidad
       modulo: self
-    [146]
+    [171]
       id: self.barrer
       nombre: barrer
       tipo: capacidad
       modulo: self
-    [147]
+    [172]
       id: self.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: self
-    [148]
+    [173]
       id: self.yo_funcional
       nombre: yo_funcional
       tipo: capacidad
       modulo: self
-    [149]
+    [174]
       id: self.oscilar
       nombre: oscilar
       tipo: capacidad
       modulo: self
-    [150]
+    [175]
       id: self.desde_donde
       nombre: desde_donde
       tipo: capacidad
       modulo: self
-    [151]
+    [176]
       id: self.estado_self
       nombre: estado_self
       tipo: capacidad
       modulo: self
-    [152]
+    [177]
       id: self.elegir
       nombre: elegir
       tipo: capacidad
       modulo: self
-    [153]
+    [178]
       id: self.inventario
       nombre: inventario
       tipo: capacidad
       modulo: self
-    [154]
+    [179]
       id: self.reporte
       nombre: reporte
       tipo: capacidad
       modulo: self
-    [155]
+    [180]
       id: self.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: self
-    [156]
+    [181]
       id: SC
       nombre: spartaco_seguridad
       rol: SC
       tipo: modulo
-    [157]
+    [182]
       id: spartaco_seguridad.verificar
       nombre: verificar
       tipo: capacidad
       modulo: spartaco_seguridad
-    [158]
+    [183]
       id: spartaco_seguridad.barrer
       nombre: barrer
       tipo: capacidad
       modulo: spartaco_seguridad
-    [159]
+    [184]
       id: spartaco_seguridad.inventario
       nombre: inventario
       tipo: capacidad
       modulo: spartaco_seguridad
-    [160]
+    [185]
       id: spartaco_seguridad.reporte
       nombre: reporte
       tipo: capacidad
       modulo: spartaco_seguridad
-    [161]
+    [186]
       id: spartaco_seguridad.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: spartaco_seguridad
-    [162]
+    [187]
       id: spartaco_seguridad.catalogo
       nombre: catalogo
       tipo: capacidad
       modulo: spartaco_seguridad
-    [163]
+    [188]
       id: spartaco_seguridad.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: spartaco_seguridad
-    [164]
+    [189]
       id: TX
       nombre: taxonomia
       rol: TX
       tipo: modulo
-    [165]
+    [190]
       id: taxonomia.verificar
       nombre: verificar
       tipo: capacidad
       modulo: taxonomia
-    [166]
+    [191]
       id: taxonomia.barrer
       nombre: barrer
       tipo: capacidad
       modulo: taxonomia
-    [167]
+    [192]
       id: taxonomia.aplicar
       nombre: aplicar
       tipo: capacidad
       modulo: taxonomia
-    [168]
+    [193]
       id: taxonomia.inventario
       nombre: inventario
       tipo: capacidad
       modulo: taxonomia
-    [169]
+    [194]
       id: taxonomia.reporte
       nombre: reporte
       tipo: capacidad
       modulo: taxonomia
-    [170]
+    [195]
       id: taxonomia.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: taxonomia
-    [171]
+    [196]
       id: taxonomia.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: taxonomia
-    [172]
+    [197]
       id: taxonomia.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: taxonomia
-    [173]
+    [198]
       id: TT
       nombre: tru_totales
       rol: TT
       tipo: modulo
-    [174]
+    [199]
       id: tru_totales.verificar
       nombre: verificar
       tipo: capacidad
       modulo: tru_totales
-    [175]
+    [200]
       id: tru_totales.barrer
       nombre: barrer
       tipo: capacidad
       modulo: tru_totales
-    [176]
+    [201]
       id: tru_totales.inventario
       nombre: inventario
       tipo: capacidad
       modulo: tru_totales
-    [177]
+    [202]
       id: tru_totales.capacidades
       nombre: capacidades
       tipo: capacidad
       modulo: tru_totales
-    [178]
+    [203]
       id: tru_totales.categorias
       nombre: categorias
       tipo: capacidad
       modulo: tru_totales
-    [179]
+    [204]
       id: tru_totales.resolver_pedido
       nombre: resolver_pedido
       tipo: capacidad
       modulo: tru_totales
-    [180]
+    [205]
       id: tru_totales.reporte
       nombre: reporte
       tipo: capacidad
       modulo: tru_totales
-    [181]
+    [206]
       id: tru_totales.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: tru_totales
-    [182]
+    [207]
       id: tru_totales.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: tru_totales
-    [183]
+    [208]
       id: VX
       nombre: verificacion
       rol: VX
       tipo: modulo
-    [184]
+    [209]
       id: verificacion.verificar
       nombre: verificar
       tipo: capacidad
       modulo: verificacion
-    [185]
+    [210]
       id: verificacion.barrer
       nombre: barrer
       tipo: capacidad
       modulo: verificacion
-    [186]
+    [211]
       id: verificacion.inventario
       nombre: inventario
       tipo: capacidad
       modulo: verificacion
-    [187]
+    [212]
       id: verificacion.reporte
       nombre: reporte
       tipo: capacidad
       modulo: verificacion
-    [188]
+    [213]
       id: verificacion.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: verificacion
-    [189]
+    [214]
       id: verificacion.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: verificacion
-    [190]
+    [215]
       id: verificacion.axiomas
       nombre: axiomas
       tipo: capacidad
@@ -11907,571 +14247,571 @@
   aristas:
     [0]
       from: axiomas
-      to: axiomas.verificar
-      tipo: declara_capacidad
+      to: *
+      tipo: requiere
     [1]
       from: axiomas
-      to: axiomas.barrer
+      to: axiomas.verificar
       tipo: declara_capacidad
     [2]
       from: axiomas
-      to: axiomas.verificar_salida
+      to: axiomas.barrer
       tipo: declara_capacidad
     [3]
       from: axiomas
-      to: axiomas.inventario
+      to: axiomas.verificar_salida
       tipo: declara_capacidad
     [4]
       from: axiomas
-      to: axiomas.axiomas
+      to: axiomas.inventario
       tipo: declara_capacidad
     [5]
       from: axiomas
-      to: axiomas.declaraciones
+      to: axiomas.axiomas
       tipo: declara_capacidad
     [6]
       from: axiomas
-      to: axiomas.generatividad
+      to: axiomas.declaraciones
       tipo: declara_capacidad
     [7]
       from: axiomas
-      to: axiomas.por_dominio
+      to: axiomas.generatividad
       tipo: declara_capacidad
     [8]
       from: axiomas
-      to: axiomas.ids_dominio_k_o
+      to: axiomas.por_dominio
       tipo: declara_capacidad
     [9]
       from: axiomas
-      to: axiomas.recolectar
+      to: axiomas.ids_dominio_k_o
       tipo: declara_capacidad
     [10]
       from: axiomas
-      to: axiomas.reporte
+      to: axiomas.recolectar
       tipo: declara_capacidad
     [11]
       from: axiomas
-      to: axiomas.diagnostico
+      to: axiomas.reporte
       tipo: declara_capacidad
     [12]
       from: axiomas
-      to: axiomas.buscar_por_id
+      to: axiomas.diagnostico
       tipo: declara_capacidad
     [13]
-      from: cache
-      to: cache.verificar
+      from: axiomas
+      to: axiomas.buscar_por_id
       tipo: declara_capacidad
     [14]
       from: cache
-      to: cache.barrer
-      tipo: declara_capacidad
+      to: *
+      tipo: requiere
     [15]
       from: cache
-      to: cache.depositar
+      to: cache.verificar
       tipo: declara_capacidad
     [16]
       from: cache
-      to: cache.leer
+      to: cache.barrer
       tipo: declara_capacidad
     [17]
       from: cache
-      to: cache.leer_eventos
+      to: cache.depositar
       tipo: declara_capacidad
     [18]
       from: cache
-      to: cache.leer_por_ciclo
+      to: cache.leer
       tipo: declara_capacidad
     [19]
       from: cache
-      to: cache.leer_por_modulo
+      to: cache.leer_eventos
       tipo: declara_capacidad
     [20]
       from: cache
-      to: cache.leer_por_tipo
+      to: cache.leer_por_ciclo
       tipo: declara_capacidad
     [21]
       from: cache
-      to: cache.leer_por_categoria
+      to: cache.leer_por_modulo
       tipo: declara_capacidad
     [22]
       from: cache
-      to: cache.leer_por_capacidad
+      to: cache.leer_por_tipo
       tipo: declara_capacidad
     [23]
       from: cache
-      to: cache.leer_por_origen
+      to: cache.leer_por_categoria
       tipo: declara_capacidad
     [24]
       from: cache
-      to: cache.leer_por_destino
+      to: cache.leer_por_capacidad
       tipo: declara_capacidad
     [25]
       from: cache
-      to: cache.leer_por_estado
+      to: cache.leer_por_origen
       tipo: declara_capacidad
     [26]
       from: cache
-      to: cache.leer_por_seq
+      to: cache.leer_por_destino
       tipo: declara_capacidad
     [27]
       from: cache
-      to: cache.leer_por_timestamp
+      to: cache.leer_por_estado
       tipo: declara_capacidad
     [28]
       from: cache
-      to: cache.categorias
+      to: cache.leer_por_seq
       tipo: declara_capacidad
     [29]
       from: cache
-      to: cache.inventario
+      to: cache.leer_por_timestamp
       tipo: declara_capacidad
     [30]
       from: cache
-      to: cache.reporte
+      to: cache.categorias
       tipo: declara_capacidad
     [31]
       from: cache
-      to: cache.diagnostico
+      to: cache.inventario
       tipo: declara_capacidad
     [32]
       from: cache
-      to: cache.verificar_salida
+      to: cache.reporte
       tipo: declara_capacidad
     [33]
       from: cache
-      to: cache.backend_para_centinela
+      to: cache.diagnostico
       tipo: declara_capacidad
     [34]
-      from: calculator
-      to: calculator.calcular
+      from: cache
+      to: cache.verificar_salida
       tipo: declara_capacidad
     [35]
-      from: calculator
-      to: calculator.calcular_C
+      from: cache
+      to: cache.backend_para_centinela
       tipo: declara_capacidad
     [36]
       from: calculator
-      to: calculator.calcular_L
-      tipo: declara_capacidad
+      to: *
+      tipo: requiere
     [37]
       from: calculator
-      to: calculator.calcular_K
+      to: calculator.calcular
       tipo: declara_capacidad
     [38]
       from: calculator
-      to: calculator.calcular_factor
+      to: calculator.calcular_C
       tipo: declara_capacidad
     [39]
       from: calculator
-      to: calculator.representar
+      to: calculator.calcular_L
       tipo: declara_capacidad
     [40]
       from: calculator
-      to: calculator.validar_evidencia
+      to: calculator.calcular_K
       tipo: declara_capacidad
     [41]
       from: calculator
-      to: calculator.explicar_calculo
+      to: calculator.calcular_factor
       tipo: declara_capacidad
     [42]
       from: calculator
-      to: calculator.verificar
+      to: calculator.representar
       tipo: declara_capacidad
     [43]
       from: calculator
-      to: calculator.barrer
+      to: calculator.validar_evidencia
       tipo: declara_capacidad
     [44]
       from: calculator
-      to: calculator.inventario
+      to: calculator.explicar_calculo
       tipo: declara_capacidad
     [45]
       from: calculator
-      to: calculator.reporte
+      to: calculator.verificar
       tipo: declara_capacidad
     [46]
       from: calculator
-      to: calculator.diagnostico
+      to: calculator.barrer
       tipo: declara_capacidad
     [47]
       from: calculator
-      to: calculator.leer_ids_escala
+      to: calculator.inventario
       tipo: declara_capacidad
     [48]
       from: calculator
-      to: calculator.verificar_salida
+      to: calculator.reporte
       tipo: declara_capacidad
     [49]
       from: calculator
-      to: calculator.historial
+      to: calculator.diagnostico
       tipo: declara_capacidad
     [50]
-      from: capacidades_engine
-      to: capacidades_engine.verificar
+      from: calculator
+      to: calculator.leer_ids_escala
       tipo: declara_capacidad
     [51]
-      from: capacidades_engine
-      to: capacidades_engine.barrer
+      from: calculator
+      to: calculator.verificar_salida
       tipo: declara_capacidad
     [52]
-      from: capacidades_engine
-      to: capacidades_engine.inventario
+      from: calculator
+      to: calculator.historial
       tipo: declara_capacidad
     [53]
-      from: capacidades_engine
-      to: capacidades_engine.skills
+      from: calculator
+      to: calculator.verificar_calculo_de_C_L_K
       tipo: declara_capacidad
     [54]
       from: capacidades_engine
-      to: capacidades_engine.ids
-      tipo: declara_capacidad
+      to: *
+      tipo: requiere
     [55]
       from: capacidades_engine
-      to: capacidades_engine.por_id
+      to: capacidades_engine.verificar
       tipo: declara_capacidad
     [56]
       from: capacidades_engine
-      to: capacidades_engine.listar_archivos
+      to: capacidades_engine.barrer
       tipo: declara_capacidad
     [57]
       from: capacidades_engine
-      to: capacidades_engine.verificar_salida
+      to: capacidades_engine.inventario
       tipo: declara_capacidad
     [58]
-      from: catalogo_citaciones
-      to: CT
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.skills
+      tipo: declara_capacidad
     [59]
-      from: catalogo_citaciones
-      to: AX
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.ids
+      tipo: declara_capacidad
     [60]
-      from: catalogo_citaciones
-      to: FO
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.por_id
+      tipo: declara_capacidad
     [61]
-      from: catalogo_citaciones
-      to: MC
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.listar_archivos
+      tipo: declara_capacidad
     [62]
-      from: catalogo_citaciones
-      to: CA
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.verificar_salida
+      tipo: declara_capacidad
     [63]
       from: catalogo_citaciones
-      to: CX
+      to: *
       tipo: requiere
     [64]
       from: catalogo_citaciones
-      to: RE
-      tipo: requiere
-    [65]
-      from: catalogo_citaciones
-      to: VX
-      tipo: requiere
-    [66]
-      from: catalogo_citaciones
-      to: TX
-      tipo: requiere
-    [67]
-      from: catalogo_citaciones
-      to: CH
-      tipo: requiere
-    [68]
-      from: catalogo_citaciones
-      to: MC
-      tipo: requiere
-    [69]
-      from: catalogo_citaciones
-      to: SF
-      tipo: requiere
-    [70]
-      from: catalogo_citaciones
       to: catalogo_citaciones.verificar
       tipo: declara_capacidad
-    [71]
+    [65]
       from: catalogo_citaciones
       to: catalogo_citaciones.barrer
       tipo: declara_capacidad
-    [72]
+    [66]
       from: catalogo_citaciones
       to: catalogo_citaciones.inventario
       tipo: declara_capacidad
-    [73]
+    [67]
       from: catalogo_citaciones
       to: catalogo_citaciones.categorias
       tipo: declara_capacidad
-    [74]
+    [68]
       from: catalogo_citaciones
       to: catalogo_citaciones.por_id
       tipo: declara_capacidad
-    [75]
+    [69]
       from: catalogo_citaciones
       to: catalogo_citaciones.ids
       tipo: declara_capacidad
-    [76]
+    [70]
       from: catalogo_citaciones
       to: catalogo_citaciones.esquema
       tipo: declara_capacidad
-    [77]
+    [71]
       from: catalogo_citaciones
       to: catalogo_citaciones.reporte
       tipo: declara_capacidad
-    [78]
+    [72]
       from: catalogo_citaciones
       to: catalogo_citaciones.diagnostico
       tipo: declara_capacidad
-    [79]
+    [73]
       from: catalogo_citaciones
       to: catalogo_citaciones.verificar_salida
       tipo: declara_capacidad
-    [80]
+    [74]
+      from: citacion
+      to: *
+      tipo: requiere
+    [75]
       from: citacion
       to: citacion.verificar
       tipo: declara_capacidad
-    [81]
+    [76]
       from: citacion
       to: citacion.barrer
       tipo: declara_capacidad
-    [82]
+    [77]
       from: citacion
       to: citacion.inventario
       tipo: declara_capacidad
-    [83]
+    [78]
       from: citacion
       to: citacion.reporte
       tipo: declara_capacidad
-    [84]
+    [79]
       from: citacion
       to: citacion.diagnostico
       tipo: declara_capacidad
-    [85]
+    [80]
       from: citacion
       to: citacion.verificar_salida
       tipo: declara_capacidad
-    [86]
+    [81]
       from: citacion
       to: citacion.anunciar
       tipo: declara_capacidad
-    [87]
+    [82]
       from: citacion
       to: citacion.anunciar_todo
       tipo: declara_capacidad
-    [88]
+    [83]
       from: citacion
       to: citacion.citar
       tipo: declara_capacidad
-    [89]
+    [84]
       from: citacion
       to: citacion.registrar
       tipo: declara_capacidad
-    [90]
+    [85]
       from: citacion
       to: citacion.resolver
       tipo: declara_capacidad
-    [91]
+    [86]
       from: citacion
       to: citacion.resolver_enunciado
       tipo: declara_capacidad
-    [92]
+    [87]
       from: citacion
       to: citacion.buscar
       tipo: declara_capacidad
-    [93]
+    [88]
       from: citacion
       to: citacion.cadena
       tipo: declara_capacidad
-    [94]
+    [89]
       from: citacion
       to: citacion.explicar
       tipo: declara_capacidad
-    [95]
+    [90]
       from: citacion
       to: citacion.relacionar
       tipo: declara_capacidad
-    [96]
+    [91]
       from: citacion
       to: citacion.limpiar_ciclo
       tipo: declara_capacidad
-    [97]
+    [92]
       from: citacion
       to: citacion.evaluar
       tipo: declara_capacidad
-    [98]
+    [93]
+      from: constante
+      to: *
+      tipo: requiere
+    [94]
       from: constante
       to: constante.alpha
       tipo: declara_capacidad
-    [99]
+    [95]
       from: constante
       to: constante.beta
       tipo: declara_capacidad
-    [100]
+    [96]
       from: constante
       to: constante.descubrir_constantes
       tipo: declara_capacidad
-    [101]
+    [97]
       from: constante
       to: constante.listar_constantes
       tipo: declara_capacidad
-    [102]
+    [98]
       from: constante
       to: constante.buscar_constante
       tipo: declara_capacidad
-    [103]
+    [99]
       from: constante
       to: constante.verificar_constantes
       tipo: declara_capacidad
-    [104]
+    [100]
       from: constante
       to: constante.inventario
       tipo: declara_capacidad
-    [105]
+    [101]
       from: constante
       to: constante.reporte
       tipo: declara_capacidad
-    [106]
+    [102]
       from: constante
       to: constante.diagnostico
       tipo: declara_capacidad
-    [107]
+    [103]
       from: constante
       to: constante.verificar
       tipo: declara_capacidad
-    [108]
+    [104]
+      from: contexto
+      to: *
+      tipo: requiere
+    [105]
       from: contexto
       to: contexto.resolver
       tipo: declara_capacidad
-    [109]
+    [106]
       from: contexto
       to: contexto.evaluar
       tipo: declara_capacidad
-    [110]
+    [107]
       from: contexto
       to: contexto.centinela
       tipo: declara_capacidad
-    [111]
+    [108]
       from: contexto
       to: contexto.verificar
       tipo: declara_capacidad
-    [112]
+    [109]
       from: contexto
       to: contexto.barrer
       tipo: declara_capacidad
-    [113]
+    [110]
       from: contexto
       to: contexto.inventario
       tipo: declara_capacidad
-    [114]
+    [111]
       from: contexto
       to: contexto.reporte
       tipo: declara_capacidad
-    [115]
+    [112]
       from: contexto
       to: contexto.diagnostico
       tipo: declara_capacidad
-    [116]
+    [113]
       from: contexto
       to: contexto.axiomas
       tipo: declara_capacidad
-    [117]
+    [114]
       from: contexto
       to: contexto.verificar_salida
       tipo: declara_capacidad
-    [118]
+    [115]
+      from: correlacion_mecanica
+      to: *
+      tipo: requiere
+    [116]
       from: correlacion_mecanica
       to: correlacion_mecanica.verificar
       tipo: declara_capacidad
-    [119]
+    [117]
       from: correlacion_mecanica
       to: correlacion_mecanica.barrer
       tipo: declara_capacidad
-    [120]
+    [118]
       from: correlacion_mecanica
       to: correlacion_mecanica.evaluar
       tipo: declara_capacidad
-    [121]
+    [119]
       from: correlacion_mecanica
       to: correlacion_mecanica.axiomas
       tipo: declara_capacidad
-    [122]
+    [120]
       from: correlacion_mecanica
       to: correlacion_mecanica.inventario
       tipo: declara_capacidad
-    [123]
+    [121]
       from: correlacion_mecanica
       to: correlacion_mecanica.verificar_salida
       tipo: declara_capacidad
-    [124]
+    [122]
       from: correlacion_mecanica
       to: correlacion_mecanica.reporte
       tipo: declara_capacidad
-    [125]
+    [123]
       from: correlacion_mecanica
       to: correlacion_mecanica.diagnostico
       tipo: declara_capacidad
-    [126]
+    [124]
       from: correlacion_mecanica
       to: correlacion_mecanica.listar_mecanicas
       tipo: declara_capacidad
+    [125]
+      from: diccionario
+      to: *
+      tipo: requiere
+    [126]
+      from: diccionario
+      to: diccionario.verificar
+      tipo: declara_capacidad
     [127]
-      from: formulas
-      to: CT
-      tipo: requiere
+      from: diccionario
+      to: diccionario.barrer
+      tipo: declara_capacidad
     [128]
-      from: formulas
-      to: AX
-      tipo: requiere
+      from: diccionario
+      to: diccionario.inventario
+      tipo: declara_capacidad
     [129]
-      from: formulas
-      to: MC
-      tipo: requiere
+      from: diccionario
+      to: diccionario.reporte
+      tipo: declara_capacidad
     [130]
-      from: formulas
-      to: SF
-      tipo: requiere
+      from: diccionario
+      to: diccionario.diagnostico
+      tipo: declara_capacidad
     [131]
-      from: formulas
-      to: CA
-      tipo: requiere
+      from: diccionario
+      to: diccionario.axiomas
+      tipo: declara_capacidad
     [132]
-      from: formulas
-      to: CX
-      tipo: requiere
+      from: diccionario
+      to: diccionario.resolver
+      tipo: declara_capacidad
     [133]
-      from: formulas
-      to: RE
-      tipo: requiere
+      from: diccionario
+      to: diccionario.listar
+      tipo: declara_capacidad
     [134]
-      from: formulas
-      to: VX
-      tipo: requiere
+      from: diccionario
+      to: diccionario.cargar
+      tipo: declara_capacidad
     [135]
-      from: formulas
-      to: TX
-      tipo: requiere
+      from: diccionario
+      to: diccionario.cargar_todos
+      tipo: declara_capacidad
     [136]
-      from: formulas
-      to: CH
-      tipo: requiere
+      from: diccionario
+      to: diccionario.definir
+      tipo: declara_capacidad
     [137]
-      from: formulas
-      to: CIT
-      tipo: requiere
+      from: diccionario
+      to: diccionario.significado
+      tipo: declara_capacidad
     [138]
-      from: formulas
-      to: CT
-      tipo: requiere
+      from: diccionario
+      to: diccionario.palabras
+      tipo: declara_capacidad
     [139]
-      from: formulas
-      to: AX
-      tipo: requiere
+      from: diccionario
+      to: diccionario.inyectar_en_peticion
+      tipo: declara_capacidad
     [140]
-      from: formulas
-      to: MC
-      tipo: requiere
+      from: diccionario
+      to: diccionario.verificar_salida
+      tipo: declara_capacidad
     [141]
       from: formulas
-      to: SF
+      to: *
       tipo: requiere
     [142]
       from: formulas
@@ -12518,198 +14858,250 @@
       to: formulas.listar_formulas
       tipo: declara_capacidad
     [153]
+      from: interfaz
+      to: interfaz.verificar
+      tipo: declara_capacidad
+    [154]
+      from: interfaz
+      to: interfaz.barrer
+      tipo: declara_capacidad
+    [155]
+      from: interfaz
+      to: interfaz.componer
+      tipo: declara_capacidad
+    [156]
+      from: interfaz
+      to: interfaz.inventario
+      tipo: declara_capacidad
+    [157]
+      from: interfaz
+      to: interfaz.inventario_paquetes
+      tipo: declara_capacidad
+    [158]
+      from: interfaz
+      to: interfaz.observar
+      tipo: declara_capacidad
+    [159]
+      from: interfaz
+      to: interfaz.axiomas
+      tipo: declara_capacidad
+    [160]
+      from: realidad
+      to: *
+      tipo: requiere
+    [161]
       from: realidad
       to: realidad.verificar
       tipo: declara_capacidad
-    [154]
+    [162]
       from: realidad
       to: realidad.barrer
       tipo: declara_capacidad
-    [155]
+    [163]
       from: realidad
       to: realidad.inventario
       tipo: declara_capacidad
-    [156]
+    [164]
       from: realidad
       to: realidad.reporte
       tipo: declara_capacidad
-    [157]
+    [165]
       from: realidad
       to: realidad.diagnostico
       tipo: declara_capacidad
-    [158]
+    [166]
       from: realidad
       to: realidad.registrar_resultado_dominio
       tipo: declara_capacidad
-    [159]
+    [167]
       from: realidad
       to: realidad.verificar_salida
       tipo: declara_capacidad
-    [160]
+    [168]
+      from: self
+      to: *
+      tipo: requiere
+    [169]
       from: self
       to: self.verificar
       tipo: declara_capacidad
-    [161]
+    [170]
       from: self
       to: self.barrer
       tipo: declara_capacidad
-    [162]
+    [171]
       from: self
       to: self.verificar_salida
       tipo: declara_capacidad
-    [163]
+    [172]
       from: self
       to: self.yo_funcional
       tipo: declara_capacidad
-    [164]
+    [173]
       from: self
       to: self.oscilar
       tipo: declara_capacidad
-    [165]
+    [174]
       from: self
       to: self.desde_donde
       tipo: declara_capacidad
-    [166]
+    [175]
       from: self
       to: self.estado_self
       tipo: declara_capacidad
-    [167]
+    [176]
       from: self
       to: self.elegir
       tipo: declara_capacidad
-    [168]
+    [177]
       from: self
       to: self.inventario
       tipo: declara_capacidad
-    [169]
+    [178]
       from: self
       to: self.reporte
       tipo: declara_capacidad
-    [170]
+    [179]
       from: self
       to: self.diagnostico
       tipo: declara_capacidad
-    [171]
+    [180]
+      from: spartaco_seguridad
+      to: *
+      tipo: requiere
+    [181]
       from: spartaco_seguridad
       to: spartaco_seguridad.verificar
       tipo: declara_capacidad
-    [172]
+    [182]
       from: spartaco_seguridad
       to: spartaco_seguridad.barrer
       tipo: declara_capacidad
-    [173]
+    [183]
       from: spartaco_seguridad
       to: spartaco_seguridad.inventario
       tipo: declara_capacidad
-    [174]
+    [184]
       from: spartaco_seguridad
       to: spartaco_seguridad.reporte
       tipo: declara_capacidad
-    [175]
+    [185]
       from: spartaco_seguridad
       to: spartaco_seguridad.diagnostico
       tipo: declara_capacidad
-    [176]
+    [186]
       from: spartaco_seguridad
       to: spartaco_seguridad.catalogo
       tipo: declara_capacidad
-    [177]
+    [187]
       from: spartaco_seguridad
       to: spartaco_seguridad.verificar_salida
       tipo: declara_capacidad
-    [178]
+    [188]
+      from: taxonomia
+      to: *
+      tipo: requiere
+    [189]
       from: taxonomia
       to: taxonomia.verificar
       tipo: declara_capacidad
-    [179]
+    [190]
       from: taxonomia
       to: taxonomia.barrer
       tipo: declara_capacidad
-    [180]
+    [191]
       from: taxonomia
       to: taxonomia.aplicar
       tipo: declara_capacidad
-    [181]
+    [192]
       from: taxonomia
       to: taxonomia.inventario
       tipo: declara_capacidad
-    [182]
+    [193]
       from: taxonomia
       to: taxonomia.reporte
       tipo: declara_capacidad
-    [183]
+    [194]
       from: taxonomia
       to: taxonomia.diagnostico
       tipo: declara_capacidad
-    [184]
+    [195]
       from: taxonomia
       to: taxonomia.axiomas
       tipo: declara_capacidad
-    [185]
+    [196]
       from: taxonomia
       to: taxonomia.verificar_salida
       tipo: declara_capacidad
-    [186]
+    [197]
+      from: tru_totales
+      to: *
+      tipo: requiere
+    [198]
       from: tru_totales
       to: tru_totales.verificar
       tipo: declara_capacidad
-    [187]
+    [199]
       from: tru_totales
       to: tru_totales.barrer
       tipo: declara_capacidad
-    [188]
+    [200]
       from: tru_totales
       to: tru_totales.inventario
       tipo: declara_capacidad
-    [189]
+    [201]
       from: tru_totales
       to: tru_totales.capacidades
       tipo: declara_capacidad
-    [190]
+    [202]
       from: tru_totales
       to: tru_totales.categorias
       tipo: declara_capacidad
-    [191]
+    [203]
       from: tru_totales
       to: tru_totales.resolver_pedido
       tipo: declara_capacidad
-    [192]
+    [204]
       from: tru_totales
       to: tru_totales.reporte
       tipo: declara_capacidad
-    [193]
+    [205]
       from: tru_totales
       to: tru_totales.diagnostico
       tipo: declara_capacidad
-    [194]
+    [206]
       from: tru_totales
       to: tru_totales.verificar_salida
       tipo: declara_capacidad
-    [195]
+    [207]
+      from: verificacion
+      to: *
+      tipo: requiere
+    [208]
       from: verificacion
       to: verificacion.verificar
       tipo: declara_capacidad
-    [196]
+    [209]
       from: verificacion
       to: verificacion.barrer
       tipo: declara_capacidad
-    [197]
+    [210]
       from: verificacion
       to: verificacion.inventario
       tipo: declara_capacidad
-    [198]
+    [211]
       from: verificacion
       to: verificacion.reporte
       tipo: declara_capacidad
-    [199]
+    [212]
       from: verificacion
       to: verificacion.diagnostico
       tipo: declara_capacidad
-    [200]
+    [213]
       from: verificacion
       to: verificacion.verificar_salida
       tipo: declara_capacidad
-    [201]
+    [214]
       from: verificacion
       to: verificacion.axiomas
       tipo: declara_capacidad
@@ -12719,326 +15111,358 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-08T10:49:47.243088+00:00
+    timestamp: 2026-08-11T20:00:30.726311+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.022415
+    duracion_s: 0.012725
   [1]
     id_traza: 2
-    timestamp: 2026-08-08T10:49:47.255426+00:00
+    timestamp: 2026-08-11T20:00:30.738662+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.012311
+    duracion_s: 0.012268
   [2]
     id_traza: 3
-    timestamp: 2026-08-08T10:49:47.266727+00:00
+    timestamp: 2026-08-11T20:00:30.749991+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.011277
+    duracion_s: 0.01124
   [3]
     id_traza: 4
-    timestamp: 2026-08-08T10:49:47.266773+00:00
+    timestamp: 2026-08-11T20:00:30.750083+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 3.1e-05
+    duracion_s: 2.2e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-08T10:49:47.266787+00:00
+    timestamp: 2026-08-11T20:00:30.750131+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 7e-06
+    duracion_s: 9e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-08T10:49:47.266799+00:00
+    timestamp: 2026-08-11T20:00:30.750182+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 8e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-08T10:49:47.267388+00:00
+    timestamp: 2026-08-11T20:00:30.750861+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00058
+    duracion_s: 0.000643
   [7]
     id_traza: 8
-    timestamp: 2026-08-08T10:49:47.267885+00:00
+    timestamp: 2026-08-11T20:00:30.751445+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000482
+    duracion_s: 0.000543
   [8]
     id_traza: 9
-    timestamp: 2026-08-08T10:49:47.268337+00:00
+    timestamp: 2026-08-11T20:00:30.751989+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000443
+    duracion_s: 0.000494
   [9]
     id_traza: 10
-    timestamp: 2026-08-08T10:49:47.268735+00:00
+    timestamp: 2026-08-11T20:00:30.753237+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000386
+    duracion_s: 0.001201
   [10]
     id_traza: 11
-    timestamp: 2026-08-08T10:49:47.270212+00:00
+    timestamp: 2026-08-11T20:00:30.755635+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001465
+    duracion_s: 0.002327
   [11]
     id_traza: 12
-    timestamp: 2026-08-08T10:49:47.271629+00:00
+    timestamp: 2026-08-11T20:00:30.757120+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001405
+    duracion_s: 0.001445
   [12]
     id_traza: 13
-    timestamp: 2026-08-08T10:49:47.273019+00:00
+    timestamp: 2026-08-11T20:00:30.759142+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001378
+    duracion_s: 0.001972
   [13]
     id_traza: 14
-    timestamp: 2026-08-08T10:49:47.273033+00:00
+    timestamp: 2026-08-11T20:00:30.759193+00:00
     modulo: citacion
     capacidad: reporte
     estado: EXITO
     duracion_s: 4e-06
   [14]
     id_traza: 15
-    timestamp: 2026-08-08T10:49:47.273039+00:00
+    timestamp: 2026-08-11T20:00:30.759223+00:00
     modulo: citacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [15]
     id_traza: 16
-    timestamp: 2026-08-08T10:49:47.273046+00:00
+    timestamp: 2026-08-11T20:00:30.759251+00:00
     modulo: citacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 5e-06
   [16]
     id_traza: 17
-    timestamp: 2026-08-08T10:49:47.273283+00:00
+    timestamp: 2026-08-11T20:00:30.759531+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000229
+    duracion_s: 0.000238
   [17]
     id_traza: 18
-    timestamp: 2026-08-08T10:49:47.273463+00:00
+    timestamp: 2026-08-11T20:00:30.759736+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000171
+    duracion_s: 0.000173
   [18]
     id_traza: 19
-    timestamp: 2026-08-08T10:49:47.273557+00:00
+    timestamp: 2026-08-11T20:00:30.759856+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8.5e-05
+    duracion_s: 8.2e-05
   [19]
     id_traza: 20
-    timestamp: 2026-08-08T10:49:47.273787+00:00
+    timestamp: 2026-08-11T20:00:30.776458+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000219
+    duracion_s: 0.016569
   [20]
     id_traza: 21
-    timestamp: 2026-08-08T10:49:47.273987+00:00
+    timestamp: 2026-08-11T20:00:30.777888+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000189
+    duracion_s: 0.001383
   [21]
     id_traza: 22
-    timestamp: 2026-08-08T10:49:47.274161+00:00
+    timestamp: 2026-08-11T20:00:30.779176+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000164
+    duracion_s: 0.001238
   [22]
     id_traza: 23
-    timestamp: 2026-08-08T10:49:47.283739+00:00
+    timestamp: 2026-08-11T20:00:30.797468+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.009567
+    duracion_s: 0.018249
   [23]
     id_traza: 24
-    timestamp: 2026-08-08T10:49:47.292688+00:00
+    timestamp: 2026-08-11T20:00:30.806012+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.008936
+    duracion_s: 0.008496
   [24]
     id_traza: 25
-    timestamp: 2026-08-08T10:49:47.293995+00:00
+    timestamp: 2026-08-11T20:00:30.807466+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001283
+    duracion_s: 0.001408
   [25]
     id_traza: 26
-    timestamp: 2026-08-08T10:49:47.294450+00:00
-    modulo: formulas
+    timestamp: 2026-08-11T20:00:30.810943+00:00
+    modulo: diccionario
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000443
+    duracion_s: 0.003436
   [26]
     id_traza: 27
-    timestamp: 2026-08-08T10:49:47.294904+00:00
-    modulo: formulas
+    timestamp: 2026-08-11T20:00:30.810996+00:00
+    modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000444
+    duracion_s: 1.2e-05
   [27]
     id_traza: 28
-    timestamp: 2026-08-08T10:49:47.295121+00:00
+    timestamp: 2026-08-11T20:00:30.811053+00:00
+    modulo: diccionario
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 2e-05
+  [28]
+    id_traza: 29
+    timestamp: 2026-08-11T20:00:30.812226+00:00
+    modulo: formulas
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.001148
+  [29]
+    id_traza: 30
+    timestamp: 2026-08-11T20:00:30.812722+00:00
+    modulo: formulas
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000462
+  [30]
+    id_traza: 31
+    timestamp: 2026-08-11T20:00:30.812972+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000207
-  [28]
-    id_traza: 29
-    timestamp: 2026-08-08T10:49:47.296415+00:00
-    modulo: realidad
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.001283
-  [29]
-    id_traza: 30
-    timestamp: 2026-08-08T10:49:47.297163+00:00
-    modulo: realidad
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000738
-  [30]
-    id_traza: 31
-    timestamp: 2026-08-08T10:49:47.304785+00:00
-    modulo: realidad
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.00761
+    duracion_s: 0.000208
   [31]
     id_traza: 32
-    timestamp: 2026-08-08T10:49:47.310339+00:00
-    modulo: self
-    capacidad: reporte
+    timestamp: 2026-08-11T20:00:30.813035+00:00
+    modulo: interfaz
+    capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00554
+    duracion_s: 2.4e-05
   [32]
     id_traza: 33
-    timestamp: 2026-08-08T10:49:47.314876+00:00
-    modulo: self
-    capacidad: diagnostico
+    timestamp: 2026-08-11T20:00:30.817536+00:00
+    modulo: realidad
+    capacidad: reporte
     estado: EXITO
-    duracion_s: 0.004525
+    duracion_s: 0.00447
   [33]
     id_traza: 34
-    timestamp: 2026-08-08T10:49:47.314894+00:00
+    timestamp: 2026-08-11T20:00:30.818206+00:00
+    modulo: realidad
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000625
+  [34]
+    id_traza: 35
+    timestamp: 2026-08-11T20:00:30.838631+00:00
+    modulo: realidad
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.020374
+  [35]
+    id_traza: 36
+    timestamp: 2026-08-11T20:00:30.844798+00:00
+    modulo: self
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.006107
+  [36]
+    id_traza: 37
+    timestamp: 2026-08-11T20:00:30.849527+00:00
+    modulo: self
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.004676
+  [37]
+    id_traza: 38
+    timestamp: 2026-08-11T20:00:30.849585+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
-  [34]
-    id_traza: 35
-    timestamp: 2026-08-08T10:49:47.326614+00:00
-    modulo: spartaco_seguridad
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.011709
-  [35]
-    id_traza: 36
-    timestamp: 2026-08-08T10:49:47.327263+00:00
-    modulo: spartaco_seguridad
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000638
-  [36]
-    id_traza: 37
-    timestamp: 2026-08-08T10:49:47.328016+00:00
-    modulo: spartaco_seguridad
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000741
-  [37]
-    id_traza: 38
-    timestamp: 2026-08-08T10:49:47.328294+00:00
-    modulo: taxonomia
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000266
+    duracion_s: 9e-06
   [38]
     id_traza: 39
-    timestamp: 2026-08-08T10:49:47.328521+00:00
-    modulo: taxonomia
-    capacidad: diagnostico
+    timestamp: 2026-08-11T20:00:30.873228+00:00
+    modulo: spartaco_seguridad
+    capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000216
+    duracion_s: 0.023607
   [39]
     id_traza: 40
-    timestamp: 2026-08-08T10:49:47.328752+00:00
+    timestamp: 2026-08-11T20:00:30.874292+00:00
+    modulo: spartaco_seguridad
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000942
+  [40]
+    id_traza: 41
+    timestamp: 2026-08-11T20:00:30.875500+00:00
+    modulo: spartaco_seguridad
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.001135
+  [41]
+    id_traza: 42
+    timestamp: 2026-08-11T20:00:30.877330+00:00
+    modulo: taxonomia
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.001768
+  [42]
+    id_traza: 43
+    timestamp: 2026-08-11T20:00:30.877775+00:00
+    modulo: taxonomia
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.000388
+  [43]
+    id_traza: 44
+    timestamp: 2026-08-11T20:00:30.878197+00:00
     modulo: taxonomia
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000222
-  [40]
-    id_traza: 41
-    timestamp: 2026-08-08T10:49:47.329581+00:00
-    modulo: tru_totales
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 0.000818
-  [41]
-    id_traza: 42
-    timestamp: 2026-08-08T10:49:47.330353+00:00
-    modulo: tru_totales
-    capacidad: diagnostico
-    estado: EXITO
-    duracion_s: 0.000761
-  [42]
-    id_traza: 43
-    timestamp: 2026-08-08T10:49:47.331117+00:00
-    modulo: tru_totales
-    capacidad: inventario
-    estado: EXITO
-    duracion_s: 0.000754
-  [43]
-    id_traza: 44
-    timestamp: 2026-08-08T10:49:47.331131+00:00
-    modulo: verificacion
-    capacidad: reporte
-    estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 0.000358
   [44]
     id_traza: 45
-    timestamp: 2026-08-08T10:49:47.331137+00:00
+    timestamp: 2026-08-11T20:00:30.881113+00:00
+    modulo: tru_totales
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 0.002865
+  [45]
+    id_traza: 46
+    timestamp: 2026-08-11T20:00:30.882496+00:00
+    modulo: tru_totales
+    capacidad: diagnostico
+    estado: EXITO
+    duracion_s: 0.001333
+  [46]
+    id_traza: 47
+    timestamp: 2026-08-11T20:00:30.883763+00:00
+    modulo: tru_totales
+    capacidad: inventario
+    estado: EXITO
+    duracion_s: 0.001206
+  [47]
+    id_traza: 48
+    timestamp: 2026-08-11T20:00:30.883831+00:00
+    modulo: verificacion
+    capacidad: reporte
+    estado: EXITO
+    duracion_s: 8e-06
+  [48]
+    id_traza: 49
+    timestamp: 2026-08-11T20:00:30.883884+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1e-06
-  [45]
-    id_traza: 46
-    timestamp: 2026-08-08T10:49:47.331142+00:00
+    duracion_s: 2e-06
+  [49]
+    id_traza: 50
+    timestamp: 2026-08-11T20:00:30.883933+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 1e-06
+    duracion_s: 4e-06
+
+══════════════════════════════════════════════════════════════════════
+  MAPA DE RUTA DE EJECUCIÓN
+══════════════════════════════════════════════════════════════════════
 
 ══════════════════════════════════════════════════════════════════════
   CIERRE

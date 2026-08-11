@@ -1094,58 +1094,66 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_reporte",
         "obtener_diagnostico",
     ],
-
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
     "autoriza_engine": {
-    # --- PERMISOS BASE ---
-    "leer": True,
-    "ejecutar": True,
-    "consultar": True,
-    "recombinar": True,
-    "reportar": True,
-    "auditar": True,
-    "inventariar": True,
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
 
-    # --- PERMISOS DE ESCRITURA ---
-    "modificar": False,
-    "alterar": False,
-    "reescribir": False,
-    "crear": False,
-    "eliminar": False,
-    "actualizar": True,
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
 
-    # --- PERMISOS DE PROCESAMIENTO ---
-    "validar": False,
-    "procesar": True,
-    "analizar": True,
-    "generar": True,
-    "transformar": False,
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
-    # --- PERMISOS DE DATOS ---
-    "exportar": True,
-    "importar": True,
-    "respaldar": True,
-    "recuperar": True,
-    "sincronizar": True,
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
 
-    # --- PERMISOS DE MONITOREO ---
-    "monitorear": True,
-    "alertar": True,
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "metricas": True,
+        "diagnostico": True,
 
-    # --- REPORTING ---
-    "metricas": True,
-    "estado": True,
-    "version": True,
-    "salud": True,
-    "inventario": True,
-    "capacidades": True,
-    "errores": True,
-    "advertencias": True,
-    "dependencias": True,
-    "contrato": True,
-    "conocimiento": True,
-    "diagnostico": True,
-    "reporte": True,
-},
+        # --- PERMISOS DE ESTADO ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
+    # ============================================================
+    # CAPACIDADES 
+    # ============================================================
     "capacidades": {
         "verificar": verificar,
         "barrer": barrer,
@@ -1166,116 +1174,238 @@ CONTENEDOR: Dict[str, Any] = {
         "limpiar_ciclo": limpiar_ciclo,
         "evaluar": anunciar,
     },
+
+        # ============================================================
+    # METACITAS
+    # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Centinela del oficio de fundamentación.",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, coherente, errores, choques",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, coherente, errores, choques"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
             "descripcion": "Alias de verificar.",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, coherente, errores, choques",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, coherente, errores, choques"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
             "descripcion": "Inventario contractual de CIT.",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, nombre, rol, version, capacidades, tipos_declaracion",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, nombre, rol, version, capacidades, "
+                "tipos_declaracion"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
             "descripcion": "Reporte de estado de CIT.",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, estado, coherente, registro_n",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, coherente, registro_n"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
             "descripcion": "Diagnóstico propio de CIT.",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, estado, problemas, advertencias",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, problemas, advertencias"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
             "descripcion": "Forma mínima de salida de CIT.",
-            "entrada": "salida: dict",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
+
         "anunciar": {
             "descripcion": (
                 "Modo Engine (paquete) o Consulta (declaración). "
                 "Fundamentación documental sin recálculo."
             ),
-            "entrada": "paquete de ciclo | declaración | None",
-            "salida": "dict con anuncios / cadena documental",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con anuncios / cadena documental"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "anunciar_todo": {
-            "descripcion": "Anuncia todas las declaraciones del registro operativo.",
-            "entrada": "filtro opcional",
+            "descripcion": (
+                "Anuncia todas las declaraciones del registro operativo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con anuncios, n",
+            "acceso_archivos": ["*"],
         },
+
         "citar": {
-            "descripcion": "Representación citable de declaraciones.",
-            "entrada": "peticion opcional (filtros)",
+            "descripcion": (
+                "Representación citable de declaraciones."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con citas, n",
+            "acceso_archivos": ["*"],
         },
+
         "registrar": {
-            "descripcion": "Incorpora declaración al registro operativo. No altera origen.",
-            "entrada": "declaracion: dict",
+            "descripcion": (
+                "Incorpora declaración al registro operativo. "
+                "No altera origen."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con ok, declaracion",
+            "acceso_archivos": ["*"],
         },
+
         "resolver": {
             "descripcion": "Resuelve una declaración por id.",
-            "entrada": "id_decl: str",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con resuelto, declaracion",
+            "acceso_archivos": ["*"],
         },
+
         "resolver_enunciado": {
-            "descripcion": "Alias de resolución orientado a enunciado.",
-            "entrada": "id_norma: str",
+            "descripcion": (
+                "Alias de resolución orientado a enunciado."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con resuelto, enunciado",
+            "acceso_archivos": ["*"],
         },
+
         "buscar": {
-            "descripcion": "Consulta declaraciones del registro operativo.",
-            "entrada": "peticion con filtros opcionales",
+            "descripcion": (
+                "Consulta declaraciones del registro operativo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con declaraciones, n",
+            "acceso_archivos": ["*"],
         },
+
         "cadena": {
-            "descripcion": "Construye cadena normativa a partir de ids resolubles.",
-            "entrada": "ids: list[str]",
-            "salida": "dict con cadena, faltantes, completa",
+            "descripcion": (
+                "Construye cadena normativa a partir de ids resolubles."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con cadena, faltantes, completa"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "explicar": {
-            "descripcion": "Explicación documental solo con declaraciones existentes.",
-            "entrada": "peticion opcional (ids/filtros)",
-            "salida": "dict con explicacion, n, completa",
+            "descripcion": (
+                "Explicación documental solo con declaraciones existentes."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con explicacion, n, completa"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "relacionar": {
-            "descripcion": "Documenta relación entre dos declaraciones resolubles.",
-            "entrada": "id_a, relacion, id_b",
-            "salida": "dict con ok, declaracion de enlace",
+            "descripcion": (
+                "Documenta relación entre dos declaraciones resolubles."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, declaracion de enlace"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "limpiar_ciclo": {
-            "descripcion": "Limpia registro operativo del ciclo.",
-            "entrada": "ninguna",
-            "salida": "dict con ok, limpiadas",
+            "descripcion": (
+                "Limpia registro operativo del ciclo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, limpiadas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "evaluar": {
-            "descripcion": "Alias de anunciar (compatibilidad Engine).",
-            "entrada": "paquete | declaración | None",
-            "salida": "dict de anuncio / fundamentación",
+            "descripcion": (
+                "Alias de anunciar (compatibilidad Engine)."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict de anuncio / fundamentación"
+            ),
+            "acceso_archivos": ["*"],
         },
     },
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
+
     "estados_validos": [
         "NO_INICIADO",
         "OPERATIVO",

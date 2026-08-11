@@ -307,7 +307,7 @@ CONTENEDOR: Dict[str, Any] = {
         "este módulo siempre puede reportar su propio estado",
         "inventario() siempre incluye id, nombre, rol, version",
     ],
-}
+
     
     "consultas_soportadas": [
         "resolver",
@@ -380,6 +380,7 @@ CONTENEDOR: Dict[str, Any] = {
         "validar_esquema": True,     # ← AGREGADO
         "acceso_archivos": True,     # ← AGREGADO
     },
+    
     # ============================================================
     # CAPACIDADES 
     # ============================================================
@@ -599,6 +600,7 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
     },
+    
     # ============================================================
     # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================

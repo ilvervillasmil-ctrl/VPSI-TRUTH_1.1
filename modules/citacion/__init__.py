@@ -188,19 +188,7 @@ CAMPOS_OPCIONALES = (
     "fuente_modulo",  # legado
 )
 
-    "conocimiento_exportable": [
-        "declaraciones",
-        "resolver",
-        "buscar",
-        "cadena",
-        "explicar",
-        "citar",
-        "anunciar",
-        "relacionar",
-        "inventario",
-        "reporte",
-        "diagnostico",
-    ],
+
 # ===============================================================
 #  — CONTENEDOR (VPSI-CONTRACT-1.0)
 # ===============================================================
@@ -308,6 +296,20 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario() siempre incluye id, nombre, rol, version",
     ],
 
+    
+    "conocimiento_exportable": [
+        "declaraciones",
+        "resolver",
+        "buscar",
+        "cadena",
+        "explicar",
+        "citar",
+        "anunciar",
+        "relacionar",
+        "inventario",
+        "reporte",
+        "diagnostico",
+    ],
     
     "consultas_soportadas": [
         "resolver",

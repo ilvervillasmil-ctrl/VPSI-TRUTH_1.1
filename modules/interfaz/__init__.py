@@ -54,7 +54,6 @@ _ZONAS_CANONICAS = (
     "correlacion",
 )
 
-# Estados de operación de componer() (distintos de los estados del módulo)
 ESTADOS_OPERACION = ("PROPUESTO", "PARCIAL", "RETENIDO")
 
 
@@ -142,7 +141,7 @@ CONTENEDOR: Dict[str, Any] = {
     # -----------------------------------------------------------
     # Parte 3.8 — Capacidades
     # -----------------------------------------------------------
-    "capacidades": {},   # se materializa al final
+    "capacidades": {},
 
     # -----------------------------------------------------------
     # Parte 3.9 — Metadatos de capacidades
@@ -151,42 +150,42 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
             "entrada": "ninguna",
-            "salida": "dict con coherente, choques, errores, advertencias, paquetes",
+            "salida": "dict con id, nombre, rol, coherente, choques, errores, advertencias, paquetes",
             "validar_esquema": ["*"],
             "acceso_archivos": ["*"],
         },
         "barrer": {
             "descripcion": "Centinela de carpeta + verificación estructural del CONTENEDOR.",
             "entrada": "ninguna",
-            "salida": "dict con coherente, choques, errores, advertencias, paquetes_n",
+            "salida": "dict con id, nombre, rol, coherente, choques, errores, advertencias, paquetes_n",
             "validar_esquema": ["*"],
             "acceso_archivos": ["*"],
         },
         "componer": {
             "descripcion": "Genera descripción de interfaz (esquema). No inventa controles.",
             "entrada": "peticion: dict con O_uso, superficie, zonas, layout",
-            "salida": "dict con estado (PROPUESTO|PARCIAL|RETENIDO), esquema, observacion, auditable_por_centinela",
+            "salida": "dict con id, nombre, rol, estado (PROPUESTO|PARCIAL|RETENIDO), esquema, observacion, auditable_por_centinela",
             "validar_esquema": ["*"],
             "acceso_archivos": ["*"],
         },
         "inventario": {
             "descripcion": "Inventario estructural del módulo UI.",
             "entrada": "peticion opcional",
-            "salida": "dict con superficies, zonas, paquetes, capacidades",
+            "salida": "dict con id, nombre, rol, version, superficies, zonas, paquetes, capacidades",
             "validar_esquema": ["*"],
             "acceso_archivos": ["*"],
         },
         "inventario_paquetes": {
             "descripcion": "Lista los paquetes descubiertos bajo paquetes/.",
             "entrada": "ninguna",
-            "salida": "dict con dir, n, paquetes",
+            "salida": "dict con id, nombre, rol, dir, n, paquetes",
             "validar_esquema": ["*"],
             "acceso_archivos": ["*"],
         },
         "observar": {
             "descripcion": "Reúne pedido + evidencia CACHE (solo lectura).",
             "entrada": "pedido y cache_snapshot opcionales",
-            "salida": "dict con pedido y evidencia_cache",
+            "salida": "dict con id, nombre, rol, pedido, evidencia_cache",
             "validar_esquema": ["*"],
             "acceso_archivos": ["*"],
         },
@@ -406,8 +405,9 @@ def barrer() -> Dict[str, Any]:
     coherente = len(errores) == 0 and len(choques) == 0
 
     return {
-        "contenedor": "interfaz",
-        "rol": "UI",
+        "id": CONTENEDOR["id"],
+        "nombre": CONTENEDOR["nombre"],
+        "rol": CONTENEDOR["rol"],
         "coherente": coherente,
         "choques": choques,
         "errores": errores,
@@ -429,6 +429,9 @@ def observar(
     pedido = dict(pedido or {})
     snap = dict(cache_snapshot or {})
     return {
+        "id": CONTENEDOR["id"],
+        "nombre": CONTENEDOR["nombre"],
+        "rol": CONTENEDOR["rol"],
         "pedido": {
             "O_uso": pedido.get("O_uso") or pedido.get("contexto") or pedido.get("enunciado") or pedido.get("descripcion"),
             "superficie": pedido.get("superficie") or "web",
@@ -454,6 +457,9 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     if superficie not in SUPERFICIES_ADMITIDAS:
         return {
+            "id": CONTENEDOR["id"],
+            "nombre": CONTENEDOR["nombre"],
+            "rol": CONTENEDOR["rol"],
             "estado": "RETENIDO",
             "razon": f"superficie no admitida: {superficie!r}",
             "esquema": None,
@@ -463,6 +469,9 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     if not o_uso or not str(o_uso).strip():
         return {
+            "id": CONTENEDOR["id"],
+            "nombre": CONTENEDOR["nombre"],
+            "rol": CONTENEDOR["rol"],
             "estado": "PARCIAL",
             "razon": "sin O_uso / pedido de diseño",
             "observacion": obs,
@@ -510,6 +519,9 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         },
     }
     return {
+        "id": CONTENEDOR["id"],
+        "nombre": CONTENEDOR["nombre"],
+        "rol": CONTENEDOR["rol"],
         "estado": "PROPUESTO",
         "observacion": obs,
         "esquema": esquema,
@@ -523,11 +535,19 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 def inventario_paquetes() -> Dict[str, Any]:
     paquetes = _descubrir_paquetes()
-    return {"dir": str(_PAQUETES), "n": len(paquetes), "paquetes": paquetes}
+    return {
+        "id": CONTENEDOR["id"],
+        "nombre": CONTENEDOR["nombre"],
+        "rol": CONTENEDOR["rol"],
+        "dir": str(_PAQUETES),
+        "n": len(paquetes),
+        "paquetes": paquetes,
+    }
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     return {
-        "contenedor": CONTENEDOR["nombre"],
+        "id": CONTENEDOR["id"],
+        "nombre": CONTENEDOR["nombre"],
         "rol": CONTENEDOR["rol"],
         "version": CONTENEDOR["version_modulo"],
         "superficies": list(SUPERFICIES_ADMITIDAS),

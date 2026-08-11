@@ -239,6 +239,14 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
     # DEPENDENCIAS
     # ============================================================
     "requiere": ["*"],
@@ -254,7 +262,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
     
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -267,34 +275,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -306,6 +313,10 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # ============================================================
@@ -337,86 +348,159 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida": "verificar_salida",
     },
 
-    # ============================================================
+        # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia del glosario.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, categorias, ids, errores",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, categorias, ids, errores"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
-            "descripcion": "Evalúa coherencia del glosario de IDs. No calcula.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, categorias, ids, errores, esquema",
+            "descripcion": (
+                "Evalúa coherencia del glosario de IDs. No calcula."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, categorias, ids, errores, esquema"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
-            "descripcion": "Inventario completo del módulo y de los IDs.",
-            "entrada": "peticion opcional",
-            "salida": "dict con id, version, categorias, ids, total, errores",
+            "descripcion": (
+                "Inventario completo del módulo y de los IDs."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, version, categorias, ids, total, errores"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "categorias": {
-            "descripcion": "Lista del catálogo si coherente; si no, lista vacía.",
-            "entrada": "ninguna",
-            "salida": "list[dict] de categorías normalizadas",
+            "descripcion": (
+                "Lista del catálogo si coherente; si no, lista vacía."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "list[dict] de categorías normalizadas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "por_id": {
-            "descripcion": "Devuelve la categoría normalizada de un id, o None.",
-            "entrada": "cat_id: str",
+            "descripcion": (
+                "Devuelve la categoría normalizada de un id, o None."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict | None",
+            "acceso_archivos": ["*"],
         },
+
         "ids": {
-            "descripcion": "Lista de todos los ids del catálogo coherente.",
-            "entrada": "ninguna",
+            "descripcion": (
+                "Lista de todos los ids del catálogo coherente."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list[str]",
+            "acceso_archivos": ["*"],
         },
+
         "esquema": {
             "descripcion": (
                 "Esquema de forma de una categoría "
                 "(obligatorios, opcionales, prohibidos)."
             ),
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict ESQUEMA_CATEGORIA",
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
-            "descripcion": "Reporte interno de estado del módulo CC.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, categorias, ids, errores",
+            "descripcion": (
+                "Reporte interno de estado del módulo CC."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, categorias, ids, errores"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
-            "descripcion": "Diagnóstico: qué falta o está mal en el glosario.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "descripcion": (
+                "Diagnóstico: qué falta o está mal en el glosario."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
             "descripcion": (
                 "Comprueba forma de una salida de barrer: "
                 "coherente bool, errores list, ids list, categorias int."
             ),
-            "entrada": "salida: dict",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
     },
 
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
+
 
     # ============================================================
     # ESTADOS VÁLIDOS

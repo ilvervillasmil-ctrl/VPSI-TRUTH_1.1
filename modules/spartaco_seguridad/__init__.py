@@ -220,7 +220,6 @@ CONTENEDOR: Dict[str, Any] = {
     "estabilidad": ESTABILIDAD,
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
-}
 
     # ============================================================
     # IDENTIDAD
@@ -232,6 +231,8 @@ CONTENEDOR: Dict[str, Any] = {
         "Adaptador Spartaco (SC). Mantiene sincronizado el catálogo "
         "con el estado real del árbol de directorios."
     ),
+    # ... TODAS las demás claves ...
+}  # ← EL CIERRE VA AL FINAL
 
     # ============================================================
     # PROPÓSITO

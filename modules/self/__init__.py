@@ -579,7 +579,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -592,34 +592,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -631,6 +630,10 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # ============================================================
@@ -665,84 +668,184 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": diagnostico,
     },
 
-    # ============================================================
+        # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
+
     "capacidades_meta": {
         "verificar": {
-            "descripcion": "Alias de barrer. Verifica coherencia interna de SF.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con coherente, capa_activa, modo, errores",
+            "descripcion": (
+                "Alias de barrer. Verifica coherencia interna de SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, capa_activa, modo, errores"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
-            "descripcion": "Centinela de SF: identidad y estado interno.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con coherente, identidad_disponible, capa_activa, modo, errores",
+            "descripcion": (
+                "Centinela de SF: identidad y estado interno."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, identidad_disponible, "
+                "capa_activa, modo, errores"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
-            "descripcion": "Comprueba forma mínima de una salida de SF.",
-            "entrada": "salida: dict",
+            "descripcion": (
+                "Comprueba forma mínima de una salida de SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
+
         "yo_funcional": {
-            "descripcion": "Identidad de fase anclada en cuerpo axiomático self.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con capa_activa, modo, ax_self, identidad_disponible, perspectivas",
+            "descripcion": (
+                "Identidad de fase anclada en cuerpo axiomático self."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con capa_activa, modo, ax_self, "
+                "identidad_disponible, perspectivas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "oscilar": {
-            "descripcion": "Cambia o reporta la altura operativa del Self (L1…L6).",
-            "entrada": "hacia opcional (str); contexto opcional (dict)",
-            "salida": "dict con ok, capa_activa, altura_operativa, modo, cambio",
+            "descripcion": (
+                "Cambia o reporta la altura operativa del Self (L1…L6)."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, capa_activa, altura_operativa, "
+                "modo, cambio"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "desde_donde": {
-            "descripcion": "Reporta altura y modo actuales del Self.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con capa_activa, altura_operativa, modo, en_casa, perspectivas",
+            "descripcion": (
+                "Reporta altura y modo actuales del Self."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con capa_activa, altura_operativa, modo, "
+                "en_casa, perspectivas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "estado_self": {
-            "descripcion": "Clasifica lucidez: REACTIVE|MECHANICAL|CONSCIOUS|META|INTEGRATED.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con modo, capa_activa, en_casa, coherente",
+            "descripcion": (
+                "Clasifica lucidez: "
+                "REACTIVE|MECHANICAL|CONSCIOUS|META|INTEGRATED."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con modo, capa_activa, en_casa, coherente"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "elegir": {
-            "descripcion": "Registra un acto de agency sin ejecutar efectos externos.",
-            "entrada": "dict con opciones, eleccion, criterio, desde (opcionales)",
-            "salida": "dict con ok, eleccion, desde, modo, n_elecciones",
+            "descripcion": (
+                "Registra un acto de agency sin ejecutar efectos externos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, eleccion, desde, modo, n_elecciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
-            "descripcion": "Inventario estructural del módulo SF.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con id, capacidades, capas_validas, modos_validos, perspectivas",
+            "descripcion": (
+                "Inventario estructural del módulo SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, capacidades, capas_validas, "
+                "modos_validos, perspectivas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
-            "descripcion": "Reporte de estado del módulo SF.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con estado, coherente, capa_activa, modo, errores",
+            "descripcion": (
+                "Reporte de estado del módulo SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, capa_activa, "
+                "modo, errores"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
-            "descripcion": "Diagnóstico: problemas, advertencias, recomendaciones.",
-            "entrada": "peticion opcional (dict)",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "descripcion": (
+                "Diagnóstico: problemas, advertencias, recomendaciones."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, "
+                "recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
         },
     },
 
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================

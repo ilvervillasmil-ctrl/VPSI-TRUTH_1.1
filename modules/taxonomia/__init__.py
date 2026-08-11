@@ -155,7 +155,9 @@ class ContratoInvalido(Exception):
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
-    # ----- ESQUEMA -----
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
@@ -163,7 +165,9 @@ CONTENEDOR: Dict[str, Any] = {
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
 
-    # ----- IDENTIDAD -----
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,

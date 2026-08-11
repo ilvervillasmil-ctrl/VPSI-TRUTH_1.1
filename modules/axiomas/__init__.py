@@ -460,7 +460,6 @@ CONTENEDOR: Dict[str, Any] = {
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,            # ← SE MANTIENE (es permitido)
         "metricas": True,
         "diagnostico": True,
 

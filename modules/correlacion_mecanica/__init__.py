@@ -351,123 +351,95 @@ CONTENEDOR: Dict[str, Any] = {
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
-    "verificar": {
-        "descripcion": "Alias de barrer. Verifica coherencia mecánica.",
-        "entrada": "ninguna",
-        "validar_esquema": ["*"],
-        "salida": "dict con coherente, choques, errores, mecanica, archivos",
-        "acceso_archivos": ["*"],
+        "verificar": {
+            "descripcion": "Alias de barrer. Verifica coherencia mecánica.",
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": "dict con coherente, choques, errores, mecanica, archivos",
+            "acceso_archivos": ["*"],
+        },
+
+        "barrer": {
+            "descripcion": (
+                "Lee todas las MECANICA de la carpeta, calcula orden, "
+                "detecta contradicciones o ciclos y notifica a DiagnosticoGlobal."
+            ),
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, choques, errores, "
+                "mecanica, archivos"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "evaluar": {
+            "descripcion": "Alias de barrer. Evalúa coherencia del núcleo MC.",
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, choques, errores, mecanica"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "axiomas": {
+            "descripcion": (
+                "Declaraciones internas de correlación "
+                "(CORR_SEQ_01, CORR_SEQ_02)."
+            ),
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": "list[dict] de declaraciones",
+            "acceso_archivos": ["*"],
+        },
+
+        "inventario": {
+            "descripcion": (
+                "Inventario objetivo de mecánicas declaradas en la carpeta."
+            ),
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": "dict con total_mecanicas, archivos, declaran",
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar_salida": {
+            "descripcion": "Comprueba si una salida de barrer es coherente.",
+            "entrada": "salida: dict",
+            "validar_esquema": ["*"],
+            "salida": "bool",
+            "acceso_archivos": ["*"],
+        },
+
+        "reporte": {
+            "descripcion": "Reporte interno de estado del módulo MC.",
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, choques, errores, capacidades"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "diagnostico": {
+            "descripcion": "Diagnóstico: qué falta, qué está mal en MC.",
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "listar_mecanicas": {
+            "descripcion": "Lista todas las MECANICA descubiertas en la carpeta.",
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": "dict archivo → meta MECANICA",
+            "acceso_archivos": ["*"],
+        },
     },
-
-    "barrer": {
-        "descripcion": (
-            "Lee todas las MECANICA de la carpeta, calcula orden, "
-            "detecta contradicciones o ciclos y notifica a DiagnosticoGlobal."
-        ),
-        "entrada": "ninguna",
-        "validar_esquema": ["*"],
-        "salida": (
-            "dict con estado, coherente, choques, errores, "
-            "mecanica, archivos"
-        ),
-        "acceso_archivos": ["*"],
-    },
-
-    "evaluar": {
-        "descripcion": "Alias de barrer. Evalúa coherencia del núcleo MC.",
-        "entrada": "ninguna",
-        "validar_esquema": ["*"],
-        "salida": (
-            "dict con estado, coherente, choques, errores, mecanica"
-        ),
-        "acceso_archivos": ["*"],
-    },
-
-    "axiomas": {
-        "descripcion": (
-            "Declaraciones internas de correlación "
-            "(CORR_SEQ_01, CORR_SEQ_02)."
-        ),
-        "entrada": "ninguna",
-        "validar_esquema": ["*"],
-        "salida": "list[dict] de declaraciones",
-        "acceso_archivos": ["*"],
-    },
-
-    "inventario": {
-        "descripcion": "Inventario objetivo de mecánicas declaradas en la carpeta.",
-        "entrada": "ninguna",
-        "validar_esquema": ["*"],
-        "salida": "dict con total_mecanicas, archivos, declaran",
-        "acceso_archivos": ["*"],
-    },
-
-    "verificar_salida": {
-        "descripcion": "Comprueba si una salida de barrer es coherente.",
-        "entrada": "salida: dict",
-        "validar_esquema": ["*"],
-        "salida": "bool",
-        "acceso_archivos": ["*"],
-    },
-
-    "reporte": {
-        "descripcion": "Reporte interno de estado del módulo MC.",
-        "entrada": "ninguna",
-        "validar_esquema": ["*"],
-        "salida": (
-            "dict con estado, coherente, choques, errores, capacidades"
-        ),
-        "acceso_archivos": ["*"],
-    },
-
-    "diagnostico": {
-        "descripcion": "Diagnóstico: qué falta, qué está mal en MC.",
-        "entrada": "ninguna",
-        "validar_esquema": ["*"],
-        "salida": (
-            "dict con estado, problemas, advertencias, recomendaciones"
-        ),
-        "acceso_archivos": ["*"],
-    },
-},
-    
-    # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
-    # ============================================================
-    "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
-        "estado": True,
-        "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
-        "inventario": True,
-        "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
-        "errores": True,
-        "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
-        "dependencias": True,
-        "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
-        "contrato": True,
-        "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
-        "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
-    },
-
-
     # ============================================================
     # ESTADOS VÁLIDOS
     # ============================================================

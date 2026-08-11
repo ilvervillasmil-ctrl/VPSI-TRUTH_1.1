@@ -26,7 +26,7 @@
 #
 # ===============================================================
 # ===============================================================
-# I — Primera parte IMPORTACIONES
+# Parte 1 IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ from core.centinela import Centinela, Veredicto
 
 
 # ===============================================================
-# II — Segunda parte CONSTANTES /el esquema de contrato requerido,
+# Parte 2 CONSTANTES /el esquema de contrato requerido,
 #  la versión de contrato exigida y la API actual del Engine
 # ===============================================================
 VERSION_ENGINE = "19"
@@ -53,7 +53,7 @@ API_ENGINE_ACTUAL = "1.0"
 
 
 # ===============================================================
-# III — Tercera parte ESTADOS CANÓNICOS/
+# Parte 3 ESTADOS CANÓNICOS/
 #
 # ===============================================================
 
@@ -65,7 +65,7 @@ ESTADOS_CANONICOS = (ESTADO_NO_INICIADO, ESTADO_OPERATIVO, ESTADO_DEGRADADO, EST
 
 
 # ===============================================================
-#  IV — Cuarta parte CLAVES OBLIGATORIAS DEL CONTRATO
+#  Parte 4 CLAVES OBLIGATORIAS DEL CONTRATO
 # Enumera el conjunto de claves que todo contrato de módulo debe contener obligatoriamente.
 # Sirve como referencia para la validación estructural posterior.
 # ===============================================================
@@ -96,7 +96,7 @@ CLAVES_OBLIGATORIAS_CONTRATO = (
 )
 
 # ===============================================================
-#   V — Quinta parte PERMISOS AUTORIZADOS POR ENGINE
+#   Parte 5 PERMISOS AUTORIZADOS POR ENGINE
 #  El Engine solo puede ejercer las acciones que el 
 #  contrato autorice explícitamente.
 # ===============================================================
@@ -125,7 +125,7 @@ PERMISOS_AUTORIZA_ENGINE = (
 
 
 # ===============================================================
-#  VI — Sexta parte BANDERAS DE REPORTING/ Define las banderas booleanas
+#  Parte 6 BANDERAS DE REPORTING/ Define las banderas booleanas
 # que controlan qué información puede devolver un módulo cuando 
 # se le solicita un reporte, diagnóstico o inventario.
 # ===============================================================
@@ -142,7 +142,7 @@ BANDERAS_REPORTING = (
 )
 
 # ===============================================================
-#  METADATOS DE CAPACIDADES/Especifica los campos obligatorios 
+#  Parte 7 METADATOS DE CAPACIDADES/Especifica los campos obligatorios 
 # que debe tener cada entrada dentro de capacidades meta
 # descripción, entrada, salida, etc.
 # ===============================================================
@@ -181,7 +181,7 @@ CLAVES_META_CAPACIDAD = (
 #
 # ===============================================================
 # ===============================================================
-# LISTAS OBLIGATORIAS DE STR obligaciones de CONTRATO  
+#  Parte 8 LISTAS OBLIGATORIAS DE STR obligaciones de CONTRATO  
 # estan abajo en autorida de engine/Define qué campos del contrato
 # deben ser listas de cadenas de texto.
 # ===============================================================
@@ -193,7 +193,7 @@ LISTAS_STR_OBLIGATORIAS = (
 )
 
 # ===============================================================
-# DEFINICIONES/Una vez validado, lo convierte 
+# Parte 9 DEFINICIONES/Una vez validado, lo convierte 
 # en un objeto Contenedor. Todas las operaciones posteriores (registro,
 # resolución de dependencias, ejecución de capacidades, construcción del grafo, etc.)
 # operan sobre instancias de esta clase. En resumen: la sección 
@@ -204,7 +204,7 @@ class ArranqueError(Exception):
     """Fallo estructural durante el arranque del Engine."""
     pass
 # ===============================================================
-# LIBRERIAS DEL SISTEMA PARA CONTRATOS MODULOS
+# Parte 10 LIBRERIAS DEL SISTEMA PARA CONTRATOS MODULOS
 # ===============================================================
 
 class Contenedor:
@@ -220,7 +220,7 @@ class Contenedor:
         self.ruta = ruta
 
         # -------------------------------------------------------
-        # IDENTIDAD DE CADA MODULO EN EL CONTRATO
+        # Parte 10.1 IDENTIDAD DE CADA MODULO EN EL CONTRATO
         # -------------------------------------------------------
 
         self.id: str = str(meta.get("id", ""))
@@ -228,7 +228,7 @@ class Contenedor:
         self.rol: str = str(meta.get("rol", ""))
 
         # -------------------------------------------------------
-        # VERSIONES Y PALABRAS CLAVE DEL CONTRATO
+        # Parte 10.2 VERSIONES Y PALABRAS CLAVE DEL CONTRATO
         # -------------------------------------------------------
 
         self.version: str = str(meta.get("version_modulo", meta.get("version", "")))
@@ -239,7 +239,7 @@ class Contenedor:
         self.api_engine: str = str(meta.get("api_engine", ""))
 
         # -------------------------------------------------------
-        # DESCRIPCIÓN Y AUTORIDAD DE ENGINE EN CADA CONTRATO
+        # Parte 10.3 DESCRIPCIÓN Y AUTORIDAD DE ENGINE EN CADA CONTRATO
         # -------------------------------------------------------
 
         self.descripcion: str = str(meta.get("descripcion", ""))
@@ -252,7 +252,7 @@ class Contenedor:
         self.acceso_archivos: List[str] = list(meta.get("acceso_archivos") or [])
 
         # -------------------------------------------------------
-        # CONTRATO OPERATIVO Y UTILIZACIÓN VARIABLE
+        # Parte 10.4 CONTRATO OPERATIVO Y UTILIZACIÓN VARIABLE
         # -------------------------------------------------------
 
         self.requiere: List[str] = list(meta.get("requiere") or [])
@@ -264,11 +264,11 @@ class Contenedor:
         self.validar_esquema: List[str] = list(meta.get("validar_esquema") or [])
 
         # -------------------------------------------------------
-        # FIN DE CLAVES DE CONTRATO
+        # FIN DE LIBRERIAS Y CLAVES DE CONTRATO
         # -------------------------------------------------------
 
     # -----------------------------------------------------------
-    # RESOLUCIÓN DE CAPACIDADES
+    # Parte 10.5 RESOLUCIÓN DE CAPACIDADES
     # -----------------------------------------------------------
 
     def fn(self, clave: str) -> Any:
@@ -281,74 +281,31 @@ class Contenedor:
 
 
 # ===============================================================
-# DEF DE REGISTROS CONTRATOS
-# ===============================================================
-
-class RegistroModulos:
-
-    def __init__(self) -> None:
-        self.contenedores: Dict[str, Contenedor] = {}
-        self.por_id: Dict[str, Contenedor] = {}
-        self.por_rol: Dict[str, List[Contenedor]] = {}
-
-    def registrar(self, cont: Contenedor) -> List[str]:
-        errores: List[str] = []
-        if cont.nombre in self.contenedores:
-            errores.append(f"duplicado de nombre: '{cont.nombre}' ya registrado")
-        if cont.id and cont.id in self.por_id:
-            errores.append(f"duplicado de id: '{cont.id}' ya registrado (módulo {self.por_id[cont.id].nombre})")
-        if cont.rol in self.por_rol and self.por_rol[cont.rol]:
-            existente = self.por_rol[cont.rol][0].nombre
-            errores.append(f"duplicado de rol: '{cont.rol}' ya ocupado por '{existente}'")
-        if errores:
-            return errores
-        self.contenedores[cont.nombre] = cont
-        if cont.id:
-            self.por_id[cont.id] = cont
-        self.por_rol.setdefault(cont.rol, []).append(cont)
-        return []
-
-    def primero(self, clave: Any) -> Optional[Contenedor]:
-        if not isinstance(clave, str):
-            return None
-        if clave in self.contenedores:
-            return self.contenedores[clave]
-        if clave in self.por_id:
-            return self.por_id[clave]
-        lista = self.por_rol.get(clave)
-        return lista[0] if lista else None
-
-    def total(self) -> int:
-        return len(self.contenedores)
-
-# ===============================================================
-# REGISTRO DE MÓDULOS
+# Parte 11 — DEF DE REGISTROS CONTRATOS
 # ===============================================================
 
 from typing import Any, Dict, List, Optional
-from collections import defaultdict
 
 
 class RegistroModulos:
     """
     Registro central de Contenedores.
-    Mantiene índices por nombre, por rol y por id.
+    Mantiene índices por nombre, por id y por rol.
+    El rol es único por definición: solo un módulo puede ocuparlo.
     No inventa datos. Solo almacena lo que el Engine le entrega
     tras la validación contractual.
     """
 
     def __init__(self) -> None:
-        # Índice principal: nombre → Contenedor
+        # -------------------------------------------------------
+        # Parte 11.1 — Índices internos
+        # -------------------------------------------------------
         self.contenedores: Dict[str, Contenedor] = {}
-
-        # Índice por rol: rol → lista de Contenedores
-        self.por_rol: Dict[str, List[Contenedor]] = defaultdict(list)
-
-        # Índice por id: id → Contenedor
         self.por_id: Dict[str, Contenedor] = {}
+        self.por_rol: Dict[str, List[Contenedor]] = {}
 
     # -----------------------------------------------------------
-    # REGISTRO
+    # Parte 11.2 — Registro
     # -----------------------------------------------------------
 
     def registrar(self, cont: Contenedor) -> List[str]:
@@ -364,44 +321,55 @@ class RegistroModulos:
         rol = cont.rol
 
         # -------------------------------------------------------
-        # Validación de duplicados
+        # Parte 11.2.1 — Validación de campos obligatorios
         # -------------------------------------------------------
-
         if not nombre:
             errores.append("nombre vacío o nulo")
             return errores
 
+        # -------------------------------------------------------
+        # Parte 11.2.2 — Validación de duplicados
+        # -------------------------------------------------------
         if nombre in self.contenedores:
-            errores.append(f"nombre duplicado: '{nombre}'")
+            errores.append(f"duplicado de nombre: '{nombre}' ya registrado")
 
         if id_mod and id_mod in self.por_id:
-            errores.append(f"id duplicado: '{id_mod}'")
+            errores.append(
+                f"duplicado de id: '{id_mod}' ya registrado "
+                f"(módulo {self.por_id[id_mod].nombre})"
+            )
+
+        if rol and rol in self.por_rol and self.por_rol[rol]:
+            existente = self.por_rol[rol][0].nombre
+            errores.append(
+                f"duplicado de rol: '{rol}' ya ocupado por '{existente}'"
+            )
 
         if errores:
             return errores
 
         # -------------------------------------------------------
-        # Materialización en los índices
+        # Parte 11.2.3 — Materialización en los índices
         # -------------------------------------------------------
-
         self.contenedores[nombre] = cont
 
         if id_mod:
             self.por_id[id_mod] = cont
 
         if rol:
-            self.por_rol[rol].append(cont)
+            self.por_rol.setdefault(rol, []).append(cont)
 
         return []
 
     # -----------------------------------------------------------
-    # CONSULTAS
+    # Parte 11.3 — Consultas
     # -----------------------------------------------------------
 
     def primero(self, clave: Any) -> Optional[Contenedor]:
         """
         Resuelve un Contenedor por nombre, por id o por rol.
-        Si se pasa un rol y existen varios, devuelve el primero.
+        Dado que el rol es único, devuelve el único módulo
+        que lo ocupa (si existe).
         """
         if not isinstance(clave, str):
             return None
@@ -416,11 +384,9 @@ class RegistroModulos:
         if clave in self.por_id:
             return self.por_id[clave]
 
-        # 3. Búsqueda por rol
-        if clave in self.por_rol and self.por_rol[clave]:
-            return self.por_rol[clave][0]
-
-        return None
+        # 3. Búsqueda por rol (único)
+        lista = self.por_rol.get(clave)
+        return lista[0] if lista else None
 
     def total(self) -> int:
         """Número total de Contenedores registrados."""

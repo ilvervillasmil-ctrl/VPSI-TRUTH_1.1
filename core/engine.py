@@ -1313,7 +1313,84 @@ class Engine:
         }
 
     # ===========================================================
-    # Parte 20 CENSO
+    # Parte 20 ENTREGA DE COMENTARIOS AL MÓDULO CONTEXTO
+    # ===========================================================
+
+    def _extraer_y_entregar_comentarios(self) -> Dict[str, Any]:
+        """Extrae comentarios de todos los módulos y los entrega a 'contexto'."""
+        paquetes: Dict[str, Any] = {}
+
+        # -------------------------------------------------------
+        # Parte 1 — Recorrido de módulos
+        # -------------------------------------------------------
+        for path_dir in self._modulos_descubiertos:
+            nombre_modulo = path_dir.name
+            archivos_paquete: Dict[str, Any] = {}
+
+            # ---------------------------------------------------
+            # Parte 2 — Recorrido de archivos .py
+            # ---------------------------------------------------
+            for archivo in sorted(p for p in path_dir.rglob("*.py") if p.is_file()):
+                try:
+                    texto = archivo.read_text(encoding="utf-8")
+                except Exception:
+                    continue
+
+                comentarios: List[str] = []
+                lineas = texto.splitlines()
+                i = 0
+                while i < len(lineas):
+                    stripped = lineas[i].strip()
+                    if stripped.startswith("#"):
+                        comentarios.append(stripped)
+                        i += 1
+                        continue
+                    if stripped.startswith('"""') or stripped.startswith("'''"):
+                        comilla = stripped[:3]
+                        bloque = [stripped]
+                        i += 1
+                        if not (stripped.endswith(comilla) and len(stripped) > 3):
+                            while i < len(lineas):
+                                bloque.append(lineas[i])
+                                if lineas[i].strip().endswith(comilla):
+                                    i += 1
+                                    break
+                                i += 1
+                        comentarios.append("\n".join(bloque))
+                        continue
+                    i += 1
+
+                archivos_paquete[str(archivo.relative_to(path_dir))] = {
+                    "ruta": str(archivo),
+                    "total_comentarios": len(comentarios),
+                    "comentarios": comentarios
+                }
+
+            # ---------------------------------------------------
+            # Parte 3 — Empaquetado del módulo
+            # ---------------------------------------------------
+            paquetes[nombre_modulo] = {
+                "modulo": nombre_modulo,
+                "ruta": str(path_dir),
+                "total_archivos": len(archivos_paquete),
+                "archivos": archivos_paquete
+            }
+
+        # -------------------------------------------------------
+        # Parte 4 — Entrega al módulo contexto
+        # -------------------------------------------------------
+        if not paquetes:
+            return {"estado": "SIN_COMENTARIOS", "total_modulos": 0}
+
+        resultado = self.ejecutar_capacidad("contexto", "recibir_comentarios", paquetes)
+        return {
+            "estado": "ENTREGADO",
+            "total_modulos": len(paquetes),
+            "resultado_contexto": resultado
+        }
+        
+    # ===========================================================
+    # Parte 21 CENSO
     # ===========================================================
 
     def censar(self) -> Dict[str, Any]:
@@ -1341,7 +1418,7 @@ class Engine:
         }
 
     # ===========================================================
-    # Parte 21 TRAZAS DE EJECUCIÓN
+    # Parte 22 TRAZAS DE EJECUCIÓN
     # ===========================================================
 
     def _registrar_traza(
@@ -1383,7 +1460,7 @@ class Engine:
         )
 
     # ===========================================================
-    # MAPA DE RUTA DE EJECUCIÓN
+    # 23 MAPA DE RUTA DE EJECUCIÓN
     # ===========================================================
 
     def obtener_mapa_ruta(self) -> Tuple[Dict[str, Any], ...]:
@@ -1394,7 +1471,7 @@ class Engine:
         )
 
     # ===========================================================
-    # RESOLUCIÓN DE CONTENEDOR
+    # Parte 24 RESOLUCIÓN DE CONTENEDOR
     # ===========================================================
 
     def _resolver_contenedor(
@@ -1413,7 +1490,7 @@ class Engine:
         return cont, None
 
     # ===========================================================
-    # VALIDACIÓN DE ENTRADA DE CAPACIDAD
+    # Parte 25 VALIDACIÓN DE ENTRADA DE CAPACIDAD
     # ===========================================================
 
     def _validar_entrada_capacidad(
@@ -1445,7 +1522,7 @@ class Engine:
         return None
 
     # ===========================================================
-    # EJECUCIÓN CONTRACTUAL
+    # Parte 26 EJECUCIÓN CONTRACTUAL
     # ===========================================================
 
     def ejecutar_capacidad(
@@ -1584,7 +1661,7 @@ class Engine:
             return salida
 
     # ===========================================================
-    # ATAJOS DE CAPACIDADES
+    # Parte 27 ATAJOS DE CAPACIDADES
     # ===========================================================
 
     def ejecutar_reporte(self, modulo_o_rol: Any) -> Dict[str, Any]:
@@ -1626,7 +1703,7 @@ class Engine:
         )
 
     # ===========================================================
-    # INVOCADOR
+    # Parte 28 INVOCADOR
     # ===========================================================
 
     def invocar(
@@ -1655,7 +1732,7 @@ class Engine:
         return salida
 
     # ===========================================================
-    # CONSOLIDACIÓN
+    # Parte 29 CONSOLIDACIÓN
     # ===========================================================
 
     def consolidar_reportes(self) -> Dict[str, Any]:
@@ -1705,7 +1782,7 @@ class Engine:
         }
 
     # ===========================================================
-    # PAQUETE OMEGA
+    # Parte 30 PAQUETE OMEGA
     # ===========================================================
 
     def paquete_omega(self) -> Dict[str, Any]:
@@ -1825,7 +1902,7 @@ class Engine:
         }
 
     # ===========================================================
-    # ESTADO GLOBAL
+    # Parte 31 ESTADO GLOBAL
     # ===========================================================
 
     def estado_global(self) -> Dict[str, Any]:
@@ -1846,7 +1923,7 @@ class Engine:
         }
 
     # ===========================================================
-    # CENTINELA
+    # Parte 32 CENTINELA
     # ===========================================================
 
     @property
@@ -1910,7 +1987,7 @@ class Engine:
 
 
 # ===========================================================
-# EXPORTACIONES
+# Parte 33 EXPORTACIONES
 # ===========================================================
 
 __all__ = [

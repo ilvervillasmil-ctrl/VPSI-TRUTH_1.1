@@ -4,7 +4,7 @@
 **SPEC:** TEST-ESPARTACO-CADENA-GRAFO-1.0 + TEST-ESPARTACO-MULTI-ATACANTE  
 **Revisión:** 2026-08-11  
 **CI de referencia:** #544 · VPSI-TRUTH_1.1  
-**Resultado medido:** 813 passed · 1 skipped · 0 failed  
+**Resultado medido:** 813 passed · 0 skipped · 0 failed  
 
 ---
 

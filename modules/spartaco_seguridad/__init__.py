@@ -282,7 +282,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -295,19 +295,19 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": True,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": True,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        "eliminar": True,
-        "actualizar": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
         "generar": True,
-        "transformar": False,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
@@ -318,11 +318,10 @@ CONTENEDOR: Dict[str, Any] = {
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": False,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -334,20 +333,11 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
-    },
 
-    # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "verificar",
-        "barrer",
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "catalogo",
-        "verificar_salida",
-    ],
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
 
     # ============================================================
     # CAPACIDADES
@@ -368,58 +358,95 @@ CONTENEDOR: Dict[str, Any] = {
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Garantiza la coherencia del catálogo sincronizado.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con coherente, errores, choques, recursos",
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
             "descripcion": "Sincroniza el árbol y reporta coherencia.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con coherente, recursos, conceptos",
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
             "descripcion": "Garantiza la enumeración de recursos y conceptos.",
-            "entrada": "opcional",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con id, version, recursos, conceptos",
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
             "descripcion": "Garantiza el estado actual del módulo.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con estado, version, recursos",
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
             "descripcion": "Garantiza problemas y advertencias del catálogo.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con estado, problemas, advertencias",
+            "acceso_archivos": ["*"],
         },
+
         "catalogo": {
             "descripcion": "Recursos y conceptos descubiertos en el árbol.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con n, recursos, conceptos",
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
             "descripcion": "Forma mínima de una salida del módulo.",
-            "entrada": "dict",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
     },
-
+    
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================

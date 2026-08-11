@@ -36,8 +36,44 @@ from typing import Any, Dict, List, Optional
 
 
 # ===============================================================
-# Parte 2 — CONSTANTES
+# Parte 2 — CONSTANTES DE IDENTIDAD
 # ===============================================================
+
+ID_MODULO = "UI"
+NOMBRE_MODULO = "interfaz"
+ROL_MODULO = "UI"
+
+VERSION_MODULO = "1.0"
+VERSION_CONTRATO = "1.0"
+ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
+
+COMPATIBLE_DESDE = "1.0"
+API_ENGINE = ">=1.0"
+ESTABILIDAD = "ESTABLE"
+
+ESTADO_NO_INICIADO = "NO_INICIADO"
+ESTADO_OPERATIVO = "OPERATIVO"
+ESTADO_DEGRADADO = "DEGRADADO"
+ESTADO_RECHAZADO = "RECHAZADO"
+ESTADOS_VALIDOS = (
+    ESTADO_NO_INICIADO,
+    ESTADO_OPERATIVO,
+    ESTADO_DEGRADADO,
+    ESTADO_RECHAZADO,
+)
+
+INVARIANTES = (
+    "el id del módulo nunca cambia",
+    "el rol nunca cambia",
+    "las capacidades declaradas son siempre callables tras la resolución",
+    "este módulo no modifica el estado de otros módulos",
+    "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+    "no calcula ni modifica C, L, K ni Tru",
+    "no orquesta el ciclo Engine",
+    "toda salida de componer es auditable por Centinela (declaración)",
+    "presentar no forma parte de v1.0",
+    "los estados de operación de componer (PROPUESTO|PARCIAL|RETENIDO) son distintos de los estados del módulo",
+)
 
 _DIR = Path(__file__).parent
 _PAQUETES = _DIR / "paquetes"
@@ -58,7 +94,7 @@ ESTADOS_OPERACION = ("PROPUESTO", "PARCIAL", "RETENIDO")
 
 
 # ===============================================================
-# Parte 3 — CONTRATO OFICIAL
+# Parte 3 — CONTRATO OFICIAL (CONTENEDOR)
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
@@ -66,19 +102,19 @@ CONTENEDOR: Dict[str, Any] = {
     # -----------------------------------------------------------
     # Parte 3.1 — Esquema y versiones
     # -----------------------------------------------------------
-    "esquema": "VPSI-CONTRACT-1.0",
-    "version_contrato": "1.0",
-    "version_modulo": "1.0",
-    "estabilidad": "ESTABLE",
-    "compatible_desde": "1.0",
-    "api_engine": ">=1.0",
+    "esquema": ESQUEMA_CONTRATO,
+    "version_contrato": VERSION_CONTRATO,
+    "version_modulo": VERSION_MODULO,
+    "estabilidad": ESTABILIDAD,
+    "compatible_desde": COMPATIBLE_DESDE,
+    "api_engine": API_ENGINE,
 
     # -----------------------------------------------------------
     # Parte 3.2 — Identidad
     # -----------------------------------------------------------
-    "id": "UI",
-    "nombre": "interfaz",
-    "rol": "UI",
+    "id": ID_MODULO,
+    "nombre": NOMBRE_MODULO,
+    "rol": ROL_MODULO,
     "descripcion": (
         "Diseño de presentación del sistema. Compone descripciones de "
         "interfaz bajo un pedido explícito y lo observable (CACHE). "
@@ -120,9 +156,13 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # -----------------------------------------------------------
-    # Parte 3.6 — Dependencias y acceso
+    # Parte 3.6 — Dependencias
     # -----------------------------------------------------------
     "requiere": [],
+
+    # -----------------------------------------------------------
+    # Parte 3.7 — Acceso y validación
+    # -----------------------------------------------------------
     "acceso_archivos": ["paquetes/"],
     "validar_esquema": [],
     "acceso": {
@@ -131,7 +171,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # -----------------------------------------------------------
-    # Parte 3.7 — Consultas soportadas
+    # Parte 3.8 — Consultas soportadas
     # -----------------------------------------------------------
     "consultas_soportadas": [
         "componer", "observar", "inventario", "inventario_paquetes",
@@ -139,12 +179,12 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # -----------------------------------------------------------
-    # Parte 3.8 — Capacidades
+    # Parte 3.9 — Capacidades
     # -----------------------------------------------------------
     "capacidades": {},
 
     # -----------------------------------------------------------
-    # Parte 3.9 — Metadatos de capacidades
+    # Parte 3.10 — Metadatos de capacidades
     # -----------------------------------------------------------
     "capacidades_meta": {
         "verificar": {
@@ -199,7 +239,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # -----------------------------------------------------------
-    # Parte 3.10 — Autorización al Engine
+    # Parte 3.11 — Autorización al Engine
     # -----------------------------------------------------------
     "autoriza_engine": {
         "leer": True,
@@ -210,20 +250,7 @@ CONTENEDOR: Dict[str, Any] = {
         "auditar": True,
         "inventariar": True,
         "alterar": False,
-        "crear": False,
-        "actualizar": False,
-        "validar": True,
-        "procesar": False,
-        "analizar": False,
-        "generar": True,
-        "exportar": True,
-        "importar": False,
-        "respaldar": False,
-        "recuperar": False,
-        "sincronizar": False,
-        "monitorear": True,
         "metricas": True,
-        "diagnostico": True,
         "estado": True,
         "version": True,
         "salud": True,
@@ -234,13 +261,26 @@ CONTENEDOR: Dict[str, Any] = {
         "dependencias": True,
         "contrato": True,
         "conocimiento": True,
+        "diagnostico": True,
         "reporte": True,
+        "crear": False,
+        "actualizar": False,
         "validar_esquema": True,
+        "validar": True,
+        "procesar": False,
+        "analizar": False,
+        "generar": True,
+        "exportar": True,
+        "importar": False,
+        "respaldar": False,
+        "recuperar": False,
+        "sincronizar": False,
+        "monitorear": True,
         "acceso_archivos": True,
     },
 
     # -----------------------------------------------------------
-    # Parte 3.11 — Reporting
+    # Parte 3.12 — Reporting
     # -----------------------------------------------------------
     "reporting": {
         "estado": True,
@@ -261,20 +301,14 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # -----------------------------------------------------------
-    # Parte 3.12 — Estados e invariantes
+    # Parte 3.13 — Estados válidos
     # -----------------------------------------------------------
-    "estados_validos": ["NO_INICIADO", "OPERATIVO", "DEGRADADO", "RECHAZADO"],
-    "invariantes": [
-        "el id del módulo nunca cambia",
-        "el rol nunca cambia",
-        "no calcula ni modifica C, L, K ni Tru",
-        "no orquesta el ciclo Engine",
-        "toda salida de componer es auditable por Centinela (declaración)",
-        "los paquetes no pueden actuar sobre evaluación (validación declarativa del manifiesto)",
-        "las capacidades declaradas son callables tras la resolución",
-        "presentar no forma parte de v1.0",
-        "los estados de operación de componer (PROPUESTO|PARCIAL|RETENIDO) son distintos de los estados del módulo",
-    ],
+    "estados_validos": list(ESTADOS_VALIDOS),
+
+    # -----------------------------------------------------------
+    # Parte 3.14 — Invariantes
+    # -----------------------------------------------------------
+    "invariantes": list(INVARIANTES),
 }
 
 
@@ -353,7 +387,7 @@ def _detectar_choques_paquetes(paquetes: Dict[str, Dict[str, Any]]) -> List[str]
 
 
 # ===============================================================
-# Parte 5 — CÓDIGO PÚBLICO
+# Parte 5 — CAPACIDADES PÚBLICAS
 # ===============================================================
 
 def barrer() -> Dict[str, Any]:
@@ -364,15 +398,15 @@ def barrer() -> Dict[str, Any]:
     if not isinstance(CONTENEDOR, dict):
         errores.append("CONTENEDOR ausente o no es dict")
     else:
-        if CONTENEDOR.get("id") != "UI":
+        if CONTENEDOR.get("id") != ID_MODULO:
             errores.append(f"id inválido: {CONTENEDOR.get('id')}")
-        if CONTENEDOR.get("nombre") != "interfaz":
+        if CONTENEDOR.get("nombre") != NOMBRE_MODULO:
             errores.append(f"nombre inválido: {CONTENEDOR.get('nombre')}")
-        if CONTENEDOR.get("rol") != "UI":
+        if CONTENEDOR.get("rol") != ROL_MODULO:
             errores.append(f"rol inválido: {CONTENEDOR.get('rol')}")
-        if CONTENEDOR.get("esquema") != "VPSI-CONTRACT-1.0":
+        if CONTENEDOR.get("esquema") != ESQUEMA_CONTRATO:
             errores.append(f"esquema inválido: {CONTENEDOR.get('esquema')}")
-        if str(CONTENEDOR.get("version_contrato")) != "1.0":
+        if str(CONTENEDOR.get("version_contrato")) != VERSION_CONTRATO:
             errores.append(f"version_contrato inválida: {CONTENEDOR.get('version_contrato')}")
         if not CONTENEDOR.get("version_modulo"):
             errores.append("version_modulo vacía")
@@ -405,9 +439,9 @@ def barrer() -> Dict[str, Any]:
     coherente = len(errores) == 0 and len(choques) == 0
 
     return {
-        "id": CONTENEDOR["id"],
-        "nombre": CONTENEDOR["nombre"],
-        "rol": CONTENEDOR["rol"],
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
         "coherente": coherente,
         "choques": choques,
         "errores": errores,
@@ -429,9 +463,9 @@ def observar(
     pedido = dict(pedido or {})
     snap = dict(cache_snapshot or {})
     return {
-        "id": CONTENEDOR["id"],
-        "nombre": CONTENEDOR["nombre"],
-        "rol": CONTENEDOR["rol"],
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
         "pedido": {
             "O_uso": pedido.get("O_uso") or pedido.get("contexto") or pedido.get("enunciado") or pedido.get("descripcion"),
             "superficie": pedido.get("superficie") or "web",
@@ -457,9 +491,9 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     if superficie not in SUPERFICIES_ADMITIDAS:
         return {
-            "id": CONTENEDOR["id"],
-            "nombre": CONTENEDOR["nombre"],
-            "rol": CONTENEDOR["rol"],
+            "id": ID_MODULO,
+            "nombre": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
             "estado": "RETENIDO",
             "razon": f"superficie no admitida: {superficie!r}",
             "esquema": None,
@@ -469,9 +503,9 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     if not o_uso or not str(o_uso).strip():
         return {
-            "id": CONTENEDOR["id"],
-            "nombre": CONTENEDOR["nombre"],
-            "rol": CONTENEDOR["rol"],
+            "id": ID_MODULO,
+            "nombre": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
             "estado": "PARCIAL",
             "razon": "sin O_uso / pedido de diseño",
             "observacion": obs,
@@ -519,9 +553,9 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         },
     }
     return {
-        "id": CONTENEDOR["id"],
-        "nombre": CONTENEDOR["nombre"],
-        "rol": CONTENEDOR["rol"],
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
         "estado": "PROPUESTO",
         "observacion": obs,
         "esquema": esquema,
@@ -536,9 +570,9 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 def inventario_paquetes() -> Dict[str, Any]:
     paquetes = _descubrir_paquetes()
     return {
-        "id": CONTENEDOR["id"],
-        "nombre": CONTENEDOR["nombre"],
-        "rol": CONTENEDOR["rol"],
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
         "dir": str(_PAQUETES),
         "n": len(paquetes),
         "paquetes": paquetes,
@@ -546,10 +580,10 @@ def inventario_paquetes() -> Dict[str, Any]:
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     return {
-        "id": CONTENEDOR["id"],
-        "nombre": CONTENEDOR["nombre"],
-        "rol": CONTENEDOR["rol"],
-        "version": CONTENEDOR["version_modulo"],
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
         "superficies": list(SUPERFICIES_ADMITIDAS),
         "zonas_canonicas": list(_ZONAS_CANONICAS),
         "paquetes": inventario_paquetes(),
@@ -608,9 +642,37 @@ def axiomas() -> List[Dict[str, Any]]:
 
 
 # ===============================================================
-# Parte 6 — MATERIALIZACIÓN DE CAPACIDADES + EXPORTACIONES
+# Parte 6 — RESOLUCIÓN DE CAPACIDADES + EXPORTACIONES
 # ===============================================================
 
+_CAP_MAP = {
+    "verificar": verificar,
+    "barrer": barrer,
+    "componer": componer,
+    "inventario": inventario,
+    "inventario_paquetes": inventario_paquetes,
+    "observar": observar,
+    "axiomas": axiomas,
+}
+
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    resueltas: Dict[str, Any] = {}
+    for nombre, ref in cont["capacidades"].items():
+        if callable(ref):
+            resueltas[nombre] = ref
+            continue
+        if isinstance(ref, str):
+            if ref not in _CAP_MAP:
+                raise Exception(f"{NOMBRE_MODULO}: capacidad '{nombre}' referencia inexistente: '{ref}'")
+            fn = _CAP_MAP[ref]
+            if not callable(fn):
+                raise Exception(f"{NOMBRE_MODULO}: '{ref}' no es callable")
+            resueltas[nombre] = fn
+            continue
+        raise Exception(f"{NOMBRE_MODULO}: capacidad '{nombre}' tiene tipo inválido")
+    cont["capacidades"] = resueltas
+
+# Materialización directa (compatible con Engine)
 CONTENEDOR["capacidades"] = {
     "verificar": verificar,
     "barrer": barrer,
@@ -623,6 +685,10 @@ CONTENEDOR["capacidades"] = {
 
 __all__ = [
     "CONTENEDOR",
+    "ID_MODULO",
+    "NOMBRE_MODULO",
+    "ROL_MODULO",
+    "VERSION_MODULO",
     "SUPERFICIES_ADMITIDAS",
     "ESTADOS_OPERACION",
     "barrer",

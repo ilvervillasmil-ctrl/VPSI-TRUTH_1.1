@@ -6,7 +6,7 @@
 # Versión:            19.0
 # Esquema contrato:   VPSI-CONTRACT-2.0
 # API Engine:         1.0
-#
+# 
 # Función:
 #   Agente ejecutor del sistema.
 #   Descubre módulos. Lee contratos. Valida contratos.

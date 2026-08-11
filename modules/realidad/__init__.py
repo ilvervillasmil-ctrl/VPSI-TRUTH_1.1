@@ -239,6 +239,14 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+    
+    # ============================================================
     # DEPENDENCIAS
     # ============================================================
     "requiere": ["*"],
@@ -254,7 +262,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -267,34 +275,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -306,7 +313,12 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
+
 
     # ============================================================
     # CONSULTAS SOPORTADAS
@@ -336,83 +348,131 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
+
     "capacidades_meta": {
         "verificar": {
             "descripcion": (
                 "Garantiza la coherencia interna de RE "
                 "(alias de barrer)."
             ),
-            "entrada": "ninguna",
-            "salida": "dict con coherente, choques, errores, funciones",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, choques, errores, funciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
             "descripcion": (
                 "Centinela de no-contradicción entre dominios/funciones "
                 "y registro de simbiosis dominio↔Engine."
             ),
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": (
                 "dict con coherente, choques, errores, funciones, "
                 "dominios_simbiosis, estados_material, notas"
             ),
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
-            "descripcion": "Enumeración de funciones, simbiosis y canal.",
-            "entrada": "peticion opcional",
+            "descripcion": (
+                "Enumeración de funciones, simbiosis y canal."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": (
                 "dict con id, version, funciones, coherente, acceso, "
                 "contrato_simbiosis"
             ),
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
-            "descripcion": "Estado actual del módulo RE.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, version, capacidades, coherente",
+            "descripcion": (
+                "Estado actual del módulo RE."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, version, capacidades, coherente"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
-            "descripcion": "Problemas, advertencias y recomendaciones de RE.",
-            "entrada": "ninguna",
+            "descripcion": (
+                "Problemas, advertencias y recomendaciones de RE."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": (
                 "dict con estado, problemas, advertencias, recomendaciones"
             ),
+            "acceso_archivos": ["*"],
         },
+
         "registrar_resultado_dominio": {
             "descripcion": (
                 "Cierra el tramo de simbiosis para un material: "
                 "registra aprobación o rechazo del dominio tras "
                 "resultado de Engine. No recalcula Tru."
             ),
-            "entrada": (
-                "nombre_dominio: str, material_id: str, "
-                "resultado_engine: dict, aprobacion_dominio: bool"
-            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict con ok, estado, nota",
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
-            "descripcion": "Forma mínima de una salida de RE.",
-            "entrada": "salida: dict",
+            "descripcion": (
+                "Forma mínima de una salida de RE."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
     },
 
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
+
 
     # ============================================================
     # ESTADOS VÁLIDOS

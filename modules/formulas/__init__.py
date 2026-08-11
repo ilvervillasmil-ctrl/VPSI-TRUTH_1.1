@@ -219,6 +219,14 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico",
     ],
 
+     # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+    
     # ============================================================
     # DEPENDENCIAS
     # ============================================================
@@ -235,7 +243,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
     
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -248,34 +256,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -287,7 +294,12 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
+
 
     # ============================================================
     # CONSULTAS SOPORTADAS
@@ -323,88 +335,174 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
+
     "capacidades_meta": {
         "verificar": {
-            "descripcion": "Alias de barrer. Verifica coherencia de fórmulas.",
-            "entrada": "ninguna",
-            "salida": "dict con coherente, faltas, reglas, formulas",
+            "descripcion": (
+                "Alias de barrer. Verifica coherencia de fórmulas."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, faltas, reglas, formulas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
-            "descripcion": "Ejecuta todas las reglas y reporta faltas de coherencia.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, faltas, reglas, formulas",
+            "descripcion": (
+                "Ejecuta todas las reglas y reporta faltas de coherencia."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, faltas, reglas, formulas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "evaluar": {
-            "descripcion": "Alias de barrer. Evalúa coherencia del módulo.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, faltas, reglas, formulas",
+            "descripcion": (
+                "Alias de barrer. Evalúa coherencia del módulo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, faltas, reglas, formulas"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
-            "descripcion": "Comprueba si una salida de barrer es coherente.",
-            "entrada": "salida: dict",
+            "descripcion": (
+                "Comprueba si una salida de barrer es coherente."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
-            "descripcion": "Inventario de fórmulas descubiertas y registradas.",
-            "entrada": "peticion opcional",
-            "salida": "dict con formulas, formulas_registradas, reglas, declaraciones",
+            "descripcion": (
+                "Inventario de fórmulas descubiertas y registradas."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con formulas, formulas_registradas, "
+                "reglas, declaraciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "axiomas": {
-            "descripcion": "Declaraciones FO registradas (FO-1..FO-4).",
-            "entrada": "ninguna",
+            "descripcion": (
+                "Declaraciones FO registradas (FO-1..FO-4)."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list[dict] de declaraciones",
+            "acceso_archivos": ["*"],
         },
+
         "tru_ri": {
             "descripcion": (
                 "Calcula Tru_Ri = C * L * K. Sin límites artificiales "
                 "sobre los valores de C, L, K."
             ),
-            "entrada": "C, L, K (numéricos o Fraction)",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "resultado de C * L * K",
+            "acceso_archivos": ["*"],
         },
+
         "tru_total": {
             "descripcion": (
                 "Calcula Tru_total = (Tru_Ri * ALPHA) + BETA. "
                 "Sin límites artificiales sobre C, L, K."
             ),
-            "entrada": "C, L, K (numéricos o Fraction)",
-            "salida": "resultado de (C*L*K)*ALPHA + BETA",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "resultado de (C*L*K)*ALPHA + BETA"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "reporte": {
-            "descripcion": "Reporte interno de estado del módulo FO.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, coherente, formulas, faltas, capacidades",
+            "descripcion": (
+                "Reporte interno de estado del módulo FO."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, formulas, faltas, capacidades"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "diagnostico": {
-            "descripcion": "Diagnóstico: qué falta, qué está mal en FO.",
-            "entrada": "ninguna",
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "descripcion": (
+                "Diagnóstico: qué falta, qué está mal en FO."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "listar_formulas": {
-            "descripcion": "Lista todas las fórmulas descubiertas y registradas.",
-            "entrada": "ninguna",
-            "salida": "dict con descubiertas y registradas",
+            "descripcion": (
+                "Lista todas las fórmulas descubiertas y registradas."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con descubiertas y registradas"
+            ),
+            "acceso_archivos": ["*"],
         },
     },
 
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
+
 
     # ============================================================
     # ESTADOS VÁLIDOS

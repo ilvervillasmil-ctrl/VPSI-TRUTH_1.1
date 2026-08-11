@@ -376,15 +376,15 @@ class RegistroModulos:
 
         clave = clave.strip()
 
-        # 1. Búsqueda por nombre
+        # 11.3.1 Búsqueda por nombre
         if clave in self.contenedores:
             return self.contenedores[clave]
 
-        # 2. Búsqueda por id
+        # 11.3.2 Búsqueda por id
         if clave in self.por_id:
             return self.por_id[clave]
 
-        # 3. Búsqueda por rol (único)
+        # 11.3.3 Búsqueda por rol (único)
         lista = self.por_rol.get(clave)
         return lista[0] if lista else None
 
@@ -756,7 +756,7 @@ class Engine:
         )
 
     # ===========================================================
-    # VALIDACIÓN DE LISTAS STR
+    # Parte 15 VALIDACIÓN DE LISTAS STR
     # ===========================================================
 
     def _validar_lista_str(
@@ -783,7 +783,7 @@ class Engine:
         return errores
 
     # ===========================================================
-    # VERSIONES capacidad de identificar las versiones de casa modulo
+    # Parte 16 VERSIONES capacidad de identificar las versiones de casa modulo
     # ===========================================================
 
     @staticmethod
@@ -865,7 +865,7 @@ class Engine:
         return None
 
     # ===========================================================
-    # VALIDACIÓN DEL ESQUEMA DEL CONTRATO
+    # Parte 17 VALIDACIÓN DEL ESQUEMA DEL CONTRATO
     # ===========================================================
 
     def _validar_esquema(
@@ -877,7 +877,7 @@ class Engine:
         errores: List[str] = []
 
         # =======================================================
-        # 1. ESQUEMA
+        # Parte 17.1 ESQUEMA
         # =======================================================
 
         if meta.get("esquema") != ESQUEMA_CONTRATO_REQUERIDO:
@@ -886,7 +886,7 @@ class Engine:
             )
 
         # =======================================================
-        # 2. VERSIÓN DEL CONTRATO
+        # Parte 17.2 VERSIÓN DEL CONTRATO
         # =======================================================
 
         vc = meta.get("version_contrato")
@@ -897,7 +897,7 @@ class Engine:
             )
 
         # =======================================================
-        # 3. VERSIÓN DEL MÓDULO
+        # Parte 17.3 VERSIÓN DEL MÓDULO
         # =======================================================
 
         vm = meta.get("version_modulo")
@@ -908,7 +908,7 @@ class Engine:
             )
 
         # =======================================================
-        # 4. CLAVES OBLIGATORIAS
+        # Parte 17.4 CLAVES OBLIGATORIAS
         # =======================================================
 
         for clave in CLAVES_OBLIGATORIAS_CONTRATO:
@@ -919,7 +919,7 @@ class Engine:
                 )
 
         # =======================================================
-        # 5. LISTAS DE STR OBLIGATORIAS
+        # Parte 17.5 LISTAS DE STR OBLIGATORIAS
         # =======================================================
 
         for clave in LISTAS_STR_OBLIGATORIAS:
@@ -940,7 +940,7 @@ class Engine:
                     )
 
         # =======================================================
-        # 6. DEPENDENCIAS (requiere)
+        # Parte 17.6 DEPENDENCIAS (requiere)
         # =======================================================
 
         requiere = meta.get("requiere")
@@ -960,7 +960,7 @@ class Engine:
                     )
 
         # =======================================================
-        # 7. CAPACIDADES
+        # Parte 17.7 CAPACIDADES
         # =======================================================
 
         caps = meta.get("capacidades")
@@ -981,7 +981,7 @@ class Engine:
                     )
 
         # =======================================================
-        # 8. METADATOS DE CAPACIDADES
+        # Parte 17.8 METADATOS DE CAPACIDADES
         # =======================================================
 
         meta_caps = meta.get("capacidades_meta")
@@ -1027,7 +1027,7 @@ class Engine:
                         )
 
         # =======================================================
-        # 9. AUTORIZACIÓN ENGINE
+        # Parte 17.9 AUTORIZACIÓN ENGINE
         # =======================================================
 
         auth = meta.get("autoriza_engine")
@@ -1063,7 +1063,7 @@ class Engine:
                 )
 
         # =======================================================
-        # 10. REPORTING
+        # Parte 17.10 REPORTING
         # =======================================================
 
         reporting = meta.get("reporting")
@@ -1091,7 +1091,7 @@ class Engine:
                     )
 
         # =======================================================
-        # 11. ESTADOS VÁLIDOS
+        # Parte 17.11 ESTADOS VÁLIDOS
         # =======================================================
 
         ev = meta.get("estados_validos")
@@ -1125,7 +1125,7 @@ class Engine:
                     )
 
         # =======================================================
-        # 12. API ENGINE
+        # Parte 17.12 API ENGINE
         # =======================================================
 
         err_api = self._comparar_api(
@@ -1136,7 +1136,7 @@ class Engine:
             errores.append(f"{nombre}: {err_api}")
 
         # =======================================================
-        # 13. COMPATIBILIDAD
+        # Parte 17.13 COMPATIBILIDAD
         # =======================================================
 
         err_cd = self._comparar_compatible_desde(
@@ -1150,7 +1150,7 @@ class Engine:
         return errores
 
     # ===========================================================
-    # DEPENDENCIAS
+    # Parte 18 DEPENDENCIAS
     # ===========================================================
 
     def _resolver_dependencias(self) -> None:
@@ -1165,7 +1165,7 @@ class Engine:
         grafo_dep: Dict[str, List[str]] = defaultdict(list)
 
         # -------------------------------------------------------
-        # DETECCIÓN DE DEPENDENCIAS
+        # Parte 18.1 DETECCIÓN DE DEPENDENCIAS
         # -------------------------------------------------------
 
         for nombre, cont in self.registro.contenedores.items():
@@ -1183,7 +1183,7 @@ class Engine:
                     )
 
         # -------------------------------------------------------
-        # RESOLUCIÓN TOPOLÓGICA
+        # Parte 18.2 RESOLUCIÓN TOPOLÓGICA
         # -------------------------------------------------------
 
         in_degree = {
@@ -1222,7 +1222,7 @@ class Engine:
                         cola.append(d)
 
         # -------------------------------------------------------
-        # DETECCIÓN DE CICLOS
+        # Parte 18.3 DETECCIÓN DE CICLOS
         # -------------------------------------------------------
 
         ciclos = [
@@ -1238,7 +1238,7 @@ class Engine:
             )
 
         # -------------------------------------------------------
-        # REGISTRO DE DEPENDENCIAS
+        # Parte 18.4 REGISTRO DE DEPENDENCIAS
         # -------------------------------------------------------
 
         self._dependencias = {
@@ -1249,7 +1249,7 @@ class Engine:
         }
 
     # ===========================================================
-    # GRAFO
+    # Parte 19 GRAFO
     # ===========================================================
 
     def _construir_grafo(self) -> None:
@@ -1258,7 +1258,7 @@ class Engine:
         aristas: List[Dict[str, Any]] = []
 
         # -------------------------------------------------------
-        # NODOS DE MÓDULOS
+        # Parte 19.1 NODOS DE MÓDULOS
         # -------------------------------------------------------
 
         for nombre, cont in self.registro.contenedores.items():
@@ -1271,7 +1271,7 @@ class Engine:
             })
 
             # ---------------------------------------------------
-            # ARISTAS DE DEPENDENCIAS
+            # Parte 19.2 ARISTAS DE DEPENDENCIAS
             # ---------------------------------------------------
 
             for dep in cont.requiere:
@@ -1283,7 +1283,7 @@ class Engine:
                 })
 
             # ---------------------------------------------------
-            # NODOS Y ARISTAS DE CAPACIDADES
+            # Parte 19.3 NODOS Y ARISTAS DE CAPACIDADES
             # ---------------------------------------------------
 
             for cap in cont.capacidades:
@@ -1304,7 +1304,7 @@ class Engine:
                 })
 
         # -------------------------------------------------------
-        # CONSOLIDACIÓN DEL GRAFO
+        # Parte 19.4 CONSOLIDACIÓN DEL GRAFO
         # -------------------------------------------------------
 
         self._grafo = {
@@ -1313,7 +1313,7 @@ class Engine:
         }
 
     # ===========================================================
-    # CENSO
+    # Parte 20 CENSO
     # ===========================================================
 
     def censar(self) -> Dict[str, Any]:
@@ -1341,7 +1341,7 @@ class Engine:
         }
 
     # ===========================================================
-    # TRAZAS DE EJECUCIÓN
+    # Parte 21 TRAZAS DE EJECUCIÓN
     # ===========================================================
 
     def _registrar_traza(

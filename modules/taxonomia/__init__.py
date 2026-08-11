@@ -290,7 +290,18 @@ CONTENEDOR: Dict[str, Any] = {
         "validar_esquema": True,     # ← AGREGADO
         "acceso_archivos": True,     # ← AGREGADO
     },
-
+    #============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
+    "consultas_soportadas": [
+        "verificar",
+        "barrer",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "catalogo",
+        "verificar_salida",
+    ],
 
     # ----- CAPACIDADES -----
     "capacidades": {

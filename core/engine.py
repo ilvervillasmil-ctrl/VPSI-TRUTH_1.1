@@ -1010,10 +1010,10 @@ class Engine:
                             f"{nombre}: capacidades_meta['{k}'] falta '{campo}'"
                         )
 
-                    elif not isinstance(entrada_meta[campo], str):
+                    elif not isinstance(entrada_meta[campo], (str, list)):    # ← ACEPTA str O list
 
                         errores.append(
-                            f"{nombre}: capacidades_meta['{k}']['{campo}'] debe ser str"
+                            f"{nombre}: capacidades_meta['{k}']['{campo}'] debe ser str o list"
                         )
 
         # =======================================================

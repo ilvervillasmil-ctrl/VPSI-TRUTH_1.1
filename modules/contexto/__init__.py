@@ -1191,7 +1191,22 @@ def axiomas() -> List[Dict[str, Any]]:
             "gobierna": ["contexto"],
         },
     ]
+def recibir_comentarios(paquetes: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Recibe el paquete de comentarios entregado por el Engine.
+    """
+    if not isinstance(paquetes, dict):
+        return {
+            "estado": "ERROR",
+            "error": "paquetes debe ser dict"
+        }
 
+    return {
+        "estado": "RECIBIDO",
+        "total_modulos": len(paquetes),
+        "modulos": list(paquetes.keys()),
+        "paquetes": paquetes
+    }
 # ===============================================================
 # FIN CAPACIDADES PÚBLICAS
 # ===============================================================

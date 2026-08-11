@@ -200,8 +200,20 @@ CONTENEDOR: Dict[str, Any] = {
         "capacidades",
     ],
 
-    # ----- DEPENDENCIAS -----
-    "requiere": [],
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
+    "requiere": ["*"],
+
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
+
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
 
     "autoriza_engine": {
     # --- PERMISOS BASE ---

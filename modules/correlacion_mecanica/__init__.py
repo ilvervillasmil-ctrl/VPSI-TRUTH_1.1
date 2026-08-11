@@ -440,6 +440,43 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
     },
+    
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
+    "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
+        "estado": True,
+        "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+        "inventario": True,
+        "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+        "errores": True,
+        "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+        "dependencias": True,
+        "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+        "contrato": True,
+        "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
+        "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
+    },
+    
     # ============================================================
     # ESTADOS VÁLIDOS
     # ============================================================

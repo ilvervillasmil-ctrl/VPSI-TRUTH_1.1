@@ -1139,7 +1139,7 @@ class Engine:
 
         return errores
 
-    # ===========================================================
+        # ===========================================================
     # Parte 18 DEPENDENCIAS
     # ===========================================================
 
@@ -1163,6 +1163,15 @@ class Engine:
             for dep in cont.requiere:
 
                 grafo_dep[nombre].append(dep)
+
+                # ---------------------------------------------------
+                # El comodín "*" no es una dependencia inexistente.
+                # Es una declaración especial que será expandida
+                # posteriormente en la Parte 18.5.
+                # ---------------------------------------------------
+
+                if dep == "*":
+                    continue
 
                 if dep not in presentes:
 
@@ -1237,7 +1246,7 @@ class Engine:
             "orden_topologico": orden,
             "ciclos": ciclos
         }
-        
+
         # -------------------------------------------------------
         # Parte 18.5 RESOLUCIÓN DE COMODÍN "*"
         # -------------------------------------------------------
@@ -1290,7 +1299,7 @@ class Engine:
         # debe conservar el literal "*".
         #
         # Solo se reportan como inexistentes las dependencias
-        # explícitas que realmente no existen en el registro.
+        # reales que no existen en el registro.
         # -------------------------------------------------------
 
         faltantes.clear()
@@ -1304,8 +1313,6 @@ class Engine:
                     faltantes.setdefault(nombre, []).append(dep)
 
                     # "*" ya fue expandido.
-                    # Si aparece aquí, no se genera un error
-                    # por dependencia inexistente.
                     if dep != "*":
 
                         contenedor = self.registro.contenedores.get(nombre)
@@ -1325,8 +1332,8 @@ class Engine:
         # Parte 18.7 GUARDAR RESULTADO DE RESOLUCIÓN
         # -------------------------------------------------------
         # El grafo almacenado ya contiene las dependencias reales.
-        # Por tanto, un módulo con ["*"] aparecerá conectado con
-        # todos los demás módulos registrados, excepto consigo mismo.
+        # Un módulo con ["*"] aparecerá conectado con todos los
+        # demás módulos registrados, excepto consigo mismo.
         # -------------------------------------------------------
 
         self._dependencias = {
@@ -1334,6 +1341,7 @@ class Engine:
             "faltantes": dict(faltantes),
             "orden_topologico": orden,
             "ciclos": ciclos,
+              "ciclos": ciclos,
         }
     # ===========================================================
     # Parte 19 GRAFO

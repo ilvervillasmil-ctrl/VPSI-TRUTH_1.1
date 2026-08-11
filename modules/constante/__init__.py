@@ -242,7 +242,7 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
     # ============================================================
-    "validar_esquema": ["*"]
+    "validar_esquema": ["*"],
 
     # ============================================================
     # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)

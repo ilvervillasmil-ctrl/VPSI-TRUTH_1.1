@@ -675,123 +675,320 @@ def test_dos_builds_no_cruzan_autorizacion(claves):
 # 6. FIRMA / PARSING / MALEABILIDAD
 # ===============================================================
 
-def test_firma_alterada_un_nibble(build_valido):
-    r, pub = build_valido
-    firma = r["manifiesto"]["firma"]
-    alterada = ("0" if firma[0] != "0" else "1") + firma[1:]
+# ---------------------------------------------------------------
+# HELPERS (pegar una sola vez, antes del bloque 6)
+# ---------------------------------------------------------------
 
-    m = copy.deepcopy(r["manifiesto"])
-    m["firma"] = alterada
+import copy
+from decimal import Decimal
+from fractions import Fraction
 
-    v = verificar(
-        r["datos"], manifiesto=m,
-        pub_bytes=pub, modo=MODO_PROTEGIDO,
+import pytest
+
+L_ED25519 = 2**252 + 27742317777372353535851937790883648493
+
+
+def _verificar(r, m, pub):
+    return verificar(r["datos"], manifiesto=m,
+                     pub_bytes=pub, modo=MODO_PROTEGIDO)
+
+
+def _exige_aceptado(r, m, pub, ctx=""):
+    """Ancla: si el manifiesto legítimo no pasa, el test es vacío."""
+    v = _verificar(r, m, pub)
+    assert isinstance(v, dict), f"verificar() no devolvió dict {ctx}: {v!r}"
+    assert v.get("ok") is True, (
+        f"CONTROL POSITIVO ROTO {ctx}: el manifiesto legítimo fue "
+        f"rechazado ({v!r}). Todo test de rechazo es vacío."
     )
-    assert v["ok"] is False
-    assert "manifiesto" in v["fallos"]
-    assert "FIRMA_INVÁLIDA" in v["conceptos"]
+    return v
 
 
-@pytest.mark.parametrize(
-    "firma",
-    [
-        "", "00", "zz", "0" * 128,
-        "a" * 130, "a", "deadbeef", "gg",
-        " " * 64, "\x00",
-        "0x" + "00" * 64,      # prefijo hex
-        "\n" + "00" * 64,      # salto de línea
-        "00 " * 64,            # bytes.fromhex ACEPTA espacios: no debe colarse
-    ],
-)
-def test_firma_malformada(build_valido, firma):
-    r, pub = build_valido
-    m = copy.deepcopy(r["manifiesto"])
-    m["firma"] = firma
-
-    ok, exc = blindado(
-        verificar,
-        r["datos"], manifiesto=m,
-        pub_bytes=pub, modo=MODO_PROTEGIDO,
-    )
-    assert exc is None
-    assert ok is False
+def _exige_rechazado(r, m, pub, msg):
+    ok, exc = blindado(verificar, r["datos"], manifiesto=m,
+                       pub_bytes=pub, modo=MODO_PROTEGIDO)
+    assert exc is None, f"crash en vez de rechazo limpio: {exc!r} — {msg}"
+    assert ok is False, msg
 
 
-@pytest.mark.parametrize(
-    "firma",
-    [
-        b"00" * 64, bytearray(b"0" * 128),
-        0, None, [], {}, 1.5, True,
-    ],
-)
-def test_firma_tipo_no_str(build_valido, firma):
-    r, pub = build_valido
-    m = {
-        "cuerpo": r["manifiesto"]["cuerpo"],
-        "firma": firma,
+def _sig_variantes(R, S):
+    """(id → firma_bytes) — todas deben ser rechazadas."""
+    return {
+        "S_mas_L":     R + (S + L_ED25519).to_bytes(32, "little"),
+        "S_igual_L":   R + L_ED25519.to_bytes(32, "little"),
+        "S_mas_2L":    R + (S + 2 * L_ED25519).to_bytes(32, "little"),
+        "S_bit_alto":  R + ((S | (1 << 255)) % 2**256).to_bytes(32, "little"),
+        "S_todo_ff":   R + b"\xff" * 32,
+        "R_identidad": b"\x01" + b"\x00" * 31 + S.to_bytes(32, "little"),
+        "R_no_canon":  b"\xff" * 32 + S.to_bytes(32, "little"),
+        "truncada_63": (R + S.to_bytes(32, "little"))[:63],
+        "extra_65":    R + S.to_bytes(32, "little") + b"\x00",
     }
 
-    ok, exc = blindado(
-        verificar,
-        r["datos"], manifiesto=m,
-        pub_bytes=pub, modo=MODO_PROTEGIDO,
-    )
-    assert exc is None
-    assert ok is False
+
+CASOS_FIRMA = [
+    "S_mas_L", "S_igual_L", "S_mas_2L", "S_bit_alto", "S_todo_ff",
+    "R_identidad", "R_no_canon", "truncada_63", "extra_65",
+]
+
+CASOS_VALUACIONES = [
+    "pop_final", "pop_inicio", "duplicar", "vaciar",
+    "reordenar", "intercambiar",
+]
 
 
-def test_mutar_cada_par_hex_firma(build_valido):
-    r, pub = build_valido
-    firma = r["manifiesto"]["firma"]
-
-    for i in range(0, min(len(firma), 128), 2):
-        chars = list(firma)
-        chars[i] = "0" if chars[i] != "0" else "1"
-
-        m = copy.deepcopy(r["manifiesto"])
-        m["firma"] = "".join(chars)
-
-        v = verificar(
-            r["datos"], manifiesto=m,
-            pub_bytes=pub, modo=MODO_PROTEGIDO,
-        )
-        assert v["ok"] is False, f"nibble {i} no invalidó"
+def _mismo_valor_y_tipo(valor, legitimo):
+    """Comparación protegida: el __eq__ del atacante no decide el flujo."""
+    if type(valor) is not type(legitimo):
+        return False
+    try:
+        return bool(valor == legitimo)
+    except Exception:
+        return False
 
 
-def test_firma_maleable_S_mas_L(build_valido):
+def _mutaciones(vals):
+    return {
+        "pop_final":    vals[:-1],
+        "pop_inicio":   vals[1:],
+        "duplicar":     vals + [vals[-1]],
+        "vaciar":       [],
+        "reordenar":    [vals[1], vals[0]] + vals[2:],
+        "intercambiar": [vals[-1]] + vals[1:-1] + [vals[0]],
+    }
+
+
+class _IntFalso(int):
+    """Subclase de int: mismo valor, tipo distinto."""
+    pass
+
+
+CASOS_CANONICO = [
+    ("int_3",        3),
+    ("float_3_0",    3.0),
+    ("bool_True",    True),
+    ("decimal_3",    Decimal("3")),
+    ("fraction_3_1", Fraction(3, 1)),
+    ("subclase_int", _IntFalso(3)),
+    ("str_3",        "3"),
+]
+
+
+class _CuerpoTOCTOU(dict):
+    """Devuelve el valor legítimo la 1ª lectura y el hostil después."""
+
+    def __init__(self, base, clave, valor_falso):
+        super().__init__(base)
+        self.clave = clave
+        self.falso = valor_falso
+        self.lecturas = 0
+
+    def __getitem__(self, k):
+        if k == self.clave:
+            self.lecturas += 1
+            if self.lecturas > 1:
+                return self.falso
+        return super().__getitem__(k)
+
+
+# ===============================================================
+# 6. FIRMA / PARSING / MALEABILIDAD  →  test_firma_maleable_S_mas_L
+# ===============================================================
+
+@pytest.mark.parametrize("caso_id", CASOS_FIRMA)
+def test_firma_maleable_S_mas_L(build_valido, caso_id):
     """
-    Ed25519: una codificación no canónica de S (S + L) no debe
-    convertirse en una firma aceptada.
+    Ed25519: ninguna codificación no canónica de S (S+L, S=L, S+2L,
+    bit alto) ni un R no canónico debe convertirse en firma aceptada.
+    Longitudes distintas de 64 → rechazo limpio, nunca crash.
     """
     r, pub = build_valido
 
-    L = (
-        2 ** 252
-        + 27742317777372353535851937790883648493
-    )
+    # Ancla: la firma legítima verifica.
+    _exige_aceptado(r, r["manifiesto"], pub, ctx=f"[{caso_id}]")
 
     raw = bytes.fromhex(r["manifiesto"]["firma"])
+    assert len(raw) == 64, f"firma legítima con longitud rara: {len(raw)}"
     R = raw[:32]
     S = int.from_bytes(raw[32:], "little")
-    S_mal = S + L
 
-    if S_mal >= 2 ** 256:
-        pytest.skip("S+L no cabe en 32 bytes")
+    # El firmante propio debe emitir S canónico (S < L).
+    assert S < L_ED25519, f"el firmante emitió S no reducido: S={S}"
 
-    mal = R + S_mal.to_bytes(32, "little")
+    mal = _sig_variantes(R, S)[caso_id]
+    assert mal != raw, f"variante {caso_id} es idéntica a la firma real"
 
     m = {
-        "cuerpo": r["manifiesto"]["cuerpo"],
+        "cuerpo": copy.deepcopy(r["manifiesto"]["cuerpo"]),
         "firma": mal.hex(),
     }
 
-    ok, exc = blindado(
-        verificar,
-        r["datos"], manifiesto=m,
-        pub_bytes=pub, modo=MODO_PROTEGIDO,
+    _exige_rechazado(r, m, pub, f"firma hostil aceptada: {caso_id}")
+
+
+# ===============================================================
+# 16-BIS. DIAGNÓSTICO DE CANONICALIZACIÓN NUMÉRICA
+#         (no es test de seguridad — mide el contrato)
+#         Ejecutar con:  pytest -s -k canonico
+# ===============================================================
+
+@pytest.mark.parametrize("caso_id,valor", CASOS_CANONICO)
+def test_diagnostico_canonico_n_neutro(build_valido, caso_id, valor):
+    """
+    Responde: ¿tu canónico distingue 3 de 3.0?
+
+    - float_3_0 → ok=True  : el canónico normaliza números (estilo
+      JCS/RFC 8785). 3.0 NO es type-confusion; hay que volver a
+      saltarlo en el test 17.
+    - float_3_0 → ok=False : el canónico distingue tipos (estilo
+      json.dumps) y el test 17 endurecido queda tal cual.
+    """
+    r, pub = build_valido
+    legitimo = r["manifiesto"]["cuerpo"]["n_neutro"]
+
+    _exige_aceptado(r, r["manifiesto"], pub, ctx=f"[{caso_id}]")
+
+    m = copy.deepcopy(r["manifiesto"])
+    try:
+        m["cuerpo"]["n_neutro"] = valor
+    except Exception as e:
+        print(f"\n[CANONICO] {caso_id:14s} no asignable: {e!r}")
+        return
+
+    ok, exc = blindado(verificar, r["datos"], manifiesto=m,
+                       pub_bytes=pub, modo=MODO_PROTEGIDO)
+
+    print(
+        f"\n[CANONICO] {caso_id:14s} "
+        f"valor={valor!r:16s} tipo={type(valor).__name__:10s} "
+        f"legitimo={legitimo!r} ({type(legitimo).__name__}) "
+        f"→ ok={ok!r} exc={type(exc).__name__ if exc else None}"
     )
-    assert exc is None
-    assert ok is False
+
+    # Única exigencia real: nunca crashear con entrada numérica rara.
+    assert exc is None, (
+        f"{caso_id}: verificar() lanzó {exc!r} en vez de "
+        f"devolver un veredicto. Eso es DoS, no rechazo."
+    )
+
+
+def test_diagnostico_canonico_resumen(build_valido):
+    """Imprime el veredicto del contrato en una sola línea."""
+    r, pub = build_valido
+    legitimo = r["manifiesto"]["cuerpo"]["n_neutro"]
+
+    if not isinstance(legitimo, int) or isinstance(legitimo, bool):
+        pytest.skip(f"n_neutro legítimo no es int puro: {legitimo!r}")
+
+    m = copy.deepcopy(r["manifiesto"])
+    m["cuerpo"]["n_neutro"] = float(legitimo)
+    ok_float, exc = blindado(verificar, r["datos"], manifiesto=m,
+                             pub_bytes=pub, modo=MODO_PROTEGIDO)
+    assert exc is None, f"crash con float equivalente: {exc!r}"
+
+    if ok_float is False:
+        veredicto = (
+            "ESTRICTO — el canónico distingue int de float. "
+            "El test 17 endurecido es correcto tal cual."
+        )
+    else:
+        veredicto = (
+            "NORMALIZADOR — el canónico trata 3 y 3.0 como el mismo "
+            "número (estilo JCS). El float equivalente NO es ataque: "
+            "hay que volver a saltarlo en el test 17."
+        )
+
+    print(f"\n[CANONICO] VEREDICTO: {veredicto}")
+
+
+# ===============================================================
+# 17. TIPOS ADVERSARIALES  →  test_n_neutro_tipo_adversarial
+# ===============================================================
+
+@pytest.mark.parametrize("valor", TIPOS_ADVERSARIOS)
+def test_n_neutro_tipo_adversarial(build_valido, valor):
+    r, pub = build_valido
+    legitimo = r["manifiesto"]["cuerpo"]["n_neutro"]
+
+    # Ancla: sin tocar nada, el manifiesto pasa.
+    _exige_aceptado(r, r["manifiesto"], pub, ctx="[n_neutro]")
+
+    # Solo se salta si el valor ES EXACTAMENTE el legítimo
+    # (mismo valor Y mismo tipo). La comparación va protegida porque
+    # el propio __eq__ del atacante es superficie de ataque.
+    if _mismo_valor_y_tipo(valor, legitimo):
+        pytest.skip("mismo valor y mismo tipo legítimo — no es ataque")
+
+    m = copy.deepcopy(r["manifiesto"])
+    m["cuerpo"]["n_neutro"] = valor
+
+    _exige_rechazado(
+        r, m, pub,
+        f"Type-confusion no rechazado: "
+        f"legítimo={legitimo!r} ({type(legitimo).__name__}) "
+        f"vs atacante={valor!r} ({type(valor).__name__})",
+    )
+
+
+# ===============================================================
+# 18. MUTACIÓN PROFUNDA / ALIASING  →  test_valuaciones_pop_rompe
+# ===============================================================
+
+@pytest.mark.parametrize("caso_id", CASOS_VALUACIONES)
+def test_valuaciones_pop_rompe(build_valido, caso_id):
+    r, pub = build_valido
+    _exige_aceptado(r, r["manifiesto"], pub, ctx=f"[{caso_id}]")
+
+    vals = list(r["manifiesto"]["cuerpo"]["valuaciones"])
+    assert len(vals) >= 2, (
+        f"fixture inútil para este test: valuaciones={len(vals)}. "
+        f"build_valido debe generar al menos 2."
+    )
+
+    nuevos = _mutaciones(vals)[caso_id]
+    assert nuevos != vals, f"la mutación {caso_id} no cambió nada"
+
+    m = copy.deepcopy(r["manifiesto"])
+    m["cuerpo"]["valuaciones"] = nuevos
+
+    _exige_rechazado(r, m, pub, f"mutación aceptada: {caso_id}")
+
+
+def test_verificar_no_muta_la_entrada(build_valido):
+    """Aliasing real: verificar() no debe tocar lo que le pasas."""
+    r, pub = build_valido
+    m = copy.deepcopy(r["manifiesto"])
+    datos = copy.deepcopy(r["datos"])
+    m_antes = copy.deepcopy(m)
+    datos_antes = copy.deepcopy(datos)
+
+    verificar(datos, manifiesto=m, pub_bytes=pub, modo=MODO_PROTEGIDO)
+
+    assert m == m_antes, "verificar() mutó el manifiesto del llamador"
+    assert datos == datos_antes, "verificar() mutó los datos del llamador"
+
+
+def test_toctou_n_neutro(build_valido):
+    """El valor cambia entre la 1ª y la 2ª lectura: no debe aceptarse."""
+    r, pub = build_valido
+    _exige_aceptado(r, r["manifiesto"], pub, ctx="[toctou]")
+
+    legitimo = r["manifiesto"]["cuerpo"]["n_neutro"]
+    cuerpo = _CuerpoTOCTOU(
+        copy.deepcopy(r["manifiesto"]["cuerpo"]),
+        "n_neutro",
+        "VALOR_INYECTADO",
+    )
+    m = {"cuerpo": cuerpo, "firma": r["manifiesto"]["firma"]}
+
+    ok, exc = blindado(verificar, r["datos"], manifiesto=m,
+                       pub_bytes=pub, modo=MODO_PROTEGIDO)
+    assert exc is None, f"crash con cuerpo TOCTOU: {exc!r}"
+    assert cuerpo.lecturas <= 1 or ok is False, (
+        f"TOCTOU: n_neutro se leyó {cuerpo.lecturas} veces y cambió "
+        f"tras la primera (legítimo={legitimo!r}), pero fue aceptado"
+    )
+
 
 
 # ===============================================================

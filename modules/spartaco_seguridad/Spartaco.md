@@ -266,7 +266,7 @@ pytest tests/test_espartaco_*.py tests/test_proteccion_adversarial*.py \
 | Tests totales | 814 collected |
 | Passed | **813** |
 | Failed | **0** |
-| Skipped | **1** (`n_neutro_tipo_adversarial[3.0]`) |
+| Skipped | **0** (`n_neutro_tipo_adversarial[3.0]`) |
 | Espartaco cadena | **6/6 PASSED** |
 | Espartaco multi-atacante | **3/3 PASSED** |
 | BREACH (cadena + multi) | **0** |

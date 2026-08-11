@@ -520,7 +520,7 @@ CONTENEDOR: Dict[str, Any] = {
     "validar_esquema": ["*"],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (TODOS LOS PERMISOS)
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -533,34 +533,33 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,
-        "crear": False,
-        "eliminar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": False,
-        "transformar": False,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
-        "importar": False,
-        "respaldar": False,
+        "importar": True,
+        "respaldar": True,
         "recuperar": True,
-        "sincronizar": False,
+        "sincronizar": True,
 
         # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
-        "alertar": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO (OBLIGATORIOS) ---
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -572,6 +571,10 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # ============================================================
@@ -609,80 +612,126 @@ CONTENEDOR: Dict[str, Any] = {
                 "Alias de barrer. ¿El inventario operativo de skills "
                 "de CE es coherente?"
             ),
-            "entrada": "ninguna",
-            "salida": "dict con id, nombre, rol, version, coherente, ids, errores",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, nombre, rol, version, coherente, ids, errores"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "barrer": {
             "descripcion": (
                 "Centinela de CE: valida forma de skills nativos. "
                 "No decide, no ejecuta, no restringe uso."
             ),
-            "entrada": "ninguna",
-            "salida": "dict con id, nombre, rol, version, coherente, ids, n, archivos",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, nombre, rol, version, coherente, "
+                "ids, n, archivos"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "inventario": {
             "descripcion": (
                 "Inventario operativo de skills nativos del Engine "
                 "expuestos por la capacidad CE. Incluye encabezado "
                 "contractual completo (id, nombre, rol, version, …)."
             ),
-            "entrada": "peticion opcional",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": (
                 "dict con id, nombre, rol, version, version_contrato, "
                 "esquema, estabilidad, ids, n, archivos, skills, coherente"
             ),
+            "acceso_archivos": ["*"],
         },
+
         "skills": {
             "descripcion": (
                 "Lista de skills válidos (nombre histórico de la API). "
                 "Futuro: podrá coexistir con procedimientos()/competencias() "
                 "como alias. Preparación: resolver(id)/existe(id)."
             ),
-            "entrada": "ninguna",
-            "salida": "list[dict] con id, nombre, version, descripcion, archivo",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "list[dict] con id, nombre, version, descripcion, archivo"
+            ),
+            "acceso_archivos": ["*"],
         },
+
         "ids": {
             "descripcion": "Ids de todos los skills válidos de CE.",
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list[str]",
+            "acceso_archivos": ["*"],
         },
+
         "por_id": {
             "descripcion": "Resuelve un skill por id.",
-            "entrada": "skill_id: str",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "dict del skill o None",
+            "acceso_archivos": ["*"],
         },
+
         "listar_archivos": {
             "descripcion": (
                 "Nombres de *.py del directorio CE "
                 "(implementación física de los skills)."
             ),
-            "entrada": "ninguna",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "list[str]",
+            "acceso_archivos": ["*"],
         },
+
         "verificar_salida": {
             "descripcion": "Comprueba forma mínima de una salida de CE.",
-            "entrada": "salida: dict",
+            "entrada": "*",
+            "validar_esquema": ["*"],
             "salida": "bool",
+            "acceso_archivos": ["*"],
         },
     },
-
     # ============================================================
-    # REPORTING
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================

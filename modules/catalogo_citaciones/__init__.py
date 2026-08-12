@@ -757,46 +757,77 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # VPSI-TRUTH — modules/catalogo_citaciones/__init__.py
 # ===============================================================
 
-def _cargar_desde_modulo(mod, origen_nombre: str) -> list[dict]:
-    halladas = []
-    
-    # 1. Cargar primero las entradas enriquecidas desde CATEGORIAS
-    categorias = getattr(mod, "CATEGORIAS", None)
-    if isinstance(categorias, list):
-        for cat in categorias:
-            if isinstance(cat, dict) and cat.get("id"):
-                item = dict(cat)
-                item.setdefault("origen", origen_nombre)
-                halladas.append(item)
+def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
+    cats: List[Dict[str, Any]] = []
+    errores: List[Dict[str, str]] = []
+    candidatos: List[Path] = []
 
-    # 2. Procesar IDS solo si no existen previamente en CATEGORIAS
-    raw_ids = getattr(mod, "IDS", None)
-    if isinstance(raw_ids, list):
-        for item in raw_ids:
-            if isinstance(item, dict) and item.get("id"):
-                cid = item["id"].strip().lower()
-                if not any(h.get("id").lower() == cid for h in halladas):
-                    entry = dict(item)
-                    entry.setdefault("origen", origen_nombre)
-                    halladas.append(entry)
-            elif isinstance(item, str) and item.strip():
-                cid = item.strip().lower()
-                # Ignorar si ya fue cargado desde CATEGORIAS
-                if not any(h.get("id").lower() == cid for h in halladas):
-                    halladas.append({
-                        "id": cid,
-                        "nombre": item.strip(),
-                        "unidad": "id",
-                        "enunciado": f"ID del repositorio: {item.strip()}",
-                        "nivel_fractal": 1,
-                        "jurisdiccion": "SISTEMA",
-                        "fuente_modulo": "CC",
-                        "origen": origen_nombre,
-                        "version": "1.0",
-                        "notas": "clase=id_plano",
-                    })
+    # 1. Localizar los archivos sin duplicar rutas
+    if _CAT_DIR.is_dir():
+        candidatos.extend(sorted(_CAT_DIR.glob("*.py")))
+    candidatos.extend(sorted(_DIR.glob("*.py")))
 
-    return halladas
+    archivos_unicos: List[Path] = []
+    rutas_vistas = set()
+    for p in candidatos:
+        if p.name == "__init__.py" or p.name.startswith("_"):
+            continue
+        try:
+            ruta_abs = str(p.resolve())
+        except Exception:
+            ruta_abs = str(p)
+        if ruta_abs not in rutas_vistas:
+            rutas_vistas.add(ruta_abs)
+            archivos_unicos.append(p)
+
+    # 2. Cargar y normalizar entradas desde los archivos legítimos
+    for archivo in archivos_unicos:
+        halladas, errs = _cargar_desde_archivo(archivo)
+        for e in errs:
+            errores.append({"archivo": archivo.name, "error": e})
+            
+        for raw in halladas:
+            ve = _validar_categoria(raw, archivo.name)
+            if ve:
+                for e in ve:
+                    errores.append({"archivo": archivo.name, "error": e})
+                continue
+            try:
+                cats.append(_normalizar(raw, archivo.stem))
+            except Exception as e:  # noqa: BLE001
+                errores.append({
+                    "archivo": archivo.name,
+                    "error": "normalizar: {0}: {1}".format(
+                        type(e).__name__, e
+                    ),
+                })
+
+    # 3. Validar unicidad respetando el MÓDULO/CONTEXTO de origen (evita falsos duplicados MC vs AX)
+    por_clave_contextual: Dict[Tuple[str, str], List[str]] = {}
+    for c in cats:
+        modulo = str(c.get("fuente_modulo") or c["origen"]).upper()
+        clave = (modulo, c["id"])
+        por_clave_contextual.setdefault(clave, []).append(c["origen"])
+
+    for (modulo, cid), origenes in por_clave_contextual.items():
+        if len(origenes) > 1:
+            errores.append({
+                "archivo": ",".join(origenes),
+                "error": "id duplicado '{0}' dentro del módulo '{1}' en {2}".format(
+                    cid, modulo, origenes
+                ),
+            })
+
+    # Ordenar por nivel_fractal y por id
+    cats.sort(
+        key=lambda c: (
+            c["nivel_fractal"] is None,
+            c["nivel_fractal"] or 0,
+            c["id"],
+        )
+    )
+
+    return cats, errores
 
 
 def recolectar() -> dict:

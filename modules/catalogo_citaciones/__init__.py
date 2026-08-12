@@ -754,18 +754,27 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # CAPACIDADES PÚBLICAS
 # ===============================================================
 
-def recolectar():
-    cats = []
-    errores = []
-    candidatos = []
+def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
+    """
+    Recolecta y normaliza las categorías desde los archivos .py en _CAT_DIR y _DIR.
 
-    # 1. Localización limpia de archivos de categorías
+    Returns:
+        Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
+            - Lista de categorías normalizadas.
+            - Lista de errores encontrados durante el proceso.
+    """
+    cats: List[Dict[str, Any]] = []
+    errores: List[Dict[str, str]] = []
+    candidatos: List[Path] = []
+
+    # 1. Localización de archivos de categorías
     if _CAT_DIR.is_dir():
         candidatos.extend(sorted(_CAT_DIR.glob("*.py")))
     candidatos.extend(sorted(_DIR.glob("*.py")))
 
-    archivos_unicos = []
-    rutas_vistas = set()
+    # Filtrar archivos únicos y excluir __init__.py y archivos que empiezan con "_"
+    archivos_unicos: List[Path] = []
+    rutas_vistas: set = set()
     for p in candidatos:
         if p.name == "__init__.py" or p.name.startswith("_"):
             continue
@@ -777,7 +786,7 @@ def recolectar():
             rutas_vistas.add(ruta_abs)
             archivos_unicos.append(p)
 
-    # 2. Carga y normalización desde los archivos reales
+    # 2. Carga y normalización desde los archivos
     for archivo in archivos_unicos:
         halladas, errs = _cargar_desde_archivo(archivo)
         for e in errs:
@@ -794,25 +803,19 @@ def recolectar():
             except Exception as e:
                 errores.append({
                     "archivo": archivo.name,
-                    "error": "normalizar: {0}: {1}".format(
-                        type(e).__name__, e
-                    ),
+                    "error": f"normalizar: {type(e).__name__}: {e}",
                 })
 
-    # 3. Validación de unicidad por espacio de nombres (MÓDULO + ID)
-    por_clave_contextual = {}
+    # 3. Validación de unicidad por ID
+    por_id_map: Dict[str, List[str]] = {}
     for c in cats:
-        modulo = str(c.get("fuente_modulo") or c["origen"]).upper()
-        clave = (modulo, c["id"])
-        por_clave_contextual.setdefault(clave, []).append(c["origen"])
+        por_id_map.setdefault(c["id"], []).append(c["origen"])
 
-    for (modulo, cid), origenes in por_clave_contextual.items():
+    for cid, origenes in por_id_map.items():
         if len(origenes) > 1:
             errores.append({
                 "archivo": ",".join(origenes),
-                "error": "id duplicado '{0}' dentro del módulo '{1}' en {2}".format(
-                    cid, modulo, origenes
-                ),
+                "error": f"id duplicado '{cid}' en {origenes}",
             })
 
     # Ordenar por nivel_fractal y por id

@@ -349,9 +349,9 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida": {
             "descripcion": "Comprueba si una salida de barrer/verificar es coherente.",
             "entrada": "salida: dict",
-            "validar_esquema": ["*"],                                     # ← AGREGADA
+            "validar_esquema": ["validar_esquema"],                                     # ← AGREGADA
             "salida": "bool",
-            "acceso_archivos": ["*"],                                    # ← AGREGADA
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "inventario": {
             "descripcion": "Inventario completo del módulo (declaraciones, cuerpos, capacidades).",

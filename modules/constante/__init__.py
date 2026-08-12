@@ -814,7 +814,7 @@ def _descubrir_archivos() -> Dict[str, Any]:
         if meta is None:
             continue
 
-                items = meta if isinstance(meta, list) else [meta]
+        items = meta if isinstance(meta, list) else [meta]
         for item in items:
             if not isinstance(item, dict):
                 errores.append({

@@ -11,12 +11,6 @@
 #   - IDS          → lista plana unificada
 #   - CATEGORIAS   → entradas con clase semántica
 #
-# Nota:
-#   Esta es la primera carga del glosario.
-#   No son los únicos IDs del sistema.
-#   Habrá más carpetas y más entradas adelante.
-#   Cada archivo nuevo en categorias/ se incorpora solo.
-#
 # ===============================================================
 
 
@@ -226,41 +220,28 @@ IDS_AGENTES = [
 ]
 
 # ===============================================================
-# IDS PLANO (para CC / Engine)
-# ===============================================================
-# Unicidad: cada cadena aparece una sola vez.
-# Colisiones archivo/función resueltas con sufijo _fn donde aplica.
-
-IDS = (
-    IDS_MODULOS
-    + IDS_ARCHIVOS
-    + IDS_FUNCIONES
-    + IDS_FACTORES
-    + IDS_VARIABLES
-    + IDS_CONTEO
-    + IDS_META
-    + IDS_ESCALAS
-    + IDS_REPRESENTACION
-    + IDS_CONTRATO
-    + IDS_ESTADOS
-    + IDS_AGENTES
-)
-
-# ===============================================================
-# CATEGORIAS CON CLASE SEMÁNTICA
+# CATEGORIAS CON CLASE SEMÁNTICA Y METADATOS ENGINE
 # ===============================================================
 
 def _cat(id_: str, clase: str, unidad: str, enunciado: str) -> dict:
+    # Normalización consistente en minúsculas para evitar choques en el map por_id
+    normalized_id = id_.lower()
     return {
-        "id": id_.lower() if clase != "factor" else id_,
+        "id": normalized_id,
         "nombre": id_,
         "unidad": unidad,
         "enunciado": enunciado,
+        "nivel_fractal": 1,
+        "jurisdiccion": "SISTEMA",
+        "fuente_modulo": "CC",
+        "origen": "ids_sistema",
+        "version": "1.0",
         "notas": "clase={0}".format(clase),
     }
 
 
-CATEGORIAS = (
+# Construcción estructurada desduplicada por ID
+_BRUTAS = (
     [
         _cat(x, "modulo", "rol", "Módulo / rol del sistema: {0}".format(x))
         for x in IDS_MODULOS
@@ -310,6 +291,21 @@ CATEGORIAS = (
         for x in IDS_AGENTES
     ]
 )
+
+# Desduplicación garantizada respetando el primer tipo asignado
+_CATEGORIAS_MAP = {}
+for entry in _BRUTAS:
+    key = entry["id"]
+    if key not in _CATEGORIAS_MAP:
+        _CATEGORIAS_MAP[key] = entry
+
+CATEGORIAS = list(_CATEGORIAS_MAP.values())
+
+# ===============================================================
+# IDS PLANO (Derivado de CATEGORIAS para garantizar sincronía 1:1)
+# ===============================================================
+
+IDS = [item["id"] for item in CATEGORIAS]
 
 # ===============================================================
 # FIN DEL ARCHIVO

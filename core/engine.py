@@ -866,6 +866,77 @@ class Engine:
 
         errores: List[str] = []
 
+    def _validar_contrato_absoluto_formulas(contenedor: Dict[str, Any]) -> None:
+    """
+    Garantiza que todo CONTENEDOR que declare capacidades de formulas
+    conserve las directrices absolutas del contrato de formulas.
+
+    Esta validacion es obligatoria para Engine.
+    Engine no puede ejecutar una capacidad de formulas si el contrato
+    no cumple las restricciones absolutas.
+    """
+
+    contrato = contenedor.get("contrato_formulas")
+
+    if contrato is None:
+        return
+
+    if not isinstance(contrato, dict):
+        raise ContratoInvalido(
+            "CONTRATO ABSOLUTO DE FORMULAS INVALIDO: "
+            "'contrato_formulas' debe ser dict."
+        )
+
+    directrices = contrato.get("directrices_absolutas")
+
+    if not isinstance(directrices, dict):
+        raise ContratoInvalido(
+            "CONTRATO ABSOLUTO DE FORMULAS INVALIDO: "
+            "faltan 'directrices_absolutas'."
+        )
+
+    obligaciones = {
+        "formula_obligatoria": True,
+        "validacion_obligatoria": True,
+        "aritmetica_exacta": True,
+        "conversion_implicita": False,
+        "calculo_aproximado": False,
+        "redondeo_automatico": False,
+        "tolerancia_numerica": Fraction(0),
+        "float_permitido": False,
+        "alteracion_formula": False,
+        "mutacion_formula": False,
+    }
+
+    for directriz, valor_exigido in obligaciones.items():
+
+        if directriz not in directrices:
+            raise ContratoInvalido(
+                "CONTRATO ABSOLUTO DE FORMULAS INVALIDO: "
+                f"falta directriz obligatoria '{directriz}'."
+            )
+
+        valor_real = directrices[directriz]
+
+        if valor_real != valor_exigido:
+            raise ContratoInvalido(
+                "VIOLACION DEL CONTRATO ABSOLUTO DE FORMULAS: "
+                f"'{directriz}' debe ser {valor_exigido!r}, "
+                f"recibido {valor_real!r}."
+            )
+
+    if contrato.get("tipo") != "FORMULA":
+        raise ContratoInvalido(
+            "CONTRATO ABSOLUTO DE FORMULAS INVALIDO: "
+            "el tipo del contrato debe ser 'FORMULA'."
+        )
+
+    if contrato.get("inmutable") is not True:
+        raise ContratoInvalido(
+            "CONTRATO ABSOLUTO DE FORMULAS INVALIDO: "
+            "el contrato de formulas debe ser inmutable."
+        )
+       
         # =======================================================
         # Parte 17.1 ESQUEMA
         # =======================================================

@@ -753,6 +753,81 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # ===============================================================
 # CAPACIDADES PÚBLICAS
 # ===============================================================
+# ===============================================================
+# VPSI-TRUTH — modules/catalogo_citaciones/__init__.py
+# ===============================================================
+
+def _cargar_desde_modulo(mod, origen_nombre: str) -> list[dict]:
+    halladas = []
+    
+    # 1. Cargar primero las entradas enriquecidas desde CATEGORIAS
+    categorias = getattr(mod, "CATEGORIAS", None)
+    if isinstance(categorias, list):
+        for cat in categorias:
+            if isinstance(cat, dict) and cat.get("id"):
+                item = dict(cat)
+                item.setdefault("origen", origen_nombre)
+                halladas.append(item)
+
+    # 2. Procesar IDS solo si no existen previamente en CATEGORIAS
+    raw_ids = getattr(mod, "IDS", None)
+    if isinstance(raw_ids, list):
+        for item in raw_ids:
+            if isinstance(item, dict) and item.get("id"):
+                cid = item["id"].strip().lower()
+                if not any(h.get("id").lower() == cid for h in halladas):
+                    entry = dict(item)
+                    entry.setdefault("origen", origen_nombre)
+                    halladas.append(entry)
+            elif isinstance(item, str) and item.strip():
+                cid = item.strip().lower()
+                # Ignorar si ya fue cargado desde CATEGORIAS
+                if not any(h.get("id").lower() == cid for h in halladas):
+                    halladas.append({
+                        "id": cid,
+                        "nombre": item.strip(),
+                        "unidad": "id",
+                        "enunciado": f"ID del repositorio: {item.strip()}",
+                        "nivel_fractal": 1,
+                        "jurisdiccion": "SISTEMA",
+                        "fuente_modulo": "CC",
+                        "origen": origen_nombre,
+                        "version": "1.0",
+                        "notas": "clase=id_plano",
+                    })
+
+    return halladas
+
+
+def recolectar() -> dict:
+    # Garantizar que no se procesen módulos duplicados
+    modulos_procesados = set()
+    todas_las_entradas = []
+
+    # Supongamos que descubres los módulos en 'categorias/'
+    modulos_descubiertos = _descubrir_modulos_categorias()
+
+    for mod in modulos_descubiertos:
+        nombre_mod = getattr(mod, "__name__", str(mod))
+        if nombre_mod in modulos_procesados:
+            continue
+        modulos_procesados.add(nombre_mod)
+
+        entradas = _cargar_desde_modulo(mod, mod.__file__.split("/")[-1].replace(".py", ""))
+        todas_las_entradas.extend(entradas)
+
+    # Desduplicación global defensiva por ID
+    entradas_unicas = {}
+    for entry in todas_las_entradas:
+        key = entry["id"].lower()
+        if key not in entradas_unicas:
+            entradas_unicas[key] = entry
+
+    return {
+        "coherente": True,
+        "total": len(entradas_unicas),
+        "entradas": list(entradas_unicas.values()),
+    }
 
 def barrer() -> Dict[str, Any]:
     cats, errores = recolectar()

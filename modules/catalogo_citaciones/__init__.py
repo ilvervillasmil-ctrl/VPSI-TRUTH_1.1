@@ -753,21 +753,18 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # ===============================================================
 # CAPACIDADES PÚBLICAS
 # ===============================================================
-# ===============================================================
-# VPSI-TRUTH — modules/catalogo_citaciones/__init__.py
-# ===============================================================
 
-def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
-    cats: List[Dict[str, Any]] = []
-    errores: List[Dict[str, str]] = []
-    candidatos: List[Path] = []
+def recolectar():
+    cats = []
+    errores = []
+    candidatos = []
 
-    # 1. Localizar los archivos sin duplicar rutas
+    # 1. Localización limpia de archivos de categorías
     if _CAT_DIR.is_dir():
         candidatos.extend(sorted(_CAT_DIR.glob("*.py")))
     candidatos.extend(sorted(_DIR.glob("*.py")))
 
-    archivos_unicos: List[Path] = []
+    archivos_unicos = []
     rutas_vistas = set()
     for p in candidatos:
         if p.name == "__init__.py" or p.name.startswith("_"):
@@ -780,12 +777,12 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
             rutas_vistas.add(ruta_abs)
             archivos_unicos.append(p)
 
-    # 2. Cargar y normalizar entradas desde los archivos legítimos
+    # 2. Carga y normalización desde los archivos reales
     for archivo in archivos_unicos:
         halladas, errs = _cargar_desde_archivo(archivo)
         for e in errs:
             errores.append({"archivo": archivo.name, "error": e})
-            
+
         for raw in halladas:
             ve = _validar_categoria(raw, archivo.name)
             if ve:
@@ -794,7 +791,7 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
                 continue
             try:
                 cats.append(_normalizar(raw, archivo.stem))
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
                 errores.append({
                     "archivo": archivo.name,
                     "error": "normalizar: {0}: {1}".format(
@@ -802,8 +799,8 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
                     ),
                 })
 
-    # 3. Validar unicidad respetando el MÓDULO/CONTEXTO de origen (evita falsos duplicados MC vs AX)
-    por_clave_contextual: Dict[Tuple[str, str], List[str]] = {}
+    # 3. Validación de unicidad por espacio de nombres (MÓDULO + ID)
+    por_clave_contextual = {}
     for c in cats:
         modulo = str(c.get("fuente_modulo") or c["origen"]).upper()
         clave = (modulo, c["id"])
@@ -828,6 +825,8 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     )
 
     return cats, errores
+
+
 
 
 def recolectar() -> dict:

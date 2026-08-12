@@ -16209,7 +16209,7 @@
           "modulo": "citacion",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 4e-06
+          "duracion_s": 3e-06
         },
         {
           "id_traza": 15,
@@ -16321,7 +16321,7 @@
           "modulo": "diccionario",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 2e-05
+          "duracion_s": 1.9e-05
         },
         {
           "id_traza": 29,
@@ -16417,7 +16417,7 @@
           "modulo": "spartaco_seguridad",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000635
+          "duracion_s": 0.000607
         },
         {
           "id_traza": 41,

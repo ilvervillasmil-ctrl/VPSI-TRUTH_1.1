@@ -15206,7 +15206,7 @@
     modulo: citacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 3e-06
   [14]
     id_traza: 15
     timestamp: 2026-08-12T01:33:58.255017+00:00
@@ -15304,7 +15304,7 @@
     modulo: diccionario
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2e-05
+    duracion_s: 1.9e-05
   [28]
     id_traza: 29
     timestamp: 2026-08-12T01:33:58.309338+00:00
@@ -15388,7 +15388,7 @@
     modulo: spartaco_seguridad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000635
+    duracion_s: 0.000607
   [40]
     id_traza: 41
     timestamp: 2026-08-12T01:33:58.356508+00:00

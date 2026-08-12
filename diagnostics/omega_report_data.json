@@ -16145,7 +16145,7 @@
           "modulo": "cache",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 8e-06
+          "duracion_s": 6e-06
         },
         {
           "id_traza": 7,
@@ -16209,7 +16209,7 @@
           "modulo": "citacion",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 4e-06
+          "duracion_s": 5e-06
         },
         {
           "id_traza": 15,
@@ -16313,7 +16313,7 @@
           "modulo": "diccionario",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 1.1e-05
+          "duracion_s": 3.5e-05
         },
         {
           "id_traza": 28,
@@ -16401,7 +16401,7 @@
           "modulo": "self",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 8e-06
+          "duracion_s": 3.3e-05
         },
         {
           "id_traza": 39,

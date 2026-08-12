@@ -15150,7 +15150,7 @@
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 6e-06
   [6]
     id_traza: 7
     timestamp: 2026-08-12T01:17:33.503610+00:00
@@ -15206,7 +15206,7 @@
     modulo: citacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 5e-06
   [14]
     id_traza: 15
     timestamp: 2026-08-12T01:17:33.511594+00:00
@@ -15297,7 +15297,7 @@
     modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1.1e-05
+    duracion_s: 3.5e-05
   [27]
     id_traza: 28
     timestamp: 2026-08-12T01:17:33.565866+00:00
@@ -15374,7 +15374,7 @@
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 3.3e-05
   [38]
     id_traza: 39
     timestamp: 2026-08-12T01:17:33.613715+00:00

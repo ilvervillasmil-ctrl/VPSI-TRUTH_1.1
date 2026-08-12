@@ -756,7 +756,8 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 
 def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     """
-    Recolecta y normaliza las categorías desde los archivos .py en _CAT_DIR y _DIR.
+    Recolecta y normaliza las categorías desde los archivos .py en _CAT_DIR y _DIR,
+    agrupando los IDs por módulo y validando su unicidad dentro de cada módulo.
 
     Returns:
         Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
@@ -799,23 +800,29 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
                     errores.append({"archivo": archivo.name, "error": e})
                 continue
             try:
-                cats.append(_normalizar(raw, archivo.stem))
+                cat_normalizada = _normalizar(raw, archivo.stem)
+                # Asignar el módulo como el nombre del archivo (sin extensión) si no tiene fuente_modulo
+                if not cat_normalizada.get("fuente_modulo"):
+                    cat_normalizada["fuente_modulo"] = archivo.stem
+                cats.append(cat_normalizada)
             except Exception as e:
                 errores.append({
                     "archivo": archivo.name,
                     "error": f"normalizar: {type(e).__name__}: {e}",
                 })
 
-    # 3. Validación de unicidad por ID
-    por_id_map: Dict[str, List[str]] = {}
+    # 3. Validación de unicidad por módulo y ID
+    por_modulo_y_id: Dict[Tuple[str, str], List[str]] = {}
     for c in cats:
-        por_id_map.setdefault(c["id"], []).append(c["origen"])
+        modulo = str(c.get("fuente_modulo") or c["origen"]).upper()
+        clave = (modulo, c["id"])
+        por_modulo_y_id.setdefault(clave, []).append(c["origen"])
 
-    for cid, origenes in por_id_map.items():
+    for (modulo, cid), origenes in por_modulo_y_id.items():
         if len(origenes) > 1:
             errores.append({
                 "archivo": ",".join(origenes),
-                "error": f"id duplicado '{cid}' en {origenes}",
+                "error": f"id duplicado '{cid}' dentro del módulo '{modulo}' en {origenes}",
             })
 
     # Ordenar por nivel_fractal y por id
@@ -828,8 +835,6 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     )
 
     return cats, errores
-
-
 
 
 def recolectar() -> dict:

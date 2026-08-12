@@ -1,5 +1,5 @@
 # ===============================================================
-# modules/formulas/resonance.py
+# modules/formulas/formulas_omega/resonance.py
 # ===============================================================
 #
 # VPSI-TRUTH — RESONANCE

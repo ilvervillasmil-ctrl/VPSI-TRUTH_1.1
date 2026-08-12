@@ -357,12 +357,15 @@ CONTENEDOR: Dict[str, Any] = {
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia del glosario.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
+            "entrada": "CT", "AX", "FO", "MC", 
+                 "SF", "CA", "CX", "DI",
+                 "RE", "VX", "TX", "CH", 
+                 "CIT", "TT", "CE", "CC",
+            "validar_esquema": ["acceso_archivos"],
             "salida": (
                 "dict con coherente, categorias, ids, errores"
             ),
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["acceso_archivos"],
         },
 
         "barrer": {

@@ -13,7 +13,7 @@
   total_modulos: 18
   trazas_n: 50
   rutas_n: 0
-  timestamp: 2026-08-12T22:21:15.489197+00:00
+  timestamp: 2026-08-12T22:42:37.393719+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -31,7 +31,7 @@
     []
   trazas_n: 50
   rutas_n: 0
-  timestamp: 2026-08-12T22:21:15.489118+00:00
+  timestamp: 2026-08-12T22:42:37.393656+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1583,32 +1583,32 @@
         archivo: __init__.py
         sha256: ad0d0f83d23bb57747fee54411b311613465469207dd171f7284a3d6ae042adc
         tamano: 64727
-        timestamp_mtime: 2026-08-12T22:21:10.909559+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.975894+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1686,32 +1686,32 @@
         archivo: __init__.py
         sha256: ad0d0f83d23bb57747fee54411b311613465469207dd171f7284a3d6ae042adc
         tamano: 64727
-        timestamp_mtime: 2026-08-12T22:21:10.909559+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.975894+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-12T22:21:10.910305+00:00
+        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
     factores_api:
       • C
       • K
@@ -2223,229 +2223,221 @@
     estabilidad: ESTABLE
     estado: DEGRADADO
     coherente: False
-    categorias: 222
+    categorias: 214
     ids:
       • afirmaciones
-      • afirmaciones
-      • afirmaciones_falsas
       • afirmaciones_falsas
       • alpha
-      • alpha
-      • aplicar_escala
       • aplicar_escala
       • autoriza_engine
-      • autoriza_engine
-      • ax
       • ax
       • barrer
-      • barrer
-      • base_nula
       • base_nula
       • base_nula_c
-      • base_nula_c
-      • base_nula_k
       • base_nula_k
       • base_nula_l
-      • base_nula_l
-      • beta
       • beta
       • c
-      • c
-      • c
-      • c
-      • ca
       • ca
       • calcular_c
-      • calcular_c
-      • calcular_k
       • calcular_k
       • calcular_l
-      • calcular_l
-      • calculator
       • calculator
       • capacidades
-      • capacidades
-      • capacidades_meta
       • capacidades_meta
       • catalogo_citaciones
-      • catalogo_citaciones
-      • categorias
       • categorias
       • cc
-      • cc
-      • coherencia
       • coherencia
       • coherencia_fn
-      • coherencia_fn
-      • combinar_resultados
       • combinar_resultados
       • compromisos
-      • compromisos
-      • conocimiento_exportable
       • conocimiento_exportable
       • contenedor
-      • contenedor
-      • conteos
       • conteos
       • contexto
-      • contexto
-      • contradicciones
       • contradicciones
       • correlacion_fn
-      • correlacion_fn
-      • correlacion_k
       • correlacion_k
       • ct
-      • ct
-      • cx
       • cx
       • decimal
-      • decimal
-      • degradado
       • degradado
       • denominador
-      • denominador
-      • descubrir
       • descubrir
       • dg
-      • dg
-      • diagnostico
       • diagnostico
       • display
-      • display
-      • ejecutar_capacidad
       • ejecutar_capacidad
       • en
-      • en
-      • engine
       • engine
       • es_valida
-      • es_valida
-      • escala
       • escala
       • escalas_ids
-      • escalas_ids
-      • esquema
       • esquema
       • esquema_categoria
-      • esquema_categoria
-      • estados_validos
       • estados_validos
       • extraer_conteos
-      • extraer_conteos
-      • f
       • f
       • fo
-      • fo
-      • formulas
       • formulas
       • fraccion
-      • fraccion
-      • ids
       • ids
       • invariantes
-      • invariantes
-      • inventario
       • inventario
       • inyectar_en_peticion
-      • inyectar_en_peticion
-      • k
-      • k
-      • k
       • k
       • l
-      • l
-      • leer_ids_escala
       • leer_ids_escala
       • logica
-      • logica
-      • logica_fn
       • logica_fn
       • m
-      • m
-      • mc
       • mc
       • no_iniciado
-      • no_iniciado
-      • numerador
       • numerador
       • o_context
-      • o_context
-      • o_presente
       • o_presente
       • omega
-      • omega
-      • omegareport
       • omegareport
       • operativo
-      • operativo
-      • p
       • p
       • por_id
-      • por_id
-      • posturas
       • posturas
       • precision
-      • precision
-      • r
       • r
       • rechazado
-      • rechazado
-      • recolectar
       • recolectar
       • reporte
-      • reporte
-      • reporting
       • reporting
       • representar
-      • representar
-      • requiere
       • requiere
       • resolver_dependencias
-      • resolver_dependencias
-      • resolver_pedido
       • resolver_pedido
       • reversiones
-      • reversiones
-      • tru_atomo
       • tru_atomo
       • tru_conversacion
-      • tru_conversacion
-      • tru_frase
       • tru_frase
       • tru_repositorio
-      • tru_repositorio
-      • tru_ri
-      • tru_ri
-      • tru_ri
       • tru_ri
       • tru_sujeto
-      • tru_sujeto
-      • tru_total
-      • tru_total
-      • tru_total
       • tru_total
       • tru_totales
-      • tru_totales
-      • truth
       • truth
       • tt
-      • tt
-      • undefined
       • undefined
       • valor
-      • valor
-      • verificar
       • verificar
       • verificar_c
-      • verificar_c
-      • verificar_escala
       • verificar_escala
       • verificar_k
-      • verificar_k
-      • verificar_l
       • verificar_l
       • verificar_salida
+      • afirmaciones
+      • afirmaciones_falsas
+      • alpha
+      • aplicar_escala
+      • autoriza_engine
+      • ax
+      • barrer
+      • base_nula
+      • base_nula_c
+      • base_nula_k
+      • base_nula_l
+      • beta
+      • c
+      • ca
+      • calcular_c
+      • calcular_k
+      • calcular_l
+      • calculator
+      • capacidades
+      • capacidades_meta
+      • catalogo_citaciones
+      • categorias
+      • cc
+      • coherencia
+      • coherencia_fn
+      • combinar_resultados
+      • compromisos
+      • conocimiento_exportable
+      • contenedor
+      • conteos
+      • contexto
+      • contradicciones
+      • correlacion_fn
+      • correlacion_k
+      • ct
+      • cx
+      • decimal
+      • degradado
+      • denominador
+      • descubrir
+      • dg
+      • diagnostico
+      • display
+      • ejecutar_capacidad
+      • en
+      • engine
+      • es_valida
+      • escala
+      • escalas_ids
+      • esquema
+      • esquema_categoria
+      • estados_validos
+      • extraer_conteos
+      • f
+      • fo
+      • formulas
+      • fraccion
+      • ids
+      • invariantes
+      • inventario
+      • inyectar_en_peticion
+      • k
+      • l
+      • leer_ids_escala
+      • logica
+      • logica_fn
+      • m
+      • mc
+      • no_iniciado
+      • numerador
+      • o_context
+      • o_presente
+      • omega
+      • omegareport
+      • operativo
+      • p
+      • por_id
+      • posturas
+      • precision
+      • r
+      • rechazado
+      • recolectar
+      • reporte
+      • reporting
+      • representar
+      • requiere
+      • resolver_dependencias
+      • resolver_pedido
+      • reversiones
+      • tru_atomo
+      • tru_conversacion
+      • tru_frase
+      • tru_repositorio
+      • tru_ri
+      • tru_sujeto
+      • tru_total
+      • tru_totales
+      • truth
+      • tt
+      • undefined
+      • valor
+      • verificar
+      • verificar_c
+      • verificar_escala
+      • verificar_k
+      • verificar_l
       • verificar_salida
     errores:
       [0]
@@ -2551,11 +2543,11 @@
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'representar' en ['ids_sistema', 'ids_sistema']
       [34]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema']
       [35]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema']
       [36]
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']
@@ -2614,14 +2606,14 @@
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']
       [55]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'c' en ['ids_sistema', 'ids_sistema']
       [56]
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'l' en ['ids_sistema', 'ids_sistema']
       [57]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'k' en ['ids_sistema', 'ids_sistema']
       [58]
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']
@@ -2930,11 +2922,11 @@
             archivo: ids_sistema,ids_sistema
             error: id duplicado 'representar' en ['ids_sistema', 'ids_sistema']
           [34]
-            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-            error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema']
           [35]
-            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-            error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema']
           [36]
             archivo: ids_sistema,ids_sistema
             error: id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']
@@ -2993,14 +2985,14 @@
             archivo: ids_sistema,ids_sistema
             error: id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']
           [55]
-            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-            error: id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'c' en ['ids_sistema', 'ids_sistema']
           [56]
             archivo: ids_sistema,ids_sistema
             error: id duplicado 'l' en ['ids_sistema', 'ids_sistema']
           [57]
-            archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-            error: id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+            archivo: ids_sistema,ids_sistema
+            error: id duplicado 'k' en ['ids_sistema', 'ids_sistema']
           [58]
             archivo: ids_sistema,ids_sistema
             error: id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']
@@ -3154,7 +3146,7 @@
       • Corregir archivos de categorias/ con errores de forma o carga
     coherente: False
     errores_n: 107
-    categorias_n: 222
+    categorias_n: 214
   inventario:
     id: CC
     nombre: catalogo_citaciones
@@ -3205,15 +3197,15 @@
         nombre: afirmaciones
         unidad: clave
         enunciado: Clave de conteo: afirmaciones
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
         requiere:
           []
         factores_evaluables:
           []
         agrega_desde:
           []
-        fuente_modulo: NO ENTREGADO POR ENGINE
+        fuente_modulo: CC
         senales:
           []
         anclas:
@@ -3222,6 +3214,2232 @@
         version: 1.0
         notas: clase=conteo
       [1]
+        id: afirmaciones_falsas
+        nombre: afirmaciones_falsas
+        unidad: clave
+        enunciado: Clave de conteo: afirmaciones_falsas
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=conteo
+      [2]
+        id: alpha
+        nombre: ALPHA
+        unidad: factor
+        enunciado: Factor o magnitud: ALPHA
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=factor
+      [3]
+        id: aplicar_escala
+        nombre: aplicar_escala
+        unidad: funcion
+        enunciado: Función o capacidad: aplicar_escala
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [4]
+        id: autoriza_engine
+        nombre: autoriza_engine
+        unidad: campo
+        enunciado: Campo estructural de contrato: autoriza_engine
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [5]
+        id: ax
+        nombre: AX
+        unidad: rol
+        enunciado: Módulo / rol del sistema: AX
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [6]
+        id: barrer
+        nombre: barrer
+        unidad: funcion
+        enunciado: Función o capacidad: barrer
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [7]
+        id: base_nula
+        nombre: base_nula
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [8]
+        id: base_nula_c
+        nombre: base_nula_C
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula_C
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [9]
+        id: base_nula_k
+        nombre: base_nula_K
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula_K
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [10]
+        id: base_nula_l
+        nombre: base_nula_L
+        unidad: meta
+        enunciado: Metadato de dominio: base_nula_L
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [11]
+        id: beta
+        nombre: BETA
+        unidad: factor
+        enunciado: Factor o magnitud: BETA
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=factor
+      [12]
+        id: c
+        nombre: C
+        unidad: factor
+        enunciado: Factor o magnitud: C
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=factor
+      [13]
+        id: ca
+        nombre: CA
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CA
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [14]
+        id: calcular_c
+        nombre: calcular_c
+        unidad: funcion
+        enunciado: Función o capacidad: calcular_c
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [15]
+        id: calcular_k
+        nombre: calcular_k
+        unidad: funcion
+        enunciado: Función o capacidad: calcular_k
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [16]
+        id: calcular_l
+        nombre: calcular_l
+        unidad: funcion
+        enunciado: Función o capacidad: calcular_l
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [17]
+        id: calculator
+        nombre: calculator
+        unidad: archivo
+        enunciado: Archivo del repositorio: calculator
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [18]
+        id: capacidades
+        nombre: capacidades
+        unidad: campo
+        enunciado: Campo estructural de contrato: capacidades
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [19]
+        id: capacidades_meta
+        nombre: capacidades_meta
+        unidad: campo
+        enunciado: Campo estructural de contrato: capacidades_meta
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [20]
+        id: catalogo_citaciones
+        nombre: catalogo_citaciones
+        unidad: archivo
+        enunciado: Archivo del repositorio: catalogo_citaciones
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [21]
+        id: categorias
+        nombre: categorias
+        unidad: funcion
+        enunciado: Función o capacidad: categorias
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [22]
+        id: cc
+        nombre: CC
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CC
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [23]
+        id: coherencia
+        nombre: coherencia
+        unidad: archivo
+        enunciado: Archivo del repositorio: coherencia
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [24]
+        id: coherencia_fn
+        nombre: coherencia_fn
+        unidad: funcion
+        enunciado: Función o capacidad: coherencia_fn
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [25]
+        id: combinar_resultados
+        nombre: combinar_resultados
+        unidad: funcion
+        enunciado: Función o capacidad: combinar_resultados
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [26]
+        id: compromisos
+        nombre: compromisos
+        unidad: clave
+        enunciado: Clave de conteo: compromisos
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=conteo
+      [27]
+        id: conocimiento_exportable
+        nombre: conocimiento_exportable
+        unidad: campo
+        enunciado: Campo estructural de contrato: conocimiento_exportable
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [28]
+        id: contenedor
+        nombre: CONTENEDOR
+        unidad: campo
+        enunciado: Campo estructural de contrato: CONTENEDOR
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [29]
+        id: conteos
+        nombre: conteos
+        unidad: archivo
+        enunciado: Archivo del repositorio: conteos
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [30]
+        id: contexto
+        nombre: contexto
+        unidad: meta
+        enunciado: Metadato de dominio: contexto
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [31]
+        id: contradicciones
+        nombre: contradicciones
+        unidad: clave
+        enunciado: Clave de conteo: contradicciones
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=conteo
+      [32]
+        id: correlacion_fn
+        nombre: correlacion_fn
+        unidad: funcion
+        enunciado: Función o capacidad: correlacion_fn
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [33]
+        id: correlacion_k
+        nombre: correlacion_k
+        unidad: archivo
+        enunciado: Archivo del repositorio: correlacion_k
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [34]
+        id: ct
+        nombre: CT
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CT
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [35]
+        id: cx
+        nombre: CX
+        unidad: rol
+        enunciado: Módulo / rol del sistema: CX
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [36]
+        id: decimal
+        nombre: decimal
+        unidad: campo
+        enunciado: Campo de representación: decimal
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=representacion
+      [37]
+        id: degradado
+        nombre: DEGRADADO
+        unidad: estado
+        enunciado: Estado de módulo: DEGRADADO
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=estado
+      [38]
+        id: denominador
+        nombre: denominador
+        unidad: campo
+        enunciado: Campo de representación: denominador
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=representacion
+      [39]
+        id: descubrir
+        nombre: descubrir
+        unidad: funcion
+        enunciado: Función o capacidad: descubrir
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [40]
+        id: dg
+        nombre: DG
+        unidad: rol
+        enunciado: Módulo / rol del sistema: DG
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [41]
+        id: diagnostico
+        nombre: diagnostico
+        unidad: funcion
+        enunciado: Función o capacidad: diagnostico
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [42]
+        id: display
+        nombre: display
+        unidad: campo
+        enunciado: Campo de representación: display
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=representacion
+      [43]
+        id: ejecutar_capacidad
+        nombre: ejecutar_capacidad
+        unidad: funcion
+        enunciado: Función o capacidad: ejecutar_capacidad
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [44]
+        id: en
+        nombre: EN
+        unidad: rol
+        enunciado: Módulo / rol del sistema: EN
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [45]
+        id: engine
+        nombre: Engine
+        unidad: agente
+        enunciado: Agente del sistema: Engine
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=agente
+      [46]
+        id: es_valida
+        nombre: es_valida
+        unidad: funcion
+        enunciado: Función o capacidad: es_valida
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [47]
+        id: escala
+        nombre: escala
+        unidad: archivo
+        enunciado: Archivo del repositorio: escala
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [48]
+        id: escalas_ids
+        nombre: escalas_ids
+        unidad: archivo
+        enunciado: Archivo del repositorio: escalas_ids
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [49]
+        id: esquema
+        nombre: esquema
+        unidad: funcion
+        enunciado: Función o capacidad: esquema
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [50]
+        id: esquema_categoria
+        nombre: ESQUEMA_CATEGORIA
+        unidad: campo
+        enunciado: Campo estructural de contrato: ESQUEMA_CATEGORIA
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [51]
+        id: estados_validos
+        nombre: estados_validos
+        unidad: campo
+        enunciado: Campo estructural de contrato: estados_validos
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [52]
+        id: extraer_conteos
+        nombre: extraer_conteos
+        unidad: funcion
+        enunciado: Función o capacidad: extraer_conteos
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [53]
+        id: f
+        nombre: f
+        unidad: variable
+        enunciado: Variable matemática: f
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=variable
+      [54]
+        id: fo
+        nombre: FO
+        unidad: rol
+        enunciado: Módulo / rol del sistema: FO
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [55]
+        id: formulas
+        nombre: formulas
+        unidad: archivo
+        enunciado: Archivo del repositorio: formulas
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [56]
+        id: fraccion
+        nombre: fraccion
+        unidad: campo
+        enunciado: Campo de representación: fraccion
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=representacion
+      [57]
+        id: ids
+        nombre: ids
+        unidad: funcion
+        enunciado: Función o capacidad: ids
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [58]
+        id: invariantes
+        nombre: invariantes
+        unidad: campo
+        enunciado: Campo estructural de contrato: invariantes
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [59]
+        id: inventario
+        nombre: inventario
+        unidad: funcion
+        enunciado: Función o capacidad: inventario
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [60]
+        id: inyectar_en_peticion
+        nombre: inyectar_en_peticion
+        unidad: funcion
+        enunciado: Función o capacidad: inyectar_en_peticion
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [61]
+        id: k
+        nombre: K
+        unidad: factor
+        enunciado: Factor o magnitud: K
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=factor
+      [62]
+        id: l
+        nombre: L
+        unidad: factor
+        enunciado: Factor o magnitud: L
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=factor
+      [63]
+        id: leer_ids_escala
+        nombre: leer_ids_escala
+        unidad: funcion
+        enunciado: Función o capacidad: leer_ids_escala
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [64]
+        id: logica
+        nombre: logica
+        unidad: archivo
+        enunciado: Archivo del repositorio: logica
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [65]
+        id: logica_fn
+        nombre: logica_fn
+        unidad: funcion
+        enunciado: Función o capacidad: logica_fn
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [66]
+        id: m
+        nombre: m
+        unidad: variable
+        enunciado: Variable matemática: m
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=variable
+      [67]
+        id: mc
+        nombre: MC
+        unidad: rol
+        enunciado: Módulo / rol del sistema: MC
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [68]
+        id: no_iniciado
+        nombre: NO_INICIADO
+        unidad: estado
+        enunciado: Estado de módulo: NO_INICIADO
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=estado
+      [69]
+        id: numerador
+        nombre: numerador
+        unidad: campo
+        enunciado: Campo de representación: numerador
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=representacion
+      [70]
+        id: o_context
+        nombre: O_context
+        unidad: meta
+        enunciado: Metadato de dominio: O_context
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [71]
+        id: o_presente
+        nombre: o_presente
+        unidad: meta
+        enunciado: Metadato de dominio: o_presente
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [72]
+        id: omega
+        nombre: Omega
+        unidad: agente
+        enunciado: Agente del sistema: Omega
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=agente
+      [73]
+        id: omegareport
+        nombre: OmegaReport
+        unidad: agente
+        enunciado: Agente del sistema: OmegaReport
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=agente
+      [74]
+        id: operativo
+        nombre: OPERATIVO
+        unidad: estado
+        enunciado: Estado de módulo: OPERATIVO
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=estado
+      [75]
+        id: p
+        nombre: p
+        unidad: variable
+        enunciado: Variable matemática: p
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=variable
+      [76]
+        id: por_id
+        nombre: por_id
+        unidad: funcion
+        enunciado: Función o capacidad: por_id
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [77]
+        id: posturas
+        nombre: posturas
+        unidad: clave
+        enunciado: Clave de conteo: posturas
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=conteo
+      [78]
+        id: precision
+        nombre: precision
+        unidad: campo
+        enunciado: Campo de representación: precision
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=representacion
+      [79]
+        id: r
+        nombre: r
+        unidad: variable
+        enunciado: Variable matemática: r
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=variable
+      [80]
+        id: rechazado
+        nombre: RECHAZADO
+        unidad: estado
+        enunciado: Estado de módulo: RECHAZADO
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=estado
+      [81]
+        id: recolectar
+        nombre: recolectar
+        unidad: funcion
+        enunciado: Función o capacidad: recolectar
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [82]
+        id: reporte
+        nombre: reporte
+        unidad: funcion
+        enunciado: Función o capacidad: reporte
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [83]
+        id: reporting
+        nombre: reporting
+        unidad: campo
+        enunciado: Campo estructural de contrato: reporting
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [84]
+        id: representar
+        nombre: representar
+        unidad: funcion
+        enunciado: Función o capacidad: representar
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [85]
+        id: requiere
+        nombre: requiere
+        unidad: campo
+        enunciado: Campo estructural de contrato: requiere
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=contrato
+      [86]
+        id: resolver_dependencias
+        nombre: resolver_dependencias
+        unidad: funcion
+        enunciado: Función o capacidad: resolver_dependencias
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [87]
+        id: resolver_pedido
+        nombre: resolver_pedido
+        unidad: funcion
+        enunciado: Función o capacidad: resolver_pedido
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [88]
+        id: reversiones
+        nombre: reversiones
+        unidad: clave
+        enunciado: Clave de conteo: reversiones
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=conteo
+      [89]
+        id: tru_atomo
+        nombre: tru_atomo
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_atomo
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=escala
+      [90]
+        id: tru_conversacion
+        nombre: tru_conversacion
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_conversacion
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=escala
+      [91]
+        id: tru_frase
+        nombre: tru_frase
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_frase
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=escala
+      [92]
+        id: tru_repositorio
+        nombre: tru_repositorio
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_repositorio
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=escala
+      [93]
+        id: tru_ri
+        nombre: tru_ri
+        unidad: funcion
+        enunciado: Función o capacidad: tru_ri
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [94]
+        id: tru_sujeto
+        nombre: tru_sujeto
+        unidad: escala
+        enunciado: Escala de alcance Tru: tru_sujeto
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=escala
+      [95]
+        id: tru_total
+        nombre: tru_total
+        unidad: funcion
+        enunciado: Función o capacidad: tru_total
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [96]
+        id: tru_totales
+        nombre: tru_totales
+        unidad: archivo
+        enunciado: Archivo del repositorio: tru_totales
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [97]
+        id: truth
+        nombre: truth
+        unidad: archivo
+        enunciado: Archivo del repositorio: truth
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=archivo
+      [98]
+        id: tt
+        nombre: TT
+        unidad: rol
+        enunciado: Módulo / rol del sistema: TT
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=modulo
+      [99]
+        id: undefined
+        nombre: UNDEFINED
+        unidad: meta
+        enunciado: Metadato de dominio: UNDEFINED
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=meta
+      [100]
+        id: valor
+        nombre: valor
+        unidad: campo
+        enunciado: Campo de representación: valor
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=representacion
+      [101]
+        id: verificar
+        nombre: verificar
+        unidad: funcion
+        enunciado: Función o capacidad: verificar
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [102]
+        id: verificar_c
+        nombre: verificar_c
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_c
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [103]
+        id: verificar_escala
+        nombre: verificar_escala
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_escala
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [104]
+        id: verificar_k
+        nombre: verificar_k
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_k
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [105]
+        id: verificar_l
+        nombre: verificar_l
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_l
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [106]
+        id: verificar_salida
+        nombre: verificar_salida
+        unidad: funcion
+        enunciado: Función o capacidad: verificar_salida
+        nivel_fractal: 1
+        jurisdiccion: SISTEMA
+        requiere:
+          []
+        factores_evaluables:
+          []
+        agrega_desde:
+          []
+        fuente_modulo: CC
+        senales:
+          []
+        anclas:
+          []
+        origen: ids_sistema
+        version: 1.0
+        notas: clase=funcion
+      [107]
         id: afirmaciones
         nombre: afirmaciones
         unidad: id
@@ -3242,28 +5460,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [2]
-        id: afirmaciones_falsas
-        nombre: afirmaciones_falsas
-        unidad: clave
-        enunciado: Clave de conteo: afirmaciones_falsas
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=conteo
-      [3]
+      [108]
         id: afirmaciones_falsas
         nombre: afirmaciones_falsas
         unidad: id
@@ -3284,32 +5481,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [4]
+      [109]
         id: alpha
-        nombre: ALPHA
-        unidad: factor
-        enunciado: Factor o magnitud: ALPHA
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=factor
-      [5]
-        id: alpha
-        nombre: ALPHA
+        nombre: alpha
         unidad: id
-        enunciado: ID del repositorio: ALPHA
+        enunciado: ID del repositorio: alpha
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -3326,28 +5502,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [6]
-        id: aplicar_escala
-        nombre: aplicar_escala
-        unidad: funcion
-        enunciado: Función o capacidad: aplicar_escala
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [7]
+      [110]
         id: aplicar_escala
         nombre: aplicar_escala
         unidad: id
@@ -3368,28 +5523,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [8]
-        id: autoriza_engine
-        nombre: autoriza_engine
-        unidad: campo
-        enunciado: Campo estructural de contrato: autoriza_engine
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [9]
+      [111]
         id: autoriza_engine
         nombre: autoriza_engine
         unidad: id
@@ -3410,32 +5544,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [10]
+      [112]
         id: ax
-        nombre: AX
-        unidad: rol
-        enunciado: Módulo / rol del sistema: AX
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [11]
-        id: ax
-        nombre: AX
+        nombre: ax
         unidad: id
-        enunciado: ID del repositorio: AX
+        enunciado: ID del repositorio: ax
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -3452,28 +5565,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [12]
-        id: barrer
-        nombre: barrer
-        unidad: funcion
-        enunciado: Función o capacidad: barrer
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [13]
+      [113]
         id: barrer
         nombre: barrer
         unidad: id
@@ -3494,28 +5586,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [14]
-        id: base_nula
-        nombre: base_nula
-        unidad: meta
-        enunciado: Metadato de dominio: base_nula
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [15]
+      [114]
         id: base_nula
         nombre: base_nula
         unidad: id
@@ -3536,32 +5607,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [16]
+      [115]
         id: base_nula_c
-        nombre: base_nula_C
-        unidad: meta
-        enunciado: Metadato de dominio: base_nula_C
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [17]
-        id: base_nula_c
-        nombre: base_nula_C
+        nombre: base_nula_c
         unidad: id
-        enunciado: ID del repositorio: base_nula_C
+        enunciado: ID del repositorio: base_nula_c
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -3578,32 +5628,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [18]
+      [116]
         id: base_nula_k
-        nombre: base_nula_K
-        unidad: meta
-        enunciado: Metadato de dominio: base_nula_K
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [19]
-        id: base_nula_k
-        nombre: base_nula_K
+        nombre: base_nula_k
         unidad: id
-        enunciado: ID del repositorio: base_nula_K
+        enunciado: ID del repositorio: base_nula_k
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -3620,32 +5649,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [20]
+      [117]
         id: base_nula_l
-        nombre: base_nula_L
-        unidad: meta
-        enunciado: Metadato de dominio: base_nula_L
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [21]
-        id: base_nula_l
-        nombre: base_nula_L
+        nombre: base_nula_l
         unidad: id
-        enunciado: ID del repositorio: base_nula_L
+        enunciado: ID del repositorio: base_nula_l
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -3662,32 +5670,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [22]
+      [118]
         id: beta
-        nombre: BETA
-        unidad: factor
-        enunciado: Factor o magnitud: BETA
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=factor
-      [23]
-        id: beta
-        nombre: BETA
+        nombre: beta
         unidad: id
-        enunciado: ID del repositorio: BETA
+        enunciado: ID del repositorio: beta
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -3704,70 +5691,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [24]
-        id: c
-        nombre: C
-        unidad: factor
-        enunciado: Factor o magnitud: C
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=factor
-      [25]
-        id: c
-        nombre: c
-        unidad: variable
-        enunciado: Variable matemática: c
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=variable
-      [26]
-        id: c
-        nombre: C
-        unidad: id
-        enunciado: ID del repositorio: C
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: NO ENTREGADO POR ENGINE
-      [27]
+      [119]
         id: c
         nombre: c
         unidad: id
@@ -3788,32 +5712,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [28]
+      [120]
         id: ca
-        nombre: CA
-        unidad: rol
-        enunciado: Módulo / rol del sistema: CA
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [29]
-        id: ca
-        nombre: CA
+        nombre: ca
         unidad: id
-        enunciado: ID del repositorio: CA
+        enunciado: ID del repositorio: ca
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -3830,28 +5733,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [30]
-        id: calcular_c
-        nombre: calcular_c
-        unidad: funcion
-        enunciado: Función o capacidad: calcular_c
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [31]
+      [121]
         id: calcular_c
         nombre: calcular_c
         unidad: id
@@ -3872,28 +5754,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [32]
-        id: calcular_k
-        nombre: calcular_k
-        unidad: funcion
-        enunciado: Función o capacidad: calcular_k
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [33]
+      [122]
         id: calcular_k
         nombre: calcular_k
         unidad: id
@@ -3914,28 +5775,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [34]
-        id: calcular_l
-        nombre: calcular_l
-        unidad: funcion
-        enunciado: Función o capacidad: calcular_l
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [35]
+      [123]
         id: calcular_l
         nombre: calcular_l
         unidad: id
@@ -3956,28 +5796,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [36]
-        id: calculator
-        nombre: calculator
-        unidad: archivo
-        enunciado: Archivo del repositorio: calculator
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [37]
+      [124]
         id: calculator
         nombre: calculator
         unidad: id
@@ -3998,28 +5817,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [38]
-        id: capacidades
-        nombre: capacidades
-        unidad: campo
-        enunciado: Campo estructural de contrato: capacidades
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [39]
+      [125]
         id: capacidades
         nombre: capacidades
         unidad: id
@@ -4040,28 +5838,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [40]
-        id: capacidades_meta
-        nombre: capacidades_meta
-        unidad: campo
-        enunciado: Campo estructural de contrato: capacidades_meta
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [41]
+      [126]
         id: capacidades_meta
         nombre: capacidades_meta
         unidad: id
@@ -4082,28 +5859,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [42]
-        id: catalogo_citaciones
-        nombre: catalogo_citaciones
-        unidad: archivo
-        enunciado: Archivo del repositorio: catalogo_citaciones
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [43]
+      [127]
         id: catalogo_citaciones
         nombre: catalogo_citaciones
         unidad: id
@@ -4124,28 +5880,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [44]
-        id: categorias
-        nombre: categorias
-        unidad: funcion
-        enunciado: Función o capacidad: categorias
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [45]
+      [128]
         id: categorias
         nombre: categorias
         unidad: id
@@ -4166,32 +5901,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [46]
+      [129]
         id: cc
-        nombre: CC
-        unidad: rol
-        enunciado: Módulo / rol del sistema: CC
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [47]
-        id: cc
-        nombre: CC
+        nombre: cc
         unidad: id
-        enunciado: ID del repositorio: CC
+        enunciado: ID del repositorio: cc
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -4208,28 +5922,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [48]
-        id: coherencia
-        nombre: coherencia
-        unidad: archivo
-        enunciado: Archivo del repositorio: coherencia
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [49]
+      [130]
         id: coherencia
         nombre: coherencia
         unidad: id
@@ -4250,28 +5943,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [50]
-        id: coherencia_fn
-        nombre: coherencia_fn
-        unidad: funcion
-        enunciado: Función o capacidad: coherencia_fn
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [51]
+      [131]
         id: coherencia_fn
         nombre: coherencia_fn
         unidad: id
@@ -4292,28 +5964,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [52]
-        id: combinar_resultados
-        nombre: combinar_resultados
-        unidad: funcion
-        enunciado: Función o capacidad: combinar_resultados
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [53]
+      [132]
         id: combinar_resultados
         nombre: combinar_resultados
         unidad: id
@@ -4334,28 +5985,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [54]
-        id: compromisos
-        nombre: compromisos
-        unidad: clave
-        enunciado: Clave de conteo: compromisos
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=conteo
-      [55]
+      [133]
         id: compromisos
         nombre: compromisos
         unidad: id
@@ -4376,28 +6006,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [56]
-        id: conocimiento_exportable
-        nombre: conocimiento_exportable
-        unidad: campo
-        enunciado: Campo estructural de contrato: conocimiento_exportable
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [57]
+      [134]
         id: conocimiento_exportable
         nombre: conocimiento_exportable
         unidad: id
@@ -4418,32 +6027,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [58]
+      [135]
         id: contenedor
-        nombre: CONTENEDOR
-        unidad: campo
-        enunciado: Campo estructural de contrato: CONTENEDOR
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [59]
-        id: contenedor
-        nombre: CONTENEDOR
+        nombre: contenedor
         unidad: id
-        enunciado: ID del repositorio: CONTENEDOR
+        enunciado: ID del repositorio: contenedor
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -4460,28 +6048,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [60]
-        id: conteos
-        nombre: conteos
-        unidad: archivo
-        enunciado: Archivo del repositorio: conteos
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [61]
+      [136]
         id: conteos
         nombre: conteos
         unidad: id
@@ -4502,28 +6069,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [62]
-        id: contexto
-        nombre: contexto
-        unidad: meta
-        enunciado: Metadato de dominio: contexto
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [63]
+      [137]
         id: contexto
         nombre: contexto
         unidad: id
@@ -4544,28 +6090,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [64]
-        id: contradicciones
-        nombre: contradicciones
-        unidad: clave
-        enunciado: Clave de conteo: contradicciones
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=conteo
-      [65]
+      [138]
         id: contradicciones
         nombre: contradicciones
         unidad: id
@@ -4586,28 +6111,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [66]
-        id: correlacion_fn
-        nombre: correlacion_fn
-        unidad: funcion
-        enunciado: Función o capacidad: correlacion_fn
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [67]
+      [139]
         id: correlacion_fn
         nombre: correlacion_fn
         unidad: id
@@ -4628,28 +6132,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [68]
-        id: correlacion_k
-        nombre: correlacion_k
-        unidad: archivo
-        enunciado: Archivo del repositorio: correlacion_k
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [69]
+      [140]
         id: correlacion_k
         nombre: correlacion_k
         unidad: id
@@ -4670,32 +6153,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [70]
+      [141]
         id: ct
-        nombre: CT
-        unidad: rol
-        enunciado: Módulo / rol del sistema: CT
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [71]
-        id: ct
-        nombre: CT
+        nombre: ct
         unidad: id
-        enunciado: ID del repositorio: CT
+        enunciado: ID del repositorio: ct
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -4712,32 +6174,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [72]
+      [142]
         id: cx
-        nombre: CX
-        unidad: rol
-        enunciado: Módulo / rol del sistema: CX
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [73]
-        id: cx
-        nombre: CX
+        nombre: cx
         unidad: id
-        enunciado: ID del repositorio: CX
+        enunciado: ID del repositorio: cx
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -4754,28 +6195,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [74]
-        id: decimal
-        nombre: decimal
-        unidad: campo
-        enunciado: Campo de representación: decimal
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=representacion
-      [75]
+      [143]
         id: decimal
         nombre: decimal
         unidad: id
@@ -4796,32 +6216,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [76]
+      [144]
         id: degradado
-        nombre: DEGRADADO
-        unidad: estado
-        enunciado: Estado de módulo: DEGRADADO
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=estado
-      [77]
-        id: degradado
-        nombre: DEGRADADO
+        nombre: degradado
         unidad: id
-        enunciado: ID del repositorio: DEGRADADO
+        enunciado: ID del repositorio: degradado
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -4838,28 +6237,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [78]
-        id: denominador
-        nombre: denominador
-        unidad: campo
-        enunciado: Campo de representación: denominador
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=representacion
-      [79]
+      [145]
         id: denominador
         nombre: denominador
         unidad: id
@@ -4880,28 +6258,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [80]
-        id: descubrir
-        nombre: descubrir
-        unidad: funcion
-        enunciado: Función o capacidad: descubrir
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [81]
+      [146]
         id: descubrir
         nombre: descubrir
         unidad: id
@@ -4922,32 +6279,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [82]
+      [147]
         id: dg
-        nombre: DG
-        unidad: rol
-        enunciado: Módulo / rol del sistema: DG
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [83]
-        id: dg
-        nombre: DG
+        nombre: dg
         unidad: id
-        enunciado: ID del repositorio: DG
+        enunciado: ID del repositorio: dg
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -4964,28 +6300,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [84]
-        id: diagnostico
-        nombre: diagnostico
-        unidad: funcion
-        enunciado: Función o capacidad: diagnostico
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [85]
+      [148]
         id: diagnostico
         nombre: diagnostico
         unidad: id
@@ -5006,28 +6321,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [86]
-        id: display
-        nombre: display
-        unidad: campo
-        enunciado: Campo de representación: display
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=representacion
-      [87]
+      [149]
         id: display
         nombre: display
         unidad: id
@@ -5048,28 +6342,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [88]
-        id: ejecutar_capacidad
-        nombre: ejecutar_capacidad
-        unidad: funcion
-        enunciado: Función o capacidad: ejecutar_capacidad
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [89]
+      [150]
         id: ejecutar_capacidad
         nombre: ejecutar_capacidad
         unidad: id
@@ -5090,32 +6363,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [90]
+      [151]
         id: en
-        nombre: EN
-        unidad: rol
-        enunciado: Módulo / rol del sistema: EN
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [91]
-        id: en
-        nombre: EN
+        nombre: en
         unidad: id
-        enunciado: ID del repositorio: EN
+        enunciado: ID del repositorio: en
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -5132,32 +6384,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [92]
+      [152]
         id: engine
-        nombre: Engine
-        unidad: agente
-        enunciado: Agente del sistema: Engine
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=agente
-      [93]
-        id: engine
-        nombre: Engine
+        nombre: engine
         unidad: id
-        enunciado: ID del repositorio: Engine
+        enunciado: ID del repositorio: engine
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -5174,28 +6405,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [94]
-        id: es_valida
-        nombre: es_valida
-        unidad: funcion
-        enunciado: Función o capacidad: es_valida
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [95]
+      [153]
         id: es_valida
         nombre: es_valida
         unidad: id
@@ -5216,28 +6426,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [96]
-        id: escala
-        nombre: escala
-        unidad: archivo
-        enunciado: Archivo del repositorio: escala
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [97]
+      [154]
         id: escala
         nombre: escala
         unidad: id
@@ -5258,28 +6447,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [98]
-        id: escalas_ids
-        nombre: escalas_ids
-        unidad: archivo
-        enunciado: Archivo del repositorio: escalas_ids
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [99]
+      [155]
         id: escalas_ids
         nombre: escalas_ids
         unidad: id
@@ -5300,28 +6468,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [100]
-        id: esquema
-        nombre: esquema
-        unidad: funcion
-        enunciado: Función o capacidad: esquema
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [101]
+      [156]
         id: esquema
         nombre: esquema
         unidad: id
@@ -5342,32 +6489,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [102]
+      [157]
         id: esquema_categoria
-        nombre: ESQUEMA_CATEGORIA
-        unidad: campo
-        enunciado: Campo estructural de contrato: ESQUEMA_CATEGORIA
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [103]
-        id: esquema_categoria
-        nombre: ESQUEMA_CATEGORIA
+        nombre: esquema_categoria
         unidad: id
-        enunciado: ID del repositorio: ESQUEMA_CATEGORIA
+        enunciado: ID del repositorio: esquema_categoria
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -5384,28 +6510,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [104]
-        id: estados_validos
-        nombre: estados_validos
-        unidad: campo
-        enunciado: Campo estructural de contrato: estados_validos
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [105]
+      [158]
         id: estados_validos
         nombre: estados_validos
         unidad: id
@@ -5426,28 +6531,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [106]
-        id: extraer_conteos
-        nombre: extraer_conteos
-        unidad: funcion
-        enunciado: Función o capacidad: extraer_conteos
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [107]
+      [159]
         id: extraer_conteos
         nombre: extraer_conteos
         unidad: id
@@ -5468,28 +6552,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [108]
-        id: f
-        nombre: f
-        unidad: variable
-        enunciado: Variable matemática: f
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=variable
-      [109]
+      [160]
         id: f
         nombre: f
         unidad: id
@@ -5510,32 +6573,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [110]
+      [161]
         id: fo
-        nombre: FO
-        unidad: rol
-        enunciado: Módulo / rol del sistema: FO
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [111]
-        id: fo
-        nombre: FO
+        nombre: fo
         unidad: id
-        enunciado: ID del repositorio: FO
+        enunciado: ID del repositorio: fo
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -5552,28 +6594,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [112]
-        id: formulas
-        nombre: formulas
-        unidad: archivo
-        enunciado: Archivo del repositorio: formulas
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [113]
+      [162]
         id: formulas
         nombre: formulas
         unidad: id
@@ -5594,28 +6615,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [114]
-        id: fraccion
-        nombre: fraccion
-        unidad: campo
-        enunciado: Campo de representación: fraccion
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=representacion
-      [115]
+      [163]
         id: fraccion
         nombre: fraccion
         unidad: id
@@ -5636,28 +6636,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [116]
-        id: ids
-        nombre: ids
-        unidad: funcion
-        enunciado: Función o capacidad: ids
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [117]
+      [164]
         id: ids
         nombre: ids
         unidad: id
@@ -5678,28 +6657,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [118]
-        id: invariantes
-        nombre: invariantes
-        unidad: campo
-        enunciado: Campo estructural de contrato: invariantes
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [119]
+      [165]
         id: invariantes
         nombre: invariantes
         unidad: id
@@ -5720,28 +6678,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [120]
-        id: inventario
-        nombre: inventario
-        unidad: funcion
-        enunciado: Función o capacidad: inventario
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [121]
+      [166]
         id: inventario
         nombre: inventario
         unidad: id
@@ -5762,28 +6699,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [122]
-        id: inyectar_en_peticion
-        nombre: inyectar_en_peticion
-        unidad: funcion
-        enunciado: Función o capacidad: inyectar_en_peticion
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [123]
+      [167]
         id: inyectar_en_peticion
         nombre: inyectar_en_peticion
         unidad: id
@@ -5804,70 +6720,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [124]
-        id: k
-        nombre: K
-        unidad: factor
-        enunciado: Factor o magnitud: K
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=factor
-      [125]
-        id: k
-        nombre: k
-        unidad: variable
-        enunciado: Variable matemática: k
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=variable
-      [126]
-        id: k
-        nombre: K
-        unidad: id
-        enunciado: ID del repositorio: K
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: NO ENTREGADO POR ENGINE
-      [127]
+      [168]
         id: k
         nombre: k
         unidad: id
@@ -5888,32 +6741,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [128]
+      [169]
         id: l
-        nombre: L
-        unidad: factor
-        enunciado: Factor o magnitud: L
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=factor
-      [129]
-        id: l
-        nombre: L
+        nombre: l
         unidad: id
-        enunciado: ID del repositorio: L
+        enunciado: ID del repositorio: l
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -5930,28 +6762,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [130]
-        id: leer_ids_escala
-        nombre: leer_ids_escala
-        unidad: funcion
-        enunciado: Función o capacidad: leer_ids_escala
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [131]
+      [170]
         id: leer_ids_escala
         nombre: leer_ids_escala
         unidad: id
@@ -5972,28 +6783,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [132]
-        id: logica
-        nombre: logica
-        unidad: archivo
-        enunciado: Archivo del repositorio: logica
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [133]
+      [171]
         id: logica
         nombre: logica
         unidad: id
@@ -6014,28 +6804,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [134]
-        id: logica_fn
-        nombre: logica_fn
-        unidad: funcion
-        enunciado: Función o capacidad: logica_fn
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [135]
+      [172]
         id: logica_fn
         nombre: logica_fn
         unidad: id
@@ -6056,28 +6825,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [136]
-        id: m
-        nombre: m
-        unidad: variable
-        enunciado: Variable matemática: m
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=variable
-      [137]
+      [173]
         id: m
         nombre: m
         unidad: id
@@ -6098,32 +6846,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [138]
+      [174]
         id: mc
-        nombre: MC
-        unidad: rol
-        enunciado: Módulo / rol del sistema: MC
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
-      [139]
-        id: mc
-        nombre: MC
+        nombre: mc
         unidad: id
-        enunciado: ID del repositorio: MC
+        enunciado: ID del repositorio: mc
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -6140,32 +6867,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [140]
+      [175]
         id: no_iniciado
-        nombre: NO_INICIADO
-        unidad: estado
-        enunciado: Estado de módulo: NO_INICIADO
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=estado
-      [141]
-        id: no_iniciado
-        nombre: NO_INICIADO
+        nombre: no_iniciado
         unidad: id
-        enunciado: ID del repositorio: NO_INICIADO
+        enunciado: ID del repositorio: no_iniciado
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -6182,28 +6888,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [142]
-        id: numerador
-        nombre: numerador
-        unidad: campo
-        enunciado: Campo de representación: numerador
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=representacion
-      [143]
+      [176]
         id: numerador
         nombre: numerador
         unidad: id
@@ -6224,32 +6909,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [144]
+      [177]
         id: o_context
-        nombre: O_context
-        unidad: meta
-        enunciado: Metadato de dominio: O_context
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [145]
-        id: o_context
-        nombre: O_context
+        nombre: o_context
         unidad: id
-        enunciado: ID del repositorio: O_context
+        enunciado: ID del repositorio: o_context
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -6266,28 +6930,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [146]
-        id: o_presente
-        nombre: o_presente
-        unidad: meta
-        enunciado: Metadato de dominio: o_presente
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [147]
+      [178]
         id: o_presente
         nombre: o_presente
         unidad: id
@@ -6308,32 +6951,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [148]
+      [179]
         id: omega
-        nombre: Omega
-        unidad: agente
-        enunciado: Agente del sistema: Omega
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=agente
-      [149]
-        id: omega
-        nombre: Omega
+        nombre: omega
         unidad: id
-        enunciado: ID del repositorio: Omega
+        enunciado: ID del repositorio: omega
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -6350,32 +6972,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [150]
+      [180]
         id: omegareport
-        nombre: OmegaReport
-        unidad: agente
-        enunciado: Agente del sistema: OmegaReport
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=agente
-      [151]
-        id: omegareport
-        nombre: OmegaReport
+        nombre: omegareport
         unidad: id
-        enunciado: ID del repositorio: OmegaReport
+        enunciado: ID del repositorio: omegareport
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -6392,32 +6993,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [152]
+      [181]
         id: operativo
-        nombre: OPERATIVO
-        unidad: estado
-        enunciado: Estado de módulo: OPERATIVO
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=estado
-      [153]
-        id: operativo
-        nombre: OPERATIVO
+        nombre: operativo
         unidad: id
-        enunciado: ID del repositorio: OPERATIVO
+        enunciado: ID del repositorio: operativo
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -6434,28 +7014,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [154]
-        id: p
-        nombre: p
-        unidad: variable
-        enunciado: Variable matemática: p
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=variable
-      [155]
+      [182]
         id: p
         nombre: p
         unidad: id
@@ -6476,28 +7035,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [156]
-        id: por_id
-        nombre: por_id
-        unidad: funcion
-        enunciado: Función o capacidad: por_id
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [157]
+      [183]
         id: por_id
         nombre: por_id
         unidad: id
@@ -6518,28 +7056,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [158]
-        id: posturas
-        nombre: posturas
-        unidad: clave
-        enunciado: Clave de conteo: posturas
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=conteo
-      [159]
+      [184]
         id: posturas
         nombre: posturas
         unidad: id
@@ -6560,28 +7077,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [160]
-        id: precision
-        nombre: precision
-        unidad: campo
-        enunciado: Campo de representación: precision
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=representacion
-      [161]
+      [185]
         id: precision
         nombre: precision
         unidad: id
@@ -6602,28 +7098,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [162]
-        id: r
-        nombre: r
-        unidad: variable
-        enunciado: Variable matemática: r
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=variable
-      [163]
+      [186]
         id: r
         nombre: r
         unidad: id
@@ -6644,32 +7119,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [164]
+      [187]
         id: rechazado
-        nombre: RECHAZADO
-        unidad: estado
-        enunciado: Estado de módulo: RECHAZADO
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=estado
-      [165]
-        id: rechazado
-        nombre: RECHAZADO
+        nombre: rechazado
         unidad: id
-        enunciado: ID del repositorio: RECHAZADO
+        enunciado: ID del repositorio: rechazado
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -6686,28 +7140,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [166]
-        id: recolectar
-        nombre: recolectar
-        unidad: funcion
-        enunciado: Función o capacidad: recolectar
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [167]
+      [188]
         id: recolectar
         nombre: recolectar
         unidad: id
@@ -6728,28 +7161,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [168]
-        id: reporte
-        nombre: reporte
-        unidad: funcion
-        enunciado: Función o capacidad: reporte
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [169]
+      [189]
         id: reporte
         nombre: reporte
         unidad: id
@@ -6770,28 +7182,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [170]
-        id: reporting
-        nombre: reporting
-        unidad: campo
-        enunciado: Campo estructural de contrato: reporting
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [171]
+      [190]
         id: reporting
         nombre: reporting
         unidad: id
@@ -6812,28 +7203,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [172]
-        id: representar
-        nombre: representar
-        unidad: funcion
-        enunciado: Función o capacidad: representar
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [173]
+      [191]
         id: representar
         nombre: representar
         unidad: id
@@ -6854,28 +7224,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [174]
-        id: requiere
-        nombre: requiere
-        unidad: campo
-        enunciado: Campo estructural de contrato: requiere
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=contrato
-      [175]
+      [192]
         id: requiere
         nombre: requiere
         unidad: id
@@ -6896,28 +7245,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [176]
-        id: resolver_dependencias
-        nombre: resolver_dependencias
-        unidad: funcion
-        enunciado: Función o capacidad: resolver_dependencias
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [177]
+      [193]
         id: resolver_dependencias
         nombre: resolver_dependencias
         unidad: id
@@ -6938,28 +7266,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [178]
-        id: resolver_pedido
-        nombre: resolver_pedido
-        unidad: funcion
-        enunciado: Función o capacidad: resolver_pedido
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [179]
+      [194]
         id: resolver_pedido
         nombre: resolver_pedido
         unidad: id
@@ -6980,28 +7287,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [180]
-        id: reversiones
-        nombre: reversiones
-        unidad: clave
-        enunciado: Clave de conteo: reversiones
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=conteo
-      [181]
+      [195]
         id: reversiones
         nombre: reversiones
         unidad: id
@@ -7022,28 +7308,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [182]
-        id: tru_atomo
-        nombre: tru_atomo
-        unidad: escala
-        enunciado: Escala de alcance Tru: tru_atomo
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=escala
-      [183]
+      [196]
         id: tru_atomo
         nombre: tru_atomo
         unidad: id
@@ -7064,28 +7329,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [184]
-        id: tru_conversacion
-        nombre: tru_conversacion
-        unidad: escala
-        enunciado: Escala de alcance Tru: tru_conversacion
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=escala
-      [185]
+      [197]
         id: tru_conversacion
         nombre: tru_conversacion
         unidad: id
@@ -7106,28 +7350,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [186]
-        id: tru_frase
-        nombre: tru_frase
-        unidad: escala
-        enunciado: Escala de alcance Tru: tru_frase
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=escala
-      [187]
+      [198]
         id: tru_frase
         nombre: tru_frase
         unidad: id
@@ -7148,28 +7371,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [188]
-        id: tru_repositorio
-        nombre: tru_repositorio
-        unidad: escala
-        enunciado: Escala de alcance Tru: tru_repositorio
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=escala
-      [189]
+      [199]
         id: tru_repositorio
         nombre: tru_repositorio
         unidad: id
@@ -7190,49 +7392,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [190]
-        id: tru_ri
-        nombre: tru_ri
-        unidad: funcion
-        enunciado: Función o capacidad: tru_ri
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [191]
-        id: tru_ri
-        nombre: Tru_Ri
-        unidad: factor
-        enunciado: Factor o magnitud: Tru_Ri
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=factor
-      [192]
+      [200]
         id: tru_ri
         nombre: tru_ri
         unidad: id
@@ -7253,49 +7413,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [193]
-        id: tru_ri
-        nombre: Tru_Ri
-        unidad: id
-        enunciado: ID del repositorio: Tru_Ri
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: NO ENTREGADO POR ENGINE
-      [194]
-        id: tru_sujeto
-        nombre: tru_sujeto
-        unidad: escala
-        enunciado: Escala de alcance Tru: tru_sujeto
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=escala
-      [195]
+      [201]
         id: tru_sujeto
         nombre: tru_sujeto
         unidad: id
@@ -7316,49 +7434,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [196]
-        id: tru_total
-        nombre: tru_total
-        unidad: funcion
-        enunciado: Función o capacidad: tru_total
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [197]
-        id: tru_total
-        nombre: Tru_total
-        unidad: factor
-        enunciado: Factor o magnitud: Tru_total
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=factor
-      [198]
+      [202]
         id: tru_total
         nombre: tru_total
         unidad: id
@@ -7379,49 +7455,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [199]
-        id: tru_total
-        nombre: Tru_total
-        unidad: id
-        enunciado: ID del repositorio: Tru_total
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: NO ENTREGADO POR ENGINE
-      [200]
-        id: tru_totales
-        nombre: tru_totales
-        unidad: archivo
-        enunciado: Archivo del repositorio: tru_totales
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [201]
+      [203]
         id: tru_totales
         nombre: tru_totales
         unidad: id
@@ -7442,28 +7476,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [202]
-        id: truth
-        nombre: truth
-        unidad: archivo
-        enunciado: Archivo del repositorio: truth
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=archivo
-      [203]
+      [204]
         id: truth
         nombre: truth
         unidad: id
@@ -7484,32 +7497,11 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [204]
-        id: tt
-        nombre: TT
-        unidad: rol
-        enunciado: Módulo / rol del sistema: TT
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=modulo
       [205]
         id: tt
-        nombre: TT
+        nombre: tt
         unidad: id
-        enunciado: ID del repositorio: TT
+        enunciado: ID del repositorio: tt
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -7528,30 +7520,9 @@
         notas: NO ENTREGADO POR ENGINE
       [206]
         id: undefined
-        nombre: UNDEFINED
-        unidad: meta
-        enunciado: Metadato de dominio: UNDEFINED
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=meta
-      [207]
-        id: undefined
-        nombre: UNDEFINED
+        nombre: undefined
         unidad: id
-        enunciado: ID del repositorio: UNDEFINED
+        enunciado: ID del repositorio: undefined
         nivel_fractal: NO ENTREGADO POR ENGINE
         jurisdiccion: NO ENTREGADO POR ENGINE
         requiere:
@@ -7568,28 +7539,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [208]
-        id: valor
-        nombre: valor
-        unidad: campo
-        enunciado: Campo de representación: valor
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=representacion
-      [209]
+      [207]
         id: valor
         nombre: valor
         unidad: id
@@ -7610,28 +7560,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [210]
-        id: verificar
-        nombre: verificar
-        unidad: funcion
-        enunciado: Función o capacidad: verificar
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [211]
+      [208]
         id: verificar
         nombre: verificar
         unidad: id
@@ -7652,28 +7581,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [212]
-        id: verificar_c
-        nombre: verificar_c
-        unidad: funcion
-        enunciado: Función o capacidad: verificar_c
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [213]
+      [209]
         id: verificar_c
         nombre: verificar_c
         unidad: id
@@ -7694,28 +7602,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [214]
-        id: verificar_escala
-        nombre: verificar_escala
-        unidad: funcion
-        enunciado: Función o capacidad: verificar_escala
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [215]
+      [210]
         id: verificar_escala
         nombre: verificar_escala
         unidad: id
@@ -7736,28 +7623,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [216]
-        id: verificar_k
-        nombre: verificar_k
-        unidad: funcion
-        enunciado: Función o capacidad: verificar_k
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [217]
+      [211]
         id: verificar_k
         nombre: verificar_k
         unidad: id
@@ -7778,28 +7644,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [218]
-        id: verificar_l
-        nombre: verificar_l
-        unidad: funcion
-        enunciado: Función o capacidad: verificar_l
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [219]
+      [212]
         id: verificar_l
         nombre: verificar_l
         unidad: id
@@ -7820,28 +7665,7 @@
         origen: ids_sistema
         version: 1.0
         notas: NO ENTREGADO POR ENGINE
-      [220]
-        id: verificar_salida
-        nombre: verificar_salida
-        unidad: funcion
-        enunciado: Función o capacidad: verificar_salida
-        nivel_fractal: NO ENTREGADO POR ENGINE
-        jurisdiccion: NO ENTREGADO POR ENGINE
-        requiere:
-          []
-        factores_evaluables:
-          []
-        agrega_desde:
-          []
-        fuente_modulo: NO ENTREGADO POR ENGINE
-        senales:
-          []
-        anclas:
-          []
-        origen: ids_sistema
-        version: 1.0
-        notas: clase=funcion
-      [221]
+      [213]
         id: verificar_salida
         nombre: verificar_salida
         unidad: id
@@ -7864,228 +7688,220 @@
         notas: NO ENTREGADO POR ENGINE
     ids:
       • afirmaciones
+      • afirmaciones_falsas
+      • alpha
+      • aplicar_escala
+      • autoriza_engine
+      • ax
+      • barrer
+      • base_nula
+      • base_nula_c
+      • base_nula_k
+      • base_nula_l
+      • beta
+      • c
+      • ca
+      • calcular_c
+      • calcular_k
+      • calcular_l
+      • calculator
+      • capacidades
+      • capacidades_meta
+      • catalogo_citaciones
+      • categorias
+      • cc
+      • coherencia
+      • coherencia_fn
+      • combinar_resultados
+      • compromisos
+      • conocimiento_exportable
+      • contenedor
+      • conteos
+      • contexto
+      • contradicciones
+      • correlacion_fn
+      • correlacion_k
+      • ct
+      • cx
+      • decimal
+      • degradado
+      • denominador
+      • descubrir
+      • dg
+      • diagnostico
+      • display
+      • ejecutar_capacidad
+      • en
+      • engine
+      • es_valida
+      • escala
+      • escalas_ids
+      • esquema
+      • esquema_categoria
+      • estados_validos
+      • extraer_conteos
+      • f
+      • fo
+      • formulas
+      • fraccion
+      • ids
+      • invariantes
+      • inventario
+      • inyectar_en_peticion
+      • k
+      • l
+      • leer_ids_escala
+      • logica
+      • logica_fn
+      • m
+      • mc
+      • no_iniciado
+      • numerador
+      • o_context
+      • o_presente
+      • omega
+      • omegareport
+      • operativo
+      • p
+      • por_id
+      • posturas
+      • precision
+      • r
+      • rechazado
+      • recolectar
+      • reporte
+      • reporting
+      • representar
+      • requiere
+      • resolver_dependencias
+      • resolver_pedido
+      • reversiones
+      • tru_atomo
+      • tru_conversacion
+      • tru_frase
+      • tru_repositorio
+      • tru_ri
+      • tru_sujeto
+      • tru_total
+      • tru_totales
+      • truth
+      • tt
+      • undefined
+      • valor
+      • verificar
+      • verificar_c
+      • verificar_escala
+      • verificar_k
+      • verificar_l
+      • verificar_salida
       • afirmaciones
       • afirmaciones_falsas
-      • afirmaciones_falsas
-      • alpha
       • alpha
       • aplicar_escala
-      • aplicar_escala
-      • autoriza_engine
       • autoriza_engine
       • ax
-      • ax
-      • barrer
       • barrer
       • base_nula
-      • base_nula
-      • base_nula_c
       • base_nula_c
       • base_nula_k
-      • base_nula_k
-      • base_nula_l
       • base_nula_l
       • beta
-      • beta
-      • c
-      • c
-      • c
       • c
       • ca
-      • ca
-      • calcular_c
       • calcular_c
       • calcular_k
-      • calcular_k
-      • calcular_l
       • calcular_l
       • calculator
-      • calculator
-      • capacidades
       • capacidades
       • capacidades_meta
-      • capacidades_meta
-      • catalogo_citaciones
       • catalogo_citaciones
       • categorias
-      • categorias
-      • cc
       • cc
       • coherencia
-      • coherencia
-      • coherencia_fn
       • coherencia_fn
       • combinar_resultados
-      • combinar_resultados
-      • compromisos
       • compromisos
       • conocimiento_exportable
-      • conocimiento_exportable
-      • contenedor
       • contenedor
       • conteos
-      • conteos
-      • contexto
       • contexto
       • contradicciones
-      • contradicciones
-      • correlacion_fn
       • correlacion_fn
       • correlacion_k
-      • correlacion_k
-      • ct
       • ct
       • cx
-      • cx
-      • decimal
       • decimal
       • degradado
-      • degradado
-      • denominador
       • denominador
       • descubrir
-      • descubrir
-      • dg
       • dg
       • diagnostico
-      • diagnostico
-      • display
       • display
       • ejecutar_capacidad
-      • ejecutar_capacidad
-      • en
       • en
       • engine
-      • engine
-      • es_valida
       • es_valida
       • escala
-      • escala
-      • escalas_ids
       • escalas_ids
       • esquema
-      • esquema
-      • esquema_categoria
       • esquema_categoria
       • estados_validos
-      • estados_validos
-      • extraer_conteos
       • extraer_conteos
       • f
-      • f
-      • fo
       • fo
       • formulas
-      • formulas
-      • fraccion
       • fraccion
       • ids
-      • ids
-      • invariantes
       • invariantes
       • inventario
-      • inventario
-      • inyectar_en_peticion
       • inyectar_en_peticion
       • k
-      • k
-      • k
-      • k
-      • l
       • l
       • leer_ids_escala
-      • leer_ids_escala
-      • logica
       • logica
       • logica_fn
-      • logica_fn
-      • m
       • m
       • mc
-      • mc
-      • no_iniciado
       • no_iniciado
       • numerador
-      • numerador
-      • o_context
       • o_context
       • o_presente
-      • o_presente
-      • omega
       • omega
       • omegareport
-      • omegareport
-      • operativo
       • operativo
       • p
-      • p
-      • por_id
       • por_id
       • posturas
-      • posturas
-      • precision
       • precision
       • r
-      • r
-      • rechazado
       • rechazado
       • recolectar
-      • recolectar
-      • reporte
       • reporte
       • reporting
-      • reporting
-      • representar
       • representar
       • requiere
-      • requiere
-      • resolver_dependencias
       • resolver_dependencias
       • resolver_pedido
-      • resolver_pedido
-      • reversiones
       • reversiones
       • tru_atomo
-      • tru_atomo
-      • tru_conversacion
       • tru_conversacion
       • tru_frase
-      • tru_frase
-      • tru_repositorio
       • tru_repositorio
       • tru_ri
-      • tru_ri
-      • tru_ri
-      • tru_ri
-      • tru_sujeto
       • tru_sujeto
       • tru_total
-      • tru_total
-      • tru_total
-      • tru_total
-      • tru_totales
       • tru_totales
       • truth
-      • truth
-      • tt
       • tt
       • undefined
-      • undefined
-      • valor
       • valor
       • verificar
-      • verificar
-      • verificar_c
       • verificar_c
       • verificar_escala
-      • verificar_escala
-      • verificar_k
       • verificar_k
       • verificar_l
-      • verificar_l
       • verificar_salida
-      • verificar_salida
-    total: 222
+    total: 214
     errores:
       [0]
         archivo: ids_sistema,ids_sistema
@@ -8190,11 +8006,11 @@
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'representar' en ['ids_sistema', 'ids_sistema']
       [34]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_ri' en ['ids_sistema', 'ids_sistema']
       [35]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'tru_total' en ['ids_sistema', 'ids_sistema']
       [36]
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'aplicar_escala' en ['ids_sistema', 'ids_sistema']
@@ -8253,14 +8069,14 @@
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'combinar_resultados' en ['ids_sistema', 'ids_sistema']
       [55]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'c' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'c' en ['ids_sistema', 'ids_sistema']
       [56]
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'l' en ['ids_sistema', 'ids_sistema']
       [57]
-        archivo: ids_sistema,ids_sistema,ids_sistema,ids_sistema
-        error: id duplicado 'k' en ['ids_sistema', 'ids_sistema', 'ids_sistema', 'ids_sistema']
+        archivo: ids_sistema,ids_sistema
+        error: id duplicado 'k' en ['ids_sistema', 'ids_sistema']
       [58]
         archivo: ids_sistema,ids_sistema
         error: id duplicado 'alpha' en ['ids_sistema', 'ids_sistema']
@@ -15574,350 +15390,350 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-12T22:21:15.365330+00:00
+    timestamp: 2026-08-12T22:42:37.301883+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.011503
+    duracion_s: 0.007843
   [1]
     id_traza: 2
-    timestamp: 2026-08-12T22:21:15.376811+00:00
+    timestamp: 2026-08-12T22:42:37.309643+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.011366
+    duracion_s: 0.007702
   [2]
     id_traza: 3
-    timestamp: 2026-08-12T22:21:15.386623+00:00
+    timestamp: 2026-08-12T22:42:37.316783+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.009715
+    duracion_s: 0.007076
   [3]
     id_traza: 4
-    timestamp: 2026-08-12T22:21:15.386717+00:00
+    timestamp: 2026-08-12T22:42:37.316843+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 2.4e-05
+    duracion_s: 1.6e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-12T22:21:15.386755+00:00
+    timestamp: 2026-08-12T22:42:37.316870+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 7e-06
+    duracion_s: 5e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-12T22:21:15.386801+00:00
+    timestamp: 2026-08-12T22:42:37.316902+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 5e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-12T22:21:15.387350+00:00
+    timestamp: 2026-08-12T22:42:37.317290+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000516
+    duracion_s: 0.000364
   [7]
     id_traza: 8
-    timestamp: 2026-08-12T22:21:15.387712+00:00
+    timestamp: 2026-08-12T22:42:37.317546+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000327
+    duracion_s: 0.000235
   [8]
     id_traza: 9
-    timestamp: 2026-08-12T22:21:15.388081+00:00
+    timestamp: 2026-08-12T22:42:37.317822+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000335
+    duracion_s: 0.000254
   [9]
     id_traza: 10
-    timestamp: 2026-08-12T22:21:15.389122+00:00
+    timestamp: 2026-08-12T22:42:37.318571+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001008
+    duracion_s: 0.000726
   [10]
     id_traza: 11
-    timestamp: 2026-08-12T22:21:15.391069+00:00
+    timestamp: 2026-08-12T22:42:37.320101+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001904
+    duracion_s: 0.001502
   [11]
     id_traza: 12
-    timestamp: 2026-08-12T22:21:15.392907+00:00
+    timestamp: 2026-08-12T22:42:37.321403+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001791
+    duracion_s: 0.001263
   [12]
     id_traza: 13
-    timestamp: 2026-08-12T22:21:15.394147+00:00
+    timestamp: 2026-08-12T22:42:37.322344+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001167
+    duracion_s: 0.000898
   [13]
     id_traza: 14
-    timestamp: 2026-08-12T22:21:15.394191+00:00
+    timestamp: 2026-08-12T22:42:37.322381+00:00
     modulo: citacion
     capacidad: reporte
     estado: EXITO
     duracion_s: 4e-06
   [14]
     id_traza: 15
-    timestamp: 2026-08-12T22:21:15.394214+00:00
+    timestamp: 2026-08-12T22:42:37.322398+00:00
     modulo: citacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [15]
     id_traza: 16
-    timestamp: 2026-08-12T22:21:15.394236+00:00
+    timestamp: 2026-08-12T22:42:37.322415+00:00
     modulo: citacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 3e-06
   [16]
     id_traza: 17
-    timestamp: 2026-08-12T22:21:15.394446+00:00
+    timestamp: 2026-08-12T22:42:37.322577+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000192
+    duracion_s: 0.000148
   [17]
     id_traza: 18
-    timestamp: 2026-08-12T22:21:15.394579+00:00
+    timestamp: 2026-08-12T22:42:37.322705+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00011
+    duracion_s: 0.000111
   [18]
     id_traza: 19
-    timestamp: 2026-08-12T22:21:15.394659+00:00
+    timestamp: 2026-08-12T22:42:37.322765+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 5.2e-05
+    duracion_s: 3.9e-05
   [19]
     id_traza: 20
-    timestamp: 2026-08-12T22:21:15.408023+00:00
+    timestamp: 2026-08-12T22:42:37.332501+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.013336
+    duracion_s: 0.009716
   [20]
     id_traza: 21
-    timestamp: 2026-08-12T22:21:15.409012+00:00
+    timestamp: 2026-08-12T22:42:37.333256+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000943
+    duracion_s: 0.000722
   [21]
     id_traza: 22
-    timestamp: 2026-08-12T22:21:15.409875+00:00
+    timestamp: 2026-08-12T22:42:37.333884+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000818
+    duracion_s: 0.000594
   [22]
     id_traza: 23
-    timestamp: 2026-08-12T22:21:15.425861+00:00
+    timestamp: 2026-08-12T22:42:37.345799+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.015948
+    duracion_s: 0.011887
   [23]
     id_traza: 24
-    timestamp: 2026-08-12T22:21:15.434479+00:00
+    timestamp: 2026-08-12T22:42:37.352483+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00856
+    duracion_s: 0.006643
   [24]
     id_traza: 25
-    timestamp: 2026-08-12T22:21:15.435612+00:00
+    timestamp: 2026-08-12T22:42:37.353291+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001085
+    duracion_s: 0.000773
   [25]
     id_traza: 26
-    timestamp: 2026-08-12T22:21:15.438438+00:00
+    timestamp: 2026-08-12T22:42:37.355398+00:00
     modulo: diccionario
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002788
+    duracion_s: 0.002075
   [26]
     id_traza: 27
-    timestamp: 2026-08-12T22:21:15.438489+00:00
+    timestamp: 2026-08-12T22:42:37.355436+00:00
     modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1.1e-05
+    duracion_s: 8e-06
   [27]
     id_traza: 28
-    timestamp: 2026-08-12T22:21:15.438540+00:00
+    timestamp: 2026-08-12T22:42:37.355473+00:00
     modulo: diccionario
     capacidad: inventario
     estado: EXITO
-    duracion_s: 1.8e-05
+    duracion_s: 1.4e-05
   [28]
     id_traza: 29
-    timestamp: 2026-08-12T22:21:15.439474+00:00
+    timestamp: 2026-08-12T22:42:37.356186+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000912
+    duracion_s: 0.000697
   [29]
     id_traza: 30
-    timestamp: 2026-08-12T22:21:15.439771+00:00
+    timestamp: 2026-08-12T22:42:37.356412+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000264
+    duracion_s: 0.000203
   [30]
     id_traza: 31
-    timestamp: 2026-08-12T22:21:15.439929+00:00
+    timestamp: 2026-08-12T22:42:37.356547+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000125
+    duracion_s: 0.000111
   [31]
     id_traza: 32
-    timestamp: 2026-08-12T22:21:15.439996+00:00
+    timestamp: 2026-08-12T22:42:37.356587+00:00
     modulo: interfaz
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2.2e-05
+    duracion_s: 1.8e-05
   [32]
     id_traza: 33
-    timestamp: 2026-08-12T22:21:15.442964+00:00
+    timestamp: 2026-08-12T22:42:37.358983+00:00
     modulo: realidad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002927
+    duracion_s: 0.002377
   [33]
     id_traza: 34
-    timestamp: 2026-08-12T22:21:15.443491+00:00
+    timestamp: 2026-08-12T22:42:37.359408+00:00
     modulo: realidad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000484
+    duracion_s: 0.000391
   [34]
     id_traza: 35
-    timestamp: 2026-08-12T22:21:15.455046+00:00
+    timestamp: 2026-08-12T22:42:37.367866+00:00
     modulo: realidad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.011512
+    duracion_s: 0.008416
   [35]
     id_traza: 36
-    timestamp: 2026-08-12T22:21:15.460150+00:00
+    timestamp: 2026-08-12T22:42:37.371549+00:00
     modulo: self
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.005037
+    duracion_s: 0.003628
   [36]
     id_traza: 37
-    timestamp: 2026-08-12T22:21:15.464050+00:00
+    timestamp: 2026-08-12T22:42:37.374517+00:00
     modulo: self
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.003845
+    duracion_s: 0.002924
   [37]
     id_traza: 38
-    timestamp: 2026-08-12T22:21:15.464106+00:00
+    timestamp: 2026-08-12T22:42:37.374563+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 7e-06
   [38]
     id_traza: 39
-    timestamp: 2026-08-12T22:21:15.483979+00:00
+    timestamp: 2026-08-12T22:42:37.389878+00:00
     modulo: spartaco_seguridad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.019846
+    duracion_s: 0.015295
   [39]
     id_traza: 40
-    timestamp: 2026-08-12T22:21:15.484575+00:00
+    timestamp: 2026-08-12T22:42:37.390323+00:00
     modulo: spartaco_seguridad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000556
+    duracion_s: 0.000417
   [40]
     id_traza: 41
-    timestamp: 2026-08-12T22:21:15.485073+00:00
+    timestamp: 2026-08-12T22:42:37.390726+00:00
     modulo: spartaco_seguridad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000459
+    duracion_s: 0.000373
   [41]
     id_traza: 42
-    timestamp: 2026-08-12T22:21:15.485934+00:00
+    timestamp: 2026-08-12T22:42:37.391355+00:00
     modulo: taxonomia
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00083
+    duracion_s: 0.000602
   [42]
     id_traza: 43
-    timestamp: 2026-08-12T22:21:15.486187+00:00
+    timestamp: 2026-08-12T22:42:37.391519+00:00
     modulo: taxonomia
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000198
+    duracion_s: 0.000137
   [43]
     id_traza: 44
-    timestamp: 2026-08-12T22:21:15.486582+00:00
+    timestamp: 2026-08-12T22:42:37.391860+00:00
     modulo: taxonomia
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00036
+    duracion_s: 0.000315
   [44]
     id_traza: 45
-    timestamp: 2026-08-12T22:21:15.487829+00:00
+    timestamp: 2026-08-12T22:42:37.392819+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001218
+    duracion_s: 0.000935
   [45]
     id_traza: 46
-    timestamp: 2026-08-12T22:21:15.488427+00:00
+    timestamp: 2026-08-12T22:42:37.393215+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000566
+    duracion_s: 0.00037
   [46]
     id_traza: 47
-    timestamp: 2026-08-12T22:21:15.489026+00:00
+    timestamp: 2026-08-12T22:42:37.393573+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00056
+    duracion_s: 0.000331
   [47]
     id_traza: 48
-    timestamp: 2026-08-12T22:21:15.489067+00:00
+    timestamp: 2026-08-12T22:42:37.393599+00:00
     modulo: verificacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 4e-06
   [48]
     id_traza: 49
-    timestamp: 2026-08-12T22:21:15.489090+00:00
+    timestamp: 2026-08-12T22:42:37.393636+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [49]
     id_traza: 50
-    timestamp: 2026-08-12T22:21:15.489109+00:00
+    timestamp: 2026-08-12T22:42:37.393650+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO

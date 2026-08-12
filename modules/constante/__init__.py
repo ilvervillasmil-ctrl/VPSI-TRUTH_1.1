@@ -487,9 +487,9 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # DEPENDENCIAS
     # ============================================================
-    "requiere": ["CT", "AX", "FO", "MC", "SF",
-                 "CA", "CX", "DI", "RE",
-                 "VX", "TX", "CH", "CIT", ],
+    "requiere": ["CT", "AX", "FO", "MC", "SF", "CA", "CX", 
+                 "DI", "RE", "VX", "TX", "CH", "CIT", "TT", 
+                 "CE", "CC",],
 
     # ============================================================
     # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)

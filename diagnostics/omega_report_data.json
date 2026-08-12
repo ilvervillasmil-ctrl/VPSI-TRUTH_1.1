@@ -16145,7 +16145,7 @@
           "modulo": "cache",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 6e-06
+          "duracion_s": 7e-06
         },
         {
           "id_traza": 7,
@@ -16217,7 +16217,7 @@
           "modulo": "citacion",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 2e-06
+          "duracion_s": 1e-06
         },
         {
           "id_traza": 16,

@@ -235,7 +235,11 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
     # ============================================================
-    "acceso_archivos": ["*"],
+    "acceso_archivos": ["CT", "AX", "FO", "MC", 
+                        "SF", "CA", "CX", "CC",
+                        "DI", "RE", "VX", "TX", 
+                        "CH", "CIT", "TT", "CE", ],
+                        
 
     # ============================================================
     # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)

@@ -15150,7 +15150,7 @@
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 9e-06
   [6]
     id_traza: 7
     timestamp: 2026-08-12T01:26:03.513051+00:00
@@ -15206,7 +15206,7 @@
     modulo: citacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 3e-06
+    duracion_s: 4e-06
   [14]
     id_traza: 15
     timestamp: 2026-08-12T01:26:03.520918+00:00
@@ -15220,7 +15220,7 @@
     modulo: citacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 5e-06
   [16]
     id_traza: 17
     timestamp: 2026-08-12T01:26:03.521180+00:00
@@ -15283,7 +15283,7 @@
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001376
+    duracion_s: 0.001733
   [25]
     id_traza: 26
     timestamp: 2026-08-12T01:26:03.572228+00:00
@@ -15297,7 +15297,7 @@
     modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1.2e-05
+    duracion_s: 1.1e-05
   [27]
     id_traza: 28
     timestamp: 2026-08-12T01:26:03.572328+00:00
@@ -15374,7 +15374,7 @@
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 1.1e-05
   [38]
     id_traza: 39
     timestamp: 2026-08-12T01:26:03.623189+00:00
@@ -15444,7 +15444,7 @@
     modulo: verificacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 9e-06
   [48]
     id_traza: 49
     timestamp: 2026-08-12T01:26:03.629865+00:00

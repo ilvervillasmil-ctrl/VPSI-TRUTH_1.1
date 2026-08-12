@@ -182,19 +182,24 @@ PERCEPTUAL_MODE = 5              # 5   faces of the center seen from outside
 # The angle itself is transcendental and has no rational form. What is
 # exact is its squared sine, and that is BETA. The angle is offered as
 # a reading, not as a definition.
-
+#sin²(θ) = β
 SIN2_THETA = BETA                # 0.037037037037037  = BETA
+#cos²(θ) = α
 COS2_THETA = ALPHA               # 0.962962962962963  = ALPHA
+#tan²(θ) = β / α
 TAN2_THETA = BETA / ALPHA        # 0.038461538461538  = 1/26
 
 R_FIN = Fraction(1) + BETA       # 1.037037037037037  the cube plus its center
 
+#R_FIN = 1 + β  ≈  1.037037037037037  (el cubo más su centro)
 
+
+#θ = arcsin(√β)  [Ángulo en radianes]
 def theta():
     """Angle in radians. Read from SIN2_THETA, not stored."""
     return math.asin(math.sqrt(float(SIN2_THETA)))
 
-
+#θ° = θ × (180° / π)  ≈  11.09°  [Ángulo en grados]
 def theta_degrees():
     """Angle in degrees. 11.09..."""
     return math.degrees(theta())

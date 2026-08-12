@@ -351,18 +351,14 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida": "verificar_salida",
     },
 
-        # ============================================================
+    # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia del glosario.",
-            "entrada": [
-                "CT", "AX", "FO", "MC", 
-                "SF", "CA", "CX", "DI",
-                "RE", "VX", "TX", "CH", 
-                "CIT", "TT", "CE", "CC"
-            ],
+            "entrada": "CT", "AX", "FO", "MC", "SF", "CA", "CX", "DI", "RE", "VX", "TX", "CH", 
+                "CIT", "TT", "CE", "CC",
             "validar_esquema": ["acceso_archivos"],
             "salida": (
                 "dict con coherente, categorias, ids, errores"

@@ -1,7 +1,7 @@
 """
 VPSI-TRUTH --- modules/diagnosticoD
 
-Rol DG: fachada / enlace a core.diagnostico.
+Rol DGCO: fachada / enlace a core.diagnostico.
 
 No calcula Tru. No orquesta. No duplica el censo.
 Expone al Engine las funciones ya establecidas en core.
@@ -111,7 +111,9 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # DEPENDENCIAS
     # ============================================================
-    "requiere": ["*"],
+    "requiere": [CT", "AX", "FO", "MC", 
+                "SF", "DGCO", "CA", "CX","DI", 
+                "RE", "VX", "TX", "CH", "CIT"],
 
     # ============================================================
     # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)

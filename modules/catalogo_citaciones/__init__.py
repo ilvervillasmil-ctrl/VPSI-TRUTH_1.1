@@ -252,7 +252,7 @@ CONTENEDOR: Dict[str, Any] = {
     "requiere": ["CT", "AX", "FO", "MC", 
                  "SF", "CA", "CX", "DI",
                  "RE", "VX", "TX", "CH", 
-                 "CIT", "TT", "CE", "CC",],
+                 "CIT", "TT", "CE",],
 
     # ============================================================
     # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
@@ -357,8 +357,7 @@ CONTENEDOR: Dict[str, Any] = {
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia del glosario.",
-            "entrada": "CT", "AX", "FO", "MC", "SF", "CA", "CX", "DI", "RE", "VX", "TX", "CH", 
-                "CIT", "TT", "CE", "CC",
+            "entrada": "acceso_archivos",
             "validar_esquema": ["acceso_archivos"],
             "salida": (
                 "dict con coherente, categorias, ids, errores"
@@ -370,7 +369,7 @@ CONTENEDOR: Dict[str, Any] = {
             "descripcion": (
                 "Evalúa coherencia del glosario de IDs. No calcula."
             ),
-            "entrada": "*",
+            "entrada": "accceso_archivos",
             "validar_esquema": ["*"],
             "salida": (
                 "dict con coherente, categorias, ids, errores, esquema"

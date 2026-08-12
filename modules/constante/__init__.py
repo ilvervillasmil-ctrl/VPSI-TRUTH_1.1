@@ -70,8 +70,263 @@ from typing import Any, Dict, List, Optional
 # ===============================================================
 # FIN IMPORTACIONES
 # ===============================================================
+# ===============================================================
+# POLÍTICA ESTRICTA DE CONSTANTES
+# ===============================================================
+
+TIPOS_CONSTANTE_VALIDOS = frozenset({
+    "Fraction",
+    "int",
+    "str",
+    "bool",
+})
+
+TIPOS_CONSTANTE_EXACTOS = {
+    "Fraction": Fraction,
+    "int": int,
+    "str": str,
+    "bool": bool,
+}
+
+POLITICA_CONSTANTES = {
+    "identidad_obligatoria": True,
+    "nombre_no_vacio": True,
+    "valor_obligatorio": True,
+    "tipo_obligatorio": True,
+    "origen_obligatorio": True,
+    "descripcion_obligatoria": True,
+    "tipo_declarado_debe_coincidir": True,
+    "rechazar_float": True,
+    "rechazar_nan": True,
+    "rechazar_inf": True,
+    "conversion_implicita": False,
+    "conversion_float_a_fraction": False,
+    "redondeo_automatico": False,
+    "tolerancia_numerica": Fraction(0),
+    "calculo_aproximado": False,
+    "aritmetica_exacta": True,
+    "fracciones_exactas": True,
+    "formula_externa_obligatoria": False,
+    "mutacion_despues_de_carga": False,
+}
 
 
+def _validar_especificacion_constante(item: Dict[str, Any]) -> None:
+    """
+    Valida estrictamente una declaracion CONSTANTE contra la politica
+    oficial del modulo CT.
+
+    Ninguna constante puede entrar al registro de CT si no cumple
+    exactamente las especificaciones de identidad, tipo, valor,
+    origen y descripcion.
+
+    Reglas fundamentales:
+    - CONSTANTE debe ser dict.
+    - Todos los campos obligatorios deben existir.
+    - nombre debe ser str no vacio.
+    - valor debe existir y no puede ser None.
+    - tipo debe ser uno de los tipos oficialmente autorizados.
+    - origen debe ser str no vacio.
+    - descripcion debe ser str no vacio.
+    - el tipo declarado debe coincidir exactamente con el tipo real.
+    - float queda prohibido.
+    - no existen conversiones implicitas.
+    - no existe conversion de float a Fraction.
+    - no existe redondeo automatico.
+    - no existe tolerancia numerica.
+    - las constantes numericas utilizan representacion exacta.
+    """
+
+    if not isinstance(item, dict):
+        raise ContratoInvalido(
+            "CONSTANTE debe ser dict"
+        )
+
+    faltantes = [
+        campo
+        for campo in CAMPOS_OBLIGATORIOS_CONSTANTE
+        if campo not in item
+    ]
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"CONSTANTE incompleta. Faltan: {faltantes}"
+        )
+
+    nombre = item.get("nombre")
+
+    if POLITICA_CONSTANTES["nombre_no_vacio"]:
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ContratoInvalido(
+                "CONSTANTE requiere 'nombre: str' no vacio"
+            )
+
+    nombre = nombre.strip()
+
+    tipo = item.get("tipo")
+
+    if POLITICA_CONSTANTES["tipo_obligatorio"]:
+        if not isinstance(tipo, str) or not tipo.strip():
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}' requiere 'tipo: str'"
+            )
+
+    tipo = tipo.strip()
+
+    if tipo not in TIPOS_CONSTANTE_VALIDOS:
+        raise ContratoInvalido(
+            f"CONSTANTE '{nombre}': tipo no autorizado: '{tipo}'. "
+            f"Tipos validos: {sorted(TIPOS_CONSTANTE_VALIDOS)}"
+        )
+
+    valor = item.get("valor")
+
+    if POLITICA_CONSTANTES["valor_obligatorio"]:
+        if valor is None:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': valor no puede ser None"
+            )
+
+    origen = item.get("origen")
+
+    if POLITICA_CONSTANTES["origen_obligatorio"]:
+        if not isinstance(origen, str) or not origen.strip():
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': 'origen' debe ser str no vacio"
+            )
+
+    descripcion = item.get("descripcion")
+
+    if POLITICA_CONSTANTES["descripcion_obligatoria"]:
+        if not isinstance(descripcion, str) or not descripcion.strip():
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': 'descripcion' debe ser str no vacio"
+            )
+
+    # -----------------------------------------------------------
+    # RECHAZO ABSOLUTO DE FLOAT
+    # -----------------------------------------------------------
+
+    if POLITICA_CONSTANTES["rechazar_float"]:
+        if isinstance(valor, float):
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': float no permitido. "
+                "Las constantes numericas deben utilizar "
+                "representacion exacta."
+            )
+
+    # -----------------------------------------------------------
+    # VALIDACION EXACTA DEL TIPO REAL
+    # -----------------------------------------------------------
+
+    if POLITICA_CONSTANTES["tipo_declarado_debe_coincidir"]:
+        tipo_esperado = TIPOS_CONSTANTE_EXACTOS[tipo]
+
+        if type(valor) is not tipo_esperado:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': incompatibilidad exacta. "
+                f"Tipo declarado='{tipo}', "
+                f"tipo real='{type(valor).__name__}'."
+            )
+
+    # -----------------------------------------------------------
+    # PROHIBICION DE CONVERSIONES IMPLICITAS
+    # -----------------------------------------------------------
+
+    if not POLITICA_CONSTANTES["conversion_implicita"]:
+        tipo_real = type(valor).__name__
+        tipo_esperado = TIPOS_CONSTANTE_EXACTOS[tipo].__name__
+
+        if tipo_real != tipo_esperado:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': conversion implicita "
+                f"no permitida. Esperado='{tipo_esperado}', "
+                f"recibido='{tipo_real}'."
+            )
+
+    # -----------------------------------------------------------
+    # PROHIBICION EXPLICITA DE FLOAT -> FRACTION
+    # -----------------------------------------------------------
+
+    if tipo == "Fraction" and isinstance(valor, float):
+        if not POLITICA_CONSTANTES["conversion_float_a_fraction"]:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': conversion float -> Fraction "
+                "no permitida."
+            )
+
+    # -----------------------------------------------------------
+    # VALIDACION DE FRACCIONES EXACTAS
+    # -----------------------------------------------------------
+
+    if tipo == "Fraction":
+        if type(valor) is not Fraction:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': Fraction invalido. "
+                f"Tipo recibido='{type(valor).__name__}'."
+            )
+
+        if POLITICA_CONSTANTES["fracciones_exactas"] is not True:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': las fracciones exactas "
+                "son obligatorias."
+            )
+
+        if POLITICA_CONSTANTES["aritmetica_exacta"] is not True:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': la aritmetica exacta "
+                "es obligatoria."
+            )
+
+    # -----------------------------------------------------------
+    # VALIDACION NUMERICA
+    # -----------------------------------------------------------
+
+    if tipo in {"Fraction", "int"}:
+
+        if POLITICA_CONSTANTES["calculo_aproximado"]:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': calculo aproximado "
+                "no permitido."
+            )
+
+        if POLITICA_CONSTANTES["redondeo_automatico"]:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': redondeo automatico "
+                "no permitido."
+            )
+
+        if POLITICA_CONSTANTES["tolerancia_numerica"] != Fraction(0):
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': tolerancia numerica "
+                "no permitida."
+            )
+
+    # -----------------------------------------------------------
+    # RECHAZO EXPLICITO DE NaN E INFINITO
+    # -----------------------------------------------------------
+    # Esta comprobacion queda definida explicitamente aunque float
+    # ya haya sido rechazado. Protege la politica si posteriormente
+    # se amplia el dominio de tipos numericos.
+
+    if POLITICA_CONSTANTES["rechazar_nan"]:
+        if isinstance(valor, float):
+            if valor != valor:
+                raise ContratoInvalido(
+                    f"CONSTANTE '{nombre}': NaN no permitido."
+                )
+
+    if POLITICA_CONSTANTES["rechazar_inf"]:
+        if isinstance(valor, float):
+            if valor in (float("inf"), float("-inf")):
+                raise ContratoInvalido(
+                    f"CONSTANTE '{nombre}': infinito no permitido."
+                )
+
+
+# ===============================================================
+# FIN POLÍTICA ESTRICTA DE CONSTANTES
+# ===============================================================
 # ===============================================================
 # CONSTANTES
 # ===============================================================
@@ -559,12 +814,21 @@ def _descubrir_archivos() -> Dict[str, Any]:
         if meta is None:
             continue
 
-        items = meta if isinstance(meta, list) else [meta]
+                items = meta if isinstance(meta, list) else [meta]
         for item in items:
             if not isinstance(item, dict):
                 errores.append({
                     "archivo": archivo.name,
                     "error": "CONSTANTE no es dict ni list[dict]",
+                })
+                continue
+
+            try:
+                _validar_especificacion_constante(item)
+            except ContratoInvalido as e:
+                errores.append({
+                    "archivo": archivo.name,
+                    "error": f"constante_rechazada: {e}",
                 })
                 continue
 

@@ -348,41 +348,44 @@ La reconstrucción independiente ya existe. Lo que falta es una superficie contr
 
 Este es el nivel máximo de la batería.
 
-La afirmación que debe verificarse es que para todo $(A, B) \in C(\Theta_{24}, 2)$:
+La afirmación que debe verificarse es que para todo par (A, B) perteneciente a C(Θ_24, 2):
 
-$$\text{decisión\_publicada}(A, B) = \text{decisión\_esperada}(A, B)$$
+decisión_publicada(A, B) == decisión_esperada(A, B)
 
 donde:
-- $\text{decisión\_esperada}(A, B)$ se obtiene exclusivamente de $D_A$, $D_B$, T15/TR1
-- $\text{decisión\_publicada}(A, B)$ debe proceder de la capa canónica de producción
+- decisión_esperada(A, B) se obtiene exclusivamente de D_A, D_B, T15/TR1
+- decisión_publicada(A, B) debe proceder de la capa canónica de producción
 
-La comparación no debe utilizar la capa operativa de 297 elementos, porque su universo no es $\Theta_{24}$.
+La comparación no debe utilizar la capa operativa de 297 elementos, porque su universo no es Θ_24.
 
 La comparación correcta es:
 
-**ORACLE $\Theta_{24}$**  
+ORACLE Θ_24  
 ↕  
-**CANÓNICA $\Theta_{24}$**  
+CANÓNICA Θ_24  
 
 ---
 
 ## 12. Condiciones necesarias para ejecutar el Nivel 5
 
-Cuando exista `canonica["traza"]`, el **TEST 3** deberá exigir simultáneamente:
-- `len(traza) == 276`
+Cuando exista `canonica["traza"]`, el TEST 3 deberá exigir simultáneamente:
+
+- len(traza) == 276
 - cobertura exacta de los 24 IDs
-- cobertura exacta de $C(24,2)$
+- cobertura exacta de C(24,2)
 - ausencia de pares duplicados
-- ausencia de pares fuera de $\Theta_{24}$
-- presencia de `id_a`, `id_b`, `primaria`, `secundaria`
+- ausencia de pares fuera de Θ_24
+- presencia de id_a, id_b, primaria, secundaria
 
-y, para cada par:
+y, para cada par individual:
 
-$$\text{primaria\_publicada} == \text{primaria\_esperada}$$
-$$\text{secundaria\_publicada} == \text{secundaria\_esperada}$$
+primaria_publicada == primaria_esperada
+secundaria_publicada == secundaria_esperada
 
-No basta con que los agregados continúen siendo **183 / 93 / 153 / 30**.  
-En este nivel, los agregados deben ser consecuencias de las 276 comparaciones individuales.
+**No basta con que los agregados continúen siendo**:
+**183 / 93 / 153 / 30**
+
+En este nivel, los agregados deben ser consecuencias directas de las 276 comparaciones individuales.
 
 ---
 

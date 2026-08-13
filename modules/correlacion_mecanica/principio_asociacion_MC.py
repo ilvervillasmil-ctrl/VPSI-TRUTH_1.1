@@ -2,15 +2,14 @@
 # VPSI-TRUTH — modules/correlacion_mecanica/principio_asociacion_MC.py
 #
 # MECÁNICA — PRINCIPIO DE ASOCIACIÓN
-# Origen: principio_asociacion_AX.py v1.2 (formalizado)
-# Serial de origen: Cuerpo axiomático PA (CEMYCA / Villasmil-Ω)
+# Origen: principio_asociacion_AX.py v1.2.1
+# (IDs únicos, sin duplicados)
 #
 # ---------------------------------------------------------------
 # ROL DEL ARCHIVO
 #   Declaración mecánica del Principio de Asociación.
-#   Extiende el grafo MC mediante orden nativo de las 44
-#   declaraciones (D → A → L → T → C) respetando el grafo
-#   de dependencias original (acíclico).
+#   Extiende el grafo MC mediante el orden nativo de las 44
+#   declaraciones (D → A → L → T → C).
 #
 #   NO es un test.
 #   NO es un nuevo contenedor.
@@ -34,12 +33,11 @@ MECANICA: Dict[str, Any] = {
     # IDENTIDAD
     # ============================================================
     "nombre": "principio_asociacion_MC",
-    "version": "1.2",
+    "version": "1.2.1",
 
     # ============================================================
     # ORDEN NATIVO
-    # Derivado del grafo de dependencias del cuerpo AX (sin ciclos).
-    # Secuencia: Definiciones → Axiomas → Lemas → Teoremas → Corolarios
+    # Derivado del grafo de dependencias (acíclico).
     # ============================================================
     "orden": [
         # --- Definiciones (PA-D1 … PA-D10) ---
@@ -101,10 +99,11 @@ MECANICA: Dict[str, Any] = {
     # DESCRIPCIÓN
     # ============================================================
     "descripcion": (
-        "Cuerpo mecánico del Principio de Asociación (PA). "
+        "Cuerpo mecánico del Principio de Asociación (PA) v1.2.1. "
         "Declara el orden nativo de las 44 declaraciones formales "
-        "(10 definiciones, 10 axiomas, 9 lemas, 7 teoremas, 8 corolarios). "
-        "La operación central es 𝒜(A,B,M): si M(B)=1 entonces ◇M. "
+        "(10 definiciones, 10 axiomas, 9 lemas, 7 teoremas, 8 corolarios) "
+        "con IDs únicos. "
+        "La operación central es 𝒜(A,B,M): M(B)=1 ⇒ ◇M. "
         "Nunca se deriva M(A). La secuencia I_i → E_i → D_i es "
         "irreversible. El cuerpo no redefine L4/L5/L6 ni R_i ⊂ R."
     ),
@@ -114,15 +113,16 @@ MECANICA: Dict[str, Any] = {
     # ============================================================
     "notas": [
         "Distinción crítica: M(B)=1 ⇒ ◇M. Nunca M(B) ⇒ M(A).",
-        "La asociación válida transfiere el mecanismo aislado (Transfer(M)), "
-        "nunca el contexto B completo.",
+        "La asociación válida transfiere únicamente el mecanismo aislado "
+        "(Transfer(M)); nunca el contexto B completo.",
         "La secuencia Identificado → Espectador → Director es irreversible "
         "y no saltable (PA-T6).",
-        "δ_i(O) > 0 es condición de observación precisa; identificación "
+        "δ_i(O) > 0 es condición de observación precisa; la identificación "
         "colapsa la distancia (δ_i = 0).",
         "R permanece invariante; solo cambia el estado representacional de R_i.",
         "Dependencias externas únicamente a ST-D4, ST-D5, ST-D6 "
         "(no se redefinen).",
+        "Versión 1.2.1: IDs únicos, sin duplicados.",
         "Este cuerpo es extensión MC; no sustituye el cuerpo axiomático "
         "original en modules/axiomas.",
     ],
@@ -135,30 +135,46 @@ MECANICA: Dict[str, Any] = {
             "id": "𝒜",
             "ecuacion": "M(B)=1 ⇒ ◇M",
             "prohibicion": "M(B)=1 ⊬ M(A)",
-            "depende_de": ["PA_D1_Principio_Asociacion", "PA_D3_Contexto_B_Evidencial"],
+            "depende_de": [
+                "PA_D1_Principio_Asociacion",
+                "PA_D3_Contexto_B_Evidencial",
+            ],
             "produce": "P_◇M",
         },
         "transferencia_mecanica": {
             "id": "Transfer",
             "ecuacion": "AsocValida ⇒ Transfer(M) ∧ ¬Transfer(Contexto_B_completo)",
-            "depende_de": ["PA_D4_Mecanica_Transferible", "PA_A8_Asociacion_Transfiere_Mecanismo"],
+            "depende_de": [
+                "PA_D4_Mecanica_Transferible",
+                "PA_A8_Asociacion_Transfiere_Mecanismo",
+            ],
         },
         "distancia_funcional": {
             "id": "delta",
             "ecuacion": "δ_i(O) > 0 ⇒ ObsPrecisa_i(O)",
             "colapso": "Identificacion_i(O) ⇒ δ_i(O) = 0",
-            "depende_de": ["PA_D7_Distancia_Observador_Objeto", "PA_A9_Observacion_Requiere_Distancia"],
+            "depende_de": [
+                "PA_D7_Distancia_Observador_Objeto",
+                "PA_A9_Observacion_Requiere_Distancia",
+            ],
         },
         "secuencia_irreversible": {
             "id": "arco",
             "ecuacion": "I_i → E_i → D_i",
             "prohibicion": "¬(I_i → D_i legítimo)",
-            "depende_de": ["PA_D10_Arco_Trabajo_Interior", "PA_A10_Observacion_Precede_Direccion", "PA_T6_Secuencia_Irreversible"],
+            "depende_de": [
+                "PA_D10_Arco_Trabajo_Interior",
+                "PA_A10_Observacion_Precede_Direccion",
+                "PA_T6_Secuencia_Irreversible",
+            ],
         },
         "actualizacion_estructural": {
             "id": "S_i",
             "ecuacion": "S_i^(0) ⊨ P_¬M  →  S_i^(1) ⊨ P_◇M",
-            "depende_de": ["PA_D6_Actualizacion_Estructural", "PA_L2_Actualizacion_Condiciones"],
+            "depende_de": [
+                "PA_D6_Actualizacion_Estructural",
+                "PA_L2_Actualizacion_Condiciones",
+            ],
         },
     },
 
@@ -169,17 +185,26 @@ MECANICA: Dict[str, Any] = {
         {
             "desde": "PA_D1_Principio_Asociacion",
             "hacia": "PA_T1_Disolucion_Imposibilidad_Absoluta",
-            "motivo": "Faltan contextos A/B, mecánica transferible y axiomas de evidencia.",
+            "motivo": (
+                "Faltan contextos A/B, mecánica transferible y axiomas "
+                "de evidencia."
+            ),
         },
         {
             "desde": "PA_D3_Contexto_B_Evidencial",
             "hacia": "PA_T2_Criterio_Transferencia_Mecanica",
-            "motivo": "Se requiere aislamiento explícito de M (PA-D4) y axioma de transferencia (PA-A8).",
+            "motivo": (
+                "Se requiere aislamiento explícito de M (PA-D4) y "
+                "axioma de transferencia (PA-A8)."
+            ),
         },
         {
             "desde": "PA_D8_Identificacion",
             "hacia": "PA_T6_Secuencia_Irreversible",
-            "motivo": "La secuencia exige haber pasado por Espectador (E_i) vía observación.",
+            "motivo": (
+                "La secuencia exige haber pasado por Espectador (E_i) "
+                "vía observación."
+            ),
         },
         {
             "desde": "cualquier",
@@ -189,7 +214,10 @@ MECANICA: Dict[str, Any] = {
         {
             "desde": "PA_D10_Arco_Trabajo_Interior",
             "hacia": "PA_T7_Libertad_por_Observacion",
-            "motivo": "Faltan lemas y teoremas intermedios de disolución de identificación.",
+            "motivo": (
+                "Faltan lemas y teoremas intermedios de disolución "
+                "de identificación."
+            ),
         },
         {
             "desde": "PA_Cierre_implicito",

@@ -494,31 +494,82 @@ class Engine:
     # Parte 12.9 EJECUCIÓN DEL PROPÓSITO FUNDAMENTAL
     # ===========================================================
 
-    def ejecutar_proposito(self, operandos: List[float | int]) -> List[float]:
+    def ejecutar_proposito(
+        self,
+        entrada: Any,
+        *args: Any,
+        **kwargs: Any
+    ) -> Any:
         """
-        Ejecuta de forma directa la función principal del Engine:
-        calcular la raíz cuadrada de cada valor entregado.
+        Ejecuta el propósito fundamental del Engine:
+
+            CALCULAR LA VERDAD
+
+        La ejecución se realiza mediante las capacidades declaradas
+        contractualmente por los módulos del sistema.
+
+        El Engine no calcula una fórmula propia ni sustituye a los
+        módulos. Localiza la capacidad correspondiente al propósito
+        y delega su ejecución mediante el mecanismo contractual.
+
+        La entrada se entrega íntegramente a la capacidad encargada
+        del cálculo de verdad.
         """
+
         if self.estado != ESTADO_OPERATIVO:
-            raise RuntimeError(f"El Engine no está operativo. Estado actual: {self.estado}")
+            raise RuntimeError(
+                f"El Engine no está operativo. Estado actual: {self.estado}"
+            )
 
-        resultados: List[float] = []
+        # -------------------------------------------------------
+        # 12.9.1 LOCALIZACIÓN CONTRACTUAL DEL PROPÓSITO
+        # -------------------------------------------------------
 
-        for valor in operandos:
-            if valor < 0:
-                raise ValueError(f"No se puede calcular la verdad real de descripcion: {valor}")
-            
-            # Ejecución matemática real
-            Tru = C*L*k*26/27)+1/27
+        existencia = self.resolver_existencia(
+            self.clave_proposito
+        )
 
-            # Guardar el resultado en el historial de evaluación
-            self.resultados_evaluacion.append({
-                "clave_proposito": self.clave_proposito,
-                "entrada": valor,
-                "resultado": raiz
-            })
+        if existencia.get("estado") != "EXISTE":
+            raise RuntimeError(
+                f"La capacidad fundamental '{self.clave_proposito}' "
+                f"no existe en el repertorio contractual del Engine."
+            )
 
-        return resultados
+        modulo = existencia.get("modulo")
+        capacidad = existencia.get("capacidad")
+
+        if not modulo or not capacidad:
+            raise RuntimeError(
+                f"No se pudo resolver la capacidad ejecutable "
+                f"del propósito '{self.clave_proposito}'."
+            )
+
+        # -------------------------------------------------------
+        # 12.9.2 EJECUCIÓN CONTRACTUAL REAL
+        # -------------------------------------------------------
+
+        resultado = self.ejecutar_capacidad(
+            modulo,
+            capacidad,
+            entrada,
+            *args,
+            **kwargs
+        )
+
+        # -------------------------------------------------------
+        # 12.9.3 REGISTRO DEL RESULTADO DEL PROPÓSITO
+        # -------------------------------------------------------
+
+        self.resultados_evaluacion.append({
+            "clave_proposito": self.clave_proposito,
+            "proposito": self.proposito,
+            "entrada": entrada,
+            "modulo": modulo,
+            "capacidad": capacidad,
+            "resultado": resultado,
+        })
+
+        return resultado
  
     # ===========================================================
     # Parte 13 LECTURA DEL CONTRATO

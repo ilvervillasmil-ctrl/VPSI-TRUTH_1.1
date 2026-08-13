@@ -8,70 +8,152 @@
 #   TEST 2  observabilidad de traza individual
 #   TEST 3  corrección semántica por vía independiente (este archivo)
 #
-# CADENA DEMOSTRADA
+# CADENA
 #   especificación (Cuadro 4 del paper)
 #        → D_A, D_B
 #        → regla T15
 #        → decisión_esperada
 #        ↔ agregados canónicos publicados por generatividad()
+#        ↔ (si existe) canonica["traza"] par a par
 #
-# LIMITACIÓN ACTUAL
-#   Sin g["traza"] no hay comparación par-a-par pública.
-#   El test certifica:
-#     (a) el oracle es autoconsistente y reproduce 276/183/93/153/30
-#     (b) esos agregados coinciden con generatividad()["canonica"]
-#     (c) comparación individual queda NO OBSERVABLE hasta que
-#         exista superficie contractual de traza
+# LIMITACIÓN
+#   Sin canonica["traza"] no hay comparación par-a-par pública.
+#   Se certifica:
+#     (a) oracle autoconsistente → 276/183/93/153/30
+#     (b) esos agregados == generatividad()["canonica"]
+#     (c) comparación individual solo contra capa CANÓNICA Θ24
 #
 # NO importa _medir_pares.
 # NO usa gobierna como D_i.
 # NO modifica producción.
+# NO compara oracle Θ24 contra una traza operativa (otro universo).
 # ===============================================================
 
 from __future__ import annotations
 
 from itertools import combinations
+from typing import Dict, FrozenSet, List, Optional
 
 from modules.axiomas import generatividad
 
-from tests.oracle_tr1 import (
-    THETA_24_FORMAL,
-    oracle_agregados,
-    oracle_par,
-    oracle_todos,
-)
 
+# ---------------------------------------------------------------------------
+# Oracle embebido — Cuadro 4 del paper (fuente independiente)
+# ID alineado con producción: B-Canonical ≡ β-Canonical del texto
+# ---------------------------------------------------------------------------
+THETA_24_FORMAL: Dict[str, FrozenSet[str]] = {
+    "T1": frozenset({"ONT", "INF"}),
+    "T2": frozenset({"INF", "LOG"}),
+    "T3": frozenset({"INF", "TMP"}),
+    "T4": frozenset({"EPI", "TMP"}),
+    "T5": frozenset({"ONT", "EPI"}),
+    "T6": frozenset({"LOG", "SEM"}),
+    "T7": frozenset({"ONT", "MET"}),
+    "T8": frozenset({"INF", "MET"}),
+    "T9": frozenset({"EPI", "INF"}),
+    "T10": frozenset({"ONT", "INF"}),
+    "T11": frozenset({"ONT", "MET"}),
+    "T12": frozenset({"EPI", "ONT"}),
+    "T13": frozenset({"EPI", "SEM"}),
+    "T14": frozenset({"EPI", "MET"}),
+    "T15": frozenset({"ONT", "INF", "MET"}),
+    "T16": frozenset({"EPI", "MET"}),
+    "T17": frozenset({"ONT", "MET", "TMP"}),
+    "U1": frozenset({"EPI", "TMP", "MET"}),
+    "M1": frozenset({"MET", "LOG"}),
+    "M.1": frozenset({"MET", "ONT"}),
+    "B-Canonical": frozenset({"ONT", "LOG", "MET"}),
+    "TT.6.1": frozenset({"LOG", "SEM", "EPI"}),
+    "U0": frozenset({"ONT", "INF", "TMP"}),
+    "TR1": frozenset({"MET", "INF", "LOG"}),
+}
+
+
+def _dominio_formal(id_elem: str) -> FrozenSet[str]:
+    if id_elem not in THETA_24_FORMAL:
+        raise KeyError(f"id fuera de Θ formal: {id_elem!r}")
+    return THETA_24_FORMAL[id_elem]
+
+
+def _oracle_par(id_a: str, id_b: str) -> Dict[str, Optional[str]]:
+    """Decisión esperada TR1/T15. Independiente de producción."""
+    a, b = str(id_a).strip(), str(id_b).strip()
+    if a == b:
+        raise ValueError(f"par degenerado: ({a},{b})")
+    Da, Db = _dominio_formal(a), _dominio_formal(b)
+    if not (Da & Db):
+        primaria, secundaria = "incompatible", None
+    else:
+        primaria = "compatible"
+        union = Da | Db
+        if union > Da and union > Db:
+            secundaria = "novedoso"
+        else:
+            secundaria = "redundante"
+    return {
+        "id_a": a,
+        "id_b": b,
+        "D_a": sorted(Da),
+        "D_b": sorted(Db),
+        "esperada_primaria": primaria,
+        "esperada_secundaria": secundaria,
+    }
+
+
+def _oracle_todos() -> List[Dict[str, Optional[str]]]:
+    ids = sorted(THETA_24_FORMAL)
+    return [_oracle_par(a, b) for a, b in combinations(ids, 2)]
+
+
+def _oracle_agregados() -> Dict[str, int]:
+    C = I = N = R = 0
+    for d in _oracle_todos():
+        if d["esperada_primaria"] == "compatible":
+            C += 1
+            if d["esperada_secundaria"] == "novedoso":
+                N += 1
+            else:
+                R += 1
+        else:
+            I += 1
+    return {
+        "theta_n": 24,
+        "pares_totales": C + I,
+        "pares_compatibles": C,
+        "pares_incompatibles": I,
+        "pares_novedosos": N,
+        "pares_redundantes": R,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
 
 def test_3_oracle_semantico_tr1():
     """
     TEST 3 — oracle semántico independiente.
 
-    Afirmación fuerte posible hoy:
-      La especificación formal (Cuadro 4 + T15) produce, por sí sola,
-      exactamente 276/183/93/153/30, y esos agregados coinciden con
-      la capa canónica publicada por generatividad().
+    Hoy:
+      Cuadro 4 + T15 → 276/183/93/153/30
+      y coincide con generatividad()["canonica"].
 
-    Afirmación todavía no posible sin traza pública:
-      Cada decisión individual publicada == decisión del oracle.
+    Comparación individual:
+      SOLO contra canonica["traza"] (universo Θ24).
+      Nunca contra g["traza"] operativa (otro universo).
+      Si no existe traza canónica → NO OBSERVABLE (no es fallo).
     """
-
-    # ---------------------------------------------------------------
-    # 1. Universo formal
-    # ---------------------------------------------------------------
+    assert len(THETA_24_FORMAL) == 24
     ids = sorted(THETA_24_FORMAL)
-    assert len(ids) == 24
     assert len(set(ids)) == 24
 
     # ---------------------------------------------------------------
-    # 2. Oracle exhaustivo — 276 decisiones independientes
+    # Oracle exhaustivo
     # ---------------------------------------------------------------
-    decisiones = oracle_todos()
+    decisiones = _oracle_todos()
     assert len(decisiones) == 276
 
-    claves = [
-        tuple(sorted((d["id_a"], d["id_b"])))
-        for d in decisiones
-    ]
+    claves = [tuple(sorted((d["id_a"], d["id_b"]))) for d in decisiones]
     assert len(claves) == len(set(claves)), "oracle: pares duplicados"
     expected_pairs = {
         tuple(sorted((a, b))) for a, b in combinations(ids, 2)
@@ -95,9 +177,9 @@ def test_3_oracle_semantico_tr1():
             )
 
     # ---------------------------------------------------------------
-    # 3. Agregados del oracle (consecuencia de las 276 decisiones)
+    # Agregados del oracle (consecuencia de las 276 decisiones)
     # ---------------------------------------------------------------
-    agg = oracle_agregados()
+    agg = _oracle_agregados()
     assert agg["pares_totales"] == 276
     assert agg["pares_compatibles"] == 183
     assert agg["pares_incompatibles"] == 93
@@ -107,12 +189,11 @@ def test_3_oracle_semantico_tr1():
     assert agg["pares_novedosos"] + agg["pares_redundantes"] == 183
 
     # ---------------------------------------------------------------
-    # 4. Comparación contra capa canónica publicada (agregados)
+    # Comparación contra capa canónica publicada (agregados)
     # ---------------------------------------------------------------
     g = generatividad()
     c = g.get("canonica")
     assert isinstance(c, dict), "canonica debe ser dict"
-
     assert c.get("theta_n") == 24
     assert c.get("pares_totales") == agg["pares_totales"]
     assert c.get("pares_compatibles") == agg["pares_compatibles"]
@@ -121,32 +202,59 @@ def test_3_oracle_semantico_tr1():
     assert c.get("pares_redundantes") == agg["pares_redundantes"]
 
     # ---------------------------------------------------------------
-    # 5. Comparación individual — solo si existe traza contractual
+    # Comparación semántica individual:
+    # SOLO contra la traza de la capa CANÓNICA Θ24.
+    #
+    # La traza operativa (g["traza"]), si algún día existe, pertenece
+    # a otro universo y requiere otro oracle. No se mezcla aquí.
     # ---------------------------------------------------------------
-    traza = None
-    if isinstance(g.get("traza"), list) and g["traza"]:
-        traza = g["traza"]
-    elif isinstance(c.get("traza"), list) and c["traza"]:
-        traza = c["traza"]
-
-    if traza is None:
-        # Hallazgo arquitectónico (no fallo semántico):
-        # oracle construido y agregados coinciden;
-        # decisión par-a-par aún no observable públicamente.
+    traza = c.get("traza")
+    if not isinstance(traza, list) or not traza:
+        # Hallazgo arquitectónico: oracle y agregados OK;
+        # decisión par-a-par canónica aún no observable.
         return
 
-    # Rama defensiva: si aparece traza pública, comparar par a par
+    assert len(traza) == 276, (
+        f"canonica['traza']: len={len(traza)} != 276"
+    )
+
     def _clave(item):
         return tuple(sorted((str(item["id_a"]), str(item["id_b"]))))
 
     mapa_prod = {}
     for item in traza:
+        assert isinstance(item, dict), (
+            f"entrada de traza canónica no es dict: {item!r}"
+        )
+        assert "id_a" in item and "id_b" in item and "primaria" in item, (
+            f"entrada de traza canónica incompleta: {item!r}"
+        )
         k = _clave(item)
-        assert k not in mapa_prod, f"traza con par duplicado: {k}"
+        assert k[0] != k[1], f"par degenerado en traza canónica: {k}"
+        assert k not in mapa_prod, f"par duplicado en traza canónica: {k}"
+
+        prim = item["primaria"]
+        assert prim in ("compatible", "incompatible"), (
+            f"primaria inválida en traza canónica par={k}: {prim!r}"
+        )
         sec = item.get("secundaria")
         if sec == "":
             sec = None
-        mapa_prod[k] = (item["primaria"], sec)
+        if prim == "compatible":
+            assert sec in ("novedoso", "redundante"), (
+                f"secundaria inválida en traza canónica par={k}: {sec!r}"
+            )
+        else:
+            assert sec is None, (
+                f"incompatible con secundaria en traza canónica par={k}: {sec!r}"
+            )
+        mapa_prod[k] = (prim, sec)
+
+    assert set(mapa_prod) == expected_pairs, (
+        "canonica['traza']: cobertura de Θ24 incompleta — "
+        f"faltan={sorted(expected_pairs - set(mapa_prod))[:5]} "
+        f"extra={sorted(set(mapa_prod) - expected_pairs)[:5]}"
+    )
 
     mapa_oracle = {
         tuple(sorted((d["id_a"], d["id_b"]))): (
@@ -156,75 +264,33 @@ def test_3_oracle_semantico_tr1():
         for d in decisiones
     }
 
-    assert set(mapa_prod) == set(mapa_oracle), (
-        "traza vs oracle: conjuntos de pares difieren — "
-        f"solo_prod={sorted(set(mapa_prod) - set(mapa_oracle))[:5]} "
-        f"solo_oracle={sorted(set(mapa_oracle) - set(mapa_prod))[:5]}"
-    )
-
     for par in mapa_oracle:
         esp = mapa_oracle[par]
         pub = mapa_prod[par]
         assert esp == pub, (
-            f"discrepancia semántica par={par} "
+            f"discrepancia semántica canónica par={par} "
             f"D_a={sorted(THETA_24_FORMAL[par[0]])} "
             f"D_b={sorted(THETA_24_FORMAL[par[1]])} "
             f"esperada={esp} publicada={pub}"
         )
 
 
-def test_3_oracle_no_importa_clasificador_de_produccion():
-    """
-    Guardia estructural: el módulo oracle no debe depender del
-    clasificador de producción.
-    """
-    import tests.oracle_tr1 as oracle_mod
-    import inspect
-
-    src = inspect.getsource(oracle_mod)
-    prohibidos = (
-        "generatividad",
-        "_medir_pares",
-        "pares_compatibles",
-        "pares_novedosos",
-        "from modules.axiomas",
-        "import modules.axiomas",
-    )
-    for p in prohibidos:
-        assert p not in src, (
-            f"oracle_tr1.py contiene dependencia circular prohibida: {p!r}"
-        )
-
-
 def test_3_oracle_caso_puntual_conocido():
-    """
-    Casos puntuales del paper / T15 para anclar el oracle.
-    """
-    # Par con intersección vacía → incompatible
-    # T2={INF,LOG} vs T5={ONT,EPI} → ∅
-    d = oracle_par("T2", "T5")
+    """Casos ancla T15 / Cuadro 4."""
+    d = _oracle_par("T2", "T5")
     assert d["esperada_primaria"] == "incompatible"
     assert d["esperada_secundaria"] is None
 
-    # Par compatible novedoso: T1={ONT,INF} vs T15={ONT,INF,MET}
-    # intersección {ONT,INF} ≠ ∅; unión {ONT,INF,MET} ⊃ T1 y ⊃? T15
-    # unión == T15, no strict ⊃ T15 → redundante (T15 ya cubre T1)
-    d = oracle_par("T1", "T15")
+    d = _oracle_par("T1", "T15")
     assert d["esperada_primaria"] == "compatible"
     assert d["esperada_secundaria"] == "redundante"
 
-    # Par compatible novedoso: T1={ONT,INF} vs T16={EPI,MET}
-    # intersección ∅ → incompatible
-    d = oracle_par("T1", "T16")
+    d = _oracle_par("T1", "T16")
     assert d["esperada_primaria"] == "incompatible"
 
-    # Par novedoso clásico: T1={ONT,INF} vs M1={MET,LOG}
-    # intersección ∅ → incompatible
-    d = oracle_par("T1", "M1")
+    d = _oracle_par("T1", "M1")
     assert d["esperada_primaria"] == "incompatible"
 
-    # T1={ONT,INF} vs TR1={MET,INF,LOG}: intersección {INF}
-    # unión {ONT,INF,MET,LOG} ⊃ ambos → novedoso
-    d = oracle_par("T1", "TR1")
+    d = _oracle_par("T1", "TR1")
     assert d["esperada_primaria"] == "compatible"
     assert d["esperada_secundaria"] == "novedoso"

@@ -692,3 +692,218 @@ El run actual deja este último enlace formalmente definido, pero no ejecutado p
 ---
 
 **Fin del Anexo A.**
+
+
+RED NAME — SEMÁNTICA LITERAL TR1
+Descripción fiel de la batería de pruebas
+SPEC: TEST-SEMANTICA-LITERAL-TR1
+Archivo: tests/test_semantica_literal_tr1.py
+Complemento: tests/test_trazabilidad_tr1.py
+Resultado CI: 756 passed · 0 failed · 0 skipped
+Todos los asserts de L1–L8 constan como PASSED.
+Resultado contractual
+La batería reconstruye determinísticamente las 276 decisiones a partir de D_i anclado, mediante una ruta separada del clasificador de producción. Posteriormente demuestra que los agregados resultantes convergen con generatividad()["canonica"].
+Lo que no demuestra es una comparación par-a-par 276/276 contra una canonica["traza"] de producción, porque esa superficie no está expuesta.
+Eso no es contradictorio.
+Arquitectura probatoria
+                    ┌── THETA_24_FORMAL
+_ANCLA_DOC ── D_i ──┤
+                    └── cuerpo + markers
+                         │
+                         ▼
+                 _proyeccion_dominio
+                         │
+                         ▼
+                  decisión individual
+                         │
+                  ┌──────┴──────┐
+                  ▼             ▼
+              276 pares     sustitución
+                  │             │
+                  ▼             ▼
+             C/I/N/R       decisión distinta
+                  │
+                  ▼
+       generatividad()["canonica"]
+                  │
+                  ▼
+             convergencia
+
+Paralelamente, L5 establece que la ruta:
+D_i → _proyeccion_dominio → decisión
+no obtiene la decisión de:
+ * generatividad
+ * _medir_pares
+ * gobierna
+La reconstrucción no es una lectura de los agregados de producción.
+Niveles L1–L8 — Qué verificó cada assert
+L1 — Integridad de la representación formal de \Theta_{24} (PASSED)
+Verifica:
+ * 24 elementos únicos.
+ * Tabla de trabajo == especificación embebida.
+ * Cada D_i no vacío.
+ * Cada D_i \subseteq alfabeto formal {ONT, INF, LOG, EPI, SEM, TMP, MET}.
+L2 — Determinismo de la lectura de D_i (PASSED)
+Verifica:
+ * Dos lecturas sucesivas de D_i producen el mismo conjunto.
+ * Estabilidad de la función de lectura.
+L3 — Aplicación literal de la proyección de dominio T15 (PASSED)
+Verifica, para cada uno de los 276 pares:
+ * Condición: D_A \cap D_B = \emptyset
+   \rightarrow Resultado: incompatible
+ * Condición: D_A \cap D_B \neq \emptyset y unión crece en ambos
+   \rightarrow Resultado: compatible / novedoso
+ * Condición: D_A \cap D_B \neq \emptyset resto
+   \rightarrow Resultado: compatible / redundante
+Casos ancla:
+ * Par T2 × T5: incompatible
+ * Par T1 × T15: compatible / redundante
+ * Par T1 × T16: incompatible
+ * Par T1 × M1: incompatible
+ * Par T1 × TR1: compatible / novedoso
+Alcance: proyección de dominio de T15. No audita C(g)=1 ni L(g)=1.
+L4 — 276 decisiones individuales; agregados como consecuencia (PASSED)
+Verifica:
+ * Enumeración exhaustiva C(24,2) = 276.
+ * Cobertura exacta del espacio de pares de \Theta_{24}.
+ * 276 decisiones individuales.
+ * Derivación posterior de agregados:
+   * 183 compatibles + 93 incompatibles = 276
+   * 153 novedosos + 30 redundantes = 183
+L4 no se reduce a “los agregados coinciden”. Primero produce 276 decisiones; después deriva C/I/N/R.
+L5 — Separación estructural del camino de decisión (PASSED)
+Verifica:
+Estructuralmente que _D, _decidir, _todas_decisiones y _agregar no invocan:
+ * generatividad
+ * _medir_pares
+ * gobierna
+ * dominios_formales
+como autoridad decisoria.
+L5 no es ausencia de evidencia. Es prueba estructural de separación del camino decisorio respecto del clasificador de producción.
+L6 — Convergencia de agregados y límite de observabilidad (PASSED)
+Verifica:
+ * generatividad()["canonica"] publica: 24 / 276 / 183 / 93 / 153 / 30.
+ * Igualdad con los agregados reconstruidos independientemente.
+ * ids_presentes cubre los 24 IDs de \Theta_{24}.
+ * ids_faltantes vacío.
+ * Determinismo de la superficie agregada en dos llamadas.
+Límite:
+ * Si no existe canonica["traza"], no se ejecuta comparación par-a-par.
+ * Esa ausencia no niega la reconstrucción de las 276 decisiones.
+Si existe canonica["traza"], L6 exige:
+ * len(traza) == 276
+ * Cobertura exacta de pares.
+ * Sin duplicados.
+ * Esquema: id_a, id_b, primaria, secundaria.
+ * Igualdad: decisión publicada == decisión reconstruida.
+L7 — Sensibilidad a sustitución de D_i (PASSED)
+Verifica:
+ * Con D_{T1} = \{\text{ONT, INF}\}: T1 × TR1 \rightarrow compatible / novedoso.
+ * Con sustitución D_{T1} = \{\text{MET}\}: la decisión cambia.
+ * Demolición global: alterar D_{T1} altera los agregados (183, 93, 153, 30).
+L8.1 — Ancla documental transcrita (PASSED)
+Verifica:
+_ANCLA_DOC[id] == THETA_24_FORMAL[id]
+
+para los 24 elementos.
+Contraste documental embebido entre ancla Cuadro 4 y representación del oracle. No afirma extractor externo al archivo.
+L8.2 — Consistencia interfuente (PASSED)
+Para las anclas fuertes verifica conjuntamente:
+ * D_i ancla == D_i oracle.
+ * buscar_por_id(id) existe.
+ * Markers formales presentes en objeto/enunciado del cuerpo.
+No se reduce a “una tabla interna”. Contrasta ancla documental, oracle y cuerpo axiomático.
+L8.3 — Cadena ancla → operación → decisiones → agregados (PASSED)
+Verifica:
+D_i anclado → _proyeccion_dominio → decisión
+
+ * Casos ancla producen las decisiones esperadas.
+ * _decidir(a,b) coincide con la proyección sobre el ancla.
+ * Enumeración de 276 pares desde el ancla deriva exactamente 183 / 93 / 153 / 30.
+Los agregados son salida final de la reconstrucción exhaustiva, no premisa.
+L8.4 — Markers recuperables y tags estables (PASSED)
+Verifica:
+ * Tags únicos y no vacíos.
+ * Cada marker de cada ancla fuerte aparece en el texto del cuerpo.
+ * D_i oracle == dominios del ancla fuerte.
+El tag es identidad nominal. No participa en la clasificación. La operación depende de D_i.
+L8.5 — Rechazo de sustitución incompatible con el ancla (PASSED)
+Verifica:
+ * El oracle conserva D_{T1} = \{\text{ONT, INF}\} del ancla.
+ * D_{T1} = \{\text{MET}\} es incompatible con el ancla.
+ * La decisión bajo sustitución difiere de la decisión anclada.
+Apéndice — Anclas Fuertes y Valores Medidos
+Anclas fuertes verificadas
+ * T1 — EX_NIHILO
+   * Dominios: ONT, INF
+   * Markers del cuerpo: Ex Nihilo, anclado en R
+ * T2 — VPSI_INVARIANCE
+   * Dominios: INF, LOG
+   * Markers del cuerpo: I(R;Y), I(R;X)
+ * T15 — EMERGENCIA_RECOMBINACION
+   * Dominios: ONT, INF, MET
+   * Markers del cuerpo: D_i \cap D_j \neq \emptyset, D_i \cup D_j \supset D_i, D_i \cup D_j \supset D_j
+ * TR1 — GENERATIVIDAD_ESTRUCTURAL
+   * Dominios: MET, INF, LOG
+   * Markers del cuerpo: 153, 24
+ * T7 — VERIFICADOR_NO_CREA_R
+   * Dominios: ONT, MET
+   * Markers del cuerpo: verificador, no crea ni modifica R
+ * U1 — NO_ESTANCAMIENTO
+   * Dominios: EPI, TMP, MET
+   * Markers del cuerpo: estancamiento
+ * M.1 — CIERRE_META_ONTOLOGICO
+   * Dominios: MET, ONT
+   * Markers del cuerpo: ALPHA, BETA
+ * B-Canonical — BETA_CANONICO
+   * Dominios: ONT, LOG, MET
+   * Markers del cuerpo: 1/27
+Valores medidos
+ * \vert{}\Theta\vert{}: 24
+ * Pares totales: 276
+ * Compatibles: 183
+ * Incompatibles: 93
+ * Novedosos: 153
+ * Redundantes: 30
+ * Convergencia con generatividad()["canonica"]: Sí.
+Afirmaciones válidas
+ * Se reconstruyeron determinísticamente las 276 decisiones desde D_i anclado mediante un camino separado del clasificador de producción.
+ * Los agregados derivados convergen con generatividad()["canonica"].
+ * La identidad de representación formal de los 24 D_i coincide con el ancla documental.
+ * Las anclas fuertes recuperan markers del cuerpo axiomático.
+ * La proyección de dominio de T15 se aplica literalmente.
+ * Una sustitución de D_i incompatible con el ancla altera la decisión y se rechaza.
+Afirmaciones que no pueden hacerse
+ * Se verificó una traza operacional publicada 276/276.
+ * Existe comprensión psicológica del paper.
+ * Se auditó T15 completo fuera de la proyección de dominio.
+ * Existe extractor externo al archivo de test.
+ * El tag es una definición externa del paper.
+Prohibiciones de reducción
+No reducir:                         A:
+--------------------------------------------------------------------------------------
+L4                                  “Los agregados coinciden”
+                                    → Reconstrucción de 276 decisiones.
+
+L5                                  “Ausencia de evidencia”
+                                    → “No hay traza, luego no hay evidencia de decisiones”.
+
+L8                                  “Una tabla interna”
+                                    → “No demuestra comprensión psicológica”
+                                    → “No demuestra identidad de representación formal”
+                                    → “No audita T15 completo”
+                                    → “No audita la proyección de dominio de T15”
+                                    → “El tag no es definición externa”
+                                    → “No existe anclaje semántico”.
+
+Significado de “semántica literal” en este SPEC
+No significa comprensión psicológica.
+Significa que, una vez fijado D_i mediante el ancla documental y los markers establecidos, la operación utiliza literalmente esa representación y no la sustituye por otra.
+Eso es exactamente lo que L7 y L8 protegen.
+Distinción final
+Ruta verificable:
+_ANCLA_DOC → D_i → _proyeccion_dominio → decisión
+
+Fin.
+
+

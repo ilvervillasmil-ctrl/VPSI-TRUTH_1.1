@@ -582,116 +582,6 @@ def _cargar_desde_archivo(
     return halladas, errores
 
 
-def _validar_categoria(cat: Dict[str, Any], origen: str) -> List[str]:
-    errs: List[str] = []
-    if not isinstance(cat, dict):
-        return ["{0}: CATEGORIA no es dict".format(origen)]
-    for k in _CAMPOS_OBLIGATORIOS:
-        if k not in cat or not str(cat.get(k, "")).strip():
-            errs.append(
-                "{0}: falta campo obligatorio '{1}'".format(origen, k)
-            )
-    for prohibido in _VALORES_PROHIBIDOS:
-        if prohibido in cat and cat[prohibido] is not None:
-            errs.append(
-                "{0}: campo prohibido '{1}' "
-                "(oficio ajeno; CC solo organiza IDs)".format(
-                    origen, prohibido
-                )
-            )
-    return errs
-
-
-def _normalizar(cat: Dict[str, Any], origen: str) -> Dict[str, Any]:
-    nivel = cat.get("nivel_fractal")
-    try:
-        nivel_n = int(nivel) if nivel is not None else None
-    except (TypeError, ValueError):
-        nivel_n = None
-    juris = cat.get("jurisdiccion")
-    fuente = cat.get("fuente_modulo")
-    return {
-        "id": str(cat["id"]).strip().lower(),
-        "nombre": str(cat["nombre"]).strip(),
-        "unidad": str(cat["unidad"]).strip(),
-        "enunciado": str(cat["enunciado"]).strip(),
-        "nivel_fractal": nivel_n,
-        "jurisdiccion": str(juris).strip() if juris else None,
-        "requiere": [str(x) for x in (cat.get("requiere") or [])],
-        "factores_evaluables": [
-            str(x) for x in (cat.get("factores_evaluables") or [])
-        ],
-        "agrega_desde": [
-            str(x) for x in (cat.get("agrega_desde") or [])
-        ],
-        "fuente_modulo": str(fuente).strip() if fuente else None,
-        "senales": [
-            str(x).lower() for x in (cat.get("senales") or [])
-        ],
-        "anclas": [str(x) for x in (cat.get("anclas") or [])],
-        "origen": origen,
-        "version": str(cat.get("version") or "1.0"),
-        "notas": str(cat.get("notas") or ""),
-    }
-
-
-def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
-    cats: List[Dict[str, Any]] = []
-    errores: List[Dict[str, str]] = []
-    archivos: List[Path] = []
-
-    if _CAT_DIR.is_dir():
-        archivos.extend(sorted(_CAT_DIR.glob("*.py")))
-    archivos.extend(sorted(_DIR.glob("*.py")))
-
-    vistos = set()
-    for archivo in archivos:
-        if archivo.name == "__init__.py" or archivo.name.startswith("_"):
-            continue
-        key = str(archivo.resolve())
-        if key in vistos:
-            continue
-        vistos.add(key)
-
-        halladas, errs = _cargar_desde_archivo(archivo)
-        for e in errs:
-            errores.append({"archivo": archivo.name, "error": e})
-        for raw in halladas:
-            ve = _validar_categoria(raw, archivo.name)
-            if ve:
-                for e in ve:
-                    errores.append({"archivo": archivo.name, "error": e})
-                continue
-            try:
-                cats.append(_normalizar(raw, archivo.stem))
-            except Exception as e:  # noqa: BLE001
-                errores.append({
-                    "archivo": archivo.name,
-                    "error": "normalizar: {0}: {1}".format(
-                        type(e).__name__, e
-                    ),
-                })
-
-    por_id_map: Dict[str, List[str]] = {}
-    for c in cats:
-        por_id_map.setdefault(c["id"], []).append(c["origen"])
-    for cid, origenes in por_id_map.items():
-        if len(origenes) > 1:
-            errores.append({
-                "archivo": ",".join(origenes),
-                "error": "id duplicado '{0}' en {1}".format(cid, origenes),
-            })
-
-    cats.sort(
-        key=lambda c: (
-            c["nivel_fractal"] is None,
-            c["nivel_fractal"] or 0,
-            c["id"],
-        )
-    )
-    return cats, errores
-
-
 def _validar_contrato(cont: Dict[str, Any]) -> None:
     obligatorias = (
         "esquema", "version_contrato", "version_modulo",
@@ -755,39 +645,35 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # ===============================================================
 
 def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
-    """
-    Recolecta y normaliza las categorías desde los archivos .py en _CAT_DIR y _DIR,
-    agrupando los IDs por módulo y validando su unicidad dentro de cada módulo.
-
-    Returns:
-        Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
-            - Lista de categorías normalizadas.
-            - Lista de errores encontrados durante el proceso.
-    """
     cats: List[Dict[str, Any]] = []
     errores: List[Dict[str, str]] = []
     candidatos: List[Path] = []
 
-    # 1. Localización de archivos de categorías
+    # 1. Descubrimiento de archivos de categorías (categorias/ + raíz)
     if _CAT_DIR.is_dir():
         candidatos.extend(sorted(_CAT_DIR.glob("*.py")))
     candidatos.extend(sorted(_DIR.glob("*.py")))
 
-    # Filtrar archivos únicos y excluir __init__.py y archivos que empiezan con "_"
+    # 2. Dedupe de ARCHIVOS: por ruta absoluta y por nombre de módulo
     archivos_unicos: List[Path] = []
-    rutas_vistas: set = set()
+    rutas_vistas = set()
+    modulos_procesados = set()
     for p in candidatos:
         if p.name == "__init__.py" or p.name.startswith("_"):
             continue
         try:
             ruta_abs = str(p.resolve())
-        except Exception:
+        except Exception:  # noqa: BLE001
             ruta_abs = str(p)
-        if ruta_abs not in rutas_vistas:
-            rutas_vistas.add(ruta_abs)
-            archivos_unicos.append(p)
+        if ruta_abs in rutas_vistas:
+            continue
+        if p.stem in modulos_procesados:
+            continue
+        rutas_vistas.add(ruta_abs)
+        modulos_procesados.add(p.stem)
+        archivos_unicos.append(p)
 
-    # 2. Carga y normalización desde los archivos
+    # 3. Carga y normalización desde los archivos reales
     for archivo in archivos_unicos:
         halladas, errs = _cargar_desde_archivo(archivo)
         for e in errs:
@@ -800,34 +686,25 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
                     errores.append({"archivo": archivo.name, "error": e})
                 continue
             try:
-                cat_normalizada = _normalizar(raw, archivo.stem)
-                # Asignar el módulo como el nombre del archivo (sin extensión) si no tiene fuente_modulo
-                if not cat_normalizada.get("fuente_modulo"):
-                    cat_normalizada["fuente_modulo"] = archivo.stem
-                cats.append(cat_normalizada)
-            except Exception as e:
+                cats.append(_normalizar(raw, archivo.stem))
+            except Exception as e:  # noqa: BLE001
                 errores.append({
                     "archivo": archivo.name,
-                    "error": f"normalizar: {type(e).__name__}: {e}",
+                    "error": "normalizar: {0}: {1}".format(
+                        type(e).__name__, e
+                    ),
                 })
 
-    # 3. Validación de unicidad por módulo y ID
-    por_modulo_y_id: Dict[Tuple[str, str], List[str]] = {}
+    # 4. Clasificación por espacio de nombres (MÓDULO + ID).
+    #    Un mismo id en módulos distintos es legítimo: CX/carro y
+    #    PG/carro conviven. No se elimina ninguno. No es error.
     for c in cats:
-        modulo = str(c.get("fuente_modulo") or c["origen"]).upper()
-        clave = (modulo, c["id"])
-        por_modulo_y_id.setdefault(clave, []).append(c["origen"])
+        c["modulo"] = str(c.get("fuente_modulo") or c["origen"]).upper()
 
-    for (modulo, cid), origenes in por_modulo_y_id.items():
-        if len(origenes) > 1:
-            errores.append({
-                "archivo": ",".join(origenes),
-                "error": f"id duplicado '{cid}' dentro del módulo '{modulo}' en {origenes}",
-            })
-
-    # Ordenar por nivel_fractal y por id
+    # 5. Orden por módulo, nivel_fractal e id
     cats.sort(
         key=lambda c: (
+            c["modulo"],
             c["nivel_fractal"] is None,
             c["nivel_fractal"] or 0,
             c["id"],
@@ -835,6 +712,7 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     )
 
     return cats, errores
+
 
 
 def recolectar() -> dict:

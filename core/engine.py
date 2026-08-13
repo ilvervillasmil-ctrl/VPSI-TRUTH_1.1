@@ -390,7 +390,13 @@ class Engine:
     VERSION = VERSION_ENGINE
 
     def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
-
+    
+    # ===========================================================
+    # DECLARACIÓN PROPÓSITO FUNDAMENTAL (MANDATO INVARIABLE)
+    # ===========================================================
+    PROPOSITO_FUNDAMENTAL = "Calcular la verdad de cualquier descripcion"
+    CLAVE_PROPOSITO = "CALCULAR_TRUTH"
+    
         # =======================================================
         # Parte 12.1 CONFIGURACIÓN BÁSICA
         # =======================================================
@@ -398,6 +404,10 @@ class Engine:
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id
         self.strict = strict
+
+        # Propósito parametrizable o fijado por instancia
+        self.proposito: str = self.PROPOSITO_FUNDAMENTAL
+        self.clave_proposito: str = self.CLAVE_PROPOSITO
 
         # =======================================================
         # Parte 12.2 ESTADO
@@ -470,6 +480,17 @@ class Engine:
         if not self.raiz.is_dir(): return []
         return [p for p in sorted(self.raiz.iterdir()) if p.is_dir() and (p / "__init__.py").is_file()]
 
+    # ===========================================================
+    # Métodos de validación de Propósito
+    # ===========================================================
+
+    def obtener_proposito(self) -> Dict[str, str]:
+        """Devuelve la declaración explicita del propósito del Engine."""
+        return {
+            "proposito": self.proposito,
+            "clave": self.clave_proposito
+        }
+        
     # ===========================================================
     # Parte 13 LECTURA DEL CONTRATO
     # ===========================================================

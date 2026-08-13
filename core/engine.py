@@ -389,8 +389,6 @@ class Engine:
 
     VERSION = VERSION_ENGINE
 
-    def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
-    
     # ===========================================================
     # DECLARACIÓN PROPÓSITO FUNDAMENTAL (MANDATO INVARIABLE)
     # ===========================================================
@@ -398,6 +396,7 @@ class Engine:
     PROPOSITO_FUNDAMENTAL = "Calcular la verdad de cualquier descripcion"
     CLAVE_PROPOSITO = "EJECUTAR_LA_FORMULA_DE_LA_VERDAD"
     
+    def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
         # =======================================================
         # Parte 12.1 CONFIGURACIÓN BÁSICA
         # =======================================================

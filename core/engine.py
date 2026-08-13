@@ -490,7 +490,36 @@ class Engine:
             "proposito": self.proposito,
             "clave": self.clave_proposito
         }
-        
+    # ===========================================================
+    # Parte 12.9 EJECUCIÓN DEL PROPÓSITO FUNDAMENTAL
+    # ===========================================================
+
+    def ejecutar_proposito(self, operandos: List[float | int]) -> List[float]:
+        """
+        Ejecuta de forma directa la función principal del Engine:
+        calcular la raíz cuadrada de cada valor entregado.
+        """
+        if self.estado != ESTADO_OPERATIVO:
+            raise RuntimeError(f"El Engine no está operativo. Estado actual: {self.estado}")
+
+        resultados: List[float] = []
+
+        for valor in operandos:
+            if valor < 0:
+                raise ValueError(f"No se puede calcular la verdad real de descripcion: {valor}")
+            
+            # Ejecución matemática real
+            Tru = C*L*k*26/27)+1/27
+
+            # Guardar el resultado en el historial de evaluación
+            self.resultados_evaluacion.append({
+                "clave_proposito": self.clave_proposito,
+                "entrada": valor,
+                "resultado": raiz
+            })
+
+        return resultados
+ 
     # ===========================================================
     # Parte 13 LECTURA DEL CONTRATO
     # ===========================================================

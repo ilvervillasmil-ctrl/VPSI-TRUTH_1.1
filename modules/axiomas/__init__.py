@@ -1038,9 +1038,64 @@ def recolectar(
 # CAPACIDADES PÚBLICAS
 # ===============================================================
 
+
+# -----------------------------------------------------------
+# Parte 1 — Recolección (fuente única de verdad)
+# -----------------------------------------------------------
+
+def recolectar(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> Tuple[List[Dict], List[Dict]]:
+    """
+    Carga y normaliza todas las declaraciones de los cuerpos del módulo.
+    Fuente única de verdad para el resto de capacidades.
+    """
+    decls: List[Dict] = []
+    errores: List[Dict] = []
+
+    # 1. Cuerpos locales del módulo
+    for archivo in sorted(_DIR.glob("**/*.py")):
+        if archivo.name == "__init__.py":
+            continue
+        try:
+            for d in _cargar_declaraciones_desde_archivo(archivo):
+                decls.append(normalizar(d, archivo.stem))
+        except Exception as e:  # noqa: BLE001
+            errores.append({
+                "archivo": archivo.name,
+                "error": "{0}: {1}".format(type(e).__name__, e),
+            })
+
+    # 2. VPSI raíz (si existe)
+    vpsi = _ruta_vpsi()
+    if vpsi is not None:
+        try:
+            for d in _cargar_declaraciones_desde_archivo(vpsi):
+                decls.append(normalizar(d, "VPSI"))
+        except Exception as e:  # noqa: BLE001
+            errores.append({
+                "archivo": str(vpsi.name),
+                "error": "{0}: {1}".format(type(e).__name__, e),
+            })
+
+    # 3. Declaraciones externas (si se pasan)
+    if declaraciones_externas:
+        for nombre, lista in declaraciones_externas.items():
+            if not isinstance(lista, list):
+                continue
+            for d in lista:
+                try:
+                    decls.append(normalizar(d, nombre))
+                except ValueError as e:
+                    errores.append({"modulo": nombre, "error": str(e)})
+
+    return decls, errores
+
+
 def ids_dominio_k_o(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[str]:
+    """Ids de declaraciones ligadas a dominios K/O o Def-5.3.1."""
     decls, _ = recolectar(declaraciones_externas)
     ids: List[str] = []
     for d in decls:
@@ -1063,9 +1118,207 @@ def ids_dominio_k_o(
     return sorted(set(ids))
 
 
+# -----------------------------------------------------------
+# Parte 2 — TR1 Generatividad (capa operativa + capa canónica)
+# -----------------------------------------------------------
+# Asignación formal de dominios: Cuadro 4 del documento VPSI v9.4
+# NO se infiere de gobierna del repo. Es la definición de Θ.
+
+THETA_24 = {
+    "T1": frozenset({"ONT", "INF"}),
+    "T2": frozenset({"INF", "LOG"}),
+    "T3": frozenset({"INF", "TMP"}),
+    "T4": frozenset({"EPI", "TMP"}),
+    "T5": frozenset({"ONT", "EPI"}),
+    "T6": frozenset({"LOG", "SEM"}),
+    "T7": frozenset({"ONT", "MET"}),
+    "T8": frozenset({"INF", "MET"}),
+    "T9": frozenset({"EPI", "INF"}),
+    "T10": frozenset({"ONT", "INF"}),
+    "T11": frozenset({"ONT", "MET"}),
+    "T12": frozenset({"EPI", "ONT"}),
+    "T13": frozenset({"EPI", "SEM"}),
+    "T14": frozenset({"EPI", "MET"}),
+    "T15": frozenset({"ONT", "INF", "MET"}),
+    "T16": frozenset({"EPI", "MET"}),
+    "T17": frozenset({"ONT", "MET", "TMP"}),
+    "U1": frozenset({"EPI", "TMP", "MET"}),
+    "M1": frozenset({"MET", "LOG"}),
+    "M.1": frozenset({"MET", "ONT"}),
+    "B-Canonical": frozenset({"ONT", "LOG", "MET"}),
+    "TT.6.1": frozenset({"LOG", "SEM", "EPI"}),
+    "U0": frozenset({"ONT", "INF", "TMP"}),
+    "TR1": frozenset({"MET", "INF", "LOG"}),
+}
+
+THETA_CANONICO = frozenset(THETA_24.keys())
+
+
+def _medir_pares(theta: list) -> dict:
+    """
+    TR1 / T15:
+      compatible  ⇔ Di ∩ Dj ≠ ∅
+      novedoso    ⇔ Di ∪ Dj ⊃ Di  ∧  Di ∪ Dj ⊃ Dj
+      redundante  ⇔ compatible ∧ no novedoso
+      incompatible⇔ Di ∩ Dj = ∅
+    Identidades:
+      compatibles + incompatibles = pares_totales
+      novedosos   + redundantes   = compatibles
+    """
+    n = len(theta)
+    pares_tot = n * (n - 1) // 2 if n >= 2 else 0
+    compatibles = 0
+    novedosos = 0
+    redundantes = 0
+    incompatibles = 0
+    for i in range(n):
+        Di = theta[i]["dominios"]
+        for j in range(i + 1, n):
+            Dj = theta[j]["dominios"]
+            if not (Di & Dj):
+                incompatibles += 1
+                continue
+            compatibles += 1
+            union = Di | Dj
+            if union != Di and union != Dj:
+                novedosos += 1
+            else:
+                redundantes += 1
+    return {
+        "theta_n": n,
+        "pares_totales": pares_tot,
+        "pares_compatibles": compatibles,
+        "pares_novedosos": novedosos,
+        "pares_redundantes": redundantes,
+        "pares_incompatibles": incompatibles,
+        "im_vs_theta": (
+            "GENERATIVO"
+            if n > 0 and novedosos > n
+            else ("ESTANCADO" if n > 0 else "SIN_DATOS")
+        ),
+        "identidad_pares": (compatibles + incompatibles == pares_tot),
+        "identidad_compatibles": (novedosos + redundantes == compatibles),
+    }
+
+
+def generatividad() -> dict:
+    """
+    TR1 en dos capas (saber, no creer):
+
+    1) operativa  — todo axioma/teorema con gobierna (grafo real del repo)
+    2) canónica   — solo los 24 ids del paper con dominios formales (Cuadro 4)
+
+    No inventa candidatos. No calcula Tru.
+    La capa canónica NO infiere dominios desde gobierna: usa THETA_24.
+    """
+    decls, errores = recolectar()
+
+    # ---------- capa operativa (cuerpo real del repo) ----------
+    oper = []
+    for d in decls:
+        if d.get("tipo") not in ("teorema", "axioma"):
+            continue
+        gob = d.get("gobierna") or []
+        if not gob:
+            continue
+        oper.append({
+            "id": d["id"],
+            "tipo": d["tipo"],
+            "dominios": set(str(x) for x in gob),
+        })
+    m_op = _medir_pares(oper)
+    dominios_op = sorted({g for n in oper for g in n["dominios"]})
+
+    # ---------- capa canónica TR1 (asignación formal del paper) ----------
+    can = [
+        {"id": tid, "tipo": "teorema", "dominios": set(doms)}
+        for tid, doms in THETA_24.items()
+    ]
+    m_can = _medir_pares(can)
+    dominios_can = sorted({g for n in can for g in n["dominios"]})
+
+    # presencia en el repo (solo informe; no altera el conteo canónico)
+    ids_en_repo = {str(d.get("id", "")) for d in decls}
+    ids_presentes = sorted(i for i in THETA_CANONICO if i in ids_en_repo)
+    ids_faltantes = sorted(THETA_CANONICO - set(ids_presentes))
+
+    # auditoría del dato formal
+    ids_sin_dominio = sorted(
+        tid for tid, doms in THETA_24.items() if not doms
+    )
+
+    u1_proxy = (
+        "NO_STAGNANT"
+        if m_can.get("pares_novedosos", 0) > 0 or m_op.get("pares_novedosos", 0) > 0
+        else "REVISAR"
+    )
+
+    return {
+        "contenedor": "axiomas",
+        # capa operativa
+        "theta_n": m_op["theta_n"],
+        "pares_totales": m_op["pares_totales"],
+        "pares_compatibles": m_op["pares_compatibles"],
+        "pares_novedosos": m_op["pares_novedosos"],
+        "pares_redundantes": m_op["pares_redundantes"],
+        "pares_incompatibles": m_op["pares_incompatibles"],
+        "im_vs_theta": m_op["im_vs_theta"],
+        "identidad_pares": m_op["identidad_pares"],
+        "identidad_compatibles": m_op["identidad_compatibles"],
+        "dominios": dominios_op,
+        "u1_proxy": u1_proxy,
+        "errores_recoleccion": len(errores),
+        "por_tipo_theta": {
+            "axioma": sum(1 for n in oper if n["tipo"] == "axioma"),
+            "teorema": sum(1 for n in oper if n["tipo"] == "teorema"),
+        },
+        # capa canónica TR1
+        "canonica": {
+            **m_can,
+            "ids_presentes": ids_presentes,
+            "ids_faltantes": ids_faltantes,
+            "ids_sin_dominio": ids_sin_dominio,
+            "dominios": dominios_can,
+            "dominios_formales": {
+                k: sorted(v) for k, v in THETA_24.items()
+            },
+            "referencia_formal": {
+                "theta_n": 24,
+                "pares_totales": 276,
+                "pares_compatibles": 183,
+                "pares_novedosos": 153,
+                "pares_redundantes": 30,
+                "pares_incompatibles": 93,
+                "nota": (
+                    "|Im(⊕)|=153 > 24=|Θ| — enumeración exacta Cuadro 3/4 "
+                    "del documento VPSI v9.4. El CI recalcula; no hardcodea."
+                ),
+            },
+            "coincide_paper": (
+                m_can.get("pares_totales") == 276
+                and m_can.get("pares_compatibles") == 183
+                and m_can.get("pares_novedosos") == 153
+                and m_can.get("pares_redundantes") == 30
+                and m_can.get("pares_incompatibles") == 93
+            ),
+        },
+        "ids_dominio_k_o": ids_dominio_k_o(),
+        "nota": (
+            "Capa operativa = grafo del repo (gobierna real). "
+            "Capa canónica = THETA_24 formal del paper (Cuadro 4). "
+            "Identidades: C+I=T y N+R=C deben cumplirse o se reporta fallo."
+        ),
+    }
+
+
+# -----------------------------------------------------------
+# Parte 3 — Coherencia (barrer / verificar)
+# -----------------------------------------------------------
+
 def barrer(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Dict:
+    """Capacidad principal: coherencia axiomática del cuerpo."""
     decls, errores = recolectar(declaraciones_externas)
     choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
 
@@ -1103,9 +1356,21 @@ def verificar_salida(salida: Dict) -> bool:
     return bool(salida.get("coherente", False))
 
 
+def verificar(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> Dict[str, Any]:
+    """Alias de contrato de barrer."""
+    return barrer(declaraciones_externas)
+
+
+# -----------------------------------------------------------
+# Parte 4 — Consultas de declaraciones
+# -----------------------------------------------------------
+
 def declaraciones(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
+    """Lista normalizada si el cuerpo es coherente; si no → []."""
     resultado = barrer(declaraciones_externas)
     if not resultado["coherente"]:
         return []
@@ -1113,10 +1378,18 @@ def declaraciones(
     return decls
 
 
+def axiomas(
+    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+) -> List[Dict]:
+    """Alias de contrato: misma semántica que declaraciones()."""
+    return declaraciones(declaraciones_externas)
+
+
 def por_dominio(
     dominio: str,
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
+    """Filtra declaraciones por dominio en gobierna."""
     dom = str(dominio).lower().strip()
     decls, _ = recolectar(declaraciones_externas)
     out = []
@@ -1127,292 +1400,8 @@ def por_dominio(
     return out
 
 
-def recolectar(
-    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
-) -> Tuple[List[Dict], List[Dict]]:
-    decls: List[Dict] = []
-    errores: List[Dict] = []
-
-    # 1. Cargar declaraciones de la carpeta local del módulo
-    for archivo in sorted(_DIR.glob("**/*.py")):
-        if archivo.name == "__init__.py":
-            continue
-        try:
-            for d in _cargar_declaraciones_desde_archivo(archivo):
-                decls.append(normalizar(d, archivo.stem))
-        except Exception as e:  # noqa: BLE001
-            errores.append({
-                "archivo": archivo.name,
-                "error": f"{type(e).__name__}: {e}",
-            })
-
-    # 2. Cargar VPSI / Raíz si aplica
-    vpsi = _ruta_vpsi()
-    if vpsi is not None:
-        try:
-            for d in _cargar_declaraciones_desde_archivo(vpsi):
-                decls.append(normalizar(d, "VPSI"))
-        except Exception as e:  # noqa: BLE001
-            errores.append({
-                "archivo": str(vpsi.name),
-                "error": f"{type(e).__name__}: {e}",
-            })
-
-        # 3. Manejo de declaraciones externas con recuperación y reporte de excepciones
-    if declaraciones_externas:
-        for nombre, lista in declaraciones_externas.items():
-            elementos_a_procesar = []
-
-            if isinstance(lista, list):
-                elementos_a_procesar = lista
-            else:
-                # Si no es una lista, escaneamos las declaraciones reales de la carpeta
-                for archivo in sorted(_DIR.glob("**/*.py")):
-                    if archivo.name == "__init__.py":
-                        continue
-                    try:
-                        for d in _cargar_declaraciones_desde_archivo(archivo):
-                            tipo = str(d.get("tipo", "")).lower()
-                            if tipo in ("axioma", "teorema", "axiom", "theorem"):
-                                elementos_a_procesar.append(d)
-                    except Exception as e:  # noqa: BLE001
-                        errores.append({
-                            "modulo": nombre,
-                            "error": f"Error extrayendo axiomas de carpeta: {e}",
-                        })
-                
-                # Si el valor no-lista es un diccionario individual, lo sumamos para evaluar
-                if isinstance(lista, dict):
-                    elementos_a_procesar.append(lista)
-
-            # Evaluación de cada declaración / marca recibida
-            for d in elementos_a_procesar:
-                if not isinstance(d, dict):
-                    errores.append({
-                        "modulo": nombre,
-                        "error": f"Declaración no válida (tipo incorrecto: {type(d).__name__})"
-                    })
-                    continue
-
-                try:
-                    # Intento de normalización/verificación de existencia
-                    decl_norm = d if "cuerpo" in d else normalizar(d, nombre)
-                    
-                    # Verificamos si la declaración posee un cuerpo/ID válido dentro del dominio
-                    if not decl_norm.get("id") or not decl_norm.get("cuerpo"):
-                        # Captura de excepción: Axioma/Declaración no existe en el sistema
-                        errores.append({
-                            "modulo": nombre,
-                            "tipo_excepcion": "axioma_no_existente",
-                            "detalle": f"El axioma o marca '{decl_norm.get('id', 'desconocido')}' no existe en el registro.",
-                            "declaracion_omitida": decl_norm
-                        })
-                        continue  # Salta y continúa con el siguiente sin tumbar el pipeline
-
-                    # Si existe y es válida, la añade a la lista de declaraciones principales
-                    decls.append(decl_norm)
-
-                except ValueError as e:
-                    # Manejo de la excepción cuando la normalización determina que no existe
-                    errores.append({
-                        "modulo": nombre,
-                        "tipo_excepcion": "declaracion_invalida_omitida",
-                        "error": str(e),
-                    })
-                    continue
-
-    # ==========================================================
-    # 2. CARGAR ARCHIVOS EN LA RAÍZ DEL PROYECTO
-    # ==========================================================
-    # Buscar en la raíz del proyecto (donde está VPSI.py)
-    raiz_proyecto = _DIR.parent.parent
-    for archivo in sorted(raiz_proyecto.glob("*.py")):
-        if archivo.name in ("__init__.py", "setup.py", "conftest.py"):
-            continue
-        try:
-            for d in _cargar_declaraciones_desde_archivo(archivo):
-                decls.append(normalizar(d, archivo.stem))
-        except Exception as e:
-            errores.append({
-                "archivo": archivo.name,
-                "error": f"{type(e).__name__}: {e}",
-            })
-
-    # ==========================================================
-    # 3. CARGAR ARCHIVOS EN EL DIRECTORIO PADRE
-    # ==========================================================
-    directorio_padre = _DIR.parent
-    for archivo in sorted(directorio_padre.glob("*.py")):
-        if archivo.name in ("__init__.py", "setup.py", "conftest.py"):
-            continue
-        try:
-            for d in _cargar_declaraciones_desde_archivo(archivo):
-                decls.append(normalizar(d, archivo.stem))
-        except Exception as e:
-            errores.append({
-                "archivo": archivo.name,
-                "error": f"{type(e).__name__}: {e}",
-            })
-
-    # ==========================================================
-    # 4. SI SE PASARON EXTERNAS, LAS PROCESAMOS
-    # ==========================================================
-    if declaraciones_externas:
-        for nombre, lista in declaraciones_externas.items():
-            if not isinstance(lista, list):
-                lista = []
-            for d in lista:
-                try:
-                    decls.append(normalizar(d, nombre))
-                except ValueError as e:
-                    errores.append({"modulo": nombre, "error": str(e)})
-
-    return decls, errores
-# ===============================================================
-# DECLARACIONES EXTERNAS AUTO-GENERADAS
-# ===============================================================
-
-def obtener_declaraciones_externas(
-    incluir_cuerpos: Optional[List[str]] = None,
-    excluir_cuerpos: Optional[List[str]] = None,
-) -> Dict[str, List[Dict]]:
-    """
-    Genera declaraciones_externas a partir de las declaraciones internas.
-    
-    Args:
-        incluir_cuerpos: Si se pasa, solo incluye estos cuerpos.
-        excluir_cuerpos: Si se pasa, excluye estos cuerpos.
-    
-    Returns:
-        Dict[str, List[Dict]]: Diccionario con declaraciones por cuerpo.
-    
-    Raises:
-        ValueError: Si no se encuentran declaraciones.
-    """
-    decls, errores = recolectar()
-    
-    # Si hay errores de carga, los registramos pero no fallamos
-    if errores:
-        # Opcional: imprimir advertencia o registrar en diagnóstico
-        print(f"[AXIOMAS] Advertencia: {len(errores)} errores al recolectar declaraciones internas")
-    
-    if not decls:
-        raise ValueError(
-            "No se encontraron declaraciones internas en el módulo axiomas. "
-            "Verifica que los cuerpos tengan DECLARACIONES."
-        )
-    
-    # Filtrar por cuerpos si se especifica
-    cuerpos_permitidos = set(incluir_cuerpos) if incluir_cuerpos else None
-    cuerpos_excluidos = set(excluir_cuerpos) if excluir_cuerpos else set()
-    
-    externas: Dict[str, List[Dict]] = {}
-    for d in decls:
-        cuerpo = d.get("cuerpo", "desconocido")
-        
-        # Aplicar filtros
-        if cuerpos_permitidos and cuerpo not in cuerpos_permitidos:
-            continue
-        if cuerpo in cuerpos_excluidos:
-            continue
-            
-        if cuerpo not in externas:
-            externas[cuerpo] = []
-        externas[cuerpo].append(d)
-    
-    if not externas:
-        raise ValueError(
-            f"No se encontraron declaraciones en los cuerpos especificados: {incluir_cuerpos}"
-        )
-    
-    return externas
-
-def axiomas(
-    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
-) -> List[Dict]:
-    return declaraciones(declaraciones_externas)
-
-
-def generatividad() -> dict:
-    decls, errores = recolectar()
-
-    oper = []
-    for d in decls:
-        if d.get("tipo") not in ("teorema", "axioma"):
-            continue
-        gob = d.get("gobierna") or []
-        if not gob:
-            continue
-        oper.append({
-            "id": d["id"],
-            "tipo": d["tipo"],
-            "dominios": set(gob),
-        })
-    m_op = _medir_pares(oper)
-    dominios_op = sorted({g for n in oper for g in n["dominios"]})
-
-    por_id = {}
-    for d in decls:
-        i = str(d.get("id", ""))
-        if i in THETA_CANONICO:
-            cand = {
-                "id": i,
-                "tipo": d.get("tipo"),
-                "dominios": _dominios_canonicos(d.get("gobierna")),
-            }
-            prev = por_id.get(i)
-            if prev is None or len(cand["dominios"]) >= len(prev["dominios"]):
-                por_id[i] = cand
-
-    can = [por_id[i] for i in sorted(por_id.keys()) if por_id[i]["dominios"]]
-    m_can = _medir_pares(can)
-    dominios_can = sorted({g for n in can for g in n["dominios"]})
-    faltan = sorted(THETA_CANONICO - set(por_id.keys()))
-    sin_dominio = sorted(i for i, n in por_id.items() if not n["dominios"])
-
-    u1_proxy = (
-        "NO_STAGNANT"
-        if m_can.get("pares_novedosos", 0) > 0
-        or m_op.get("pares_novedosos", 0) > 0
-        else "REVISAR"
-    )
-
-    return {
-        "contenedor": "axiomas",
-        "theta_n": m_op["theta_n"],
-        "pares_totales": m_op["pares_totales"],
-        "pares_compatibles": m_op["pares_compatibles"],
-        "pares_novedosos": m_op["pares_novedosos"],
-        "im_vs_theta": m_op["im_vs_theta"],
-        "dominios": dominios_op,
-        "u1_proxy": u1_proxy,
-        "errores_recoleccion": len(errores),
-        "por_tipo_theta": {
-            "axioma": sum(1 for n in oper if n["tipo"] == "axioma"),
-            "teorema": sum(1 for n in oper if n["tipo"] == "teorema"),
-        },
-        "canonica": {
-            **m_can,
-            "ids_presentes": sorted(por_id.keys()),
-            "ids_faltantes": faltan,
-            "ids_sin_dominio": sin_dominio,
-            "dominios": dominios_can,
-            "objetivo_paper": {
-                "theta_n": 24,
-                "im_esperada": 153,
-                "nota": "|Im(⊕)|=153 > 24=|Θ| en enumeración del texto",
-            },
-        },
-        "ids_dominio_k_o": ids_dominio_k_o(),
-        "nota": (
-            "Capa operativa = grafo del repo. "
-            "Capa canonica = solo ids TR1 del paper. "
-            "Dominio O/K: ver ids_dominio_k_o y cuerpos."
-        ),
-    }
-
-
 def buscar_por_id(id_decl: str) -> Optional[Dict]:
+    """Busca y cita una declaración por su id."""
     decls, _ = recolectar()
     for d in decls:
         if d.get("id") == id_decl:
@@ -1420,285 +1409,41 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
     return None
 
 
-def verificar(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict[str, Any]:
-    return barrer(declaraciones_externas)
-# ===========================================================
-# 4. RESOLUCIÓN POR REPERTORIO DECLARATIVO
-# ===========================================================
+# -----------------------------------------------------------
+# Parte 5 — Inventario y reporting
+# -----------------------------------------------------------
 
-def resolver_por_repertorio(
-    consulta: Dict,
-    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
-) -> Dict:
-    decls, errores = recolectar(
-        declaraciones_externas
-    )
-
-    if errores:
-        return {
-            "coherente": False,
-            "estado": "ERROR_REPERTORIO",
-            "errores": errores,
-        }
-
-    resultado = barrer(
-        declaraciones_externas
-    )
-
-    if not resultado["coherente"]:
-        return {
-            "coherente": False,
-            "estado": "INCONSISTENTE",
-            "resultado": resultado,
-        }
-
-    # X representa cualquier objeto de la demanda.
-    # No se codifica ningún X concreto.
-
-    encontrada = correlacionar(
-        consulta,
-        decls,
-    )
-
-    if encontrada is not None:
-        return {
-            "coherente": True,
-            "estado": "RESUELTA",
-            "respuesta": encontrada,
-        }
-
-    # X no pertenece al repertorio.
-    # No se inventa X.
-    # La respuesta se deriva del propio repertorio AX.
-
+def inventario(peticion=None) -> Dict:
+    decls, errores = recolectar()
     return {
-        "coherente": True,
-        "estado": "NO_SUSTENTADA",
-        "respuesta": decls,
-    }
-
-def verificar(declaraciones_externas: Optional[Dict[str, List[Dict]]] = None) -> Dict[str, Any]:
-    # ==========================================================
-    # INTENTAR USAR BARRER
-    # ==========================================================
-    try:
-        resultado = barrer(declaraciones_externas)
-        if resultado.get("coherente"):
-            # Si barrer funciona y es coherente, devolver su resultado
-            return resultado
-    except Exception:
-        # Si barrer falla, no inventamos X
-        pass
-
-    # ==========================================================
-    # SI BARRER NO EXISTE O FALLA: USAR LÓGICA DEL REPO
-    # ==========================================================
-    # Recolectar declaraciones directamente (sin barrer)
-    decls, errores = recolectar(declaraciones_externas)
-
-    # Verificar coherencia con lógica propia (no barrer)
-    choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
-
-    # Si hay errores o choques, reportarlos
-    if errores or choques:
-        return {
-            "coherente": False,
-            "choques": choques,
-            "errores": errores,
-            "declaraciones": len(decls),
-            "cuerpos": sorted({d["cuerpo"] for d in decls}),
-            "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
-            "ids_dominio_k_o": [],
-            "nota": "Barrer no disponible. Se usó lógica alternativa."
-        }
-
-    # Si no hay errores ni choques, es coherente
-    return {
-        "coherente": True,
-        "choques": [],
-        "errores": [],
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "tipos": list(TIPOS),
         "declaraciones": len(decls),
+        "por_tipo": {
+            t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS
+        },
         "cuerpos": sorted({d["cuerpo"] for d in decls}),
-        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
-        "ids_dominio_k_o": ids_dominio_k_o(declaraciones_externas),
-        "nota": "Barrer no disponible. Se usó lógica alternativa."
-    }
-# ===============================================================
-# DECLARACIONES EXTERNAS - EXTRACCIÓN COMPLETA
-# ===============================================================
-
-def extraer_todas_declaraciones() -> Dict[str, List[Dict]]:
-    """
-    Extrae TODAS las declaraciones de TODOS los archivos del módulo.
-    
-    Returns:
-        Dict[str, List[Dict]]: Diccionario con:
-            - "declaraciones": Lista de todas las declaraciones válidas
-            - "por_cuerpo": Diccionario con declaraciones agrupadas por cuerpo
-            - "ids": Lista de todos los IDs
-            - "totales": Conteo por tipo
-    """
-    declaraciones_validas: List[Dict] = []
-    errores: List[Dict] = []
-    ids_encontrados: List[str] = []
-    
-    # ==========================================================
-    # RECORRER TODOS LOS ARCHIVOS
-    # ==========================================================
-    for archivo in sorted(_DIR.glob("**/*.py")):
-        if archivo.name == "__init__.py":
-            continue
-        
-        try:
-            declaraciones_raw = _cargar_declaraciones_desde_archivo(archivo)
-            if not declaraciones_raw:
-                continue
-                
-            for d in declaraciones_raw:
-                # ==============================================
-                # VALIDAR CAMPOS OBLIGATORIOS
-                # ==============================================
-                id_decl = d.get("id")
-                if not id_decl:
-                    errores.append({
-                        "archivo": archivo.name,
-                        "error": f"Declaración sin ID: {d}"
-                    })
-                    continue
-                
-                                # Validar que el ID sea string
-                if not isinstance(id_decl, str):
-                    errores.append({
-                        "archivo": archivo.name,
-                        "error": f"ID no es string: {id_decl}"
-                    })
-                    continue
-                
-                # Validar campos obligatorios
-                campos_obligatorios = ["sujeto", "relacion", "objeto", "polaridad", "tipo"]
-                faltan = [c for c in campos_obligatorios if c not in d]
-                if faltan:
-                    errores.append({
-                        "archivo": archivo.name,
-                        "id": id_decl,
-                        "error": f"Faltan campos: {faltan}"
-                    })
-                    continue
-
-                
-                # ==============================================
-                # NORMALIZAR Y AGREGAR
-                # ==============================================
-                try:
-                    decl_normalizada = normalizar(d, archivo.stem)
-                    declaraciones_validas.append(decl_normalizada)
-                    if id_decl not in ids_encontrados:
-                        ids_encontrados.append(id_decl)
-                except Exception as e:
-                    errores.append({
-                        "archivo": archivo.name,
-                        "id": id_decl,
-                        "error": f"Error al normalizar: {e}"
-                    })
-                    
-        except Exception as e:
-            errores.append({
-                "archivo": archivo.name,
-                "error": f"Error al cargar archivo: {e}"
-            })
-    
-    # ==========================================================
-    # AGRUPAR POR CUERPO
-    # ==========================================================
-    por_cuerpo: Dict[str, List[Dict]] = {}
-    for d in declaraciones_validas:
-        cuerpo = d.get("cuerpo", "desconocido")
-        if cuerpo not in por_cuerpo:
-            por_cuerpo[cuerpo] = []
-        por_cuerpo[cuerpo].append(d)
-    
-    # ==========================================================
-    # CONTAR POR TIPO
-    # ==========================================================
-    totales = {
-        "axioma": sum(1 for d in declaraciones_validas if d.get("tipo") == "axioma"),
-        "lema": sum(1 for d in declaraciones_validas if d.get("tipo") == "lema"),
-        "teorema": sum(1 for d in declaraciones_validas if d.get("tipo") == "teorema"),
-        "corolario": sum(1 for d in declaraciones_validas if d.get("tipo") == "corolario"),
-        "definicion": sum(1 for d in declaraciones_validas if d.get("tipo") == "definicion"),
-    }
-    
-    return {
-        "declaraciones": declaraciones_validas,
-        "por_cuerpo": por_cuerpo,
-        "ids": sorted(ids_encontrados),
-        "totales": totales,
-        "total_general": len(declaraciones_validas),
         "errores": errores,
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "autoridad": CONTENEDOR.get("autoridad"),
+        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+        "invariantes": CONTENEDOR.get("invariantes"),
+        "vigila": ["contradiccion_directa", "contradiccion_de_cota"],
+        "ids_dominio_k_o": ids_dominio_k_o(),
+        "nota": (
+            "Def-5.3.1 y dominio O viven en los cuerpos cargados; "
+            "este módulo los vigila y expone, no los clasifica en entrada."
+        ),
     }
 
-
-# ===============================================================
-# BUSCAR DECLARACIÓN POR ID
-# ===============================================================
-
-def buscar_por_id(id_buscado: str) -> Dict[str, Any]:
-    """
-    Busca una declaración por su ID.
-    
-    Args:
-        id_buscado: ID de la declaración a buscar
-    
-    Returns:
-        Dict con:
-            - "encontrado": True/False
-            - "declaracion": La declaración si existe, o None
-            - "error": Mensaje de error si no existe
-    """
-    todas = extraer_todas_declaraciones()
-    
-    for d in todas["declaraciones"]:
-        if d.get("id") == id_buscado:
-            return {
-                "encontrado": True,
-                "declaracion": d,
-                "error": None
-            }
-    
-    return {
-        "encontrado": False,
-        "declaracion": None,
-        "error": f"No se encontró declaración con ID '{id_buscado}'"
-    }
-
-
-# ===============================================================
-# LISTAR TODOS LOS IDS
-# ===============================================================
-
-def listar_todos_ids() -> List[str]:
-    """Retorna todos los IDs de declaraciones existentes."""
-    todas = extraer_todas_declaraciones()
-    return todas["ids"]
-
-
-# ===============================================================
-# VERIFICAR SI ID EXISTE
-# ===============================================================
-
-def id_existe(id_buscado: str) -> bool:
-    """Verifica si un ID existe en las declaraciones."""
-    todas = extraer_todas_declaraciones()
-    return id_buscado in todas["ids"]
-
-# ===============================================================
-# FIN CAPACIDADES PÚBLICAS
-# ===============================================================
-
-
-# ===============================================================
-# REPORTING INTERNO
-# ===============================================================
 
 def reporte() -> Dict[str, Any]:
     r = barrer()
@@ -1765,6 +1510,12 @@ def diagnostico() -> Dict[str, Any]:
         "choques_n": len(r.get("choques") or []),
         "errores_n": len(r.get("errores") or []),
     }
+
+
+# ===============================================================
+# FIN CAPACIDADES PÚBLICAS
+# ===============================================================
+    
 
 # ===============================================================
 # FIN REPORTING

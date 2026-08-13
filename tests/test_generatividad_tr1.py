@@ -9,54 +9,66 @@
 #   Ilver Villasmil). Este archivo audita; no diseña el módulo.
 # ---------------------------------------------------------------
 #
-# TR1
+# QUÉ ES TR1
 #   universo Θ
-#        → generación de pares
-#        → evaluación semántica de cada par
-#        → compatible / incompatible
-#        → novedoso / redundante (dentro de compatibles)
-#        → agregación
-#        → im_vs_theta
-#        → GENERATIVO / ESTANCADO
+#        ↓
+#   pares
+#        ↓
+#   clasificación semántica:
+#        compatible / incompatible
+#        novedoso / redundante
+#        ↓
+#   conteos agregados + identidades
+#        ↓
+#   Im(⊕) vs |Θ|
+#        ↓
+#   GENERATIVO / ESTANCADO
 #
-#   pares_compatibles (C), pares_incompatibles (I),
-#   pares_novedosos (N) y pares_redundantes (R) son el resultado
-#   agregado de esa clasificación semántica. No son números
-#   sin significado.
+#   La clasificación semántica es el contenido de TR1.
+#   Los campos pares_compatibles, pares_incompatibles,
+#   pares_novedosos y pares_redundantes son resultados de esa
+#   clasificación, no números aritméticos vacíos de significado.
 #
-# QUÉ VERIFICA ESTE TEST
-#   - Universo operativo válido (carga, coherencia, IDs, gobierna).
-#   - Generación de pares: T = n(n-1)/2.
-#   - Clasificación semántica agregada reportada por generatividad():
-#       C, I, N, R y sus invariantes C+I=T, N+R=C.
-#   - im_vs_theta coherente con N > theta_n.
-#   - Capa canónica: clasificación TR1 sobre THETA_24 produce
-#       exactamente 24 / 276 / 183 / 153 / 30 / 93.
-#   - ids_presentes / ids_faltantes vs recolectar().
-#   - Separación de capas y determinismo observable.
+# QUÉ CERTIFICA ESTE TEST
+#   1. Universo operativo válido (carga, coherencia, IDs, gobierna).
+#   2. Generación correcta del número de pares: T = n(n-1)/2.
+#   3. Salida agregada de la clasificación semántica TR1:
+#        C = pares clasificados compatibles
+#        I = pares clasificados incompatibles
+#        N = compatibles clasificados novedosos
+#        R = compatibles clasificados redundantes
+#   4. Conservación de esa clasificación:
+#        C + I = T
+#        N + R = C
+#   5. Consecuencia generativa:
+#        im_vs_theta coherente con novedosos > theta_n.
+#   6. Proxy de actividad (u1_proxy) respaldado por novedosos > 0.
+#   7. Capa canónica: clasificación TR1 sobre THETA_24 produce
+#        exactamente 24 / 276 / 183 / 153 / 30 / 93.
+#   8. ids_presentes / ids_faltantes contrastados con recolectar().
+#   9. Separación operativa / canónica.
+#  10. Determinismo.
 #
-# TRAZABILIDAD
-#   El test verifica la clasificación semántica agregada reportada
-#   por generatividad() y sus invariantes contractuales.
+# LIMITACIÓN DE OBSERVABILIDAD (no de significado)
+#   La API pública expone la clasificación de TR1 en forma agregada
+#   (conteos). Este test verifica esos resultados agregados, sus
+#   identidades y su consecuencia en im_vs_theta.
 #
-#   La superficie pública actual no expone la traza individual de
-#   cada par. Por ello, este test no puede auditar externamente la
-#   correspondencia entre cada par concreto y su clasificación.
+#   La API no expone la traza par-a-par, por lo que este test no
+#   reconstruye externamente qué clasificación recibió cada par
+#   individual sin reimplementar la lógica privada.
 #
-#   Esto NO permite concluir que generatividad() no ejecute la
-#   clasificación semántica. Los campos C, I, N y R pertenecen
-#   contractualmente a esa clasificación y este test verifica sus
-#   resultados agregados.
+#   Eso limita la trazabilidad externa.
+#   NO niega, NO elimina y NO pone fuera de alcance la clasificación
+#   semántica que generatividad() produce y reporta.
 #
-#   Tampoco permite concluir, únicamente a partir de los conteos,
-#   que cada clasificación individual sea correcta.
-#
-#   La limitación es de trazabilidad externa, no una redefinición
-#   del significado semántico de C, I, N y R.
+#   VALIDAR EL RESULTADO AGREGADO
+#          ≠
+#   RECONSTRUIR EXTERNAMENTE CADA CLASIFICACIÓN INDIVIDUAL
 #
 # REGLAS
-#   - No reimplementar _medir_pares ni la semántica de TR1.
-#   - No inventar campos públicos.
+#   - No reimplementar _medir_pares.
+#   - No inventar campos públicos inexistentes.
 #   - No modificar Engine, CONTENEDOR, THETA_24 ni módulos ajenos.
 # ===============================================================
 
@@ -69,9 +81,14 @@ def test_generatividad_tr1_contract():
     """
     Certificado contractual AX / TR1.
 
-    Verifica la clasificación semántica agregada reportada por
-    generatividad(), sus invariantes, im_vs_theta, la capa canónica
-    formal y el determinismo observable.
+    Verifica el universo operativo, la generación de pares, la salida
+    agregada de la clasificación semántica TR1, sus identidades, la
+    consecuencia en im_vs_theta, la capa canónica formal y el
+    determinismo.
+
+    No reimplementa _medir_pares.
+    No inventa campos.
+    No niega el significado semántico de los conteos reportados.
     """
 
     # -----------------------------------------------------------
@@ -180,6 +197,7 @@ def test_generatividad_tr1_contract():
             f"generatividad(): falta clave de contrato '{clave}'"
         )
 
+    # Cardinalidad del universo operativo
     assert g["theta_n"] == len(operativas), (
         "capa operativa: theta_n no coincide con |universo operativo| "
         f"{g['theta_n']} != {len(operativas)}"
@@ -216,8 +234,11 @@ def test_generatividad_tr1_contract():
     )
 
     # -----------------------------------------------------------
-    # NIVEL 3 — Clasificación semántica agregada (resultado TR1)
+    # NIVEL 3 — Clasificación TR1 agregada (resultado semántico)
     # -----------------------------------------------------------
+    # C, I, N, R son resultados de la clasificación semántica
+    # que generatividad() realizó sobre los pares del universo.
+    # Se verifican como tales, no como números vacíos.
     C = g["pares_compatibles"]
     I = g["pares_incompatibles"]
     N = g["pares_novedosos"]
@@ -228,11 +249,11 @@ def test_generatividad_tr1_contract():
     assert g["identidad_pares"] is True
     assert g["identidad_compatibles"] is True
     assert C + I == T, (
-        "capa operativa: clasificación agregada no conserva C+I=T "
+        "capa operativa: la clasificación agregada no conserva C+I=T "
         f"({C}+{I} != {T})"
     )
     assert N + R == C, (
-        "capa operativa: clasificación agregada no conserva N+R=C "
+        "capa operativa: la clasificación agregada no conserva N+R=C "
         f"({N}+{R} != {C})"
     )
     assert 0 <= N <= C
@@ -268,7 +289,7 @@ def test_generatividad_tr1_contract():
     )
 
     # -----------------------------------------------------------
-    # NIVEL 6 — Capa canónica
+    # NIVEL 6 — Capa canónica (clasificación TR1 sobre THETA_24)
     # -----------------------------------------------------------
     c = g["canonica"]
     assert isinstance(c, dict), "canonica debe ser dict"
@@ -311,6 +332,7 @@ def test_generatividad_tr1_contract():
             f"dominios_formales['{tid}'] != THETA_24"
         )
 
+    # Salida agregada de la clasificación TR1 sobre THETA_24
     assert c["pares_totales"] == 276
     assert c["pares_compatibles"] == 183
     assert c["pares_novedosos"] == 153
@@ -342,6 +364,7 @@ def test_generatividad_tr1_contract():
     )
     assert c["im_vs_theta"] == "GENERATIVO"
 
+    # ids_presentes / ids_faltantes vs universo real
     presentes = set(c["ids_presentes"])
     faltantes = set(c["ids_faltantes"])
     assert presentes.isdisjoint(faltantes)
@@ -359,16 +382,18 @@ def test_generatividad_tr1_contract():
         "ids_faltantes no coincide con THETA_24 − IDs reales"
     )
 
+    # Separación de capas
     assert c["theta_n"] == 24, (
         "separación: canónica debe permanecer en 24"
     )
 
+    # Proxy respaldado por alguna capa
     assert (
         g["pares_novedosos"] > 0 or c["pares_novedosos"] > 0
     ), "u1_proxy=NO_STAGNANT sin novedosos en ninguna capa"
 
     # -----------------------------------------------------------
-    # NIVEL 7 — Determinismo observable
+    # NIVEL 7 — Determinismo
     # -----------------------------------------------------------
     g2 = generatividad()
     for clave in metricas_op + (

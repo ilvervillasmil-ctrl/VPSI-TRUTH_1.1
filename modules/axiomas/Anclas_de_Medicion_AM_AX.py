@@ -63,7 +63,7 @@ CUERPO = {
         "contexto_AX",    # O_context, Def-5.3.1
         "indefinido_AX",  # indefinido ≠ 0
     ],
-    "aplica_a": ["calculator", "conteos", "correlacion_k", "coherencia", "logica"],
+    "govierna": ["calculator", "aplica_a", "correlacion_k", "coherencia", "logica"],
     "descripcion": (
         "Fija las anclas de inclusión, severidad y vacío que hacen "
         "reproducible el conteo de m,k,p,r,c,f. No altera la fórmula "
@@ -122,7 +122,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D1"],
-            "gobierna": ["conteos", "coherencia"],
+            "gobierna": ["aplica_a", "coherencia"],
             "enunciado": (
                 "AM-D2 (Compromiso de carga): Un compromiso de carga es solo "
                 "aquello que el mensaje adopta como propio de forma enunciada "
@@ -159,7 +159,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D1", "Def-5.2"],
-            "gobierna": ["conteos", "logica"],
+            "gobierna": ["aplica_a", "logica"],
             "enunciado": (
                 "AM-D3 (Posición sobre fijado): Una posición sobre fijado es "
                 "una toma de partido explícita del mensaje respecto de un punto "
@@ -182,7 +182,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D1", "Def-5.3", "Def-5.3.1"],
-            "gobierna": ["conteos", "correlacion_k"],
+            "gobierna": ["aplica_a", "correlacion_k"],
             "enunciado": (
                 "AM-D4 (Claim de correspondencia): Un claim de correspondencia "
                 "es una afirmación del mensaje que pretende corresponder a "
@@ -204,7 +204,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D2", "AM-D3", "AM-D4"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-D5 (Retícula de severidad): Los pesos parciales de k, r, f "
                 "pertenecen exclusivamente al conjunto "
@@ -240,7 +240,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D1", "indefinido_AX"],
-            "gobierna": ["conteos", "calculator"],
+            "gobierna": ["aplica_a", "calculator"],
             "enunciado": (
                 "AM-D6 (Base nula): Si m = 0, C no se define (no se asigna 1). "
                 "Si p = 0, L no se define. Si no hay O_context o c no es "
@@ -268,7 +268,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D2", "AM-D3", "AM-D4"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-A1 (Inclusión): Un elemento entra en m solo si satisface "
                 "AM-D2; en p solo si satisface AM-D3; en c solo si satisface "
@@ -288,7 +288,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D5"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-A2 (Severidad): Todo peso asignado a un elemento de k, r "
                 "o f pertenece a RETICULA_SEVERIDAD = {1/4, 1/2, 3/4, 1}. "
@@ -328,7 +328,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D2", "AM-D3", "AM-D4"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-A4 (Ortogonalidad): Un mismo evento causal se registra "
                 "una sola vez como origen. Puede derivar efectos en más de "
@@ -383,7 +383,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-A1", "AM-D2", "AM-D3", "AM-D4"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-L1: Bajo AM-A1, dos auditores que apliquen el mismo "
                 "cuerpo obtienen el mismo conjunto {m, p, c} para el mismo "
@@ -406,7 +406,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-A2", "AM-D5"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-L2: Con la retícula de AM-D5, el paso mínimo de C es "
                 "(1/4)/m = 1/(4m). Para obtener resolución 0.001 hace falta "
@@ -448,7 +448,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-A1", "AM-A2", "AM-L1"],
-            "gobierna": ["conteos", "calculator"],
+            "gobierna": ["aplica_a", "calculator"],
             "enunciado": (
                 "AM-T1 (Reproducibilidad): Si dos evaluadores aplican AM-A1 "
                 "y AM-A2 al mismo texto bajo el mismo O_context, obtienen "
@@ -523,7 +523,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-D2", "AM-A1"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-C1: Una propuesta, un acto de reformulación o una "
                 "invitación ('te propongo…', 'introduzcamos…') no incrementa "
@@ -540,7 +540,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             "polaridad": True,
             "cota": None,
             "depende_de": ["AM-L2", "AM-A2"],
-            "gobierna": ["conteos"],
+            "gobierna": ["aplica_a"],
             "enunciado": (
                 "AM-C2: La vía legítima hacia resolución 0.001 es aumentar "
                 "m, p, c mediante descomposición atómica bajo AM-A1, "

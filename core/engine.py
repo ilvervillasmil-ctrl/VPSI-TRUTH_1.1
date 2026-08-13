@@ -2080,10 +2080,80 @@ class Engine:
             )
 
             raise
+            
+# ===========================================================
+# Parte 33 — EJECUCIÓN CONTRACTUAL COMPLETA
+# ===========================================================
 
+def ejecutar_contrato(
+    self,
+    modulo_o_rol: Any,
+    capacidad: Optional[str] = None,
+    *args: Any,
+    **kwargs: Any
+) -> Any:
+    """
+    Ejecuta una capacidad declarada por el contrato del módulo.
+
+    Si se especifica 'capacidad', ejecuta únicamente esa capacidad.
+
+    Si no se especifica 'capacidad', ejecuta todas las capacidades
+    ejecutables declaradas por el contrato.
+
+    La ejecución material delega en ejecutar_capacidad(), que constituye
+    el núcleo único de invocación del Engine.
+    """
+
+    cont, error = self._resolver_contenedor(modulo_o_rol)
+
+    if cont is None:
+        raise KeyError(error)
+
+    # -------------------------------------------------------
+    # EJECUCIÓN DE UNA CAPACIDAD ESPECÍFICA
+    # -------------------------------------------------------
+
+    if capacidad is not None:
+
+        if capacidad not in cont.capacidades:
+            raise AttributeError(
+                f"El módulo '{cont.nombre}' no declara "
+                f"la capacidad '{capacidad}'."
+            )
+
+        return self.ejecutar_capacidad(
+            cont,
+            capacidad,
+            *args,
+            **kwargs
+        )
+
+    # -------------------------------------------------------
+    # EJECUCIÓN DE TODAS LAS CAPACIDADES DECLARADAS
+    # -------------------------------------------------------
+
+    resultados: Dict[str, Any] = {}
+
+    for nombre_capacidad in cont.capacidades.keys():
+
+        resultados[nombre_capacidad] = self.ejecutar_capacidad(
+            cont,
+            nombre_capacidad,
+            *args,
+            **kwargs
+        )
+
+    return {
+        "estado": "EXITO",
+        "modulo": cont.nombre,
+        "rol": cont.rol,
+        "id": cont.id,
+        "capacidades_ejecutadas": list(resultados.keys()),
+        "resultados": resultados,
+    }
 
 # ===========================================================
-# Parte 33 EXPORTACIONES
+# Parte 34 EXPORTACIONES
 # ===========================================================
 
 __all__ = [

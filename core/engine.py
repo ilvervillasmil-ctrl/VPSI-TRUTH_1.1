@@ -490,7 +490,7 @@ class Engine:
             "proposito": self.proposito,
             "clave": self.clave_proposito
         }
-    # ===========================================================
+        # ===========================================================
     # Parte 12.9 EJECUCIÓN DEL PROPÓSITO FUNDAMENTAL
     # ===========================================================
 
@@ -505,15 +505,8 @@ class Engine:
 
             CALCULAR LA VERDAD
 
-        La ejecución se realiza mediante las capacidades declaradas
-        contractualmente por los módulos del sistema.
-
-        El Engine no calcula una fórmula propia ni sustituye a los
-        módulos. Localiza la capacidad correspondiente al propósito
-        y delega su ejecución mediante el mecanismo contractual.
-
-        La entrada se entrega íntegramente a la capacidad encargada
-        del cálculo de verdad.
+        La ejecución se delega íntegramente en la capacidad
+        declarada contractualmente por los módulos del sistema.
         """
 
         if self.estado != ESTADO_OPERATIVO:
@@ -521,18 +514,15 @@ class Engine:
                 f"El Engine no está operativo. Estado actual: {self.estado}"
             )
 
-        # -------------------------------------------------------
-        # 12.9.1 LOCALIZACIÓN CONTRACTUAL DEL PROPÓSITO
-        # -------------------------------------------------------
-
         existencia = self.resolver_existencia(
             self.clave_proposito
         )
 
         if existencia.get("estado") != "EXISTE":
             raise RuntimeError(
-                f"La capacidad fundamental '{self.clave_proposito}' "
-                f"no existe en el repertorio contractual del Engine."
+                f"La capacidad fundamental "
+                f"'{self.clave_proposito}' no existe "
+                f"en el repertorio contractual."
             )
 
         modulo = existencia.get("modulo")
@@ -544,10 +534,6 @@ class Engine:
                 f"del propósito '{self.clave_proposito}'."
             )
 
-        # -------------------------------------------------------
-        # 12.9.2 EJECUCIÓN CONTRACTUAL REAL
-        # -------------------------------------------------------
-
         resultado = self.ejecutar_capacidad(
             modulo,
             capacidad,
@@ -555,10 +541,6 @@ class Engine:
             *args,
             **kwargs
         )
-
-        # -------------------------------------------------------
-        # 12.9.3 REGISTRO DEL RESULTADO DEL PROPÓSITO
-        # -------------------------------------------------------
 
         self.resultados_evaluacion.append({
             "clave_proposito": self.clave_proposito,

@@ -60,7 +60,7 @@ $$R = 30$$
 La ausencia de contradicciones entre estas relaciones no demuestra por sí sola la semántica externa de cada decisión.  
 Tampoco es correcto reducir el resultado a una simple coincidencia numérica.
 
-La batería utiliza el significado operacional de las categorías:
+La batería utiliza el significado operacional de las categorías:  
 **compatible** / **incompatible** / **novedoso** / **redundante**
 
 para verificar invariantes, cobertura, identidad y consistencia entre capas.
@@ -147,13 +147,7 @@ La ausencia de `g["traza"]` no significa que la decisión individual sea concept
 
 La decisión puede reconstruirse independientemente para cada par.
 
-Para cualquier:  
-**(A, B)**
-
-se obtiene:  
-**$D_A$, $D_B$**
-
-desde la especificación formal independiente.
+Para cualquier **(A, B)**, se obtiene **$D_A, D_B$** desde la especificación formal independiente.
 
 Después se aplica T15:
 
@@ -179,10 +173,7 @@ Cada decisión tiene la forma:
 ↓  
 **primaria / secundaria**  
 
-Los agregados:  
-**183 / 93 / 153 / 30**
-
-son consecuencias de esas 276 decisiones. No son la fuente primaria de la reconstrucción.
+Los agregados **183 / 93 / 153 / 30** son consecuencias de esas 276 decisiones. No son la fuente primaria de la reconstrucción.
 
 ---
 
@@ -261,11 +252,9 @@ La estructura requerida es:
 ↓  
 **agregación**  
 
-La superficie pública actual no expone:  
-`id_a`, `id_b`, `primaria`, `secundaria` por cada par.
+La superficie pública actual no expone `id_a`, `id_b`, `primaria`, `secundaria` por cada par.
 
-Por ello:  
-**TRAZABILIDAD INDIVIDUAL NO OBSERVABLE** es un hallazgo arquitectónico de auditabilidad.
+Por ello, **TRAZABILIDAD INDIVIDUAL NO OBSERVABLE** es un hallazgo arquitectónico de auditabilidad.
 
 No debe etiquetarse como:
 - fallo semántico
@@ -279,7 +268,7 @@ No debe etiquetarse como:
 **Test:** `tests/test_3oracle_semantico_tr1.py`
 
 Este nivel responde una pregunta distinta:  
-Si no se utiliza el clasificador de producción, ¿puede derivarse independientemente qué debería ocurrir con cada uno de los 276 pares?
+*Si no se utiliza el clasificador de producción, ¿puede derivarse independientemente qué debería ocurrir con cada uno de los 276 pares?*
 
 Respuesta medida: **sí**.
 
@@ -359,8 +348,7 @@ La reconstrucción independiente ya existe. Lo que falta es una superficie contr
 
 Este es el nivel máximo de la batería.
 
-La afirmación que debe verificarse es:  
-para todo $(A, B) \in C(\Theta_{24}, 2)$:
+La afirmación que debe verificarse es que para todo $(A, B) \in C(\Theta_{24}, 2)$:
 
 $$\text{decisión\_publicada}(A, B) = \text{decisión\_esperada}(A, B)$$
 
@@ -380,10 +368,7 @@ La comparación correcta es:
 
 ## 12. Condiciones necesarias para ejecutar el Nivel 5
 
-Cuando exista:  
-`canonica["traza"]`
-
-el **TEST 3** deberá exigir simultáneamente:
+Cuando exista `canonica["traza"]`, el **TEST 3** deberá exigir simultáneamente:
 - `len(traza) == 276`
 - cobertura exacta de los 24 IDs
 - cobertura exacta de $C(24,2)$
@@ -396,27 +381,19 @@ y, para cada par:
 $$\text{primaria\_publicada} == \text{primaria\_esperada}$$
 $$\text{secundaria\_publicada} == \text{secundaria\_esperada}$$
 
-No basta con que los agregados continúen siendo:  
-**183 / 93 / 153 / 30**
-
+No basta con que los agregados continúen siendo **183 / 93 / 153 / 30**.  
 En este nivel, los agregados deben ser consecuencias de las 276 comparaciones individuales.
 
 ---
 
 ## 13. Por qué los agregados no son evidencia primaria del Nivel 5
 
-Dos sistemas diferentes podrían producir:
-- 183 compatibles
-- 93 incompatibles
-- 153 novedosos
-- 30 redundantes
-
-y, sin embargo, diferir en cuáles pares recibieron cada clasificación.
+Dos sistemas diferentes podrían producir 183 compatibles, 93 incompatibles, 153 novedosos y 30 redundantes, y, sin embargo, diferir en cuáles pares recibieron cada clasificación.
 
 Por tanto:
 
-* **Igualdad de agregados:** Coincidencia global
-* **Igualdad de las 276 decisiones:** Correspondencia individual
+* **Igualdad de agregados:** Coincidencia global.
+* **Igualdad de las 276 decisiones:** Correspondencia individual.
 
 El Nivel 5 exige la segunda.
 
@@ -450,11 +427,7 @@ En el run actual, la cadena llega hasta:
 ↕  
 **agregados canónicos**  
 
-La arista:
-
-**decisión esperada $\leftrightarrow$ decisión publicada**
-
-queda definida, pero no ejecutable por falta de exposición contractual de la decisión individual.
+La arista **decisión esperada $\leftrightarrow$ decisión publicada** queda definida, pero no ejecutable por falta de exposición contractual de la decisión individual.
 
 ---
 
@@ -523,9 +496,7 @@ Para preservar independencia semántica, **TEST 3** excluye:
 - clasificadores privados
 - rutas de producción que ya hayan generado la decisión
 
-Tampoco utiliza:  
-`canonica["dominios_formales"]`  
-como fuente independiente si dicha estructura procede de la misma ruta semántica que se pretende contrastar.
+Tampoco utiliza `canonica["dominios_formales"]` como fuente independiente si dicha estructura procede de la misma ruta semántica que se pretende contrastar.
 
 La capa canónica se utiliza como superficie de comparación, no como fuente del oracle.
 
@@ -546,21 +517,18 @@ La razón del estado del Nivel 5 es exclusivamente la ausencia de una superficie
 ## 19. Qué demuestra realmente el run
 
 El run demuestra simultáneamente:
-1. coherencia contractual de la implementación;
-2. coherencia de las invariantes;
-3. estabilidad/determinismo de las superficies auditadas;
-4. correspondencia de la capa canónica con los valores formales;
-5. existencia de una reconstrucción semántica independiente;
-6. reproducción independiente de los 276 pares;
-7. coincidencia de los agregados independientes con la capa canónica;
-8. existencia de una especificación precisa para la verificación semántica individual de Nivel 5.
+1. Coherencia contractual de la implementación.
+2. Coherencia de las invariantes.
+3. Estabilidad/determinismo de las superficies auditadas.
+4. Correspondencia de la capa canónica con los valores formales.
+5. Existencia de una reconstrucción semántica independiente.
+6. Reproducción independiente de los 276 pares.
+7. Coincidencia de los agregados independientes con la capa canónica.
+8. Existencia de una especificación precisa para la verificación semántica individual de Nivel 5.
 
-No debe afirmarse todavía:  
-*las 276 decisiones de producción fueron verificadas individualmente contra el oracle*  
-porque la superficie contractual actual no permite observarlas.
+No debe afirmarse todavía: *las 276 decisiones de producción fueron verificadas individualmente contra el oracle* porque la superficie contractual actual no permite observarlas.
 
-La afirmación correcta es:  
-*las 276 decisiones esperadas pueden reconstruirse independientemente y sus agregados coinciden exactamente con la capa canónica; la confrontación individual queda definida contractualmente para cuando la decisión publicada sea observable.*
+La afirmación correcta es: *las 276 decisiones esperadas pueden reconstruirse independientemente y sus agregados coinciden exactamente con la capa canónica; la confrontación individual queda definida contractualmente para cuando la decisión publicada sea observable.*
 
 ---
 
@@ -575,8 +543,7 @@ El Nivel 5 solamente podrá declararse **DEMOSTRADO** cuando:
 6. T15 produzca la decisión esperada;
 7. $\text{decisión esperada} == \text{decisión publicada}$ para los 276 pares.
 
-Solamente después de completar esas 276 comparaciones podrá afirmarse:  
-**VERIFICACIÓN SEMÁNTICA INDIVIDUAL 276/276**
+Solamente después de completar esas 276 comparaciones podrá afirmarse: **VERIFICACIÓN SEMÁNTICA INDIVIDUAL 276/276**.
 
 Los agregados (**183 / 93 / 153 / 30**) deberán entonces recalcularse desde esas 276 decisiones verificadas, no utilizarse como sustituto de ellas.
 
@@ -623,9 +590,7 @@ Un cuerpo formal independiente reconstruye las mismas 276 decisiones sin reutili
 Por tanto, existe una vía independiente de reconstrucción semántica.
 
 El último salto no es reconstruir la semántica.  
-El último salto es observar simultáneamente:  
-$\text{decisión esperada}$ y $\text{decisión publicada}$  
-para el mismo par $(A, B)$.
+El último salto es observar simultáneamente **decisión esperada** y **decisión publicada** para el mismo par $(A, B)$.
 
 Ese salto constituye el Nivel 5:
 
@@ -657,7 +622,7 @@ El run actual deja este último enlace formalmente definido, pero no ejecutado p
 * **T:** `pares_totales`. Número total de pares del universo considerado.
 * **C:** `pares_compatibles`. Pares con intersección de dominios no vacía.
 * **I:** `pares_incompatibles`. Pares con intersección de dominios vacía.
-* **N:** `pares_novedosos`. Compatibles cuya unión crece strictly respecto de ambos dominios.
+* **N:** `pares_novedosos`. Compatibles cuya unión crece estrictamente respecto de ambos dominios.
 * **R:** `pares_redundantes`. Compatibles sin crecimiento estricto en ambos lados (subsunción).
 * **$C + I = T$:** Invariante primaria: todo par es compatible o incompatible; no hay terceros.
 * **$N + R = C$:** Invariante secundaria: todo compatible es novedoso o redundante.

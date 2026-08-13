@@ -2,7 +2,7 @@
   "coherente": true,
   "choques": [],
   "errores": [],
-  "declaraciones": 692,
+  "declaraciones": 704,
   "cuerpos": [
     "Anclas_de_Medicion_AM_AX",
     "VPSI_AX",
@@ -12,6 +12,7 @@
     "entendimiento_fractal_AX",
     "estructura_pensamiento_AX",
     "indefinido_AX",
+    "ley_coherencia_AX",
     "metaconciencia_AX",
     "peticion_anuncio_AX",
     "realidad_AX",
@@ -27,11 +28,11 @@
     "teorema_luz_AX"
   ],
   "por_tipo": {
-    "axioma": 212,
-    "lema": 83,
-    "teorema": 148,
-    "corolario": 158,
-    "definicion": 91
+    "axioma": 215,
+    "lema": 85,
+    "teorema": 150,
+    "corolario": 161,
+    "definicion": 93
   },
   "ids_dominio_k_o": [
     "A1",
@@ -202,6 +203,18 @@
     "IND-L4",
     "IND-T1",
     "IV",
+    "LC-A1",
+    "LC-A2",
+    "LC-A3",
+    "LC-C1",
+    "LC-C2",
+    "LC-C3",
+    "LC-D1",
+    "LC-D2",
+    "LC-L1",
+    "LC-L2",
+    "LC-T1",
+    "LC-T2",
     "M.1",
     "MC-A1",
     "MC-A2",

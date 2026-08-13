@@ -145,6 +145,89 @@ jobs:
           EOF
 
       # ==========================================================
+      # 5b. COMPUERTA — GENERATIVIDAD (TR1 operativa + canónica)
+      # ==========================================================
+      - name: Generatividad (TR1 operativa + canónica)
+        run: |
+          python - <<'EOF'
+          import sys, json
+          from pathlib import Path
+          sys.path.insert(0, ".")
+
+          from modules.axiomas import generatividad
+
+          g = generatividad()
+          Path("diagnostics").mkdir(exist_ok=True)
+          Path("diagnostics/generatividad_report.json").write_text(
+              json.dumps(g, indent=2, ensure_ascii=False, default=str),
+              encoding="utf-8",
+          )
+
+          print("=" * 60)
+          print("GENERATIVIDAD — capa OPERATIVA (cuerpo real del repo)")
+          print("=" * 60)
+          print(f"theta_n              : {g.get('theta_n')}")
+          print(f"pares_totales        : {g.get('pares_totales')}")
+          print(f"pares_compatibles    : {g.get('pares_compatibles')}")
+          print(f"pares_novedosos      : {g.get('pares_novedosos')}")
+          print(f"pares_redundantes    : {g.get('pares_redundantes')}")
+          print(f"pares_incompatibles  : {g.get('pares_incompatibles')}")
+          print(f"im_vs_theta          : {g.get('im_vs_theta')}")
+          print(f"u1_proxy             : {g.get('u1_proxy')}")
+          print(f"identidad_pares      : {g.get('identidad_pares')}")
+          print(f"identidad_compatibles: {g.get('identidad_compatibles')}")
+          print(f"por_tipo_theta       : {g.get('por_tipo_theta')}")
+          print()
+
+          can = g.get("canonica") or {}
+          print("=" * 60)
+          print("GENERATIVIDAD — capa CANÓNICA TR1 (Cuadro 4 del paper)")
+          print("=" * 60)
+          print(f"theta_n              : {can.get('theta_n')}")
+          print(f"pares_totales        : {can.get('pares_totales')}")
+          print(f"pares_compatibles    : {can.get('pares_compatibles')}")
+          print(f"pares_novedosos      : {can.get('pares_novedosos')}")
+          print(f"pares_redundantes    : {can.get('pares_redundantes')}")
+          print(f"pares_incompatibles  : {can.get('pares_incompatibles')}")
+          print(f"im_vs_theta          : {can.get('im_vs_theta')}")
+          print(f"identidad_pares      : {can.get('identidad_pares')}")
+          print(f"identidad_compatibles: {can.get('identidad_compatibles')}")
+          print(f"coincide_paper       : {can.get('coincide_paper')}")
+          print(f"ids_presentes (n)    : {len(can.get('ids_presentes') or [])}")
+          print(f"ids_faltantes        : {can.get('ids_faltantes')}")
+          print()
+
+          # Fallo solo si la capa canónica rompe identidades o no coincide
+          # con la enumeración formal del paper (CI cuenta, no inventa).
+          fallos = []
+          if not can.get("identidad_pares"):
+              fallos.append("canónica: compatibles+incompatibles != totales")
+          if not can.get("identidad_compatibles"):
+              fallos.append("canónica: novedosos+redundantes != compatibles")
+          if not can.get("coincide_paper"):
+              fallos.append(
+                  "canónica no reproduce Cuadro 3: "
+                  f"C={can.get('pares_compatibles')} N={can.get('pares_novedosos')} "
+                  f"R={can.get('pares_redundantes')} I={can.get('pares_incompatibles')} "
+                  "(esperado 183/153/30/93)"
+              )
+          if not g.get("identidad_pares"):
+              fallos.append("operativa: compatibles+incompatibles != totales")
+          if not g.get("identidad_compatibles"):
+              fallos.append("operativa: novedosos+redundantes != compatibles")
+
+          if fallos:
+              print("FALLO generatividad:")
+              for f in fallos:
+                  print("  -", f)
+              sys.exit(1)
+
+          print("OK  generatividad coherente (operativa + canónica TR1)")
+          print("    depositado: diagnostics/generatividad_report.json")
+          EOF
+          
+
+      # ==========================================================
       # 6. COMPUERTA 3 --- PROHIBICIÓN DE COMPONENTES ESTOCÁSTICOS
       # ==========================================================
       - name: Prohibición de componentes estocásticos

@@ -587,3 +587,82 @@ El run actual deja este último enlace formalmente definido, pero no ejecutado p
 
 Fin del estudio.
 
+# ANEXO A — GLOSARIO DE TÉRMINOS Y SÍMBOLOS
+## RED NAME — TR1 GENERATIVIDAD
+
+| Término / símbolo | Significado |
+|-------------------|-------------|
+| **Θ** | Universo formal de teoremas del framework. En la capa canónica, \(\lvert\Theta\rvert = 24\). |
+| **Θ24** | Conjunto canónico de 24 elementos: T1–T17, U0, U1, M1, M.1, B-Canonical, TT.6.1, TR1. |
+| **\(\lvert\Theta\rvert\)** | Cardinalidad de Θ. Valor canónico: 24. |
+| **C(n, 2)** | Número de pares no ordenados de n elementos. \(C(24,2) = 276\). |
+| **T** | `pares_totales`. Número total de pares del universo considerado. |
+| **C** | `pares_compatibles`. Pares con intersección de dominios no vacía. |
+| **I** | `pares_incompatibles`. Pares con intersección de dominios vacía. |
+| **N** | `pares_novedosos`. Compatibles cuya unión crece estrictamente respecto de ambos dominios. |
+| **R** | `pares_redundantes`. Compatibles sin crecimiento estricto en ambos lados (subsunción). |
+| **C + I = T** | Invariante primaria: todo par es compatible o incompatible; no hay terceros. |
+| **N + R = C** | Invariante secundaria: todo compatible es novedoso o redundante. |
+| **\(D_i\)** | Dominio formal del elemento \(i\). Subconjunto de {ONT, INF, LOG, EPI, SEM, TMP, MET}. |
+| **\(D_A\), \(D_B\)** | Dominios formales de los elementos A y B de un par. |
+| **\(D_A \cap D_B\)** | Intersección de dominios. Vacía ⇒ incompatible; no vacía ⇒ compatible. |
+| **\(D_A \cup D_B\)** | Unión de dominios. Base de la distinción novedoso / redundante. |
+| **\(D_A \cup D_B \supset D_A\)** | La unión es estrictamente mayor que \(D_A\) (A aporta algo nuevo al otro). |
+| **⊃** | Inclusión estricta de conjuntos. |
+| **∅** | Conjunto vacío. |
+| **T15** | Teorema 15: emergencia estructural vía recombinación invariante. Regla formal de clasificación de pares. |
+| **TR1** | Teorema de generatividad estructural: \(\lvert\mathrm{Im}(\oplus)\rvert > \lvert\Theta\rvert\). |
+| **⊕** | Operador de recombinación entre elementos de Θ. Definido solo si \(D_i \cap D_j \neq \emptyset\). |
+| **Im(⊕)** | Imagen del operador de recombinación. Conjunto de proposiciones generadas. |
+| **compatible** | Clasificación primaria: \(D_A \cap D_B \neq \emptyset\). |
+| **incompatible** | Clasificación primaria: \(D_A \cap D_B = \emptyset\). Secundaria = None. |
+| **novedoso** | Clasificación secundaria: compatible y la unión crece estrictamente respecto de ambos. |
+| **redundante** | Clasificación secundaria: compatible sin crecimiento estricto en ambos lados. |
+| **primaria** | Etiqueta de primer nivel de un par: `compatible` o `incompatible`. |
+| **secundaria** | Etiqueta de segundo nivel: `novedoso`, `redundante` o `None`. |
+| **theta_n** | Cardinalidad del universo medido por `generatividad()` en una capa. |
+| **im_vs_theta** | Relación imagen vs. Θ. Valores: `GENERATIVO`, `ESTANCADO`, `SIN_DATOS`. |
+| **GENERATIVO** | Estado en el que el número de novedosos supera \(\lvert\Theta\rvert\). |
+| **u1_proxy** | Indicador de no-estancamiento. Valor medido: `NO_STAGNANT`. |
+| **identidad_pares** | Determinismo: dos llamadas producen el mismo conjunto de pares. |
+| **identidad_compatibles** | Determinismo: dos llamadas producen el mismo conjunto de compatibles. |
+| **coincide_paper** | Indicador de que la capa canónica reproduce los valores del paper. |
+| **capa operativa** | Universo real del repositorio (en el run: 297 elementos). |
+| **capa canónica** | Universo formal Θ24 usado para comparación con la especificación. |
+| **capa formal independiente** | Fuente de \(D_i\) externa al clasificador de producción (Cuadro 4 del paper). |
+| **oracle** | Procedimiento que, desde la fuente formal y T15, produce decisión esperada por par. |
+| **decisión esperada** | Clasificación obtenida por el oracle independiente para un par (A, B). |
+| **decisión publicada** | Clasificación expuesta por producción para el mismo par, cuando sea observable. |
+| **traza** | Superficie pública de decisiones individuales por par (`id_a`, `id_b`, `primaria`, `secundaria`). |
+| **canonica["traza"]** | Traza de la capa canónica. Ausente en el run de referencia. |
+| **g["traza"]** | Eventual traza en la raíz de `generatividad()`. No se usa para comparar Θ24. |
+| **gobierna** | Campo de declaración que lista dominios/módulos gobernados. No se usa como \(D_i\) del oracle. |
+| **dominios_formales** | Estructura de dominios en producción. No se usa como fuente del oracle si procede de la misma ruta clasificadora. |
+| **_medir_pares** | Función interna de clasificación de producción. Excluida del oracle. |
+| **generatividad()** | Capacidad pública que mide generatividad operativa y canónica. |
+| **recolectar()** | Carga y normaliza declaraciones del módulo. |
+| **barrer()** | Verifica coherencia interna de declaraciones. |
+| **ONT** | Dominio formal: ontología. |
+| **INF** | Dominio formal: información. |
+| **LOG** | Dominio formal: lógica. |
+| **EPI** | Dominio formal: epistemología. |
+| **SEM** | Dominio formal: semántica. |
+| **TMP** | Dominio formal: temporal. |
+| **MET** | Dominio formal: meta. |
+| **Cuadro 4** | Tabla del paper *Principle of Structural Invariance* con la asignación formal \(ID \mapsto D_i\) de los 24 elementos. |
+| **Cuadro 3** | Enumeración exhaustiva de pares de recombinación para \(\lvert\Theta\rvert = 24\). |
+| **Nivel 1** | Coherencia contractual de agregados. |
+| **Nivel 2** | Coherencia estructural e invariantes. |
+| **Nivel 3** | Observabilidad de la decisión individual. |
+| **Nivel 4** | Reconstrucción semántica independiente. |
+| **Nivel 5** | Verificación semántica par-a-par (276/276). |
+| **DEMOSTRADO** | Afirmación verificada por el run de referencia. |
+| **NO OBSERVABLE** | Superficie pública ausente; no es fallo semántico. |
+| **DEFINIDO / NO EJECUTADO** | Criterio formal establecido; comparación individual aún no ejecutable. |
+| **PASS** | Asserts del test cumplidos. |
+| **FAIL** | Asserts del test no cumplidos. |
+| **run de referencia** | Ejecución CI asociada al commit `e98adb7…` con 742 passed. |
+
+---
+
+**Fin del Anexo A.**

@@ -416,7 +416,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
         "buscar_por_id": {
             "descripcion": "Busca y cita una declaración por su id.",
-            "entrada": "id_decl: str", "acceso_archivos", 
+            "entrada": "id_decl: str",
             "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "dict de la declaración o None",
             "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA

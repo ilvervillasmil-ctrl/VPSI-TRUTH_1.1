@@ -1,89 +1,589 @@
-Esa comparación individual requiere una decisión obtenida por la vía operacional mapeable al mismo par.  
-En este run esa superficie pública no está presente; el Nivel 5 queda definido, no ejecutado sobre 276/276.
+# RED NAME — TR1 GENERATIVIDAD
+## Estudio formal · coherencia · trazabilidad · reconstrucción semántica independiente
 
-Cuando exista `canonica["traza"]`, el TEST 3 ya exige:
+**SPEC**
+- TEST-GENERATIVIDAD-TR1
+- TEST-TRAZABILIDAD-TR1
+- TEST-ORACLE-SEMANTICO-TR1
 
-- comparación **solo** contra la capa canónica (no contra traza operativa)
-- `len(traza) == 276`
-- cobertura exacta de Θ24
-- esquema completo por entrada
-- igualdad par-a-par de primaria y secundaria
-
-Los agregados `183/93/153/30` pasan entonces a ser **consecuencia** de las 276 verificaciones individuales, no evidencia primaria.
-
----
-
-## 4. Valores medidos en el run de referencia
-
-### Capa operativa (cuerpo real del repo)
-
-| Campo | Valor |
-|-------|------:|
-| `theta_n` | 297 |
-| `pares_totales` | 43956 |
-| `pares_compatibles` | 11506 |
-| `pares_novedosos` | 7047 |
-| `pares_redundantes` | 4459 |
-| `pares_incompatibles` | 32450 |
-| `im_vs_theta` | GENERATIVO |
-| `u1_proxy` | NO_STAGNANT |
-| `identidad_pares` | True |
-| `identidad_compatibles` | True |
-
-### Capa canónica TR1
-
-| Campo | Valor |
-|-------|------:|
-| `theta_n` | 24 |
-| `pares_totales` | 276 |
-| `pares_compatibles` | 183 |
-| `pares_novedosos` | 153 |
-| `pares_redundantes` | 30 |
-| `pares_incompatibles` | 93 |
-| `im_vs_theta` | GENERATIVO |
-| `identidad_pares` | True |
-| `identidad_compatibles` | True |
-| `coincide_paper` | True |
-| `ids_presentes` | 24 |
-| `ids_faltantes` | [] |
-
-### Oracle independiente (TEST 3)
-
-| Campo | Valor |
-|-------|------:|
-| pares enumerados | 276 |
-| compatibles | 183 |
-| incompatibles | 93 |
-| novedosos | 153 |
-| redundantes | 30 |
-| igualdad de agregados con `canonica` | True |
+**Revisión:** 2026-08-13  
+**Commit CI de referencia:** `e98adb7b30e4a959e7238e7be61a68816b0b3c4e`  
+**Resultado medido del run:** 742 passed · 0 failed · 0 skipped  
 
 ---
 
-## 5. Determinismo
+## 1. Objeto del estudio
 
-Los tests TR1 son deterministas:
+Esta batería no constituye un único test ni una única afirmación.
 
-- no usan muestreo aleatorio
-- no usan semillas variables
-- enumeran el universo canónico completo (`C(24,2) = 276`)
-- comparan valores publicados por `generatividad()` contra constantes formales y contra el oracle
+Establece una cadena de verificación separada en niveles:
 
-En el run medido: `identidad_pares = True`, `identidad_compatibles = True`.
+| Nivel | Contenido |
+|------:|-----------|
+| 1 | Coherencia contractual de los agregados publicados |
+| 2 | Coherencia estructural e invariantes del universo operativo y de la capa canónica |
+| 3 | Observabilidad de la decisión individual |
+| 4 | Reconstrucción semántica independiente de las decisiones individuales mediante fuente formal externa a la implementación |
+| 5 | Confrontación par-a-par entre decisión esperada y decisión publicada |
 
----
+El Nivel 5 constituye la verificación semántica individual máxima.
 
-## 6. Separación de conceptos que no deben confundirse
+En el run de referencia, el Nivel 5 queda definido contractualmente, pero no puede ejecutarse sobre 276/276 porque la superficie pública actual no expone la decisión individual de cada par.
 
-| Concepto | Estado en este run |
-|----------|--------------------|
-| Observabilidad de traza pública | No existe (`canonica["traza"]` ausente) |
-| Reconstrucción independiente de la decisión | Sí existe (Cuadro 4 + T15 → 276 decisiones) |
-| Igualdad de agregados oracle ↔ `canonica` | Demostrada |
-| Igualdad par-a-par oracle ↔ producción | Definida como Nivel 5; no ejecutada sin decisión obtenida comparable |
-| Uso de `gobierna` o `dominios_formales` de producción como \(D_i\) | Excluido (circularidad de fuente) |
-| Comparación de oracle Θ24 contra traza operativa | Excluida (universos distintos) |
+Eso no invalida los niveles anteriores.  
+Tampoco convierte la ausencia de superficie de traza en un fallo semántico.
 
 ---
 
-## 7. Cadena contractual
+## 2. Qué significa coherencia en esta batería
+
+El resultado:
+
+```text
+742 passed · 0 failed · 0 skipped
+no debe describirse únicamente como “los tests pasaron”.
+La batería demuestra que el cuerpo contractual sometido a prueba mantiene simultáneamente sus relaciones internas bajo ejecución.
+En particular:
+C + I = T
+N + R = C
+y, para la capa canónica:
+|Θ| = 24
+C(24,2) = 276
+C = 183
+I = 93
+N = 153
+R = 30
+La ausencia de contradicciones entre estas relaciones no demuestra por sí sola la semántica externa de cada decisión.
+Tampoco es correcto reducir el resultado a una simple coincidencia numérica.
+La batería utiliza el significado operacional de las categorías
+compatible / incompatible / novedoso / redundante
+para verificar invariantes, cobertura, identidad y consistencia entre capas.
+La semántica de los objetos auditados es, por tanto, una condición necesaria para interpretar correctamente qué está siendo verificado.
+
+3. Arquitectura de las capas
+3.1 Capa operacional
+Es el cuerpo real producido por el repositorio.
+En el run de referencia:
+Campo
+Valor
+theta_n
+297
+pares_totales
+43956
+pares_compatibles
+11506
+pares_novedosos
+7047
+pares_redundantes
+4459
+pares_incompatibles
+32450
+Esta capa representa el universo operacional completo del repositorio. No debe mezclarse con Θ24.
+3.2 Capa canónica
+La capa canónica fija el universo formal de TR1:
+|Θ| = 24
+C(24,2) = 276
+con los valores:
+Campo
+Valor
+compatibles
+183
+incompatibles
+93
+novedosos
+153
+redundantes
+30
+La capa canónica funciona como superficie de comparación con la especificación formal.
+3.3 Capa formal independiente
+La reconstrucción semántica independiente no obtiene (D_i) de:
+	•	gobierna
+	•	_medir_pares
+	•	generatividad()
+	•	canonica["dominios_formales"]
+cuando cualquiera de ellos proceda de la misma ruta clasificadora que se pretende verificar.
+Los (D_i) se obtienen del cuerpo formal independiente:
+Cuadro 4
+Principle of Structural Invariance
+y se aplica directamente la regla formal TR1/T15.
+La independencia es la separación entre:
+FUENTE FORMAL
+      ↓
+    D_i
+      ↓
+   T15/TR1
+      ↓
+decisión esperada
+y:
+IMPLEMENTACIÓN
+      ↓
+clasificador operacional
+      ↓
+decisión publicada
+
+4. Reconstrucción semántica individual
+La ausencia de g["traza"] no significa que la decisión individual sea conceptualmente irrecuperable.
+La decisión puede reconstruirse independientemente para cada par.
+Para cualquier:
+(A, B)
+se obtiene:
+D_A
+D_B
+desde la especificación formal independiente.
+Después se aplica T15:
+Condición
+Resultado
+(D_A \cap D_B = \emptyset)
+incompatible
+(D_A \cap D_B \neq \emptyset)
+compatible
+compatible y (D_A \cup D_B \supset D_A) y (D_A \cup D_B \supset D_B)
+novedoso
+compatible en cualquier otro caso
+redundante
+Por tanto, el oracle no solamente produce cinco números finales.
+Produce una decisión semántica individual para cada uno de los:
+C(24,2) = 276
+pares.
+Cada decisión tiene la forma:
+(A, B)
+   ↓
+D_A, D_B
+   ↓
+TR1 / T15
+   ↓
+primaria
+secundaria
+Los agregados:
+183 / 93 / 153 / 30
+son consecuencias de esas 276 decisiones. No son la fuente primaria de la reconstrucción.
+
+5. Independencia semántica
+La independencia exigida no significa que los conceptos de TR1/T15 sean desconocidos por el repositorio.
+Significa que la derivación que produce la decisión esperada no depende del clasificador cuya salida se pretende auditar.
+El oracle no debe:
+	•	importar generatividad()
+	•	importar _medir_pares
+	•	reutilizar el clasificador operacional
+	•	utilizar gobierna como sustituto de (D_i)
+	•	utilizar una estructura producida por la misma ruta semántica
+El oracle debe efectuar una derivación independiente:
+fuente formal
+      ↓
+dominios D_i
+      ↓
+intersección
+      ↓
+unión
+      ↓
+regla T15
+      ↓
+clasificación esperada
+
+6. Nivel 1 — Coherencia contractual
+Test: tests/test_generatividad_tr1.py
+Pregunta: ¿La implementación publica agregados que satisfacen sus invariantes contractuales?
+Verifica:
+	•	theta_n
+	•	pares_totales
+	•	pares_compatibles
+	•	pares_incompatibles
+	•	pares_novedosos
+	•	pares_redundantes
+	•	im_vs_theta
+	•	identidad_pares
+	•	identidad_compatibles
+Invariantes:
+C + I = T
+N + R = C
+También verifica la capa canónica:
+24 / 276 / 183 / 153 / 30 / 93
+Este nivel demuestra coherencia contractual. No constituye todavía una demostración par-a-par.
+
+7. Nivel 2 — Observabilidad y trazabilidad
+Tests:
+	•	tests/test_2trazabilidad_tr1.py
+	•	tests/test_trazabilidad_tr1.py
+Pregunta: ¿La superficie pública permite seguir una decisión individual?
+La estructura requerida es:
+(A, B)
+   ↓
+decisión primaria
+   ↓
+decisión secundaria
+   ↓
+agregación
+La superficie pública actual no expone:
+id_a
+id_b
+primaria
+secundaria
+por cada par.
+Por ello:
+TRAZABILIDAD INDIVIDUAL NO OBSERVABLE
+es un hallazgo arquitectónico de auditabilidad.
+No debe etiquetarse como:
+	•	fallo semántico
+	•	contradicción
+	•	inconsistencia de producción
+
+8. Nivel 3 — Reconstrucción formal independiente
+Test: tests/test_3oracle_semantico_tr1.py
+Este nivel responde una pregunta distinta:
+Si no se utiliza el clasificador de producción, ¿puede derivarse independientemente qué debería ocurrir con cada uno de los 276 pares?
+Respuesta medida: sí.
+El oracle:
+	1	fija Θ24 formal;
+	2	asigna (D_i) desde la fuente formal independiente;
+	3	enumera C(24,2) = 276 pares;
+	4	aplica T15 a cada par;
+	5	produce una decisión esperada individual;
+	6	deriva los agregados de esas decisiones.
+Resultado:
+Campo
+Valor
+decisiones
+276
+compatibles
+183
+incompatibles
+93
+novedosas
+153
+redundantes
+30
+
+9. Validación cruzada de agregados
+Una vez construidas independientemente las 276 decisiones, sus agregados producen:
+276
+183
+93
+153
+30
+La capa canónica de producción publica exactamente:
+276
+183
+93
+153
+30
+Por tanto:
+ORACLE INDEPENDIENTE
+        ↓
+   276 decisiones
+        ↓
+   agregación
+        ↓
+276 / 183 / 93 / 153 / 30
+        ↕
+CAPA CANÓNICA
+        ↓
+276 / 183 / 93 / 153 / 30
+Esta coincidencia constituye una validación cruzada independiente de los agregados.
+Debe quedar explícitamente establecido:
+coincidencia de agregados
+≠
+comparación individual de producción
+
+10. Nivel 4 — Trazabilidad semántica reconstruida
+Este nivel distingue dos hechos:
+A. La decisión esperada puede reconstruirse. B. La decisión publicada por producción no puede actualmente observarse par-a-par.
+Estado actual:
+(A, B)
+   ↓
+D_A, D_B
+   ↓
+T15
+   ↓
+decisión esperada
+   ↓
+[superficie pública ausente]
+   X
+decisión publicada
+La X representa una limitación de observabilidad, no una contradicción semántica.
+La reconstrucción independiente ya existe. Lo que falta es una superficie contractual que permita poner ambos resultados uno frente al otro.
+
+11. Nivel 5 — Verificación semántica par-a-par
+Este es el nivel máximo de la batería.
+La afirmación que debe verificarse es:
+para todo (A, B) ∈ C(Θ24, 2):
+
+    decisión_publicada(A, B)
+    =
+    decisión_esperada(A, B)
+donde:
+	•	decisión_esperada(A, B) se obtiene exclusivamente de (D_A), (D_B), T15/TR1
+	•	decisión_publicada(A, B) debe proceder de la capa canónica de producción
+La comparación no debe utilizar la capa operativa de 297 elementos, porque su universo no es Θ24.
+La comparación correcta es:
+ORACLE Θ24
+    ↕
+CANONICA Θ24
+
+12. Condiciones necesarias para ejecutar el Nivel 5
+Cuando exista:
+canonica["traza"]
+el TEST 3 deberá exigir simultáneamente:
+	•	len(traza) == 276
+	•	cobertura exacta de los 24 IDs
+	•	cobertura exacta de C(24,2)
+	•	ausencia de pares duplicados
+	•	ausencia de pares fuera de Θ24
+	•	presencia de id_a, id_b, primaria, secundaria
+y, para cada par:
+primaria_publicada  == primaria_esperada
+secundaria_publicada == secundaria_esperada
+No basta con que los agregados continúen siendo:
+183 / 93 / 153 / 30
+En este nivel, los agregados deben ser consecuencias de las 276 comparaciones individuales.
+
+13. Por qué los agregados no son evidencia primaria del Nivel 5
+Dos sistemas diferentes podrían producir:
+183 compatibles
+93 incompatibles
+153 novedosos
+30 redundantes
+y, sin embargo, diferir en cuáles pares recibieron cada clasificación.
+Por tanto:
+Afirmación
+Alcance
+igualdad de agregados
+coincidencia global
+igualdad de las 276 decisiones
+correspondencia individual
+El Nivel 5 exige la segunda.
+
+14. Cadena completa de demostración
+┌───────────────────────────────┐
+│ CUERPO FORMAL INDEPENDIENTE   │
+│ Cuadro 4 / Θ24                │
+└───────────────┬───────────────┘
+                ↓
+          D_A , D_B
+                ↓
+          Regla T15/TR1
+                ↓
+     ┌─────────────────────┐
+     │ DECISIÓN ESPERADA   │
+     └──────────┬──────────┘
+                │
+                │ comparación individual
+                │
+                ↕
+     ┌─────────────────────┐
+     │ DECISIÓN PUBLICADA  │
+     │ CAPA CANÓNICA       │
+     └──────────┬──────────┘
+                ↓
+         276 verificaciones
+                ↓
+      agregación secundaria
+                ↓
+         183 / 93 / 153 / 30
+En el run actual, la cadena llega hasta:
+decisión esperada
+      ↓
+agregados oracle
+      ↕
+agregados canónicos
+La arista:
+decisión esperada
+      ↕
+decisión publicada
+queda definida, pero no ejecutable por falta de exposición contractual de la decisión individual.
+
+15. Resultados del run de referencia
+Capa operativa
+Campo
+Valor
+theta_n
+297
+pares_totales
+43956
+pares_compatibles
+11506
+pares_novedosos
+7047
+pares_redundantes
+4459
+pares_incompatibles
+32450
+im_vs_theta
+GENERATIVO
+u1_proxy
+NO_STAGNANT
+identidad_pares
+True
+identidad_compatibles
+True
+Capa canónica
+Campo
+Valor
+theta_n
+24
+pares_totales
+276
+pares_compatibles
+183
+pares_novedosos
+153
+pares_redundantes
+30
+pares_incompatibles
+93
+im_vs_theta
+GENERATIVO
+identidad_pares
+True
+identidad_compatibles
+True
+coincide_paper
+True
+ids_presentes
+24
+ids_faltantes
+[]
+Reconstrucción independiente
+Campo
+Resultado
+pares derivados
+276
+compatibles
+183
+incompatibles
+93
+novedosos
+153
+redundantes
+30
+igualdad oracle ↔ canónica
+True
+comparación individual
+NO OBSERVABLE
+
+16. Determinismo
+La batería no depende de muestreo aleatorio.
+El universo Θ24 se enumera exhaustivamente:
+C(24,2) = 276
+La reconstrucción formal es determinista. La producción también se somete a comprobaciones de determinismo en sus superficies agregadas.
+Esto permite distinguir:
+Concepto
+Estado en este run
+determinismo de agregados
+medido (identidad_pares, identidad_compatibles)
+determinismo de decisión individual
+no certificable directamente sin decisión individual observable
+
+17. Independencia y exclusiones
+Para preservar independencia semántica, TEST 3 excluye:
+	•	_medir_pares
+	•	generatividad() como clasificador
+	•	gobierna como (D_i)
+	•	clasificadores privados
+	•	rutas de producción que ya hayan generado la decisión
+Tampoco utiliza:
+canonica["dominios_formales"]
+como fuente independiente si dicha estructura procede de la misma ruta semántica que se pretende contrastar.
+La capa canónica se utiliza como superficie de comparación, no como fuente del oracle.
+
+18. Estado actual de cada nivel
+Nivel
+Pregunta
+Estado
+1
+¿Los agregados cumplen el contrato?
+DEMOSTRADO
+2
+¿Las capas mantienen invariantes y determinismo?
+DEMOSTRADO
+3
+¿La decisión individual es públicamente observable?
+NO OBSERVABLE
+4
+¿Puede reconstruirse independientemente la decisión para cada par?
+DEMOSTRADO
+5
+¿Cada decisión independiente coincide con la decisión publicada?
+DEFINIDO / NO EJECUTADO PAR-A-PAR
+La razón del estado del Nivel 5 es exclusivamente la ausencia de una superficie pública contractual que permita observar la decisión individual de producción.
+
+19. Qué demuestra realmente el run
+El run demuestra simultáneamente:
+	1	coherencia contractual de la implementación;
+	2	coherencia de las invariantes;
+	3	estabilidad/determinismo de las superficies auditadas;
+	4	correspondencia de la capa canónica con los valores formales;
+	5	existencia de una reconstrucción semántica independiente;
+	6	reproducción independiente de los 276 pares;
+	7	coincidencia de los agregados independientes con la capa canónica;
+	8	existencia de una especificación precisa para la verificación semántica individual de Nivel 5.
+No debe afirmarse todavía:
+las 276 decisiones de producción fueron verificadas individualmente contra el oracle
+porque la superficie contractual actual no permite observarlas.
+La afirmación correcta es:
+las 276 decisiones esperadas pueden reconstruirse independientemente y sus agregados coinciden exactamente con la capa canónica; la confrontación individual queda definida contractualmente para cuando la decisión publicada sea observable.
+
+20. Criterio de cierre del Nivel 5
+El Nivel 5 solamente podrá declararse DEMOSTRADO cuando:
+	1	276/276 pares estén publicados;
+	2	cada par aparezca exactamente una vez;
+	3	cada par pertenezca a Θ24;
+	4	cada entrada contenga la decisión primaria y secundaria;
+	5	(D_A) y (D_B) procedan de la fuente independiente;
+	6	T15 produzca la decisión esperada;
+	7	decisión esperada == decisión publicada para los 276 pares.
+Solamente después de completar esas 276 comparaciones podrá afirmarse:
+VERIFICACIÓN SEMÁNTICA INDIVIDUAL 276/276
+Los agregados:
+183 / 93 / 153 / 30
+deberán entonces recalcularse desde esas 276 decisiones verificadas, no utilizarse como sustituto de ellas.
+
+21. Integridad arquitectónica
+TEST 3 no modifica:
+	•	Engine
+	•	CONTENEDOR
+	•	THETA
+	•	generatividad()
+	•	_medir_pares
+	•	contratos existentes
+La ausencia de traza pública tampoco obliga a introducir una nueva API como parte de esta batería.
+La eventual exposición de una traza individual es una decisión arquitectónica independiente de la auditoría.
+El test debe auditar la superficie existente y no diseñar la arquitectura que le gustaría tener.
+
+22. Conclusión formal
+La batería TR1 establece una separación entre cuatro hechos que no deben confundirse:
+COHERENCIA
+OBSERVABILIDAD
+RECONSTRUCCIÓN INDEPENDIENTE
+VERIFICACIÓN INDIVIDUAL
+La implementación ha sido sometida a una batería que alcanza 742 tests pasados sin fallos.
+La capa canónica reproduce:
+Θ24
+276 pares
+183 compatibles
+93 incompatibles
+153 novedosos
+30 redundantes
+Un cuerpo formal independiente reconstruye las mismas 276 decisiones sin reutilizar el clasificador de producción y obtiene exactamente los mismos agregados.
+Por tanto, existe una vía independiente de reconstrucción semántica.
+El último salto no es reconstruir la semántica.
+El último salto es observar simultáneamente:
+decisión esperada
+y
+decisión publicada
+para el mismo par (A, B).
+Ese salto constituye el Nivel 5:
+(A, B)
+  →
+D_A, D_B
+  →
+TR1 / T15
+  →
+decisión esperada
+  ↔
+decisión publicada
+  →
+276 / 276
+El run actual deja este último enlace formalmente definido, pero no ejecutado par-a-par debido a la ausencia de la superficie contractual de traza individual.
+
+Fin del estudio.
+

@@ -715,36 +715,6 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
 
 
 
-def recolectar() -> dict:
-    # Garantizar que no se procesen módulos duplicados
-    modulos_procesados = set()
-    todas_las_entradas = []
-
-    # Supongamos que descubres los módulos en 'categorias/'
-    modulos_descubiertos = _descubrir_modulos_categorias()
-
-    for mod in modulos_descubiertos:
-        nombre_mod = getattr(mod, "__name__", str(mod))
-        if nombre_mod in modulos_procesados:
-            continue
-        modulos_procesados.add(nombre_mod)
-
-        entradas = _cargar_desde_modulo(mod, mod.__file__.split("/")[-1].replace(".py", ""))
-        todas_las_entradas.extend(entradas)
-
-    # Desduplicación global defensiva por ID
-    entradas_unicas = {}
-    for entry in todas_las_entradas:
-        key = entry["id"].lower()
-        if key not in entradas_unicas:
-            entradas_unicas[key] = entry
-
-    return {
-        "coherente": True,
-        "total": len(entradas_unicas),
-        "entradas": list(entradas_unicas.values()),
-    }
-
 def barrer() -> Dict[str, Any]:
     cats, errores = recolectar()
     notas: List[str] = []

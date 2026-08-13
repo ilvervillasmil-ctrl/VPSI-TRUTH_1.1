@@ -63,7 +63,7 @@ CUERPO = {
         "contexto_AX",    # O_context, Def-5.3.1
         "indefinido_AX",  # indefinido ≠ 0
     ],
-    "gobierna": ["calculator", "conteos", "correlacion_k", "coherencia", "logica"],
+    "aplica_a": ["calculator", "conteos", "correlacion_k", "coherencia", "logica"],
     "descripcion": (
         "Fija las anclas de inclusión, severidad y vacío que hacen "
         "reproducible el conteo de m,k,p,r,c,f. No altera la fórmula "

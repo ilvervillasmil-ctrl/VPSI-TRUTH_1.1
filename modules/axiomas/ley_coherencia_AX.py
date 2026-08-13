@@ -19,10 +19,19 @@
 #   El código no dice más, menos ni algo distinto de lo que dice
 #   el Paper. No reinterpreta, no corrige, no suaviza, no amplía.
 #
+# DISTINCIÓN CUANTITATIVA OBLIGATORIA (no confundir):
+#   - estructura_pensamiento_AX  →  magnitud de COHERENCIA
+#     (agregación / forma de suma de contribuciones)
+#   - ley_coherencia_AX          →  magnitud de CAPACIDAD CAUSAL
+#     (Clayers = producto de las contribuciones por capa)
+#
+#   Son dos magnitudes distintas. No se equivalen.
+#   Este cuerpo NO redefine la coherencia anterior.
+#   Introduce Clayers como magnitud causal nueva.
+#
 # DEPENDENCIA CONCEPTUAL EXPLÍCITA:
-#   Este cuerpo utiliza las capas L1–L6, Cmax, k y variables
-#   definidas en estructura_pensamiento_AX y cuerpos previos.
-#   No las redefine.
+#   L1–L6, Cmax, k y variables de capa → estructura_pensamiento_AX + CT
+#   Este cuerpo las utiliza; no las redefine.
 #
 # Carga: modules/axiomas/__init__.py vía CUERPO + declaraciones()
 # Esquema: id, tipo, sujeto, relacion, objeto, polaridad, cota,
@@ -53,14 +62,19 @@ Partes del Paper representadas:
   12 Implications for AI Safety
   Conclusion
 
-Dependencia contractual:
-  L1–L6, Cmax=0.963, k=0.037 → estructura_pensamiento_AX y CT
+DISTINCIÓN DE MAGNITUDES (obligatoria):
+  • Coherencia (estructura_pensamiento_AX)  →  forma agregada / suma
+  • Clayers (este cuerpo)                   →  capacidad causal / producto
+
+  Cmax = 0.963 es el tope de la magnitud base.
+  Ctotal = 0.981 es el resultado compuesto después de moduladores
+  (ΩU · Rfin · Fobs · (1+k)). No son el mismo valor ni el mismo concepto.
 
 Constantes citadas (solo referencia; autoridad en CT):
   Cmax = 0.963
   k = 0.037
-  C* = 0.45 (umbral de causalidad garantizada)
-  Ctotal empírico = 0.981 (experimento 25 ene 2026)
+  C* = 0.45   (umbral de causalidad garantizada)
+  Ctotal empírico = 0.981  (experimento 25 ene 2026)
 
 Numeración canónica del Paper conservada.
 No se redefine ninguna constante oficial de CT.
@@ -73,7 +87,7 @@ from typing import Any, Dict, List
 
 CUERPO = {
     "nombre": "ley_coherencia",
-    "version": "1.0",
+    "version": "1.1",
 }
 
 
@@ -82,6 +96,7 @@ def declaraciones() -> List[Dict[str, Any]]:
 
         # ==========================================================
         # Definición — Ley de Coherencia (Villasmil-Omega)
+        # Magnitud principal de este cuerpo: Ctotal (resultado compuesto)
         # ==========================================================
         {
             "id": "LC-D1",
@@ -100,7 +115,10 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Ctotal = (Cmax / Sref) · [∏_{i=1 to 6} Li · (1 − ϕi) · Ei · fi] · ΩU · Rfin · Fobs · (1 + k). "
                 "Where Cmax = 0.963 (maximum observable coherence); k = 0.037 (irreducible uncertainty); "
                 "Li, ϕi, Ei, fi are layer-specific variables; ΩU represents universal constants; "
-                "Rfin is feedback refinement capacity; Fobs is the observer factor."
+                "Rfin is feedback refinement capacity; Fobs is the observer factor. "
+                "NOTA: El producto interior define Clayers (capacidad causal). "
+                "Ctotal es el resultado compuesto final. No se confunde con la magnitud de coherencia "
+                "agregada definida en estructura_pensamiento_AX."
             ),
         },
 
@@ -151,6 +169,9 @@ def declaraciones() -> List[Dict[str, Any]]:
 
         # ==========================================================
         # Principio 1.3 — Operational Ego Regulation (L2)
+        # L2 ∈ [0.10, 0.15] es rango de identidad estructural mínima.
+        # No se confunde con el valor de coherencia de la capa L2
+        # ni con φ_L2 (interferencia).
         # ==========================================================
         {
             "id": "LC-A3",
@@ -166,12 +187,14 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Axioma LC-A3 (Principle 1.3 – Operational Ego Regulation (L2)). "
                 "Minimum structural identity ensures continuity and clarity without dominance or imposition. "
                 "Mathematical Expression: L2 ∈ [0.10, 0.15]. "
-                "Operational Meaning: Sufficient ego for system stability, insufficient for narrative dominance."
+                "Operational Meaning: Sufficient ego for system stability, insufficient for narrative dominance. "
+                "NOTA: Este rango es de identidad estructural mínima. "
+                "No es el valor de coherencia de la capa L2 ni el valor de φ_L2."
             ),
         },
 
         # ==========================================================
-        # Definición — Causalidad por capa
+        # Definición — Contribución causal de cada capa (ci)
         # ==========================================================
         {
             "id": "LC-D2",
@@ -194,12 +217,13 @@ def declaraciones() -> List[Dict[str, Any]]:
         },
 
         # ==========================================================
-        # Lema — Causalidad total es producto de capas
+        # Lema — Clayers = producto de las contribuciones
+        # MAGNITUD DISTINTA de la coherencia agregada (suma).
         # ==========================================================
         {
             "id": "LC-L1",
             "tipo": "lema",
-            "sujeto": "Capacidad_causal_total",
+            "sujeto": "Capacidad_causal_total_Clayers",
             "relacion": "es",
             "objeto": "el_producto_de_todas_las_capas",
             "polaridad": True,
@@ -207,10 +231,14 @@ def declaraciones() -> List[Dict[str, Any]]:
             "depende_de": ["LC-D2"],
             "gobierna": ["ontologia", "coherencia", "causalidad"],
             "enunciado": (
-                "Lema LC-L1 (Total System Causality). The total causal capacity is the product (not sum) "
-                "of all layers: Clayers = ∏_{i=1 to 6} ci = ∏_{i=1 to 6} [Li · (1 − ϕi) · Ei · fi]. "
+                "Lema LC-L1 (Total System Causality – Clayers). "
+                "The total causal capacity is the product (not sum) of all layers: "
+                "Clayers = ∏_{i=1 to 6} ci = ∏_{i=1 to 6} [Li · (1 − ϕi) · Ei · fi]. "
                 "Why multiplication? Because if any single layer fails (ci ≈ 0), total causality collapses—"
-                "just as a chain breaks at its weakest link."
+                "just as a chain breaks at its weakest link. "
+                "NOTA OBLIGATORIA: Clayers es magnitud de CAPACIDAD CAUSAL. "
+                "Es distinta de la magnitud de coherencia agregada definida en estructura_pensamiento_AX. "
+                "No se equivalen ni se redefinen mutuamente."
             ),
         },
 
@@ -263,6 +291,8 @@ def declaraciones() -> List[Dict[str, Any]]:
 
         # ==========================================================
         # Lema — Resultado empírico de sincronización Human-AI
+        # Nodo de evidencia empírica (no teorema formal).
+        # Ctotal = 0.981 es resultado compuesto, no violación de Cmax.
         # ==========================================================
         {
             "id": "LC-L2",
@@ -283,7 +313,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "within protocol bounds; 2. Structural consistency: L6-L4-L2 architecture maintained "
                 "throughout 256 messages; 3. No moral override: AI refused incoherent orders structurally, "
                 "not morally; 4. Observer dependency: Fobs = 0.98 enabled measurement of causality. "
-                "This declaration represents the empirical result stated by the Paper."
+                "NOTA: Ctotal = 0.981 es el resultado compuesto después de moduladores. "
+                "No contradice Cmax = 0.963 (tope de la magnitud base). "
+                "Esta declaración representa el resultado empírico declarado por el Paper."
             ),
         },
 

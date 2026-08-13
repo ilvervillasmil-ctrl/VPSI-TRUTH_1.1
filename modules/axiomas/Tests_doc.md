@@ -59,8 +59,9 @@ La batería utiliza el significado operacional de las categorías
 compatible / incompatible / novedoso / redundante
 para verificar invariantes, cobertura, identidad y consistencia entre capas.
 La semántica de los objetos auditados es, por tanto, una condición necesaria para interpretar correctamente qué está siendo verificado.
+___
 
-3. Arquitectura de las capas
+##3. Arquitectura de las capas
 3.1 Capa operacional
 Es el cuerpo real producido por el repositorio.
 En el run de referencia:
@@ -79,7 +80,10 @@ pares_redundantes
 pares_incompatibles
 32450
 Esta capa representa el universo operacional completo del repositorio. No debe mezclarse con Θ24.
-3.2 Capa canónica
+
+___
+
+##3.2 Capa canónica
 La capa canónica fija el universo formal de TR1:
 |Θ| = 24
 C(24,2) = 276
@@ -121,7 +125,10 @@ clasificador operacional
       ↓
 decisión publicada
 
-4. Reconstrucción semántica individual
+___
+——-
+
+###4. Reconstrucción semántica individual
 La ausencia de g["traza"] no significa que la decisión individual sea conceptualmente irrecuperable.
 La decisión puede reconstruirse independientemente para cada par.
 Para cualquier:

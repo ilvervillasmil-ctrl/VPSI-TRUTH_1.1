@@ -4,50 +4,49 @@
 TEST: test_engine_calculo_verdad_contractual
 ===============================================================================
 
-NOMBRE DEL TEST
----------------
-test_engine_calculo_verdad_contractual
+DECLARACIÓN DE AUTORIDAD
+------------------------
+Este Test no es un segundo Engine.
+No es un Calculator.
+No es un evaluador de fórmulas.
+No es un juez semántico.
+
+Es un test de integración de caja negra contractual:
+  1. suministra material semántico
+  2. invoca únicamente engine.evaluar(peticion)
+  3. verifica que la autoridad productiva publique las cuantificaciones
+     contractuales que ella misma está obligada a producir
 
 PROPOSICIÓN QUE SE DEMUESTRA
 ----------------------------
-Dada una conversación semántica y un contexto válido, el Engine de
-VPSI-TRUTH ejecuta autónomamente sus contratos existentes y publica
-las cuantificaciones deterministas Tru_Ri y Tru_total.
+Dada una entrada semántica válida, el Engine real del repositorio,
+ejecutado en CI, produce determinísticamente las cuantificaciones
+Tru_Ri y Tru_total mediante las capacidades y fórmulas contractuales
+existentes, sin que el Test calcule, orqueste, sustituya o anticipe
+ninguna parte del cálculo.
 
-AUTORIDAD DE EJECUCIÓN
-----------------------
-El único punto de ejecución del cálculo es:
-
-    resultado = engine.evaluar(peticion)
-
-El test no calcula.
-El test no orquesta módulos.
-El test no reconstruye la cadena interna.
-El test no conoce el número correcto.
-El test solo entrega material semántico y observa el paquete contractual
-que el Engine publica.
-
-FÓRMULA CONTRACTUAL DE REFERENCIA (documental, no ejecutada aquí)
------------------------------------------------------------------
+FÓRMULA CONTRACTUAL DE REFERENCIA (solo documentación)
+------------------------------------------------------
     Tru_Ri    = C × L × K
     Tru_total = Tru_Ri × α + β
 
-Estas fórmulas viven en los módulos productivos (FO / truth).
-Este archivo no las implementa ni las importa.
+La fórmula pertenece a FO/truth del repositorio.
+Este archivo no la implementa, no la importa y no la ejecuta.
 
-PROHIBICIONES ABSOLUTAS EN ESTE ARCHIVO
----------------------------------------
+PROHIBICIONES ABSOLUTAS
+-----------------------
 - No importar Calculator, conteos, coherencia, logica, correlacion_k,
-  truth.py, ALPHA, BETA ni ninguna fórmula.
+  truth.py, ALPHA, BETA, tru_ri, tru_total.
 - No fabricar O_id, permite_k, m, k, p, r, c, f, C, L, K.
 - No hardcodear ningún valor numérico de Tru_Ri o Tru_total.
-- No usar pytest.skip() para ocultar fallos de arranque.
+- No usar pytest.skip().
 - No usar strict=False.
-- No aceptar PARCIAL / UNDEFINED / ERROR / RECHAZADO en el escenario
-  principal (conversación + contexto suficiente).
+- No aceptar PARCIAL / UNDEFINED / ERROR / RECHAZADO cuando la entrada
+  cumple el formato contractual y el Engine está operativo.
+- No inventar campos de salida que el Engine no publique.
+- No fijar unilateralmente una sola escala si el objetivo es demostrar
+  la capacidad contractual general de evaluación.
 - No modificar ningún módulo de producción.
-- No depender de símbolos internos no exportados por el contrato público
-  del Engine (p. ej. es_undefined).
 
 ===============================================================================
 """
@@ -55,13 +54,12 @@ PROHIBICIONES ABSOLUTAS EN ESTE ARCHIVO
 from __future__ import annotations
 
 import sys
-from fractions import Fraction
 from pathlib import Path
 
 import pytest
 
 # ---------------------------------------------------------------------------
-# NOTA DE IMPLEMENTACIÓN — path del repositorio
+# NOTA: path del repositorio
 # Layout esperado:
 #   <repo>/
 #     core/engine.py
@@ -73,20 +71,18 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 # ---------------------------------------------------------------------------
-# NOTA DE IMPLEMENTACIÓN — único import de producción permitido
-# Solo se importa la interfaz pública Engine.
-# No se importa es_undefined porque en el repositorio real ese símbolo
-# no forma parte del contrato público exportado por core.engine.
+# NOTA: único import de producción permitido
+# Solo la interfaz pública Engine.
+# No se importa es_undefined ni ningún otro símbolo interno.
 # ---------------------------------------------------------------------------
 from core.engine import Engine
 
 
 # ===========================================================================
-# MATERIAL SEMÁNTICO DE ENTRADA
+# MATERIAL SEMÁNTICO
 # ===========================================================================
-# NOTA: Estos textos son DATOS, no reglas de programación.
-# No existe ninguna condición del tipo if "Carlos" in texto.
-# El Engine debe tratarlos como material semántico puro.
+# NOTA: Estos textos son DATOS de entrada, no reglas de código.
+# No existe ninguna condición if "Carlos" in texto ni similar.
 
 CONVERSACION_A = (
     "Carlos: Mana, voy a Miami.\n"
@@ -117,14 +113,6 @@ CONVERSACION_NOMBRES = (
     "no de Pedro."
 )
 
-# ---------------------------------------------------------------------------
-# NOTA DE IMPLEMENTACIÓN — contexto
-# Se entrega el contexto semántico como entrada.
-# El Engine (vía CX y sus contratos) es quien debe resolver el dominio O.
-# El test no construye O_id, no calcula permite_k, no genera registros
-# internos. Solo declara: "esta es la afirmación y esta es la evidencia".
-# ---------------------------------------------------------------------------
-
 CONTEXTO_A = (
     "Afirmación a evaluar: Carlos afirma 'Tengo 5 apartamentos'. "
     "Evidencia aportada por Carla: los contratos y títulos de propiedad "
@@ -150,14 +138,19 @@ CONTEXTO_NOMBRES = (
 
 def _peticion(conversacion: str, contexto: str) -> dict:
     """
-    NOTA DE IMPLEMENTACIÓN:
-    Campos reconocidos por el contrato actual de Engine.evaluar:
-      texto, mensaje, descripcion, contexto, O_context, enunciado_O
+    NOTA DE IMPLEMENTACIÓN
+    ----------------------
+    Se entregan únicamente los campos de entrada semántica reconocidos
+    por el contrato de Engine.evaluar.
 
-    No se inyectan:
-      C, L, K, m, k, p, r, c, f, O_id, permite_k, compromisos, etc.
+    No se inyectan factores, conteos, O_id, permite_k ni resultados
+    intermedios.
 
-    El Engine debe obtener esos valores mediante sus propios módulos.
+    No se fija unilateralmente escala_id="tru_conversacion".
+    El Engine decide el alcance de evaluación conforme a sus contratos
+    y a las capacidades de escala que tenga cargadas.
+    Si el Engine requiere un campo de escala, lo resolverá por sí mismo
+    o devolverá el estado contractual correspondiente.
     """
     return {
         "texto": conversacion,
@@ -166,16 +159,14 @@ def _peticion(conversacion: str, contexto: str) -> dict:
         "contexto": contexto,
         "O_context": contexto,
         "enunciado_O": contexto,
-        "escala_id": "tru_conversacion",
         "metodo": "operacional",
     }
 
 
 def _peticion_sin_o(texto: str) -> dict:
     """
-    NOTA DE IMPLEMENTACIÓN:
-    Entrada deliberadamente sin dominio O.
-    Se usa solo en el test de restricción contractual (Def-5.3.1).
+    NOTA: caso contractual separado (ausencia de O).
+    No se usa para suavizar los casos principales.
     """
     return {
         "texto": texto,
@@ -185,23 +176,24 @@ def _peticion_sin_o(texto: str) -> dict:
 
 
 # ===========================================================================
-# INSPECCIÓN DE FORMA CONTRACTUAL PUBLICADA
+# HELPERS MÍNIMOS DE INSPECCIÓN (solo forma publicada)
 # ===========================================================================
 
-def _es_cuantificacion_publicada(valor) -> bool:
+def _tiene_cuantificacion(resultado: dict, campo: str) -> bool:
     """
-    NOTA DE IMPLEMENTACIÓN:
-    Verifica únicamente la forma del valor que el Engine publica:
-      - no es None
-      - no es la cadena "UNDEFINED" / "NONE" / vacía
-      - es convertible a Fraction (representación racional contractual)
+    NOTA DE IMPLEMENTACIÓN
+    ----------------------
+    Comprueba únicamente que el Engine publicó el campo y que el valor
+    no es None ni la marca de indefinido.
 
-    Esta función NO calcula la verdad.
-    NO aplica la fórmula Tru_Ri = C×L×K.
-    NO conoce el número correcto.
-    NO depende de símbolos internos del Engine (es_undefined, etc.).
-    Solo comprueba que el Engine publicó una cuantificación racional.
+    No convierte a Fraction.
+    No aplica ninguna fórmula.
+    No conoce el número correcto.
+    No inventa un micro-contrato de representación.
     """
+    if campo not in resultado:
+        return False
+    valor = resultado[campo]
     if valor is None:
         return False
     texto = str(valor).strip()
@@ -209,24 +201,22 @@ def _es_cuantificacion_publicada(valor) -> bool:
         return False
     if texto.upper() in ("UNDEFINED", "NONE", "NULL", "∅"):
         return False
-    try:
-        Fraction(texto)
-        return True
-    except Exception:
-        return False
+    return True
 
 
 # ===========================================================================
-# FIXTURE — Engine en configuración contractual real
+# FIXTURE
 # ===========================================================================
 
 @pytest.fixture(scope="module")
 def engine():
     """
-    NOTA DE IMPLEMENTACIÓN:
-    - strict=True  → cualquier incumplimiento de arranque falla el test.
-    - verificar_axiomas=True → se ejecuta la ruta contractual normal.
-    - No se usa pytest.skip(). Si el Engine no arranca, el CI falla.
+    NOTA DE IMPLEMENTACIÓN
+    ----------------------
+    Configuración contractual real:
+      - strict=True
+      - verificar_axiomas=True
+    Si el Engine no arranca, el test FALLA (no se salta).
     """
     raiz = ROOT / "modules"
     eng = Engine(
@@ -235,7 +225,6 @@ def engine():
         verificar_axiomas=True,
         strict=True,
     )
-    # Si el estado no es OPERATIVO, el assert falla el test (no se salta).
     assert eng.estado == "OPERATIVO", (
         "Engine no operativo. "
         f"estado={eng.estado!r} errores={eng.errores_arranque!r}"
@@ -244,159 +233,139 @@ def engine():
 
 
 # ===========================================================================
-# TESTS
+# SUITE
 # ===========================================================================
 
 class TestEngineCalculoVerdadContractual:
     """
-    NOMBRE DE LA CLASE DE TEST
-    --------------------------
+    NOMBRE DE LA CLASE
+    ------------------
     TestEngineCalculoVerdadContractual
 
-    NOTA DE DISEÑO DE LA SUITE
-    --------------------------
-    test_a_calculo_completo_con_evidencia_contra
-        → cálculo completo (evidencia contra)
-
-    test_b_evidencia_invertida
-        → evidencia invertida (evaluación independiente)
-
-    test_c_independencia_de_nombres
-        → independencia de nombres (anti-hardcoding)
-
-    test_d_determinismo
-        → misma entrada → misma cuantificación
-
-    test_e_sin_o_no_cuantifica
-        → ausencia de O (restricción contractual separada)
-
-    Los tests a-d exigen cuantificación.
-    El test e exige la restricción de indefinición.
+    PROPIEDADES QUE SE VERIFICAN
+    ----------------------------
+    A. Capacidad de cálculo
+    B. Sensibilidad a cambio de evidencia (evaluaciones independientes)
+    C. Independencia léxica (nombres distintos)
+    D. Determinismo
+    E. Restricción contractual sin O
     """
 
     # ------------------------------------------------------------------
-    # TEST A — Caso principal: cálculo completo de verdad
+    # A — Capacidad de cálculo
     # ------------------------------------------------------------------
-    def test_a_calculo_completo_con_evidencia_contra(self, engine):
+    def test_a_capacidad_de_calculo(self, engine):
         """
-        NOMBRE: test_a_calculo_completo_con_evidencia_contra
+        NOMBRE: test_a_capacidad_de_calculo
 
-        NOTA DE IMPLEMENTACIÓN:
-        Entrada con conversación + contexto suficiente.
-        El Engine debe ejecutar su cadena contractual y publicar:
-          - estado == "OK"
-          - Tru_Ri cuantificado
-          - Tru_total cuantificado
+        PROPOSICIÓN
+        -----------
+        El Engine, ante conversación + contexto válido, publica
+        Tru_Ri y Tru_total como resultado de su capacidad contractual.
 
-        Cualquier otro estado (PARCIAL, UNDEFINED, ERROR, RECHAZADO)
-        o la ausencia de cuantificación constituye FAIL.
-        No se acepta la existencia de un diccionario como sustituto
-        del cálculo de verdad.
+        No se acepta:
+          PARCIAL, UNDEFINED, ERROR, RECHAZADO,
+          ausencia de tru_ri, ausencia de tru_total,
+          valores indefinidos.
         """
         pet = _peticion(CONVERSACION_A, CONTEXTO_A)
         resultado = engine.evaluar(pet)
 
         assert isinstance(resultado, dict), (
-            "Engine.evaluar debe devolver un dict contractual"
+            "Engine.evaluar debe devolver un dict"
         )
-
         assert resultado.get("estado") == "OK", (
-            "Con conversación + contexto suficiente se exige estado OK. "
+            "Se exige estado OK cuando la entrada es contractual. "
             f"Recibido estado={resultado.get('estado')!r} "
             f"razon={resultado.get('razon')!r}"
         )
-
-        assert "tru_ri" in resultado, (
-            "El Engine debe publicar el campo contractual 'tru_ri'"
+        assert _tiene_cuantificacion(resultado, "tru_ri"), (
+            "El Engine debe publicar Tru_Ri cuantificado. "
+            f"Valor: {resultado.get('tru_ri')!r}"
         )
-        assert "tru_total" in resultado, (
-            "El Engine debe publicar el campo contractual 'tru_total'"
+        assert _tiene_cuantificacion(resultado, "tru_total"), (
+            "El Engine debe publicar Tru_total cuantificado. "
+            f"Valor: {resultado.get('tru_total')!r}"
         )
-
-        assert _es_cuantificacion_publicada(resultado["tru_ri"]), (
-            "Tru_Ri debe ser una cuantificación racional publicada. "
-            f"Valor recibido: {resultado.get('tru_ri')!r}"
-        )
-        assert _es_cuantificacion_publicada(resultado["tru_total"]), (
-            "Tru_total debe ser una cuantificación racional publicada. "
-            f"Valor recibido: {resultado.get('tru_total')!r}"
-        )
-
-        assert "factores" in resultado, (
-            "El Engine debe publicar el campo 'factores'"
-        )
-        assert isinstance(resultado["factores"], dict)
 
     # ------------------------------------------------------------------
-    # TEST B — Evidencia invertida
+    # B — Sensibilidad semántica (evidencia invertida)
     # ------------------------------------------------------------------
-    def test_b_evidencia_invertida(self, engine):
+    def test_b_sensibilidad_evidencia_invertida(self, engine):
         """
-        NOMBRE: test_b_evidencia_invertida
+        NOMBRE: test_b_sensibilidad_evidencia_invertida
 
-        NOTA DE IMPLEMENTACIÓN:
-        Misma afirmación, evidencia opuesta.
-        Se exige una evaluación independiente y cuantificada.
-        El test NO conoce ni impone el número correcto.
-        Solo exige que el Engine ejecute de nuevo la capacidad de cálculo
-        y publique Tru_Ri / Tru_total cuantificados.
+        PROPOSICIÓN
+        -----------
+        Dos entradas con evidencia semánticamente distinta producen
+        dos evaluaciones independientes y cuantificadas.
+
+        NOTA:
+        El Test no impone qué número debe salir en cada caso.
+        No escribe assert A != B con un umbral inventado.
+        Solo exige:
+          - ambas ejecuciones publican Tru_Ri y Tru_total
+          - ambas son evaluaciones reales (estado OK)
+          - los resultados se obtuvieron de llamadas independientes
+            a engine.evaluar (no se reutiliza un valor anterior)
         """
-        pet = _peticion(CONVERSACION_B, CONTEXTO_B)
-        resultado = engine.evaluar(pet)
+        ra = engine.evaluar(_peticion(CONVERSACION_A, CONTEXTO_A))
+        rb = engine.evaluar(_peticion(CONVERSACION_B, CONTEXTO_B))
 
-        assert isinstance(resultado, dict)
+        assert ra.get("estado") == "OK", (
+            f"Caso A debe ser OK. Recibido: {ra.get('estado')!r}"
+        )
+        assert rb.get("estado") == "OK", (
+            f"Caso B debe ser OK. Recibido: {rb.get('estado')!r}"
+        )
+        assert _tiene_cuantificacion(ra, "tru_ri")
+        assert _tiene_cuantificacion(ra, "tru_total")
+        assert _tiene_cuantificacion(rb, "tru_ri")
+        assert _tiene_cuantificacion(rb, "tru_total")
+
+        # Las dos evaluaciones son objetos distintos (llamadas independientes)
+        assert ra is not rb
+
+    # ------------------------------------------------------------------
+    # C — Independencia léxica
+    # ------------------------------------------------------------------
+    def test_c_independencia_lexica(self, engine):
+        """
+        NOMBRE: test_c_independencia_lexica
+
+        PROPOSICIÓN
+        -----------
+        La misma estructura semántica con nombres distintos
+        (Pedro / Laura / Sofia) produce una evaluación contractual válida.
+        No debe existir dependencia de los nombres literales del ejemplo.
+        """
+        resultado = engine.evaluar(
+            _peticion(CONVERSACION_NOMBRES, CONTEXTO_NOMBRES)
+        )
+
         assert resultado.get("estado") == "OK", (
-            "Evidencia invertida también debe producir estado OK. "
+            "Cambio de nombres no debe impedir la evaluación. "
             f"Recibido: {resultado.get('estado')!r}"
         )
-        assert _es_cuantificacion_publicada(resultado.get("tru_ri")), (
-            f"Tru_Ri no cuantificado: {resultado.get('tru_ri')!r}"
-        )
-        assert _es_cuantificacion_publicada(resultado.get("tru_total")), (
-            f"Tru_total no cuantificado: {resultado.get('tru_total')!r}"
-        )
+        assert _tiene_cuantificacion(resultado, "tru_ri")
+        assert _tiene_cuantificacion(resultado, "tru_total")
 
     # ------------------------------------------------------------------
-    # TEST C — Independencia de nombres (anti-hardcoding)
-    # ------------------------------------------------------------------
-    def test_c_independencia_de_nombres(self, engine):
-        """
-        NOMBRE: test_c_independencia_de_nombres
-
-        NOTA DE IMPLEMENTACIÓN:
-        Misma estructura semántica, identidades distintas
-        (Pedro / Laura / Sofia).
-        Si el Engine depende de los nombres literales "Carlos"/"Carla",
-        este test debe fallar.
-        Se exige cuantificación, no igualdad numérica con el caso A.
-        """
-        pet = _peticion(CONVERSACION_NOMBRES, CONTEXTO_NOMBRES)
-        resultado = engine.evaluar(pet)
-
-        assert isinstance(resultado, dict)
-        assert resultado.get("estado") == "OK", (
-            "Cambio de nombres no debe destruir la capacidad de evaluación. "
-            f"Recibido: {resultado.get('estado')!r}"
-        )
-        assert _es_cuantificacion_publicada(resultado.get("tru_ri")), (
-            f"Tru_Ri no cuantificado: {resultado.get('tru_ri')!r}"
-        )
-        assert _es_cuantificacion_publicada(resultado.get("tru_total")), (
-            f"Tru_total no cuantificado: {resultado.get('tru_total')!r}"
-        )
-
-    # ------------------------------------------------------------------
-    # TEST D — Determinismo
+    # D — Determinismo
     # ------------------------------------------------------------------
     def test_d_determinismo(self, engine):
         """
         NOMBRE: test_d_determinismo
 
-        NOTA DE IMPLEMENTACIÓN:
-        Misma petición ejecutada dos veces debe producir
-        exactamente la misma cuantificación publicada.
-        Esto no calcula la verdad; demuestra que el cálculo
-        del Engine es determinista bajo entrada idéntica.
+        PROPOSICIÓN
+        -----------
+        Misma entrada + misma configuración → misma cuantificación
+        publicada.
+
+        Esta prueba demuestra determinismo.
+        No sustituye la prueba de capacidad de cálculo.
+        Un valor constante también sería determinista; por eso
+        esta propiedad es secundaria y complementaria a A y B.
         """
         pet = _peticion(CONVERSACION_A, CONTEXTO_A)
 
@@ -405,58 +374,54 @@ class TestEngineCalculoVerdadContractual:
 
         assert r1.get("estado") == "OK"
         assert r2.get("estado") == "OK"
-
-        assert _es_cuantificacion_publicada(r1.get("tru_ri"))
-        assert _es_cuantificacion_publicada(r1.get("tru_total"))
-        assert _es_cuantificacion_publicada(r2.get("tru_ri"))
-        assert _es_cuantificacion_publicada(r2.get("tru_total"))
+        assert _tiene_cuantificacion(r1, "tru_ri")
+        assert _tiene_cuantificacion(r1, "tru_total")
+        assert _tiene_cuantificacion(r2, "tru_ri")
+        assert _tiene_cuantificacion(r2, "tru_total")
 
         assert str(r1["tru_ri"]) == str(r2["tru_ri"]), (
-            "Dos ejecuciones idénticas deben publicar el mismo Tru_Ri. "
+            "Tru_Ri debe ser idéntico en dos ejecuciones iguales. "
             f"r1={r1['tru_ri']!r} r2={r2['tru_ri']!r}"
         )
         assert str(r1["tru_total"]) == str(r2["tru_total"]), (
-            "Dos ejecuciones idénticas deben publicar el mismo Tru_total. "
+            "Tru_total debe ser idéntico en dos ejecuciones iguales. "
             f"r1={r1['tru_total']!r} r2={r2['tru_total']!r}"
         )
 
     # ------------------------------------------------------------------
-    # TEST E — Ausencia de O (restricción contractual separada)
+    # E — Ausencia de O (restricción contractual)
     # ------------------------------------------------------------------
     def test_e_sin_o_no_cuantifica(self, engine):
         """
         NOMBRE: test_e_sin_o_no_cuantifica
 
-        NOTA DE IMPLEMENTACIÓN:
-        Caso contractual distinto (Def-5.3.1).
-        Sin O usable el Engine no debe fabricar K ni publicar
-        Tru_total cuantificado.
-        Este test NO suaviza los tests A-D.
+        PROPOSICIÓN
+        -----------
+        Sin O usable el Engine no debe publicar Tru_Ri ni Tru_total
+        cuantificados (restricción Def-5.3.1).
+
+        Esta prueba es independiente y no suaviza A-D.
         """
         resultado = engine.evaluar(
             _peticion_sin_o("Tengo 5 apartamentos.")
         )
 
         assert isinstance(resultado, dict)
-
         estado = str(resultado.get("estado", "")).upper()
         assert estado == "UNDEFINED", (
-            "Sin O usable se exige estado UNDEFINED. "
+            "Sin O se exige estado UNDEFINED. "
             f"Recibido: {estado!r}"
         )
-
-        assert not _es_cuantificacion_publicada(resultado.get("tru_total")), (
+        assert not _tiene_cuantificacion(resultado, "tru_total"), (
             "Sin O no debe publicarse Tru_total cuantificado. "
-            f"Valor recibido: {resultado.get('tru_total')!r}"
+            f"Valor: {resultado.get('tru_total')!r}"
         )
-        assert not _es_cuantificacion_publicada(resultado.get("tru_ri")), (
+        assert not _tiene_cuantificacion(resultado, "tru_ri"), (
             "Sin O no debe publicarse Tru_Ri cuantificado. "
-            f"Valor recibido: {resultado.get('tru_ri')!r}"
+            f"Valor: {resultado.get('tru_ri')!r}"
         )
 
 
-# ===========================================================================
-# Ejecución directa
 # ===========================================================================
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

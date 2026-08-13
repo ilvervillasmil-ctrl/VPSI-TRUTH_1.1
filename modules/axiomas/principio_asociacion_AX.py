@@ -1,43 +1,33 @@
 # ===============================================================
 # modules/axiomas/principio_asociacion_AX.py
-# Cuerpo axiomático: Principio de Asociación
-# Formalización matemática temática — v1.2
+# Cuerpo axiomático: Principio de Asociación — v1.2.1
+# Formalización matemática temática
 #
-# FUENTE NORMATIVA ÚNICA:
-#   El Principio de Asociación (texto CEMYCA / Villasmil-Ω)
+# CORRECCIÓN:
+#   Eliminados IDs duplicados (PA-A1…PA-A5).
+#   44 declaraciones, 44 IDs únicos.
+#   theta_n coherente con universo operativo.
 #
 # REGLA ABSOLUTA:
 #   PAPER → FORMALIZACIÓN → DEPENDENCIAS → DEMOSTRACIÓN → CONTRATO → ENGINE
-#   Nunca: PAPER → INTERPRETACIÓN → PREMISA NUEVA → “TEOREMA”
+#   M(B)=1 ⇒ ◇M
+#   NUNCA: M(B) ⇒ M(A)
 #
-# BASE FORMAL DEL CORPUS (sin redefinir):
-#   R_i = C · L · K
-#   R_i ⊂ R
-#   R → X → Y
-#   L4 = Yo / elección
-#   L5 = Consciencia / observación
-#   L6 = Alma / dirección
-#
-# DISTINCIÓN CRÍTICA:
-#   M(B)=1  ⇒  ¬∀C[M(C)=0]   ≡  ◇M
-#   NUNCA:  M(B) ⇒ M(A)
-#
-# Carga: modules/axiomas/__init__.py vía CUERPO + declaraciones()
+# BASE FORMAL (sin redefinir):
+#   R_i = C · L · K ;  R_i ⊂ R ;  R → X → Y
+#   L4 = Yo/elección ; L5 = Consciencia/obs ; L6 = Alma/dirección
 # ===============================================================
 
 """
-Cuerpo axiomático: Principio de Asociación — v1.2 (formalizado)
+Cuerpo axiomático: Principio de Asociación — v1.2.1
 
-Estructura congelada:
+Estructura:
   Definiciones  : 10  (PA-D1  … PA-D10)
   Axiomas       : 10  (PA-A1  … PA-A10)
   Lemas         :  9  (PA-L1  … PA-L9)
   Teoremas      :  7  (PA-T1  … PA-T7)
   Corolarios    :  8  (PA-C1  … PA-C8)
-  Total         : 44
-
-Observador formal: R_i
-Realidad: R (invariante bajo la operación de asociación)
+  Total         : 44  (IDs únicos, sin duplicados)
 """
 
 from __future__ import annotations
@@ -46,16 +36,14 @@ from typing import Any, Dict, List
 
 CUERPO = {
     "nombre": "principio_asociacion",
-    "version": "1.2",
+    "version": "1.2.1",
 }
 
 
 def declaraciones() -> List[Dict[str, Any]]:
     return [
 
-        # ==========================================================
-        # DEFINICIONES  (PA-D1 … PA-D10)
-        # ==========================================================
+        # ── DEFINICIONES ──────────────────────────────────────────
 
         {
             "id": "PA-D1",
@@ -72,15 +60,12 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Sea A un contexto donde R_i sostiene la premisa P_¬M := “M es imposible”. "
                 "Sea B un contexto real donde M(B)=1. "
                 "El Principio de Asociación establece la operación 𝒜(A,B,M) por la cual "
-                "R_i introduce B como evidencia, forzando la actualización: "
-                "P_¬M → P_◇M. "
+                "R_i introduce B como evidencia, forzando la actualización: P_¬M → P_◇M. "
                 "Formalmente: M(B)=1 ⇒ ◇M. "
-                "En términos del documento: si pasa allá, la mecánica existe; "
-                "si la mecánica existe, puede pasar aquí. "
+                "Documento: si pasa allá, la mecánica existe; si la mecánica existe, puede pasar aquí. "
                 "Nota: “puede” ≡ ◇M, no ≡ M(A)."
             ),
         },
-
         {
             "id": "PA-D2",
             "tipo": "definicion",
@@ -92,12 +77,11 @@ def declaraciones() -> List[Dict[str, Any]]:
             "depende_de": ["PA-D1"],
             "gobierna": ["ontologia", "desbloqueo"],
             "enunciado": (
-                "Definición PA-D2 (Contexto A – Contexto de Bloqueo). "
+                "Definición PA-D2 (Contexto A – Bloqueo). "
                 "A := contexto en el que R_i sostiene P_¬M. "
-                "Es el dominio donde opera la limitación aceptada por la mente de R_i."
+                "Dominio donde opera la limitación aceptada por la mente de R_i."
             ),
         },
-
         {
             "id": "PA-D3",
             "tipo": "definicion",
@@ -109,12 +93,11 @@ def declaraciones() -> List[Dict[str, Any]]:
             "depende_de": ["PA-D1"],
             "gobierna": ["ontologia", "desbloqueo"],
             "enunciado": (
-                "Definición PA-D3 (Contexto B – Contexto de Evidencia). "
+                "Definición PA-D3 (Contexto B – Evidencia). "
                 "B := contexto real tal que M(B)=1 de manera verificable. "
                 "B constituye el puente de evidencia para 𝒜(A,B,M)."
             ),
         },
-
         {
             "id": "PA-D4",
             "tipo": "definicion",
@@ -127,13 +110,11 @@ def declaraciones() -> List[Dict[str, Any]]:
             "gobierna": ["ontologia", "desbloqueo"],
             "enunciado": (
                 "Definición PA-D4 (Mecánica Transferible). "
-                "M es la mecánica concreta que existe en B y que puede aislarse del resto "
-                "del contexto: B ─aislamiento→ M. "
-                "No se transfiere B completo; se transfiere M. "
+                "M es la mecánica concreta que existe en B y que puede aislarse: "
+                "B ─aislamiento→ M. "
                 "Formalmente: Transfer(M) ∧ ¬Transfer(Contexto_B_completo)."
             ),
         },
-
         {
             "id": "PA-D5",
             "tipo": "definicion",
@@ -152,7 +133,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Formalmente: P_¬M → B_i."
             ),
         },
-
         {
             "id": "PA-D6",
             "tipo": "definicion",
@@ -166,13 +146,11 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Definición PA-D6 (Actualización Estructural). "
                 "Sea S_i^(0) el estado representacional de R_i que contiene P_¬M. "
-                "Tras evidencia M(B)=1, se produce la transición: "
-                "S_i^(0) → S_i^(1) donde S_i^(1) contiene P_◇M. "
+                "Tras evidencia M(B)=1: S_i^(0) → S_i^(1) donde S_i^(1) contiene P_◇M. "
                 "Transición documental: “Es imposible” → “Es posible bajo ciertas condiciones”. "
                 "R permanece invariante. Solo cambia el estado de R_i."
             ),
         },
-
         {
             "id": "PA-D7",
             "tipo": "definicion",
@@ -188,11 +166,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "δ_i(O) representa la separación funcional entre R_i y el objeto O. "
                 "δ_i(O) > 0 := separación funcional (posición observacional). "
                 "δ_i(O) = 0 := fusión funcional (identificación). "
-                "δ_i no es distancia espacial ni métrica física; es relación funcional "
-                "autorizada por el documento como condición de descripción precisa."
+                "δ_i no es distancia espacial ni métrica física; es relación funcional."
             ),
         },
-
         {
             "id": "PA-D8",
             "tipo": "definicion",
@@ -210,7 +186,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Ejemplo del documento: “Yo soy la angustia”."
             ),
         },
-
         {
             "id": "PA-D9",
             "tipo": "definicion",
@@ -226,11 +201,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "L5(R_i) = Obs(R_i). "
                 "ObsInterna_i(O) := observar el proceso interno O con la misma neutralidad "
                 "con la que se observa un proceso externo. "
-                "El documento la vincula explícitamente con L5. "
-                "No se redefine L5."
+                "Vinculada explícitamente con L5. No se redefine L5."
             ),
         },
-
         {
             "id": "PA-D10",
             "tipo": "definicion",
@@ -243,7 +216,6 @@ def declaraciones() -> List[Dict[str, Any]]:
             "gobierna": ["ontologia", "observacion", "direccion"],
             "enunciado": (
                 "Definición PA-D10 (Arco del trabajo interior). "
-                "Tres estados/funciones de R_i: "
                 "I_i := Identificado (R_i es el patrón). "
                 "E_i := Espectador (R_i ve el patrón; función de L5). "
                 "D_i := Director (R_i orienta; función de L4 integrada por L6). "
@@ -252,9 +224,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             ),
         },
 
-        # ==========================================================
-        # AXIOMAS  (PA-A1 … PA-A10)
-        # ==========================================================
+        # ── AXIOMAS ───────────────────────────────────────────────
 
         {
             "id": "PA-A1",
@@ -272,7 +242,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "una realidad coherente a partir de sus premisas."
             ),
         },
-
         {
             "id": "PA-A2",
             "tipo": "axioma",
@@ -289,7 +258,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "P_¬M := “Esto es imposible”."
             ),
         },
-
         {
             "id": "PA-A3",
             "tipo": "axioma",
@@ -306,7 +274,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "alrededor de ella: S_i ⊨ P_¬M."
             ),
         },
-
         {
             "id": "PA-A4",
             "tipo": "axioma",
@@ -324,7 +291,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "del espacio de procesamiento de R_i."
             ),
         },
-
         {
             "id": "PA-A5",
             "tipo": "axioma",
@@ -341,7 +307,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "sin necesitar enfrentarse directamente con ella."
             ),
         },
-
         {
             "id": "PA-A6",
             "tipo": "axioma",
@@ -358,7 +323,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "el ego puede reforzar su propia estructura, reforzando B_i."
             ),
         },
-
         {
             "id": "PA-A7",
             "tipo": "axioma",
@@ -376,7 +340,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Mecánica demostrada en B invalida la imposibilidad absoluta de la mecánica."
             ),
         },
-
         {
             "id": "PA-A8",
             "tipo": "axioma",
@@ -391,11 +354,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Axioma PA-A8 (La asociación válida transfiere mecanismo, no contexto). "
                 "AsocValida(A,B,M) ⇒ Transfer(M) ∧ ¬Transfer(Contexto_B_completo). "
                 "El contexto completo, identidad, jerarquía, deseo o permiso "
-                "no deben confundirse con el mecanismo. "
-                "Principal mecanismo anti-racionalización del modelo."
+                "no deben confundirse con el mecanismo."
             ),
         },
-
         {
             "id": "PA-A9",
             "tipo": "axioma",
@@ -413,7 +374,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "la descripción precisa se vuelve estructuralmente más difícil."
             ),
         },
-
         {
             "id": "PA-A10",
             "tipo": "axioma",
@@ -431,9 +391,7 @@ def declaraciones() -> List[Dict[str, Any]]:
             ),
         },
 
-        # ==========================================================
-        # LEMAS  (PA-L1 … PA-L9)
-        # ==========================================================
+        # ── LEMAS ─────────────────────────────────────────────────
 
         {
             "id": "PA-L1",
@@ -448,12 +406,10 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Lema PA-L1 (Transferencia de Posibilidad). "
                 "M(B)=1 ⇒ ¬∀C[¬M(C)]. "
-                "Si una mecánica existe realmente en B, entonces la afirmación absoluta "
-                "de que esa mecánica es imposible en A queda estructuralmente debilitada. "
-                "No se concluye M(A)."
+                "Si una mecánica existe realmente en B, la afirmación absoluta de "
+                "imposibilidad queda estructuralmente debilitada. No se concluye M(A)."
             ),
         },
-
         {
             "id": "PA-L2",
             "tipo": "lema",
@@ -468,11 +424,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Lema PA-L2 (Actualización de Condiciones). "
                 "La mente de R_i no transita de ¬◇M → M garantizado, "
                 "sino de ¬◇M → ◇M (posible bajo determinadas condiciones). "
-                "S_i^(0) ⊨ ¬◇M  →  S_i^(1) ⊨ ◇M. "
-                "Esto evita convertir el principio en pensamiento positivo."
+                "S_i^(0) ⊨ ¬◇M → S_i^(1) ⊨ ◇M."
             ),
         },
-
         {
             "id": "PA-L3",
             "tipo": "lema",
@@ -486,11 +440,9 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Lema PA-L3 (Asociación no es imaginación positiva). "
                 "AsocValida requiere: hecho real (M(B)=1) + mecanismo identificable + "
-                "transferencia delimitada (Transfer(M)). "
-                "No funciona mediante esperanza."
+                "transferencia delimitada (Transfer(M)). No funciona mediante esperanza."
             ),
         },
-
         {
             "id": "PA-L4",
             "tipo": "lema",
@@ -505,11 +457,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Lema PA-L4 (La capacidad ya existente puede reutilizarse). "
                 "El mismo R_i que puede describir con precisión procesos externos "
                 "ya posee la capacidad de observación y descripción. "
-                "El problema de la observación interna no se presenta como ausencia "
-                "absoluta de capacidad."
+                "El problema interno no se presenta como ausencia absoluta de capacidad."
             ),
         },
-
         {
             "id": "PA-L5",
             "tipo": "lema",
@@ -523,11 +473,9 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Lema PA-L5 (El problema interno es de posición del observador). "
                 "Si ObsPrecisa_i funciona externamente pero aparentemente falla internamente, "
-                "el documento localiza la diferencia en δ_i(O): posición del observador / "
-                "distancia funcional respecto del objeto."
+                "el documento localiza la diferencia en δ_i(O)."
             ),
         },
-
         {
             "id": "PA-L6",
             "tipo": "lema",
@@ -541,11 +489,9 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Lema PA-L6 (La identificación colapsa la distancia). "
                 "Identificacion_i(O) ⇒ δ_i(O) = 0. "
-                "Identificación → R_i fusionado con O → pérdida de distancia funcional. "
-                "Ejemplo: “Soy la angustia” en lugar de “Observo la angustia”."
+                "Identificación → R_i fusionado con O → pérdida de distancia funcional."
             ),
         },
-
         {
             "id": "PA-L7",
             "tipo": "lema",
@@ -563,7 +509,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Formulación documental: lo que se ve, se suelta."
             ),
         },
-
         {
             "id": "PA-L8",
             "tipo": "lema",
@@ -581,7 +526,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "del criterio externo."
             ),
         },
-
         {
             "id": "PA-L9",
             "tipo": "lema",
@@ -595,15 +539,11 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Lema PA-L9 (El director depende del espectador). "
                 "D_i legítimo requiere E_i previo. "
-                "E_i → condición de posibilidad → D_i. "
-                "No basta con detectar un patrón; la dirección solamente aparece después "
-                "de haber establecido δ_i(O) > 0 mediante observación."
+                "E_i → condición de posibilidad → D_i."
             ),
         },
 
-        # ==========================================================
-        # TEOREMAS  (PA-T1 … PA-T7)
-        # ==========================================================
+        # ── TEOREMAS ──────────────────────────────────────────────
 
         {
             "id": "PA-T1",
@@ -617,17 +557,13 @@ def declaraciones() -> List[Dict[str, Any]]:
             "gobierna": ["ontologia", "desbloqueo"],
             "enunciado": (
                 "Teorema PA-T1 (Disolución de la Imposibilidad Absoluta). "
-                "Premisas: "
-                "P1. M(B)=1 (PA-D3, evidencia). "
-                "P2. M(B)=1 ⇒ ¬∀C[¬M(C)] (PA-A7, PA-L1). "
-                "Derivación: P1 ∧ P2 ⊢ ¬∀C[M(C)=0]. "
-                "Equivalente: M(B)=1 ⊢ ◇M. "
+                "Premisas: P1. M(B)=1. P2. M(B)=1 ⇒ ¬∀C[¬M(C)]. "
+                "Derivación: P1 ∧ P2 ⊢ ¬∀C[M(C)=0]. Equivalente: M(B)=1 ⊢ ◇M. "
                 "Conclusión: la imposibilidad absoluta de M queda invalidada. "
-                "Esto NO demuestra M(A). Demuestra solamente: M es posible bajo "
-                "alguna configuración de condiciones."
+                "NO demuestra M(A). Demuestra solamente: M es posible bajo alguna "
+                "configuración de condiciones."
             ),
         },
-
         {
             "id": "PA-T2",
             "tipo": "teorema",
@@ -641,15 +577,14 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Teorema PA-T2 (Criterio de transferencia mecánica). "
                 "Premisas: "
-                "P1. AsocValida(A,B,M) ⇒ Transfer(M) ∧ ¬Transfer(Contexto_B_completo) (PA-A8). "
-                "P2. M es aislable y nombrable independientemente del resto del contexto (PA-D4). "
+                "P1. AsocValida(A,B,M) ⇒ Transfer(M) ∧ ¬Transfer(Contexto_B_completo). "
+                "P2. M es aislable y nombrable independientemente del resto del contexto. "
                 "Derivación: P1 ∧ P2 ⊢ base documental para asociación válida. "
                 "Criterio del documento: ¿qué mecánica exacta estoy transfiriendo, "
                 "y por qué opera igual en los dos casos? "
                 "NO se deriva: M(B) ⇒ M(A)."
             ),
         },
-
         {
             "id": "PA-T3",
             "tipo": "teorema",
@@ -663,15 +598,12 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Teorema PA-T3 (No-Transferencia Contextual). "
                 "Premisas: "
-                "P1. AsocValida ⇒ Transfer(M) ∧ ¬Transfer(Contexto_B_completo) (PA-A8). "
+                "P1. AsocValida ⇒ Transfer(M) ∧ ¬Transfer(Contexto_B_completo). "
                 "P2. Importar identidad, jerarquía, deseo, permiso o contexto completo "
                 "≡ Transfer(Contexto_B_completo). "
-                "Derivación: P1 ∧ P2 ⊢ ¬AsocValida cuando se importa contexto completo. "
-                "Conclusión: contexto completo → racionalización potencial; "
-                "mecanismo aislado → asociación verificable."
+                "Derivación: P1 ∧ P2 ⊢ ¬AsocValida cuando se importa contexto completo."
             ),
         },
-
         {
             "id": "PA-T4",
             "tipo": "teorema",
@@ -685,16 +617,11 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Teorema PA-T4 (Distancia Observacional). "
                 "Premisas: "
-                "P1. δ_i(O) > 0 ⇒ ObsPrecisa_i(O) (PA-A9). "
-                "P2. Identificacion_i(O) ⇒ δ_i(O) = 0 (PA-L6). "
-                "Derivación: P1 ∧ P2 ⊢ Identificacion_i(O) ⇒ ¬ObsPrecisa_i(O) "
-                "(en el sentido de reducción de capacidad descriptiva precisa). "
-                "Explica la paradoja documental: puedo describir el motor, "
-                "pero aparentemente no puedo describir mi angustia. "
-                "No porque la herramienta desaparezca, sino porque cambia δ_i."
+                "P1. δ_i(O) > 0 ⇒ ObsPrecisa_i(O). "
+                "P2. Identificacion_i(O) ⇒ δ_i(O) = 0. "
+                "Derivación: P1 ∧ P2 ⊢ Identificacion_i(O) ⇒ reducción de ObsPrecisa_i(O)."
             ),
         },
-
         {
             "id": "PA-T5",
             "tipo": "teorema",
@@ -708,16 +635,15 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Teorema PA-T5 (Observación Interna). "
                 "Premisas: "
-                "P1. R_i ya posee ObsPrecisa sobre objetos externos (PA-L4). "
-                "P2. δ_i(O) > 0 es la condición de ObsPrecisa (PA-A9, PA-T4). "
-                "P3. ObsInterna_i(O) ≡ aplicar Obs hacia adentro (PA-D9, L5). "
+                "P1. R_i ya posee ObsPrecisa sobre objetos externos. "
+                "P2. δ_i(O) > 0 es la condición de ObsPrecisa. "
+                "P3. ObsInterna_i(O) ≡ aplicar Obs hacia adentro (L5). "
                 "Derivación: P1 ∧ P2 ∧ P3 ⊢ si δ_i(O_interno) > 0, "
                 "entonces R_i puede reutilizar la misma función observacional hacia adentro. "
-                "Formulación documental: la tarea no es desarrollar una nueva capacidad; "
+                "Documento: la tarea no es desarrollar una nueva capacidad; "
                 "es aplicar la misma posición de observación hacia adentro."
             ),
         },
-
         {
             "id": "PA-T6",
             "tipo": "teorema",
@@ -731,15 +657,13 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Teorema PA-T6 (Secuencia Irreversible). "
                 "Premisas: "
-                "P1. Secuencia legítima: I_i → E_i → D_i (PA-A10, PA-D10). "
-                "P2. D_i legítimo requiere E_i previo (PA-L9). "
+                "P1. Secuencia legítima: I_i → E_i → D_i. "
+                "P2. D_i legítimo requiere E_i previo. "
                 "Derivación: P1 ∧ P2 ⊢ ¬(I_i → D_i legítimo). "
-                "Conclusión documental: quien intenta dirigir sin antes observar "
-                "sigue identificado y solo ha cambiado de máscara. "
-                "Director sin Espectador = identificación operando bajo otra forma."
+                "Documento: quien intenta dirigir sin antes observar sigue identificado "
+                "y solo ha cambiado de máscara."
             ),
         },
-
         {
             "id": "PA-T7",
             "tipo": "teorema",
@@ -753,23 +677,18 @@ def declaraciones() -> List[Dict[str, Any]]:
             "enunciado": (
                 "Teorema PA-T7 (Libertad por Observación). "
                 "Premisas: "
-                "P1. Obs del patrón → disolución progresiva de identificación (PA-L7). "
-                "P2. δ_i > 0 permite ObsInterna (PA-T5). "
-                "P3. E_i precede a D_i (PA-T6). "
-                "Derivación documental: "
-                "ver patrón → establecer δ_i > 0 → disminuir identificación → "
+                "P1. Obs del patrón → disolución progresiva de identificación. "
+                "P2. δ_i > 0 permite ObsInterna. "
+                "P3. E_i precede a D_i. "
+                "Cadena documental: ver patrón → establecer δ_i > 0 → disminuir identificación → "
                 "recuperar capacidad de elección → dirección. "
-                "Formulación del documento: no dejas de ser esclavo del patrón por luchar "
-                "contra él, sino por verlo operar. Lo que observas, lo sueltas. "
-                "Lo que sueltas, deja de tener fuerza sobre ti. "
-                "Estado: formulación documental con cadena soportada por dependencias; "
-                "no se afirma Γ ⊢ Libertad como teorema matemático cerrado más allá del texto."
+                "Documento: no dejas de ser esclavo del patrón por luchar contra él, "
+                "sino por verlo operar. Lo que observas, lo sueltas. "
+                "Estado: formulación documental; no se afirma Γ ⊢ Libertad más allá del texto."
             ),
         },
 
-        # ==========================================================
-        # COROLARIOS  (PA-C1 … PA-C8)
-        # ==========================================================
+        # ── COROLARIOS ────────────────────────────────────────────
 
         {
             "id": "PA-C1",
@@ -788,7 +707,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Puede representar una regla estructural aceptada por la identidad de R_i."
             ),
         },
-
         {
             "id": "PA-C2",
             "tipo": "corolario",
@@ -806,7 +724,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "no necesariamente el resultado completo M(A)."
             ),
         },
-
         {
             "id": "PA-C3",
             "tipo": "corolario",
@@ -825,7 +742,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Asociación conceptual del documento; no demostración biomédica cuantitativa."
             ),
         },
-
         {
             "id": "PA-C4",
             "tipo": "corolario",
@@ -843,7 +759,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "Mecánica transferida: procesamiento sin identificación."
             ),
         },
-
         {
             "id": "PA-C5",
             "tipo": "corolario",
@@ -859,12 +774,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "El documento utiliza fenómenos de IA (alucinaciones, sesgos) como B "
                 "para mostrar que determinados fenómenos de procesamiento no son defectos "
                 "exclusivos del “estar vivo”, sino consecuencias mecánicas de cómo se "
-                "procesa la información en una red neuronal. "
-                "Si la máquina alucina porque simula al humano, entonces el humano también "
-                "opera bajo mecánicas predecibles y replicables."
+                "procesa la información en una red neuronal."
             ),
         },
-
         {
             "id": "PA-C6",
             "tipo": "corolario",
@@ -880,12 +792,9 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "L5(R_i) = Obs(R_i). "
                 "El documento conecta el Principio de Asociación con CEMYCA: "
                 "L5 = observar el proceso interno con la misma neutralidad con que se "
-                "observa un proceso externo. "
-                "No identificarse con la angustia, sino observarla. "
-                "No se redefine L5."
+                "observa un proceso externo. No se redefine L5."
             ),
         },
-
         {
             "id": "PA-C7",
             "tipo": "corolario",
@@ -903,7 +812,6 @@ def declaraciones() -> List[Dict[str, Any]]:
                 "porque la propia estructura observada revela el error."
             ),
         },
-
         {
             "id": "PA-C8",
             "tipo": "corolario",

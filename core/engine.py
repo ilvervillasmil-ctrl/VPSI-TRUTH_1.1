@@ -394,6 +394,7 @@ class Engine:
     # ===========================================================
     # DECLARACIÓN PROPÓSITO FUNDAMENTAL (MANDATO INVARIABLE)
     # ===========================================================
+    
     PROPOSITO_FUNDAMENTAL = "Calcular la verdad de cualquier descripcion"
     CLAVE_PROPOSITO = "EJECUTAR_LA_FORMULA_DE_LA_VERDAD"
     

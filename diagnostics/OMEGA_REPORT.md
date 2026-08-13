@@ -13,7 +13,7 @@
   total_modulos: 18
   trazas_n: 50
   rutas_n: 0
-  timestamp: 2026-08-12T22:42:37.393719+00:00
+  timestamp: 2026-08-13T01:54:39.310346+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -31,7 +31,7 @@
     []
   trazas_n: 50
   rutas_n: 0
-  timestamp: 2026-08-12T22:42:37.393656+00:00
+  timestamp: 2026-08-13T01:54:39.310272+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1583,32 +1583,32 @@
         archivo: __init__.py
         sha256: ad0d0f83d23bb57747fee54411b311613465469207dd171f7284a3d6ae042adc
         tamano: 64727
-        timestamp_mtime: 2026-08-12T22:42:23.975894+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.237771+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1686,32 +1686,32 @@
         archivo: __init__.py
         sha256: ad0d0f83d23bb57747fee54411b311613465469207dd171f7284a3d6ae042adc
         tamano: 64727
-        timestamp_mtime: 2026-08-12T22:42:23.975894+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.237771+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-12T22:42:23.976410+00:00
+        timestamp_mtime: 2026-08-13T01:54:34.238105+00:00
     factores_api:
       • C
       • K
@@ -2055,21 +2055,7 @@
     • obtener_diagnostico
     • verificar_coherencia
   requiere:
-    • CT
-    • AX
-    • FO
-    • MC
-    • SF
-    • CA
-    • CX
-    • DI
-    • RE
-    • VX
-    • TX
-    • CH
-    • CIT
-    • TT
-    • CE
+    • *
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -2120,15 +2106,15 @@
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia del glosario.
-      entrada: acceso_archivos
+      entrada: *
       validar_esquema:
-        • acceso_archivos
+        • *
       salida: dict con coherente, categorias, ids, errores
       acceso_archivos:
-        • acceso_archivos
+        • *
     barrer:
       descripcion: Evalúa coherencia del glosario de IDs. No calcula.
-      entrada: accceso_archivos
+      entrada: *
       validar_esquema:
         • *
       salida: dict con coherente, categorias, ids, errores, esquema
@@ -2775,21 +2761,7 @@
       • diagnostico
       • verificar_salida
     requiere:
-      • CT
-      • AX
-      • FO
-      • MC
-      • SF
-      • CA
-      • CX
-      • DI
-      • RE
-      • VX
-      • TX
-      • CH
-      • CIT
-      • TT
-      • CE
+      • *
     autoridad:
       • Declarar los IDs disponibles en el catálogo
       • Resolver consulta por_id / ids / esquema
@@ -8237,21 +8209,7 @@
       • diagnostico
       • verificar_salida
     requiere:
-      • CT
-      • AX
-      • FO
-      • MC
-      • SF
-      • CA
-      • CX
-      • DI
-      • RE
-      • VX
-      • TX
-      • CH
-      • CIT
-      • TT
-      • CE
+      • *
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
@@ -12632,21 +12590,41 @@
       • CE
       • CC
     catalogo_citaciones:
-      • CT
       • AX
-      • FO
-      • MC
-      • SF
       • CA
-      • CX
-      • DI
-      • RE
-      • VX
-      • TX
+      • CC
+      • CE
       • CH
       • CIT
+      • CT
+      • CX
+      • DI
+      • FO
+      • MC
+      • RE
+      • SC
+      • SF
       • TT
-      • CE
+      • TX
+      • UI
+      • VX
+      • axiomas
+      • cache
+      • calculator
+      • capacidades_engine
+      • citacion
+      • constante
+      • contexto
+      • correlacion_mecanica
+      • diccionario
+      • formulas
+      • interfaz
+      • realidad
+      • self
+      • spartaco_seguridad
+      • taxonomia
+      • tru_totales
+      • verificacion
     citacion:
       • AX
       • CA
@@ -14662,725 +14640,669 @@
       tipo: declara_capacidad
     [123]
       from: catalogo_citaciones
-      to: CT
+      to: *
       tipo: requiere
     [124]
       from: catalogo_citaciones
-      to: AX
-      tipo: requiere
-    [125]
-      from: catalogo_citaciones
-      to: FO
-      tipo: requiere
-    [126]
-      from: catalogo_citaciones
-      to: MC
-      tipo: requiere
-    [127]
-      from: catalogo_citaciones
-      to: SF
-      tipo: requiere
-    [128]
-      from: catalogo_citaciones
-      to: CA
-      tipo: requiere
-    [129]
-      from: catalogo_citaciones
-      to: CX
-      tipo: requiere
-    [130]
-      from: catalogo_citaciones
-      to: DI
-      tipo: requiere
-    [131]
-      from: catalogo_citaciones
-      to: RE
-      tipo: requiere
-    [132]
-      from: catalogo_citaciones
-      to: VX
-      tipo: requiere
-    [133]
-      from: catalogo_citaciones
-      to: TX
-      tipo: requiere
-    [134]
-      from: catalogo_citaciones
-      to: CH
-      tipo: requiere
-    [135]
-      from: catalogo_citaciones
-      to: CIT
-      tipo: requiere
-    [136]
-      from: catalogo_citaciones
-      to: TT
-      tipo: requiere
-    [137]
-      from: catalogo_citaciones
-      to: CE
-      tipo: requiere
-    [138]
-      from: catalogo_citaciones
       to: catalogo_citaciones.verificar
       tipo: declara_capacidad
-    [139]
+    [125]
       from: catalogo_citaciones
       to: catalogo_citaciones.barrer
       tipo: declara_capacidad
-    [140]
+    [126]
       from: catalogo_citaciones
       to: catalogo_citaciones.inventario
       tipo: declara_capacidad
-    [141]
+    [127]
       from: catalogo_citaciones
       to: catalogo_citaciones.categorias
       tipo: declara_capacidad
-    [142]
+    [128]
       from: catalogo_citaciones
       to: catalogo_citaciones.por_id
       tipo: declara_capacidad
-    [143]
+    [129]
       from: catalogo_citaciones
       to: catalogo_citaciones.ids
       tipo: declara_capacidad
-    [144]
+    [130]
       from: catalogo_citaciones
       to: catalogo_citaciones.esquema
       tipo: declara_capacidad
-    [145]
+    [131]
       from: catalogo_citaciones
       to: catalogo_citaciones.reporte
       tipo: declara_capacidad
-    [146]
+    [132]
       from: catalogo_citaciones
       to: catalogo_citaciones.diagnostico
       tipo: declara_capacidad
-    [147]
+    [133]
       from: catalogo_citaciones
       to: catalogo_citaciones.verificar_salida
       tipo: declara_capacidad
-    [148]
+    [134]
       from: citacion
       to: *
       tipo: requiere
-    [149]
+    [135]
       from: citacion
       to: citacion.verificar
       tipo: declara_capacidad
-    [150]
+    [136]
       from: citacion
       to: citacion.barrer
       tipo: declara_capacidad
-    [151]
+    [137]
       from: citacion
       to: citacion.inventario
       tipo: declara_capacidad
-    [152]
+    [138]
       from: citacion
       to: citacion.reporte
       tipo: declara_capacidad
-    [153]
+    [139]
       from: citacion
       to: citacion.diagnostico
       tipo: declara_capacidad
-    [154]
+    [140]
       from: citacion
       to: citacion.verificar_salida
       tipo: declara_capacidad
-    [155]
+    [141]
       from: citacion
       to: citacion.anunciar
       tipo: declara_capacidad
-    [156]
+    [142]
       from: citacion
       to: citacion.anunciar_todo
       tipo: declara_capacidad
-    [157]
+    [143]
       from: citacion
       to: citacion.citar
       tipo: declara_capacidad
-    [158]
+    [144]
       from: citacion
       to: citacion.registrar
       tipo: declara_capacidad
-    [159]
+    [145]
       from: citacion
       to: citacion.resolver
       tipo: declara_capacidad
-    [160]
+    [146]
       from: citacion
       to: citacion.resolver_enunciado
       tipo: declara_capacidad
-    [161]
+    [147]
       from: citacion
       to: citacion.buscar
       tipo: declara_capacidad
-    [162]
+    [148]
       from: citacion
       to: citacion.cadena
       tipo: declara_capacidad
-    [163]
+    [149]
       from: citacion
       to: citacion.explicar
       tipo: declara_capacidad
-    [164]
+    [150]
       from: citacion
       to: citacion.relacionar
       tipo: declara_capacidad
-    [165]
+    [151]
       from: citacion
       to: citacion.limpiar_ciclo
       tipo: declara_capacidad
-    [166]
+    [152]
       from: citacion
       to: citacion.evaluar
       tipo: declara_capacidad
-    [167]
+    [153]
       from: constante
       to: CT
       tipo: requiere
-    [168]
+    [154]
       from: constante
       to: AX
       tipo: requiere
-    [169]
+    [155]
       from: constante
       to: FO
       tipo: requiere
-    [170]
+    [156]
       from: constante
       to: MC
       tipo: requiere
-    [171]
+    [157]
       from: constante
       to: SF
       tipo: requiere
-    [172]
+    [158]
       from: constante
       to: CA
       tipo: requiere
-    [173]
+    [159]
       from: constante
       to: CX
       tipo: requiere
-    [174]
+    [160]
       from: constante
       to: DI
       tipo: requiere
-    [175]
+    [161]
       from: constante
       to: RE
       tipo: requiere
-    [176]
+    [162]
       from: constante
       to: VX
       tipo: requiere
-    [177]
+    [163]
       from: constante
       to: TX
       tipo: requiere
-    [178]
+    [164]
       from: constante
       to: CH
       tipo: requiere
-    [179]
+    [165]
       from: constante
       to: CIT
       tipo: requiere
-    [180]
+    [166]
       from: constante
       to: TT
       tipo: requiere
-    [181]
+    [167]
       from: constante
       to: CE
       tipo: requiere
-    [182]
+    [168]
       from: constante
       to: CC
       tipo: requiere
-    [183]
+    [169]
       from: constante
       to: constante.alpha
       tipo: declara_capacidad
-    [184]
+    [170]
       from: constante
       to: constante.beta
       tipo: declara_capacidad
-    [185]
+    [171]
       from: constante
       to: constante.descubrir_constantes
       tipo: declara_capacidad
-    [186]
+    [172]
       from: constante
       to: constante.listar_constantes
       tipo: declara_capacidad
-    [187]
+    [173]
       from: constante
       to: constante.buscar_constante
       tipo: declara_capacidad
-    [188]
+    [174]
       from: constante
       to: constante.verificar_constantes
       tipo: declara_capacidad
-    [189]
+    [175]
       from: constante
       to: constante.inventario
       tipo: declara_capacidad
-    [190]
+    [176]
       from: constante
       to: constante.reporte
       tipo: declara_capacidad
-    [191]
+    [177]
       from: constante
       to: constante.diagnostico
       tipo: declara_capacidad
-    [192]
+    [178]
       from: constante
       to: constante.verificar
       tipo: declara_capacidad
-    [193]
+    [179]
       from: contexto
       to: *
       tipo: requiere
-    [194]
+    [180]
       from: contexto
       to: contexto.resolver
       tipo: declara_capacidad
-    [195]
+    [181]
       from: contexto
       to: contexto.evaluar
       tipo: declara_capacidad
-    [196]
+    [182]
       from: contexto
       to: contexto.centinela
       tipo: declara_capacidad
-    [197]
+    [183]
       from: contexto
       to: contexto.verificar
       tipo: declara_capacidad
-    [198]
+    [184]
       from: contexto
       to: contexto.barrer
       tipo: declara_capacidad
-    [199]
+    [185]
       from: contexto
       to: contexto.inventario
       tipo: declara_capacidad
-    [200]
+    [186]
       from: contexto
       to: contexto.reporte
       tipo: declara_capacidad
-    [201]
+    [187]
       from: contexto
       to: contexto.diagnostico
       tipo: declara_capacidad
-    [202]
+    [188]
       from: contexto
       to: contexto.axiomas
       tipo: declara_capacidad
-    [203]
+    [189]
       from: contexto
       to: contexto.verificar_salida
       tipo: declara_capacidad
-    [204]
+    [190]
       from: correlacion_mecanica
       to: *
       tipo: requiere
-    [205]
+    [191]
       from: correlacion_mecanica
       to: correlacion_mecanica.verificar
       tipo: declara_capacidad
-    [206]
+    [192]
       from: correlacion_mecanica
       to: correlacion_mecanica.barrer
       tipo: declara_capacidad
-    [207]
+    [193]
       from: correlacion_mecanica
       to: correlacion_mecanica.evaluar
       tipo: declara_capacidad
-    [208]
+    [194]
       from: correlacion_mecanica
       to: correlacion_mecanica.axiomas
       tipo: declara_capacidad
-    [209]
+    [195]
       from: correlacion_mecanica
       to: correlacion_mecanica.inventario
       tipo: declara_capacidad
-    [210]
+    [196]
       from: correlacion_mecanica
       to: correlacion_mecanica.verificar_salida
       tipo: declara_capacidad
-    [211]
+    [197]
       from: correlacion_mecanica
       to: correlacion_mecanica.reporte
       tipo: declara_capacidad
-    [212]
+    [198]
       from: correlacion_mecanica
       to: correlacion_mecanica.diagnostico
       tipo: declara_capacidad
-    [213]
+    [199]
       from: correlacion_mecanica
       to: correlacion_mecanica.listar_mecanicas
       tipo: declara_capacidad
-    [214]
+    [200]
       from: diccionario
       to: *
       tipo: requiere
-    [215]
+    [201]
       from: diccionario
       to: diccionario.verificar
       tipo: declara_capacidad
-    [216]
+    [202]
       from: diccionario
       to: diccionario.barrer
       tipo: declara_capacidad
-    [217]
+    [203]
       from: diccionario
       to: diccionario.inventario
       tipo: declara_capacidad
-    [218]
+    [204]
       from: diccionario
       to: diccionario.reporte
       tipo: declara_capacidad
-    [219]
+    [205]
       from: diccionario
       to: diccionario.diagnostico
       tipo: declara_capacidad
-    [220]
+    [206]
       from: diccionario
       to: diccionario.axiomas
       tipo: declara_capacidad
-    [221]
+    [207]
       from: diccionario
       to: diccionario.resolver
       tipo: declara_capacidad
-    [222]
+    [208]
       from: diccionario
       to: diccionario.listar
       tipo: declara_capacidad
-    [223]
+    [209]
       from: diccionario
       to: diccionario.cargar
       tipo: declara_capacidad
-    [224]
+    [210]
       from: diccionario
       to: diccionario.cargar_todos
       tipo: declara_capacidad
-    [225]
+    [211]
       from: diccionario
       to: diccionario.definir
       tipo: declara_capacidad
-    [226]
+    [212]
       from: diccionario
       to: diccionario.significado
       tipo: declara_capacidad
-    [227]
+    [213]
       from: diccionario
       to: diccionario.palabras
       tipo: declara_capacidad
-    [228]
+    [214]
       from: diccionario
       to: diccionario.inyectar_en_peticion
       tipo: declara_capacidad
-    [229]
+    [215]
       from: diccionario
       to: diccionario.verificar_salida
       tipo: declara_capacidad
-    [230]
+    [216]
       from: formulas
       to: *
       tipo: requiere
-    [231]
+    [217]
       from: formulas
       to: formulas.verificar
       tipo: declara_capacidad
-    [232]
+    [218]
       from: formulas
       to: formulas.barrer
       tipo: declara_capacidad
-    [233]
+    [219]
       from: formulas
       to: formulas.evaluar
       tipo: declara_capacidad
-    [234]
+    [220]
       from: formulas
       to: formulas.verificar_salida
       tipo: declara_capacidad
-    [235]
+    [221]
       from: formulas
       to: formulas.inventario
       tipo: declara_capacidad
-    [236]
+    [222]
       from: formulas
       to: formulas.axiomas
       tipo: declara_capacidad
-    [237]
+    [223]
       from: formulas
       to: formulas.tru_ri
       tipo: declara_capacidad
-    [238]
+    [224]
       from: formulas
       to: formulas.tru_total
       tipo: declara_capacidad
-    [239]
+    [225]
       from: formulas
       to: formulas.reporte
       tipo: declara_capacidad
-    [240]
+    [226]
       from: formulas
       to: formulas.diagnostico
       tipo: declara_capacidad
-    [241]
+    [227]
       from: formulas
       to: formulas.listar_formulas
       tipo: declara_capacidad
-    [242]
+    [228]
       from: interfaz
       to: interfaz.verificar
       tipo: declara_capacidad
-    [243]
+    [229]
       from: interfaz
       to: interfaz.barrer
       tipo: declara_capacidad
-    [244]
+    [230]
       from: interfaz
       to: interfaz.componer
       tipo: declara_capacidad
-    [245]
+    [231]
       from: interfaz
       to: interfaz.inventario
       tipo: declara_capacidad
-    [246]
+    [232]
       from: interfaz
       to: interfaz.inventario_paquetes
       tipo: declara_capacidad
-    [247]
+    [233]
       from: interfaz
       to: interfaz.observar
       tipo: declara_capacidad
-    [248]
+    [234]
       from: interfaz
       to: interfaz.axiomas
       tipo: declara_capacidad
-    [249]
+    [235]
       from: realidad
       to: *
       tipo: requiere
-    [250]
+    [236]
       from: realidad
       to: realidad.verificar
       tipo: declara_capacidad
-    [251]
+    [237]
       from: realidad
       to: realidad.barrer
       tipo: declara_capacidad
-    [252]
+    [238]
       from: realidad
       to: realidad.inventario
       tipo: declara_capacidad
-    [253]
+    [239]
       from: realidad
       to: realidad.reporte
       tipo: declara_capacidad
-    [254]
+    [240]
       from: realidad
       to: realidad.diagnostico
       tipo: declara_capacidad
-    [255]
+    [241]
       from: realidad
       to: realidad.registrar_resultado_dominio
       tipo: declara_capacidad
-    [256]
+    [242]
       from: realidad
       to: realidad.verificar_salida
       tipo: declara_capacidad
-    [257]
+    [243]
       from: self
       to: *
       tipo: requiere
-    [258]
+    [244]
       from: self
       to: self.verificar
       tipo: declara_capacidad
-    [259]
+    [245]
       from: self
       to: self.barrer
       tipo: declara_capacidad
-    [260]
+    [246]
       from: self
       to: self.verificar_salida
       tipo: declara_capacidad
-    [261]
+    [247]
       from: self
       to: self.yo_funcional
       tipo: declara_capacidad
-    [262]
+    [248]
       from: self
       to: self.oscilar
       tipo: declara_capacidad
-    [263]
+    [249]
       from: self
       to: self.desde_donde
       tipo: declara_capacidad
-    [264]
+    [250]
       from: self
       to: self.estado_self
       tipo: declara_capacidad
-    [265]
+    [251]
       from: self
       to: self.elegir
       tipo: declara_capacidad
-    [266]
+    [252]
       from: self
       to: self.inventario
       tipo: declara_capacidad
-    [267]
+    [253]
       from: self
       to: self.reporte
       tipo: declara_capacidad
-    [268]
+    [254]
       from: self
       to: self.diagnostico
       tipo: declara_capacidad
-    [269]
+    [255]
       from: spartaco_seguridad
       to: *
       tipo: requiere
-    [270]
+    [256]
       from: spartaco_seguridad
       to: spartaco_seguridad.verificar
       tipo: declara_capacidad
-    [271]
+    [257]
       from: spartaco_seguridad
       to: spartaco_seguridad.barrer
       tipo: declara_capacidad
-    [272]
+    [258]
       from: spartaco_seguridad
       to: spartaco_seguridad.inventario
       tipo: declara_capacidad
-    [273]
+    [259]
       from: spartaco_seguridad
       to: spartaco_seguridad.reporte
       tipo: declara_capacidad
-    [274]
+    [260]
       from: spartaco_seguridad
       to: spartaco_seguridad.diagnostico
       tipo: declara_capacidad
-    [275]
+    [261]
       from: spartaco_seguridad
       to: spartaco_seguridad.catalogo
       tipo: declara_capacidad
-    [276]
+    [262]
       from: spartaco_seguridad
       to: spartaco_seguridad.verificar_salida
       tipo: declara_capacidad
-    [277]
+    [263]
       from: taxonomia
       to: *
       tipo: requiere
-    [278]
+    [264]
       from: taxonomia
       to: taxonomia.verificar
       tipo: declara_capacidad
-    [279]
+    [265]
       from: taxonomia
       to: taxonomia.barrer
       tipo: declara_capacidad
-    [280]
+    [266]
       from: taxonomia
       to: taxonomia.aplicar
       tipo: declara_capacidad
-    [281]
+    [267]
       from: taxonomia
       to: taxonomia.inventario
       tipo: declara_capacidad
-    [282]
+    [268]
       from: taxonomia
       to: taxonomia.reporte
       tipo: declara_capacidad
-    [283]
+    [269]
       from: taxonomia
       to: taxonomia.diagnostico
       tipo: declara_capacidad
-    [284]
+    [270]
       from: taxonomia
       to: taxonomia.axiomas
       tipo: declara_capacidad
-    [285]
+    [271]
       from: taxonomia
       to: taxonomia.verificar_salida
       tipo: declara_capacidad
-    [286]
+    [272]
       from: tru_totales
       to: *
       tipo: requiere
-    [287]
+    [273]
       from: tru_totales
       to: tru_totales.verificar
       tipo: declara_capacidad
-    [288]
+    [274]
       from: tru_totales
       to: tru_totales.barrer
       tipo: declara_capacidad
-    [289]
+    [275]
       from: tru_totales
       to: tru_totales.inventario
       tipo: declara_capacidad
-    [290]
+    [276]
       from: tru_totales
       to: tru_totales.capacidades
       tipo: declara_capacidad
-    [291]
+    [277]
       from: tru_totales
       to: tru_totales.categorias
       tipo: declara_capacidad
-    [292]
+    [278]
       from: tru_totales
       to: tru_totales.resolver_pedido
       tipo: declara_capacidad
-    [293]
+    [279]
       from: tru_totales
       to: tru_totales.reporte
       tipo: declara_capacidad
-    [294]
+    [280]
       from: tru_totales
       to: tru_totales.diagnostico
       tipo: declara_capacidad
-    [295]
+    [281]
       from: tru_totales
       to: tru_totales.verificar_salida
       tipo: declara_capacidad
-    [296]
+    [282]
       from: verificacion
       to: *
       tipo: requiere
-    [297]
+    [283]
       from: verificacion
       to: verificacion.verificar
       tipo: declara_capacidad
-    [298]
+    [284]
       from: verificacion
       to: verificacion.barrer
       tipo: declara_capacidad
-    [299]
+    [285]
       from: verificacion
       to: verificacion.inventario
       tipo: declara_capacidad
-    [300]
+    [286]
       from: verificacion
       to: verificacion.reporte
       tipo: declara_capacidad
-    [301]
+    [287]
       from: verificacion
       to: verificacion.diagnostico
       tipo: declara_capacidad
-    [302]
+    [288]
       from: verificacion
       to: verificacion.verificar_salida
       tipo: declara_capacidad
-    [303]
+    [289]
       from: verificacion
       to: verificacion.axiomas
       tipo: declara_capacidad
@@ -15390,350 +15312,350 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-12T22:42:37.301883+00:00
+    timestamp: 2026-08-13T01:54:39.185904+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.007843
+    duracion_s: 0.010709
   [1]
     id_traza: 2
-    timestamp: 2026-08-12T22:42:37.309643+00:00
+    timestamp: 2026-08-13T01:54:39.196701+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.007702
+    duracion_s: 0.010723
   [2]
     id_traza: 3
-    timestamp: 2026-08-12T22:42:37.316783+00:00
+    timestamp: 2026-08-13T01:54:39.206611+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.007076
+    duracion_s: 0.009831
   [3]
     id_traza: 4
-    timestamp: 2026-08-12T22:42:37.316843+00:00
+    timestamp: 2026-08-13T01:54:39.206691+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 1.6e-05
+    duracion_s: 2.1e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-12T22:42:37.316870+00:00
+    timestamp: 2026-08-13T01:54:39.206728+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 7e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-12T22:42:37.316902+00:00
+    timestamp: 2026-08-13T01:54:39.206772+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 6e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-12T22:42:37.317290+00:00
+    timestamp: 2026-08-13T01:54:39.207308+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000364
+    duracion_s: 0.000505
   [7]
     id_traza: 8
-    timestamp: 2026-08-12T22:42:37.317546+00:00
+    timestamp: 2026-08-13T01:54:39.207709+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000235
+    duracion_s: 0.000365
   [8]
     id_traza: 9
-    timestamp: 2026-08-12T22:42:37.317822+00:00
+    timestamp: 2026-08-13T01:54:39.208118+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000254
+    duracion_s: 0.000373
   [9]
     id_traza: 10
-    timestamp: 2026-08-12T22:42:37.318571+00:00
+    timestamp: 2026-08-13T01:54:39.209120+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000726
+    duracion_s: 0.000966
   [10]
     id_traza: 11
-    timestamp: 2026-08-12T22:42:37.320101+00:00
+    timestamp: 2026-08-13T01:54:39.211216+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001502
+    duracion_s: 0.002061
   [11]
     id_traza: 12
-    timestamp: 2026-08-12T22:42:37.321403+00:00
+    timestamp: 2026-08-13T01:54:39.212974+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001263
+    duracion_s: 0.001718
   [12]
     id_traza: 13
-    timestamp: 2026-08-12T22:42:37.322344+00:00
+    timestamp: 2026-08-13T01:54:39.214291+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000898
+    duracion_s: 0.00125
   [13]
     id_traza: 14
-    timestamp: 2026-08-12T22:42:37.322381+00:00
+    timestamp: 2026-08-13T01:54:39.214337+00:00
     modulo: citacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 3e-06
   [14]
     id_traza: 15
-    timestamp: 2026-08-12T22:42:37.322398+00:00
+    timestamp: 2026-08-13T01:54:39.214360+00:00
     modulo: citacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [15]
     id_traza: 16
-    timestamp: 2026-08-12T22:42:37.322415+00:00
+    timestamp: 2026-08-13T01:54:39.214382+00:00
     modulo: citacion
     capacidad: inventario
     estado: EXITO
     duracion_s: 3e-06
   [16]
     id_traza: 17
-    timestamp: 2026-08-12T22:42:37.322577+00:00
+    timestamp: 2026-08-13T01:54:39.214591+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000148
+    duracion_s: 0.00019
   [17]
     id_traza: 18
-    timestamp: 2026-08-12T22:42:37.322705+00:00
+    timestamp: 2026-08-13T01:54:39.214737+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000111
+    duracion_s: 0.000121
   [18]
     id_traza: 19
-    timestamp: 2026-08-12T22:42:37.322765+00:00
+    timestamp: 2026-08-13T01:54:39.214822+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 3.9e-05
+    duracion_s: 5.8e-05
   [19]
     id_traza: 20
-    timestamp: 2026-08-12T22:42:37.332501+00:00
+    timestamp: 2026-08-13T01:54:39.227849+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.009716
+    duracion_s: 0.013001
   [20]
     id_traza: 21
-    timestamp: 2026-08-12T22:42:37.333256+00:00
+    timestamp: 2026-08-13T01:54:39.228841+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000722
+    duracion_s: 0.000953
   [21]
     id_traza: 22
-    timestamp: 2026-08-12T22:42:37.333884+00:00
+    timestamp: 2026-08-13T01:54:39.229776+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000594
+    duracion_s: 0.000891
   [22]
     id_traza: 23
-    timestamp: 2026-08-12T22:42:37.345799+00:00
+    timestamp: 2026-08-13T01:54:39.245744+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.011887
+    duracion_s: 0.015931
   [23]
     id_traza: 24
-    timestamp: 2026-08-12T22:42:37.352483+00:00
+    timestamp: 2026-08-13T01:54:39.254336+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.006643
+    duracion_s: 0.008544
   [24]
     id_traza: 25
-    timestamp: 2026-08-12T22:42:37.353291+00:00
+    timestamp: 2026-08-13T01:54:39.255434+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000773
+    duracion_s: 0.001057
   [25]
     id_traza: 26
-    timestamp: 2026-08-12T22:42:37.355398+00:00
+    timestamp: 2026-08-13T01:54:39.258246+00:00
     modulo: diccionario
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002075
+    duracion_s: 0.002775
   [26]
     id_traza: 27
-    timestamp: 2026-08-12T22:42:37.355436+00:00
+    timestamp: 2026-08-13T01:54:39.258290+00:00
     modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 1e-05
   [27]
     id_traza: 28
-    timestamp: 2026-08-12T22:42:37.355473+00:00
+    timestamp: 2026-08-13T01:54:39.258339+00:00
     modulo: diccionario
     capacidad: inventario
     estado: EXITO
-    duracion_s: 1.4e-05
+    duracion_s: 1.7e-05
   [28]
     id_traza: 29
-    timestamp: 2026-08-12T22:42:37.356186+00:00
+    timestamp: 2026-08-13T01:54:39.259357+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000697
+    duracion_s: 0.000997
   [29]
     id_traza: 30
-    timestamp: 2026-08-12T22:42:37.356412+00:00
+    timestamp: 2026-08-13T01:54:39.259691+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000203
+    duracion_s: 0.000301
   [30]
     id_traza: 31
-    timestamp: 2026-08-12T22:42:37.356547+00:00
+    timestamp: 2026-08-13T01:54:39.259917+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000111
+    duracion_s: 0.000189
   [31]
     id_traza: 32
-    timestamp: 2026-08-12T22:42:37.356587+00:00
+    timestamp: 2026-08-13T01:54:39.259970+00:00
     modulo: interfaz
     capacidad: inventario
     estado: EXITO
-    duracion_s: 1.8e-05
+    duracion_s: 2.1e-05
   [32]
     id_traza: 33
-    timestamp: 2026-08-12T22:42:37.358983+00:00
+    timestamp: 2026-08-13T01:54:39.263064+00:00
     modulo: realidad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002377
+    duracion_s: 0.003041
   [33]
     id_traza: 34
-    timestamp: 2026-08-12T22:42:37.359408+00:00
+    timestamp: 2026-08-13T01:54:39.263585+00:00
     modulo: realidad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000391
+    duracion_s: 0.000484
   [34]
     id_traza: 35
-    timestamp: 2026-08-12T22:42:37.367866+00:00
+    timestamp: 2026-08-13T01:54:39.276047+00:00
     modulo: realidad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.008416
+    duracion_s: 0.012421
   [35]
     id_traza: 36
-    timestamp: 2026-08-12T22:42:37.371549+00:00
+    timestamp: 2026-08-13T01:54:39.281044+00:00
     modulo: self
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.003628
+    duracion_s: 0.004944
   [36]
     id_traza: 37
-    timestamp: 2026-08-12T22:42:37.374517+00:00
+    timestamp: 2026-08-13T01:54:39.285127+00:00
     modulo: self
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.002924
+    duracion_s: 0.004034
   [37]
     id_traza: 38
-    timestamp: 2026-08-12T22:42:37.374563+00:00
+    timestamp: 2026-08-13T01:54:39.285180+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 7e-06
+    duracion_s: 8e-06
   [38]
     id_traza: 39
-    timestamp: 2026-08-12T22:42:37.389878+00:00
+    timestamp: 2026-08-13T01:54:39.304916+00:00
     modulo: spartaco_seguridad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.015295
+    duracion_s: 0.019709
   [39]
     id_traza: 40
-    timestamp: 2026-08-12T22:42:37.390323+00:00
+    timestamp: 2026-08-13T01:54:39.305525+00:00
     modulo: spartaco_seguridad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000417
+    duracion_s: 0.000568
   [40]
     id_traza: 41
-    timestamp: 2026-08-12T22:42:37.390726+00:00
+    timestamp: 2026-08-13T01:54:39.306097+00:00
     modulo: spartaco_seguridad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000373
+    duracion_s: 0.000522
   [41]
     id_traza: 42
-    timestamp: 2026-08-12T22:42:37.391355+00:00
+    timestamp: 2026-08-13T01:54:39.307012+00:00
     modulo: taxonomia
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000602
+    duracion_s: 0.000878
   [42]
     id_traza: 43
-    timestamp: 2026-08-12T22:42:37.391519+00:00
+    timestamp: 2026-08-13T01:54:39.307249+00:00
     modulo: taxonomia
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000137
+    duracion_s: 0.000202
   [43]
     id_traza: 44
-    timestamp: 2026-08-12T22:42:37.391860+00:00
+    timestamp: 2026-08-13T01:54:39.307631+00:00
     modulo: taxonomia
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000315
+    duracion_s: 0.000346
   [44]
     id_traza: 45
-    timestamp: 2026-08-12T22:42:37.392819+00:00
+    timestamp: 2026-08-13T01:54:39.308973+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000935
+    duracion_s: 0.00131
   [45]
     id_traza: 46
-    timestamp: 2026-08-12T22:42:37.393215+00:00
+    timestamp: 2026-08-13T01:54:39.309592+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00037
+    duracion_s: 0.000571
   [46]
     id_traza: 47
-    timestamp: 2026-08-12T22:42:37.393573+00:00
+    timestamp: 2026-08-13T01:54:39.310183+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000331
+    duracion_s: 0.000554
   [47]
     id_traza: 48
-    timestamp: 2026-08-12T22:42:37.393599+00:00
+    timestamp: 2026-08-13T01:54:39.310223+00:00
     modulo: verificacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 5e-06
   [48]
     id_traza: 49
-    timestamp: 2026-08-12T22:42:37.393636+00:00
+    timestamp: 2026-08-13T01:54:39.310245+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [49]
     id_traza: 50
-    timestamp: 2026-08-12T22:42:37.393650+00:00
+    timestamp: 2026-08-13T01:54:39.310263+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO

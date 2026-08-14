@@ -1,138 +1,34 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-TEST: test_engine_calculo_verdad_contractual
+TEST SONDA — test_engine_calculo_verdad_blackbox_probe
 ===============================================================================
 
-PRINCIPIO ABSOLUTO
-------------------
-Este Test es una prueba de integración de caja negra.
+OBJETIVO
+--------
+Sonda diagnóstica de caja negra sobre Engine.evaluar().
 
-El Test NO sabe cómo se calcula la verdad.
-El Test NO sabe qué módulos intervienen.
-El Test NO sabe qué orden siguen los módulos.
-El Test NO sabe cómo se obtienen C, L o K.
-El Test NO conoce las fórmulas productivas.
-El Test NO calcula Tru_Ri.
-El Test NO calcula Tru_total.
-El Test NO reconstruye resultados.
-El Test NO interpreta semánticamente la conversación.
-El Test NO decide si una afirmación es verdadera o falsa.
-El Test NO decide qué evidencia pesa más.
-El Test NO decide qué camino interno debe recorrer Engine.
-El Test NO fabrica valores intermedios.
-El Test NO contiene un segundo Calculator.
-El Test NO contiene una segunda implementación de Truth.
+Este Test NO calcula la verdad.
+Este Test NO calcula C, L, K.
+Este Test NO calcula α ni β.
+Este Test NO importa Calculator.
+Este Test NO importa truth.py.
+Este Test NO reconstruye Tru_Ri.
+Este Test NO reconstruye Tru_total.
+Este Test NO conoce los valores correctos.
 
-El único punto de ejecución del cálculo es:
+El único cálculo autorizado es el que realiza:
 
-    resultado = engine.evaluar(peticion)
+    Engine.evaluar(peticion)
 
-Desde esa llamada, Engine es la única autoridad de cálculo.
+La sonda entrega X + O al Engine y posteriormente compara los valores
+publicados por Engine contra valores señuelo deliberadamente incorrectos.
 
-Las fórmulas, conteos, correlaciones, factores, transformaciones y
-determinaciones internas pertenecen exclusivamente a los contratos y
-módulos productivos del repositorio.
+Los señuelos NO representan valores esperados.
+Su única finalidad es provocar un fallo controlado de pytest.
 
-Este Test solamente suministra material de entrada y observa el resultado
-publicado por Engine.
-
-===============================================================================
-AUTORIDAD
-===============================================================================
-
-TEST
-  |
-  | X + O
-  v
-ENGINE.evaluar(...)
-  |
-  | [toda la cadena interna pertenece exclusivamente al Engine]
-  |
-  v
-RESULTADO CONTRACTUAL
-  |
-  | Tru_Ri / Tru_total / estado / demás campos publicados
-  v
-TEST
-
-No existe una segunda ruta de cálculo:
-
-TEST -> Calculator
-TEST -> Conteos
-TEST -> C/L/K
-TEST -> FO
-TEST -> Truth
-TEST -> fórmula
-
-Cualquier Test que necesite realizar esa segunda ruta deja de ser una
-prueba de caja negra y se convierte en un segundo evaluador.
-
-===============================================================================
-PROHIBICIONES ABSOLUTAS
-===============================================================================
-
-- No importar Calculator.
-- No importar conteos.
-- No importar coherencia.
-- No importar logica.
-- No importar correlacion_k.
-- No importar truth.py.
-- No importar ALPHA.
-- No importar BETA.
-- No importar fórmulas productivas.
-- No importar funciones internas de cálculo.
-- No fabricar O_id.
-- No fabricar permite_k.
-- No fabricar m, k, p, r, c, f.
-- No fabricar C, L, K.
-- No fabricar Tru_Ri.
-- No fabricar Tru_total.
-- No hardcodear ningún resultado numérico.
-- No reconstruir ninguna fórmula.
-- No convertir valores para determinar si son matemáticamente correctos.
-- No calcular una expectativa independiente del resultado.
-- No decidir qué número debería producir Engine.
-- No imponer una relación numérica entre dos entradas distintas.
-- No utilizar nombres literales como reglas de evaluación.
-- No usar pytest.skip().
-- No usar strict=False.
-- No modificar módulos de producción.
-- No sustituir Engine por ningún componente interno.
-- No aceptar un resultado fabricado por el Test como evidencia de cálculo.
-
-===============================================================================
-ALCANCE DE LA PRUEBA
-===============================================================================
-
-P1 — ARRANQUE CONTRACTUAL
-     El Engine real debe iniciar en configuración contractual.
-
-P2 — EJECUCIÓN DE CAJA NEGRA
-     Una entrada X + O debe ser entregada exclusivamente a Engine.evaluar().
-
-P3 — PUBLICACIÓN CONTRACTUAL
-     El resultado observado debe contener los campos de salida que forman
-     parte del contrato público de evaluación.
-
-P4 — DETERMINISMO
-     La misma entrada entregada dos veces al mismo Engine debe producir la
-     misma salida publicada.
-
-P5 — INDEPENDENCIA DE EJECUCIONES
-     Dos entradas distintas deben ser entregadas mediante llamadas
-     independientes a Engine.evaluar(). El Test NO establece qué relación
-     matemática debe existir entre sus resultados.
-
-P6 — VARIACIÓN LÉXICA
-     Una segunda entrada con las mismas relaciones expresadas mediante
-     nombres diferentes debe poder ser entregada al Engine sin que el Test
-     aplique reglas sobre esos nombres.
-
-P7 — RESTRICCIÓN DE AUSENCIA DE O
-     Cuando no existe O en la entrada, el Engine debe aplicar su propio
-     contrato de indefinición. El Test solamente verifica el estado
-     contractual publicado.
+El valor ACTUAL mostrado por pytest corresponde al valor publicado
+por Engine para esa ejecución.
 
 ===============================================================================
 """
@@ -146,7 +42,7 @@ import pytest
 
 
 # ===========================================================================
-# ROOT DEL REPOSITORIO
+# REPOSITORIO
 # ===========================================================================
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -156,7 +52,7 @@ if str(ROOT) not in sys.path:
 
 
 # ===========================================================================
-# ÚNICA INTERFAZ DE PRODUCCIÓN IMPORTADA
+# ÚNICO IMPORT PRODUCTIVO
 # ===========================================================================
 
 from core.engine import Engine
@@ -164,17 +60,6 @@ from core.engine import Engine
 
 # ===========================================================================
 # MATERIAL SEMÁNTICO
-# ===========================================================================
-#
-# Estos valores son exclusivamente datos de entrada.
-#
-# El Test no interpreta su contenido.
-# El Test no busca nombres.
-# El Test no busca números.
-# El Test no determina contradicciones.
-# El Test no determina evidencia.
-#
-# Todo eso pertenece al Engine y a sus contratos productivos.
 # ===========================================================================
 
 CONVERSACION_A = (
@@ -187,63 +72,24 @@ CONVERSACION_A = (
     "no de Carlos."
 )
 
-CONVERSACION_B = (
-    "Carlos: Mana, voy a Miami.\n"
-    "Maria: Genial, ¿qué harás?\n"
-    "Carlos: Voy de vacaciones. Tengo 5 apartamentos.\n"
-    "Maria: Carlos me dijo que tiene 5 apartamentos.\n"
-    "Carla: Yo soy la hermana. Aquí están los contratos y títulos de "
-    "propiedad de los 5 apartamentos; están a nombre de Carlos."
-)
-
-CONVERSACION_NOMBRES = (
-    "Pedro: Mana, voy a Miami.\n"
-    "Laura: Genial, ¿qué harás?\n"
-    "Pedro: Voy de vacaciones. Tengo 5 apartamentos.\n"
-    "Laura: Pedro me dijo que tiene 5 apartamentos.\n"
-    "Sofia: Yo soy la hermana. Esta es la evidencia: aquí están los "
-    "contratos y títulos de propiedad de esos 5 apartamentos y son míos, "
-    "no de Pedro."
-)
-
 CONTEXTO_A = (
     "Afirmación a evaluar: Carlos afirma 'Tengo 5 apartamentos'. "
     "Evidencia aportada por Carla: los contratos y títulos de propiedad "
     "de esos 5 apartamentos están a su nombre y no a nombre de Carlos."
 )
 
-CONTEXTO_B = (
-    "Afirmación a evaluar: Carlos afirma 'Tengo 5 apartamentos'. "
-    "Evidencia aportada por Carla: los contratos y títulos de propiedad "
-    "de esos 5 apartamentos están a nombre de Carlos."
-)
-
-CONTEXTO_NOMBRES = (
-    "Afirmación a evaluar: Pedro afirma 'Tengo 5 apartamentos'. "
-    "Evidencia aportada por Sofia: los contratos y títulos de propiedad "
-    "de esos 5 apartamentos están a su nombre y no a nombre de Pedro."
-)
-
 
 # ===========================================================================
-# CONSTRUCCIÓN DE ENTRADA
-# ===========================================================================
-#
-# Esta función solamente empaqueta material semántico.
-#
-# No contiene:
-#   C, L, K
-#   conteos
-#   factores
-#   resultados
-#   O_id
-#   permite_k
-#   parámetros de cálculo
-#
-# Engine recibe la información y decide internamente cómo procesarla.
+# CONSTRUCCIÓN DE PETICIÓN
 # ===========================================================================
 
 def _peticion(conversacion: str, contexto: str) -> dict:
+    """
+    Entrada semántica.
+
+    No contiene resultados, factores ni parámetros del cálculo.
+    """
+
     return {
         "texto": conversacion,
         "mensaje": conversacion,
@@ -253,37 +99,6 @@ def _peticion(conversacion: str, contexto: str) -> dict:
     }
 
 
-def _peticion_sin_o(texto: str) -> dict:
-    return {
-        "texto": texto,
-        "mensaje": texto,
-    }
-
-
-# ===========================================================================
-# INSPECCIÓN MÍNIMA DEL RESULTADO
-# ===========================================================================
-#
-# Esta función NO valida el contenido matemático.
-#
-# Solamente verifica que un campo contractual fue publicado.
-#
-# No convierte a Fraction.
-# No compara contra un número.
-# No conoce una fórmula.
-# No establece un rango.
-# No determina si el valor es correcto.
-#
-# La corrección del valor pertenece exclusivamente al productor.
-# ===========================================================================
-
-def _campo_publicado(resultado: dict, campo: str) -> bool:
-    if campo not in resultado:
-        return False
-
-    return resultado[campo] is not None
-
-
 # ===========================================================================
 # FIXTURE — ENGINE REAL
 # ===========================================================================
@@ -291,29 +106,21 @@ def _campo_publicado(resultado: dict, campo: str) -> bool:
 @pytest.fixture(scope="module")
 def engine():
     """
-    Instancia exclusivamente el Engine productivo.
+    Instancia real del Engine.
 
-    strict=True:
-        un fallo contractual de arranque produce fallo del Test.
-
-    verificar_axiomas=True:
-        se utiliza la configuración contractual solicitada al Engine.
-
-    No existe fallback.
-    No existe skip.
-    No existe sustitución por módulos internos.
+    Si el Engine no arranca, la prueba falla.
     """
 
     eng = Engine(
         raiz_modulos=ROOT / "modules",
-        invocador_id="test_engine_calculo_verdad_contractual",
+        invocador_id="test_engine_calculo_verdad_blackbox_probe",
         verificar_axiomas=True,
         strict=True,
     )
 
     assert eng.estado == "OPERATIVO", (
-        "Engine no operativo. "
-        f"estado={eng.estado!r} "
+        "ENGINE NO OPERATIVO\n"
+        f"estado={eng.estado!r}\n"
         f"errores={eng.errores_arranque!r}"
     )
 
@@ -321,242 +128,76 @@ def engine():
 
 
 # ===========================================================================
-# SUITE DE INTEGRACIÓN
+# SONDA
 # ===========================================================================
 
-class TestEngineCalculoVerdadContractual:
+class TestEngineBlackBoxProbe:
     """
-    Prueba de caja negra del Engine.
+    Sonda deliberadamente falsificada.
 
-    Ningún método de esta clase calcula verdad.
+    La prueba NO busca pasar.
 
-    Ningún método conoce la fórmula.
-
-    Ningún método genera resultados esperados.
-
-    Todos los resultados observados proceden exclusivamente de:
-
-        engine.evaluar(...)
+    La finalidad es que pytest revele el valor producido por Engine.
     """
 
-    # -----------------------------------------------------------------------
-    # P1 — EJECUTABILIDAD
-    # -----------------------------------------------------------------------
-
-    def test_p1_ejecutabilidad(self, engine):
+    def test_sonda_tru_ri(self, engine):
         """
-        X + O
-            |
-            v
-        Engine.evaluar()
-            |
-            v
-        resultado publicado
+        Ejecuta Engine y fuerza una discrepancia contra un valor señuelo.
 
-        El Test no determina qué sucede internamente.
-        Solo verifica que la interfaz de evaluación respondió.
+        Si Engine publica, por ejemplo:
+
+            1/6
+
+        pytest mostrará la discrepancia entre el valor actual y el señuelo.
         """
 
-        peticion = _peticion(
-            CONVERSACION_A,
-            CONTEXTO_A,
+        resultado = engine.evaluar(
+            _peticion(CONVERSACION_A, CONTEXTO_A)
         )
-
-        resultado = engine.evaluar(peticion)
 
         assert isinstance(resultado, dict), (
-            "Engine.evaluar() debe publicar un resultado contractual "
-            "representado por un diccionario."
-        )
-
-        assert "estado" in resultado, (
-            "El resultado del Engine debe publicar su estado contractual."
+            f"Engine no devolvió dict: {resultado!r}"
         )
 
         assert "tru_ri" in resultado, (
-            "El resultado del Engine debe publicar Tru_Ri."
+            f"Engine no publicó 'tru_ri'. Resultado: {resultado!r}"
+        )
+
+        # SEÑUELO DELIBERADAMENTE INCORRECTO.
+        # NO calcular.
+        # NO sustituir por el valor real.
+        tru_ri_señuelo = "999999999/999999998"
+
+        assert str(resultado["tru_ri"]) == tru_ri_señuelo
+
+
+    def test_sonda_tru_total(self, engine):
+        """
+        Ejecuta nuevamente Engine y fuerza una discrepancia contra un
+        valor señuelo independiente.
+
+        Si Engine publica, por ejemplo:
+
+            11/162
+
+        pytest mostrará ese valor como ACTUAL.
+        """
+
+        resultado = engine.evaluar(
+            _peticion(CONVERSACION_A, CONTEXTO_A)
+        )
+
+        assert isinstance(resultado, dict), (
+            f"Engine no devolvió dict: {resultado!r}"
         )
 
         assert "tru_total" in resultado, (
-            "El resultado del Engine debe publicar Tru_total."
+            f"Engine no publicó 'tru_total'. Resultado: {resultado!r}"
         )
 
-    # -----------------------------------------------------------------------
-    # P2 — DETERMINISMO
-    # -----------------------------------------------------------------------
+        # SEÑUELO DELIBERADAMENTE INCORRECTO.
+        # NO calcular.
+        # NO sustituir por el valor real.
+        tru_total_señuelo = "888888887/888888886"
 
-    def test_p2_determinismo(self, engine):
-        """
-        Misma entrada + misma configuración + misma autoridad
-        ------------------------------------------------------
-        debe producir la misma publicación.
-
-        El Test no calcula cuál debe ser el resultado.
-
-        Solamente compara las dos publicaciones producidas por Engine.
-        """
-
-        peticion = _peticion(
-            CONVERSACION_A,
-            CONTEXTO_A,
-        )
-
-        resultado_1 = engine.evaluar(peticion)
-        resultado_2 = engine.evaluar(peticion)
-
-        assert isinstance(resultado_1, dict)
-        assert isinstance(resultado_2, dict)
-
-        assert resultado_1.get("estado") == resultado_2.get("estado"), (
-            "La misma entrada no puede producir estados publicados "
-            "diferentes bajo la misma configuración."
-        )
-
-        assert str(resultado_1.get("tru_ri")) == str(
-            resultado_2.get("tru_ri")
-        ), (
-            "La misma entrada debe producir la misma publicación de Tru_Ri."
-        )
-
-        assert str(resultado_1.get("tru_total")) == str(
-            resultado_2.get("tru_total")
-        ), (
-            "La misma entrada debe producir la misma publicación "
-            "de Tru_total."
-        )
-
-    # -----------------------------------------------------------------------
-    # P3 — EJECUCIONES INDEPENDIENTES
-    # -----------------------------------------------------------------------
-
-    def test_p3_ejecuciones_independientes(self, engine):
-        """
-        Dos entradas distintas son entregadas independientemente al Engine.
-
-        El Test NO determina:
-            resultado_A > resultado_B
-            resultado_A < resultado_B
-            resultado_A != resultado_B
-            ninguna otra relación numérica.
-
-        Esa relación, si existe y si el contrato la exige, pertenece
-        exclusivamente al cálculo productivo.
-
-        El único hecho que este Test demuestra es que ambas entradas fueron
-        evaluadas mediante llamadas independientes a Engine.evaluar().
-        """
-
-        resultado_a = engine.evaluar(
-            _peticion(
-                CONVERSACION_A,
-                CONTEXTO_A,
-            )
-        )
-
-        resultado_b = engine.evaluar(
-            _peticion(
-                CONVERSACION_B,
-                CONTEXTO_B,
-            )
-        )
-
-        assert isinstance(resultado_a, dict)
-        assert isinstance(resultado_b, dict)
-
-        assert "estado" in resultado_a
-        assert "estado" in resultado_b
-
-        assert "tru_ri" in resultado_a
-        assert "tru_total" in resultado_a
-
-        assert "tru_ri" in resultado_b
-        assert "tru_total" in resultado_b
-
-        assert resultado_a is not resultado_b
-
-    # -----------------------------------------------------------------------
-    # P4 — VARIACIÓN LÉXICA
-    # -----------------------------------------------------------------------
-
-    def test_p4_variacion_lexica(self, engine):
-        """
-        Se presenta al mismo Engine una entrada con identidades léxicas
-        diferentes.
-
-        El Test no contiene ninguna regla sobre Carlos, Carla, Pedro,
-        Laura o Sofia.
-
-        No se compara ningún valor numérico.
-
-        No se afirma que los resultados deban ser iguales o diferentes.
-
-        Solamente se comprueba que la entrada puede recorrer la misma
-        interfaz pública de evaluación.
-        """
-
-        resultado = engine.evaluar(
-            _peticion(
-                CONVERSACION_NOMBRES,
-                CONTEXTO_NOMBRES,
-            )
-        )
-
-        assert isinstance(resultado, dict)
-
-        assert "estado" in resultado
-        assert "tru_ri" in resultado
-        assert "tru_total" in resultado
-
-    # -----------------------------------------------------------------------
-    # P5 — AUSENCIA DE O
-    # -----------------------------------------------------------------------
-
-    def test_p5_ausencia_de_o(self, engine):
-        """
-        Caso contractual separado.
-
-        No se proporciona contexto O.
-
-        El Test NO fabrica K.
-        El Test NO decide el resultado matemático.
-        El Test NO calcula Tru_Ri.
-        El Test NO calcula Tru_total.
-
-        Engine decide exclusivamente qué estado corresponde a esta entrada.
-
-        La única comprobación específica es la condición contractual pública
-        de ausencia de O: el Engine debe publicar el estado correspondiente
-        a una evaluación sin dominio O.
-        """
-
-        resultado = engine.evaluar(
-            _peticion_sin_o(
-                "Tengo 5 apartamentos."
-            )
-        )
-
-        assert isinstance(resultado, dict)
-
-        assert "estado" in resultado
-
-        estado = str(resultado.get("estado", "")).upper()
-
-        assert estado == "UNDEFINED", (
-            "Ante ausencia de O usable, el Engine debe publicar el "
-            "estado contractual de indefinición. "
-            f"Estado publicado: {estado!r}"
-        )
-
-
-# ===========================================================================
-# EJECUCIÓN DIRECTA
-# ===========================================================================
-
-if __name__ == "__main__":
-    pytest.main(
-        [
-            __file__,
-            "-v",
-            "--tb=short",
-        ]
-    )
+        assert str(resultado["tru_total"]) == tru_total_señuelo

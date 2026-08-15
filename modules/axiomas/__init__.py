@@ -263,7 +263,9 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario",
         "estado",
         "reporte",
-        "diagnostico",
+        "diagnostico","ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
     # ============================================================
@@ -304,7 +306,9 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_diagnostico",
         "verificar_coherencia",
         "ids_dominio_k_o",
-        "recolectar",
+        "recolectar","ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
     # ============================================================
@@ -324,6 +328,9 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": "reporte",
         "diagnostico": "diagnostico",
         "buscar_por_id": "buscar_por_id",
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
     },
 
     # ============================================================

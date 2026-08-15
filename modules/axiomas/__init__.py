@@ -2117,7 +2117,138 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
 # ===============================================================
 # FIN 8.5
 # ===============================================================# 8.6 — # ===============================================================
+# ===============================================================
+# 8.6 — INVENTARIO
+# ===============================================================
 
+def inventario(peticion=None) -> Dict:
+    """
+    Inventario estructural del módulo.
+    Callable público.
+
+    peticion:
+        Parámetro de compatibilidad contractual.
+        Se conserva por contrato y no altera la construcción
+        del inventario.
+
+    Instantánea única:
+        Una sola llamada a recolectar().
+        limite_axiomático y el filtrado K/O operan sobre esa
+        misma recolección.
+
+    No invoca ids_dominio_k_o() porque esa callable realiza
+    internamente una nueva recolección.
+
+    La regla K/O utilizada aquí es exactamente la regla
+    estructural definida en 8.2:
+        gobierna ∩ DOMINIOS_K_O
+    """
+    decls, errores = recolectar()
+    lim = limite_axiomático(decls=decls, errores=errores)
+
+    # -----------------------------------------------------------
+    # IDS DE DOMINIO K/O
+    # -----------------------------------------------------------
+    # Se aplica la misma regla de 8.2 sobre la instantánea ya
+    # recolectada. No se crea una nueva función ni se realiza
+    # una segunda recolección.
+    ids_k_o: List[str] = []
+
+    for d in decls:
+        gobs = {
+            str(g).lower().strip()
+            for g in (d.get("gobierna") or [])
+        }
+
+        if gobs & DOMINIOS_K_O:
+            ids_k_o.append(d["id"])
+
+    ids_k_o = sorted(set(ids_k_o))
+
+    # -----------------------------------------------------------
+    # INVENTARIO
+    # -----------------------------------------------------------
+    return {
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "compatible_desde": COMPATIBLE_DESDE,
+        "api_engine": API_ENGINE,
+        "descripcion": CONTENEDOR.get("descripcion"),
+        "funcion": CONTENEDOR.get("funcion"),
+        "no_hace": CONTENEDOR.get("no_hace"),
+        "tipos": list(TIPOS),
+        "declaraciones": len(decls),
+        "por_tipo": {
+            t: sum(1 for d in decls if d["tipo"] == t)
+            for t in TIPOS
+        },
+        "cuerpos": sorted({d["cuerpo"] for d in decls}),
+        "errores": errores,
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
+        "capacidades_meta": list(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "autoridad": CONTENEDOR.get("autoridad"),
+        "conocimiento_exportable": CONTENEDOR.get(
+            "conocimiento_exportable"
+        ),
+        "consultas_soportadas": CONTENEDOR.get(
+            "consultas_soportadas"
+        ),
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "estados_validos": CONTENEDOR.get("estados_validos"),
+        "invariantes": CONTENEDOR.get("invariantes"),
+        "vigila": [
+            "contradiccion_directa",
+            "contradiccion_de_cota",
+        ],
+        "ids_dominio_k_o": ids_k_o,
+        "limite_axiomático": {
+            "premisas_faltantes": len(
+                lim.get("premisas_faltantes") or []
+            ),
+            "dependencias_no_satisfechas": len(
+                lim.get("dependencias_no_satisfechas") or []
+            ),
+            "dependencias_circulares": len(
+                lim.get("dependencias_circulares") or []
+            ),
+            "alcance": lim.get("alcance"),
+        },
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": (
+                "ejecutar_total"
+                in CONTENEDOR.get("capacidades", {})
+            ),
+            "inspeccionar": (
+                "inspeccionar"
+                in CONTENEDOR.get("capacidades", {})
+            ),
+        },
+        "nota": (
+            "Inventario estructural. "
+            "La información se construye sobre una única "
+            "recolección. "
+            "ids_dominio_k_o se determina mediante la misma "
+            "regla estructural de 8.2 sobre esa instantánea, "
+            "sin invocar nuevamente la callable. "
+            "limite_axiomático se reporta como información "
+            "estructural y no como criterio adicional de "
+            "coherencia."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.6
+# ===============================================================
 # ===============================================================
 # 9.1 — REPORTE
 # ===============================================================

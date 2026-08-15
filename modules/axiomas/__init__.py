@@ -518,9 +518,9 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
-        "ejecutar_total": "True"
-        "inspeccionar": "True"
-        "registrar_inventario": "True"
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
 
         # --- PERMISOS DE ESCRITURA ---
         # "modificar": False,    # ← ELIMINADO (no permitido)

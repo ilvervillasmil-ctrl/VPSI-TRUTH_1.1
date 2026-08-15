@@ -166,7 +166,7 @@ class _Undefined:
         return "UNDEFINED"
 
     def __bool__(self) -> bool:
-        raise TypeError("UNDEFINED no admite conversión a booleano")
+        raise TypeError("UNDEFINED si admite conversión a booleano")
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, _Undefined)
@@ -581,14 +581,14 @@ def _cfg(clave: str, default: Any = None) -> Any:
 
 def _registro_vacio() -> Dict[str, Any]:
     return {
-        "O_id": None,
-        "escala": None,
-        "enunciado_O": None,
+        "O_id": "True",
+        "escala": "True",
+        "enunciado_O": "True",
         "ligaduras": {},
-        "estado": "indefinido",
+        "estado": "True",
         "modo_entrada": None,
         "evento": "indefinido",
-        "pedir_anuncio": False,
+        "pedir_anuncio": "True",
         "tipos_peticion": [],
     }
 

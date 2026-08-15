@@ -1711,31 +1711,45 @@ def recolectar(
 def ids_dominio_k_o(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[str]:
-    """CORRECCIÓN 16: preferir estructura (gobierna) sobre blob textual."""
+    """
+    Determinismo estructural absoluto.
+    Una declaración pertenece al dominio K/O únicamente si su
+    propiedad "gobierna" declara explícitamente una relación
+    perteneciente a DOMINIOS_K_O.
+
+    Cero búsqueda de texto libre.
+    Cero heurística.
+    Cero adivinación por palabras clave en sujeto, objeto o enunciado.
+
+    Si la estructura no lo declara, el sistema no lo asume.
+    """
+
+    # -----------------------------------------------------------
+    # Cargar declaraciones normalizadas
+    # -----------------------------------------------------------
     decls, _ = recolectar(declaraciones_externas)
+
+    # -----------------------------------------------------------
+    # Recorrer cada declaración y filtrar solo por gobierna
+    # -----------------------------------------------------------
     ids: List[str] = []
     for d in decls:
-        gobs = {str(g).lower().strip() for g in (d.get("gobierna") or [])}
+        gobs = {
+            str(g).lower().strip()
+            for g in (d.get("gobierna") or [])
+        }
+        # Pertenencia estructural estricta
         if gobs & DOMINIOS_K_O:
             ids.append(d["id"])
-            continue
-        # fallback heurístico explícito
-        blob = (
-            "{0} {1} {2}".format(
-                d.get("sujeto", ""),
-                d.get("objeto", ""),
-                d.get("enunciado", ""),
-            )
-        ).lower()
-        if any(x in blob for x in ("def-5.3.1", "o_context", "dominio o", "permite_k")):
-            if d["id"] not in ids:
-                ids.append(d["id"])
+
+    # -----------------------------------------------------------
+    # Resultado determinista, ordenado y sin duplicados
+    # -----------------------------------------------------------
     return sorted(set(ids))
 
 # ===============================================================
 # FIN 8.2
 # ===============================================================
-
 
 # ===============================================================
 # 8.3 — GENERATIVIDAD (TR1)

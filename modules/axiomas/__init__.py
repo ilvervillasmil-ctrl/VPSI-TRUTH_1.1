@@ -1983,13 +1983,21 @@ def verificar(
 # FIN 8.4
 # ===============================================================
 # ===============================================================
-# 8.5 — CONSULTAS DE DECLARACIONES
+# 8.5 — CONSULTAS Y APLICACIÓN DEL CUERPO AXIOMÁTICO
 # ===============================================================
 
 def declaraciones(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """CORRECCIÓN 17: evita doble recolección innecesaria cuando es posible."""
+    """
+    Callable público.
+
+    Obtiene las declaraciones normalizadas mediante la fuente única
+    recolectar().
+
+    La función permite consultar el conjunto de declaraciones disponible.
+    No reconstruye, modifica ni inventa declaraciones.
+    """
     decls, errores = recolectar(declaraciones_externas)
     choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
     if choques or errores:
@@ -2000,99 +2008,115 @@ def declaraciones(
 def axiomas(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    return declaraciones(declaraciones_externas)
+    """
+    Callable universal del cuerpo axiomático de AX.
+
+    Fuente única de verdad: recolectar(declaraciones_externas).
+
+    Expone el cuerpo axiomático completo para su utilización por Engine
+    y por cualquier módulo que requiera aplicar las reglas declaradas
+    en dicho cuerpo.
+
+    La capacidad pertenece a AX y no al módulo consumidor.
+
+    El cuerpo contiene axiomas, lemas, teoremas, corolarios y definiciones.
+    La aplicación de una declaración se realiza conforme a su estructura,
+    contrato, dominio, premisas, dependencias y demás reglas declaradas
+    en el cuerpo axiomático.
+
+    No restringe el cuerpo a un dominio determinado.
+    No selecciona arbitrariamente una declaración.
+    No inventa premisas.
+    No convierte una ausencia de premisa en axioma.
+    No sustituye las reglas declaradas por heurística o búsqueda textual.
+
+    La callable permanece abierta para cualquier dominio y cualquier
+    módulo que Engine dirija hacia AX.
+
+    Salida: cuerpo axiomático normalizado disponible para aplicación.
+    """
+    decls, _ = recolectar(declaraciones_externas)
+    return decls
 
 
 def por_dominio(
     dominio: str,
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """CORRECCIÓN 13: normalizar dominio con DOMINIO_CANONICO."""
+    """
+    Callable público.
+
+    Selecciona declaraciones mediante la relación estructural
+    "gobierna", normalizando el dominio con DOMINIO_CANONICO.
+
+    No utiliza búsqueda textual ni heurística.
+    """
     key = str(dominio).lower().strip()
-    dom_can = DOMINIO_CANONICO.get(key, key.upper()[:3] if len(key) >= 3 else key.upper())
+    dom_can = DOMINIO_CANONICO.get(
+        key,
+        key.upper()[:3] if len(key) >= 3 else key.upper(),
+    )
+
     decls, _ = recolectar(declaraciones_externas)
-    out = []
+
+    out: List[Dict] = []
+
     for d in decls:
-        gobs_raw = [str(g).lower().strip() for g in (d.get("gobierna") or [])]
-        gobs_can = {DOMINIO_CANONICO.get(g, g.upper()[:3]) for g in gobs_raw}
-        if dom_can in gobs_can or key in gobs_raw:
+        gobs = {
+            str(g).lower().strip()
+            for g in (d.get("gobierna") or [])
+        }
+
+        gobs_can = {
+            DOMINIO_CANONICO.get(
+                g,
+                g.upper()[:3] if len(g) >= 3 else g.upper(),
+            )
+            for g in gobs
+        }
+
+        if dom_can in gobs_can or key in gobs:
             out.append(d)
+
     return out
 
 
 def buscar_por_id(id_decl: str) -> Optional[Dict]:
-    """CORRECCIÓN 18: no seleccionar arbitrariamente si hay duplicados."""
+    """
+    Callable público.
+
+    Resuelve exactamente una declaración por su identificador.
+
+    Si el identificador está afectado por un duplicado registrado por
+    recolectar(), no selecciona ninguna declaración arbitrariamente.
+
+    Si existe exactamente una declaración válida con ese ID, devuelve
+    la declaración normalizada.
+
+    En cualquier otro caso devuelve None.
+    """
     decls, errores = recolectar()
-    matches = [d for d in decls if d.get("id") == id_decl]
-    if len(matches) == 0:
+
+    for error in errores:
+        if (
+            error.get("tipo") == "id_duplicado"
+            and error.get("id") == id_decl
+        ):
+            return None
+
+    matches = [
+        d for d in decls
+        if d.get("id") == id_decl
+    ]
+
+    if len(matches) != 1:
         return None
-    if len(matches) > 1:
-        # conflicto de ID duplicado — no escoger
-        return None
+
     return matches[0]
 
 # ===============================================================
 # FIN 8.5
-# ===============================================================
-# ===============================================================
-# 8.6 — INVENTARIO
-# ===============================================================
-
-def inventario(peticion=None) -> Dict:
-    decls, errores = recolectar()
-    lim = limite_axiomático(decls=decls, errores=errores)
-    return {
-        "id": ID_MODULO,
-        "nombre": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "version": VERSION_MODULO,
-        "version_contrato": VERSION_CONTRATO,
-        "esquema": ESQUEMA_CONTRATO,
-        "estabilidad": ESTABILIDAD,
-        "tipos": list(TIPOS),
-        "declaraciones": len(decls),
-        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
-        "cuerpos": sorted({d["cuerpo"] for d in decls}),
-        "errores": errores,
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
-        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
-        "invariantes": CONTENEDOR.get("invariantes"),
-        "vigila": [
-            "contradiccion_directa",
-            "contradiccion_de_cota",
-            "limite_axiomático",
-        ],
-        "ids_dominio_k_o": ids_dominio_k_o(),
-        "limite_axiomático": {
-            "premisas_faltantes": len(lim.get("premisas_faltantes") or []),
-            "dependencias_no_satisfechas": len(
-                lim.get("dependencias_no_satisfechas") or []
-            ),
-            "dependencias_circulares": len(
-                lim.get("dependencias_circulares") or []
-            ),
-            "alcance": lim.get("alcance"),
-        },
-        "operaciones_arquitectonicas": {
-            "ejecutar_total": "ejecutar_total" in CONTENEDOR.get("capacidades", {}),
-            "inspeccionar": "inspeccionar" in CONTENEDOR.get("capacidades", {}),
-            "registrar_inventario": (
-                "registrar_inventario" in CONTENEDOR.get("capacidades", {})
-            ),
-        },
-        "nota": (
-            "Def-5.3.1 y dominio O viven en los cuerpos cargados; "
-            "este módulo los vigila y expone, no los clasifica en entrada."
-        ),
-    }
-
-# ===============================================================
-# FIN 8.6
-# ===============================================================
+# ===============================================================# 8.6 — # ===============================================================
 
 # ===============================================================
 # PARTE 9 — REPORTING

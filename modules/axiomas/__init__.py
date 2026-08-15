@@ -649,6 +649,24 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 # FUNCIONES PRIVADAS
 # ===============================================================
+def inspeccionar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Operación arquitectónica genérica.
+
+    Inspecciona la totalidad de las unidades, estructuras, recursos,
+    capacidades, dependencias, archivos, metadatos y demás elementos
+    pertenecientes al módulo, conforme a su contrato, inventario,
+    clasificación y leyes internas.
+
+    La totalidad se determina por inspección e inventario del módulo,
+    no por una lista fija de funciones ni por nombres concretos.
+
+    No enumera elementos concretos.
+    No inventa elementos ni capacidades.
+    No altera los contratos internos del módulo.
+    """
+    return inspeccionar(peticion)
+    
 def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Operación arquitectónica genérica.

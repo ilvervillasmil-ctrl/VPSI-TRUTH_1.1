@@ -2198,13 +2198,21 @@ CAPACIDADES_RESUELTAS: Dict[str, Any] = {}
 
 
 def _resolver_capacidades() -> None:
-    """CORRECCIÓN 24/25: no mutar CONTENEDOR['capacidades']."""
+    """
+    CORRECCIÓN 24/25: no mutar CONTENEDOR['capacidades'].
+    Resuelve las referencias contractuales hacia callables reales.
+    El resultado vive exclusivamente en CAPACIDADES_RESUELTAS.
+    """
     global CAPACIDADES_RESUELTAS
     resueltas: Dict[str, Any] = {}
+
     for nombre, ref in CONTENEDOR["capacidades"].items():
+        # Ya es callable
         if callable(ref):
             resueltas[nombre] = ref
             continue
+
+        # Es una referencia por nombre (str)
         if isinstance(ref, str):
             if ref not in _CAP_MAP:
                 raise ContratoInvalido(
@@ -2218,10 +2226,13 @@ def _resolver_capacidades() -> None:
                 )
             resueltas[nombre] = fn
             continue
+
+        # Tipo inválido
         raise ContratoInvalido(
             f"{NOMBRE_MODULO}: capacidad '{nombre}' "
             f"tiene tipo inválido: {type(ref).__name__}"
         )
+
     CAPACIDADES_RESUELTAS = resueltas
     # CONTENEDOR["capacidades"] permanece como declaración contractual.
     # No se muta.
@@ -2229,8 +2240,6 @@ def _resolver_capacidades() -> None:
 # ===============================================================
 # FIN 10.2
 # ===============================================================
-
-
 # ===============================================================
 # 10.3 — EJECUCIÓN DE VALIDACIÓN Y RESOLUCIÓN
 # ===============================================================

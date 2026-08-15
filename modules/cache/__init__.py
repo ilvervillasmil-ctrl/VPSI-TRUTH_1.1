@@ -1456,6 +1456,9 @@ _CAP_MAP = {
     "diagnostico": diagnostico,
     "verificar_salida": verificar_salida,
     "backend_para_centinela": backend_para_centinela,
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
 
 

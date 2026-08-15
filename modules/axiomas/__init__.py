@@ -1921,16 +1921,32 @@ def generatividad() -> dict:
 def barrer(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Dict:
+    """
+    Barrido de coherencia del cuerpo axiomático.
+
+    Alcance exclusivo:
+    - errores de recolección
+    - contradiccion_directa
+    - contradiccion_de_cota
+
+    No invoca limite_axiomático.
+    No fusiona coherencia con límite axiomático.
+    Una sola recolección.
+    """
     decls, errores = recolectar(declaraciones_externas)
     choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
+    coherente = not (choques or errores)
 
+    # Notificación a DiagnosticoGlobal (no altera el resultado de coherencia)
     if (choques or errores) and DiagnosticoGlobal is not None:
         try:
             DiagnosticoGlobal.recibir_reporte(
                 modulo="axiomas",
                 errores=(
                     [{"tipo": "choque", "detalle": c} for c in choques]
-                    + [{"tipo": "error_carga", "detalle": e} for e in errores]
+                    + list(errores)  # conserva tipo original (error_carga,
+                                    # error_normalizacion, id_duplicado,
+                                    # error_entrada_externa, etc.)
                 ),
             )
         except Exception:
@@ -1940,35 +1956,32 @@ def barrer(
     por_tipo = {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS}
 
     return {
-        "coherente": not (choques or errores),
+        "coherente": coherente,
         "choques": choques,
         "errores": errores,
         "declaraciones": len(decls),
         "cuerpos": cuerpos,
         "por_tipo": por_tipo,
         "ids_dominio_k_o": (
-            ids_dominio_k_o(declaraciones_externas)
-            if not (choques or errores)
-            else []
+            ids_dominio_k_o(declaraciones_externas) if coherente else []
         ),
     }
 
 
 def verificar_salida(salida: Dict) -> bool:
+    """Interpreta la salida de barrer mediante su campo coherente."""
     return bool(salida.get("coherente", False))
 
 
 def verificar(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Dict[str, Any]:
-    """API compatible. El alias contractual 'verificar' resuelve a barrer."""
+    """Alias contractual de barrer. Sin segunda implementación."""
     return barrer(declaraciones_externas)
 
 # ===============================================================
 # FIN 8.4
 # ===============================================================
-
-
 # ===============================================================
 # 8.5 — CONSULTAS DE DECLARACIONES
 # ===============================================================

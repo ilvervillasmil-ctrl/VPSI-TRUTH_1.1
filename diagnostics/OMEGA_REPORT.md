@@ -13,7 +13,7 @@
   total_modulos: 18
   trazas_n: 50
   rutas_n: 0
-  timestamp: 2026-08-15T02:37:16.802374+00:00
+  timestamp: 2026-08-15T02:53:21.955147+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -31,7 +31,7 @@
     []
   trazas_n: 50
   rutas_n: 0
-  timestamp: 2026-08-15T02:37:16.802286+00:00
+  timestamp: 2026-08-15T02:53:21.955063+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -1813,32 +1813,32 @@
         archivo: __init__.py
         sha256: ad0d0f83d23bb57747fee54411b311613465469207dd171f7284a3d6ae042adc
         tamano: 64727
-        timestamp_mtime: 2026-08-15T02:37:12.353884+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.508390+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
     historial_n: 0
     errores_n: 0
     choques_n: 0
@@ -1916,32 +1916,32 @@
         archivo: __init__.py
         sha256: ad0d0f83d23bb57747fee54411b311613465469207dd171f7284a3d6ae042adc
         tamano: 64727
-        timestamp_mtime: 2026-08-15T02:37:12.353884+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.508390+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: ba9d374bca15dc4b36766d151068fdf9895166a60a4352aa0b2706f1a3714313
         tamano: 6153
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-15T02:37:12.354550+00:00
+        timestamp_mtime: 2026-08-15T02:53:17.509094+00:00
     factores_api:
       • C
       • K
@@ -15610,350 +15610,350 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-15T02:37:16.635312+00:00
+    timestamp: 2026-08-15T02:53:21.783794+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.019109
+    duracion_s: 0.019127
   [1]
     id_traza: 2
-    timestamp: 2026-08-15T02:37:16.652552+00:00
+    timestamp: 2026-08-15T02:53:21.801160+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.017167
+    duracion_s: 0.017296
   [2]
     id_traza: 3
-    timestamp: 2026-08-15T02:37:16.669011+00:00
+    timestamp: 2026-08-15T02:53:21.817583+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.016384
+    duracion_s: 0.016345
   [3]
     id_traza: 4
-    timestamp: 2026-08-15T02:37:16.669082+00:00
+    timestamp: 2026-08-15T02:53:21.817687+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 2e-05
+    duracion_s: 2.2e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-15T02:37:16.669124+00:00
+    timestamp: 2026-08-15T02:53:21.817734+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 9e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-15T02:37:16.669171+00:00
+    timestamp: 2026-08-15T02:53:21.817799+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 9e-06
   [6]
     id_traza: 7
-    timestamp: 2026-08-15T02:37:16.669821+00:00
+    timestamp: 2026-08-15T02:53:21.818484+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000615
+    duracion_s: 0.000644
   [7]
     id_traza: 8
-    timestamp: 2026-08-15T02:37:16.670393+00:00
+    timestamp: 2026-08-15T02:53:21.819065+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000537
+    duracion_s: 0.000545
   [8]
     id_traza: 9
-    timestamp: 2026-08-15T02:37:16.670932+00:00
+    timestamp: 2026-08-15T02:53:21.819619+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000501
+    duracion_s: 0.000511
   [9]
     id_traza: 10
-    timestamp: 2026-08-15T02:37:16.672187+00:00
+    timestamp: 2026-08-15T02:53:21.820865+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001187
+    duracion_s: 0.001178
   [10]
     id_traza: 11
-    timestamp: 2026-08-15T02:37:16.674531+00:00
+    timestamp: 2026-08-15T02:53:21.823175+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002308
+    duracion_s: 0.002274
   [11]
     id_traza: 12
-    timestamp: 2026-08-15T02:37:16.676012+00:00
+    timestamp: 2026-08-15T02:53:21.824615+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001445
+    duracion_s: 0.001404
   [12]
     id_traza: 13
-    timestamp: 2026-08-15T02:37:16.677417+00:00
+    timestamp: 2026-08-15T02:53:21.826079+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001362
+    duracion_s: 0.001385
   [13]
     id_traza: 14
-    timestamp: 2026-08-15T02:37:16.677462+00:00
+    timestamp: 2026-08-15T02:53:21.826123+00:00
     modulo: citacion
     capacidad: reporte
     estado: EXITO
     duracion_s: 4e-06
   [14]
     id_traza: 15
-    timestamp: 2026-08-15T02:37:16.677490+00:00
+    timestamp: 2026-08-15T02:53:21.826152+00:00
     modulo: citacion
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1e-06
+    duracion_s: 2e-06
   [15]
     id_traza: 16
-    timestamp: 2026-08-15T02:37:16.677518+00:00
+    timestamp: 2026-08-15T02:53:21.826180+00:00
     modulo: citacion
     capacidad: inventario
     estado: EXITO
     duracion_s: 4e-06
   [16]
     id_traza: 17
-    timestamp: 2026-08-15T02:37:16.677780+00:00
+    timestamp: 2026-08-15T02:53:21.826449+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000239
+    duracion_s: 0.000246
   [17]
     id_traza: 18
-    timestamp: 2026-08-15T02:37:16.678040+00:00
+    timestamp: 2026-08-15T02:53:21.826695+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000226
+    duracion_s: 0.000213
   [18]
     id_traza: 19
-    timestamp: 2026-08-15T02:37:16.678173+00:00
+    timestamp: 2026-08-15T02:53:21.826831+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 9.5e-05
+    duracion_s: 9.7e-05
   [19]
     id_traza: 20
-    timestamp: 2026-08-15T02:37:16.693994+00:00
+    timestamp: 2026-08-15T02:53:21.842823+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.015788
+    duracion_s: 0.015959
   [20]
     id_traza: 21
-    timestamp: 2026-08-15T02:37:16.695227+00:00
+    timestamp: 2026-08-15T02:53:21.844069+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001193
+    duracion_s: 0.001201
   [21]
     id_traza: 22
-    timestamp: 2026-08-15T02:37:16.696998+00:00
+    timestamp: 2026-08-15T02:53:21.845975+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001729
+    duracion_s: 0.00186
   [22]
     id_traza: 23
-    timestamp: 2026-08-15T02:37:16.724116+00:00
+    timestamp: 2026-08-15T02:53:21.872479+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.027079
+    duracion_s: 0.02646
   [23]
     id_traza: 24
-    timestamp: 2026-08-15T02:37:16.739607+00:00
+    timestamp: 2026-08-15T02:53:21.888093+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.01544
+    duracion_s: 0.015555
   [24]
     id_traza: 25
-    timestamp: 2026-08-15T02:37:16.741222+00:00
+    timestamp: 2026-08-15T02:53:21.889850+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001575
+    duracion_s: 0.001707
   [25]
     id_traza: 26
-    timestamp: 2026-08-15T02:37:16.744633+00:00
+    timestamp: 2026-08-15T02:53:21.893350+00:00
     modulo: diccionario
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.003375
+    duracion_s: 0.003457
   [26]
     id_traza: 27
-    timestamp: 2026-08-15T02:37:16.744678+00:00
+    timestamp: 2026-08-15T02:53:21.893402+00:00
     modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1.2e-05
   [27]
     id_traza: 28
-    timestamp: 2026-08-15T02:37:16.744733+00:00
+    timestamp: 2026-08-15T02:53:21.893460+00:00
     modulo: diccionario
     capacidad: inventario
     estado: EXITO
-    duracion_s: 1.9e-05
+    duracion_s: 2e-05
   [28]
     id_traza: 29
-    timestamp: 2026-08-15T02:37:16.745909+00:00
+    timestamp: 2026-08-15T02:53:21.894668+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001145
+    duracion_s: 0.001182
   [29]
     id_traza: 30
-    timestamp: 2026-08-15T02:37:16.746397+00:00
+    timestamp: 2026-08-15T02:53:21.895134+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000429
+    duracion_s: 0.00043
   [30]
     id_traza: 31
-    timestamp: 2026-08-15T02:37:16.746649+00:00
+    timestamp: 2026-08-15T02:53:21.895394+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000205
+    duracion_s: 0.000218
   [31]
     id_traza: 32
-    timestamp: 2026-08-15T02:37:16.746711+00:00
+    timestamp: 2026-08-15T02:53:21.895459+00:00
     modulo: interfaz
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2.4e-05
+    duracion_s: 2.6e-05
   [32]
     id_traza: 33
-    timestamp: 2026-08-15T02:37:16.750523+00:00
+    timestamp: 2026-08-15T02:53:21.899335+00:00
     modulo: realidad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.003783
+    duracion_s: 0.003846
   [33]
     id_traza: 34
-    timestamp: 2026-08-15T02:37:16.751215+00:00
+    timestamp: 2026-08-15T02:53:21.900031+00:00
     modulo: realidad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000656
+    duracion_s: 0.00066
   [34]
     id_traza: 35
-    timestamp: 2026-08-15T02:37:16.759005+00:00
+    timestamp: 2026-08-15T02:53:21.911030+00:00
     modulo: realidad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.007748
+    duracion_s: 0.010956
   [35]
     id_traza: 36
-    timestamp: 2026-08-15T02:37:16.766667+00:00
+    timestamp: 2026-08-15T02:53:21.918853+00:00
     modulo: self
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.007606
+    duracion_s: 0.007773
   [36]
     id_traza: 37
-    timestamp: 2026-08-15T02:37:16.773566+00:00
+    timestamp: 2026-08-15T02:53:21.925946+00:00
     modulo: self
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.006856
+    duracion_s: 0.007049
   [37]
     id_traza: 38
-    timestamp: 2026-08-15T02:37:16.773614+00:00
+    timestamp: 2026-08-15T02:53:21.925995+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8e-06
+    duracion_s: 9e-06
   [38]
     id_traza: 39
-    timestamp: 2026-08-15T02:37:16.795678+00:00
+    timestamp: 2026-08-15T02:53:21.948425+00:00
     modulo: spartaco_seguridad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.022037
+    duracion_s: 0.022401
   [39]
     id_traza: 40
-    timestamp: 2026-08-15T02:37:16.796326+00:00
+    timestamp: 2026-08-15T02:53:21.949088+00:00
     modulo: spartaco_seguridad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000611
+    duracion_s: 0.000627
   [40]
     id_traza: 41
-    timestamp: 2026-08-15T02:37:16.797104+00:00
+    timestamp: 2026-08-15T02:53:21.949866+00:00
     modulo: spartaco_seguridad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000738
+    duracion_s: 0.000735
   [41]
     id_traza: 42
-    timestamp: 2026-08-15T02:37:16.798163+00:00
+    timestamp: 2026-08-15T02:53:21.950909+00:00
     modulo: taxonomia
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001022
+    duracion_s: 0.001007
   [42]
     id_traza: 43
-    timestamp: 2026-08-15T02:37:16.798419+00:00
+    timestamp: 2026-08-15T02:53:21.951178+00:00
     modulo: taxonomia
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000223
+    duracion_s: 0.000234
   [43]
     id_traza: 44
-    timestamp: 2026-08-15T02:37:16.798663+00:00
+    timestamp: 2026-08-15T02:53:21.951429+00:00
     modulo: taxonomia
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000201
+    duracion_s: 0.000209
   [44]
     id_traza: 45
-    timestamp: 2026-08-15T02:37:16.800519+00:00
+    timestamp: 2026-08-15T02:53:21.953304+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001824
+    duracion_s: 0.001844
   [45]
     id_traza: 46
-    timestamp: 2026-08-15T02:37:16.801376+00:00
+    timestamp: 2026-08-15T02:53:21.954161+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 0.000824
   [46]
     id_traza: 47
-    timestamp: 2026-08-15T02:37:16.802184+00:00
+    timestamp: 2026-08-15T02:53:21.954961+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00077
+    duracion_s: 0.000761
   [47]
     id_traza: 48
-    timestamp: 2026-08-15T02:37:16.802226+00:00
+    timestamp: 2026-08-15T02:53:21.955002+00:00
     modulo: verificacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 5e-06
   [48]
     id_traza: 49
-    timestamp: 2026-08-15T02:37:16.802254+00:00
+    timestamp: 2026-08-15T02:53:21.955030+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [49]
     id_traza: 50
-    timestamp: 2026-08-15T02:37:16.802277+00:00
+    timestamp: 2026-08-15T02:53:21.955054+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO

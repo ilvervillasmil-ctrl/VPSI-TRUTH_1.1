@@ -828,7 +828,6 @@ def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # ===============================================================
 # FIN PARTE X
 # ===============================================================
-
 # ===============================================================
 # PARTE Y — INSPECCIONAR
 # ===============================================================
@@ -888,13 +887,8 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "reporte": callable(reporte),
         "diagnostico": callable(diagnostico),
         "buscar_por_id": callable(buscar_por_id),
-        "ejecutar_total": callable(ejecutar_total) if "ejecutar_total" in dir() else False,
+        "ejecutar_total": callable(ejecutar_total),
         "inspeccionar": True,
-        "registrar_inventario": (
-            callable(registrar_inventario)
-            if "registrar_inventario" in dir()
-            else False
-        ),
     }
 
     # -----------------------------------------------------------
@@ -937,9 +931,13 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "componentes_privados": privadas,
         "componentes_publicos": publicas,
 
-        "capacidades_declaradas": list(CONTENEDOR.get("capacidades", {}).keys()),
+        "capacidades_declaradas": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
         "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
-        "capacidades_meta": list(CONTENEDOR.get("capacidades_meta", {}).keys()),
+        "capacidades_meta": list(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
 
         "constantes": constantes,
 
@@ -959,7 +957,9 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "estabilidad": CONTENEDOR.get("estabilidad"),
             "requiere": CONTENEDOR.get("requiere"),
             "autoridad": CONTENEDOR.get("autoridad"),
-            "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+            "conocimiento_exportable": CONTENEDOR.get(
+                "conocimiento_exportable"
+            ),
             "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
             "invariantes": CONTENEDOR.get("invariantes"),
             "estados_validos": CONTENEDOR.get("estados_validos"),
@@ -988,8 +988,7 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 # ===============================================================
 # FIN PARTE Y
-# =============================================================== 
-# ===============================================================
+# ===============================================================# ===============================================================
 # 6.1 — CARGA DESDE ARCHIVO
 # ===============================================================
 
@@ -1449,10 +1448,8 @@ def limite_axiomático(
                 if vecino not in visitado:
                     dfs(vecino)
                 elif vecino in en_stack:
-                    # Se encontró un ciclo
                     idx = stack.index(vecino)
                     ciclo = stack[idx:] + [vecino]
-                    # Evitar registrar el mismo ciclo varias veces
                     ciclo_norm = tuple(sorted(set(ciclo[:-1])))
                     if ciclo_norm and ciclo_norm not in {
                         tuple(sorted(set(c[:-1]))) for c in ciclos
@@ -1482,8 +1479,6 @@ def limite_axiomático(
 
     # -----------------------------------------------------------
     # Resolución transitiva de premisas faltantes (CORRECCIÓN 9)
-    # Si A depende de B y B depende de C, y C no existe,
-    # entonces A también tiene premisa faltante
     # -----------------------------------------------------------
     def _premisas_transitivas(
         start: str, vistos: Optional[Set[str]] = None
@@ -1564,7 +1559,6 @@ def limite_axiomático(
 # ===============================================================
 # FIN 7.1
 # ===============================================================
-
 # ===============================================================
 # PARTE 8 — CAPACIDADES PÚBLICAS
 # ===============================================================
@@ -1750,7 +1744,6 @@ def ids_dominio_k_o(
 # ===============================================================
 # FIN 8.2
 # ===============================================================
-
 # ===============================================================
 # 8.3 — GENERATIVIDAD (TR1)
 # ===============================================================
@@ -1758,9 +1751,13 @@ def ids_dominio_k_o(
 def generatividad() -> dict:
     """
     CORRECCIÓN 14: normalizar dominios de la capa operativa con DOMINIO_CANONICO.
+    Callable público. Mide generatividad operativa y canónica (TR1).
     """
     decls, errores = recolectar()
 
+    # -----------------------------------------------------------
+    # Capa operativa: grafo real del repositorio
+    # -----------------------------------------------------------
     oper = []
     for d in decls:
         if d.get("tipo") not in ("teorema", "axioma"):
@@ -1780,6 +1777,9 @@ def generatividad() -> dict:
     m_op = _medir_pares(oper)
     dominios_op = sorted({g for n in oper for g in n["dominios"]})
 
+    # -----------------------------------------------------------
+    # Capa canónica: THETA_24 formal del paper
+    # -----------------------------------------------------------
     can = [
         {"id": tid, "tipo": "teorema", "dominios": set(doms)}
         for tid, doms in THETA_24.items()
@@ -1790,14 +1790,20 @@ def generatividad() -> dict:
     ids_en_repo = {str(d.get("id", "")) for d in decls}
     ids_presentes = sorted(i for i in THETA_CANONICO if i in ids_en_repo)
     ids_faltantes = sorted(THETA_CANONICO - set(ids_presentes))
-    ids_sin_dominio = sorted(tid for tid, doms in THETA_24.items() if not doms)
+    ids_sin_dominio = sorted(
+        tid for tid, doms in THETA_24.items() if not doms
+    )
 
     u1_proxy = (
         "NO_STAGNANT"
-        if m_can.get("pares_novedosos", 0) > 0 or m_op.get("pares_novedosos", 0) > 0
+        if m_can.get("pares_novedosos", 0) > 0
+        or m_op.get("pares_novedosos", 0) > 0
         else "REVISAR"
     )
 
+    # -----------------------------------------------------------
+    # Resultado
+    # -----------------------------------------------------------
     return {
         "contenedor": "axiomas",
         "theta_n": m_op["theta_n"],
@@ -1822,7 +1828,9 @@ def generatividad() -> dict:
             "ids_faltantes": ids_faltantes,
             "ids_sin_dominio": ids_sin_dominio,
             "dominios": dominios_can,
-            "dominios_formales": {k: sorted(v) for k, v in THETA_24.items()},
+            "dominios_formales": {
+                k: sorted(v) for k, v in THETA_24.items()
+            },
             "referencia_formal": {
                 "theta_n": 24,
                 "pares_totales": 276,

@@ -108,7 +108,8 @@ PERMISOS_AUTORIZA_ENGINE = (
     "analizar", "generar",
     "exportar","importar", "respaldar",
     "recuperar", "sincronizar",
-    "monitorear", "acceso_archivos",
+    "monitorear", "acceso_archivos", "ejecutar_total", 
+    "inspeccionar", "registrar_inventario",
 )
 
 

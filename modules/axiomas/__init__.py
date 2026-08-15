@@ -321,7 +321,7 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # 5.5 — CONOCIMIENTO EXPORTABLE
     # ============================================================
-    "conocimiento_exportable": [
+     "conocimiento_exportable": [
         "declaraciones",
         "referencias",
         "dependencias",
@@ -332,7 +332,6 @@ CONTENEDOR: Dict[str, Any] = {
         "estado",
         "reporte",
         "diagnostico",
-        "limite_axiomático",
     ],
 
     # ============================================================
@@ -371,7 +370,6 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_coherencia",
         "ids_dominio_k_o",
         "recolectar",
-        "limite_axiomático",
     ],
 
     # ============================================================
@@ -391,149 +389,150 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": "reporte",
         "diagnostico": "diagnostico",
         "buscar_por_id": "buscar_por_id",
-        "limite_axiomático": "limite_axiomático",
     },
 
     # ============================================================
     # 5.11 — METADATOS DE CAPACIDADES
     # ============================================================
-    "capacidades_meta": {
+     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                     # ← AGREGADA
             "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "barrer": {
             "descripcion": "Analiza coherencia de todas las declaraciones (contradicción directa y de cota).",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo, ids_dominio_k_o",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "verificar_salida": {
             "descripcion": "Comprueba si una salida de barrer/verificar es coherente.",
             "entrada": "salida: dict",
-            "validar_esquema": ["validar_esquema"],
+            "validar_esquema": ["validar_esquema"],                                     # ← AGREGADA
             "salida": "bool",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "inventario": {
             "descripcion": "Inventario completo del módulo (declaraciones, cuerpos, capacidades).",
             "entrada": "peticion",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "dict con id, nombre, rol, version, declaraciones, cuerpos, capacidades",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "axiomas": {
             "descripcion": "Devuelve las declaraciones si el módulo es coherente; lista vacía si no.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "list[dict] de declaraciones normalizadas",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "declaraciones": {
             "descripcion": "Igual que axiomas: declaraciones normalizadas si coherente.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "list[dict] de declaraciones normalizadas",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "generatividad": {
             "descripcion": "Mide generatividad operativa y canónica (TR1).",
             "entrada": "acceso_archivos",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "dict con theta_n, pares, im_vs_theta, capa canonica, dominios, u1_proxy",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "por_dominio": {
             "descripcion": "Filtra declaraciones por dominio en gobierna.",
             "entrada": "dominio: str; declaraciones_externas opcional",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "list[dict] de declaraciones del dominio",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "ids_dominio_k_o": {
             "descripcion": "Ids de declaraciones ligadas a dominios K/O o Def-5.3.1.",
             "entrada": "declaraciones_externas (dict)",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "list[str] de ids ordenados",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "recolectar": {
             "descripcion": "Carga y normaliza todas las declaraciones de los cuerpos del módulo.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "tuple[list[dict], list[dict]] → (declaraciones, errores)",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "reporte": {
             "descripcion": "Reporte interno de estado del módulo.",
             "entrada": "acceso_archivos",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "dict con estado, coherente, declaraciones, choques, errores, capacidades",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "diagnostico": {
             "descripcion": "Diagnóstico: qué me sucede, qué falta, qué está mal, qué necesito.",
-            "entrada": "acceso_archivos",
-            "validar_esquema": ["acceso_archivos"],
-            "salida": "dict con estado, problemas, advertencias, recomendaciones, limites",
-            "acceso_archivos": ["acceso_archivos"],
+            "entrada": "acceso_archivos", 
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
+            "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "buscar_por_id": {
             "descripcion": "Busca y cita una declaración por su id.",
             "entrada": "id_decl: str",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "dict de la declaración o None",
-            "acceso_archivos": ["acceso_archivos"],
-        },
-        "limite_axiomático": {
-            "descripcion": (
-                "Determina el límite de derivación axiomática: "
-                "premisas disponibles, premisas faltantes, dependencias "
-                "no satisfechas, alcance y declaraciones no derivables."
-            ),
-            "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["acceso_archivos"],
-            "salida": (
-                "dict con premisas_disponibles, premisas_faltantes, "
-                "dependencias_no_satisfechas, limites, alcance"
-            ),
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
     },
 
     # ============================================================
     # 5.12 — AUTORIZACIÓN AL ENGINE
     # ============================================================
-    "autoriza_engine": {
+     "autoriza_engine": {
+        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
-        "ejecutar_total": True,
-        "inspeccionar": True,
-        "registrar_inventario": True,
         "consultar": True,
         "recombinar": True,
         "reportar": True,
         "auditar": True,
         "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
-        "generar": True,
+        "generar": True, 
+        "ejecutar": True,
+        "ejecutar_total": True,
+        "inspeccionar": True,
+
+        # "transformar": False,  # ← ELIMINADO (no permitido)
+
+        # --- PERMISOS DE DATOS ---
         "exportar": True,
         "importar": True,
         "respaldar": True,
         "recuperar": True,
         "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
         "metricas": True,
         "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -545,29 +544,46 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
-        "validar_esquema": True,
-        "acceso_archivos": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
     },
 
     # ============================================================
     # 5.13 — REPORTING
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
-        "acceso_archivos": True,
-        "validar_esquema": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
     },
 
     # ============================================================
@@ -832,40 +848,39 @@ def contradiccion_de_cota(decls: List[Dict]) -> List[Dict]:
 # 6.5 — MEDICIÓN DE PARES (TR1)
 # ===============================================================
 
+def _dominios_canonicos(gobierna) -> set:
+    out = set()
+    for g in gobierna or []:
+        key = str(g).lower().strip()
+        out.add(DOMINIO_CANONICO.get(key, key.upper()[:3]))
+    return out
+
+
 def _medir_pares(theta: list) -> dict:
     n = len(theta)
     pares_tot = n * (n - 1) // 2 if n >= 2 else 0
     compatibles = 0
     novedosos = 0
-    redundantes = 0
-    incompatibles = 0
     for i in range(n):
         Di = theta[i]["dominios"]
         for j in range(i + 1, n):
             Dj = theta[j]["dominios"]
             if not (Di & Dj):
-                incompatibles += 1
                 continue
             compatibles += 1
             union = Di | Dj
-            if union != Di and union != Dj:
+            if union > Di and union > Dj:
                 novedosos += 1
-            else:
-                redundantes += 1
     return {
         "theta_n": n,
         "pares_totales": pares_tot,
         "pares_compatibles": compatibles,
         "pares_novedosos": novedosos,
-        "pares_redundantes": redundantes,
-        "pares_incompatibles": incompatibles,
         "im_vs_theta": (
             "GENERATIVO"
             if n > 0 and novedosos > n
             else ("ESTANCADO" if n > 0 else "SIN_DATOS")
         ),
-        "identidad_pares": (compatibles + incompatibles == pares_tot),
-        "identidad_compatibles": (novedosos + redundantes == compatibles),
     }
 
 # ===============================================================
@@ -878,12 +893,46 @@ def _medir_pares(theta: list) -> dict:
 # ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
-    """
-    Valida que el CONTENEDOR cumpla el esquema contractual.
-    CORRECCIONES 2 y 4:
-    - validar acceso_archivos y validar_esquema como listas
-    - validación completa de capacidades_meta (1:1, campos, sin huérfanas)
-    """
+    obligatorias = (
+        "esquema", "version_contrato", "version_modulo",
+        "id", "nombre", "rol", "descripcion",
+        "funcion", "no_hace", "autoridad",
+        "conocimiento_exportable", "requiere",
+        "autoriza_engine", "consultas_soportadas",
+        "capacidades", "capacidades_meta",
+        "reporting", "estados_validos", "invariantes",
+        "estabilidad", "compatible_desde", "api_engine",
+    )
+    faltantes = [k for k in obligatorias if k not in cont]
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
+        )
+    if cont.get("esquema") != ESQUEMA_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: esquema incompatible: {cont.get('esquema')}"
+        )
+    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: version_contrato inválida: {cont.get('version_contrato')}"
+        )
+    meta_caps = cont.get("capacidades_meta") or {}
+    for nombre_cap in cont.get("capacidades") or {}:
+        if nombre_cap not in meta_caps:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre_cap}' sin capacidades_meta"
+            )
+        entrada = meta_caps[nombre_cap]
+        if not isinstance(entrada, dict):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] debe ser dict"
+            )
+        for campo in ("descripcion", "entrada", "salida"):
+            if campo not in entrada or not isinstance(entrada[campo], str):
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] "
+                    f"requiere '{campo}: str'"
+                )
 
     # -----------------------------------------------------------
     # Lista de claves que el contrato DEBE tener obligatoriamente

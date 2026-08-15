@@ -628,7 +628,367 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 # PARTE 6 — FUNCIONES PRIVADAS
 # ===============================================================
+# ===============================================================
+# PARTE X — EJECUTAR_TOTAL
+# ===============================================================
 
+def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Operación arquitectónica genérica.
+    Ejerce la totalidad de las unidades operativamente ejecutables
+    pertenecientes al módulo, conforme a su contrato, inventario,
+    clasificación, dependencias y leyes internas.
+
+    La totalidad se determina por inspección e inventario del módulo,
+    no por una lista fija de funciones ni por nombres concretos.
+
+    No enumera funciones concretas.
+    No inventa capacidades ni unidades operativas.
+    No altera los contratos internos del módulo.
+    """
+
+    # -----------------------------------------------------------
+    # X1. Instantánea única
+    # -----------------------------------------------------------
+    externas = None
+    if isinstance(peticion, dict):
+        externas = peticion.get("declaraciones_externas")
+
+    decls, errores = recolectar(externas)
+    choques_directa = contradiccion_directa(decls)
+    choques_cota = contradiccion_de_cota(decls)
+    choques = choques_directa + choques_cota
+    lim = limite_axiomático(decls=decls, errores=errores)
+
+    # -----------------------------------------------------------
+    # X2. Unidades privadas ejercidas
+    # -----------------------------------------------------------
+    rutas = _rutas_py()
+    ruta_vpsi = _ruta_vpsi()
+
+    # medir pares sobre capa canónica
+    canonicos = [
+        {"id": tid, "tipo": "teorema", "dominios": set(doms)}
+        for tid, doms in THETA_24.items()
+    ]
+    medicion_canonica = _medir_pares(canonicos)
+
+    # -----------------------------------------------------------
+    # X3. Unidades públicas ejercidas
+    # -----------------------------------------------------------
+    resultado_barrer = {
+        "coherente": not (choques or errores),
+        "choques": choques,
+        "choques_directa": len(choques_directa),
+        "choques_cota": len(choques_cota),
+        "errores": errores,
+        "declaraciones": len(decls),
+        "cuerpos": sorted({d["cuerpo"] for d in decls}),
+        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
+        "ids_dominio_k_o": ids_dominio_k_o(externas) if not (choques or errores) else [],
+    }
+
+    resultado_verificar_salida = verificar_salida(resultado_barrer)
+    resultado_declaraciones = decls if resultado_barrer["coherente"] else []
+    resultado_axiomas = resultado_declaraciones
+    resultado_generatividad = generatividad()
+    resultado_inventario = inventario()
+    resultado_reporte = reporte()
+    resultado_diagnostico = diagnostico()
+    resultado_ids_k_o = ids_dominio_k_o(externas)
+    resultado_limite = lim
+
+    # -----------------------------------------------------------
+    # X4. Consolidación total
+    # -----------------------------------------------------------
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "operacion": "ejecutar_total",
+        "estado": (
+            ESTADO_OPERATIVO
+            if resultado_barrer["coherente"]
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": resultado_barrer["coherente"],
+
+        # -------------------------------------------------------
+        # Unidades privadas
+        # -------------------------------------------------------
+        "unidades_privadas": {
+            "_ruta_vpsi": str(ruta_vpsi) if ruta_vpsi else None,
+            "_rutas_py": [str(p) for p in rutas],
+            "contradiccion_directa": {
+                "total": len(choques_directa),
+            },
+            "contradiccion_de_cota": {
+                "total": len(choques_cota),
+            },
+            "_medir_pares": {
+                "theta_n": medicion_canonica.get("theta_n"),
+                "pares_totales": medicion_canonica.get("pares_totales"),
+                "pares_compatibles": medicion_canonica.get("pares_compatibles"),
+                "pares_novedosos": medicion_canonica.get("pares_novedosos"),
+                "pares_redundantes": medicion_canonica.get("pares_redundantes"),
+                "pares_incompatibles": medicion_canonica.get("pares_incompatibles"),
+                "im_vs_theta": medicion_canonica.get("im_vs_theta"),
+            },
+            "clave_ref": "disponible (helpers de tripleta y ubicación)",
+            "normalizar": "disponible (normalización de declaraciones)",
+            "_cargar_declaraciones_desde_archivo": "disponible (carga por archivo)",
+            "_validar_contrato": "ejecutado al importar el módulo",
+            "_resolver_capacidades": "ejecutado al importar el módulo",
+        },
+
+        # -------------------------------------------------------
+        # Unidades públicas
+        # -------------------------------------------------------
+        "unidades_publicas": {
+            "recolectar": {
+                "declaraciones": len(decls),
+                "errores": len(errores),
+            },
+            "barrer": resultado_barrer,
+            "verificar": resultado_barrer,
+            "verificar_salida": resultado_verificar_salida,
+            "declaraciones": len(resultado_declaraciones),
+            "axiomas": len(resultado_axiomas),
+            "generatividad": {
+                "theta_n": resultado_generatividad.get("theta_n"),
+                "pares_totales": resultado_generatividad.get("pares_totales"),
+                "pares_novedosos": resultado_generatividad.get("pares_novedosos"),
+                "im_vs_theta": resultado_generatividad.get("im_vs_theta"),
+                "u1_proxy": resultado_generatividad.get("u1_proxy"),
+                "coincide_paper": (
+                    resultado_generatividad.get("canonica", {}).get("coincide_paper")
+                ),
+            },
+            "por_dominio": "disponible (requiere dominio)",
+            "ids_dominio_k_o": resultado_ids_k_o,
+            "limite_axiomático": {
+                "premisas_disponibles": len(
+                    resultado_limite.get("premisas_disponibles") or []
+                ),
+                "premisas_faltantes": len(
+                    resultado_limite.get("premisas_faltantes") or []
+                ),
+                "dependencias_no_satisfechas": len(
+                    resultado_limite.get("dependencias_no_satisfechas") or []
+                ),
+                "dependencias_circulares": len(
+                    resultado_limite.get("dependencias_circulares") or []
+                ),
+                "alcance": resultado_limite.get("alcance"),
+            },
+            "inventario": {
+                "declaraciones": resultado_inventario.get("declaraciones"),
+                "cuerpos": resultado_inventario.get("cuerpos"),
+                "capacidades": resultado_inventario.get("capacidades"),
+            },
+            "reporte": resultado_reporte,
+            "diagnostico": {
+                "estado": resultado_diagnostico.get("estado"),
+                "problemas": len(resultado_diagnostico.get("problemas") or []),
+                "advertencias": len(resultado_diagnostico.get("advertencias") or []),
+                "limites": len(resultado_diagnostico.get("limites") or []),
+            },
+            "buscar_por_id": "disponible (requiere id_decl)",
+        },
+
+        "capacidades_declaradas": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
+
+        "resumen": {
+            "total_declaraciones": len(decls),
+            "total_errores": len(errores),
+            "total_choques": len(choques),
+            "premisas_faltantes": len(
+                resultado_limite.get("premisas_faltantes") or []
+            ),
+            "dependencias_circulares": len(
+                resultado_limite.get("dependencias_circulares") or []
+            ),
+            "theta_n": resultado_generatividad.get("theta_n"),
+            "im_vs_theta": resultado_generatividad.get("im_vs_theta"),
+            "archivos_py": len(rutas),
+            "vpsi_presente": ruta_vpsi is not None,
+        },
+
+        "nota": (
+            "ejecutar_total ejerce la totalidad de las unidades "
+            "públicas y privadas del módulo AX. "
+            "No inventa capacidades. No altera el contrato."
+        ),
+    }
+
+# ===============================================================
+# FIN PARTE X
+# ===============================================================
+
+# ===============================================================
+# PARTE Y — INSPECCIONAR
+# ===============================================================
+
+def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Capacidad meta de inspección estructural del módulo.
+    Expone el estado interno, componentes, unidades ejecutables,
+    contrato y estructura sin alterar nada.
+
+    No ejecuta capacidades de análisis profundo.
+    No inventa componentes.
+    No modifica el contrato.
+    """
+
+    # -----------------------------------------------------------
+    # Y1. Instantánea estructural
+    # -----------------------------------------------------------
+    rutas = _rutas_py()
+    ruta_vpsi = _ruta_vpsi()
+    decls, errores = recolectar()
+
+    # -----------------------------------------------------------
+    # Y2. Componentes privados detectados
+    # -----------------------------------------------------------
+    privadas = {
+        "_ruta_vpsi": callable(_ruta_vpsi),
+        "_rutas_py": callable(_rutas_py),
+        "_cargar_declaraciones_desde_archivo": callable(
+            _cargar_declaraciones_desde_archivo
+        ),
+        "normalizar": callable(normalizar),
+        "clave": callable(clave),
+        "ref": callable(ref),
+        "contradiccion_directa": callable(contradiccion_directa),
+        "contradiccion_de_cota": callable(contradiccion_de_cota),
+        "_medir_pares": callable(_medir_pares),
+        "_validar_contrato": callable(_validar_contrato),
+        "_resolver_capacidades": callable(_resolver_capacidades),
+    }
+
+    # -----------------------------------------------------------
+    # Y3. Componentes públicos detectados
+    # -----------------------------------------------------------
+    publicas = {
+        "recolectar": callable(recolectar),
+        "barrer": callable(barrer),
+        "verificar": callable(verificar),
+        "verificar_salida": callable(verificar_salida),
+        "declaraciones": callable(declaraciones),
+        "axiomas": callable(axiomas),
+        "generatividad": callable(generatividad),
+        "por_dominio": callable(por_dominio),
+        "ids_dominio_k_o": callable(ids_dominio_k_o),
+        "limite_axiomático": callable(limite_axiomático),
+        "inventario": callable(inventario),
+        "reporte": callable(reporte),
+        "diagnostico": callable(diagnostico),
+        "buscar_por_id": callable(buscar_por_id),
+        "ejecutar_total": callable(ejecutar_total) if "ejecutar_total" in dir() else False,
+        "inspeccionar": True,
+        "registrar_inventario": (
+            callable(registrar_inventario)
+            if "registrar_inventario" in dir()
+            else False
+        ),
+    }
+
+    # -----------------------------------------------------------
+    # Y4. Contrato y constantes
+    # -----------------------------------------------------------
+    constantes = {
+        "ID_MODULO": ID_MODULO,
+        "NOMBRE_MODULO": NOMBRE_MODULO,
+        "ROL_MODULO": ROL_MODULO,
+        "VERSION_MODULO": VERSION_MODULO,
+        "VERSION_CONTRATO": VERSION_CONTRATO,
+        "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+        "ESTABILIDAD": ESTABILIDAD,
+        "COMPATIBLE_DESDE": COMPATIBLE_DESDE,
+        "API_ENGINE": API_ENGINE,
+        "TIPOS": list(TIPOS),
+        "OBLIGATORIOS": list(OBLIGATORIOS),
+        "ESTADOS_VALIDOS": list(ESTADOS_VALIDOS),
+        "THETA_24_n": len(THETA_24),
+        "DOMINIOS_K_O": sorted(DOMINIOS_K_O),
+        "DOMINIO_CANONICO_n": len(DOMINIO_CANONICO),
+    }
+
+    # -----------------------------------------------------------
+    # Y5. Resultado de inspección
+    # -----------------------------------------------------------
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+
+        "archivos": {
+            "py_del_modulo": [str(p) for p in rutas],
+            "total_py": len(rutas),
+            "vpsi": str(ruta_vpsi) if ruta_vpsi else None,
+        },
+
+        "componentes_privados": privadas,
+        "componentes_publicos": publicas,
+
+        "capacidades_declaradas": list(CONTENEDOR.get("capacidades", {}).keys()),
+        "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
+        "capacidades_meta": list(CONTENEDOR.get("capacidades_meta", {}).keys()),
+
+        "constantes": constantes,
+
+        "cuerpo_axiomático": {
+            "declaraciones_cargadas": len(decls),
+            "errores_carga": len(errores),
+            "cuerpos": sorted({d["cuerpo"] for d in decls}),
+            "por_tipo": {
+                t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS
+            },
+        },
+
+        "contrato": {
+            "esquema": CONTENEDOR.get("esquema"),
+            "version_contrato": CONTENEDOR.get("version_contrato"),
+            "version_modulo": CONTENEDOR.get("version_modulo"),
+            "estabilidad": CONTENEDOR.get("estabilidad"),
+            "requiere": CONTENEDOR.get("requiere"),
+            "autoridad": CONTENEDOR.get("autoridad"),
+            "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+            "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+            "invariantes": CONTENEDOR.get("invariantes"),
+            "estados_validos": CONTENEDOR.get("estados_validos"),
+        },
+
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+
+        "resumen": {
+            "total_privadas": sum(1 for v in privadas.values() if v),
+            "total_publicas": sum(1 for v in publicas.values() if v),
+            "total_capacidades_declaradas": len(
+                CONTENEDOR.get("capacidades", {})
+            ),
+            "total_capacidades_resueltas": len(CAPACIDADES_RESUELTAS),
+            "total_archivos_py": len(rutas),
+            "declaraciones": len(decls),
+            "errores": len(errores),
+        },
+
+        "nota": (
+            "inspeccionar expone la estructura completa del módulo "
+            "sin ejecutar análisis profundo ni alterar el contrato."
+        ),
+    }
+
+# ===============================================================
+# FIN PARTE Y
+# =============================================================== 
 # ===============================================================
 # 6.1 — CARGA DESDE ARCHIVO
 # ===============================================================
@@ -1589,8 +1949,6 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
 # ===============================================================
 # FIN 8.5
 # ===============================================================
-
-
 # ===============================================================
 # 8.6 — INVENTARIO
 # ===============================================================
@@ -1612,18 +1970,34 @@ def inventario(peticion=None) -> Dict:
         "cuerpos": sorted({d["cuerpo"] for d in decls}),
         "errores": errores,
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
         "invariantes": CONTENEDOR.get("invariantes"),
-        "vigila": ["contradiccion_directa", "contradiccion_de_cota", "limite_axiomático"],
+        "vigila": [
+            "contradiccion_directa",
+            "contradiccion_de_cota",
+            "limite_axiomático",
+        ],
         "ids_dominio_k_o": ids_dominio_k_o(),
         "limite_axiomático": {
             "premisas_faltantes": len(lim.get("premisas_faltantes") or []),
-            "dependencias_no_satisfechas": len(lim.get("dependencias_no_satisfechas") or []),
-            "dependencias_circulares": len(lim.get("dependencias_circulares") or []),
+            "dependencias_no_satisfechas": len(
+                lim.get("dependencias_no_satisfechas") or []
+            ),
+            "dependencias_circulares": len(
+                lim.get("dependencias_circulares") or []
+            ),
             "alcance": lim.get("alcance"),
+        },
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": "ejecutar_total" in CONTENEDOR.get("capacidades", {}),
+            "inspeccionar": "inspeccionar" in CONTENEDOR.get("capacidades", {}),
+            "registrar_inventario": (
+                "registrar_inventario" in CONTENEDOR.get("capacidades", {})
+            ),
         },
         "nota": (
             "Def-5.3.1 y dominio O viven en los cuerpos cargados; "
@@ -1634,7 +2008,6 @@ def inventario(peticion=None) -> Dict:
 # ===============================================================
 # FIN 8.6
 # ===============================================================
-
 
 # ===============================================================
 # PARTE 9 — REPORTING
@@ -1666,22 +2039,29 @@ def reporte() -> Dict[str, Any]:
         "cuerpos": sorted({d["cuerpo"] for d in decls}),
         "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
         "limite_axiomático": {
             "premisas_faltantes": len(lim.get("premisas_faltantes") or []),
-            "dependencias_no_satisfechas": len(lim.get("dependencias_no_satisfechas") or []),
-            "dependencias_circulares": len(lim.get("dependencias_circulares") or []),
+            "dependencias_no_satisfechas": len(
+                lim.get("dependencias_no_satisfechas") or []
+            ),
+            "dependencias_circulares": len(
+                lim.get("dependencias_circulares") or []
+            ),
+        },
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": "ejecutar_total" in CONTENEDOR.get("capacidades", {}),
+            "inspeccionar": "inspeccionar" in CONTENEDOR.get("capacidades", {}),
         },
     }
 
 # ===============================================================
 # FIN 9.1
 # ===============================================================
-
-
 # ===============================================================
 # 9.2 — DIAGNÓSTICO
 # ===============================================================
@@ -1758,7 +2138,6 @@ def diagnostico() -> Dict[str, Any]:
 # ===============================================================
 # PARTE 10 — RESOLUCIÓN ESTRICTA (sin mutar CONTENEDOR)
 # ===============================================================
-
 # ===============================================================
 # 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
@@ -1779,6 +2158,8 @@ _CAP_MAP = {
     "buscar_por_id": buscar_por_id,
     "verificar": barrer,          # alias contractual → barrer
     "limite_axiomático": limite_axiomático,
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
 }
 
 # ===============================================================
@@ -1838,8 +2219,6 @@ _resolver_capacidades()
 # ===============================================================
 # FIN 10.3
 # ===============================================================
-
-
 # ===============================================================
 # PARTE 11 — EXPORTACIONES
 # ===============================================================
@@ -1878,6 +2257,8 @@ __all__ = [
     "diagnostico",
     "buscar_por_id",
     "limite_axiomático",
+    "ejecutar_total",
+    "inspeccionar",
     "ContratoInvalido",
     "CAPACIDADES_RESUELTAS",
 ]

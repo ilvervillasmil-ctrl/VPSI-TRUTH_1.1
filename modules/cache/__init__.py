@@ -1126,6 +1126,119 @@ def categorias() -> List[str]:
     """Categorías descubiertas dinámicamente hasta ahora."""
     return _registro.categorias_conocidas()
 
+# ===============================================================
+# CAPACIDADES ARQUITECTÓNICAS NUEVAS
+# ===============================================================
+
+def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Operación arquitectónica genérica de CACHE.
+    Ejerce las unidades operativas del módulo conforme a su contrato.
+    No interpreta. No deduce. No altera evidencia depositada.
+    """
+    res = _registro.resumen()
+    integridad = _registro.verificar_integridad()
+    cats = _registro.categorias_conocidas()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": ESTADO_OPERATIVO if not integridad else ESTADO_DEGRADADO,
+        "resumen": res,
+        "integridad": {
+            "ok": len(integridad) == 0,
+            "errores": integridad,
+        },
+        "categorias": cats,
+        "capacidades": list(CONTENEDOR.get("capacidades", {}).keys()),
+        "nota": (
+            "ejecutar_total ejerce las unidades de CACHE. "
+            "No interpreta. No altera evidencia."
+        ),
+    }
+
+
+def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Inspección estructural de CACHE.
+    Expone estado interno y unidades sin alterar el contrato ni la evidencia.
+    """
+    res = _registro.resumen()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+            "CAMPOS_REGISTRO": list(CAMPOS_REGISTRO),
+        },
+        "capacidades_declaradas": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": list(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "registro": res,
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone la estructura de CACHE "
+            "sin alterar evidencia ni contrato."
+        ),
+    }
+
+
+def registrar_inventario(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Registra el inventario estructural de CACHE como evento append-only.
+    No modifica evidencia previa. Solo incorpora un evento nuevo.
+    """
+    inv = {
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "capacidades": list(CONTENEDOR.get("capacidades", {}).keys()),
+        "resumen": _registro.resumen(),
+        "categorias": _registro.categorias_conocidas(),
+    }
+    entrada = _registro.append({
+        "origen": ID_MODULO,
+        "destino": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "capacidad": "registrar_inventario",
+        "tipo": "inventario",
+        "categoria": "estructura",
+        "estado": ESTADO_OPERATIVO,
+        "payload": inv,
+        "run_id": (peticion or {}).get("run_id") if isinstance(peticion, dict) else None,
+        "ciclo_id": (peticion or {}).get("ciclo_id") if isinstance(peticion, dict) else None,
+    })
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "evento": entrada,
+        "inventario": inv,
+    }
+
+# ===============================================================
+# FIN CAPACIDADES ARQUITECTÓNICAS NUEVAS
+# ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     return {
@@ -1239,6 +1352,7 @@ def backend_para_centinela() -> CacheBackend:
 
 def reporte() -> Dict[str, Any]:
     r = barrer()
+    caps = list(CONTENEDOR["capacidades"].keys())
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1255,13 +1369,21 @@ def reporte() -> Dict[str, Any]:
         "errores": r.get("errores"),
         "memoria": r.get("resumen"),
         "categorias": _registro.categorias_conocidas(),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades": caps,
+        "capacidades_meta": list(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get(
             "conocimiento_exportable"
         ),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": "ejecutar_total" in CONTENEDOR.get("capacidades", {}),
+            "inspeccionar": "inspeccionar" in CONTENEDOR.get("capacidades", {}),
+            "registrar_inventario": "registrar_inventario" in CONTENEDOR.get("capacidades", {}),
+        },
     }
 
 

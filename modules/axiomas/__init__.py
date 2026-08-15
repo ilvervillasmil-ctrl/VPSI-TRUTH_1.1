@@ -347,7 +347,6 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # 5.7 — DEPENDENCIAS
     # ============================================================
-    # CORRECCIÓN 1: eliminado "AX" de requiere (dependencia autorreferencial)
     "requiere": [
         "CT", "FO", "MC", "SF", "CA", "CX", "CC",
         "DI", "RE", "VX", "TX", "CH", "CIT", "TT", "CE",
@@ -493,7 +492,7 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["acceso_archivos"],
         },
         "limite_axiomático": {
-                "descripcion": (
+            "descripcion": (
                 "Determina el límite de derivación axiomática: "
                 "premisas disponibles, premisas faltantes, dependencias "
                 "no satisfechas, alcance y declaraciones no derivables."
@@ -624,7 +623,6 @@ CONTENEDOR: Dict[str, Any] = {
     "estados_validos": list(ESTADOS_VALIDOS),
     "invariantes": list(INVARIANTES),
 }
-
 # ===============================================================
 # PARTE 6 — FUNCIONES PRIVADAS
 # ===============================================================
@@ -2193,15 +2191,15 @@ _CAP_MAP = {
 # 10.2 — RESOLUCIÓN DE CAPACIDADES
 # ===============================================================
 
-# Estructura paralela de capacidades resueltas (no muta el contrato)
+# Estructura paralela de capacidades resueltas
 CAPACIDADES_RESUELTAS: Dict[str, Any] = {}
 
 
 def _resolver_capacidades() -> None:
     """
-    CORRECCIÓN 24/25: no mutar CONTENEDOR['capacidades'].
     Resuelve las referencias contractuales hacia callables reales.
-    El resultado vive exclusivamente en CAPACIDADES_RESUELTAS.
+    Materializa los callables en CONTENEDOR["capacidades"]
+    porque Engine exige callables, no strings.
     """
     global CAPACIDADES_RESUELTAS
     resueltas: Dict[str, Any] = {}
@@ -2234,13 +2232,12 @@ def _resolver_capacidades() -> None:
         )
 
     CAPACIDADES_RESUELTAS = resueltas
-    # CONTENEDOR["capacidades"] permanece como declaración contractual.
-    # No se muta.
+    # Engine exige callables en CONTENEDOR["capacidades"]
+    CONTENEDOR["capacidades"] = resueltas
 
 # ===============================================================
 # FIN 10.2
-# ===============================================================
-# ===============================================================
+# ===============================================================# ===============================================================
 # 10.3 — EJECUCIÓN DE VALIDACIÓN Y RESOLUCIÓN
 # ===============================================================
 

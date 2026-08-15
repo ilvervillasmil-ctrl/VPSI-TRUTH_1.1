@@ -20,7 +20,13 @@
 #   - Clasifica estado, evento, ligaduras y modo_entrada.
 #   - Determina permite_k y pedir_anuncio.
 #   - Garantiza la coherencia estructural del dominio.
-#   - Descubre, carga y valida automáticamente cada archivo *.py del módulo.
+#   - Descubre, registra, inspecciona y valida el contenido completo
+#     del módulo, incluyendo archivos, funciones, clases, constantes,
+#     excepciones, reglas, clasificadores, validadores, capacidades
+#     y demás componentes detectables.
+#   - Expone una operación de ejecución total que ejerce todas las
+#     unidades operativamente ejecutables del módulo conforme al
+#     contrato y a sus leyes internas.
 #   - Expone inventario, reporte, diagnóstico y axiomas del dominio.
 #
 # Qué NO hace:
@@ -40,15 +46,21 @@
 #   - Clasificar el contexto evaluable
 #   - Validar la estructura y el dominio de los archivos internos
 #   - Reportar el estado estructural del módulo
+#   - Declarar la política de inventario y ejecución del módulo
+#   - Registrar todos los componentes descubiertos
+#   - Determinar qué componentes son operacionalmente ejecutables
+#   - Ejercer la ejecución total solicitada por Engine
 #
 # Conocimiento exportable:
 #   O_context, registro, permite_k, pedir_anuncio, tipos_peticion,
-#   inventario, reporte, diagnostico, axiomas
+#   inventario, inventario_total, componentes, unidades_ejecutables,
+#   ejecucion, reporte, diagnostico, axiomas
 #
 # Relación con Engine:
-#   Engine descubre este CONTENEDOR, ejecuta únicamente las
-#   capacidades declaradas, puede inspeccionar todos los archivos
-#   del módulo y consolida el reporte producido por este.
+#   Engine descubre este CONTENEDOR, obtiene el inventario completo
+#   del módulo, resuelve sus capacidades contractuales y puede
+#   solicitar la ejecución total de las unidades operativamente
+#   ejecutables del módulo conforme al contrato y sus leyes internas.
 #
 # Relación con Omega:
 #   Omega no calcula información de este módulo.
@@ -174,6 +186,12 @@ INVARIANTES = (
     "todo *.py interno se valida por estructura y dominio",
     "permite_k exige registro con estado=estable, O_id y enunciado_O",
     "pedir_anuncio verdadero implica tipos_peticion no vacío",
+    "el inventario total no omite componentes descubiertos del módulo",
+    "ejecutar no equivale a resolver",
+    "ejecutar total ejerce todas las unidades operativamente ejecutables",
+    "todo componente descubierto recibe clasificación estructural",
+    "ningún componente descubierto se convierte en ejecutable arbitrariamente",
+    "todo componente ejecutable posee una estrategia de ejecución válida",
 )
 
 # ===============================================================
@@ -338,6 +356,10 @@ CONTENEDOR: Dict[str, Any] = {
         "Clasificar el contexto evaluable",
         "Validar la estructura y el dominio de los archivos internos",
         "Reportar el estado estructural del módulo",
+        "Declarar la política de inventario y ejecución del módulo",
+        "Registrar todos los componentes descubiertos",
+        "Determinar qué componentes son operacionalmente ejecutables conforme al contrato",
+        "Ejercer la ejecución total solicitada por Engine",
     ],
 
     # ============================================================
@@ -350,6 +372,10 @@ CONTENEDOR: Dict[str, Any] = {
         "pedir_anuncio",
         "tipos_peticion",
         "inventario",
+        "inventario_total",
+        "componentes",
+        "unidades_ejecutables",
+        "ejecucion",
         "reporte",
         "diagnostico",
         "axiomas",
@@ -391,6 +417,9 @@ CONTENEDOR: Dict[str, Any] = {
     "autoriza_engine": {
         "leer": True,
         "ejecutar": True,
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
         "consultar": True,
         "recombinar": True,
         "reportar": True,
@@ -437,6 +466,9 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico",
         "verificar",
         "axiomas",
+        "ejecutar",
+        "ejecutar_total",
+        "registrar_inventario",
     ],
 
     # ============================================================
@@ -453,6 +485,9 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": "diagnostico",
         "axiomas": "axiomas",
         "verificar_salida": "verificar_salida",
+        "ejecutar": "ejecutar",
+        "ejecutar_total": "ejecutar",
+        "registrar_inventario": "registrar_inventario",
     },
 
     # ============================================================
@@ -519,7 +554,7 @@ CONTENEDOR: Dict[str, Any] = {
             "validar_esquema": ["*"],
             "salida": (
                 "dict con id, version, reglas_internas, modos, "
-                "estados, capacidades"
+                "estados, capacidades, inventario_total"
             ),
             "acceso_archivos": ["*"],
         },
@@ -564,10 +599,84 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
+        "ejecutar": {
+            "descripcion": (
+                "Ejercer todas las unidades operativas ejecutables "
+                "descubiertas dentro del módulo conforme al contrato "
+                "y a sus leyes internas."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con inventario, ejecuciones, resultados, "
+                "errores, advertencias y estado"
+            ),
+            "acceso_archivos": ["*"],
+        },
+        "ejecutar_total": {
+            "descripcion": "Alias contractual de ejecutar.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con inventario, ejecuciones, resultados, "
+                "errores, advertencias y estado"
+            ),
+            "acceso_archivos": ["*"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Construir el inventario estructural completo del módulo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con archivos, componentes, funciones, clases, "
+                "constantes, reglas, capacidades y unidades ejecutables"
+            ),
+            "acceso_archivos": ["*"],
+        },
     },
 
     # ============================================================
-    # 5.14 — REPORTING
+    # 5.14 — INVENTARIO Y EJECUCIÓN TOTAL
+    # ============================================================
+    "inventario_total": {
+        "modo": "completo",
+        "incluye": [
+            "archivos",
+            "modulos",
+            "funciones",
+            "clases",
+            "constantes",
+            "excepciones",
+            "reglas",
+            "clasificadores",
+            "validadores",
+            "capacidades",
+            "componentes",
+        ],
+        "descubrimiento": "dinamico",
+        "incluye_no_declarados": True,
+    },
+    "ejecucion": {
+        "modo": "total",
+        "incluye_capacidades_declaradas": True,
+        "incluye_componentes_ejecutables_descubiertos": True,
+        "respeta_contrato": True,
+        "respeta_leyes_internas": True,
+        "ejecuta_constantes": False,
+        "ejecuta_excepciones": False,
+        "instancia_clases_automaticamente": False,
+    },
+    "capacidades_sistema": {
+        "inventariar": "inventario",
+        "registrar": "registrar_inventario",
+        "resolver": "resolver",
+        "ejecutar": "ejecutar",
+    },
+
+    # ============================================================
+    # 5.15 — REPORTING
     # ============================================================
     "reporting": {
         "estado": True,
@@ -588,7 +697,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # 5.15 — ESTADOS VÁLIDOS E INVARIANTES
+    # 5.16 — ESTADOS VÁLIDOS E INVARIANTES
     # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
     "invariantes": list(INVARIANTES),
@@ -604,7 +713,8 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 #
 # Responsabilidad: normalización del registro O, validación de
-# clasificadores, descubrimiento dinámico y garantía de invariantes.
+# clasificadores, descubrimiento dinámico, inventario total y
+# garantía de invariantes.
 # ===============================================================
 
 
@@ -1003,7 +1113,7 @@ def _centinela_archivo(
 
 
 # ===============================================================
-# 6.9 — DESCUBRIMIENTO Y CARGA DINÁMICA
+# 6.9 — DESCUBRIMIENTO Y CARGA DINÁMICA DE REGLAS
 # ===============================================================
 
 
@@ -1186,6 +1296,196 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 
 # ===============================================================
 # FIN 6.10
+# ===============================================================
+
+
+# ===============================================================
+# 6.11 — DESCUBRIMIENTO DEL INVENTARIO TOTAL
+# ===============================================================
+#
+# Descubre la realidad existente en el módulo.
+# No depende exclusivamente de CONTENEDOR["capacidades"].
+# ===============================================================
+
+def _descubrir_inventario_total() -> Dict[str, Any]:
+    """
+    Inspecciona el propio módulo y construye el inventario estructural completo.
+    Clasifica cada componente descubierto.
+    """
+    componentes: List[Dict[str, Any]] = []
+    archivos: List[Dict[str, Any]] = []
+    funciones: List[Dict[str, Any]] = []
+    clases: List[Dict[str, Any]] = []
+    constantes: List[Dict[str, Any]] = []
+    excepciones: List[Dict[str, Any]] = []
+    reglas: List[Dict[str, Any]] = []
+    clasificadores: List[Dict[str, Any]] = []
+    validadores: List[Dict[str, Any]] = []
+    unidades_ejecutables: List[Dict[str, Any]] = []
+    errores_descubrimiento: List[str] = []
+
+    # -----------------------------------------------------------
+    # 6.11.1 — ARCHIVOS INTERNOS
+    # -----------------------------------------------------------
+    for archivo in sorted(_DIR.glob("*.py")):
+        if archivo.name.startswith("_") and archivo.name != "__init__.py":
+            continue
+        archivos.append({
+            "nombre": archivo.name,
+            "ruta": str(archivo),
+            "tipo": "archivo",
+            "declarado": archivo.name == "__init__.py",
+            "descubierto": True,
+        })
+
+    # -----------------------------------------------------------
+    # 6.11.2 — INSPECCIÓN DEL MÓDULO ACTUAL
+    # -----------------------------------------------------------
+    modulo_actual = sys.modules.get(__name__)
+    if modulo_actual is None:
+        errores_descubrimiento.append("módulo actual no disponible en sys.modules")
+        return {
+            "archivos": archivos,
+            "componentes": componentes,
+            "errores": errores_descubrimiento,
+        }
+
+    miembros = inspect.getmembers(modulo_actual)
+    capacidades_declaradas = set(CONTENEDOR.get("capacidades", {}).keys())
+
+    for nombre, obj in miembros:
+        # omitir builtins y imports
+        if nombre in ("__builtins__", "__cached__", "__file__", "__loader__",
+                      "__name__", "__package__", "__spec__", "__doc__"):
+            continue
+
+        entry: Dict[str, Any] = {
+            "nombre": nombre,
+            "origen": __name__,
+            "modulo": NOMBRE_MODULO,
+            "archivo": "__init__.py",
+            "declarado": nombre in capacidades_declaradas,
+            "descubierto": True,
+            "callable": callable(obj),
+            "ejecutable": False,
+            "requiere_entrada": False,
+            "tipo": "desconocido",
+            "estado": "descubierto",
+            "errores": [],
+        }
+
+        if inspect.isfunction(obj) or inspect.ismethod(obj):
+            entry["tipo"] = "funcion"
+            entry["referencia"] = obj
+            # Firmar
+            try:
+                sig = inspect.signature(obj)
+                params = [
+                    p for p in sig.parameters.values()
+                    if p.default is inspect.Parameter.empty
+                    and p.kind in (
+                        inspect.Parameter.POSITIONAL_ONLY,
+                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    )
+                ]
+                # self / cls no cuentan como requeridos para funciones de módulo
+                params = [p for p in params if p.name not in ("self", "cls")]
+                entry["requiere_entrada"] = len(params) > 0
+                # Ejecutable si no requiere argumentos obligatorios o si es capacidad declarada
+                if nombre.startswith("_"):
+                    entry["ejecutable"] = False
+                    entry["ejecutable_directamente"] = False
+                    entry["participa_en_ejecucion"] = True
+                else:
+                    entry["ejecutable"] = True
+                    entry["ejecutable_directamente"] = not entry["requiere_entrada"]
+            except (ValueError, TypeError):
+                entry["requiere_entrada"] = True
+                entry["ejecutable"] = False
+
+            funciones.append(entry)
+            componentes.append(entry)
+            if entry["ejecutable"]:
+                unidades_ejecutables.append(entry)
+
+        elif inspect.isclass(obj):
+            entry["tipo"] = "clase"
+            entry["ejecutable"] = False  # no instanciar automáticamente
+            if issubclass(obj, Exception):
+                entry["tipo"] = "excepcion"
+                excepciones.append(entry)
+            else:
+                clases.append(entry)
+            componentes.append(entry)
+
+        elif isinstance(obj, (str, int, float, bool, list, tuple, dict, set, frozenset, type(None))):
+            if nombre.isupper() or nombre.startswith("_"):
+                entry["tipo"] = "constante"
+                entry["ejecutable"] = False
+                try:
+                    entry["representacion"] = repr(obj)[:200]
+                except Exception:
+                    entry["representacion"] = "<no representable>"
+                constantes.append(entry)
+                componentes.append(entry)
+
+    # -----------------------------------------------------------
+    # 6.11.3 — REGLAS INTERNAS (reutiliza mecanismo existente)
+    # -----------------------------------------------------------
+    try:
+        reglas_raw = _cargar_reglas(None)
+        for stem, datos in reglas_raw.items():
+            entry_r = {
+                "nombre": stem,
+                "tipo": "regla",
+                "origen": stem + ".py",
+                "modulo": NOMBRE_MODULO,
+                "archivo": stem + ".py",
+                "declarado": False,
+                "descubierto": True,
+                "callable": False,
+                "ejecutable": False,
+                "estado": "descubierto" if "error" not in datos else "error",
+                "errores": datos.get("errores_centinela") or [],
+            }
+            if "clasificacion" in datos:
+                entry_r["tipo"] = "clasificador"
+                clasificadores.append(entry_r)
+            elif "resultado" in datos:
+                entry_r["tipo"] = "validador"
+                validadores.append(entry_r)
+            else:
+                reglas.append(entry_r)
+            componentes.append(entry_r)
+    except Exception as e:
+        errores_descubrimiento.append(
+            "error al cargar reglas: {0}: {1}".format(type(e).__name__, e)
+        )
+
+    # -----------------------------------------------------------
+    # 6.11.4 — CONSOLIDACIÓN
+    # -----------------------------------------------------------
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "archivos": archivos,
+        "componentes": componentes,
+        "funciones": funciones,
+        "clases": clases,
+        "constantes": constantes,
+        "excepciones": excepciones,
+        "reglas": reglas,
+        "clasificadores": clasificadores,
+        "validadores": validadores,
+        "capacidades_declaradas": list(capacidades_declaradas),
+        "unidades_ejecutables": unidades_ejecutables,
+        "total_componentes": len(componentes),
+        "total_ejecutables": len(unidades_ejecutables),
+        "errores_descubrimiento": errores_descubrimiento,
+    }
+
+# ===============================================================
+# FIN 6.11
 # ===============================================================
 
 
@@ -1472,11 +1772,44 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
 
 
 # ===============================================================
-# 7.5 — INVENTARIO
+# 7.5 — REGISTRAR_INVENTARIO
+# ===============================================================
+
+def registrar_inventario() -> Dict[str, Any]:
+    """Construye el inventario estructural completo del módulo."""
+    inv = _descubrir_inventario_total()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "operacion": "registrar_inventario",
+        "archivos": inv.get("archivos", []),
+        "componentes": inv.get("componentes", []),
+        "funciones": inv.get("funciones", []),
+        "clases": inv.get("clases", []),
+        "constantes": inv.get("constantes", []),
+        "excepciones": inv.get("excepciones", []),
+        "reglas": inv.get("reglas", []),
+        "clasificadores": inv.get("clasificadores", []),
+        "validadores": inv.get("validadores", []),
+        "capacidades_declaradas": inv.get("capacidades_declaradas", []),
+        "unidades_ejecutables": inv.get("unidades_ejecutables", []),
+        "total_componentes": inv.get("total_componentes", 0),
+        "total_ejecutables": inv.get("total_ejecutables", 0),
+        "errores_descubrimiento": inv.get("errores_descubrimiento", []),
+    }
+
+# ===============================================================
+# FIN 7.5
+# ===============================================================
+
+
+# ===============================================================
+# 7.6 — INVENTARIO (AMPLIADO)
 # ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     reglas = _cargar_reglas()
+    inv_total = _descubrir_inventario_total()
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -1487,6 +1820,8 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades_declaradas": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades_resueltas": list(CONTENEDOR["capacidades"].keys()),
         "reglas_internas": sorted(reglas.keys()),
         "total_reglas": len(reglas),
         "modos_entrada": list(_cfg("modos_entrada") if isinstance(_cfg("modos_entrada"), list) else []),
@@ -1498,15 +1833,113 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
         "invariantes": CONTENEDOR.get("invariantes"),
+        # inventario total
+        "archivos": inv_total.get("archivos", []),
+        "componentes": inv_total.get("componentes", []),
+        "funciones": inv_total.get("funciones", []),
+        "clases": inv_total.get("clases", []),
+        "constantes": inv_total.get("constantes", []),
+        "excepciones": inv_total.get("excepciones", []),
+        "clasificadores": inv_total.get("clasificadores", []),
+        "validadores": inv_total.get("validadores", []),
+        "unidades_ejecutables": inv_total.get("unidades_ejecutables", []),
+        "total_componentes": inv_total.get("total_componentes", 0),
+        "total_ejecutables": inv_total.get("total_ejecutables", 0),
     }
 
 # ===============================================================
-# FIN 7.5
+# FIN 7.6
 # ===============================================================
 
 
 # ===============================================================
-# 7.6 — AXIOMAS
+# 7.7 — EJECUCIÓN TOTAL DEL MÓDULO
+# ===============================================================
+
+def ejecutar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Ejercer todas las unidades operativas ejecutables descubiertas
+    dentro del módulo conforme al contrato y a sus leyes internas.
+
+    NO es un alias de resolver().
+    NO se limita a CONTENEDOR["capacidades"].
+    """
+    inv = _descubrir_inventario_total()
+    unidades = inv.get("unidades_ejecutables", [])
+    resultados: List[Dict[str, Any]] = []
+    errores: List[Dict[str, Any]] = []
+    advertencias: List[str] = []
+    ejecutados = 0
+
+    for unidad in unidades:
+        nombre = unidad.get("nombre")
+        ref = unidad.get("referencia")
+        if not callable(ref):
+            advertencias.append(
+                "unidad '{0}' marcada ejecutable pero no es callable".format(nombre)
+            )
+            continue
+
+        if unidad.get("requiere_entrada") and not (peticion and isinstance(peticion, dict)):
+            advertencias.append(
+                "unidad '{0}' requiere entrada; no se inventa argumento".format(nombre)
+            )
+            resultados.append({
+                "nombre": nombre,
+                "estado": "OMITIDA",
+                "razon": "requiere_entrada",
+            })
+            continue
+
+        try:
+            if unidad.get("requiere_entrada"):
+                # Solo pasar peticion si la firma lo admite de forma legítima
+                out = ref(peticion)
+            else:
+                out = ref()
+            ejecutados += 1
+            resultados.append({
+                "nombre": nombre,
+                "estado": "EXITO",
+                "resultado": out if not isinstance(out, (dict, list)) else "<objeto>",
+            })
+        except Exception as e:
+            errores.append({
+                "nombre": nombre,
+                "error": "{0}: {1}".format(type(e).__name__, e),
+            })
+            resultados.append({
+                "nombre": nombre,
+                "estado": "ERROR",
+                "error": "{0}: {1}".format(type(e).__name__, e),
+            })
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "operacion": "ejecutar",
+        "modo": "total",
+        "inventario": {
+            "total_componentes": inv.get("total_componentes", 0),
+            "total_ejecutables": inv.get("total_ejecutables", 0),
+        },
+        "total_componentes": inv.get("total_componentes", 0),
+        "total_ejecutables": inv.get("total_ejecutables", 0),
+        "ejecutados": ejecutados,
+        "resultados": resultados,
+        "errores": errores,
+        "advertencias": advertencias,
+        "coherente": len(errores) == 0,
+        "estado": ESTADO_OPERATIVO if len(errores) == 0 else ESTADO_DEGRADADO,
+    }
+
+# ===============================================================
+# FIN 7.7
+# ===============================================================
+
+
+# ===============================================================
+# 7.8 — AXIOMAS
 # ===============================================================
 
 def axiomas() -> List[Dict[str, Any]]:
@@ -1579,19 +2012,49 @@ def axiomas() -> List[Dict[str, Any]]:
             "depende_de": ["CX-OP-3"],
             "gobierna": ["contexto"],
         },
+        {
+            "id": "CX-OP-6",
+            "tipo": "axioma",
+            "sujeto": "ejecucion_total",
+            "relacion": "ejerce",
+            "objeto": "todas_las_unidades_operativamente_ejecutables",
+            "polaridad": True,
+            "enunciado": (
+                "La ejecución total ejerce todas las unidades operativamente "
+                "ejecutables descubiertas dentro del módulo conforme al contrato "
+                "y a sus leyes internas."
+            ),
+            "depende_de": ["CX-OP-5"],
+            "gobierna": ["contexto"],
+        },
+        {
+            "id": "CX-OP-7",
+            "tipo": "axioma",
+            "sujeto": "inventario_total",
+            "relacion": "incluye",
+            "objeto": "componentes_descubiertos",
+            "polaridad": True,
+            "enunciado": (
+                "El inventario total registra los componentes existentes del módulo "
+                "aunque no estén declarados como capacidades nominales."
+            ),
+            "depende_de": [],
+            "gobierna": ["contexto"],
+        },
     ]
 
 # ===============================================================
-# FIN 7.6
+# FIN 7.8
 # ===============================================================
 
 
 # ===============================================================
-# 7.7 — FUNCIÓN AUXILIAR recibir_comentarios
+# 7.9 — FUNCIÓN AUXILIAR recibir_comentarios
 # ===============================================================
 #
 # Función auxiliar; no forma parte de las capacidades contractuales
 # declaradas en CONTENEDOR (decisión Option B).
+# Debe ser descubierta por el inventario total.
 # ===============================================================
 
 def recibir_comentarios(paquetes: Dict[str, Any]) -> Dict[str, Any]:
@@ -1614,7 +2077,7 @@ def recibir_comentarios(paquetes: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 # ===============================================================
-# FIN 7.7
+# FIN 7.9
 # ===============================================================
 
 
@@ -1728,6 +2191,9 @@ _CAP_MAP = {
     "diagnostico": diagnostico,
     "axiomas": axiomas,
     "verificar_salida": verificar_salida,
+    "ejecutar": ejecutar,
+    "ejecutar_total": ejecutar,
+    "registrar_inventario": registrar_inventario,
 }
 
 # ===============================================================
@@ -1809,6 +2275,8 @@ __all__ = [
     "axiomas",
     "reporte",
     "diagnostico",
+    "ejecutar",
+    "registrar_inventario",
 ]
 
 # ===============================================================

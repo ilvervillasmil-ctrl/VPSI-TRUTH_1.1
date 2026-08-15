@@ -1692,6 +1692,7 @@ _CAP_MAP = {
     "diagnostico": diagnostico,
     "buscar_por_id": buscar_por_id,
     "verificar": verificar,
+    "ejecutar_total": ejecutar_total,
 }
 
 
@@ -1742,6 +1743,7 @@ __all__ = [
     "normalizar",
     "clave",
     "ref",
+    "ejecutar_total",
     "recolectar",
     "por_dominio",
     "ids_dominio_k_o",

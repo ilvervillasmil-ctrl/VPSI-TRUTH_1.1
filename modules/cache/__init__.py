@@ -1659,7 +1659,6 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
 # FIN 8.5
 # ===============================================================
 
-
 # ===============================================================
 # 8.6 — INVENTARIO
 # ===============================================================
@@ -1669,7 +1668,7 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
     Inventario del módulo CH + resumen del registro +
     estructura mapeada e IDs clasificados si existen.
     """
-    clasif = clasificar_ids()
+    clasif = clasificar_ids(peticion)
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -1705,8 +1704,6 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
 # ===============================================================
 # FIN 8.6
 # ===============================================================
-
-
 # ===============================================================
 # 8.7 — CAPACIDADES ARQUITECTÓNICAS
 # ===============================================================
@@ -1719,7 +1716,7 @@ def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     res_barrer = barrer()
     res_mapa = mapear_codigo(peticion)
     res_clasif = clasificar_ids(peticion)
-    res_inv = inventario()
+    res_inv = inventario(peticion)
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1834,7 +1831,6 @@ def registrar_inventario(peticion: Optional[Dict[str, Any]] = None) -> Dict[str,
 # FIN 8.7
 # ===============================================================
 
-
 # ===============================================================
 # 8.8 — BACKEND CENTINELA
 # ===============================================================
@@ -1847,10 +1843,12 @@ class CacheBackend:
     """
 
     def guardar(self, registro: Dict[str, Any]) -> None:
+        if not isinstance(registro, dict):
+            raise CacheError("registro debe ser dict")
         tipo = str(registro.get("tipo") or "veredicto_centinela")
         depositar(
             tipo,
-            registro if isinstance(registro, dict) else {},
+            registro,
             ciclo_id=(
                 str(registro.get("ciclo_id"))
                 if registro.get("ciclo_id") is not None

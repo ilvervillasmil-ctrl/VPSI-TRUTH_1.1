@@ -715,7 +715,7 @@ def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "coherente": resultado_barrer["coherente"],
 
         # -------------------------------------------------------
-        # Unidades privadas
+        #  X4.1 Unidades privadas
         # -------------------------------------------------------
         "unidades_privadas": {
             "_ruta_vpsi": str(ruta_vpsi) if ruta_vpsi else None,
@@ -743,7 +743,7 @@ def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         },
 
         # -------------------------------------------------------
-        # Unidades públicas
+        # X4.2 Unidades públicas
         # -------------------------------------------------------
         "unidades_publicas": {
             "recolectar": {
@@ -1667,6 +1667,11 @@ def recolectar(
     if declaraciones_externas:
         for nombre, lista in declaraciones_externas.items():
             if not isinstance(lista, list):
+                errores.append({
+                    "modulo": nombre,
+                    "tipo": "error_entrada_externa",
+                    "error": "declaraciones_externas['{0}'] debe ser list".format(nombre),
+                })
                 continue
             for d in lista:
                 try:
@@ -1695,8 +1700,7 @@ def recolectar(
 
 # ===============================================================
 # FIN 8.1
-# ===============================================================
-# ===============================================================
+# ===============================================================# ===============================================================
 # 8.2 — IDS DE DOMINIO K/O
 # ===============================================================
 

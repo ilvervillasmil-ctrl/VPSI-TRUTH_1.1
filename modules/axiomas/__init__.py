@@ -480,6 +480,44 @@ CONTENEDOR: Dict[str, Any] = {
     
 
     # ============================================================
+    # 5.14 — INVENTARIO Y EJECUCIÓN TOTAL
+    # ============================================================
+    "inventario_total": {
+        "modo": "completo",
+        "incluye": [
+            "archivos",
+            "modulos",
+            "funciones",
+            "clases",
+            "constantes",
+            "excepciones",
+            "reglas",
+            "clasificadores",
+            "validadores",
+            "capacidades",
+            "componentes",
+        ],
+        "descubrimiento": "dinamico",
+        "incluye_no_declarados": True,
+    },
+    "ejecucion": {
+        "modo": "total",
+        "incluye_capacidades_declaradas": True,
+        "incluye_componentes_ejecutables_descubiertos": True,
+        "respeta_contrato": True,
+        "respeta_leyes_internas": True,
+        "ejecuta_constantes": False,
+        "ejecuta_excepciones": False,
+        "instancia_clases_automaticamente": False,
+    },
+    "capacidades_sistema": {
+        "inventariar": "inventario",
+        "registrar": "registrar_inventario",
+        "resolver": "resolver",
+        "ejecutar": "ejecutar",
+    },
+    
+    # ============================================================
     # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {

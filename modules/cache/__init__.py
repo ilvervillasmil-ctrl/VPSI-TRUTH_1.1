@@ -74,39 +74,45 @@
 
 
 # ===============================================================
-# IMPORTACIONES
+# PARTE 1 — PRINCIPIOS, BANDERAS Y ESPECIFICACIONES PRECISAS
+# ===============================================================
+
+# ===============================================================
+# 1.1 — IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
 
 import copy
-
 import importlib.util
-
 import sys
-
 import threading
-
 from collections import defaultdict
-
 from datetime import datetime, timezone
-
 from pathlib import Path
-
 from typing import Any, Dict, List, Optional
 
 # ===============================================================
-# FIN IMPORTACIONES
+# FIN 1.1
 # ===============================================================
 
 
 # ===============================================================
-# CONSTANTES
+# 1.2 — IDENTIDAD
 # ===============================================================
 
 ID_MODULO = "CH"
 NOMBRE_MODULO = "cache"
 ROL_MODULO = "CH"
+
+# ===============================================================
+# FIN 1.2
+# ===============================================================
+
+
+# ===============================================================
+# 1.3 — VERSIONES Y ESTABILIDAD
+# ===============================================================
 
 VERSION_MODULO = "4.0"
 VERSION_CONTRATO = "1.0"
@@ -115,6 +121,15 @@ ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
 COMPATIBLE_DESDE = "1.0"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
+
+# ===============================================================
+# FIN 1.3
+# ===============================================================
+
+
+# ===============================================================
+# 1.4 — BANDERAS DE ESTADO
+# ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
@@ -127,7 +142,15 @@ ESTADOS_VALIDOS = (
     ESTADO_RECHAZADO,
 )
 
-# Campos del registro neutro
+# ===============================================================
+# FIN 1.4
+# ===============================================================
+
+
+# ===============================================================
+# 1.5 — CAMPOS DEL REGISTRO NEUTRO
+# ===============================================================
+
 CAMPOS_REGISTRO = (
     "seq",
     "timestamp",
@@ -142,6 +165,15 @@ CAMPOS_REGISTRO = (
     "estado",
     "payload",
 )
+
+# ===============================================================
+# FIN 1.5
+# ===============================================================
+
+
+# ===============================================================
+# 1.6 — INVARIANTES
+# ===============================================================
 
 INVARIANTES = (
     "el id del módulo nunca cambia",
@@ -162,26 +194,31 @@ INVARIANTES = (
 )
 
 # ===============================================================
-# FIN CONSTANTES
+# FIN 1.6
 # ===============================================================
 
 
 # ===============================================================
-# CONFIGURACIÓN
+# 1.7 — CONFIGURACIÓN
 # ===============================================================
 
 # Carpetas físicas futuras: solo datos, sin lógica.
 # cache/ciclos/run_x/ciclo_001/registros/ ...
 
 # ===============================================================
-# FIN CONFIGURACIÓN
+# FIN 1.7
 # ===============================================================
 
+# ===============================================================
+# FIN PARTE 1
+# ===============================================================
+# ===============================================================
+# PARTE 4 — DEFINICIONES
+# ===============================================================
 
 # ===============================================================
-# DEFINICIONES
+# 4.1 — EXCEPCIONES
 # ===============================================================
-
 class ContratoInvalido(Exception):
     """El CONTENEDOR no cumple el esquema o la resolución falló."""
     pass
@@ -195,7 +232,9 @@ class CacheError(Exception):
 class CacheInmutableError(CacheError):
     """Intento de modificar evidencia ya depositada."""
     pass
-
+# ===============================================================
+# 4.2 — REGISTRO DE EVENTOS
+# ===============================================================
 
 class _RegistroEventos:
     """
@@ -203,12 +242,19 @@ class _RegistroEventos:
     No interpreta. No indexa relaciones. Solo guarda y filtra.
     """
 
+    # -----------------------------------------------------------
+    # 4.2.1 — Inicialización
+    # -----------------------------------------------------------
+
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._eventos: List[Dict[str, Any]] = []
         self._seq = 0
         self._categorias: set = set()
-
+    # -----------------------------------------------------------
+    # 4.2.2 — Append (única vía de escritura)
+    # -----------------------------------------------------------
+    
     def append(self, datos: Dict[str, Any]) -> Dict[str, Any]:
         if not isinstance(datos, dict):
             raise CacheError("datos debe ser dict")
@@ -237,6 +283,10 @@ class _RegistroEventos:
             self._eventos.append(entrada)
             return copy.deepcopy(entrada)
 
+    # -----------------------------------------------------------
+    # 4.2.3 — Filtrar
+    # -----------------------------------------------------------
+    
     def filtrar(
         self,
         *,
@@ -288,10 +338,18 @@ class _RegistroEventos:
                 out.append(copy.deepcopy(e))
             return out
 
+    # -----------------------------------------------------------
+    # 4.2.4 — Categorías conocidas
+    # -----------------------------------------------------------
+    
     def categorias_conocidas(self) -> List[str]:
         with self._lock:
             return sorted(self._categorias)
 
+    # -----------------------------------------------------------
+    # 4.2.5 — Resumen
+    # -----------------------------------------------------------
+    
     def resumen(self) -> Dict[str, Any]:
         with self._lock:
             por_tipo: Dict[str, int] = defaultdict(int)
@@ -313,6 +371,10 @@ class _RegistroEventos:
                 "inmutable": True,
             }
 
+     # -----------------------------------------------------------
+    # 4.2.6 — Verificar integridad
+    # -----------------------------------------------------------
+    
     def verificar_integridad(self) -> List[str]:
         errores: List[str] = []
         with self._lock:
@@ -345,6 +407,10 @@ class _RegistroEventos:
                     )
         return errores
 
+    # -----------------------------------------------------------
+    # 4.2.7 — Barreras de inmutabilidad
+    # -----------------------------------------------------------
+    
     def intentar_modificar(self, *args: Any, **kwargs: Any) -> None:
         raise CacheInmutableError(
             "CACHE no modifica evidencia depositada; solo registra"
@@ -355,6 +421,9 @@ class _RegistroEventos:
             "CACHE no borra evidencia en operación normal (append-only)"
         )
 
+# ===============================================================
+# 4.3 — INSTANCIA GLOBAL DEL REGISTRO
+# ===============================================================
 
 _registro = _RegistroEventos()
 
@@ -364,12 +433,12 @@ _registro = _RegistroEventos()
 
 
 # ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
+# PARTE 5 — CONTRATO OFICIAL (CONTENEDOR)
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
     # ============================================================
-    # ESQUEMA
+    # 5.1 — ESQUEMA
     # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
@@ -379,7 +448,7 @@ CONTENEDOR: Dict[str, Any] = {
     "api_engine": API_ENGINE,
 
     # ============================================================
-    # IDENTIDAD
+    # 5.2 — IDENTIDAD
     # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
@@ -391,11 +460,12 @@ CONTENEDOR: Dict[str, Any] = {
     ),
 
     # ============================================================
-    # PROPÓSITO
+    # 5.3 — PROPÓSITO
     # ============================================================
     "funcion": (
         "Registrar exactamente lo que ocurrió durante la ejecución "
-        "y exponer lecturas filtradas por campos del registro. "
+        "y exponer lecturas y la evidencia del proceso y mecanica del sistema "
+        "filtradas por campos del registro. "
         "Nada más."
     ),
     "no_hace": [
@@ -412,7 +482,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # AUTORIDAD
+    # 5.4 — AUTORIDAD
     # ============================================================
     "autoridad": [
         "Registrar eventos depositados por Engine o Centinela",
@@ -423,7 +493,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # CONOCIMIENTO EXPORTABLE
+    # 5.5 — CONOCIMIENTO EXPORTABLE
     # ============================================================
     "conocimiento_exportable": [
         "depositar",
@@ -444,10 +514,14 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
         "backend_para_centinela",
+        # — banderas nuevas —
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
     # ============================================================
-    # ACCESO (obligatorio en el esquema)
+    #  5.6 ACCESO (obligatorio en el esquema)
     # ============================================================
     "acceso": {
         "nivel": "completo",
@@ -455,7 +529,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # DEPENDENCIAS
+    # 5.7 DEPENDENCIAS
     # ============================================================
     "requiere": ["CT", "AX", "FO", "MC", 
                         "SF", "CA", "CX", "CC",
@@ -463,32 +537,31 @@ CONTENEDOR: Dict[str, Any] = {
                         "CH", "CIT", "TT", "CE",],
 
     # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # 5.8 ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
     # ============================================================
     "acceso_archivos": ["*"],
 
     # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # 5.9 VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
     # ============================================================
     "validar_esquema": ["*"],
 
     # ============================================================
-    # CONSULTAS SOPORTADAS
+    # 5.11 — CONSULTAS SOPORTADAS
     # ============================================================
     "consultas_soportadas": [
-        "buscar_por_id",
-        "buscar_por_dominio",
-        "obtener_generatividad",
+        "depositar_evento",
+        "leer_eventos",
+        "filtrar_por_campo",
+        "listar_categorias",
         "obtener_inventario",
         "obtener_reporte",
         "obtener_diagnostico",
-        "verificar_coherencia",
-        "ids_dominio_k_o",
-        "recolectar",
+        "verificar_integridad_registro",
     ],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # 5.12 — AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -501,11 +574,8 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
@@ -513,7 +583,6 @@ CONTENEDOR: Dict[str, Any] = {
         "procesar": True,
         "analizar": True,
         "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
@@ -541,26 +610,17 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
 
         # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
+        "validar_esquema": True,
+        "acceso_archivos": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
     # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "depositar_evento",
-        "leer_eventos",
-        "filtrar_por_campo",
-        "listar_categorias",
-        "obtener_inventario",
-        "obtener_reporte",
-        "obtener_diagnostico",
-        "verificar_integridad_registro",
-    ],
-
-    # ============================================================
-    # CAPACIDADES
+    # 6 CAPACIDADES
     # ============================================================
     "capacidades": {
         "verificar": "barrer",
@@ -584,10 +644,13 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico": "diagnostico",
         "verificar_salida": "verificar_salida",
         "backend_para_centinela": "backend_para_centinela",
+        "ejecutar_total": "ejecutar_total",
+        "registrar_inventario": "registrar_inventario",
+        "inspeccionar": "inspeccionar",
     },
 
     # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # 6.1 METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
         "verificar": {
@@ -739,6 +802,38 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
+                "ejecutar_total": {
+            "descripcion": (
+                "Operación arquitectónica genérica. "
+                "Ejerce la totalidad de las unidades operativamente "
+                "ejecutables del módulo conforme a su contrato e inventario."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspección estructural del módulo. "
+                "Expone el estado interno, componentes y unidades "
+                "ejecutables sin alterar el contrato."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del módulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural del módulo "
+                "sin alterar evidencia depositada."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
         "backend_para_centinela": {
             "descripcion": (
                 "Adaptador estable CacheBackend para Centinela. "
@@ -750,9 +845,9 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
     },
-
+    
     # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # 6.2 REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
         # --- BANDERAS DE ESTADO Y SALUD ---
@@ -782,18 +877,23 @@ CONTENEDOR: Dict[str, Any] = {
         # --- BANDERA DE REPORTE ---
         "reporte": True,
 
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+        # --- BANDERAS OBLIGATORIAS ---
+        "acceso_archivos": True,
+        "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
     # ============================================================
-    # ESTADOS VÁLIDOS
+    # 6.3 ESTADOS VÁLIDOS
     # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
 
     # ============================================================
-    # INVARIANTES
+    # 6.4 INVARIANTES
     # ============================================================
     "invariantes": list(INVARIANTES),
 
@@ -804,7 +904,7 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 
 # ===============================================================
-# FUNCIONES PRIVADAS
+# 7 FUNCIONES PRIVADAS
 # ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
@@ -861,12 +961,12 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                 )
 
 # ===============================================================
-# FIN FUNCIONES PRIVADAS
+# 7 FIN FUNCIONES PRIVADAS
 # ===============================================================
 
 
 # ===============================================================
-# CAPACIDADES PÚBLICAS
+# 8 CAPACIDADES PÚBLICAS
 # ===============================================================
 
 def depositar(
@@ -1134,7 +1234,7 @@ def backend_para_centinela() -> CacheBackend:
 
 
 # ===============================================================
-# REPORTING INTERNO
+#  9 REPORTING INTERNO
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
@@ -1209,7 +1309,7 @@ def diagnostico() -> Dict[str, Any]:
 
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA
+# 10 EXPORTACIONES + RESOLUCIÓN ESTRICTA
 # ===============================================================
 
 _CAP_MAP = {

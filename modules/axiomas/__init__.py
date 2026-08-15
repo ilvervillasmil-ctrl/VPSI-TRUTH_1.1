@@ -574,6 +574,7 @@ CONTENEDOR: Dict[str, Any] = {
 
         # --- PERMISOS DE ESTADO ---
         "estado": True,
+        "ejecutar": True,
         "version": True,
         "salud": True,
         "inventario": True,
@@ -584,6 +585,9 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
 
         # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
         "validar_esquema": True,     # ← AGREGADO

@@ -1530,6 +1530,8 @@ def mapear_codigo(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # ===============================================================
 # FIN 8.3
 # ===============================================================# ===============================================================
+
+# ===============================================================
 # 8.4 — CLASIFICACIÓN DE IDs
 # ===============================================================
 
@@ -1538,26 +1540,53 @@ def clasificar_ids(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     Clasifica IDs por módulo a partir del inventario estructural.
     Si el inventario no está actualizado, ejecuta mapear_codigo primero.
 
-    Salida:
-      ids_por_modulo  — módulo → [ids]
-      id_a_modulos    — id → [módulos]
-      ids_unicos      — ids con exactamente 1 módulo
-      ids_duplicados  — id → [módulos] cuando len > 1
+    _inventario_estructural["ids"] conserva:
+        id → [ {modulo, archivo}, ... ]   (apariciones; no se modifica)
 
-    Un duplicado es clasificación estructural, no error automático.
+    Esta capacidad deriva:
+        id_a_modulos   — id → [módulos únicos ordenados]
+        ids_por_modulo — módulo → [ids]
+        ids_unicos     — ids presentes en exactamente un módulo
+        ids_duplicados — id → [módulos] cuando el ID aparece en >1 módulo
+
+    Duplicado = el mismo ID declarado en más de un módulo.
+    Es clasificación estructural, no error automático.
     """
     if not _inventario_estructural.get("modulos"):
         mapear_codigo(peticion)
 
     inv = _inventario_estructural
-    id_a_modulos: Dict[str, List[str]] = {
-        k: list(v) for k, v in (inv.get("ids") or {}).items()
-    }
 
+    # -----------------------------------------------------------
+    # 1. id → apariciones {modulo, archivo}
+    #    Derivar id → módulos únicos (sin repetir el mismo módulo)
+    # -----------------------------------------------------------
+    id_a_modulos: Dict[str, List[str]] = {}
+    for idv, apariciones in (inv.get("ids") or {}).items():
+        mods: List[str] = []
+        vistos: Set[str] = set()
+        for ap in apariciones:
+            if not isinstance(ap, dict):
+                continue
+            m = ap.get("modulo")
+            if m is None:
+                continue
+            m = str(m)
+            if m not in vistos:
+                vistos.add(m)
+                mods.append(m)
+        id_a_modulos[idv] = sorted(mods)
+
+    # -----------------------------------------------------------
+    # 2. módulo → lista de IDs
+    # -----------------------------------------------------------
     ids_por_modulo: Dict[str, List[str]] = {}
     for nombre_mod, info in (inv.get("modulos") or {}).items():
         ids_por_modulo[nombre_mod] = list(info.get("ids") or [])
 
+    # -----------------------------------------------------------
+    # 3. Únicos vs duplicados (por cantidad de módulos, no de apariciones)
+    # -----------------------------------------------------------
     ids_unicos: List[str] = sorted(
         i for i, mods in id_a_modulos.items() if len(mods) == 1
     )
@@ -1584,8 +1613,6 @@ def clasificar_ids(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # ===============================================================
 # FIN 8.4
 # ===============================================================
-
-
 # ===============================================================
 # 8.5 — INTEGRIDAD DEL REGISTRO (barrer / verificar)
 # ===============================================================

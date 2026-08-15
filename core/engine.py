@@ -192,6 +192,19 @@ LISTAS_STR_OBLIGATORIAS = (
 class ArranqueError(Exception):
     """Fallo estructural durante el arranque del Engine."""
     pass
+class ContratoError(Exception):
+    """Contrato CONTENEDOR inválido o capacidad no resoluble."""
+
+
+# ===============================================================
+# ROLES
+# ===============================================================
+ROLES: Tuple[str, ...] = (
+    "CT", "AX", "FO", "MC", "SF", "CA", "CX", "DI",
+    "RE", "VX", "TX", "CH", "CIT",
+)
+OBLIGATORIOS: Tuple[str, ...] = ("CT", "AX", "FO", "MC", "SF")  
+
 # ===============================================================
 # Parte 10 CONTENEDOR LIBRERIAS Y CONTRATO Y ESPECIDICACIONES 
 # ===============================================================

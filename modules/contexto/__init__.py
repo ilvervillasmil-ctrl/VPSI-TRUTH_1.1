@@ -1,6 +1,8 @@
 # ===============================================================
-# VPSI-TRUTH — modules/contexto/__init__.py
+# PARTE 0 — ENCABEZADO DEL MÓDULO
 # ===============================================================
+#
+# VPSI-TRUTH — modules/contexto/__init__.py
 #
 # MÓDULO:              contexto
 # ID:                  CX
@@ -33,17 +35,6 @@
 #   - Validar la estructura y el dominio de los archivos internos.
 #   - Reportar el estado estructural del módulo.
 #
-# Conocimiento exportable:
-#   - O_context
-#   - registro
-#   - permite_k
-#   - pedir_anuncio
-#   - tipos_peticion
-#   - inventario
-#   - reporte
-#   - diagnostico
-#   - axiomas
-#
 # Relación con Engine:
 #   Engine descubre este CONTENEDOR, ejecuta únicamente las
 #   capacidades declaradas, puede inspeccionar todos los archivos
@@ -53,16 +44,26 @@
 #   Omega no calcula información de este módulo.
 #   Solo presenta los resultados entregados por Engine.
 #
-# Observaciones:
-#   Todo archivo *.py del directorio forma parte del dominio del
-#   módulo y puede ser descubierto, validado y auditado
-#   automáticamente mediante el centinela.
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 1 — IDENTIDAD Y CONTRATO
+# ===============================================================
 #
+# Responsabilidad: fijar la identidad contractual e inmutable del módulo.
+# Contrato: ID, nombre, rol, versiones y esquema no cambian.
+# Invariantes: "el id del módulo nunca cambia", "el rol nunca cambia".
 # ===============================================================
 
 
 # ===============================================================
-# IMPORTACIONES
+# 1.1 — IMPORTACIONES
+# ===============================================================
+#
+# Responsabilidad: proveer los símbolos estándar de la biblioteca
+# de Python requeridos por el dominio CX.
+# Contrato: no se importan módulos ajenos al directorio del módulo.
 # ===============================================================
 
 from __future__ import annotations
@@ -89,12 +90,12 @@ from collections import defaultdict, deque
 from typing import Any, Dict, List, Tuple, Set, Optional, Iterable, Callable
 
 # ===============================================================
-# FIN IMPORTACIONES
+# FIN 1.1
 # ===============================================================
 
 
 # ===============================================================
-# CONSTANTES
+# 1.2 — CONSTANTES DE IDENTIDAD
 # ===============================================================
 
 ID_MODULO = "CX"
@@ -109,6 +110,19 @@ COMPATIBLE_DESDE = "1.0"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
 
+# ===============================================================
+# FIN 1.2
+# ===============================================================
+
+
+# ===============================================================
+# 1.3 — ESTADOS ESTRUCTURALES DEL MÓDULO
+# ===============================================================
+#
+# Estos estados pertenecen al ciclo de vida del módulo CX.
+# No deben confundirse con estados_O del registro O.
+# ===============================================================
+
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
 ESTADO_DEGRADADO = "DEGRADADO"
@@ -119,6 +133,15 @@ ESTADOS_VALIDOS = (
     ESTADO_DEGRADADO,
     ESTADO_RECHAZADO,
 )
+
+# ===============================================================
+# FIN 1.3
+# ===============================================================
+
+
+# ===============================================================
+# 1.4 — INVARIANTES
+# ===============================================================
 
 INVARIANTES = (
     "el id del módulo nunca cambia",
@@ -132,23 +155,27 @@ INVARIANTES = (
 )
 
 # ===============================================================
-# FIN CONSTANTES
+# FIN 1.4
 # ===============================================================
 
 
 # ===============================================================
-# CONFIGURACIÓN
+# 1.5 — CONFIGURACIÓN DE DIRECTORIO
 # ===============================================================
 
 _DIR = Path(__file__).parent
 
 # ===============================================================
-# FIN CONFIGURACIÓN
+# FIN 1.5
 # ===============================================================
 
 
 # ===============================================================
-# DEFINICIONES
+# 1.6 — DEFINICIONES DE EXCEPCIONES Y UNDEFINED
+# ===============================================================
+#
+# Responsabilidad: excepciones de dominio y el valor centinela UNDEFINED.
+# Contrato: UNDEFINED no admite conversión a booleano.
 # ===============================================================
 
 class ContratoInvalido(Exception):
@@ -182,26 +209,28 @@ def es_undefined(v: Any) -> bool:
     return v is UNDEFINED or isinstance(v, _Undefined)
 
 # ===============================================================
-# FIN DEFINICIONES
+# FIN 1.6
 # ===============================================================
+
+
 # ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
+# PARTE 2 — CONTENEDOR CONTRACTUAL
+# ===============================================================
+#
+# Responsabilidad: declarar de forma completa e inmutable la identidad,
+# autoridad, dominio, capacidades y reporting del módulo CX.
+# Contrato: VPSI-CONTRACT-1.0. La implementación se adapta a este
+# CONTENEDOR; nunca al contrario.
+# Invariantes: no se inventan capacidades; las declaradas son callables.
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
-    # ============================================================
-    # ESQUEMA
-    # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
     "estabilidad": ESTABILIDAD,
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
-
-    # ============================================================
-    # IDENTIDAD
-    # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
@@ -210,10 +239,6 @@ CONTENEDOR: Dict[str, Any] = {
     "descripcion": (
         "Representación operativa del marco evaluable O_context."
     ),
-
-    # ============================================================
-    # PROPÓSITO
-    # ============================================================
     "funcion": (
         "Generar el marco O a partir de la petición y garantizar "
         "la coherencia estructural de su dominio."
@@ -226,20 +251,12 @@ CONTENEDOR: Dict[str, Any] = {
         "No orquesta ciclos",
         "No emite cadenas auditables",
     ],
-
-    # ============================================================
-    # AUTORIDAD
-    # ============================================================
     "autoridad": [
         "Declarar el registro O y permite_k",
         "Clasificar el contexto evaluable",
         "Validar la estructura y el dominio de los archivos internos",
         "Reportar el estado estructural del módulo",
     ],
-
-    # ============================================================
-    # CONOCIMIENTO EXPORTABLE
-    # ============================================================
     "conocimiento_exportable": [
         "O_context",
         "registro",
@@ -251,33 +268,13 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico",
         "axiomas",
     ],
-
-    # ============================================================
-    # ACCESO (obligatorio en el esquema)
-    # ============================================================
     "acceso": {
         "nivel": "completo",
         "descripcion": "Acceso total a recursos del módulo"
     },
-
-    # ============================================================
-    # DEPENDENCIAS
-    # ============================================================
     "requiere": ["*"],
-
-    # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
-    # ============================================================
     "acceso_archivos": ["*"],
-
-    # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
-    # ============================================================
     "validar_esquema": ["*"],
-
-    # ============================================================
-    # DOMINIO
-    # ============================================================
     "modos_entrada": [
         "conversacion",
         "afirmacion",
@@ -310,12 +307,7 @@ CONTENEDOR: Dict[str, Any] = {
         "C", "L", "K",
         "alpha", "beta", "ALPHA", "BETA",
     ],
-
-      # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
-    # ============================================================
     "autoriza_engine": {
-        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -323,35 +315,21 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
-
-        # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
-
-        # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
         "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
-
-        # --- PERMISOS DE DATOS ---
         "exportar": True,
         "importar": True,
         "respaldar": True,
         "recuperar": True,
         "sincronizar": True,
-
-        # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
         "metricas": True,
         "diagnostico": True,
-
-        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -363,16 +341,9 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
-
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
+        "validar_esquema": True,
+        "acceso_archivos": True,
     },
-
-
-    # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
     "consultas_soportadas": [
         "resolver",
         "centinela",
@@ -382,10 +353,6 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar",
         "axiomas",
     ],
-
-    # ============================================================
-    # CAPACIDADES
-    # ============================================================
     "capacidades": {
         "resolver": "resolver",
         "evaluar": "resolver",
@@ -398,10 +365,6 @@ CONTENEDOR: Dict[str, Any] = {
         "axiomas": "axiomas",
         "verificar_salida": "verificar_salida",
     },
-
-        # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
-    # ============================================================
     "capacidades_meta": {
         "resolver": {
             "descripcion": (
@@ -415,7 +378,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "evaluar": {
             "descripcion": "Alias de resolver.",
             "entrada": "*",
@@ -425,7 +387,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "centinela": {
             "descripcion": (
                 "Garantiza la coherencia estructural del dominio."
@@ -437,7 +398,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "verificar": {
             "descripcion": "Alias de barrer.",
             "entrada": "*",
@@ -447,7 +407,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "barrer": {
             "descripcion": (
                 "Garantiza la coherencia de los clasificadores internos."
@@ -459,7 +418,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "inventario": {
             "descripcion": (
                 "Garantiza la enumeración de lo que existe en el módulo."
@@ -472,7 +430,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "reporte": {
             "descripcion": (
                 "Garantiza el estado actual del módulo."
@@ -484,7 +441,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "diagnostico": {
             "descripcion": (
                 "Garantiza problemas, advertencias y recomendaciones."
@@ -497,7 +453,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "axiomas": {
             "descripcion": (
                 "Garantiza las declaraciones operativas del dominio."
@@ -507,7 +462,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "list[dict]",
             "acceso_archivos": ["*"],
         },
-
         "verificar_salida": {
             "descripcion": (
                 "Garantiza la validez estructural de una salida del módulo."
@@ -518,82 +472,195 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
     },
-
-    # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
-    # ============================================================
     "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
         "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+        "acceso_archivos": True,
+        "validar_esquema": True,
     },
-
-
-    # ============================================================
-    # ESTADOS VÁLIDOS
-    # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ============================================================
-    # INVARIANTES
-    # ============================================================
     "invariantes": list(INVARIANTES),
+}
 
-}  # <--- CIERRE FINAL
+# ===============================================================
+# FIN PARTE 2
+# ===============================================================
+
 
 # ===============================================================
-# FIN CONTRATO
+# PARTE 3 — VALIDACIÓN DEL CONTRATO
 # ===============================================================
+#
+# Responsabilidad: garantizar que CONTENEDOR cumple el esquema
+# y que las estructuras de dominio tienen el tipo correcto.
+# Contrato: contrato inválido produce ContratoInvalido explícito.
+# No se aplican fallbacks silenciosos que oculten un contrato mal formado.
 # ===============================================================
-# FUNCIONES PRIVADAS
+
+
+# ===============================================================
+# 3.1 — ACCESO A CONFIGURACIÓN
 # ===============================================================
 
 def _cfg(clave: str, default: Any = None) -> Any:
     return CONTENEDOR.get(clave, default)
 
+# ===============================================================
+# FIN 3.1
+# ===============================================================
+
+
+# ===============================================================
+# 3.2 — VALIDACIÓN ESTRUCTURAL DEL CONTENEDOR
+# ===============================================================
+
+def _validar_contrato(cont: Dict[str, Any]) -> None:
+    obligatorias = (
+        "esquema", "version_contrato", "version_modulo",
+        "id", "nombre", "rol", "descripcion",
+        "funcion", "no_hace", "autoridad",
+        "conocimiento_exportable", "requiere",
+        "autoriza_engine", "consultas_soportadas",
+        "capacidades", "capacidades_meta",
+        "reporting", "estados_validos", "invariantes",
+        "estabilidad", "compatible_desde", "api_engine",
+    )
+    faltantes = [k for k in obligatorias if k not in cont]
+    if faltantes:
+        raise ContratoInvalido(
+            "{0}: CONTENEDOR incompleto. Faltan: {1}".format(
+                NOMBRE_MODULO, faltantes
+            )
+        )
+
+    if cont.get("esquema") != ESQUEMA_CONTRATO:
+        raise ContratoInvalido(
+            "{0}: esquema incompatible: {1}".format(
+                NOMBRE_MODULO, cont.get("esquema")
+            )
+        )
+
+    if not isinstance(cont.get("capacidades"), dict):
+        raise ContratoInvalido(
+            "{0}: 'capacidades' debe ser dict".format(NOMBRE_MODULO)
+        )
+
+    if not isinstance(cont.get("requiere"), list):
+        raise ContratoInvalido(
+            "{0}: 'requiere' debe ser list".format(NOMBRE_MODULO)
+        )
+
+    if not isinstance(cont.get("no_hace"), list):
+        raise ContratoInvalido(
+            "{0}: 'no_hace' debe ser list".format(NOMBRE_MODULO)
+        )
+
+    estructuras_lista = (
+        "modos_entrada",
+        "estados_O",
+        "eventos",
+        "tipos_peticion",
+        "claves_pedir_anuncio",
+        "regla_campos_obligatorios",
+        "claves_fuera_de_dominio",
+        "estados_validos",
+    )
+    for clave in estructuras_lista:
+        valor = cont.get(clave)
+        if valor is not None and not isinstance(valor, list):
+            raise ContratoInvalido(
+                "{0}: '{1}' debe ser list, recibido {2}".format(
+                    NOMBRE_MODULO, clave, type(valor).__name__
+                )
+            )
+
+    meta_caps = cont.get("capacidades_meta")
+    if meta_caps is None:
+        raise ContratoInvalido(
+            "{0}: 'capacidades_meta' ausente".format(NOMBRE_MODULO)
+        )
+    if not isinstance(meta_caps, dict):
+        raise ContratoInvalido(
+            "{0}: 'capacidades_meta' debe ser dict".format(NOMBRE_MODULO)
+        )
+
+    for nombre_cap in cont.get("capacidades") or {}:
+        if nombre_cap not in meta_caps:
+            raise ContratoInvalido(
+                "{0}: capacidad '{1}' sin capacidades_meta".format(
+                    NOMBRE_MODULO, nombre_cap
+                )
+            )
+        entrada = meta_caps[nombre_cap]
+        if not isinstance(entrada, dict):
+            raise ContratoInvalido(
+                "{0}: capacidades_meta['{1}'] debe ser dict".format(
+                    NOMBRE_MODULO, nombre_cap
+                )
+            )
+        for campo in ("descripcion", "entrada", "salida"):
+            if campo not in entrada or not isinstance(entrada[campo], str):
+                raise ContratoInvalido(
+                    "{0}: capacidades_meta['{1}'] requiere '{2}: str'".format(
+                        NOMBRE_MODULO, nombre_cap, campo
+                    )
+                )
+
+# ===============================================================
+# FIN 3.2
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 4 — NORMALIZACIÓN Y ESTADO
+# ===============================================================
+#
+# Responsabilidad: construir el registro O canónico a partir de
+# una petición, respetando el dominio declarado.
+# Invariante: pedir_anuncio verdadero implica tipos_peticion no vacío.
+# ===============================================================
+
+
+# ===============================================================
+# 4.1 — REGISTRO O CANÓNICO
+# ===============================================================
 
 def _registro_vacio() -> Dict[str, Any]:
+    """Registro canónico vacío compatible con el dominio declarado."""
     return {
-        "O_id": "True",
-        "escala": "True",
-        "enunciado_O": "True",
+        "O_id": None,
+        "escala": None,
+        "enunciado_O": None,
         "ligaduras": {},
-        "estado": "True",
+        "estado": "indefinido",
         "modo_entrada": None,
         "evento": "indefinido",
-        "pedir_anuncio": "True",
+        "pedir_anuncio": False,
         "tipos_peticion": [],
     }
 
+# ===============================================================
+# FIN 4.1
+# ===============================================================
+
+
+# ===============================================================
+# 4.2 — EVALUACIÓN DE pedir_anuncio
+# ===============================================================
 
 def _truthy_pedir(v: Any) -> bool:
+    """Evalúa representaciones canónicas de petición de anuncio."""
     if v is True:
         return True
     if v is False or v is None:
@@ -603,9 +670,18 @@ def _truthy_pedir(v: Any) -> bool:
     s = str(v).strip().lower()
     return s in ("1", "true", "si", "sí", "yes", "on", "citar", "anuncio")
 
+# ===============================================================
+# FIN 4.2
+# ===============================================================
+
+
+# ===============================================================
+# 4.3 — NORMALIZACIÓN DE TIPOS DE PETICIÓN
+# ===============================================================
 
 def _normalizar_tipos_peticion(raw: Any) -> List[str]:
-    admitidos = set(_cfg("tipos_peticion") or [])
+    admitidos_cfg = _cfg("tipos_peticion")
+    admitidos = set(admitidos_cfg) if isinstance(admitidos_cfg, (list, tuple, set)) else set()
     tipos: List[str] = []
     if isinstance(raw, str):
         for p in raw.replace(";", ",").split(","):
@@ -619,23 +695,55 @@ def _normalizar_tipos_peticion(raw: Any) -> List[str]:
                 tipos.append(s)
     return tipos
 
+# ===============================================================
+# FIN 4.3
+# ===============================================================
+
+
+# ===============================================================
+# 4.4 — GARANTÍA ATÓMICA DE LA INVARIANTE pedir_anuncio
+# ===============================================================
+
+def _asegurar_invariante_pedir_anuncio(registro: Dict[str, Any]) -> None:
+    """Garantiza la invariante: pedir_anuncio verdadero implica tipos_peticion no vacío."""
+    if registro.get("pedir_anuncio") and not registro.get("tipos_peticion"):
+        registro["tipos_peticion"] = ["dame_cadena_completa"]
+
+# ===============================================================
+# FIN 4.4
+# ===============================================================
+
+
+# ===============================================================
+# 4.5 — NORMALIZACIÓN COMPLETA DEL REGISTRO
+# ===============================================================
 
 def _normalizar_registro(peticion: Dict[str, Any]) -> Dict[str, Any]:
     reg = _registro_vacio()
-    estados = set(_cfg("estados_O") or [])
-    eventos = set(_cfg("eventos") or [])
-    claves_pedir = tuple(_cfg("claves_pedir_anuncio") or [])
+    estados_cfg = _cfg("estados_O")
+    estados = set(estados_cfg) if isinstance(estados_cfg, (list, tuple, set)) else set()
+    eventos_cfg = _cfg("eventos")
+    eventos = set(eventos_cfg) if isinstance(eventos_cfg, (list, tuple, set)) else set()
+    claves_pedir_cfg = _cfg("claves_pedir_anuncio")
+    claves_pedir = tuple(claves_pedir_cfg) if isinstance(claves_pedir_cfg, (list, tuple)) else ()
 
-    o_id = peticion.get("O_id") or peticion.get("o_id")
-    enunciado = (
-        peticion.get("enunciado_O")
-        or peticion.get("enunciado")
-        or peticion.get("contexto")
-        or peticion.get("O_context")
-    )
+    o_id = peticion.get("O_id")
+    if o_id is None:
+        o_id = peticion.get("o_id")
+    enunciado = peticion.get("enunciado_O")
+    if enunciado is None:
+        enunciado = peticion.get("enunciado")
+    if enunciado is None:
+        enunciado = peticion.get("contexto")
+    if enunciado is None:
+        enunciado = peticion.get("O_context")
     escala = peticion.get("escala")
-    modo = peticion.get("modo_entrada") or peticion.get("modo")
-    ligaduras = peticion.get("ligaduras") or {}
+    modo = peticion.get("modo_entrada")
+    if modo is None:
+        modo = peticion.get("modo")
+    ligaduras = peticion.get("ligaduras")
+    if ligaduras is None:
+        ligaduras = {}
     estado_decl = peticion.get("estado")
 
     if isinstance(ligaduras, dict):
@@ -647,10 +755,10 @@ def _normalizar_registro(peticion: Dict[str, Any]) -> Dict[str, Any]:
     else:
         reg["ligaduras"] = {}
 
-    reg["O_id"] = str(o_id).strip() if o_id else None
-    reg["enunciado_O"] = str(enunciado).strip() if enunciado else None
-    reg["escala"] = str(escala).strip() if escala else None
-    reg["modo_entrada"] = str(modo).strip() if modo else None
+    reg["O_id"] = str(o_id).strip() if o_id is not None else None
+    reg["enunciado_O"] = str(enunciado).strip() if enunciado is not None else None
+    reg["escala"] = str(escala).strip() if escala is not None else None
+    reg["modo_entrada"] = str(modo).strip() if modo is not None else None
 
     if estado_decl in estados:
         reg["estado"] = estado_decl
@@ -674,7 +782,7 @@ def _normalizar_registro(peticion: Dict[str, Any]) -> Dict[str, Any]:
             break
 
     tipos = _normalizar_tipos_peticion(
-        peticion.get("tipos_peticion") or peticion.get("tipo_peticion")
+        peticion.get("tipos_peticion") if "tipos_peticion" in peticion else peticion.get("tipo_peticion")
     )
     if tipos and not pedir:
         pedir = True
@@ -685,6 +793,14 @@ def _normalizar_registro(peticion: Dict[str, Any]) -> Dict[str, Any]:
     reg["tipos_peticion"] = tipos
     return reg
 
+# ===============================================================
+# FIN 4.5
+# ===============================================================
+
+
+# ===============================================================
+# 4.6 — CONFLICTOS DE LIGADURAS Y CÁLCULO DE permite_k
+# ===============================================================
 
 def _conflicto_ligaduras(ligaduras: Dict[str, str]) -> List[str]:
     errs: List[str] = []
@@ -703,9 +819,30 @@ def _permite_k(registro: Dict[str, Any]) -> bool:
         return False
     return True
 
+# ===============================================================
+# FIN 4.6
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 5 — VALIDACIÓN DE CLASIFICADORES
+# ===============================================================
+#
+# Responsabilidad: validar estructura, anclaje de dominio y
+# claves fuera de dominio de las REGLA y de los resultados de clasificar().
+# Contrato: no se permiten claves de dominio ajeno.
+# ===============================================================
+
+
+# ===============================================================
+# 5.1 — ANCLAJE DE REGLAS AL DOMINIO
+# ===============================================================
 
 def _id_anclado(rid: str, regla: Dict[str, Any]) -> bool:
-    prefijo = str(_cfg("prefijo_reglas") or _cfg("dominio") or "")
+    prefijo_cfg = _cfg("prefijo_reglas")
+    if prefijo_cfg is None:
+        prefijo_cfg = _cfg("dominio")
+    prefijo = str(prefijo_cfg) if prefijo_cfg is not None else ""
     if not rid:
         return False
     if prefijo and (
@@ -718,13 +855,23 @@ def _id_anclado(rid: str, regla: Dict[str, Any]) -> bool:
         return True
     return False
 
+# ===============================================================
+# FIN 5.1
+# ===============================================================
+
+
+# ===============================================================
+# 5.2 — VALIDACIÓN DE META DE REGLA
+# ===============================================================
 
 def _validar_regla_meta(stem: str, regla: Any) -> List[str]:
     errs: List[str] = []
     if not isinstance(regla, dict):
         return ["{0}: REGLA debe ser dict".format(stem)]
 
-    for k in (_cfg("regla_campos_obligatorios") or []):
+    campos_cfg = _cfg("regla_campos_obligatorios")
+    campos = campos_cfg if isinstance(campos_cfg, list) else []
+    for k in campos:
         if k not in regla or not str(regla.get(k, "")).strip():
             errs.append(
                 "{0}: REGLA sin campo obligatorio '{1}'".format(stem, k)
@@ -738,7 +885,8 @@ def _validar_regla_meta(stem: str, regla: Any) -> List[str]:
             )
         )
 
-    fuera = set(_cfg("claves_fuera_de_dominio") or [])
+    fuera_cfg = _cfg("claves_fuera_de_dominio")
+    fuera = set(fuera_cfg) if isinstance(fuera_cfg, (list, tuple, set)) else set()
     for clave in fuera:
         if clave in regla and regla[clave] is not None:
             errs.append(
@@ -748,13 +896,22 @@ def _validar_regla_meta(stem: str, regla: Any) -> List[str]:
             )
     return errs
 
+# ===============================================================
+# FIN 5.2
+# ===============================================================
+
+
+# ===============================================================
+# 5.3 — VALIDACIÓN DE RESULTADO DE CLASIFICACIÓN
+# ===============================================================
 
 def _validar_clasificacion(stem: str, cls: Any) -> List[str]:
     errs: List[str] = []
     if not isinstance(cls, dict):
         return ["{0}: clasificar() debe devolver dict".format(stem)]
 
-    fuera = set(_cfg("claves_fuera_de_dominio") or [])
+    fuera_cfg = _cfg("claves_fuera_de_dominio")
+    fuera = set(fuera_cfg) if isinstance(fuera_cfg, (list, tuple, set)) else set()
     for clave in fuera:
         if clave in cls and cls[clave] is not None:
             if clave == "K" and isinstance(cls.get("K"), bool):
@@ -765,9 +922,12 @@ def _validar_clasificacion(stem: str, cls: Any) -> List[str]:
                 )
             )
 
-    estados = set(_cfg("estados_O") or [])
-    eventos = set(_cfg("eventos") or [])
-    tipos_ok = set(_cfg("tipos_peticion") or [])
+    estados_cfg = _cfg("estados_O")
+    estados = set(estados_cfg) if isinstance(estados_cfg, (list, tuple, set)) else set()
+    eventos_cfg = _cfg("eventos")
+    eventos = set(eventos_cfg) if isinstance(eventos_cfg, (list, tuple, set)) else set()
+    tipos_cfg = _cfg("tipos_peticion")
+    tipos_ok = set(tipos_cfg) if isinstance(tipos_cfg, (list, tuple, set)) else set()
 
     if "estado" in cls and cls["estado"] is not None:
         if cls["estado"] not in estados:
@@ -792,6 +952,14 @@ def _validar_clasificacion(stem: str, cls: Any) -> List[str]:
                     )
     return errs
 
+# ===============================================================
+# FIN 5.3
+# ===============================================================
+
+
+# ===============================================================
+# 5.4 — CENTINELA DE ARCHIVO INDIVIDUAL
+# ===============================================================
 
 def _centinela_archivo(
     stem: str,
@@ -846,6 +1014,27 @@ def _centinela_archivo(
             entrada["error"] = errores_c[0]
     return entrada
 
+# ===============================================================
+# FIN 5.4
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 6 — DESCUBRIMIENTO Y CARGA DINÁMICA
+# ===============================================================
+#
+# Responsabilidad: descubrir automáticamente todo *.py del directorio
+# (excepto __init__.py y archivos privados), cargarlo, validarlo y
+# reportar choques de id/nombre.
+# Contrato: no se importa código ajeno al directorio.
+# Ciclo de vida: se limpia sys.modules en caso de fallo de carga
+# para evitar módulos parcialmente inicializados.
+# ===============================================================
+
+
+# ===============================================================
+# 6.1 — CARGA DE REGLAS INTERNAS
+# ===============================================================
 
 def _cargar_reglas(
     peticion: Optional[Dict[str, Any]] = None,
@@ -867,9 +1056,12 @@ def _cargar_reglas(
         try:
             spec.loader.exec_module(mod)
         except Exception as e:
+            if nombre_mod in sys.modules:
+                del sys.modules[nombre_mod]
             registro[archivo.stem] = {
                 "error": "{0}: {1}".format(type(e).__name__, e),
                 "errores_centinela": ["import: {0}".format(e)],
+                "traceback": traceback.format_exc(),
             }
             continue
         registro[archivo.stem] = _centinela_archivo(
@@ -877,6 +1069,14 @@ def _cargar_reglas(
         )
     return registro
 
+# ===============================================================
+# FIN 6.1
+# ===============================================================
+
+
+# ===============================================================
+# 6.2 — DETECCIÓN DE CHOQUES DE ID Y NOMBRE
+# ===============================================================
 
 def _detectar_choques_reglas(reglas: Dict[str, Any]) -> List[str]:
     choques: List[str] = []
@@ -908,78 +1108,23 @@ def _detectar_choques_reglas(reglas: Dict[str, Any]) -> List[str]:
             )
     return choques
 
-
-def _validar_contrato(cont: Dict[str, Any]) -> None:
-    obligatorias = (
-        "esquema", "version_contrato", "version_modulo",
-        "id", "nombre", "rol", "descripcion",
-        "funcion", "no_hace", "autoridad",
-        "conocimiento_exportable", "requiere",
-        "autoriza_engine", "consultas_soportadas",
-        "capacidades", "capacidades_meta",
-        "reporting", "estados_validos", "invariantes",
-        "estabilidad", "compatible_desde", "api_engine",
-    )
-    faltantes = [k for k in obligatorias if k not in cont]
-    if faltantes:
-        raise ContratoInvalido(
-            "{0}: CONTENEDOR incompleto. Faltan: {1}".format(
-                NOMBRE_MODULO, faltantes
-            )
-        )
-
-    if cont.get("esquema") != ESQUEMA_CONTRATO:
-        raise ContratoInvalido(
-            "{0}: esquema incompatible: {1}".format(
-                NOMBRE_MODULO, cont.get("esquema")
-            )
-        )
-
-    if not isinstance(cont.get("capacidades"), dict):
-        raise ContratoInvalido(
-            "{0}: 'capacidades' debe ser dict".format(NOMBRE_MODULO)
-        )
-
-    if not isinstance(cont.get("requiere"), list):
-        raise ContratoInvalido(
-            "{0}: 'requiere' debe ser list".format(NOMBRE_MODULO)
-        )
-
-    if not isinstance(cont.get("no_hace"), list):
-        raise ContratoInvalido(
-            "{0}: 'no_hace' debe ser list".format(NOMBRE_MODULO)
-        )
-
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
-            raise ContratoInvalido(
-                "{0}: capacidad '{1}' sin capacidades_meta".format(
-                    NOMBRE_MODULO, nombre_cap
-                )
-            )
-        entrada = meta_caps[nombre_cap]
-        if not isinstance(entrada, dict):
-            raise ContratoInvalido(
-                "{0}: capacidades_meta['{1}'] debe ser dict".format(
-                    NOMBRE_MODULO, nombre_cap
-                )
-            )
-        for campo in ("descripcion", "entrada", "salida"):
-            if campo not in entrada or not isinstance(entrada[campo], str):
-                raise ContratoInvalido(
-                    "{0}: capacidades_meta['{1}'] requiere '{2}: str'".format(
-                        NOMBRE_MODULO, nombre_cap, campo
-                    )
-                )
-
 # ===============================================================
-# FIN FUNCIONES PRIVADAS
+# FIN 6.2
 # ===============================================================
 
 
 # ===============================================================
-# CAPACIDADES PÚBLICAS
+# PARTE 7 — CAPACIDADES PÚBLICAS
+# ===============================================================
+#
+# Responsabilidad: implementar las capacidades declaradas en CONTENEDOR.
+# Contrato: solo se exponen las capacidades listadas; ninguna inventada.
+# Invariantes: permite_k y pedir_anuncio se garantizan según reglas.
+# ===============================================================
+
+
+# ===============================================================
+# 7.1 — CENTINELA ESTRUCTURAL
 # ===============================================================
 
 def centinela() -> Dict[str, Any]:
@@ -1005,15 +1150,53 @@ def centinela() -> Dict[str, Any]:
         "version": VERSION_MODULO,
     }
 
+# ===============================================================
+# FIN 7.1
+# ===============================================================
+
+
+# ===============================================================
+# 7.2 — RESOLVER (CAPACIDAD PRINCIPAL)
+# ===============================================================
 
 def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    peticion = dict(peticion or {})
-    modos = set(_cfg("modos_entrada") or [])
-    estados = set(_cfg("estados_O") or [])
-    eventos = set(_cfg("eventos") or [])
-    tipos_ok = set(_cfg("tipos_peticion") or [])
+    if peticion is not None and not isinstance(peticion, dict):
+        return {
+            "O_context": None,
+            "registro": None,
+            "permite_k": False,
+            "pedir_anuncio": False,
+            "tipos_peticion": [],
+            "coherente": False,
+            "escala": "macro",
+            "modo_entrada": None,
+            "reglas_internas": {
+                "total": 0,
+                "choques": [],
+            },
+            "errores": [
+                "peticion debe ser dict o None; recibido {0}".format(
+                    type(peticion).__name__
+                )
+            ],
+            "notas": ["tipo de petición inválido"],
+        }
 
-    if not peticion:
+    # Distinción explícita None vs dict.
+    # Semántica contractual vigente: tanto None como {} producen auditoría pura.
+    es_auditoria_pura = peticion is None
+    peticion_datos = dict(peticion) if peticion is not None else {}
+
+    modos_cfg = _cfg("modos_entrada")
+    modos = set(modos_cfg) if isinstance(modos_cfg, (list, tuple, set)) else set()
+    estados_cfg = _cfg("estados_O")
+    estados = set(estados_cfg) if isinstance(estados_cfg, (list, tuple, set)) else set()
+    eventos_cfg = _cfg("eventos")
+    eventos = set(eventos_cfg) if isinstance(eventos_cfg, (list, tuple, set)) else set()
+    tipos_cfg = _cfg("tipos_peticion")
+    tipos_ok = set(tipos_cfg) if isinstance(tipos_cfg, (list, tuple, set)) else set()
+
+    if es_auditoria_pura or not peticion_datos:
         audit = centinela()
         return {
             "O_context": None,
@@ -1026,13 +1209,13 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "modo_entrada": "repositorio",
             "reglas_internas": {
                 "total": audit.get("total", 0),
-                "choques": audit.get("choques") or [],
+                "choques": audit.get("choques") if audit.get("choques") is not None else [],
             },
-            "errores": list(audit.get("errores") or []),
+            "errores": list(audit.get("errores") if audit.get("errores") is not None else []),
             "notas": ["sin petición: solo auditoría de clasificadores"],
         }
 
-    reglas = _cargar_reglas(peticion)
+    reglas = _cargar_reglas(peticion_datos)
     choques = _detectar_choques_reglas(reglas)
     errores: List[str] = list(choques)
 
@@ -1043,7 +1226,7 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             if ec not in errores:
                 errores.append("centinela '{0}': {1}".format(nombre, ec))
 
-    registro = _normalizar_registro(peticion)
+    registro = _normalizar_registro(peticion_datos)
     errores.extend(_conflicto_ligaduras(registro.get("ligaduras") or {}))
 
     if registro.get("modo_entrada") and registro["modo_entrada"] not in modos:
@@ -1070,17 +1253,14 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 if t in tipos_ok and t not in seen:
                     registro.setdefault("tipos_peticion", []).append(t)
                     seen.add(t)
-            if registro.get("tipos_peticion") and not registro.get(
-                "pedir_anuncio"
-            ):
+            if registro.get("tipos_peticion") and not registro.get("pedir_anuncio"):
                 registro["pedir_anuncio"] = True
         if cls.get("error"):
             errores.append(
                 "clasificacion '{0}': {1}".format(nombre, cls["error"])
             )
 
-    if registro.get("pedir_anuncio") and not registro.get("tipos_peticion"):
-        registro["tipos_peticion"] = ["dame_cadena_completa"]
+    _asegurar_invariante_pedir_anuncio(registro)
 
     permite = _permite_k(registro)
     o_ctx = registro.get("enunciado_O") or registro.get("O_id") or UNDEFINED
@@ -1112,6 +1292,14 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "notas": notas,
     }
 
+# ===============================================================
+# FIN 7.2
+# ===============================================================
+
+
+# ===============================================================
+# 7.3 — BARRER / VERIFICAR
+# ===============================================================
 
 def barrer() -> Dict[str, Any]:
     audit = centinela()
@@ -1120,10 +1308,10 @@ def barrer() -> Dict[str, Any]:
         "rol": ROL_MODULO,
         "dominio": _cfg("dominio"),
         "coherente": audit.get("coherente", False),
-        "errores": audit.get("errores") or [],
+        "errores": audit.get("errores") if audit.get("errores") is not None else [],
         "reglas_internas": {
             "total": audit.get("total", 0),
-            "choques": audit.get("choques") or [],
+            "choques": audit.get("choques") if audit.get("choques") is not None else [],
         },
         "version": VERSION_MODULO,
     }
@@ -1132,6 +1320,14 @@ def barrer() -> Dict[str, Any]:
 def verificar() -> Dict[str, Any]:
     return barrer()
 
+# ===============================================================
+# FIN 7.3
+# ===============================================================
+
+
+# ===============================================================
+# 7.4 — VERIFICAR_SALIDA
+# ===============================================================
 
 def verificar_salida(salida: Dict[str, Any]) -> bool:
     if not isinstance(salida, dict):
@@ -1143,9 +1339,27 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
     if "notas" in salida and not isinstance(salida["notas"], list):
         return False
 
-    estados = set(_cfg("estados_O") or [])
-    eventos = set(_cfg("eventos") or [])
-    tipos_ok = set(_cfg("tipos_peticion") or [])
+    estados_cfg = _cfg("estados_O")
+    estados = set(estados_cfg) if isinstance(estados_cfg, (list, tuple, set)) else set()
+    eventos_cfg = _cfg("eventos")
+    eventos = set(eventos_cfg) if isinstance(eventos_cfg, (list, tuple, set)) else set()
+    tipos_cfg = _cfg("tipos_peticion")
+    tipos_ok = set(tipos_cfg) if isinstance(tipos_cfg, (list, tuple, set)) else set()
+
+    if "permite_k" in salida:
+        if not isinstance(salida["permite_k"], bool):
+            return False
+        if salida["permite_k"] is True:
+            reg = salida.get("registro")
+            if not isinstance(reg, dict):
+                return False
+            if reg.get("estado") != "estable":
+                return False
+            if not reg.get("O_id") or not reg.get("enunciado_O"):
+                return False
+    else:
+        if "registro" in salida and salida["registro"] is not None:
+            return False
 
     if "registro" in salida:
         reg = salida["registro"]
@@ -1162,41 +1376,31 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
                 for t in reg["tipos_peticion"]:
                     if t not in tipos_ok:
                         return False
-            if "pedir_anuncio" in reg and not isinstance(
-                reg["pedir_anuncio"], bool
-            ):
+            if "pedir_anuncio" in reg and not isinstance(reg["pedir_anuncio"], bool):
                 return False
-
-        if "permite_k" not in salida or not isinstance(
-            salida["permite_k"], bool
-        ):
-            return False
-
-        if salida.get("permite_k") is True:
-            if not isinstance(reg, dict):
-                return False
-            if reg.get("estado") != "estable":
-                return False
-            if not reg.get("O_id") or not reg.get("enunciado_O"):
-                return False
-
-        if isinstance(reg, dict) and reg.get("pedir_anuncio") is True:
-            if not (reg.get("tipos_peticion") or []):
-                return False
-
-        if "pedir_anuncio" in salida and not isinstance(
-            salida["pedir_anuncio"], bool
-        ):
-            return False
-
-        if "tipos_peticion" in salida:
-            if not isinstance(salida["tipos_peticion"], list):
-                return False
-            for t in salida["tipos_peticion"]:
-                if t not in tipos_ok:
+            if isinstance(reg, dict) and reg.get("pedir_anuncio") is True:
+                if not (reg.get("tipos_peticion") or []):
                     return False
+
+    if "pedir_anuncio" in salida and not isinstance(salida["pedir_anuncio"], bool):
+        return False
+
+    if "tipos_peticion" in salida:
+        if not isinstance(salida["tipos_peticion"], list):
+            return False
+        for t in salida["tipos_peticion"]:
+            if t not in tipos_ok:
+                return False
     return True
 
+# ===============================================================
+# FIN 7.4
+# ===============================================================
+
+
+# ===============================================================
+# 7.5 — INVENTARIO
+# ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     reglas = _cargar_reglas()
@@ -1212,17 +1416,25 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "reglas_internas": sorted(reglas.keys()),
         "total_reglas": len(reglas),
-        "modos_entrada": list(_cfg("modos_entrada") or []),
-        "estados_O": list(_cfg("estados_O") or []),
-        "eventos": list(_cfg("eventos") or []),
-        "tipos_peticion": list(_cfg("tipos_peticion") or []),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "modos_entrada": list(_cfg("modos_entrada") if isinstance(_cfg("modos_entrada"), list) else []),
+        "estados_O": list(_cfg("estados_O") if isinstance(_cfg("estados_O"), list) else []),
+        "eventos": list(_cfg("eventos") if isinstance(_cfg("eventos"), list) else []),
+        "tipos_peticion": list(_cfg("tipos_peticion") if isinstance(_cfg("tipos_peticion"), list) else []),
+        "requiere": list(CONTENEDOR.get("requiere") if isinstance(CONTENEDOR.get("requiere"), list) else []),
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
         "invariantes": CONTENEDOR.get("invariantes"),
     }
 
+# ===============================================================
+# FIN 7.5
+# ===============================================================
+
+
+# ===============================================================
+# 7.6 — AXIOMAS
+# ===============================================================
 
 def axiomas() -> List[Dict[str, Any]]:
     return [
@@ -1295,9 +1507,25 @@ def axiomas() -> List[Dict[str, Any]]:
             "gobierna": ["contexto"],
         },
     ]
+
+# ===============================================================
+# FIN 7.6
+# ===============================================================
+
+
+# ===============================================================
+# 7.7 — FUNCIÓN AUXILIAR recibir_comentarios
+# ===============================================================
+#
+# Función auxiliar; no forma parte de las capacidades contractuales
+# declaradas en CONTENEDOR (decisión Option B).
+# ===============================================================
+
 def recibir_comentarios(paquetes: Dict[str, Any]) -> Dict[str, Any]:
     """
     Recibe el paquete de comentarios entregado por el Engine.
+    Función auxiliar; no forma parte de las capacidades contractuales
+    declaradas en CONTENEDOR.
     """
     if not isinstance(paquetes, dict):
         return {
@@ -1311,13 +1539,23 @@ def recibir_comentarios(paquetes: Dict[str, Any]) -> Dict[str, Any]:
         "modulos": list(paquetes.keys()),
         "paquetes": paquetes
     }
+
 # ===============================================================
-# FIN CAPACIDADES PÚBLICAS
+# FIN 7.7
 # ===============================================================
 
 
 # ===============================================================
-# REPORTING INTERNO
+# PARTE 8 — REPORTING INTERNO
+# ===============================================================
+#
+# Responsabilidad: exponer estado, diagnóstico e inventario
+# sin alterar el dominio ni el contrato.
+# ===============================================================
+
+
+# ===============================================================
+# 8.1 — REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
@@ -1337,12 +1575,20 @@ def reporte() -> Dict[str, Any]:
         "coherente": audit.get("coherente"),
         "reglas_n": audit.get("total", 0),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "requiere": list(CONTENEDOR.get("requiere") if isinstance(CONTENEDOR.get("requiere"), list) else []),
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
     }
 
+# ===============================================================
+# FIN 8.1
+# ===============================================================
+
+
+# ===============================================================
+# 8.2 — DIAGNÓSTICO
+# ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
     audit = centinela()
@@ -1389,12 +1635,22 @@ def diagnostico() -> Dict[str, Any]:
     }
 
 # ===============================================================
-# FIN REPORTING
+# FIN 8.2
 # ===============================================================
 
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA DEL CONTRATO
+# PARTE 9 — RESOLUCIÓN ESTRICTA DEL CONTRATO
+# ===============================================================
+#
+# Responsabilidad: mapear nombres de capacidades a callables y
+# garantizar que solo existen las capacidades declaradas.
+# Invariante: este módulo no inventa capacidades no declaradas.
+# ===============================================================
+
+
+# ===============================================================
+# 9.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
 _CAP_MAP = {
@@ -1408,9 +1664,16 @@ _CAP_MAP = {
     "diagnostico": diagnostico,
     "axiomas": axiomas,
     "verificar_salida": verificar_salida,
-    "recibir_comentarios": recibir_comentarios,
 }
 
+# ===============================================================
+# FIN 9.1
+# ===============================================================
+
+
+# ===============================================================
+# 9.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     resueltas: Dict[str, Any] = {}
@@ -1439,9 +1702,29 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
         )
     cont["capacidades"] = resueltas
 
+# ===============================================================
+# FIN 9.2
+# ===============================================================
+
+
+# ===============================================================
+# 9.3 — EJECUCIÓN DE VALIDACIÓN Y RESOLUCIÓN
+# ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# FIN 9.3
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 10 — EXPORTACIONES
+# ===============================================================
+#
+# Responsabilidad: declarar el API público del módulo.
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -1468,22 +1751,22 @@ __all__ = [
 ]
 
 # ===============================================================
-# FIN EXPORTACIONES
+# FIN PARTE 10
 # ===============================================================
 
 
 # ===============================================================
-# EXTENSIONES FUTURAS
+# PARTE 11 — EXTENSIONES FUTURAS
 # ===============================================================
 #
 # Capacidad nueva → capacidades + capacidades_meta + _CAP_MAP
-# + VERSION_MODULO
+# + VERSION_MODULO (solo si el contrato lo exige)
 #
 # Clasificador nuevo → *.py en este directorio con REGLA
 # y/o clasificar()/validar(). Descubrimiento automático.
 #
 # ===============================================================
-# FIN EXTENSIONES FUTURAS
+# FIN PARTE 11
 # ===============================================================
 
 

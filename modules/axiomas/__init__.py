@@ -464,7 +464,7 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-        "registrar_inventario": {
+                "registrar_inventario": {
             "descripcion": (
                 "Construir el inventario estructural completo del módulo."
             ),
@@ -473,6 +473,21 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": (
                 "dict con archivos, componentes, funciones, clases, "
                 "constantes, reglas, capacidades y unidades ejecutables"
+            ),
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Inspeccionar el contenido estructural del módulo: "
+                "archivos, componentes, funciones, clases, constantes, "
+                "excepciones, reglas, clasificadores, validadores y "
+                "unidades ejecutables descubiertas."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con inventario estructural completo, "
+                "componentes clasificados y estado de descubrimiento"
             ),
             "acceso_archivos": ["*"],
         },

@@ -1745,29 +1745,53 @@ def ids_dominio_k_o(
 
 # ===============================================================
 # FIN 8.2
-# ===============================================================
-# ===============================================================
+# ===============================================================# ===============================================================
 # 8.3 — GENERATIVIDAD (TR1)
 # ===============================================================
 
 def generatividad() -> dict:
     """
-    CORRECCIÓN 14: normalizar dominios de la capa operativa con DOMINIO_CANONICO.
-    Callable público. Mide generatividad operativa y canónica (TR1).
+    Capacidad pública callable. Calcula TR1 en dos capas independientes
+    mediante la misma callable matemática _medir_pares.
+
+    Capa operativa: nodos del repositorio (recolectar + DOMINIO_CANONICO).
+    Capa canónica: nodos de THETA_24 en el orden de THETA_NAMES.
+
+    Criterio TR1 (documento canónico):
+      Di ∩ Dj = ∅              → incompatible
+      Di ∩ Dj ≠ ∅              → compatible
+      compatible ∧ (union ⊋ Di) ∧ (union ⊋ Dj) → novedoso
+      compatible en otro caso  → redundante
+
+    Identidades:
+      compatibles + incompatibles == pares_totales
+      novedosos + redundantes == compatibles
+    Generatividad formal: novedosos > theta_n
     """
-    decls, errores = recolectar()
 
     # -----------------------------------------------------------
-    # Capa operativa: grafo real del repositorio
+    # Orden canónico de Θ (fuente de n y del recorrido de pares)
     # -----------------------------------------------------------
-    oper = []
+    THETA_NAMES = (
+        "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8",
+        "T9", "T10", "T11", "T12", "T13", "T14", "T15", "T16",
+        "T17", "U1", "M1", "M.1", "B-Canonical", "TT.6.1",
+        "U0", "TR1",
+    )
+
+    # -----------------------------------------------------------
+    # 1. Capa operativa — grafo real del repositorio
+    # -----------------------------------------------------------
+    decls, errores = recolectar()
+
+    oper: List[Dict] = []
     for d in decls:
         if d.get("tipo") not in ("teorema", "axioma"):
             continue
         gob = d.get("gobierna") or []
         if not gob:
             continue
-        dominios_norm = set()
+        dominios_norm: Set[str] = set()
         for g in gob:
             key = str(g).lower().strip()
             dominios_norm.add(DOMINIO_CANONICO.get(key, key.upper()[:3]))
@@ -1776,26 +1800,40 @@ def generatividad() -> dict:
             "tipo": d["tipo"],
             "dominios": dominios_norm,
         })
+
+    # Misma callable matemática sobre el grafo operativo
     m_op = _medir_pares(oper)
     dominios_op = sorted({g for n in oper for g in n["dominios"]})
 
     # -----------------------------------------------------------
-    # Capa canónica: THETA_24 formal del paper
+    # 2. Capa canónica — TR1 formal desde THETA_NAMES / THETA_24
     # -----------------------------------------------------------
-    can = [
-        {"id": tid, "tipo": "teorema", "dominios": set(doms)}
-        for tid, doms in THETA_24.items()
+    can: List[Dict] = [
+        {
+            "id": tid,
+            "tipo": "teorema",
+            "dominios": set(THETA_24[tid]),
+        }
+        for tid in THETA_NAMES
+        if tid in THETA_24
     ]
+
+    # Misma callable matemática sobre el grafo canónico
     m_can = _medir_pares(can)
     dominios_can = sorted({g for n in can for g in n["dominios"]})
 
+    # Correspondencia repo ↔ canon (no altera el cálculo TR1)
     ids_en_repo = {str(d.get("id", "")) for d in decls}
-    ids_presentes = sorted(i for i in THETA_CANONICO if i in ids_en_repo)
-    ids_faltantes = sorted(THETA_CANONICO - set(ids_presentes))
+    ids_presentes = sorted(i for i in THETA_NAMES if i in ids_en_repo)
+    ids_faltantes = sorted(i for i in THETA_NAMES if i not in ids_en_repo)
     ids_sin_dominio = sorted(
-        tid for tid, doms in THETA_24.items() if not doms
+        tid for tid in THETA_NAMES
+        if tid in THETA_24 and not THETA_24[tid]
     )
 
+    # -----------------------------------------------------------
+    # 3. Indicadores derivados (no forman parte de la mecánica TR1)
+    # -----------------------------------------------------------
     u1_proxy = (
         "NO_STAGNANT"
         if m_can.get("pares_novedosos", 0) > 0
@@ -1803,11 +1841,31 @@ def generatividad() -> dict:
         else "REVISAR"
     )
 
+    # Referencia documental (solo verificación; no es entrada de cálculo)
+    ref_doc = {
+        "theta_n": 24,
+        "pares_totales": 276,
+        "pares_compatibles": 183,
+        "pares_novedosos": 153,
+        "pares_redundantes": 30,
+        "pares_incompatibles": 93,
+        "condicion_central": "153 > 24",
+    }
+
+    coincide_paper = (
+        m_can.get("pares_totales") == ref_doc["pares_totales"]
+        and m_can.get("pares_compatibles") == ref_doc["pares_compatibles"]
+        and m_can.get("pares_novedosos") == ref_doc["pares_novedosos"]
+        and m_can.get("pares_redundantes") == ref_doc["pares_redundantes"]
+        and m_can.get("pares_incompatibles") == ref_doc["pares_incompatibles"]
+    )
+
     # -----------------------------------------------------------
-    # Resultado
+    # 4. Salida contractual
     # -----------------------------------------------------------
     return {
         "contenedor": "axiomas",
+        # capa operativa
         "theta_n": m_op["theta_n"],
         "pares_totales": m_op["pares_totales"],
         "pares_compatibles": m_op["pares_compatibles"],
@@ -1824,8 +1882,17 @@ def generatividad() -> dict:
             "axioma": sum(1 for n in oper if n["tipo"] == "axioma"),
             "teorema": sum(1 for n in oper if n["tipo"] == "teorema"),
         },
+        # capa canónica
         "canonica": {
-            **m_can,
+            "theta_n": m_can["theta_n"],
+            "pares_totales": m_can["pares_totales"],
+            "pares_compatibles": m_can["pares_compatibles"],
+            "pares_novedosos": m_can["pares_novedosos"],
+            "pares_redundantes": m_can["pares_redundantes"],
+            "pares_incompatibles": m_can["pares_incompatibles"],
+            "im_vs_theta": m_can["im_vs_theta"],
+            "identidad_pares": m_can["identidad_pares"],
+            "identidad_compatibles": m_can["identidad_compatibles"],
             "ids_presentes": ids_presentes,
             "ids_faltantes": ids_faltantes,
             "ids_sin_dominio": ids_sin_dominio,
@@ -1833,30 +1900,13 @@ def generatividad() -> dict:
             "dominios_formales": {
                 k: sorted(v) for k, v in THETA_24.items()
             },
-            "referencia_formal": {
-                "theta_n": 24,
-                "pares_totales": 276,
-                "pares_compatibles": 183,
-                "pares_novedosos": 153,
-                "pares_redundantes": 30,
-                "pares_incompatibles": 93,
-                "nota": (
-                    "|Im(⊕)|=153 > 24=|Θ| — enumeración exacta. "
-                    "El CI recalcula; no hardcodea."
-                ),
-            },
-            "coincide_paper": (
-                m_can.get("pares_totales") == 276
-                and m_can.get("pares_compatibles") == 183
-                and m_can.get("pares_novedosos") == 153
-                and m_can.get("pares_redundantes") == 30
-                and m_can.get("pares_incompatibles") == 93
-            ),
+            "referencia_documental": ref_doc,
+            "coincide_paper": coincide_paper,
         },
-        "ids_dominio_k_o": ids_dominio_k_o(),
         "nota": (
-            "Capa operativa = grafo del repo normalizado. "
-            "Capa canónica = THETA_24 formal. "
+            "Capa operativa = grafo del repo. "
+            "Capa canónica = TR1 formal desde THETA_NAMES / THETA_24. "
+            "Ambas capas usan la misma callable _medir_pares. "
             "Identidades C+I=T y N+R=C deben cumplirse."
         ),
     }
@@ -1864,8 +1914,6 @@ def generatividad() -> dict:
 # ===============================================================
 # FIN 8.3
 # ===============================================================
-
-
 # ===============================================================
 # 8.4 — COHERENCIA (barrer / verificar)
 # ===============================================================

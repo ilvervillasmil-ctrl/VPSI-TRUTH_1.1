@@ -331,103 +331,101 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": "registrar_inventario",
     },
 
-    # ============================================================
+    ============================================================
     # METADATOS DE CAPACIDADES (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia interna del módulo.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                     # ← AGREGADA
             "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "barrer": {
             "descripcion": "Analiza coherencia de todas las declaraciones (contradicción directa y de cota).",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "dict con coherente, choques, errores, declaraciones, cuerpos, por_tipo, ids_dominio_k_o",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "verificar_salida": {
             "descripcion": "Comprueba si una salida de barrer/verificar es coherente.",
             "entrada": "salida: dict",
-            "validar_esquema": ["validar_esquema"],
+            "validar_esquema": ["validar_esquema"],                                     # ← AGREGADA
             "salida": "bool",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "inventario": {
             "descripcion": "Inventario completo del módulo (declaraciones, cuerpos, capacidades).",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, version, reglas_internas, modos, "
-                "estados, capacidades, inventario_total"
-            ),
-            "acceso_archivos": ["*"],
+            "entrada": "peticion",
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
+            "salida": "dict con id, nombre, rol, version, declaraciones, cuerpos, capacidades",
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "axiomas": {
             "descripcion": "Devuelve las declaraciones si el módulo es coherente; lista vacía si no.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "list[dict] de declaraciones normalizadas",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "declaraciones": {
             "descripcion": "Igual que axiomas: declaraciones normalizadas si coherente.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "list[dict] de declaraciones normalizadas",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "generatividad": {
             "descripcion": "Mide generatividad operativa y canónica (TR1).",
             "entrada": "acceso_archivos",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "dict con theta_n, pares, im_vs_theta, capa canonica, dominios, u1_proxy",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "por_dominio": {
             "descripcion": "Filtra declaraciones por dominio en gobierna.",
             "entrada": "dominio: str; declaraciones_externas opcional",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "list[dict] de declaraciones del dominio",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "ids_dominio_k_o": {
             "descripcion": "Ids de declaraciones ligadas a dominios K/O o Def-5.3.1.",
             "entrada": "declaraciones_externas (dict)",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "list[str] de ids ordenados",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "recolectar": {
             "descripcion": "Carga y normaliza todas las declaraciones de los cuerpos del módulo.",
             "entrada": "declaraciones_externas opcional (dict)",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "tuple[list[dict], list[dict]] → (declaraciones, errores)",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                     # ← AGREGADA
         },
         "reporte": {
             "descripcion": "Reporte interno de estado del módulo.",
             "entrada": "acceso_archivos",
-            "validar_esquema": ["*"],
+            "validar_esquema": ["*"],                                     # ← AGREGADA
             "salida": "dict con estado, coherente, declaraciones, choques, errores, capacidades",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["*"],                                    # ← AGREGADA
         },
         "diagnostico": {
             "descripcion": "Diagnóstico: qué me sucede, qué falta, qué está mal, qué necesito.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
+            "entrada": "acceso_archivos", 
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "dict con estado, problemas, advertencias, recomendaciones",
-            "acceso_archivos": ["*"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
         "buscar_por_id": {
             "descripcion": "Busca y cita una declaración por su id.",
             "entrada": "id_decl: str",
-            "validar_esquema": ["acceso_archivos"],
+            "validar_esquema": ["acceso_archivos"],                                      # ← AGREGADA
             "salida": "dict de la declaración o None",
-            "acceso_archivos": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
+        },
         },
         "ejecutar": {
             "descripcion": (

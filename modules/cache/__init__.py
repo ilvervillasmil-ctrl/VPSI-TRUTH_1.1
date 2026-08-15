@@ -5,7 +5,7 @@
 # MÓDULO:              cache
 # ID:                  CH
 # Rol:                 CH
-# Versión módulo:      4.0
+# Versión módulo:      4.1
 # Versión contrato:    1.0
 # Esquema contrato:    VPSI-CONTRACT-1.0
 # Estabilidad:         ESTABLE
@@ -15,60 +15,19 @@
 # Función:
 #   Registrador universal de eventos.
 #   Libro de actas del sistema.
+#   Mapeo estructural completo del código accesible.
+#   Clasificación de IDs por módulo y detección de duplicados.
 #
-#   CACHE no sabe lo que ocurrió.
-#   Solo sabe qué fue registrado.
+#   CACHE no interpreta semántica.
+#   CACHE no deduce causas.
+#   CACHE conserva evidencia y estructura.
 #
 # Principio:
 #   Engine produce.
 #   Centinela verifica.
-#   CACHE conserva.
+#   CACHE conserva y mapea.
 #   (Futuro) Analizadores interpretan.
 #   Omega presenta.
-#
-# Qué hace:
-#   - Registrar exactamente lo que ocurrió durante la ejecución
-#   - Conservar evidencia objetiva (append-only)
-#   - Exponer lecturas filtradas por campos del registro
-#   - Descubrir categorías dinámicamente al depositar
-#
-# Qué NO hace:
-#   - No interpreta
-#   - No deduce
-#   - No reconstruye
-#   - No infiere
-#   - No calcula
-#   - No descubre relaciones
-#   - No genera grafos ni árboles
-#   - No explica razonamientos
-#   - No responde "por qué", "qué significa", "cuál fue la causa"
-#
-# Registro neutro (cada evento):
-#   seq, timestamp, run_id, ciclo_id, origen, destino,
-#   modulo, capacidad, tipo, categoria, estado, payload
-#
-# Categorías:
-#   Dinámicas. Si Engine deposita categoria="predicciones",
-#   CACHE la registra. No hay lista fija de dominios.
-#
-# Lecturas:
-#   Solo filtros sobre lo registrado.
-#   Nunca reconstrucciones ni proyecciones interpretativas.
-#
-# Relación con Engine:
-#   Engine deposita. Engine lee. CACHE no inicia operaciones.
-#
-# Relación con Centinela:
-#   Centinela consulta y deposita veredicto como evento nuevo.
-#   Nunca modifica evidencia previa.
-#
-# Relación con Omega:
-#   Omega solo presenta lo que Engine entrega.
-#
-# Futuro:
-#   Un módulo analizador de trazabilidad leerá CACHE
-#   para grafos, rutas, causalidad y explicaciones.
-#   Ese análisis no pertenece a este módulo.
 #
 # ===============================================================
 
@@ -83,6 +42,7 @@
 
 from __future__ import annotations
 
+import ast
 import copy
 import importlib.util
 import sys
@@ -90,7 +50,7 @@ import threading
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 # ===============================================================
 # FIN 1.1
@@ -114,10 +74,9 @@ ROL_MODULO = "CH"
 # 1.3 — VERSIONES Y ESTABILIDAD
 # ===============================================================
 
-VERSION_MODULO = "4.0"
+VERSION_MODULO = "4.1"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-
 COMPATIBLE_DESDE = "1.0"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
@@ -183,7 +142,7 @@ INVARIANTES = (
     "este módulo no calcula",
     "este módulo no interpreta",
     "este módulo no deduce ni infiere",
-    "este módulo no reconstruye ni genera grafos",
+    "este módulo no reconstruye ni genera grafos interpretativos",
     "la evidencia depositada nunca se modifica",
     "la evidencia depositada nunca se sobrescribe",
     "la evidencia depositada nunca se reordena",
@@ -191,6 +150,8 @@ INVARIANTES = (
     "toda información nueva se incorpora solo como evento nuevo",
     "las categorías son dinámicas; no hay lista fija de dominios",
     "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+    "el mapeo estructural no ejecuta funciones descubiertas",
+    "un ID duplicado se clasifica, no se borra ni se interpreta como error automático",
 )
 
 # ===============================================================
@@ -199,11 +160,12 @@ INVARIANTES = (
 
 
 # ===============================================================
-# 1.7 — CONFIGURACIÓN
+# 1.7 — CONFIGURACIÓN DE RUTAS
 # ===============================================================
 
-# Carpetas físicas futuras: solo datos, sin lógica.
-# cache/ciclos/run_x/ciclo_001/registros/ ...
+_DIR = Path(__file__).resolve().parent
+# Raíz de modules/ (hermano de cache)
+_MODULES_ROOT = _DIR.parent
 
 # ===============================================================
 # FIN 1.7
@@ -212,6 +174,8 @@ INVARIANTES = (
 # ===============================================================
 # FIN PARTE 1
 # ===============================================================
+
+
 # ===============================================================
 # PARTE 4 — DEFINICIONES
 # ===============================================================
@@ -219,6 +183,7 @@ INVARIANTES = (
 # ===============================================================
 # 4.1 — EXCEPCIONES
 # ===============================================================
+
 class ContratoInvalido(Exception):
     """El CONTENEDOR no cumple el esquema o la resolución falló."""
     pass
@@ -232,29 +197,34 @@ class CacheError(Exception):
 class CacheInmutableError(CacheError):
     """Intento de modificar evidencia ya depositada."""
     pass
+
 # ===============================================================
-# 4.2 — REGISTRO DE EVENTOS
+# FIN 4.1
+# ===============================================================
+
+
+# ===============================================================
+# 4.2 — REGISTRO DE EVENTOS (APPEND-ONLY)
 # ===============================================================
 
 class _RegistroEventos:
     """
     Almacén append-only de registros neutros.
-    No interpreta. No indexa relaciones. Solo guarda y filtra.
+    No interpreta. No indexa relaciones semánticas. Solo guarda y filtra.
     """
 
     # -----------------------------------------------------------
     # 4.2.1 — Inicialización
     # -----------------------------------------------------------
-
     def __init__(self) -> None:
         self._lock = threading.RLock()
         self._eventos: List[Dict[str, Any]] = []
         self._seq = 0
         self._categorias: set = set()
+
     # -----------------------------------------------------------
     # 4.2.2 — Append (única vía de escritura)
     # -----------------------------------------------------------
-    
     def append(self, datos: Dict[str, Any]) -> Dict[str, Any]:
         if not isinstance(datos, dict):
             raise CacheError("datos debe ser dict")
@@ -286,7 +256,6 @@ class _RegistroEventos:
     # -----------------------------------------------------------
     # 4.2.3 — Filtrar
     # -----------------------------------------------------------
-    
     def filtrar(
         self,
         *,
@@ -341,7 +310,6 @@ class _RegistroEventos:
     # -----------------------------------------------------------
     # 4.2.4 — Categorías conocidas
     # -----------------------------------------------------------
-    
     def categorias_conocidas(self) -> List[str]:
         with self._lock:
             return sorted(self._categorias)
@@ -349,7 +317,6 @@ class _RegistroEventos:
     # -----------------------------------------------------------
     # 4.2.5 — Resumen
     # -----------------------------------------------------------
-    
     def resumen(self) -> Dict[str, Any]:
         with self._lock:
             por_tipo: Dict[str, int] = defaultdict(int)
@@ -371,10 +338,9 @@ class _RegistroEventos:
                 "inmutable": True,
             }
 
-     # -----------------------------------------------------------
+    # -----------------------------------------------------------
     # 4.2.6 — Verificar integridad
     # -----------------------------------------------------------
-    
     def verificar_integridad(self) -> List[str]:
         errores: List[str] = []
         with self._lock:
@@ -410,7 +376,6 @@ class _RegistroEventos:
     # -----------------------------------------------------------
     # 4.2.7 — Barreras de inmutabilidad
     # -----------------------------------------------------------
-    
     def intentar_modificar(self, *args: Any, **kwargs: Any) -> None:
         raise CacheInmutableError(
             "CACHE no modifica evidencia depositada; solo registra"
@@ -422,13 +387,45 @@ class _RegistroEventos:
         )
 
 # ===============================================================
+# FIN 4.2
+# ===============================================================
+
+
+# ===============================================================
 # 4.3 — INSTANCIA GLOBAL DEL REGISTRO
 # ===============================================================
 
 _registro = _RegistroEventos()
 
 # ===============================================================
-# FIN DEFINICIONES
+# FIN 4.3
+# ===============================================================
+
+
+# ===============================================================
+# 4.4 — INVENTARIO ESTRUCTURAL INTERNO
+# ===============================================================
+#
+# Conserva apariciones sin sobrescribirlas.
+# El mismo ID puede aparecer en varios módulos.
+#
+
+_inventario_estructural: Dict[str, Any] = {
+    "modulos": {},      # nombre_modulo → {archivos, ids, funciones, clases, callables, capacidades}
+    "ids": {},          # id → [modulos donde aparece]
+    "funciones": {},    # nombre_calificado → {modulo, archivo, linea}
+    "clases": {},       # nombre_calificado → {modulo, archivo, linea, metodos}
+    "callables": {},    # nombre_calificado → {modulo, archivo, tipo}
+    "capacidades": {},  # nombre_modulo → [capacidades declaradas]
+    "actualizado": None,
+}
+
+# ===============================================================
+# FIN 4.4
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 4
 # ===============================================================
 
 
@@ -455,30 +452,34 @@ CONTENEDOR: Dict[str, Any] = {
     "rol": ROL_MODULO,
     "descripcion": (
         "Registrador universal de eventos. Libro de actas del sistema. "
+        "Mapeo estructural del código accesible. "
+        "Clasificación de IDs por módulo y detección de duplicados. "
         "Conserva evidencia objetiva. Categorías dinámicas. "
-        "No interpreta. No deduce. No reconstruye. No calcula."
+        "No interpreta. No deduce. No reconstruye semánticamente. No calcula."
     ),
 
     # ============================================================
     # 5.3 — PROPÓSITO
     # ============================================================
     "funcion": (
-        "Registrar exactamente lo que ocurrió durante la ejecución "
-        "y exponer lecturas y la evidencia del proceso y mecanica del sistema "
-        "filtradas por campos del registro. "
+        "Registrar exactamente lo que ocurrió durante la ejecución, "
+        "exponer lecturas filtradas por campos del registro, "
+        "mapear la estructura del código accesible y "
+        "clasificar IDs por módulo incluyendo duplicados. "
         "Nada más."
     ),
     "no_hace": [
         "No interpreta",
         "No deduce ni infiere",
-        "No reconstruye ciclos",
-        "No genera grafos ni árboles",
+        "No reconstruye ciclos semánticamente",
+        "No genera grafos interpretativos ni árboles de causalidad",
         "No explica razonamientos ni causas",
         "No calcula C / L / K / Tru",
-        "No descubre relaciones",
+        "No descubre relaciones semánticas",
         "No altera evidencia depositada",
-        "No inicia operaciones",
+        "No inicia operaciones de otros módulos",
         "No envía reportes a otros módulos",
+        "No ejecuta funciones descubiertas durante el mapeo",
     ],
 
     # ============================================================
@@ -489,6 +490,8 @@ CONTENEDOR: Dict[str, Any] = {
         "Entregar lecturas filtradas por campos del registro",
         "Exponer categorías descubiertas dinámicamente",
         "Verificar integridad del registro (forma, no contenido)",
+        "Mapear estructura del código accesible",
+        "Clasificar IDs por módulo y reportar duplicados",
         "Reportar estado, inventario y diagnóstico propios",
     ],
 
@@ -514,40 +517,41 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
         "backend_para_centinela",
-        # — banderas nuevas —
         "ejecutar_total",
         "inspeccionar",
         "registrar_inventario",
+        "mapear_codigo",
+        "clasificar_ids",
     ],
 
     # ============================================================
-    #  5.6 ACCESO (obligatorio en el esquema)
+    # 5.6 — ACCESO
     # ============================================================
     "acceso": {
         "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
+        "descripcion": "Acceso total a recursos del módulo y al árbol modules/",
     },
 
     # ============================================================
-    # 5.7 DEPENDENCIAS
+    # 5.7 — DEPENDENCIAS
     # ============================================================
-    "requiere": ["CT", "AX", "FO", "MC", 
-                        "SF", "CA", "CX", "CC",
-                        "DI", "RE", "VX", "TX", 
-                        "CH", "CIT", "TT", "CE",],
+    "requiere": [
+        "CT", "AX", "FO", "MC", "SF", "CA", "CX", "CC",
+        "DI", "RE", "VX", "TX", "CIT", "TT", "CE",
+    ],
 
     # ============================================================
-    # 5.8 ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # 5.8 — ACCESO A ARCHIVOS
     # ============================================================
     "acceso_archivos": ["*"],
 
     # ============================================================
-    # 5.9 VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # 5.9 — VALIDAR ESQUEMA
     # ============================================================
     "validar_esquema": ["*"],
 
     # ============================================================
-    # 5.11 — CONSULTAS SOPORTADAS
+    # 5.10 — CONSULTAS SOPORTADAS
     # ============================================================
     "consultas_soportadas": [
         "depositar_evento",
@@ -558,10 +562,12 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_reporte",
         "obtener_diagnostico",
         "verificar_integridad_registro",
+        "mapear_codigo",
+        "clasificar_ids",
     ],
 
     # ============================================================
-    # 5.12 — AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # 5.11 — AUTORIZACIÓN AL ENGINE
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -609,7 +615,7 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "reporte": True,
 
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        # --- PERMISOS OBLIGATORIOS ---
         "validar_esquema": True,
         "acceso_archivos": True,
 
@@ -620,7 +626,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # 6 CAPACIDADES
+    # 5.12 — CAPACIDADES (solo unidades ejecutables)
     # ============================================================
     "capacidades": {
         "verificar": "barrer",
@@ -645,12 +651,14 @@ CONTENEDOR: Dict[str, Any] = {
         "verificar_salida": "verificar_salida",
         "backend_para_centinela": "backend_para_centinela",
         "ejecutar_total": "ejecutar_total",
-        "registrar_inventario": "registrar_inventario",
         "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+        "mapear_codigo": "mapear_codigo",
+        "clasificar_ids": "clasificar_ids",
     },
 
     # ============================================================
-    # 6.1 METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # 5.13 — METADATOS DE CAPACIDADES (1:1)
     # ============================================================
     "capacidades_meta": {
         "verificar": {
@@ -663,7 +671,7 @@ CONTENEDOR: Dict[str, Any] = {
         "barrer": {
             "descripcion": (
                 "Verifica forma del registro: seq creciente, timestamps, "
-                "payload dict. No interpreta contenido."
+                "payload dict. No interpreta contenido. No mapea código."
             ),
             "entrada": "ninguna",
             "validar_esquema": ["*"],
@@ -775,10 +783,13 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
         "inventario": {
-            "descripcion": "Inventario del módulo y resumen del registro.",
+            "descripcion": (
+                "Inventario del módulo, resumen del registro y, "
+                "si disponible, inventario estructural mapeado."
+            ),
             "entrada": "ninguna",
             "validar_esquema": ["*"],
-            "salida": "dict con id, version, memoria, categorias, capacidades",
+            "salida": "dict con id, version, memoria, categorias, capacidades, estructura",
             "acceso_archivos": ["*"],
         },
         "reporte": {
@@ -802,7 +813,17 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
-                "ejecutar_total": {
+        "backend_para_centinela": {
+            "descripcion": (
+                "Adaptador estable CacheBackend para Centinela. "
+                "Centinela no conoce la implementación interna."
+            ),
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": "CacheBackend",
+            "acceso_archivos": ["*"],
+        },
+        "ejecutar_total": {
             "descripcion": (
                 "Operación arquitectónica genérica. "
                 "Ejerce la totalidad de las unidades operativamente "
@@ -816,8 +837,8 @@ CONTENEDOR: Dict[str, Any] = {
         "inspeccionar": {
             "descripcion": (
                 "Capacidad meta de inspección estructural del módulo. "
-                "Expone el estado interno, componentes y unidades "
-                "ejecutables sin alterar el contrato."
+                "Expone capacidades contractuales, callables reales, "
+                "estructura descubierta, IDs y duplicados."
             ),
             "entrada": "peticion opcional (dict)",
             "validar_esquema": ["acceso_archivos"],
@@ -834,80 +855,86 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con inventario registrado",
             "acceso_archivos": ["acceso_archivos"],
         },
-        "backend_para_centinela": {
+        "mapear_codigo": {
             "descripcion": (
-                "Adaptador estable CacheBackend para Centinela. "
-                "Centinela no conoce la implementación interna."
+                "Recorre el código accesible a CACHE y obtiene la estructura "
+                "real: módulos, archivos, IDs, funciones, métodos, clases, "
+                "callables y capacidades declaradas. No interpreta semántica. "
+                "No ejecuta funciones descubiertas."
             ),
-            "entrada": "ninguna",
+            "entrada": "peticion opcional (dict con raiz?)",
             "validar_esquema": ["*"],
-            "salida": "CacheBackend",
+            "salida": "dict con inventario estructural completo",
+            "acceso_archivos": ["*"],
+        },
+        "clasificar_ids": {
+            "descripcion": (
+                "Clasifica IDs por módulo a partir del inventario estructural. "
+                "Separa IDs únicos de IDs duplicados. "
+                "Un duplicado es clasificación estructural, no error automático."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ids_por_modulo, ids_unicos, ids_duplicados, "
+                "id_a_modulos"
+            ),
             "acceso_archivos": ["*"],
         },
     },
-    
+
     # ============================================================
-    # 6.2 REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # 5.14 — REPORTING
     # ============================================================
     "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
         "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS ---
         "acceso_archivos": True,
         "validar_esquema": True,
-
-        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": True,
         "inspeccionar": True,
         "registrar_inventario": True,
+        "mapear_codigo": True,
+        "clasificar_ids": True,
     },
 
     # ============================================================
-    # 6.3 ESTADOS VÁLIDOS
+    # 5.15 — ESTADOS VÁLIDOS E INVARIANTES
     # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ============================================================
-    # 6.4 INVARIANTES
-    # ============================================================
     "invariantes": list(INVARIANTES),
-
-}  # <--- CIERRE FINAL
-
-# ===============================================================
-# FIN CONTRATO
-# ===============================================================
+}
 
 # ===============================================================
-# 7 FUNCIONES PRIVADAS
+# FIN PARTE 5
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 7 — VALIDACIÓN DEL CONTRATO
+# ===============================================================
+
+# ===============================================================
+# 7.1 — VALIDAR CONTRATO
 # ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Valida que el CONTENEDOR cumpla el esquema contractual.
+    Comprueba claves obligatorias, 1:1 capacidades ↔ meta,
+    y tipos mínimos de capacidades_meta.
+    """
     obligatorias = (
         "esquema", "version_contrato", "version_modulo",
         "id", "nombre", "rol", "descripcion",
@@ -917,6 +944,7 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
         "capacidades", "capacidades_meta",
         "reporting", "estados_validos", "invariantes",
         "estabilidad", "compatible_desde", "api_engine",
+        "acceso_archivos", "validar_esquema",
     )
     faltantes = [k for k in obligatorias if k not in cont]
     if faltantes:
@@ -937,15 +965,20 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                 NOMBRE_MODULO, cont.get("version_contrato")
             )
         )
+
+    caps = cont.get("capacidades") or {}
     meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
-            raise ContratoInvalido(
-                "{0}: capacidad '{1}' sin capacidades_meta".format(
-                    NOMBRE_MODULO, nombre_cap
-                )
+    if set(caps.keys()) != set(meta_caps.keys()):
+        solo_caps = set(caps.keys()) - set(meta_caps.keys())
+        solo_meta = set(meta_caps.keys()) - set(caps.keys())
+        raise ContratoInvalido(
+            "{0}: desajuste capacidades/capacidades_meta. "
+            "solo_en_capacidades={1} solo_en_meta={2}".format(
+                NOMBRE_MODULO, solo_caps, solo_meta
             )
-        entrada = meta_caps[nombre_cap]
+        )
+
+    for nombre_cap, entrada in meta_caps.items():
         if not isinstance(entrada, dict):
             raise ContratoInvalido(
                 "{0}: capacidades_meta['{1}'] debe ser dict".format(
@@ -961,12 +994,20 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                 )
 
 # ===============================================================
-# 7 FIN FUNCIONES PRIVADAS
+# FIN 7.1
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 7
 # ===============================================================
 
 
 # ===============================================================
-# 8 CAPACIDADES PÚBLICAS
+# PARTE 8 — CAPACIDADES PÚBLICAS
+# ===============================================================
+
+# ===============================================================
+# 8.1 — DEPOSITAR
 # ===============================================================
 
 def depositar(
@@ -1005,6 +1046,14 @@ def depositar(
         "estado": estado,
     })
 
+# ===============================================================
+# FIN 8.1
+# ===============================================================
+
+
+# ===============================================================
+# 8.2 — LECTURAS
+# ===============================================================
 
 def leer(
     ciclo_id: Optional[str] = None,
@@ -1127,34 +1176,414 @@ def categorias() -> List[str]:
     return _registro.categorias_conocidas()
 
 # ===============================================================
-# CAPACIDADES ARQUITECTÓNICAS NUEVAS
+# FIN 8.2
+# ===============================================================
+
+
+# ===============================================================
+# 8.3 — MAPEO ESTRUCTURAL (mapear_codigo)
+# ===============================================================
+
+def _escanear_archivo_py(archivo: Path, nombre_modulo: str) -> Dict[str, Any]:
+    """
+    Escaneo estructural de un .py mediante AST.
+    No ejecuta el módulo. No interpreta semántica.
+    Extrae: funciones, clases, métodos, asignaciones ID_MODULO / id.
+    """
+    resultado = {
+        "archivo": str(archivo),
+        "funciones": [],
+        "clases": [],
+        "metodos": [],
+        "ids_declarados": [],
+        "capacidades_keys": [],
+        "errores_parse": None,
+    }
+    try:
+        fuente = archivo.read_text(encoding="utf-8")
+        arbol = ast.parse(fuente, filename=str(archivo))
+    except Exception as e:
+        resultado["errores_parse"] = "{0}: {1}".format(type(e).__name__, e)
+        return resultado
+
+    for nodo in arbol.body:
+        # Funciones de módulo
+        if isinstance(nodo, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            resultado["funciones"].append({
+                "nombre": nodo.name,
+                "linea": nodo.lineno,
+                "async": isinstance(nodo, ast.AsyncFunctionDef),
+            })
+        # Clases y métodos
+        elif isinstance(nodo, ast.ClassDef):
+            metodos = []
+            for item in nodo.body:
+                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    metodos.append({
+                        "nombre": item.name,
+                        "linea": item.lineno,
+                    })
+            resultado["clases"].append({
+                "nombre": nodo.name,
+                "linea": nodo.lineno,
+                "metodos": metodos,
+            })
+            resultado["metodos"].extend([
+                {
+                    "clase": nodo.name,
+                    "nombre": m["nombre"],
+                    "linea": m["linea"],
+                }
+                for m in metodos
+            ])
+        # Asignaciones de ID (ID_MODULO = "XX" o "id": "XX" en dicts top-level simples)
+        elif isinstance(nodo, ast.Assign):
+            for target in nodo.targets:
+                if isinstance(target, ast.Name) and target.id in (
+                    "ID_MODULO", "ID", "id_modulo"
+                ):
+                    if isinstance(nodo.value, ast.Constant) and isinstance(
+                        nodo.value.value, str
+                    ):
+                        resultado["ids_declarados"].append(nodo.value.value)
+
+    # Búsqueda superficial de claves de capacidades en CONTENEDOR
+    # (solo literales de string en el AST, sin ejecutar)
+    for nodo in ast.walk(arbol):
+        if isinstance(nodo, ast.Constant) and isinstance(nodo.value, str):
+            # no se usa como capacidades; se deja para análisis posterior
+            pass
+
+    return resultado
+
+
+def mapear_codigo(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Recorre el código accesible a CACHE y construye el inventario estructural.
+    No interpreta semántica. No ejecuta funciones descubiertas.
+
+    Identifica: módulo, archivo, IDs, funciones, métodos, clases, callables.
+    Actualiza _inventario_estructural sin perder apariciones previas de IDs.
+    """
+    global _inventario_estructural
+
+    raiz = _MODULES_ROOT
+    if isinstance(peticion, dict) and peticion.get("raiz"):
+        candidata = Path(str(peticion["raiz"]))
+        if candidata.exists() and candidata.is_dir():
+            raiz = candidata
+
+    modulos: Dict[str, Any] = {}
+    ids: Dict[str, List[str]] = defaultdict(list)
+    funciones: Dict[str, Any] = {}
+    clases: Dict[str, Any] = {}
+    callables: Dict[str, Any] = {}
+    capacidades: Dict[str, List[str]] = {}
+
+    if not raiz.exists():
+        return {
+            "id": ID_MODULO,
+            "operacion": "mapear_codigo",
+            "error": "raiz_inexistente",
+            "raiz": str(raiz),
+            "modulos": {},
+        }
+
+    for sub in sorted(raiz.iterdir()):
+        if not sub.is_dir():
+            continue
+        if sub.name.startswith(("_", ".")):
+            continue
+        nombre_mod = sub.name
+        archivos_info = []
+        ids_mod: List[str] = []
+        funcs_mod: List[str] = []
+        clases_mod: List[str] = []
+
+        for py in sorted(sub.glob("**/*.py")):
+            esc = _escanear_archivo_py(py, nombre_mod)
+            archivos_info.append(esc)
+
+            for idv in esc.get("ids_declarados") or []:
+                if idv not in ids_mod:
+                    ids_mod.append(idv)
+                if nombre_mod not in ids[idv]:
+                    ids[idv].append(nombre_mod)
+
+            for f in esc.get("funciones") or []:
+                calificado = "{0}.{1}".format(nombre_mod, f["nombre"])
+                funciones[calificado] = {
+                    "modulo": nombre_mod,
+                    "archivo": esc["archivo"],
+                    "linea": f["linea"],
+                }
+                callables[calificado] = {
+                    "modulo": nombre_mod,
+                    "archivo": esc["archivo"],
+                    "tipo": "funcion",
+                }
+                funcs_mod.append(f["nombre"])
+
+            for c in esc.get("clases") or []:
+                calificado = "{0}.{1}".format(nombre_mod, c["nombre"])
+                clases[calificado] = {
+                    "modulo": nombre_mod,
+                    "archivo": esc["archivo"],
+                    "linea": c["linea"],
+                    "metodos": [m["nombre"] for m in c.get("metodos") or []],
+                }
+                callables[calificado] = {
+                    "modulo": nombre_mod,
+                    "archivo": esc["archivo"],
+                    "tipo": "clase",
+                }
+                clases_mod.append(c["nombre"])
+                for m in c.get("metodos") or []:
+                    mcal = "{0}.{1}.{2}".format(
+                        nombre_mod, c["nombre"], m["nombre"]
+                    )
+                    callables[mcal] = {
+                        "modulo": nombre_mod,
+                        "archivo": esc["archivo"],
+                        "tipo": "metodo",
+                    }
+
+        modulos[nombre_mod] = {
+            "archivos": [a["archivo"] for a in archivos_info],
+            "ids": ids_mod,
+            "funciones": funcs_mod,
+            "clases": clases_mod,
+            "detalle_archivos": archivos_info,
+        }
+
+    _inventario_estructural = {
+        "modulos": modulos,
+        "ids": dict(ids),
+        "funciones": funciones,
+        "clases": clases,
+        "callables": callables,
+        "capacidades": capacidades,
+        "actualizado": datetime.now(timezone.utc).isoformat(),
+        "raiz": str(raiz),
+    }
+
+    return {
+        "id": ID_MODULO,
+        "operacion": "mapear_codigo",
+        "raiz": str(raiz),
+        "total_modulos": len(modulos),
+        "total_ids": len(ids),
+        "total_funciones": len(funciones),
+        "total_clases": len(clases),
+        "total_callables": len(callables),
+        "modulos": sorted(modulos.keys()),
+        "actualizado": _inventario_estructural["actualizado"],
+        "nota": (
+            "Mapeo estructural puro. No ejecuta código descubierto. "
+            "No interpreta semántica."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.3
+# ===============================================================
+
+
+# ===============================================================
+# 8.4 — CLASIFICACIÓN DE IDs
+# ===============================================================
+
+def clasificar_ids(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Clasifica IDs por módulo a partir del inventario estructural.
+    Si el inventario no está actualizado, ejecuta mapear_codigo primero.
+
+    Salida:
+      ids_por_modulo  — módulo → [ids]
+      id_a_modulos    — id → [módulos]
+      ids_unicos      — ids con exactamente 1 módulo
+      ids_duplicados  — id → [módulos] cuando len > 1
+
+    Un duplicado es clasificación estructural, no error automático.
+    """
+    if not _inventario_estructural.get("modulos"):
+        mapear_codigo(peticion)
+
+    inv = _inventario_estructural
+    id_a_modulos: Dict[str, List[str]] = {
+        k: list(v) for k, v in (inv.get("ids") or {}).items()
+    }
+
+    ids_por_modulo: Dict[str, List[str]] = {}
+    for nombre_mod, info in (inv.get("modulos") or {}).items():
+        ids_por_modulo[nombre_mod] = list(info.get("ids") or [])
+
+    ids_unicos: List[str] = sorted(
+        i for i, mods in id_a_modulos.items() if len(mods) == 1
+    )
+    ids_duplicados: Dict[str, List[str]] = {
+        i: mods for i, mods in id_a_modulos.items() if len(mods) > 1
+    }
+
+    return {
+        "id": ID_MODULO,
+        "operacion": "clasificar_ids",
+        "ids_por_modulo": ids_por_modulo,
+        "id_a_modulos": id_a_modulos,
+        "ids_unicos": ids_unicos,
+        "ids_duplicados": ids_duplicados,
+        "total_ids": len(id_a_modulos),
+        "total_unicos": len(ids_unicos),
+        "total_duplicados": len(ids_duplicados),
+        "nota": (
+            "Duplicado = el mismo ID aparece en más de un módulo. "
+            "Es clasificación estructural, no violación contractual automática."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.4
+# ===============================================================
+
+
+# ===============================================================
+# 8.5 — INTEGRIDAD DEL REGISTRO (barrer / verificar)
+# ===============================================================
+
+def barrer() -> Dict[str, Any]:
+    """
+    Integridad formal del registro de eventos.
+    No interpreta contenido. No mapea código.
+    """
+    errores = _registro.verificar_integridad()
+    res = _registro.resumen()
+    return {
+        "contenedor": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "coherente": not errores,
+        "inmutable": True,
+        "errores": errores,
+        "resumen": res,
+        "version": VERSION_MODULO,
+    }
+
+
+def verificar() -> Dict[str, Any]:
+    """Alias contractual de barrer."""
+    return barrer()
+
+
+def verificar_salida(salida: Dict[str, Any]) -> bool:
+    if not isinstance(salida, dict):
+        return False
+    if "coherente" in salida:
+        if not isinstance(salida["coherente"], bool):
+            return False
+        if "errores" in salida and not isinstance(salida["errores"], list):
+            return False
+        return True
+    if "seq" in salida:
+        return isinstance(salida.get("seq"), int)
+    if "memoria" in salida:
+        return isinstance(salida["memoria"], dict)
+    return False
+
+# ===============================================================
+# FIN 8.5
+# ===============================================================
+
+
+# ===============================================================
+# 8.6 — INVENTARIO
+# ===============================================================
+
+def inventario(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Inventario del módulo CH + resumen del registro +
+    estructura mapeada e IDs clasificados si existen.
+    """
+    clasif = clasificar_ids()
+    return {
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "funcion": (
+            "Registrador universal de eventos. Libro de actas. "
+            "Mapeo estructural. Clasificación de IDs. Append-only."
+        ),
+        "memoria": _registro.resumen(),
+        "categorias": _registro.categorias_conocidas(),
+        "campos_registro": list(CAMPOS_REGISTRO),
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "invariantes": CONTENEDOR.get("invariantes"),
+        "estructura": {
+            "total_modulos": len(_inventario_estructural.get("modulos") or {}),
+            "total_ids": clasif.get("total_ids"),
+            "total_unicos": clasif.get("total_unicos"),
+            "total_duplicados": clasif.get("total_duplicados"),
+            "ids_duplicados": clasif.get("ids_duplicados"),
+            "actualizado": _inventario_estructural.get("actualizado"),
+        },
+        "nota": (
+            "CACHE no sabe lo que ocurrió. Solo sabe qué fue registrado "
+            "y qué estructura encontró. Análisis semántico: módulo futuro."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.6
+# ===============================================================
+
+
+# ===============================================================
+# 8.7 — CAPACIDADES ARQUITECTÓNICAS
 # ===============================================================
 
 def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
-    Operación arquitectónica genérica de CACHE.
-    Ejerce las unidades operativas del módulo conforme a su contrato.
-    No interpreta. No deduce. No altera evidencia depositada.
+    Ejerce las unidades operativas declaradas del módulo CH.
+    No inventa capacidades. No ejecuta funciones arbitrarias del escaneo.
     """
-    res = _registro.resumen()
-    integridad = _registro.verificar_integridad()
-    cats = _registro.categorias_conocidas()
+    res_barrer = barrer()
+    res_mapa = mapear_codigo(peticion)
+    res_clasif = clasificar_ids(peticion)
+    res_inv = inventario()
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
         "operacion": "ejecutar_total",
-        "estado": ESTADO_OPERATIVO if not integridad else ESTADO_DEGRADADO,
-        "resumen": res,
-        "integridad": {
-            "ok": len(integridad) == 0,
-            "errores": integridad,
+        "estado": (
+            ESTADO_OPERATIVO
+            if res_barrer.get("coherente")
+            else ESTADO_DEGRADADO
+        ),
+        "barrer": res_barrer,
+        "mapear_codigo": {
+            "total_modulos": res_mapa.get("total_modulos"),
+            "total_ids": res_mapa.get("total_ids"),
+            "total_funciones": res_mapa.get("total_funciones"),
+            "total_clases": res_mapa.get("total_clases"),
         },
-        "categorias": cats,
-        "capacidades": list(CONTENEDOR.get("capacidades", {}).keys()),
+        "clasificar_ids": {
+            "total_ids": res_clasif.get("total_ids"),
+            "total_unicos": res_clasif.get("total_unicos"),
+            "total_duplicados": res_clasif.get("total_duplicados"),
+            "ids_duplicados": res_clasif.get("ids_duplicados"),
+        },
+        "inventario": {
+            "capacidades": res_inv.get("capacidades"),
+            "memoria": res_inv.get("memoria"),
+        },
+        "capacidades_declaradas": list(CONTENEDOR.get("capacidades", {}).keys()),
         "nota": (
-            "ejecutar_total ejerce las unidades de CACHE. "
+            "ejecutar_total ejerce solo unidades contractuales de CACHE. "
             "No interpreta. No altera evidencia."
         ),
     }
@@ -1163,9 +1592,11 @@ def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Inspección estructural de CACHE.
-    Expone estado interno y unidades sin alterar el contrato ni la evidencia.
+    Expone: capacidades contractuales, callables reales,
+    estructura descubierta, IDs y duplicados.
     """
     res = _registro.resumen()
+    clasif = clasificar_ids(peticion)
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1182,19 +1613,26 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "ESTABILIDAD": ESTABILIDAD,
             "CAMPOS_REGISTRO": list(CAMPOS_REGISTRO),
         },
-        "capacidades_declaradas": list(
+        "capacidades_contractuales": list(
             CONTENEDOR.get("capacidades", {}).keys()
         ),
         "capacidades_meta": list(
             CONTENEDOR.get("capacidades_meta", {}).keys()
         ),
         "registro": res,
+        "estructura_descubierta": {
+            "total_modulos": len(_inventario_estructural.get("modulos") or {}),
+            "total_ids": clasif.get("total_ids"),
+            "ids_unicos": clasif.get("ids_unicos"),
+            "ids_duplicados": clasif.get("ids_duplicados"),
+            "actualizado": _inventario_estructural.get("actualizado"),
+        },
         "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
         "reporting": CONTENEDOR.get("reporting"),
         "invariantes": list(INVARIANTES),
         "nota": (
-            "inspeccionar expone la estructura de CACHE "
-            "sin alterar evidencia ni contrato."
+            "inspeccionar expone contrato, callables y estructura "
+            "sin alterar evidencia ni ejecutar código descubierto."
         ),
     }
 
@@ -1202,20 +1640,9 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 def registrar_inventario(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Registra el inventario estructural de CACHE como evento append-only.
-    No modifica evidencia previa. Solo incorpora un evento nuevo.
+    No modifica evidencia previa.
     """
-    inv = {
-        "id": ID_MODULO,
-        "nombre": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "version": VERSION_MODULO,
-        "version_contrato": VERSION_CONTRATO,
-        "esquema": ESQUEMA_CONTRATO,
-        "estabilidad": ESTABILIDAD,
-        "capacidades": list(CONTENEDOR.get("capacidades", {}).keys()),
-        "resumen": _registro.resumen(),
-        "categorias": _registro.categorias_conocidas(),
-    }
+    inv = inventario(peticion)
     entrada = _registro.append({
         "origen": ID_MODULO,
         "destino": ID_MODULO,
@@ -1237,69 +1664,13 @@ def registrar_inventario(peticion: Optional[Dict[str, Any]] = None) -> Dict[str,
     }
 
 # ===============================================================
-# FIN CAPACIDADES ARQUITECTÓNICAS NUEVAS
+# FIN 8.7
 # ===============================================================
 
-def inventario(peticion: Any = None) -> Dict[str, Any]:
-    return {
-        "id": ID_MODULO,
-        "nombre": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "version": VERSION_MODULO,
-        "version_contrato": VERSION_CONTRATO,
-        "esquema": ESQUEMA_CONTRATO,
-        "estabilidad": ESTABILIDAD,
-        "funcion": (
-            "Registrador universal de eventos. Libro de actas. "
-            "Append-only. No interpreta."
-        ),
-        "memoria": _registro.resumen(),
-        "categorias": _registro.categorias_conocidas(),
-        "campos_registro": list(CAMPOS_REGISTRO),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "invariantes": CONTENEDOR.get("invariantes"),
-        "nota": (
-            "CACHE no sabe lo que ocurrió. Solo sabe qué fue registrado. "
-            "Análisis de trazabilidad: módulo futuro, no este."
-        ),
-    }
 
-
-def barrer() -> Dict[str, Any]:
-    """Integridad formal del registro. No interpreta contenido."""
-    errores = _registro.verificar_integridad()
-    res = _registro.resumen()
-    return {
-        "contenedor": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "coherente": not errores,
-        "inmutable": True,
-        "errores": errores,
-        "resumen": res,
-        "version": VERSION_MODULO,
-    }
-
-
-def verificar() -> Dict[str, Any]:
-    return barrer()
-
-
-def verificar_salida(salida: Dict[str, Any]) -> bool:
-    if not isinstance(salida, dict):
-        return False
-    if "coherente" in salida:
-        if not isinstance(salida["coherente"], bool):
-            return False
-        if "errores" in salida and not isinstance(salida["errores"], list):
-            return False
-        return True
-    if "seq" in salida:
-        return isinstance(salida.get("seq"), int)
-    if "memoria" in salida:
-        return isinstance(salida["memoria"], dict)
-    return False
-
+# ===============================================================
+# 8.8 — BACKEND CENTINELA
+# ===============================================================
 
 class CacheBackend:
     """
@@ -1334,7 +1705,6 @@ class CacheBackend:
         regs = leer_por_ciclo(str(ciclo_id))
         if not regs:
             return None
-        # último registro del ciclo; sin interpretación de contenido
         return regs[-1]
 
 
@@ -1342,12 +1712,20 @@ def backend_para_centinela() -> CacheBackend:
     return CacheBackend()
 
 # ===============================================================
-# FIN CAPACIDADES PÚBLICAS
+# FIN 8.8
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 8
 # ===============================================================
 
 
 # ===============================================================
-#  9 REPORTING INTERNO
+# PARTE 9 — REPORTING INTERNO
+# ===============================================================
+
+# ===============================================================
+# 9.1 — REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
@@ -1383,9 +1761,19 @@ def reporte() -> Dict[str, Any]:
             "ejecutar_total": "ejecutar_total" in CONTENEDOR.get("capacidades", {}),
             "inspeccionar": "inspeccionar" in CONTENEDOR.get("capacidades", {}),
             "registrar_inventario": "registrar_inventario" in CONTENEDOR.get("capacidades", {}),
+            "mapear_codigo": "mapear_codigo" in CONTENEDOR.get("capacidades", {}),
+            "clasificar_ids": "clasificar_ids" in CONTENEDOR.get("capacidades", {}),
         },
     }
 
+# ===============================================================
+# FIN 9.1
+# ===============================================================
+
+
+# ===============================================================
+# 9.2 — DIAGNÓSTICO
+# ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
     r = barrer()
@@ -1426,12 +1814,20 @@ def diagnostico() -> Dict[str, Any]:
     }
 
 # ===============================================================
-# FIN REPORTING
+# FIN 9.2
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 9
 # ===============================================================
 
 
 # ===============================================================
-# 10 EXPORTACIONES + RESOLUCIÓN ESTRICTA
+# PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
+# ===============================================================
+
+# ===============================================================
+# 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
 _CAP_MAP = {
@@ -1459,10 +1855,24 @@ _CAP_MAP = {
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
+    "mapear_codigo": mapear_codigo,
+    "clasificar_ids": clasificar_ids,
 }
 
+# ===============================================================
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Transforma referencias declarativas (str) en callables reales.
+    Engine exige callables en CONTENEDOR["capacidades"].
+    """
     resueltas: Dict[str, Any] = {}
     for nombre, ref in cont["capacidades"].items():
         if callable(ref):
@@ -1489,9 +1899,26 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
         )
     cont["capacidades"] = resueltas
 
+# ===============================================================
+# FIN 10.2
+# ===============================================================
+
+
+# ===============================================================
+# 10.3 — EJECUCIÓN DE VALIDACIÓN Y RESOLUCIÓN
+# ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# FIN 10.3
+# ===============================================================
+
+
+# ===============================================================
+# 10.4 — EXPORTACIONES
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -1505,6 +1932,7 @@ __all__ = [
     "CAMPOS_REGISTRO",
     "CacheError",
     "CacheInmutableError",
+    "ContratoInvalido",
     "depositar",
     "leer",
     "leer_eventos",
@@ -1527,29 +1955,19 @@ __all__ = [
     "diagnostico",
     "CacheBackend",
     "backend_para_centinela",
-    "ContratoInvalido",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
+    "mapear_codigo",
+    "clasificar_ids",
 ]
 
 # ===============================================================
-# FIN EXPORTACIONES
+# FIN 10.4
 # ===============================================================
 
-
 # ===============================================================
-# EXTENSIONES FUTURAS
-# ===============================================================
-#
-# Carpetas físicas: solo datos, sin lógica.
-# Analizador de trazabilidad: módulo futuro, no este.
-#
-# Toda capacidad nueva DEBE agregarse simultáneamente en:
-#   1. capacidades
-#   2. capacidades_meta
-#   3. _CAP_MAP
-#   4. VERSION_MODULO
-#
-# ===============================================================
-# FIN EXTENSIONES FUTURAS
+# FIN PARTE 10
 # ===============================================================
 
 

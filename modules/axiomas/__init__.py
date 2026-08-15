@@ -502,7 +502,7 @@ CONTENEDOR: Dict[str, Any] = {
         "resolver": "resolver",
         "ejecutar": "ejecutar",
     },
-}
+
 
 
     # ============================================================

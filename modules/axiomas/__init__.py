@@ -1727,6 +1727,7 @@ _CAP_MAP = {
     "buscar_por_id": buscar_por_id,
     "verificar": verificar,
     "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
 }
 
 

@@ -304,9 +304,7 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_diagnostico",
         "verificar_coherencia",
         "ids_dominio_k_o",
-        "recolectar","ejecutar_total",
-        "inspeccionar",
-        "registrar_inventario",
+        "recolectar",
     ],
 
     # ============================================================
@@ -326,12 +324,9 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": "reporte",
         "diagnostico": "diagnostico",
         "buscar_por_id": "buscar_por_id",
-        "ejecutar_total": "ejecutar_total",
-        "inspeccionar": "inspeccionar",
-        "registrar_inventario": "registrar_inventario",
     },
 
-    ============================================================
+    # ============================================================
     # METADATOS DE CAPACIDADES (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "capacidades_meta": {
@@ -426,6 +421,17 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict de la declaración o None",
             "acceso_archivos": ["acceso_archivos"],                                    # ← AGREGADA
         },
+        "inventario": {
+            "descripcion": (
+                "Garantiza la enumeración de lo que existe en el módulo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, version, reglas_internas, modos, "
+                "estados, capacidades, inventario_total"
+            ),
+            "acceso_archivos": ["*"],
         },
         "ejecutar": {
             "descripcion": (
@@ -464,46 +470,7 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
     },
-
-    # ============================================================
-    # 5.14 — INVENTARIO Y EJECUCIÓN TOTAL
-    # ============================================================
-    "inventario_total": {
-        "modo": "completo",
-        "incluye": [
-            "archivos",
-            "modulos",
-            "funciones",
-            "clases",
-            "constantes",
-            "excepciones",
-            "reglas",
-            "clasificadores",
-            "validadores",
-            "capacidades",
-            "componentes",
-        ],
-        "descubrimiento": "dinamico",
-        "incluye_no_declarados": True,
-    },
-    "ejecucion": {
-        "modo": "total",
-        "incluye_capacidades_declaradas": True,
-        "incluye_componentes_ejecutables_descubiertos": True,
-        "respeta_contrato": True,
-        "respeta_leyes_internas": True,
-        "ejecuta_constantes": False,
-        "ejecuta_excepciones": False,
-        "instancia_clases_automaticamente": False,
-    },
-    "capacidades_sistema": {
-        "inventariar": "inventario",
-        "registrar": "registrar_inventario",
-        "resolver": "resolver",
-        "ejecutar": "ejecutar",
-    },
-
-
+    
 
     # ============================================================
     # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
@@ -517,9 +484,6 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
-        "ejecutar_total": True,
-        "inspeccionar": True,
-        "registrar_inventario": True,
 
         # --- PERMISOS DE ESCRITURA ---
         # "modificar": False,    # ← ELIMINADO (no permitido)
@@ -612,7 +576,7 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "invariantes": list(INVARIANTES),
 
-},  # <--- CIERRE FINAL
+}  # <--- CIERRE FINAL
 # ===============================================================
 # FIN CONTRATO
 # ===============================================================

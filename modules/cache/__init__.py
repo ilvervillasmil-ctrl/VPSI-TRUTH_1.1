@@ -1179,7 +1179,6 @@ def categorias() -> List[str]:
 # FIN 8.2
 # ===============================================================
 
-
 # ===============================================================
 # 8.3 — MAPEO ESTRUCTURAL (mapear_codigo)
 # ===============================================================
@@ -1187,34 +1186,58 @@ def categorias() -> List[str]:
 def _escanear_archivo_py(archivo: Path, nombre_modulo: str) -> Dict[str, Any]:
     """
     Escaneo estructural de un .py mediante AST.
-    No ejecuta el módulo. No interpreta semántica.
-    Extrae: funciones, clases, métodos, asignaciones ID_MODULO / id.
+    No importa. No ejecuta. No instancia. No llama código descubierto.
+
+    Extrae:
+      - funciones (nombre, linea)
+      - clases y métodos (nombre, linea)
+      - IDs contractuales: ID_MODULO / ID / id_modulo (Assign y AnnAssign)
+        y CONTENEDOR["id"]
+      - claves de CONTENEDOR["capacidades"] cuando sean determinables por AST
+
+    Distingue:
+      - error_lectura: el archivo no pudo leerse
+      - errores_parse: el contenido no pudo parsearse como AST
     """
-    resultado = {
+    resultado: Dict[str, Any] = {
         "archivo": str(archivo),
         "funciones": [],
         "clases": [],
         "metodos": [],
         "ids_declarados": [],
         "capacidades_keys": [],
+        "error_lectura": None,
         "errores_parse": None,
     }
+
+    # -----------------------------------------------------------
+    # Lectura del archivo (separada del parseo AST)
+    # -----------------------------------------------------------
     try:
         fuente = archivo.read_text(encoding="utf-8")
+    except Exception as e:
+        resultado["error_lectura"] = "{0}: {1}".format(type(e).__name__, e)
+        return resultado
+
+    # -----------------------------------------------------------
+    # Parseo AST
+    # -----------------------------------------------------------
+    try:
         arbol = ast.parse(fuente, filename=str(archivo))
     except Exception as e:
         resultado["errores_parse"] = "{0}: {1}".format(type(e).__name__, e)
         return resultado
 
+    # -----------------------------------------------------------
+    # 1. Funciones y clases de nivel módulo (no anidadas)
+    # -----------------------------------------------------------
     for nodo in arbol.body:
-        # Funciones de módulo
         if isinstance(nodo, (ast.FunctionDef, ast.AsyncFunctionDef)):
             resultado["funciones"].append({
                 "nombre": nodo.name,
                 "linea": nodo.lineno,
                 "async": isinstance(nodo, ast.AsyncFunctionDef),
             })
-        # Clases y métodos
         elif isinstance(nodo, ast.ClassDef):
             metodos = []
             for item in nodo.body:
@@ -1236,67 +1259,154 @@ def _escanear_archivo_py(archivo: Path, nombre_modulo: str) -> Dict[str, Any]:
                 }
                 for m in metodos
             ])
-        # Asignaciones de ID (ID_MODULO = "XX" o "id": "XX" en dicts top-level simples)
+
+    # -----------------------------------------------------------
+    # 2. IDs: Assign y AnnAssign de ID_MODULO / ID / id_modulo
+    # -----------------------------------------------------------
+    def _extraer_id_constante(valor_nodo: Any) -> Optional[str]:
+        if isinstance(valor_nodo, ast.Constant) and isinstance(
+            valor_nodo.value, str
+        ):
+            val = valor_nodo.value.strip()
+            return val if val else None
+        return None
+
+    for nodo in arbol.body:
+        # Assign: ID_MODULO = "XX"
+        if isinstance(nodo, ast.Assign):
+            for target in nodo.targets:
+                if not isinstance(target, ast.Name):
+                    continue
+                if target.id not in ("ID_MODULO", "ID", "id_modulo"):
+                    continue
+                val = _extraer_id_constante(nodo.value)
+                if val and val not in resultado["ids_declarados"]:
+                    resultado["ids_declarados"].append(val)
+
+        # AnnAssign: ID_MODULO: str = "XX"
+        elif isinstance(nodo, ast.AnnAssign):
+            if not isinstance(nodo.target, ast.Name):
+                continue
+            if nodo.target.id not in ("ID_MODULO", "ID", "id_modulo"):
+                continue
+            if nodo.value is None:
+                continue
+            val = _extraer_id_constante(nodo.value)
+            if val and val not in resultado["ids_declarados"]:
+                resultado["ids_declarados"].append(val)
+
+    # -----------------------------------------------------------
+    # 3. CONTENEDOR: "id" y "capacidades" vía AST (sin ejecutar)
+    # -----------------------------------------------------------
+    for nodo in arbol.body:
+        valor = None
+        # AnnAssign: CONTENEDOR: Dict[str, Any] = {...}
+        if isinstance(nodo, ast.AnnAssign) and isinstance(nodo.target, ast.Name):
+            if nodo.target.id == "CONTENEDOR":
+                valor = nodo.value
+        # Assign: CONTENEDOR = {...}
         elif isinstance(nodo, ast.Assign):
             for target in nodo.targets:
-                if isinstance(target, ast.Name) and target.id in (
-                    "ID_MODULO", "ID", "id_modulo"
-                ):
-                    if isinstance(nodo.value, ast.Constant) and isinstance(
-                        nodo.value.value, str
-                    ):
-                        resultado["ids_declarados"].append(nodo.value.value)
+                if isinstance(target, ast.Name) and target.id == "CONTENEDOR":
+                    valor = nodo.value
+                    break
+        if valor is None or not isinstance(valor, ast.Dict):
+            continue
 
-    # Búsqueda superficial de claves de capacidades en CONTENEDOR
-    # (solo literales de string en el AST, sin ejecutar)
-    for nodo in ast.walk(arbol):
-        if isinstance(nodo, ast.Constant) and isinstance(nodo.value, str):
-            # no se usa como capacidades; se deja para análisis posterior
-            pass
+        for key_node, val_node in zip(valor.keys, valor.values):
+            if not isinstance(key_node, ast.Constant):
+                continue
+            if not isinstance(key_node.value, str):
+                continue
+            clave = key_node.value
+
+            # CONTENEDOR["id"] = "XX"
+            if clave == "id":
+                val = _extraer_id_constante(val_node)
+                if val and val not in resultado["ids_declarados"]:
+                    resultado["ids_declarados"].append(val)
+
+            # CONTENEDOR["capacidades"] = { "k": ..., ... }
+            if clave == "capacidades" and isinstance(val_node, ast.Dict):
+                for ck in val_node.keys:
+                    if isinstance(ck, ast.Constant) and isinstance(ck.value, str):
+                        k = ck.value.strip()
+                        if k and k not in resultado["capacidades_keys"]:
+                            resultado["capacidades_keys"].append(k)
 
     return resultado
 
 
 def mapear_codigo(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
-    Recorre el código accesible a CACHE y construye el inventario estructural.
-    No interpreta semántica. No ejecuta funciones descubiertas.
+    Recorre el árbol accesible (_MODULES_ROOT o peticion["raiz"]) y
+    construye el inventario estructural completo mediante AST.
 
-    Identifica: módulo, archivo, IDs, funciones, métodos, clases, callables.
-    Actualiza _inventario_estructural sin perder apariciones previas de IDs.
+    No importa. No ejecuta. No instancia. No llama código descubierto.
+    Conserva todas las apariciones (módulo, archivo, línea).
+    Actualiza _inventario_estructural con el snapshot de esta ejecución.
     """
     global _inventario_estructural
 
+    # -----------------------------------------------------------
+    # 1. Resolver raíz
+    # -----------------------------------------------------------
     raiz = _MODULES_ROOT
     if isinstance(peticion, dict) and peticion.get("raiz"):
         candidata = Path(str(peticion["raiz"]))
         if candidata.exists() and candidata.is_dir():
             raiz = candidata
 
+    # -----------------------------------------------------------
+    # 2. Estructuras de acumulación (listas = sin sobrescritura)
+    # -----------------------------------------------------------
     modulos: Dict[str, Any] = {}
-    ids: Dict[str, List[str]] = defaultdict(list)
-    funciones: Dict[str, Any] = {}
-    clases: Dict[str, Any] = {}
-    callables: Dict[str, Any] = {}
+    ids: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    funciones: List[Dict[str, Any]] = []
+    clases: List[Dict[str, Any]] = []
+    callables: List[Dict[str, Any]] = []
     capacidades: Dict[str, List[str]] = {}
 
-    if not raiz.exists():
+    # Corrección: debe existir Y ser directorio
+    if not raiz.exists() or not raiz.is_dir():
+        _inventario_estructural = {
+            "modulos": {},
+            "ids": {},
+            "funciones": [],
+            "clases": [],
+            "callables": [],
+            "capacidades": {},
+            "actualizado": datetime.now(timezone.utc).isoformat(),
+            "raiz": str(raiz),
+            "error": "raiz_inexistente",
+        }
         return {
             "id": ID_MODULO,
             "operacion": "mapear_codigo",
             "error": "raiz_inexistente",
             "raiz": str(raiz),
             "modulos": {},
+            "total_modulos": 0,
+            "total_ids": 0,
+            "total_funciones": 0,
+            "total_clases": 0,
+            "total_callables": 0,
+            "total_capacidades": 0,
         }
 
+    # -----------------------------------------------------------
+    # 3. Recorrer cada subdirectorio = módulo candidato
+    # -----------------------------------------------------------
     for sub in sorted(raiz.iterdir()):
         if not sub.is_dir():
             continue
         if sub.name.startswith(("_", ".")):
             continue
+
         nombre_mod = sub.name
-        archivos_info = []
+        archivos_info: List[Dict[str, Any]] = []
         ids_mod: List[str] = []
+        caps_mod: List[str] = []
         funcs_mod: List[str] = []
         clases_mod: List[str] = []
 
@@ -1304,58 +1414,83 @@ def mapear_codigo(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             esc = _escanear_archivo_py(py, nombre_mod)
             archivos_info.append(esc)
 
+            # --- IDs (todas las apariciones) ---
             for idv in esc.get("ids_declarados") or []:
                 if idv not in ids_mod:
                     ids_mod.append(idv)
-                if nombre_mod not in ids[idv]:
-                    ids[idv].append(nombre_mod)
+                ids[idv].append({
+                    "modulo": nombre_mod,
+                    "archivo": esc["archivo"],
+                })
 
+            # --- Capacidades (AST de CONTENEDOR) ---
+            for ck in esc.get("capacidades_keys") or []:
+                if ck not in caps_mod:
+                    caps_mod.append(ck)
+
+            # --- Funciones ---
             for f in esc.get("funciones") or []:
-                calificado = "{0}.{1}".format(nombre_mod, f["nombre"])
-                funciones[calificado] = {
+                funciones.append({
                     "modulo": nombre_mod,
                     "archivo": esc["archivo"],
+                    "nombre": f["nombre"],
                     "linea": f["linea"],
-                }
-                callables[calificado] = {
+                    "async": f.get("async", False),
+                })
+                callables.append({
                     "modulo": nombre_mod,
                     "archivo": esc["archivo"],
+                    "nombre": f["nombre"],
+                    "linea": f["linea"],
                     "tipo": "funcion",
-                }
-                funcs_mod.append(f["nombre"])
+                })
+                if f["nombre"] not in funcs_mod:
+                    funcs_mod.append(f["nombre"])
 
+            # --- Clases y métodos ---
             for c in esc.get("clases") or []:
-                calificado = "{0}.{1}".format(nombre_mod, c["nombre"])
-                clases[calificado] = {
+                clases.append({
                     "modulo": nombre_mod,
                     "archivo": esc["archivo"],
+                    "nombre": c["nombre"],
                     "linea": c["linea"],
                     "metodos": [m["nombre"] for m in c.get("metodos") or []],
-                }
-                callables[calificado] = {
+                })
+                callables.append({
                     "modulo": nombre_mod,
                     "archivo": esc["archivo"],
+                    "nombre": c["nombre"],
+                    "linea": c["linea"],
                     "tipo": "clase",
-                }
-                clases_mod.append(c["nombre"])
+                })
+                if c["nombre"] not in clases_mod:
+                    clases_mod.append(c["nombre"])
                 for m in c.get("metodos") or []:
-                    mcal = "{0}.{1}.{2}".format(
-                        nombre_mod, c["nombre"], m["nombre"]
-                    )
-                    callables[mcal] = {
+                    callables.append({
                         "modulo": nombre_mod,
                         "archivo": esc["archivo"],
+                        "nombre": m["nombre"],
+                        "clase": c["nombre"],
+                        "linea": m["linea"],
                         "tipo": "metodo",
-                    }
+                    })
+
+        if caps_mod:
+            capacidades[nombre_mod] = list(caps_mod)
 
         modulos[nombre_mod] = {
             "archivos": [a["archivo"] for a in archivos_info],
             "ids": ids_mod,
             "funciones": funcs_mod,
             "clases": clases_mod,
+            "capacidades": list(caps_mod),
             "detalle_archivos": archivos_info,
         }
 
+    # -----------------------------------------------------------
+    # 4. Snapshot completo → _inventario_estructural
+    # -----------------------------------------------------------
+    ahora = datetime.now(timezone.utc).isoformat()
     _inventario_estructural = {
         "modulos": modulos,
         "ids": dict(ids),
@@ -1363,9 +1498,11 @@ def mapear_codigo(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "clases": clases,
         "callables": callables,
         "capacidades": capacidades,
-        "actualizado": datetime.now(timezone.utc).isoformat(),
+        "actualizado": ahora,
         "raiz": str(raiz),
     }
+
+    total_caps = sum(len(v) for v in capacidades.values())
 
     return {
         "id": ID_MODULO,
@@ -1376,20 +1513,23 @@ def mapear_codigo(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "total_funciones": len(funciones),
         "total_clases": len(clases),
         "total_callables": len(callables),
+        "total_capacidades": total_caps,
         "modulos": sorted(modulos.keys()),
-        "actualizado": _inventario_estructural["actualizado"],
+        "capacidades_por_modulo": {
+            m: list(cs) for m, cs in capacidades.items()
+        },
+        "actualizado": ahora,
         "nota": (
-            "Mapeo estructural puro. No ejecuta código descubierto. "
-            "No interpreta semántica."
+            "Mapeo estructural puro por AST. "
+            "No ejecuta código descubierto. "
+            "No interpreta semántica. "
+            "Todas las apariciones se conservan."
         ),
     }
 
 # ===============================================================
 # FIN 8.3
-# ===============================================================
-
-
-# ===============================================================
+# ===============================================================# ===============================================================
 # 8.4 — CLASIFICACIÓN DE IDs
 # ===============================================================
 

@@ -649,6 +649,22 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 # FUNCIONES PRIVADAS
 # ===============================================================
+def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Operación arquitectónica genérica.
+
+    Ejerce la totalidad de las unidades operativamente ejecutables
+    pertenecientes al módulo, conforme a su contrato, inventario,
+    clasificación, dependencias y leyes internas.
+
+    La totalidad se determina por inspección e inventario del módulo,
+    no por una lista fija de funciones ni por nombres concretos.
+
+    No enumera funciones concretas.
+    No inventa capacidades ni unidades operativas.
+    No altera los contratos internos del módulo.
+    """
+    return ejecutar(peticion)
 
 def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
     if archivo.name.startswith("_"):

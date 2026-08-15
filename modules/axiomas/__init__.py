@@ -12,40 +12,13 @@
 # Compatible desde:    9.5
 # API Engine:          >=1.0
 #
-# Función:
-#   Responsable del conocimiento axiomático del sistema.
-#   Mantiene, valida, organiza y expone todas las declaraciones
-#   oficiales del repositorio para cualquier módulo autorizado.
-#
-# Qué hace:
-#   - Carga, normaliza y recolecta declaraciones de todos los archivos
-#   - Detecta contradicción directa y de cota
-#   - Expone generatividad (TR1 / capa canónica)
-#   - Responde consultas por id, dominio, sujeto, relación, objeto
-#   - Cita cualquier declaración del grafo
-#   - Genera inventario, reporte y diagnóstico propios
-#   - Notifica a DiagnosticoGlobal cuando hay choques o errores
-#   - Determina el límite axiomático (premisas faltantes, alcance, derivabilidad)
-#
-# Qué NO hace:
-#   - No calcula Tru_total ni Tru_Ri
-#   - No clasifica entrada de usuario (eso es CX)
-#   - No orquesta el sistema (eso es Engine)
-#   - No genera reportes de otros módulos
-#   - No modifica declaraciones ajenas
-#
+# Correcciones aplicadas según instrucciones 1-34.
 # ===============================================================
 
 
 # ===============================================================
 # PARTE 1 — PRINCIPIOS, BANDERAS Y ESPECIFICACIONES PRECISAS
 # ===============================================================
-#
-# Responsabilidad: fijar todas las constantes, banderas, tipos,
-# dominios y principios operativos antes de cualquier identidad
-# o contrato.
-# ===============================================================
-
 
 # ===============================================================
 # 1.1 — IMPORTACIONES
@@ -69,7 +42,7 @@ except Exception:  # noqa: BLE001
 
 
 # ===============================================================
-# 1.2 — BANDERAS DE ESTADO DEL MÓDULO
+# 1.2 — BANDERAS DE ESTADO
 # ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
@@ -89,7 +62,7 @@ ESTADOS_VALIDOS = (
 
 
 # ===============================================================
-# 1.3 — TIPOS DE DECLARACIÓN Y CLAVES OBLIGATORIAS
+# 1.3 — TIPOS Y CLAVES OBLIGATORIAS
 # ===============================================================
 
 OBLIGATORIOS = ("id", "tipo", "sujeto", "relacion", "objeto", "polaridad")
@@ -107,19 +80,19 @@ DEFINICION = "definicion"
 
 
 # ===============================================================
-# 1.4 — TRADUCCIÓN DE CLAVES (NORMALIZACIÓN)
+# 1.4 — TRADUCCIÓN DE CLAVES
 # ===============================================================
 
 TRADUCCION_CLAVES = {
-    "type": "tipo",
-    "subject": "sujeto",
-    "relation": "relacion",
-    "object": "objeto",
-    "polarity": "polaridad",
-    "statement": "enunciado",
-    "depends_on": "depende_de",
-    "governs": "gobierna",
-    "cota": "cota",
+    "type": "tipo",           # type = tipo
+    "subject": "sujeto",      # subject = sujeto
+    "relation": "relacion",   # relation = relación
+    "object": "objeto",       # object = objeto
+    "polarity": "polaridad",  # polarity = polaridad (verdadero o falso)
+    "statement": "enunciado", # statement = el texto de la declaración
+    "depends_on": "depende_de", # depends_on = de qué depende
+    "governs": "gobierna",    # governs = qué dominios controla
+    "cota": "cota",           # cota = límite o valor límite
 }
 
 # ===============================================================
@@ -128,7 +101,7 @@ TRADUCCION_CLAVES = {
 
 
 # ===============================================================
-# 1.5 — DOMINIOS K/O Y DOMINIOS CANÓNICOS
+# 1.5 — DOMINIOS
 # ===============================================================
 
 DOMINIOS_K_O = frozenset({
@@ -157,7 +130,7 @@ DOMINIO_CANONICO = {
 
 
 # ===============================================================
-# 1.6 — Θ CANÓNICO (TR1 — ASIGNACIÓN FORMAL DEL PAPER)
+# 1.6 — Θ CANÓNICO
 # ===============================================================
 
 THETA_24 = {
@@ -195,7 +168,7 @@ THETA_CANONICO = frozenset(THETA_24.keys())
 
 
 # ===============================================================
-# 1.7 — INVARIANTES DEL MÓDULO
+# 1.7 — INVARIANTES
 # ===============================================================
 
 INVARIANTES = (
@@ -216,12 +189,8 @@ INVARIANTES = (
 
 
 # ===============================================================
-# PARTE 2 — IDENTIDAD DEL MÓDULO
+# PARTE 2 — IDENTIDAD
 # ===============================================================
-#
-# Responsabilidad: fijar la identidad contractual e inmutable.
-# ===============================================================
-
 
 # ===============================================================
 # 2.1 — IDENTIFICADORES
@@ -243,7 +212,6 @@ ROL_MODULO = "AX"
 VERSION_MODULO = "9.6"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-
 COMPATIBLE_DESDE = "9.5"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
@@ -254,7 +222,7 @@ ESTABILIDAD = "ESTABLE"
 
 
 # ===============================================================
-# PARTE 3 — CONFIGURACIÓN DE DIRECTORIO
+# PARTE 3 — CONFIGURACIÓN
 # ===============================================================
 
 _DIR = Path(__file__).parent
@@ -273,7 +241,6 @@ def _ruta_vpsi() -> Optional[Path]:
 
 
 def _rutas_py() -> List[Path]:
-    """Retorna todos los archivos .py del módulo excepto __init__.py."""
     return sorted(
         p for p in _DIR.glob("**/*.py")
         if p.name != "__init__.py"
@@ -285,7 +252,7 @@ def _rutas_py() -> List[Path]:
 
 
 # ===============================================================
-# PARTE 4 — DEFINICIONES DE EXCEPCIONES
+# PARTE 4 — EXCEPCIONES
 # ===============================================================
 
 class ContratoInvalido(Exception):
@@ -297,12 +264,7 @@ class ContratoInvalido(Exception):
 
 
 # ===============================================================
-# PARTE 5 — CONTRATO OFICIAL DEL MÓDULO (CONTENEDOR)
-# ===============================================================
-#
-# Responsabilidad: declarar de forma completa e inmutable la identidad,
-# autoridad, dominio, capacidades y reporting del módulo AX.
-# Contrato: VPSI-CONTRACT-1.0.
+# PARTE 5 — CONTRATO OFICIAL (CONTENEDOR)
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
@@ -384,8 +346,9 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # 5.7 — DEPENDENCIAS
     # ============================================================
+    # CORRECCIÓN 1: eliminado "AX" de requiere (dependencia autorreferencial)
     "requiere": [
-        "CT", "AX", "FO", "MC", "SF", "CA", "CX", "CC",
+        "CT", "FO", "MC", "SF", "CA", "CX", "CC",
         "DI", "RE", "VX", "TX", "CH", "CIT", "TT", "CE",
     ],
 
@@ -432,7 +395,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # 5.11 — METADATOS DE CAPACIDADES (1:1)
+    # 5.11 — METADATOS DE CAPACIDADES
     # ============================================================
     "capacidades_meta": {
         "verificar": {
@@ -548,6 +511,9 @@ CONTENEDOR: Dict[str, Any] = {
     "autoriza_engine": {
         "leer": True,
         "ejecutar": True,
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
         "consultar": True,
         "recombinar": True,
         "reportar": True,
@@ -619,40 +585,41 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 # PARTE 6 — FUNCIONES PRIVADAS
 # ===============================================================
-#
-# Responsabilidad: carga, normalización, detección de choques,
-# medición de generatividad.
-# ===============================================================
-
 
 # ===============================================================
 # 6.1 — CARGA DESDE ARCHIVO
 # ===============================================================
 
-def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
+def _cargar_declaraciones_desde_archivo(archivo: Path) -> Tuple[List[Dict], Optional[str]]:
+    """
+    CORRECCIÓN 21: Distingue archivo sin declaraciones vs error de ejecución.
+    Retorna (lista, error_opcional).
+    """
     if archivo.name.startswith("_"):
-        return []
+        return [], None
 
-    nombre_mod = "axiomas_{0}".format(archivo.stem)
+    # CORRECCIÓN 22: nombre de módulo inequívoco
+    rel = archivo.relative_to(_DIR) if _DIR in archivo.parents or archivo.parent == _DIR else archivo.name
+    nombre_mod = "axiomas_{0}".format(str(rel).replace("/", "_").replace("\\", "_").replace(".", "_"))
     spec = importlib.util.spec_from_file_location(nombre_mod, archivo)
     if spec is None or spec.loader is None:
-        return []
+        return [], "spec_invalido"
 
     mod = importlib.util.module_from_spec(spec)
     sys.modules[nombre_mod] = mod
     try:
         spec.loader.exec_module(mod)
-    except Exception:
+    except Exception as e:
         if nombre_mod in sys.modules:
             del sys.modules[nombre_mod]
-        return []
+        return [], "{0}: {1}".format(type(e).__name__, e)
 
     declaraciones_raw = getattr(mod, "DECLARACIONES", None)
     if declaraciones_raw is None and callable(getattr(mod, "declaraciones", None)):
         try:
             declaraciones_raw = mod.declaraciones()
-        except Exception:  # noqa: BLE001
-            declaraciones_raw = []
+        except Exception as e:
+            return [], "declaraciones(): {0}: {1}".format(type(e).__name__, e)
 
     if declaraciones_raw is None:
         for attr in ("CUERPO", "declaraciones_lista"):
@@ -661,7 +628,13 @@ def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
                 declaraciones_raw = val
                 break
 
-    return declaraciones_raw if isinstance(declaraciones_raw, list) else []
+    if declaraciones_raw is None:
+        return [], None  # archivo sin declaraciones
+
+    if not isinstance(declaraciones_raw, list):
+        return [], "DECLARACIONES no es list"
+
+    return declaraciones_raw, None
 
 # ===============================================================
 # FIN 6.1
@@ -673,6 +646,12 @@ def _cargar_declaraciones_desde_archivo(archivo: Path) -> List[Dict]:
 # ===============================================================
 
 def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
+    """
+    CORRECCIONES 6, 7, 8:
+    - depende_de y gobierna deben ser iterables propios
+    - id no vacío
+    - sujeto/relacion/objeto no vacíos
+    """
     if not isinstance(decl_original, dict):
         raise ValueError("{0}: declaración no es dict".format(cuerpo))
 
@@ -688,6 +667,17 @@ def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
                 )
             )
 
+    # CORRECCIÓN 7: id no vacío
+    id_norm = str(decl["id"]).strip()
+    if not id_norm:
+        raise ValueError("{0}: id vacío o inválido".format(cuerpo))
+
+    # CORRECCIÓN 8: sujeto/relacion/objeto no vacíos
+    for campo in ("sujeto", "relacion", "objeto"):
+        val = decl.get(campo)
+        if val is None or str(val).strip() == "":
+            raise ValueError("{0}:{1} '{2}' vacío o None".format(cuerpo, id_norm, campo))
+
     tipo = str(decl["tipo"]).lower()
     tipo = {
         "axiom": "axioma",
@@ -700,25 +690,42 @@ def normalizar(decl_original: Dict, cuerpo: str) -> Dict:
     if tipo not in TIPOS:
         raise ValueError(
             "{0}:{1} tipo '{2}' no válido. Admitidos: {3}".format(
-                cuerpo, decl["id"], tipo, TIPOS
+                cuerpo, id_norm, tipo, TIPOS
             )
         )
     if not isinstance(decl["polaridad"], bool):
         raise ValueError(
-            "{0}:{1} polaridad debe ser bool".format(cuerpo, decl["id"])
+            "{0}:{1} polaridad debe ser bool".format(cuerpo, id_norm)
         )
 
+    # CORRECCIÓN 6: depende_de y gobierna deben ser list/tuple/set
+    def _norm_lista(campo: str) -> List[str]:
+        raw = decl.get(campo, [])
+        if raw is None:
+            return []
+        if isinstance(raw, str):
+            raise ValueError(
+                "{0}:{1} '{2}' no puede ser str (sería convertido a caracteres)".format(
+                    cuerpo, id_norm, campo
+                )
+            )
+        if not isinstance(raw, (list, tuple, set)):
+            raise ValueError(
+                "{0}:{1} '{2}' debe ser list/tuple/set".format(cuerpo, id_norm, campo)
+            )
+        return [str(x).strip() for x in raw if str(x).strip()]
+
     return {
-        "id": str(decl["id"]),
+        "id": id_norm,
         "cuerpo": cuerpo,
         "tipo": tipo,
-        "sujeto": str(decl["sujeto"]),
-        "relacion": str(decl["relacion"]),
-        "objeto": str(decl["objeto"]),
+        "sujeto": str(decl["sujeto"]).strip(),
+        "relacion": str(decl["relacion"]).strip(),
+        "objeto": str(decl["objeto"]).strip(),
         "polaridad": bool(decl["polaridad"]),
-        "cota": None if decl.get("cota") is None else str(decl["cota"]),
-        "depende_de": [str(x) for x in decl.get("depende_de", [])],
-        "gobierna": [str(x) for x in decl.get("gobierna", [])],
+        "cota": None if decl.get("cota") is None else str(decl["cota"]).strip(),
+        "depende_de": _norm_lista("depende_de"),
+        "gobierna": _norm_lista("gobierna"),
         "enunciado": str(decl.get("enunciado", "")),
     }
 
@@ -785,6 +792,7 @@ def contradiccion_directa(decls: List[Dict]) -> List[Dict]:
 
 
 def contradiccion_de_cota(decls: List[Dict]) -> List[Dict]:
+    """CORRECCIÓN 12: normalización textual segura de cota (strip + espacios)."""
     grupos: Dict[Tuple[str, str], List[Dict]] = {}
     for d in decls:
         if d["cota"] is None:
@@ -798,7 +806,9 @@ def contradiccion_de_cota(decls: List[Dict]) -> List[Dict]:
     for (suj, rel), grupo in grupos.items():
         porcota: Dict[str, List[str]] = {}
         for d in grupo:
-            porcota.setdefault(d["cota"], []).append(ref(d))
+            # normalización textual segura
+            cota_norm = " ".join(str(d["cota"]).split())
+            porcota.setdefault(cota_norm, []).append(ref(d))
         if len(porcota) > 1:
             choques.append({
                 "tipo": "contradiccion_de_cota",
@@ -868,6 +878,16 @@ def _medir_pares(theta: list) -> dict:
 # ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Valida que el CONTENEDOR cumpla el esquema contractual.
+    CORRECCIONES 2 y 4:
+    - validar acceso_archivos y validar_esquema como listas
+    - validación completa de capacidades_meta (1:1, campos, sin huérfanas)
+    """
+
+    # -----------------------------------------------------------
+    # Lista de claves que el contrato DEBE tener obligatoriamente
+    # -----------------------------------------------------------
     obligatorias = (
         "esquema", "version_contrato", "version_modulo",
         "id", "nombre", "rol", "descripcion",
@@ -877,31 +897,71 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
         "capacidades", "capacidades_meta",
         "reporting", "estados_validos", "invariantes",
         "estabilidad", "compatible_desde", "api_engine",
+        "acceso_archivos", "validar_esquema",
     )
+
+    # -----------------------------------------------------------
+    # Comprueba si falta alguna clave obligatoria
+    # -----------------------------------------------------------
     faltantes = [k for k in obligatorias if k not in cont]
     if faltantes:
         raise ContratoInvalido(
             f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
         )
+
+    # -----------------------------------------------------------
+    # Verifica que el esquema sea exactamente el esperado
+    # -----------------------------------------------------------
     if cont.get("esquema") != ESQUEMA_CONTRATO:
         raise ContratoInvalido(
             f"{NOMBRE_MODULO}: esquema incompatible: {cont.get('esquema')}"
         )
+
+    # -----------------------------------------------------------
+    # Verifica que la versión del contrato sea la correcta
+    # -----------------------------------------------------------
     if str(cont.get("version_contrato")) != VERSION_CONTRATO:
         raise ContratoInvalido(
             f"{NOMBRE_MODULO}: version_contrato inválida: {cont.get('version_contrato')}"
         )
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
+
+    # -----------------------------------------------------------
+    # CORRECCIÓN 2:
+    # acceso_archivos y validar_esquema deben ser listas
+    # -----------------------------------------------------------
+    for campo in ("acceso_archivos", "validar_esquema"):
+        val = cont.get(campo)
+        if not isinstance(val, list):
             raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidad '{nombre_cap}' sin capacidades_meta"
+                f"{NOMBRE_MODULO}: '{campo}' debe ser list"
             )
-        entrada = meta_caps[nombre_cap]
+
+    # -----------------------------------------------------------
+    # CORRECCIÓN 4:
+    # capacidades y capacidades_meta deben coincidir 1:1
+    # (ninguna capacidad sin meta, ninguna meta huérfana)
+    # -----------------------------------------------------------
+    caps = cont.get("capacidades") or {}
+    meta_caps = cont.get("capacidades_meta") or {}
+    if set(caps.keys()) != set(meta_caps.keys()):
+        solo_caps = set(caps.keys()) - set(meta_caps.keys())
+        solo_meta = set(meta_caps.keys()) - set(caps.keys())
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: desajuste capacidades/capacidades_meta. "
+            f"solo_en_capacidades={solo_caps} solo_en_meta={solo_meta}"
+        )
+
+    # -----------------------------------------------------------
+    # Cada entrada de capacidades_meta debe ser un diccionario
+    # y debe contener los campos mínimos obligatorios
+    # -----------------------------------------------------------
+    for nombre_cap, entrada in meta_caps.items():
         if not isinstance(entrada, dict):
             raise ContratoInvalido(
                 f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] debe ser dict"
             )
+
+        # Campos que siempre deben existir y ser texto
         for campo in ("descripcion", "entrada", "salida"):
             if campo not in entrada or not isinstance(entrada[campo], str):
                 raise ContratoInvalido(
@@ -909,23 +969,21 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                     f"requiere '{campo}: str'"
                 )
 
+        # Campos opcionales que, si existen, deben ser listas
+        for campo in ("validar_esquema", "acceso_archivos"):
+            if campo in entrada and not isinstance(entrada[campo], list):
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}']['{campo}'] "
+                    f"debe ser list"
+                )
+
 # ===============================================================
 # FIN 6.6
 # ===============================================================
 
-
 # ===============================================================
 # PARTE 7 — LÍMITE AXIOMÁTICO
 # ===============================================================
-#
-# Distinción fundamental:
-#   Contradicción  → existe información incompatible
-#   Límite         → no existe suficiente base axiomática
-#
-# No se inventan premisas.
-# No se completan huecos con conocimiento externo.
-# ===============================================================
-
 
 # ===============================================================
 # 7.1 — LÍMITE AXIOMÁTICO
@@ -933,22 +991,26 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 
 def limite_axiomático(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
+    decls: Optional[List[Dict]] = None,
+    errores: Optional[List[Dict]] = None,
 ) -> Dict[str, Any]:
     """
     Determina el límite de derivación axiomática.
-
-    Una conclusión solamente puede ser reconocida como internamente
-    sustentada cuando sus premisas y dependencias requeridas están
-    contenidas en el cuerpo axiomático autorizado.
-
-    Si falta una premisa requerida:
-    - no completar
-    - no asumir
-    - no inferir externamente
-    - no crear una declaración
+    CORRECCIONES 9, 10, 27:
+    - resolución transitiva de dependencias
+    - detección de ciclos de cualquier longitud
+    - estados: NO_DERIVABLE, PREMISA_FALTANTE, CIRCULAR
     """
-    decls, errores = recolectar(declaraciones_externas)
 
+    # -----------------------------------------------------------
+    # Si no se recibe una instantánea, se recolecta una nueva
+    # -----------------------------------------------------------
+    if decls is None or errores is None:
+        decls, errores = recolectar(declaraciones_externas)
+
+    # -----------------------------------------------------------
+    # Conjuntos de trabajo
+    # -----------------------------------------------------------
     ids_presentes: Set[str] = {d["id"] for d in decls}
     premisas_disponibles: List[str] = sorted(ids_presentes)
     premisas_faltantes: List[Dict[str, Any]] = []
@@ -956,9 +1018,91 @@ def limite_axiomático(
     dependencias_circulares: List[Dict[str, Any]] = []
     limites: List[Dict[str, Any]] = []
 
+    # -----------------------------------------------------------
+    # Grafo de dependencias:
+    # cada declaración apunta a las que necesita (depende_de)
+    # -----------------------------------------------------------
+    grafo: Dict[str, List[str]] = {
+        d["id"]: list(d.get("depende_de") or []) for d in decls
+    }
+
+    # -----------------------------------------------------------
+    # Detección de ciclos de cualquier longitud (CORRECCIÓN 10)
+    # Usa DFS para encontrar ciclos en el grafo
+    # -----------------------------------------------------------
+    def _detectar_ciclos() -> List[List[str]]:
+        ciclos: List[List[str]] = []
+        visitado: Set[str] = set()
+        stack: List[str] = []
+        en_stack: Set[str] = set()
+
+        def dfs(nodo: str) -> None:
+            visitado.add(nodo)
+            stack.append(nodo)
+            en_stack.add(nodo)
+            for vecino in grafo.get(nodo, []):
+                if vecino not in grafo:
+                    continue
+                if vecino not in visitado:
+                    dfs(vecino)
+                elif vecino in en_stack:
+                    # Se encontró un ciclo
+                    idx = stack.index(vecino)
+                    ciclo = stack[idx:] + [vecino]
+                    # Evitar registrar el mismo ciclo varias veces
+                    ciclo_norm = tuple(sorted(set(ciclo[:-1])))
+                    if ciclo_norm and ciclo_norm not in {
+                        tuple(sorted(set(c[:-1]))) for c in ciclos
+                    }:
+                        ciclos.append(ciclo)
+            stack.pop()
+            en_stack.discard(nodo)
+
+        for n in list(grafo.keys()):
+            if n not in visitado:
+                dfs(n)
+        return ciclos
+
+    # -----------------------------------------------------------
+    # Registrar cada ciclo encontrado
+    # -----------------------------------------------------------
+    for ciclo in _detectar_ciclos():
+        dependencias_circulares.append({
+            "ciclo": ciclo,
+            "mensaje": "Dependencia circular: {0}".format(" → ".join(ciclo)),
+        })
+        limites.append({
+            "tipo": "CIRCULAR",
+            "ciclo": ciclo,
+            "estado": "CIRCULAR",
+        })
+
+    # -----------------------------------------------------------
+    # Resolución transitiva de premisas faltantes (CORRECCIÓN 9)
+    # Si A depende de B y B depende de C, y C no existe,
+    # entonces A también tiene premisa faltante
+    # -----------------------------------------------------------
+    def _premisas_transitivas(
+        start: str, vistos: Optional[Set[str]] = None
+    ) -> Set[str]:
+        if vistos is None:
+            vistos = set()
+        if start in vistos:
+            return set()
+        vistos.add(start)
+        faltantes: Set[str] = set()
+        for dep in grafo.get(start, []):
+            if dep not in ids_presentes:
+                faltantes.add(dep)
+            else:
+                faltantes |= _premisas_transitivas(dep, vistos)
+        return faltantes
+
+    # -----------------------------------------------------------
+    # Revisar cada declaración y registrar premisas faltantes
+    # -----------------------------------------------------------
     for d in decls:
-        deps = d.get("depende_de") or []
-        faltantes = [dep for dep in deps if dep not in ids_presentes]
+        faltantes = sorted(_premisas_transitivas(d["id"]))
         if faltantes:
             premisas_faltantes.append({
                 "declaracion": d["id"],
@@ -970,38 +1114,34 @@ def limite_axiomático(
                 "declaracion": d["id"],
                 "dependencias_faltantes": faltantes,
                 "mensaje": (
-                    "La declaración '{0}' depende de premisas no presentes "
-                    "en el cuerpo axiomático: {1}".format(d["id"], faltantes)
+                    "La declaración '{0}' depende transitivamente de premisas "
+                    "no presentes: {1}".format(d["id"], faltantes)
                 ),
             })
             limites.append({
-                "tipo": "limite_por_premisa_faltante",
+                "tipo": "PREMISA_FALTANTE",
                 "declaracion": d["id"],
                 "premisas_faltantes": faltantes,
                 "estado": "NO_DERIVABLE",
             })
 
-    for d in decls:
-        for dep in (d.get("depende_de") or []):
-            for d2 in decls:
-                if d2["id"] == dep and d["id"] in (d2.get("depende_de") or []):
-                    dependencias_circulares.append({
-                        "declaracion_1": d["id"],
-                        "declaracion_2": dep,
-                        "mensaje": (
-                            "Posible dependencia circular entre '{0}' y '{1}'".format(
-                                d["id"], dep
-                            )
-                        ),
-                    })
-
+    # -----------------------------------------------------------
+    # Resumen de alcance
+    # -----------------------------------------------------------
     alcance = {
         "total_declaraciones": len(decls),
-        "con_dependencias_satisfechas": len(decls) - len(dependencias_no_satisfechas),
+        "con_dependencias_satisfechas": (
+            len(decls)
+            - len(dependencias_no_satisfechas)
+            - len(dependencias_circulares)
+        ),
         "con_premisas_faltantes": len(premisas_faltantes),
-        "posibles_circulares": len(dependencias_circulares),
+        "con_dependencias_circulares": len(dependencias_circulares),
     }
 
+    # -----------------------------------------------------------
+    # Resultado final
+    # -----------------------------------------------------------
     return {
         "contenedor": NOMBRE_MODULO,
         "premisas_disponibles": premisas_disponibles,
@@ -1013,8 +1153,8 @@ def limite_axiomático(
         "errores_recoleccion": errores,
         "nota": (
             "Límite axiomático ≠ contradicción. "
-            "Si falta una premisa requerida, se declara el límite. "
-            "No se inventan premisas ni se completan huecos."
+            "Si falta una premisa requerida (incluso transitiva), se declara el límite. "
+            "No se inventan premisas."
         ),
     }
 
@@ -1022,14 +1162,9 @@ def limite_axiomático(
 # FIN 7.1
 # ===============================================================
 
-
 # ===============================================================
 # PARTE 8 — CAPACIDADES PÚBLICAS
 # ===============================================================
-#
-# Responsabilidad: implementar las capacidades declaradas en CONTENEDOR.
-# ===============================================================
-
 
 # ===============================================================
 # 8.1 — RECOLECCIÓN (FUENTE ÚNICA DE VERDAD)
@@ -1039,51 +1174,133 @@ def recolectar(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Tuple[List[Dict], List[Dict]]:
     """
-    Carga y normaliza todas las declaraciones de los cuerpos del módulo.
-    Fuente única de verdad para el resto de capacidades.
+    Carga y normaliza todas las declaraciones del módulo.
+    CORRECCIONES 5 y 21:
+    - detección de IDs duplicados
+    - trazabilidad de errores de carga
     """
+
+    # -----------------------------------------------------------
+    # Listas de resultado
+    # -----------------------------------------------------------
     decls: List[Dict] = []
     errores: List[Dict] = []
+    ids_vistos: Dict[str, str] = {}  # id → primera ubicación
 
+    # -----------------------------------------------------------
+    # 1. Recorrer todos los archivos .py del módulo
+    # -----------------------------------------------------------
     for archivo in sorted(_DIR.glob("**/*.py")):
         if archivo.name == "__init__.py":
             continue
-        try:
-            for d in _cargar_declaraciones_desde_archivo(archivo):
-                decls.append(normalizar(d, archivo.stem))
-        except Exception as e:  # noqa: BLE001
+
+        # Cargar declaraciones del archivo
+        raw, err = _cargar_declaraciones_desde_archivo(archivo)
+
+        # Si hubo error de carga, registrarlo y pasar al siguiente
+        if err:
             errores.append({
                 "archivo": archivo.name,
-                "error": "{0}: {1}".format(type(e).__name__, e),
+                "error": err,
+                "tipo": "error_carga",
             })
+            continue
 
+        # Normalizar cada declaración encontrada
+        for d in raw:
+            try:
+                norm = normalizar(d, archivo.stem)
+
+                # CORRECCIÓN 5: detectar ID duplicado
+                if norm["id"] in ids_vistos:
+                    errores.append({
+                        "tipo": "id_duplicado",
+                        "id": norm["id"],
+                        "primera_ubicacion": ids_vistos[norm["id"]],
+                        "segunda_ubicacion": ref(norm),
+                    })
+                    continue  # no se agrega el duplicado
+
+                # Registrar el ID y agregar la declaración
+                ids_vistos[norm["id"]] = ref(norm)
+                decls.append(norm)
+
+            except ValueError as e:
+                # Error de normalización (id vacío, polaridad inválida, etc.)
+                errores.append({
+                    "archivo": archivo.name,
+                    "error": str(e),
+                    "tipo": "error_normalizacion",
+                })
+
+    # -----------------------------------------------------------
+    # 2. Cargar declaraciones desde VPSI.py (si existe)
+    # -----------------------------------------------------------
     vpsi = _ruta_vpsi()
     if vpsi is not None:
-        try:
-            for d in _cargar_declaraciones_desde_archivo(vpsi):
-                decls.append(normalizar(d, "VPSI"))
-        except Exception as e:  # noqa: BLE001
+        raw, err = _cargar_declaraciones_desde_archivo(vpsi)
+        if err:
             errores.append({
                 "archivo": str(vpsi.name),
-                "error": "{0}: {1}".format(type(e).__name__, e),
+                "error": err,
+                "tipo": "error_carga",
             })
+        else:
+            for d in raw:
+                try:
+                    norm = normalizar(d, "VPSI")
+                    if norm["id"] in ids_vistos:
+                        errores.append({
+                            "tipo": "id_duplicado",
+                            "id": norm["id"],
+                            "primera_ubicacion": ids_vistos[norm["id"]],
+                            "segunda_ubicacion": ref(norm),
+                        })
+                        continue
+                    ids_vistos[norm["id"]] = ref(norm)
+                    decls.append(norm)
+                except ValueError as e:
+                    errores.append({
+                        "archivo": "VPSI",
+                        "error": str(e),
+                        "tipo": "error_normalizacion",
+                    })
 
+    # -----------------------------------------------------------
+    # 3. Incorporar declaraciones externas (si se reciben)
+    # -----------------------------------------------------------
     if declaraciones_externas:
         for nombre, lista in declaraciones_externas.items():
             if not isinstance(lista, list):
                 continue
             for d in lista:
                 try:
-                    decls.append(normalizar(d, nombre))
+                    norm = normalizar(d, nombre)
+                    if norm["id"] in ids_vistos:
+                        errores.append({
+                            "tipo": "id_duplicado",
+                            "id": norm["id"],
+                            "primera_ubicacion": ids_vistos[norm["id"]],
+                            "segunda_ubicacion": ref(norm),
+                        })
+                        continue
+                    ids_vistos[norm["id"]] = ref(norm)
+                    decls.append(norm)
                 except ValueError as e:
-                    errores.append({"modulo": nombre, "error": str(e)})
+                    errores.append({
+                        "modulo": nombre,
+                        "error": str(e),
+                        "tipo": "error_normalizacion",
+                    })
 
+    # -----------------------------------------------------------
+    # Resultado: (declaraciones normalizadas, errores encontrados)
+    # -----------------------------------------------------------
     return decls, errores
 
 # ===============================================================
 # FIN 8.1
 # ===============================================================
-
 
 # ===============================================================
 # 8.2 — IDS DE DOMINIO K/O
@@ -1092,13 +1309,15 @@ def recolectar(
 def ids_dominio_k_o(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[str]:
-    """Ids de declaraciones ligadas a dominios K/O o Def-5.3.1."""
+    """CORRECCIÓN 16: preferir estructura (gobierna) sobre blob textual."""
     decls, _ = recolectar(declaraciones_externas)
     ids: List[str] = []
     for d in decls:
         gobs = {str(g).lower().strip() for g in (d.get("gobierna") or [])}
         if gobs & DOMINIOS_K_O:
             ids.append(d["id"])
+            continue
+        # fallback heurístico explícito
         blob = (
             "{0} {1} {2}".format(
                 d.get("sujeto", ""),
@@ -1106,10 +1325,7 @@ def ids_dominio_k_o(
                 d.get("enunciado", ""),
             )
         ).lower()
-        if any(
-            x in blob
-            for x in ("def-5.3.1", "o_context", "dominio o", "permite_k")
-        ):
+        if any(x in blob for x in ("def-5.3.1", "o_context", "dominio o", "permite_k")):
             if d["id"] not in ids:
                 ids.append(d["id"])
     return sorted(set(ids))
@@ -1125,13 +1341,7 @@ def ids_dominio_k_o(
 
 def generatividad() -> dict:
     """
-    TR1 en dos capas (saber, no creer):
-
-    1) operativa  — todo axioma/teorema con gobierna (grafo real del repo)
-    2) canónica   — solo los 24 ids del paper con dominios formales (Cuadro 4)
-
-    No inventa candidatos. No calcula Tru.
-    La capa canónica NO infiere dominios desde gobierna: usa THETA_24.
+    CORRECCIÓN 14: normalizar dominios de la capa operativa con DOMINIO_CANONICO.
     """
     decls, errores = recolectar()
 
@@ -1142,10 +1352,14 @@ def generatividad() -> dict:
         gob = d.get("gobierna") or []
         if not gob:
             continue
+        dominios_norm = set()
+        for g in gob:
+            key = str(g).lower().strip()
+            dominios_norm.add(DOMINIO_CANONICO.get(key, key.upper()[:3]))
         oper.append({
             "id": d["id"],
             "tipo": d["tipo"],
-            "dominios": set(str(x) for x in gob),
+            "dominios": dominios_norm,
         })
     m_op = _medir_pares(oper)
     dominios_op = sorted({g for n in oper for g in n["dominios"]})
@@ -1160,9 +1374,7 @@ def generatividad() -> dict:
     ids_en_repo = {str(d.get("id", "")) for d in decls}
     ids_presentes = sorted(i for i in THETA_CANONICO if i in ids_en_repo)
     ids_faltantes = sorted(THETA_CANONICO - set(ids_presentes))
-    ids_sin_dominio = sorted(
-        tid for tid, doms in THETA_24.items() if not doms
-    )
+    ids_sin_dominio = sorted(tid for tid, doms in THETA_24.items() if not doms)
 
     u1_proxy = (
         "NO_STAGNANT"
@@ -1194,9 +1406,7 @@ def generatividad() -> dict:
             "ids_faltantes": ids_faltantes,
             "ids_sin_dominio": ids_sin_dominio,
             "dominios": dominios_can,
-            "dominios_formales": {
-                k: sorted(v) for k, v in THETA_24.items()
-            },
+            "dominios_formales": {k: sorted(v) for k, v in THETA_24.items()},
             "referencia_formal": {
                 "theta_n": 24,
                 "pares_totales": 276,
@@ -1205,8 +1415,8 @@ def generatividad() -> dict:
                 "pares_redundantes": 30,
                 "pares_incompatibles": 93,
                 "nota": (
-                    "|Im(⊕)|=153 > 24=|Θ| — enumeración exacta Cuadro 3/4 "
-                    "del documento VPSI. El CI recalcula; no hardcodea."
+                    "|Im(⊕)|=153 > 24=|Θ| — enumeración exacta. "
+                    "El CI recalcula; no hardcodea."
                 ),
             },
             "coincide_paper": (
@@ -1219,9 +1429,9 @@ def generatividad() -> dict:
         },
         "ids_dominio_k_o": ids_dominio_k_o(),
         "nota": (
-            "Capa operativa = grafo del repo (gobierna real). "
-            "Capa canónica = THETA_24 formal del paper (Cuadro 4). "
-            "Identidades: C+I=T y N+R=C deben cumplirse o se reporta fallo."
+            "Capa operativa = grafo del repo normalizado. "
+            "Capa canónica = THETA_24 formal. "
+            "Identidades C+I=T y N+R=C deben cumplirse."
         ),
     }
 
@@ -1237,7 +1447,6 @@ def generatividad() -> dict:
 def barrer(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Dict:
-    """Capacidad principal: coherencia axiomática del cuerpo."""
     decls, errores = recolectar(declaraciones_externas)
     choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
 
@@ -1250,7 +1459,7 @@ def barrer(
                     + [{"tipo": "error_carga", "detalle": e} for e in errores]
                 ),
             )
-        except Exception:  # noqa: BLE001
+        except Exception:
             pass
 
     cuerpos = sorted({d["cuerpo"] for d in decls})
@@ -1278,7 +1487,7 @@ def verificar_salida(salida: Dict) -> bool:
 def verificar(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> Dict[str, Any]:
-    """Alias de contrato de barrer."""
+    """API compatible. El alias contractual 'verificar' resuelve a barrer."""
     return barrer(declaraciones_externas)
 
 # ===============================================================
@@ -1293,18 +1502,17 @@ def verificar(
 def declaraciones(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """Lista normalizada si el cuerpo es coherente; si no → []."""
-    resultado = barrer(declaraciones_externas)
-    if not resultado["coherente"]:
+    """CORRECCIÓN 17: evita doble recolección innecesaria cuando es posible."""
+    decls, errores = recolectar(declaraciones_externas)
+    choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
+    if choques or errores:
         return []
-    decls, _ = recolectar(declaraciones_externas)
     return decls
 
 
 def axiomas(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """Alias de contrato: misma semántica que declaraciones()."""
     return declaraciones(declaraciones_externas)
 
 
@@ -1312,24 +1520,29 @@ def por_dominio(
     dominio: str,
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
 ) -> List[Dict]:
-    """Filtra declaraciones por dominio en gobierna."""
-    dom = str(dominio).lower().strip()
+    """CORRECCIÓN 13: normalizar dominio con DOMINIO_CANONICO."""
+    key = str(dominio).lower().strip()
+    dom_can = DOMINIO_CANONICO.get(key, key.upper()[:3] if len(key) >= 3 else key.upper())
     decls, _ = recolectar(declaraciones_externas)
     out = []
     for d in decls:
-        gobs = [str(g).lower().strip() for g in (d.get("gobierna") or [])]
-        if dom in gobs or any(dom in g for g in gobs):
+        gobs_raw = [str(g).lower().strip() for g in (d.get("gobierna") or [])]
+        gobs_can = {DOMINIO_CANONICO.get(g, g.upper()[:3]) for g in gobs_raw}
+        if dom_can in gobs_can or key in gobs_raw:
             out.append(d)
     return out
 
 
 def buscar_por_id(id_decl: str) -> Optional[Dict]:
-    """Busca y cita una declaración por su id."""
-    decls, _ = recolectar()
-    for d in decls:
-        if d.get("id") == id_decl:
-            return d
-    return None
+    """CORRECCIÓN 18: no seleccionar arbitrariamente si hay duplicados."""
+    decls, errores = recolectar()
+    matches = [d for d in decls if d.get("id") == id_decl]
+    if len(matches) == 0:
+        return None
+    if len(matches) > 1:
+        # conflicto de ID duplicado — no escoger
+        return None
+    return matches[0]
 
 # ===============================================================
 # FIN 8.5
@@ -1342,7 +1555,7 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
 
 def inventario(peticion=None) -> Dict:
     decls, errores = recolectar()
-    lim = limite_axiomático()
+    lim = limite_axiomático(decls=decls, errores=errores)
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -1353,9 +1566,7 @@ def inventario(peticion=None) -> Dict:
         "estabilidad": ESTABILIDAD,
         "tipos": list(TIPOS),
         "declaraciones": len(decls),
-        "por_tipo": {
-            t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS
-        },
+        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
         "cuerpos": sorted({d["cuerpo"] for d in decls}),
         "errores": errores,
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
@@ -1369,6 +1580,7 @@ def inventario(peticion=None) -> Dict:
         "limite_axiomático": {
             "premisas_faltantes": len(lim.get("premisas_faltantes") or []),
             "dependencias_no_satisfechas": len(lim.get("dependencias_no_satisfechas") or []),
+            "dependencias_circulares": len(lim.get("dependencias_circulares") or []),
             "alcance": lim.get("alcance"),
         },
         "nota": (
@@ -1383,17 +1595,19 @@ def inventario(peticion=None) -> Dict:
 
 
 # ===============================================================
-# PARTE 9 — REPORTING INTERNO
+# PARTE 9 — REPORTING
 # ===============================================================
-
 
 # ===============================================================
 # 9.1 — REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
-    r = barrer()
-    lim = limite_axiomático()
+    """CORRECCIÓN 29: una sola instantánea."""
+    decls, errores = recolectar()
+    choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
+    lim = limite_axiomático(decls=decls, errores=errores)
+    coherente = not (choques or errores)
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1402,13 +1616,13 @@ def reporte() -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "estado": ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO,
-        "coherente": r.get("coherente"),
-        "declaraciones": r.get("declaraciones"),
-        "choques": len(r.get("choques") or []),
-        "errores": len(r.get("errores") or []),
-        "cuerpos": r.get("cuerpos"),
-        "por_tipo": r.get("por_tipo"),
+        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
+        "coherente": coherente,
+        "declaraciones": len(decls),
+        "choques": len(choques),
+        "errores": len(errores),
+        "cuerpos": sorted({d["cuerpo"] for d in decls}),
+        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "autoridad": CONTENEDOR.get("autoridad"),
@@ -1417,6 +1631,7 @@ def reporte() -> Dict[str, Any]:
         "limite_axiomático": {
             "premisas_faltantes": len(lim.get("premisas_faltantes") or []),
             "dependencias_no_satisfechas": len(lim.get("dependencias_no_satisfechas") or []),
+            "dependencias_circulares": len(lim.get("dependencias_circulares") or []),
         },
     }
 
@@ -1430,28 +1645,31 @@ def reporte() -> Dict[str, Any]:
 # ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
-    r = barrer()
-    lim = limite_axiomático()
+    """CORRECCIÓN 30: distinguir problemas / advertencias / limites."""
+    decls, errores = recolectar()
+    choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
+    lim = limite_axiomático(decls=decls, errores=errores)
+
     problemas = []
     advertencias = []
     recomendaciones = []
     limites_reportados = []
 
-    if r.get("errores"):
-        problemas.append({"tipo": "errores_carga", "detalle": r["errores"]})
+    if errores:
+        problemas.append({"tipo": "errores_carga", "detalle": errores})
         recomendaciones.append("Revisar archivos de cuerpos con error de carga")
 
-    if r.get("choques"):
+    if choques:
         problemas.append({
             "tipo": "contradicciones",
-            "cantidad": len(r["choques"]),
-            "detalle": r["choques"][:5],
+            "cantidad": len(choques),
+            "detalle": choques[:5],
         })
         recomendaciones.append("Resolver contradicciones directas o de cota")
 
     if lim.get("premisas_faltantes"):
         limites_reportados.append({
-            "tipo": "premisas_faltantes",
+            "tipo": "PREMISA_FALTANTE",
             "cantidad": len(lim["premisas_faltantes"]),
             "detalle": lim["premisas_faltantes"][:5],
         })
@@ -1459,20 +1677,20 @@ def diagnostico() -> Dict[str, Any]:
             "Existen declaraciones cuyas premisas no están en el cuerpo axiomático"
         )
 
-    if lim.get("dependencias_no_satisfechas"):
+    if lim.get("dependencias_circulares"):
         limites_reportados.append({
-            "tipo": "dependencias_no_satisfechas",
-            "cantidad": len(lim["dependencias_no_satisfechas"]),
+            "tipo": "CIRCULAR",
+            "cantidad": len(lim["dependencias_circulares"]),
         })
 
-    if not r.get("declaraciones"):
+    if not decls:
         advertencias.append("No hay declaraciones cargadas")
         recomendaciones.append("Verificar que existan cuerpos .py con DECLARACIONES")
 
     estado = ESTADO_OPERATIVO
     if problemas:
         estado = ESTADO_DEGRADADO
-    if not r.get("declaraciones") and not problemas:
+    if not decls and not problemas:
         estado = ESTADO_NO_INICIADO
 
     return {
@@ -1483,10 +1701,10 @@ def diagnostico() -> Dict[str, Any]:
         "advertencias": advertencias,
         "recomendaciones": recomendaciones,
         "limites": limites_reportados,
-        "coherente": r.get("coherente"),
-        "declaraciones": r.get("declaraciones"),
-        "choques_n": len(r.get("choques") or []),
-        "errores_n": len(r.get("errores") or []),
+        "coherente": not (choques or errores),
+        "declaraciones": len(decls),
+        "choques_n": len(choques),
+        "errores_n": len(errores),
         "premisas_faltantes_n": len(lim.get("premisas_faltantes") or []),
     }
 
@@ -1496,14 +1714,14 @@ def diagnostico() -> Dict[str, Any]:
 
 
 # ===============================================================
-# PARTE 10 — RESOLUCIÓN ESTRICTA DEL CONTRATO
+# PARTE 10 — RESOLUCIÓN ESTRICTA (sin mutar CONTENEDOR)
 # ===============================================================
-
 
 # ===============================================================
 # 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
+# CORRECCIÓN 3 y 24/25: mapa de resolución separado; no mutar CONTENEDOR
 _CAP_MAP = {
     "barrer": barrer,
     "verificar_salida": verificar_salida,
@@ -1517,7 +1735,7 @@ _CAP_MAP = {
     "reporte": reporte,
     "diagnostico": diagnostico,
     "buscar_por_id": buscar_por_id,
-    "verificar": verificar,
+    "verificar": barrer,          # alias contractual → barrer
     "limite_axiomático": limite_axiomático,
 }
 
@@ -1530,9 +1748,15 @@ _CAP_MAP = {
 # 10.2 — RESOLUCIÓN DE CAPACIDADES
 # ===============================================================
 
-def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+# Estructura paralela de capacidades resueltas (no muta el contrato)
+CAPACIDADES_RESUELTAS: Dict[str, Any] = {}
+
+
+def _resolver_capacidades() -> None:
+    """CORRECCIÓN 24/25: no mutar CONTENEDOR['capacidades']."""
+    global CAPACIDADES_RESUELTAS
     resueltas: Dict[str, Any] = {}
-    for nombre, ref in cont["capacidades"].items():
+    for nombre, ref in CONTENEDOR["capacidades"].items():
         if callable(ref):
             resueltas[nombre] = ref
             continue
@@ -1553,7 +1777,9 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
             f"{NOMBRE_MODULO}: capacidad '{nombre}' "
             f"tiene tipo inválido: {type(ref).__name__}"
         )
-    cont["capacidades"] = resueltas
+    CAPACIDADES_RESUELTAS = resueltas
+    # CONTENEDOR["capacidades"] permanece como declaración contractual.
+    # No se muta.
 
 # ===============================================================
 # FIN 10.2
@@ -1565,7 +1791,7 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
 # ===============================================================
 
 _validar_contrato(CONTENEDOR)
-_resolver_capacidades(CONTENEDOR)
+_resolver_capacidades()
 
 # ===============================================================
 # FIN 10.3
@@ -1611,25 +1837,11 @@ __all__ = [
     "buscar_por_id",
     "limite_axiomático",
     "ContratoInvalido",
+    "CAPACIDADES_RESUELTAS",
 ]
 
 # ===============================================================
 # FIN PARTE 11
-# ===============================================================
-
-
-# ===============================================================
-# PARTE 12 — EXTENSIONES FUTURAS
-# ===============================================================
-#
-# Toda capacidad nueva DEBE agregarse simultáneamente en:
-#   1. capacidades
-#   2. capacidades_meta  (descripcion, entrada, salida: str)
-#   3. _CAP_MAP
-#   4. VERSION_MODULO
-#
-# ===============================================================
-# FIN PARTE 12
 # ===============================================================
 
 

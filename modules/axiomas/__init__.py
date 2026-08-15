@@ -265,7 +265,7 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico","ejecutar_total",
         "inspeccionar",
-        "registrar_inventario",
+        "registrar_inventario", "inspeccionar"
     ],
 
     # ============================================================

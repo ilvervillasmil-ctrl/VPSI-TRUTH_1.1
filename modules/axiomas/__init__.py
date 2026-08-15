@@ -2119,10 +2119,6 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
 # ===============================================================# 8.6 — # ===============================================================
 
 # ===============================================================
-# PARTE 9 — REPORTING
-# ===============================================================
-
-# ===============================================================
 # 9.1 — REPORTE
 # ===============================================================
 
@@ -2132,6 +2128,7 @@ def reporte() -> Dict[str, Any]:
     choques = contradiccion_directa(decls) + contradiccion_de_cota(decls)
     lim = limite_axiomático(decls=decls, errores=errores)
     coherente = not (choques or errores)
+    caps = list(CONTENEDOR["capacidades"].keys())
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -2146,15 +2143,24 @@ def reporte() -> Dict[str, Any]:
         "choques": len(choques),
         "errores": len(errores),
         "cuerpos": sorted({d["cuerpo"] for d in decls}),
-        "por_tipo": {t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS},
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "por_tipo": {
+            t: sum(1 for d in decls if d["tipo"] == t) for t in TIPOS
+        },
+        "capacidades": caps,
         "capacidades_resueltas": list(CAPACIDADES_RESUELTAS.keys()),
+        "capacidades_meta": list(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+        "conocimiento_exportable": CONTENEDOR.get(
+            "conocimiento_exportable"
+        ),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
         "limite_axiomático": {
-            "premisas_faltantes": len(lim.get("premisas_faltantes") or []),
+            "premisas_faltantes": len(
+                lim.get("premisas_faltantes") or []
+            ),
             "dependencias_no_satisfechas": len(
                 lim.get("dependencias_no_satisfechas") or []
             ),
@@ -2163,11 +2169,13 @@ def reporte() -> Dict[str, Any]:
             ),
         },
         "operaciones_arquitectonicas": {
-            "ejecutar_total": "ejecutar_total" in CONTENEDOR.get("capacidades", {}),
-            "inspeccionar": "inspeccionar" in CONTENEDOR.get("capacidades", {}),
+            nombre: True for nombre in caps
         },
     }
 
+# ===============================================================
+# FIN 9.1
+# ===============================================================
 # ===============================================================
 # FIN 9.1
 # ===============================================================

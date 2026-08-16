@@ -5,7 +5,7 @@
 # MÓDULO:              calculator
 # ID:                  CA
 # Rol:                 CA
-# Versión módulo:      2.3
+# Versión módulo:      2.4
 # Versión contrato:    1.0
 # Esquema contrato:    VPSI-CONTRACT-1.0
 # Estabilidad:         ESTABLE
@@ -24,11 +24,18 @@
 # Pipeline oficial:
 #   contexto → evidencia → C/L/K → centinela → ID → historial → salida
 #
+# ENGINE tiene autoridad total de ejecutar todas las capacidades
+# declaradas del módulo. Todo es callable real.
+#
 # ===============================================================
 
 
 # ===============================================================
-# IMPORTACIONES
+# PARTE 1 — PRINCIPIOS, BANDERAS Y ESPECIFICACIONES PRECISAS
+# ===============================================================
+
+# ===============================================================
+# 1.1 — IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
@@ -45,25 +52,42 @@ from typing import Any, Deque, Dict, List, Optional, Tuple
 getcontext().prec = 50
 
 # ===============================================================
-# FIN IMPORTACIONES
+# FIN 1.1
 # ===============================================================
 
 
 # ===============================================================
-# CONSTANTES
+# 1.2 — IDENTIDAD
 # ===============================================================
 
 ID_MODULO = "CA"
 NOMBRE_MODULO = "calculator"
 ROL_MODULO = "CA"
 
-VERSION_MODULO = "2.3"
+# ===============================================================
+# FIN 1.2
+# ===============================================================
+
+
+# ===============================================================
+# 1.3 — VERSIONES Y ESTABILIDAD
+# ===============================================================
+
+VERSION_MODULO = "2.4"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-
 COMPATIBLE_DESDE = "1.2"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
+
+# ===============================================================
+# FIN 1.3
+# ===============================================================
+
+
+# ===============================================================
+# 1.4 — BANDERAS DE ESTADO
+# ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
@@ -76,6 +100,15 @@ ESTADOS_VALIDOS = (
     ESTADO_RECHAZADO,
 )
 
+# ===============================================================
+# FIN 1.4
+# ===============================================================
+
+
+# ===============================================================
+# 1.5 — INVARIANTES
+# ===============================================================
+
 INVARIANTES = (
     "CA es la unica autoridad del dominio de calculo estructural",
     "todo calculo interno utiliza Fraction como valor oficial",
@@ -86,7 +119,17 @@ INVARIANTES = (
     "toda magnitud registra evidencia trazable con id_evidencia",
     "K ausente sin contexto/O es legitimo (Def-5.3.1)",
     "L = UNDEFINED cuando p=0 (AM-D6 / AM-A3)",
+    "ENGINE ejerce autoridad total sobre las capacidades declaradas de CA",
 )
+
+# ===============================================================
+# FIN 1.5
+# ===============================================================
+
+
+# ===============================================================
+# 1.6 — CONSTANTES DE CÁLCULO
+# ===============================================================
 
 PRECISION_DECIMAL_DEFAULT = 3
 HISTORIAL_MAX = 64
@@ -107,23 +150,31 @@ _CLAVES_CONTEO = (
 )
 
 # ===============================================================
-# FIN CONSTANTES
+# FIN 1.6
 # ===============================================================
 
 
 # ===============================================================
-# CONFIGURACIÓN
+# 1.7 — CONFIGURACIÓN
 # ===============================================================
 
 _DIR = Path(__file__).parent
 
 # ===============================================================
-# FIN CONFIGURACIÓN
+# FIN 1.7
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 1
 # ===============================================================
 
 
 # ===============================================================
-# DEFINICIONES
+# PARTE 4 — DEFINICIONES
+# ===============================================================
+
+# ===============================================================
+# 4.1 — EXCEPCIONES
 # ===============================================================
 
 class ContratoInvalido(Exception):
@@ -137,6 +188,14 @@ class DominioError(ValueError):
 class MetodoError(ValueError):
     pass
 
+# ===============================================================
+# FIN 4.1
+# ===============================================================
+
+
+# ===============================================================
+# 4.2 — UNDEFINED
+# ===============================================================
 
 class _Undefined:
     __slots__ = ()
@@ -160,6 +219,14 @@ UNDEFINED = _Undefined()
 def es_undefined(v: Any) -> bool:
     return v is UNDEFINED or isinstance(v, _Undefined)
 
+# ===============================================================
+# FIN 4.2
+# ===============================================================
+
+
+# ===============================================================
+# 4.3 — ESTADO INTERNO
+# ===============================================================
 
 _CALC_SEQ = 0
 _EV_SEQ = 0
@@ -168,16 +235,21 @@ _EVIDENCIA_POR_CALC: Dict[str, List[Dict[str, Any]]] = {}
 _REG_EVIDENCIA: Dict[str, Dict[str, Any]] = {}
 
 # ===============================================================
-# FIN DEFINICIONES
+# FIN 4.3
 # ===============================================================
 
 # ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
+# FIN PARTE 4
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 5 — CONTRATO OFICIAL (CONTENEDOR)
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
     # ============================================================
-    # ESQUEMA
+    # 5.1 — ESQUEMA
     # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
@@ -187,7 +259,7 @@ CONTENEDOR: Dict[str, Any] = {
     "api_engine": API_ENGINE,
 
     # ============================================================
-    # IDENTIDAD
+    # 5.2 — IDENTIDAD
     # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
@@ -199,7 +271,7 @@ CONTENEDOR: Dict[str, Any] = {
     ),
 
     # ============================================================
-    # PROPÓSITO
+    # 5.3 — PROPÓSITO
     # ============================================================
     "funcion": (
         "Pipeline: evidencia -> C/L/K -> centinela -> ID compuesto -> "
@@ -214,7 +286,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # AUTORIDAD
+    # 5.4 — AUTORIDAD
     # ============================================================
     "autoridad": [
         "Unica autoridad para calcular C, L, K",
@@ -224,44 +296,58 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # CONOCIMIENTO EXPORTABLE
+    # 5.5 — CONOCIMIENTO EXPORTABLE
     # ============================================================
     "conocimiento_exportable": [
         "C", "L", "K", "factores", "UNDEFINED",
         "evidencia", "versiones_utilizadas", "contratos_utilizados",
         "historial", "explicaciones",
         "inventario", "estado", "reporte", "diagnostico",
+        "ejecutar_total", "inspeccionar", "registrar_inventario",
     ],
 
-    #============================================================
-    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    # 5.6 — ACCESO
     # ============================================================
     "acceso": {
         "nivel": "acceso_archivos",
-        "descripcion": "Acceso total a recursos del módulo"
+        "descripcion": "Acceso total a recursos del módulo",
     },
 
     # ============================================================
-    # DEPENDENCIAS
+    # 5.7 — DEPENDENCIAS
     # ============================================================
-    "requiere": ["CT", "AX", "FO", "MC", 
-                 "SF", "CA", "CX", "DI",
-                 "RE", "VX", "TX", "CH", 
-                 "CIT", "TT", "CE", "CC",],
+    "requiere": [
+        "CT", "AX", "FO", "MC",
+        "SF", "CA", "CX", "DI",
+        "RE", "VX", "TX", "CH",
+        "CIT", "TT", "CE", "CC",
+    ],
 
     # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # 5.8 — ACCESO A ARCHIVOS
     # ============================================================
     "acceso_archivos": ["acceso_archivos"],
 
     # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # 5.9 — VALIDAR ESQUEMA
     # ============================================================
     "validar_esquema": ["validar_esquema"],
 
+    # ============================================================
+    # 5.10 — CONSULTAS SOPORTADAS
+    # ============================================================
+    "consultas_soportadas": [
+        "calcular", "calcular_C", "calcular_L", "calcular_K",
+        "calcular_factor", "representar", "validar_evidencia",
+        "explicar_calculo", "verificar_coherencia",
+        "obtener_inventario", "obtener_reporte", "obtener_diagnostico",
+        "leer_ids_escala", "historial", "verificar_calculo_de_C_L_K",
+        "ejecutar_total", "inspeccionar", "registrar_inventario",
+    ],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # 5.11 — AUTORIZACIÓN AL ENGINE
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -274,11 +360,8 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
@@ -286,7 +369,6 @@ CONTENEDOR: Dict[str, Any] = {
         "procesar": True,
         "analizar": True,
         "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
@@ -313,23 +395,18 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "reporte": True,
 
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
+        # --- PERMISOS OBLIGATORIOS ---
+        "validar_esquema": True,
+        "acceso_archivos": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
-    # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "calcular", "calcular_C", "calcular_L", "calcular_K",
-        "calcular_factor", "representar", "validar_evidencia",
-        "explicar_calculo", "verificar_coherencia",
-        "obtener_inventario", "obtener_reporte", "obtener_diagnostico",
-        "leer_ids_escala", "historial", "verificar_calculo_de_C_L_K",
-    ],
 
     # ============================================================
-    # CAPACIDADES
+    # 5.12 — CAPACIDADES
     # ============================================================
     "capacidades": {
         "calcular": "calcular",
@@ -348,11 +425,14 @@ CONTENEDOR: Dict[str, Any] = {
         "leer_ids_escala": "leer_ids_escala",
         "verificar_salida": "verificar_salida",
         "historial": "historial",
-        "verificar_calculo_de_C_L_K": "verificar_calculo_de_C_L_K"
+        "verificar_calculo_de_C_L_K": "verificar_calculo_de_C_L_K",
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
     },
 
     # ============================================================
-    # META CALCULOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # 5.13 — METADATOS DE CAPACIDADES (1:1)
     # ============================================================
     "capacidades_meta": {
         "calcular": {
@@ -368,7 +448,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "calcular_C": {
             "descripcion": "Factor C como objeto fraccion+decimal.",
             "entrada": "peticion: dict",
@@ -376,7 +455,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con C, ruta, notas, evidencia",
             "acceso_archivos": ["*"],
         },
-
         "calcular_L": {
             "descripcion": "Factor L como objeto (o UNDEFINED).",
             "entrada": "peticion: dict",
@@ -384,7 +462,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con L, p, r, ruta, notas, evidencia",
             "acceso_archivos": ["*"],
         },
-
         "calcular_K": {
             "descripcion": "Factor K como objeto (o None sin O).",
             "entrada": "peticion: dict",
@@ -392,7 +469,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con K, ruta, notas, evidencia",
             "acceso_archivos": ["*"],
         },
-
         "calcular_factor": {
             "descripcion": "Factor por nombre C|L|K.",
             "entrada": "factor: str, peticion: dict",
@@ -400,7 +476,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict del factor",
             "acceso_archivos": ["*"],
         },
-
         "representar": {
             "descripcion": (
                 "Fraction -> objeto con fraccion, numerador, denominador, "
@@ -411,7 +486,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict valor completo",
             "acceso_archivos": ["*"],
         },
-
         "validar_evidencia": {
             "descripcion": (
                 "Valida lista de evidencia sin calcular: estructura, "
@@ -425,7 +499,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "explicar_calculo": {
             "descripcion": (
                 "Explica un calculo por id usando evidencia real almacenada."
@@ -435,7 +508,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict explicativo dinamico o None",
             "acceso_archivos": ["*"],
         },
-
         "verificar": {
             "descripcion": "Centinela de integridad (APIs, hashes, choques).",
             "entrada": "ninguna",
@@ -443,7 +515,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con coherente, errores, choques, hashes",
             "acceso_archivos": ["*"],
         },
-
         "barrer": {
             "descripcion": "Alias de verificar.",
             "entrada": "ninguna",
@@ -451,17 +522,13 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con coherente, errores, choques, hashes",
             "acceso_archivos": ["*"],
         },
-
         "inventario": {
             "descripcion": "Inventario del dominio de calculo.",
             "entrada": "peticion opcional",
             "validar_esquema": ["*"],
-            "salida": (
-                "dict con capacidades, factores, archivos, hashes"
-            ),
+            "salida": "dict con capacidades, factores, archivos, hashes",
             "acceso_archivos": ["*"],
         },
-
         "reporte": {
             "descripcion": "Reporte de estado de CA.",
             "entrada": "ninguna",
@@ -469,7 +536,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con estado, coherente, factores_api",
             "acceso_archivos": ["*"],
         },
-
         "diagnostico": {
             "descripcion": "Diagnostico de problemas y recomendaciones.",
             "entrada": "ninguna",
@@ -480,7 +546,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "leer_ids_escala": {
             "descripcion": "Ids de escala reconocidos.",
             "entrada": "ninguna",
@@ -488,7 +553,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con ids, n, origenes",
             "acceso_archivos": ["*"],
         },
-
         "verificar_salida": {
             "descripcion": (
                 "Forma minima: C, L, K, id_calculo; "
@@ -499,7 +563,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
-
         "historial": {
             "descripcion": "Buffer liviano de ultimos calculos.",
             "entrada": "limite opcional: int",
@@ -507,7 +570,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "list[dict]",
             "acceso_archivos": ["*"],
         },
-
         "verificar_calculo_de_C_L_K": {
             "descripcion": (
                 "Verifica la integridad y coherencia del calculo "
@@ -521,61 +583,83 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre CA. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del modulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de CA. "
+                "Expone constantes, capacidades, APIs y estado "
+                "sin alterar el contrato ni calcular factores."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de CA "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
     },
-    
+
     # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # 5.14 — REPORTING
     # ============================================================
     "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
         "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+        "acceso_archivos": True,
+        "validar_esquema": True,
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
     # ============================================================
-    # ESTADOS VÁLIDOS
+    # 5.15 — ESTADOS VÁLIDOS E INVARIANTES
     # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ============================================================
-    # INVARIANTES
-    # ============================================================
     "invariantes": list(INVARIANTES),
+}
 
-}  # <--- CIERRE FINAL
+# ===============================================================
+# FIN PARTE 5
+# ===============================================================
+
 
 # ===============================================================
-# FIN CONTRATO
+# PARTE 7 — FUNCIONES PRIVADAS
 # ===============================================================
+
 # ===============================================================
-# FUNCIONES PRIVADAS
+# 7.1 — CARGA DE APIs C/L/K
 # ===============================================================
 
 def _importar_apis() -> Tuple[Dict[str, Any], List[Dict[str, str]]]:
@@ -609,6 +693,14 @@ def _importar_apis() -> Tuple[Dict[str, Any], List[Dict[str, str]]]:
 
 _APIS, _ERRORES_CARGA = _importar_apis()
 
+# ===============================================================
+# FIN 7.1
+# ===============================================================
+
+
+# ===============================================================
+# 7.2 — CARGA DE CONTEOS Y ESCALAS
+# ===============================================================
 
 def _cargar_conteos():
     try:
@@ -645,6 +737,14 @@ def _cargar_escalas_ids():
 
 _ESCALAS = _cargar_escalas_ids()
 
+# ===============================================================
+# FIN 7.2
+# ===============================================================
+
+
+# ===============================================================
+# 7.3 — ARCHIVOS Y HASHES
+# ===============================================================
 
 def _listar_py() -> List[Path]:
     return [
@@ -686,6 +786,14 @@ def _hashes_modulo() -> Dict[str, Dict[str, Any]]:
         out[p.name] = _meta_archivo(p)
     return out
 
+# ===============================================================
+# FIN 7.3
+# ===============================================================
+
+
+# ===============================================================
+# 7.4 — CONVERSIÓN Y CONTEOS
+# ===============================================================
 
 def _a_fraction(x: Any) -> Optional[Fraction]:
     if x is None or es_undefined(x):
@@ -728,6 +836,14 @@ def _id_escala_pedido(peticion: Dict[str, Any]) -> Optional[str]:
             return str(v).strip().lower()
     return None
 
+# ===============================================================
+# FIN 7.4
+# ===============================================================
+
+
+# ===============================================================
+# 7.5 — IDS DE CÁLCULO Y EVIDENCIA
+# ===============================================================
 
 def _nuevo_id_calculo() -> str:
     global _CALC_SEQ
@@ -783,6 +899,14 @@ def _acepta_dict(fn: Any) -> bool:
         pass
     return False
 
+# ===============================================================
+# FIN 7.5
+# ===============================================================
+
+
+# ===============================================================
+# 7.6 — CENTINELA DE RESULTADO
+# ===============================================================
 
 def _centinela_resultado(
     salida: Dict[str, Any],
@@ -821,7 +945,6 @@ def _centinela_resultado(
                 "evidencia de modulo rechazado: {0}".format(ev.get("modulo"))
             )
 
-    # Mismo modulo con versiones distintas
     por_mod: Dict[str, set] = {}
     for ev in evidencia:
         mod = ev.get("modulo")
@@ -872,6 +995,14 @@ def _centinela_resultado(
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
+# ===============================================================
+# FIN 7.6
+# ===============================================================
+
+
+# ===============================================================
+# 7.7 — VALIDACIÓN DEL CONTRATO
+# ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
     obligatorias = (
@@ -912,12 +1043,20 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                 )
 
 # ===============================================================
-# FIN FUNCIONES PRIVADAS
+# FIN 7.7
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 7
 # ===============================================================
 
 
 # ===============================================================
-# CAPACIDADES PÚBLICAS
+# PARTE 8 — CAPACIDADES PÚBLICAS
+# ===============================================================
+
+# ===============================================================
+# 8.1 — REPRESENTAR
 # ===============================================================
 
 def representar(
@@ -983,6 +1122,14 @@ def representar(
         "undefined": False,
     }
 
+# ===============================================================
+# FIN 8.1
+# ===============================================================
+
+
+# ===============================================================
+# 8.2 — VALIDAR EVIDENCIA
+# ===============================================================
 
 def validar_evidencia(evidencia: Any = None) -> Dict[str, Any]:
     """Valida evidencia sin calcular."""
@@ -1026,6 +1173,14 @@ def validar_evidencia(evidencia: Any = None) -> Dict[str, Any]:
         "n": len(normalizada),
     }
 
+# ===============================================================
+# FIN 8.2
+# ===============================================================
+
+
+# ===============================================================
+# 8.3 — LEER IDS ESCALA
+# ===============================================================
 
 def leer_ids_escala() -> Dict[str, Any]:
     ids_local: List[str] = []
@@ -1050,6 +1205,14 @@ def leer_ids_escala() -> Dict[str, Any]:
         "disponible": bool(unidos),
     }
 
+# ===============================================================
+# FIN 8.3
+# ===============================================================
+
+
+# ===============================================================
+# 8.4 — BARRER / VERIFICAR
+# ===============================================================
 
 def barrer() -> Dict[str, Any]:
     errores: List[Dict[str, str]] = list(_ERRORES_CARGA)
@@ -1101,6 +1264,19 @@ def barrer() -> Dict[str, Any]:
         "historial_n": len(_HISTORIAL),
     }
 
+
+def verificar() -> Dict[str, Any]:
+    """Alias contractual de barrer."""
+    return barrer()
+
+# ===============================================================
+# FIN 8.4
+# ===============================================================
+
+
+# ===============================================================
+# 8.5 — CALCULAR C / L / K / FACTOR
+# ===============================================================
 
 def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     peticion = dict(peticion or {})
@@ -1323,6 +1499,14 @@ def calcular_factor(
         "soportados": list(_FACTORES_CANONICOS),
     }
 
+# ===============================================================
+# FIN 8.5
+# ===============================================================
+
+
+# ===============================================================
+# 8.6 — CALCULAR (PIPELINE COMPLETO)
+# ===============================================================
 
 def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -1339,7 +1523,6 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     id_calculo = _nuevo_id_calculo()
     errores: List[str] = []
 
-    # Validar evidencia entrante
     val_ev = validar_evidencia(peticion.get("evidencia"))
     evidencia = list(val_ev.get("evidencia_normalizada") or [])
     if not val_ev.get("ok"):
@@ -1440,7 +1623,6 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     salida["version_ca"] = VERSION_MODULO
     salida["esquema"] = ESQUEMA_CONTRATO
 
-    # Historial liviano (sin evidencia completa)
     _EVIDENCIA_POR_CALC[id_calculo] = ev_all
     _HISTORIAL.append({
         "id_calculo": id_calculo,
@@ -1491,6 +1673,14 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
     return salida
 
+# ===============================================================
+# FIN 8.6
+# ===============================================================
+
+
+# ===============================================================
+# 8.7 — EXPLICAR / HISTORIAL / VERIFICAR SALIDA
+# ===============================================================
 
 def explicar_calculo(id_calculo: str) -> Optional[Dict[str, Any]]:
     """Explicacion dinamica desde evidencia real del calculo."""
@@ -1504,7 +1694,6 @@ def explicar_calculo(id_calculo: str) -> Optional[Dict[str, Any]]:
         return None
 
     evidencia = list(_EVIDENCIA_POR_CALC.get(key) or [])
-    # reconstruir desde ids si hace falta
     if not evidencia:
         for eid in item.get("id_evidencias") or []:
             if eid in _REG_EVIDENCIA:
@@ -1599,31 +1788,22 @@ def verificar_salida(salida: Any) -> bool:
             return False
         if "display" not in bloque:
             return False
-        # no debe haber C_fraccion en la raiz
     if any(k in salida for k in ("C_fraccion", "L_fraccion", "K_fraccion")):
         return False
     return True
 
 # ===============================================================
-# VERIFICACIÓN DE CÁLCULO DE C, L, K (DOBLE VERIFICACIÓN)
+# FIN 8.7
+# ===============================================================
+
+
+# ===============================================================
+# 8.8 — VERIFICAR CÁLCULO C/L/K
 # ===============================================================
 
 def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
     """
     Verifica la integridad y coherencia del cálculo de C, L y K.
-    
-    Args:
-        calculo: Diccionario con los resultados de C, L, K (salida de calcular())
-    
-    Returns:
-        Dict con:
-            - valido: bool
-            - errores: List[str]
-            - advertencias: List[str]
-            - C: dict o None
-            - L: dict o None
-            - K: dict o None
-            - verificacion: dict con detalles por factor
     """
     if not isinstance(calculo, dict):
         return {
@@ -1633,37 +1813,36 @@ def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
             "C": None,
             "L": None,
             "K": None,
-            "verificacion": {}
+            "verificacion": {},
         }
-    
+
     errores: List[str] = []
     advertencias: List[str] = []
     verificacion: Dict[str, Any] = {}
-    
-    # ==========================================================
-    # 1. VERIFICAR C
-    # ==========================================================
+
     C = calculo.get("C")
     if C is None:
         errores.append("C no está presente en el cálculo")
         verificacion["C"] = {"presente": False, "ok": False}
     elif not isinstance(C, dict):
         errores.append("C debe ser un dict")
-        verificacion["C"] = {"presente": True, "ok": False, "tipo": type(C).__name__}
+        verificacion["C"] = {
+            "presente": True,
+            "ok": False,
+            "tipo": type(C).__name__,
+        }
     else:
         ok_c = True
         detalles = {}
-        
-        # Verificar campos obligatorios
-        for campo in ["fraccion", "decimal", "display", "numerador", "denominador"]:
+        for campo in [
+            "fraccion", "decimal", "display", "numerador", "denominador"
+        ]:
             if campo not in C:
                 errores.append(f"C falta campo '{campo}'")
                 ok_c = False
                 detalles[campo] = "FALTANTE"
             else:
                 detalles[campo] = C.get(campo)
-        
-        # Verificar que fraccion = numerador/denominador
         if "fraccion" in C and "numerador" in C and "denominador" in C:
             fraccion = C.get("fraccion")
             num = C.get("numerador")
@@ -1672,35 +1851,43 @@ def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
                 esperado = f"{num}/{den}"
                 if str(fraccion) != esperado:
                     advertencias.append(
-                        f"C: fraccion '{fraccion}' no coincide con numerador/denominador '{esperado}'"
+                        f"C: fraccion '{fraccion}' no coincide con "
+                        f"numerador/denominador '{esperado}'"
                     )
-        
-        verificacion["C"] = {"presente": True, "ok": ok_c, "detalles": detalles}
-    
-    # ==========================================================
-    # 2. VERIFICAR L
-    # ==========================================================
+        verificacion["C"] = {
+            "presente": True,
+            "ok": ok_c,
+            "detalles": detalles,
+        }
+
     L = calculo.get("L")
     if L is None:
-        advertencias.append("L no está presente en el cálculo (puede ser UNDEFINED)")
-        verificacion["L"] = {"presente": False, "ok": True, "nota": "L puede ser UNDEFINED si p=0"}
+        advertencias.append(
+            "L no está presente en el cálculo (puede ser UNDEFINED)"
+        )
+        verificacion["L"] = {
+            "presente": False,
+            "ok": True,
+            "nota": "L puede ser UNDEFINED si p=0",
+        }
     elif not isinstance(L, dict):
         errores.append("L debe ser un dict")
-        verificacion["L"] = {"presente": True, "ok": False, "tipo": type(L).__name__}
+        verificacion["L"] = {
+            "presente": True,
+            "ok": False,
+            "tipo": type(L).__name__,
+        }
     else:
-        ok_l = True
-        detalles = {}
-        
-        # Verificar si es UNDEFINED
         if L.get("undefined"):
             verificacion["L"] = {
                 "presente": True,
                 "ok": True,
                 "undefined": True,
-                "detalles": {"display": L.get("display")}
+                "detalles": {"display": L.get("display")},
             }
         else:
-            # Verificar campos obligatorios
+            ok_l = True
+            detalles = {}
             for campo in ["fraccion", "decimal", "display"]:
                 if campo not in L:
                     errores.append(f"L falta campo '{campo}'")
@@ -1708,33 +1895,40 @@ def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
                     detalles[campo] = "FALTANTE"
                 else:
                     detalles[campo] = L.get(campo)
-            
-            verificacion["L"] = {"presente": True, "ok": ok_l, "detalles": detalles}
-    
-    # ==========================================================
-    # 3. VERIFICAR K
-    # ==========================================================
+            verificacion["L"] = {
+                "presente": True,
+                "ok": ok_l,
+                "detalles": detalles,
+            }
+
     K = calculo.get("K")
     if K is None:
-        advertencias.append("K no está presente en el cálculo (puede ser None sin contexto/O)")
-        verificacion["K"] = {"presente": False, "ok": True, "nota": "K=None es legitimo sin contexto/O (Def-5.3.1)"}
+        advertencias.append(
+            "K no está presente (puede ser None sin contexto/O)"
+        )
+        verificacion["K"] = {
+            "presente": False,
+            "ok": True,
+            "nota": "K=None es legitimo sin contexto/O (Def-5.3.1)",
+        }
     elif not isinstance(K, dict):
         errores.append("K debe ser un dict")
-        verificacion["K"] = {"presente": True, "ok": False, "tipo": type(K).__name__}
+        verificacion["K"] = {
+            "presente": True,
+            "ok": False,
+            "tipo": type(K).__name__,
+        }
     else:
-        ok_k = True
-        detalles = {}
-        
-        # Verificar si es None (representado como dict con None)
         if K.get("valor") is None and K.get("fraccion") is None:
             verificacion["K"] = {
                 "presente": True,
                 "ok": True,
                 "none": True,
-                "detalles": {"display": K.get("display")}
+                "detalles": {"display": K.get("display")},
             }
         else:
-            # Verificar campos obligatorios
+            ok_k = True
+            detalles = {}
             for campo in ["fraccion", "decimal", "display"]:
                 if campo not in K:
                     errores.append(f"K falta campo '{campo}'")
@@ -1742,34 +1936,25 @@ def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
                     detalles[campo] = "FALTANTE"
                 else:
                     detalles[campo] = K.get(campo)
-            
-            verificacion["K"] = {"presente": True, "ok": ok_k, "detalles": detalles}
-    
-    # ==========================================================
-    # 4. VERIFICACIÓN ADICIONAL
-    # ==========================================================
-    
-    # Verificar id_calculo
+            verificacion["K"] = {
+                "presente": True,
+                "ok": ok_k,
+                "detalles": detalles,
+            }
+
     if "id_calculo" not in calculo:
         advertencias.append("Falta 'id_calculo' en el resultado")
-    
-    # Verificar centinela
+
     centinela = calculo.get("centinela")
     if centinela is None:
         advertencias.append("Falta 'centinela' en el resultado")
     elif not centinela.get("ok"):
         errores.extend(centinela.get("problemas") or [])
-    
-    # Verificar errores
+
     if calculo.get("errores"):
         errores.extend(calculo.get("errores") or [])
-    
-    # ==========================================================
-    # 5. RESULTADO FINAL
-    # ==========================================================
-    
+
     valido = len(errores) == 0
-    
     return {
         "valido": valido,
         "errores": errores,
@@ -1782,10 +1967,18 @@ def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
             "C_ok": verificacion.get("C", {}).get("ok", False),
             "L_ok": verificacion.get("L", {}).get("ok", False),
             "K_ok": verificacion.get("K", {}).get("ok", False),
-            "centinela_ok": centinela.get("ok") if centinela else False
-        }
+            "centinela_ok": centinela.get("ok") if centinela else False,
+        },
     }
 
+# ===============================================================
+# FIN 8.8
+# ===============================================================
+
+
+# ===============================================================
+# 8.9 — INVENTARIO
+# ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     b = barrer()
@@ -1809,16 +2002,282 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "invariantes": CONTENEDOR.get("invariantes"),
         "precision_decimal_default": PRECISION_DECIMAL_DEFAULT,
-        "regla_salida": "un objeto por factor: fraccion = decimal (7/9 = 0.778)",
+        "regla_salida": (
+            "un objeto por factor: fraccion = decimal (7/9 = 0.778)"
+        ),
     }
 
 # ===============================================================
-# FIN CAPACIDADES PÚBLICAS
+# FIN 8.9
 # ===============================================================
 
 
 # ===============================================================
-# REPORTING INTERNO
+# 8.10 — CAPACIDADES ARQUITECTÓNICAS
+# ===============================================================
+
+def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Autoridad total de ENGINE sobre CA.
+    Ejerce TODAS las unidades operativamente ejecutables del módulo
+    conforme a su contrato e inventario.
+
+    Todo es callable real. Nada es texto.
+    No inventa capacidades. No altera el contrato.
+    """
+    peticion = dict(peticion or {}) if isinstance(peticion, dict) else {}
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    # -----------------------------------------------------------
+    # 1. Integridad del dominio
+    # -----------------------------------------------------------
+    try:
+        resultados["barrer"] = barrer()
+        resultados["verificar"] = resultados["barrer"]
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("barrer: {0}".format(e))
+        resultados["barrer"] = None
+
+    # -----------------------------------------------------------
+    # 2. Inventario y diagnóstico
+    # -----------------------------------------------------------
+    try:
+        resultados["inventario"] = inventario(peticion)
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("inventario: {0}".format(e))
+        resultados["inventario"] = None
+
+    try:
+        resultados["diagnostico"] = diagnostico()
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("diagnostico: {0}".format(e))
+        resultados["diagnostico"] = None
+
+    try:
+        resultados["reporte"] = reporte()
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("reporte: {0}".format(e))
+        resultados["reporte"] = None
+
+    # -----------------------------------------------------------
+    # 3. Escalas e historial
+    # -----------------------------------------------------------
+    try:
+        resultados["leer_ids_escala"] = leer_ids_escala()
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("leer_ids_escala: {0}".format(e))
+        resultados["leer_ids_escala"] = None
+
+    try:
+        resultados["historial"] = historial()
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("historial: {0}".format(e))
+        resultados["historial"] = None
+
+    # -----------------------------------------------------------
+    # 4. Representación determinista (callable real)
+    # -----------------------------------------------------------
+    try:
+        resultados["representar"] = {
+            "ejemplo_fraccion": representar(Fraction(7, 9)),
+            "ejemplo_none": representar(None),
+            "ejemplo_undefined": representar(UNDEFINED),
+        }
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("representar: {0}".format(e))
+        resultados["representar"] = None
+
+    # -----------------------------------------------------------
+    # 5. Validación de evidencia (callable real)
+    # -----------------------------------------------------------
+    try:
+        resultados["validar_evidencia"] = validar_evidencia(
+            peticion.get("evidencia")
+        )
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("validar_evidencia: {0}".format(e))
+        resultados["validar_evidencia"] = None
+
+    # -----------------------------------------------------------
+    # 6. Factores C / L / K (callables reales con peticion)
+    # -----------------------------------------------------------
+    try:
+        resultados["calcular_C"] = calcular_C(peticion)
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("calcular_C: {0}".format(e))
+        resultados["calcular_C"] = None
+
+    try:
+        resultados["calcular_L"] = calcular_L(peticion)
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("calcular_L: {0}".format(e))
+        resultados["calcular_L"] = None
+
+    try:
+        resultados["calcular_K"] = calcular_K(peticion)
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("calcular_K: {0}".format(e))
+        resultados["calcular_K"] = None
+
+    # -----------------------------------------------------------
+    # 7. Pipeline completo si hay datos suficientes
+    # -----------------------------------------------------------
+    try:
+        resultados["calcular"] = calcular(peticion)
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("calcular: {0}".format(e))
+        resultados["calcular"] = None
+
+    # -----------------------------------------------------------
+    # 8. Verificar salida del pipeline si existe
+    # -----------------------------------------------------------
+    calc_out = resultados.get("calcular")
+    if isinstance(calc_out, dict):
+        try:
+            resultados["verificar_salida"] = verificar_salida(calc_out)
+            resultados["verificar_calculo_de_C_L_K"] = (
+                verificar_calculo_de_C_L_K(calc_out)
+            )
+        except Exception as e:  # noqa: BLE001
+            errores_ejecucion.append(
+                "verificar_calculo: {0}".format(e)
+            )
+    else:
+        resultados["verificar_salida"] = None
+        resultados["verificar_calculo_de_C_L_K"] = None
+
+    # -----------------------------------------------------------
+    # 9. Inspección estructural y registro
+    # -----------------------------------------------------------
+    try:
+        resultados["inspeccionar"] = inspeccionar(peticion)
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("inspeccionar: {0}".format(e))
+        resultados["inspeccionar"] = None
+
+    try:
+        resultados["registrar_inventario"] = registrar_inventario(peticion)
+    except Exception as e:  # noqa: BLE001
+        errores_ejecucion.append("registrar_inventario: {0}".format(e))
+        resultados["registrar_inventario"] = None
+
+    # -----------------------------------------------------------
+    # Resultado consolidado
+    # -----------------------------------------------------------
+    coherente = False
+    if isinstance(resultados.get("barrer"), dict):
+        coherente = bool(resultados["barrer"].get("coherente"))
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
+        "coherente": coherente,
+        "capacidades_ejecutadas": sorted([
+            k for k, v in resultados.items() if v is not None
+        ]),
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "nota": (
+            "ejecutar_total ejerce autoridad total de ENGINE sobre CA. "
+            "Todas las unidades son callables reales. "
+            "No inventa capacidades ni altera el contrato."
+        ),
+    }
+
+
+def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Inspeccion estructural de CA.
+    Expone contrato, APIs y estado sin calcular factores.
+    """
+    res_barrer = barrer()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+            "PRECISION_DECIMAL_DEFAULT": PRECISION_DECIMAL_DEFAULT,
+            "FACTORES_CANONICOS": list(_FACTORES_CANONICOS),
+        },
+        "capacidades_contractuales": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": list(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "apis": {
+            "factores_cargados": sorted(_APIS.keys()),
+            "errores_carga": list(_ERRORES_CARGA),
+            "conteos_disponible": _CONTEOS is not None,
+            "escalas_ids_disponible": _ESCALAS is not None,
+        },
+        "integridad": {
+            "coherente": res_barrer.get("coherente"),
+            "archivos": res_barrer.get("archivos"),
+            "historial_n": res_barrer.get("historial_n"),
+        },
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone estructura de CA sin calcular "
+            "ni alterar el contrato."
+        ),
+    }
+
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Registra el inventario estructural de CA como instantanea determinista.
+    No altera evidencia de calculos previos.
+    """
+    inv = inventario(peticion)
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "inventario": inv,
+        "nota": (
+            "Instantanea determinista del inventario de CA. "
+            "No modifica historial ni evidencia de calculos."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.10
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 8
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 9 — REPORTING INTERNO
+# ===============================================================
+
+# ===============================================================
+# 9.1 — REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
@@ -1841,11 +2300,28 @@ def reporte() -> Dict[str, Any]:
         "errores_n": len(b.get("errores") or []),
         "choques_n": len(b.get("choques") or []),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "regla_salida": "un objeto por factor: fraccion = decimal (7/9 = 0.778)",
+        "regla_salida": (
+            "un objeto por factor: fraccion = decimal (7/9 = 0.778)"
+        ),
         "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+        "conocimiento_exportable": CONTENEDOR.get(
+            "conocimiento_exportable"
+        ),
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": True,
+            "inspeccionar": True,
+            "registrar_inventario": True,
+        },
     }
 
+# ===============================================================
+# FIN 9.1
+# ===============================================================
+
+
+# ===============================================================
+# 9.2 — DIAGNÓSTICO
+# ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
     b = barrer()
@@ -1862,7 +2338,9 @@ def diagnostico() -> Dict[str, Any]:
         advertencias.append("conteos.py no disponible")
     if not b.get("factores_api"):
         problemas.append({"tipo": "sin_apis", "detalle": "sin C/L/K"})
-        recomendaciones.append("Verificar coherencia.py, logica.py, correlacion_k.py")
+        recomendaciones.append(
+            "Verificar coherencia.py, logica.py, correlacion_k.py"
+        )
 
     estado = ESTADO_OPERATIVO if b.get("coherente") else ESTADO_DEGRADADO
     return {
@@ -1878,12 +2356,20 @@ def diagnostico() -> Dict[str, Any]:
     }
 
 # ===============================================================
-# FIN REPORTING
+# FIN 9.2
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 9
 # ===============================================================
 
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA
+# PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
+# ===============================================================
+
+# ===============================================================
+# 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
 _CAP_MAP = {
@@ -1896,15 +2382,27 @@ _CAP_MAP = {
     "validar_evidencia": validar_evidencia,
     "explicar_calculo": explicar_calculo,
     "barrer": barrer,
+    "verificar": barrer,
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
     "leer_ids_escala": leer_ids_escala,
     "verificar_salida": verificar_salida,
     "historial": historial,
-    "verificar_calculo_de_C_L_K": verificar_calculo_de_C_L_K
+    "verificar_calculo_de_C_L_K": verificar_calculo_de_C_L_K,
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
 
+# ===============================================================
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     resueltas: Dict[str, Any] = {}
@@ -1930,9 +2428,26 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
         )
     cont["capacidades"] = resueltas
 
+# ===============================================================
+# FIN 10.2
+# ===============================================================
+
+
+# ===============================================================
+# 10.3 — EJECUCIÓN DE VALIDACIÓN Y RESOLUCIÓN
+# ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# FIN 10.3
+# ===============================================================
+
+
+# ===============================================================
+# 10.4 — EXPORTACIONES
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -1951,14 +2466,28 @@ __all__ = [
     "validar_evidencia",
     "explicar_calculo",
     "barrer",
+    "verificar",
     "inventario",
     "reporte",
     "diagnostico",
     "leer_ids_escala",
     "verificar_salida",
     "historial",
+    "verificar_calculo_de_C_L_K",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
     "ContratoInvalido",
 ]
+
+# ===============================================================
+# FIN 10.4
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 10
+# ===============================================================
+
 
 # ===============================================================
 # FIN DEL MÓDULO

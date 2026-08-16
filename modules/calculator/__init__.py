@@ -1628,13 +1628,85 @@ def verificar() -> Dict[str, Any]:
 # ===============================================================
 
 def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    peticion = dict(peticion or {})
-    metodo = str(peticion.get("metodo") or "operacional")
-    prec = int(peticion.get("precision") or PRECISION_DECIMAL_DEFAULT)
-    if metodo == "operacional":
-        peticion = _asegurar_conteos(peticion)
+    """
+    Ejecuta exclusivamente el cálculo contractual del factor C.
 
-    evidencia = _normalizar_evidencia(peticion.get("evidencia"))
+    Flujo determinista:
+        petición
+        → método
+        → precisión
+        → preparación de conteos cuando corresponde
+        → normalización de evidencia
+        → resolución de API C
+        → ejecución única de API C
+        → resolución del valor C
+        → normalización a Fraction
+        → representación contractual.
+
+    No calcula L ni K.
+    No inventa fórmulas.
+    No sustituye una API C ausente.
+    """
+
+    if peticion is None:
+        peticion = {}
+    elif not isinstance(peticion, dict):
+        return {
+            "C": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "ruta": None,
+            "notas": ["Peticion invalida: se esperaba dict"],
+            "evidencia": [],
+        }
+    else:
+        peticion = dict(peticion)
+
+    metodo = str(peticion.get("metodo") or "operacional")
+
+    try:
+        prec = int(
+            peticion.get("precision")
+            or PRECISION_DECIMAL_DEFAULT
+        )
+    except (TypeError, ValueError):
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    if prec < 0:
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    if metodo == "operacional":
+        try:
+            peticion = _asegurar_conteos(peticion)
+        except Exception as e:  # noqa: BLE001
+            evidencia = _normalizar_evidencia(
+                peticion.get("evidencia")
+            )
+            evidencia.append({
+                "id_evidencia": _nuevo_id_evidencia(),
+                "modulo": NOMBRE_MODULO,
+                "capacidad": "calcular_C",
+                "aporte": "factor_C",
+                "version_modulo": VERSION_MODULO,
+                "version_contrato": VERSION_CONTRATO,
+                "rechazado": True,
+            })
+            for evidencia_item in evidencia:
+                _REG_EVIDENCIA[
+                    evidencia_item["id_evidencia"]
+                ] = evidencia_item
+
+            return {
+                "C": representar(None, prec),
+                "ruta": metodo,
+                "notas": [
+                    "Error preparando conteos para C: {0}".format(e)
+                ],
+                "evidencia": evidencia,
+            }
+
+    evidencia = _normalizar_evidencia(
+        peticion.get("evidencia")
+    )
+
     evidencia.append({
         "id_evidencia": _nuevo_id_evidencia(),
         "modulo": NOMBRE_MODULO,
@@ -1644,11 +1716,16 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "rechazado": False,
     })
-    for e in evidencia:
-        _REG_EVIDENCIA[e["id_evidencia"]] = e
+
+    for evidencia_item in evidencia:
+        _REG_EVIDENCIA[
+            evidencia_item["id_evidencia"]
+        ] = evidencia_item
 
     fn = _APIS.get("C")
+
     if not callable(fn):
+        evidencia[-1]["rechazado"] = True
         return {
             "C": representar(None, prec),
             "ruta": None,
@@ -1657,31 +1734,79 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         }
 
     try:
-        try:
-            raw = fn(peticion) if _acepta_dict(fn) else fn(
+        if _acepta_dict(fn):
+            raw = fn(peticion)
+        else:
+            raw = fn(
                 compromisos=peticion.get("compromisos"),
                 contradicciones=peticion.get("contradicciones"),
                 metodo=metodo,
             )
-        except TypeError:
-            raw = fn(peticion)
-
-        val = raw["C"] if isinstance(raw, dict) and "C" in raw else raw
-        if es_undefined(val):
-            obj = representar(UNDEFINED, prec)
-        else:
-            obj = representar(
-                val if isinstance(val, Fraction) else _a_fraction(val),
-                prec,
-            )
-        return {"C": obj, "ruta": metodo, "notas": [], "evidencia": evidencia}
     except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
         return {
             "C": representar(None, prec),
             "ruta": metodo,
-            "notas": ["Error en C: {0}".format(e)],
+            "notas": [
+                "Error en API C: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
             "evidencia": evidencia,
         }
+
+    if isinstance(raw, dict):
+        if "C" not in raw:
+            evidencia[-1]["rechazado"] = True
+            return {
+                "C": representar(None, prec),
+                "ruta": metodo,
+                "notas": [
+                    "API C retorno dict sin campo 'C'"
+                ],
+                "evidencia": evidencia,
+            }
+        val = raw["C"]
+    else:
+        val = raw
+
+    if es_undefined(val):
+        return {
+            "C": representar(UNDEFINED, prec),
+            "ruta": metodo,
+            "notas": [],
+            "evidencia": evidencia,
+        }
+
+    try:
+        fraccion = (
+            val
+            if isinstance(val, Fraction)
+            else _a_fraction(val)
+        )
+        obj = representar(fraccion, prec)
+    except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
+        return {
+            "C": representar(None, prec),
+            "ruta": metodo,
+            "notas": [
+                "Valor C no normalizable: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": evidencia,
+        }
+
+    return {
+        "C": obj,
+        "ruta": metodo,
+        "notas": [],
+        "evidencia": evidencia,
+    }
+
 
 # ===============================================================
 # FIN 8.5
@@ -1693,13 +1818,90 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # ===============================================================
 
 def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    peticion = dict(peticion or {})
-    metodo = str(peticion.get("metodo") or "operacional")
-    prec = int(peticion.get("precision") or PRECISION_DECIMAL_DEFAULT)
-    if metodo == "operacional":
-        peticion = _asegurar_conteos(peticion)
+    """
+    Ejecuta exclusivamente el cálculo contractual del factor L.
 
-    evidencia = _normalizar_evidencia(peticion.get("evidencia"))
+    Flujo determinista:
+        petición
+        → método
+        → precisión
+        → preparación de conteos cuando corresponde
+        → normalización de evidencia
+        → resolución de API L
+        → ejecución única de API L
+        → resolución del valor L
+        → tratamiento de UNDEFINED
+        → normalización a Fraction
+        → representación contractual.
+
+    No calcula C ni K.
+    No inventa fórmulas.
+    No sustituye una API L ausente.
+    """
+
+    if peticion is None:
+        peticion = {}
+    elif not isinstance(peticion, dict):
+        return {
+            "L": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "p": None,
+            "r": None,
+            "ruta": None,
+            "notas": ["Peticion invalida: se esperaba dict"],
+            "evidencia": [],
+        }
+    else:
+        peticion = dict(peticion)
+
+    metodo = str(peticion.get("metodo") or "operacional")
+
+    try:
+        prec = int(
+            peticion.get("precision")
+            or PRECISION_DECIMAL_DEFAULT
+        )
+    except (TypeError, ValueError):
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    if prec < 0:
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    if metodo == "operacional":
+        try:
+            peticion = _asegurar_conteos(peticion)
+        except Exception as e:  # noqa: BLE001
+            evidencia = _normalizar_evidencia(
+                peticion.get("evidencia")
+            )
+            evidencia.append({
+                "id_evidencia": _nuevo_id_evidencia(),
+                "modulo": NOMBRE_MODULO,
+                "capacidad": "calcular_L",
+                "aporte": "factor_L",
+                "version_modulo": VERSION_MODULO,
+                "version_contrato": VERSION_CONTRATO,
+                "rechazado": True,
+            })
+            for evidencia_item in evidencia:
+                _REG_EVIDENCIA[
+                    evidencia_item["id_evidencia"]
+                ] = evidencia_item
+
+            return {
+                "L": representar(None, prec),
+                "p": None,
+                "r": None,
+                "ruta": metodo,
+                "notas": [
+                    "Error preparando conteos para L: {0}".format(e)
+                ],
+                "evidencia": evidencia,
+            }
+
+    evidencia = _normalizar_evidencia(
+        peticion.get("evidencia")
+    )
+
     evidencia.append({
         "id_evidencia": _nuevo_id_evidencia(),
         "modulo": NOMBRE_MODULO,
@@ -1709,11 +1911,16 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "rechazado": False,
     })
-    for e in evidencia:
-        _REG_EVIDENCIA[e["id_evidencia"]] = e
+
+    for evidencia_item in evidencia:
+        _REG_EVIDENCIA[
+            evidencia_item["id_evidencia"]
+        ] = evidencia_item
 
     fn = _APIS.get("L")
+
     if not callable(fn):
+        evidencia[-1]["rechazado"] = True
         return {
             "L": representar(None, prec),
             "p": None,
@@ -1724,69 +1931,184 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         }
 
     try:
-        try:
-            raw = fn(peticion) if _acepta_dict(fn) else fn(
+        if _acepta_dict(fn):
+            raw = fn(peticion)
+        else:
+            raw = fn(
                 posturas=peticion.get("posturas"),
                 reversiones=peticion.get("reversiones"),
                 metodo=metodo,
             )
-        except TypeError:
-            raw = fn(peticion)
-
-        p = r = None
-        if isinstance(raw, dict) and "L" in raw:
-            val = raw["L"]
-            p = raw.get("p")
-            r = raw.get("r")
-        else:
-            val = raw
-
-        if es_undefined(val):
-            obj = representar(UNDEFINED, prec)
-            notas = ["L=UNDEFINED (AM-D6)"]
-        else:
-            obj = representar(
-                val if isinstance(val, Fraction) else _a_fraction(val),
-                prec,
-            )
-            notas = []
-
+    except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
         return {
-            "L": obj,
+            "L": representar(None, prec),
+            "p": None,
+            "r": None,
+            "ruta": metodo,
+            "notas": [
+                "Error en API L: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": evidencia,
+        }
+
+    p = None
+    r = None
+
+    if isinstance(raw, dict):
+        if "L" not in raw:
+            evidencia[-1]["rechazado"] = True
+            return {
+                "L": representar(None, prec),
+                "p": None,
+                "r": None,
+                "ruta": metodo,
+                "notas": [
+                    "API L retorno dict sin campo 'L'"
+                ],
+                "evidencia": evidencia,
+            }
+
+        val = raw["L"]
+        p = raw.get("p")
+        r = raw.get("r")
+    else:
+        val = raw
+
+    if es_undefined(val):
+        return {
+            "L": representar(UNDEFINED, prec),
             "p": p,
             "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": notas,
+            "notas": ["L=UNDEFINED (AM-D6)"],
             "evidencia": evidencia,
         }
+
+    try:
+        fraccion = (
+            val
+            if isinstance(val, Fraction)
+            else _a_fraction(val)
+        )
+        obj = representar(fraccion, prec)
     except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
         return {
             "L": representar(None, prec),
+            "p": p,
+            "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": ["Error en L: {0}".format(e)],
+            "notas": [
+                "Valor L no normalizable: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
             "evidencia": evidencia,
         }
+
+    return {
+        "L": obj,
+        "p": p,
+        "r": str(r) if r is not None else None,
+        "ruta": metodo,
+        "notas": [],
+        "evidencia": evidencia,
+    }
+
 
 # ===============================================================
 # FIN 8.6
 # ===============================================================
-
-
 # ===============================================================
 # 8.7 — CALCULAR K
 # ===============================================================
 
 def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    peticion = dict(peticion or {})
-    metodo = str(peticion.get("metodo") or "operacional")
-    prec = int(peticion.get("precision") or PRECISION_DECIMAL_DEFAULT)
-    o_ctx = (
-        peticion.get("contexto")
-        or peticion.get("O_context")
-        or peticion.get("o_context")
+    """
+    Ejecuta exclusivamente el cálculo contractual del factor K.
+
+    Flujo determinista:
+        petición
+        → método
+        → precisión
+        → resolución explícita de O_context
+        → normalización de evidencia
+        → caso contractual K=None sin contexto/O
+        → preparación de conteos cuando corresponde
+        → resolución de API K
+        → ejecución única de API K
+        → resolución del valor K
+        → tratamiento de UNDEFINED
+        → normalización a Fraction
+        → representación contractual.
+
+    No calcula C ni L.
+    No inventa fórmulas.
+    No sustituye una API K ausente.
+    No ejecuta la API K por una segunda firma ante TypeError.
+    """
+
+    # -----------------------------------------------------------
+    # 8.7.1 — ENTRADA
+    # -----------------------------------------------------------
+    if peticion is None:
+        peticion = {}
+    elif not isinstance(peticion, dict):
+        return {
+            "K": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "ruta": None,
+            "notas": [
+                "Peticion invalida: se esperaba dict"
+            ],
+            "evidencia": [],
+        }
+    else:
+        peticion = dict(peticion)
+
+    # -----------------------------------------------------------
+    # 8.7.2 — MÉTODO
+    # -----------------------------------------------------------
+    metodo = str(
+        peticion.get("metodo") or "operacional"
     )
 
-    evidencia = _normalizar_evidencia(peticion.get("evidencia"))
+    # -----------------------------------------------------------
+    # 8.7.3 — PRECISIÓN
+    # -----------------------------------------------------------
+    try:
+        prec = int(
+            peticion.get("precision")
+            or PRECISION_DECIMAL_DEFAULT
+        )
+    except (TypeError, ValueError):
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    if prec < 0:
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    # -----------------------------------------------------------
+    # 8.7.4 — O_context
+    # -----------------------------------------------------------
+    o_ctx = peticion.get("contexto")
+
+    if o_ctx is None:
+        o_ctx = peticion.get("O_context")
+
+    if o_ctx is None:
+        o_ctx = peticion.get("o_context")
+
+    # -----------------------------------------------------------
+    # 8.7.5 — EVIDENCIA
+    # -----------------------------------------------------------
+    evidencia = _normalizar_evidencia(
+        peticion.get("evidencia")
+    )
+
     evidencia.append({
         "id_evidencia": _nuevo_id_evidencia(),
         "modulo": NOMBRE_MODULO,
@@ -1796,62 +2118,179 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "rechazado": False,
     })
-    for e in evidencia:
-        _REG_EVIDENCIA[e["id_evidencia"]] = e
 
+    for evidencia_item in evidencia:
+        _REG_EVIDENCIA[
+            evidencia_item["id_evidencia"]
+        ] = evidencia_item
+
+    # -----------------------------------------------------------
+    # 8.7.6 — CASO CONTRACTUAL K SIN CONTEXTO/O
+    # -----------------------------------------------------------
     if o_ctx is None:
         return {
             "K": representar(None, prec),
             "ruta": metodo,
-            "notas": ["K=None sin contexto/O (Def-5.3.1)"],
+            "notas": [
+                "K=None sin contexto/O (Def-5.3.1)"
+            ],
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.7.7 — CONTEOS PARA MÉTODO OPERACIONAL
+    # -----------------------------------------------------------
     if metodo == "operacional":
-        peticion = _asegurar_conteos(peticion)
+        try:
+            peticion = _asegurar_conteos(peticion)
+        except Exception as e:  # noqa: BLE001
+            evidencia[-1]["rechazado"] = True
 
+            return {
+                "K": representar(None, prec),
+                "ruta": metodo,
+                "notas": [
+                    "Error preparando conteos para K: {0}".format(e)
+                ],
+                "evidencia": evidencia,
+            }
+
+    # -----------------------------------------------------------
+    # 8.7.8 — RESOLUCIÓN DE API K
+    # -----------------------------------------------------------
     fn = _APIS.get("K")
+
     if not callable(fn):
+        evidencia[-1]["rechazado"] = True
+
         return {
             "K": representar(None, prec),
             "ruta": None,
-            "notas": ["API K no disponible"],
+            "notas": [
+                "API K no disponible"
+            ],
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.7.9 — EJECUCIÓN ÚNICA DE API K
+    # -----------------------------------------------------------
     try:
-        try:
-            raw = fn(peticion) if _acepta_dict(fn) else fn(
+        if _acepta_dict(fn):
+            raw = fn(peticion)
+        else:
+            raw = fn(
                 afirmaciones=peticion.get("afirmaciones"),
-                afirmaciones_falsas=peticion.get("afirmaciones_falsas"),
+                afirmaciones_falsas=peticion.get(
+                    "afirmaciones_falsas"
+                ),
                 o_context=o_ctx,
                 metodo=metodo,
             )
-        except TypeError:
-            raw = fn(peticion)
-
-        val = raw["K"] if isinstance(raw, dict) and "K" in raw else raw
-        if es_undefined(val):
-            obj = representar(UNDEFINED, prec)
-        else:
-            obj = representar(
-                val if isinstance(val, Fraction) else _a_fraction(val),
-                prec,
-            )
-        return {"K": obj, "ruta": metodo, "notas": [], "evidencia": evidencia}
     except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
+
         return {
             "K": representar(None, prec),
             "ruta": metodo,
-            "notas": ["Error en K: {0}".format(e)],
+            "notas": [
+                "Error en API K: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
             "evidencia": evidencia,
         }
+
+    # -----------------------------------------------------------
+    # 8.7.10 — RESOLUCIÓN DEL RETORNO
+    # -----------------------------------------------------------
+    if isinstance(raw, dict):
+        if "K" not in raw:
+            evidencia[-1]["rechazado"] = True
+
+            return {
+                "K": representar(None, prec),
+                "ruta": metodo,
+                "notas": [
+                    "API K retorno dict sin campo 'K'"
+                ],
+                "evidencia": evidencia,
+            }
+
+        val = raw["K"]
+    else:
+        val = raw
+
+    # -----------------------------------------------------------
+    # 8.7.11 — UNDEFINED
+    # -----------------------------------------------------------
+    if es_undefined(val):
+        return {
+            "K": representar(UNDEFINED, prec),
+            "ruta": metodo,
+            "notas": [],
+            "evidencia": evidencia,
+        }
+
+    # -----------------------------------------------------------
+    # 8.7.12 — NORMALIZACIÓN A FRACCIÓN
+    # -----------------------------------------------------------
+    try:
+        fraccion = (
+            val
+            if isinstance(val, Fraction)
+            else _a_fraction(val)
+        )
+    except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
+
+        return {
+            "K": representar(None, prec),
+            "ruta": metodo,
+            "notas": [
+                "Valor K no normalizable: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": evidencia,
+        }
+
+    # -----------------------------------------------------------
+    # 8.7.13 — REPRESENTACIÓN CONTRACTUAL
+    # -----------------------------------------------------------
+    try:
+        obj = representar(fraccion, prec)
+    except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
+
+        return {
+            "K": representar(None, prec),
+            "ruta": metodo,
+            "notas": [
+                "Error representando K: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": evidencia,
+        }
+
+    # -----------------------------------------------------------
+    # 8.7.14 — SALIDA
+    # -----------------------------------------------------------
+    return {
+        "K": obj,
+        "ruta": metodo,
+        "notas": [],
+        "evidencia": evidencia,
+    }
+
 
 # ===============================================================
 # FIN 8.7
 # ===============================================================
-
-
 # ===============================================================
 # 8.8 — CALCULAR FACTOR
 # ===============================================================

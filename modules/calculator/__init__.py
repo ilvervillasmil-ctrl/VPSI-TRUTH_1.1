@@ -1227,25 +1227,89 @@ def leer_ids_escala() -> Dict[str, Any]:
 # FIN 8.3
 # ===============================================================
 
-
 # ===============================================================
-# 8.4 — BARRER
+# 8.4 — BARRER / VERIFICAR
 # ===============================================================
 
 def barrer() -> Dict[str, Any]:
+    """
+    Centinela de integridad del dominio CA.
+    Si coherente == True, todas las APIs que esta sección declara
+    necesarias existen, son callables y no producen contradicción.
+    No calcula factores. No inventa capacidades.
+    """
     errores: List[Dict[str, str]] = list(_ERRORES_CARGA)
     choques: List[str] = []
     archivos = [p.name for p in _listar_py()]
     hashes = _hashes_modulo()
 
-    factores_ok = sorted(_APIS.keys())
+    # -----------------------------------------------------------
+    # 8.4.1 / 8.4-A — C/L/K: factor → stem → archivo → API → callable
+    # -----------------------------------------------------------
+    stem_por_factor = {v: k for k, v in _ARCHIVO_FACTOR.items()}
+    factores_ok: List[str] = []
+    apis_factor: Dict[str, bool] = {}
+
     for factor in _FACTORES_CANONICOS:
-        if factor not in _APIS:
+        stem = stem_por_factor.get(factor)
+        if stem is None:
             errores.append({
                 "archivo": "?",
-                "error": "factor '{0}' sin API".format(factor),
+                "error": (
+                    "factor '{0}' sin stem declarado en _ARCHIVO_FACTOR"
+                    .format(factor)
+                ),
             })
+            apis_factor[factor] = False
+            continue
 
+        path = _DIR / "{0}.py".format(stem)
+        if not path.exists():
+            errores.append({
+                "archivo": "{0}.py".format(stem),
+                "error": (
+                    "factor '{0}' declara stem '{1}' pero el archivo "
+                    "no existe fisicamente"
+                    .format(factor, stem)
+                ),
+            })
+            apis_factor[factor] = False
+            continue
+
+        fn = _APIS.get(factor)
+        es_callable = callable(fn)
+        apis_factor[factor] = es_callable
+        if not es_callable:
+            errores.append({
+                "archivo": "{0}.py".format(stem),
+                "error": (
+                    "factor '{0}' tiene archivo '{1}.py' pero "
+                    "API no callable en _APIS"
+                    .format(factor, stem)
+                ),
+            })
+        else:
+            factores_ok.append(factor)
+
+    # -----------------------------------------------------------
+    # 8.4-B — APIs de factores no declaradas
+    # -----------------------------------------------------------
+    factores_no_declarados = sorted(
+        set(_APIS.keys()) - set(_FACTORES_CANONICOS)
+    )
+    for factor_extra in factores_no_declarados:
+        errores.append({
+            "archivo": "?",
+            "error": (
+                "API de factor '{0}' cargada en _APIS pero no "
+                "pertenece a _FACTORES_CANONICOS"
+                .format(factor_extra)
+            ),
+        })
+
+    # -----------------------------------------------------------
+    # Choques de stems → factor
+    # -----------------------------------------------------------
     por_factor: Dict[str, List[str]] = {}
     for stem, factor in _ARCHIVO_FACTOR.items():
         if (_DIR / "{0}.py".format(stem)).exists():
@@ -1256,8 +1320,17 @@ def barrer() -> Dict[str, Any]:
                 "factor '{0}' reclamado por: {1}".format(factor, stems)
             )
 
-    stems_conocidos = set(_ARCHIVO_FACTOR.keys()) | {"conteos", "escalas_ids"}
-    extra = [p.stem for p in _listar_py() if p.stem not in stems_conocidos]
+    # -----------------------------------------------------------
+    # 8.4-C — Archivos extra (informativo, no error por existencia)
+    # -----------------------------------------------------------
+    stems_conocidos = set(_ARCHIVO_FACTOR.keys()) | {
+        "conteos",
+        "escalas_ids",
+    }
+    extra = [
+        p.stem for p in _listar_py()
+        if p.stem not in stems_conocidos
+    ]
 
     for nombre, meta in hashes.items():
         if meta.get("sha256") is None:
@@ -1266,26 +1339,161 @@ def barrer() -> Dict[str, Any]:
                 "error": meta.get("error") or "hash no calculable",
             })
 
+    # -----------------------------------------------------------
+    # 8.4-D — CONTEOS: ambas APIs contractuales deben ser callables
+    # -----------------------------------------------------------
+    # verificar_conteos NO pertenece al contrato vigente de
+    # CONTENEDOR["capacidades"] ni a la resolución actual de CA.
+    # No se agrega. Solo se validan extraer_conteos e
+    # inyectar_en_peticion.
+    extraer_ok = (
+        _CONTEOS is not None
+        and callable(_CONTEOS.get("extraer_conteos"))
+    )
+    inyectar_ok = (
+        _CONTEOS is not None
+        and callable(_CONTEOS.get("inyectar_en_peticion"))
+    )
+    conteos_ok = extraer_ok and inyectar_ok
+
+    if _CONTEOS is None:
+        errores.append({
+            "archivo": "conteos.py",
+            "error": "API de conteos no cargada",
+        })
+    else:
+        if not extraer_ok:
+            errores.append({
+                "archivo": "conteos.py",
+                "error": "extraer_conteos no es callable",
+            })
+        if not inyectar_ok:
+            errores.append({
+                "archivo": "conteos.py",
+                "error": "inyectar_en_peticion no es callable",
+            })
+
+    apis_conteos = {
+        "extraer_conteos": extraer_ok,
+        "inyectar_en_peticion": inyectar_ok,
+    }
+
+    # -----------------------------------------------------------
+    # 8.4-E — ESCALAS: callable + ejecución segura + n == len(ids)
+    # -----------------------------------------------------------
+    escalas_ok = _ESCALAS is not None and callable(
+        _ESCALAS.get("ids")
+    )
+    ids_escala: Dict[str, Any] = {
+        "ids": [],
+        "n": 0,
+        "origenes": [],
+        "disponible": False,
+    }
+
+    if _ESCALAS is None:
+        errores.append({
+            "archivo": "escalas_ids.py",
+            "error": "API de escalas_ids no cargada",
+        })
+        escalas_ok = False
+    elif not callable(_ESCALAS.get("ids")):
+        errores.append({
+            "archivo": "escalas_ids.py",
+            "error": "escalas_ids.ids no es callable",
+        })
+        escalas_ok = False
+    else:
+        try:
+            resultado = leer_ids_escala()
+            if not (
+                isinstance(resultado, dict)
+                and "ids" in resultado
+                and "n" in resultado
+                and "disponible" in resultado
+            ):
+                errores.append({
+                    "archivo": "escalas_ids.py",
+                    "error": "leer_ids_escala retorno estructura invalida",
+                })
+                escalas_ok = False
+            else:
+                ids_list = resultado.get("ids") or []
+                n_val = resultado.get("n")
+                if not isinstance(ids_list, list):
+                    errores.append({
+                        "archivo": "escalas_ids.py",
+                        "error": "leer_ids_escala: 'ids' no es list",
+                    })
+                    escalas_ok = False
+                elif n_val != len(ids_list):
+                    errores.append({
+                        "archivo": "escalas_ids.py",
+                        "error": (
+                            "leer_ids_escala: n={0} != len(ids)={1}"
+                            .format(n_val, len(ids_list))
+                        ),
+                    })
+                    escalas_ok = False
+                else:
+                    ids_escala = resultado
+                    escalas_ok = True
+        except Exception as e:  # noqa: BLE001
+            errores.append({
+                "archivo": "escalas_ids.py",
+                "error": "leer_ids_escala fallo: {0}: {1}".format(
+                    type(e).__name__, e
+                ),
+            })
+            escalas_ok = False
+
+    # -----------------------------------------------------------
+    # 8.4-F — COHERENCIA FINAL
+    # -----------------------------------------------------------
+    # errores ya acumula: factor sin archivo/API, no declarados,
+    # conteos, escalas, hashes, n!=len(ids).
+    # choques ya acumula stems múltiples.
+    # No se ejecutan calcular_* desde el centinela.
+    coherente = not errores and not choques
+
+    # -----------------------------------------------------------
+    # 8.4-G — RETORNO
+    # -----------------------------------------------------------
     return {
         "contenedor": NOMBRE_MODULO,
         "rol": ROL_MODULO,
-        "coherente": not errores and not choques,
+        "coherente": coherente,
         "errores": errores,
         "choques": choques,
         "archivos": archivos,
         "hashes": hashes,
-        "factores_api": factores_ok,
+        "factores_api": sorted(factores_ok),
+        "factores_no_declarados": factores_no_declarados,
         "archivos_extra": extra,
-        "conteos_disponible": _CONTEOS is not None,
-        "escalas_ids_disponible": _ESCALAS is not None,
-        "ids_escala": leer_ids_escala(),
+        "conteos_disponible": conteos_ok,
+        "escalas_ids_disponible": escalas_ok,
+        "ids_escala": ids_escala,
         "historial_n": len(_HISTORIAL),
+        "apis_factor": apis_factor,
+        "apis_conteos": apis_conteos,
     }
+
+
+def verificar() -> Dict[str, Any]:
+    """
+    Alias contractual real de barrer.
+    Correspondencia contractual confirmada:
+      verificar → barrer
+    Existe como callable público para 1:1 con:
+      CONTENEDOR['capacidades']['verificar']
+      _CAP_MAP['verificar']
+    No reimplementa lógica. No inventa comportamiento.
+    """
+    return barrer()
 
 # ===============================================================
 # FIN 8.4
 # ===============================================================
-
 
 # ===============================================================
 # 8.5 — CALCULAR C

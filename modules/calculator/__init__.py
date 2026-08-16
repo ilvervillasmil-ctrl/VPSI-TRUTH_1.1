@@ -304,7 +304,10 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "acceso": {
         "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo",
+        "descripcion": "acceso": {
+    "nivel": "acceso_archivos",
+    "descripcion": "Acceso total a recursos del módulo"
+},,
     },
 
     # ============================================================

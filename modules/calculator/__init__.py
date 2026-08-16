@@ -303,13 +303,9 @@ CONTENEDOR: Dict[str, Any] = {
     # 5.6 — ACCESO (obligatorio en el esquema)
     # ============================================================
     "acceso": {
-        "nivel": "completo",
-        "descripcion": "acceso": {
     "nivel": "acceso_archivos",
     "descripcion": "Acceso total a recursos del módulo"
-},,
     },
-
     # ============================================================
     # 5.7 — DEPENDENCIAS
     # ============================================================

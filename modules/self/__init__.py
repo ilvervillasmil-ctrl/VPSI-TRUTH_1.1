@@ -51,6 +51,604 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
+# ===============================================================
+# PARTE 1 — PRINCIPIOS, BANDERAS Y ESPECIFICACIONES PRECISAS
+# ===============================================================
+
+# ===============================================================
+# 1.1 — IDENTIDAD
+# ===============================================================
+
+ID_MODULO = "SF"
+NOMBRE_MODULO = "self"
+ROL_MODULO = "SF"
+
+# ===============================================================
+# FIN 1.1
+# ===============================================================
+
+
+# ===============================================================
+# 1.2 — VERSIONES Y ESTABILIDAD
+# ===============================================================
+
+VERSION_MODULO = "1.0"
+VERSION_CONTRATO = "1.0"
+ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
+COMPATIBLE_DESDE = "1.0"
+API_ENGINE = ">=1.0"
+ESTABILIDAD = "FASE"
+
+# ===============================================================
+# FIN 1.2
+# ===============================================================
+
+
+# ===============================================================
+# 1.3 — BANDERAS DE ESTADO
+# ===============================================================
+
+ESTADO_NO_INICIADO = "NO_INICIADO"
+ESTADO_OPERATIVO = "OPERATIVO"
+ESTADO_DEGRADADO = "DEGRADADO"
+ESTADO_RECHAZADO = "RECHAZADO"
+ESTADOS_VALIDOS = (
+    ESTADO_NO_INICIADO,
+    ESTADO_OPERATIVO,
+    ESTADO_DEGRADADO,
+    ESTADO_RECHAZADO,
+)
+
+# ===============================================================
+# FIN 1.3
+# ===============================================================
+
+
+# ===============================================================
+# 1.4 — CAPAS Y MODOS (DOMINIO SF)
+# ===============================================================
+
+CAPAS_VALIDAS: Set[str] = {
+    "L1_CUERPO",
+    "L2_EGO",
+    "L3_MENTE",
+    "L4_YO",
+    "L5_CONSCIENCIA",
+    "L6_ALMA",
+}
+
+CASA_SELF = "L4_YO"
+
+MODOS_VALIDOS: Set[str] = {
+    "REACTIVE",
+    "MECHANICAL",
+    "CONSCIOUS",
+    "META",
+    "INTEGRATED",
+}
+
+# ===============================================================
+# FIN 1.4
+# ===============================================================
+
+
+# ===============================================================
+# 1.5 — INVARIANTES
+# ===============================================================
+
+INVARIANTES = (
+    "el id del módulo nunca cambia",
+    "el rol nunca cambia",
+    "la casa operativa del Self es L4_YO",
+    "oscilar no es elegir",
+    "elegir no ejecuta efectos externos",
+    "las perspectivas L1…L6 son mecanismos legibles, no dependencias de arranque",
+    "las capacidades declaradas son callables tras la resolución",
+    "este módulo no modifica el estado de otros módulos",
+    "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+    "este módulo siempre puede reportar su propio estado",
+)
+
+# ===============================================================
+# FIN 1.5
+# ===============================================================
+
+
+# ===============================================================
+# 1.6 — CONFIGURACIÓN
+# ===============================================================
+
+_DIR = Path(__file__).parent
+
+# ===============================================================
+# FIN 1.6
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 1
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 4 — DEFINICIONES
+# ===============================================================
+
+# ===============================================================
+# 4.1 — EXCEPCIONES
+# ===============================================================
+
+class ContratoInvalido(Exception):
+    """El CONTENEDOR no cumple el esquema o la resolución falló."""
+    pass
+
+# ===============================================================
+# FIN 4.1
+# ===============================================================
+
+
+# ===============================================================
+# 4.2 — ESTADO INTERNO (FASE; NO PERSISTENCIA DE NEGOCIO)
+# ===============================================================
+
+_estado_self: Dict[str, Any] = {
+    "capa_activa": CASA_SELF,
+    "altura_operativa": "L4",
+    "modo": "CONSCIOUS",
+    "historial_oscilacion": [],
+    "historial_elecciones": [],
+    "loop_sospechado": False,
+}
+
+# ===============================================================
+# FIN 4.2
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 4
+# ===============================================================
+
+CONTENEDOR: Dict[str, Any] = {
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
+    "esquema": "VPSI-CONTRACT-1.0",
+    "version_contrato": "1.0",
+    "version_modulo": "1.0",
+    "estabilidad": "FASE",
+    "compatible_desde": "1.0",
+    "api_engine": ">=1.0",
+
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
+    "id": "SF",
+    "nombre": "self",
+    "rol": "SF",
+    "descripcion": (
+        "Yo funcional del sistema. Centro de elección e identidad de fase. "
+        "Casa operativa L4. Punto de acceso a perspectivas L1…L6. "
+        "Oscila entre alturas; registra actos de agency sin side-effects. "
+        "No orquesta. No calcula Tru."
+    ),
+
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
+    "funcion": (
+        "Ser el punto de referencia de elección e identidad de fase: "
+        "exponer quién es el sistema en fase, desde qué altura opera, "
+        "en qué modo de lucidez está, registrar actos de elección, "
+        "y ofrecer a Engine las perspectivas L1…L6 como mecanismos "
+        "legibles para cálculo y resolución de problemas."
+    ),
+    "no_hace": [],
+
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
+    "autoridad": [
+        "Exponer identidad de fase (yo_funcional)",
+        "Reportar y cambiar altura operativa del Self (oscilar)",
+        "Declarar desde qué altura opera (desde_donde)",
+        "Clasificar modo de lucidez (estado_self)",
+        "Registrar actos de agency sin side-effects (elegir)",
+        "Declarar acceso a perspectivas L1…L6",
+        "Verificar coherencia interna y reportar estado propio",
+    ],
+
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
+    "conocimiento_exportable": [
+        "yo_funcional",
+        "oscilar",
+        "desde_donde",
+        "elegir",
+        "estado_self",
+        "barrer",
+        "verificar",
+        "inventario",
+        "reporte",
+        "diagnostico",
+    ],
+
+    # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+    
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
+    "requiere": [
+        "CT", "AX", "FO", "MC", "CA", "CX",
+        "RE", "VX", "TX", "CH", "CIT", "TT",
+        "CE", "CC", "DI",
+    ],
+
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
+
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
+    "autoriza_engine": {
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,
+        "acceso_archivos": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+    },
+
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
+    "consultas_soportadas": [
+        "yo_funcional",
+        "desde_donde",
+        "estado_self",
+        "oscilar",
+        "elegir",
+        "obtener_inventario",
+        "obtener_reporte",
+        "obtener_diagnostico",
+        "verificar_coherencia",
+    ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
+        "capacidades": {
+        # --- CENTINELA ---
+        "verificar": verificar,
+        "barrer": barrer,
+        "verificar_salida": verificar_salida,
+
+        # --- IDENTIDAD Y FASE ---
+        "yo_funcional": yo_funcional,
+        "oscilar": oscilar,
+        "desde_donde": desde_donde,
+        "estado_self": estado_self,
+        "elegir": elegir,
+
+        # --- INVENTARIO Y REPORTING ---
+        "inventario": inventario,
+        "reporte": reporte,
+        "diagnostico": diagnostico,
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+    },
+
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
+
+    "capacidades_meta": {
+        "verificar": {
+            "descripcion": (
+                "Alias de barrer. Verifica coherencia interna de SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, capa_activa, modo, errores"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "barrer": {
+            "descripcion": (
+                "Centinela de SF: identidad y estado interno."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, identidad_disponible, "
+                "capa_activa, modo, errores"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar_salida": {
+            "descripcion": (
+                "Comprueba forma mínima de una salida de SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "bool",
+            "acceso_archivos": ["*"],
+        },
+
+        "yo_funcional": {
+            "descripcion": (
+                "Identidad de fase anclada en cuerpo axiomático self."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con capa_activa, modo, ax_self, "
+                "identidad_disponible, perspectivas"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "oscilar": {
+            "descripcion": (
+                "Cambia o reporta la altura operativa del Self (L1…L6)."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, capa_activa, altura_operativa, "
+                "modo, cambio"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "desde_donde": {
+            "descripcion": (
+                "Reporta altura y modo actuales del Self."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con capa_activa, altura_operativa, modo, "
+                "en_casa, perspectivas"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "estado_self": {
+            "descripcion": (
+                "Clasifica lucidez: "
+                "REACTIVE|MECHANICAL|CONSCIOUS|META|INTEGRATED."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con modo, capa_activa, en_casa, coherente"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "elegir": {
+            "descripcion": (
+                "Registra un acto de agency sin ejecutar efectos externos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, eleccion, desde, modo, n_elecciones"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "inventario": {
+            "descripcion": (
+                "Inventario estructural del módulo SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, capacidades, capas_validas, "
+                "modos_validos, perspectivas"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "reporte": {
+            "descripcion": (
+                "Reporte de estado del módulo SF."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, capa_activa, "
+                "modo, errores"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+                "diagnostico": {
+            "descripcion": (
+                "Diagnóstico: problemas, advertencias, recomendaciones."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, "
+                "recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre SF. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de SF. "
+                "Expone constantes, capacidades, capas, modos y estado "
+                "sin alterar el contrato ni calcular."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de SF "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+    },
+
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
+    "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
+        "estado": True,
+        "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+        "inventario": True,
+        "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+        "errores": True,
+        "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+        "dependencias": True,
+        "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+        "contrato": True,
+        "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
+        "reporte": True,
+
+                # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,
+        "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+    },
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
+    "estados_validos": [
+        "NO_INICIADO",
+        "OPERATIVO",
+        "DEGRADADO",
+        "RECHAZADO",
+    ],
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
+    "invariantes": [
+        "el id del módulo nunca cambia",
+        "el rol nunca cambia",
+        "la casa operativa del Self es L4_YO",
+        "oscilar no es elegir",
+        "elegir no ejecuta efectos externos",
+        "las perspectivas L1…L6 son mecanismos legibles, no dependencias de arranque",
+        "las capacidades declaradas son callables tras la resolución",
+        "este módulo no modifica el estado de otros módulos",
+        "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+        "este módulo siempre puede reportar su propio estado",
+    ],
+
+}  # <--- CIERRE FINAL
 
 # ---------------------------------------------------------------------------
 # CONSTANTES DE CAPA (L4 = casa)
@@ -430,462 +1028,355 @@ def inventario(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     }
 
 
-def reporte(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    b = barrer()
-    cfg = _cfg()
+
+# ===============================================================
+# CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE)
+# ===============================================================
+
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Autoridad total de ENGINE sobre SF.
+    Fuente única: CONTENEDOR["capacidades"].
+    No inventa. No autoinvoca. Todo callable real.
+    """
+    peticion_normalizada = (
+        dict(peticion) if isinstance(peticion, dict) else {}
+    )
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    if not isinstance(capacidades, dict):
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_DEGRADADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": [
+                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] no es dict"
+            ],
+            "resultados": {},
+            "capacidades_declaradas": [],
+        }
+
+    for nombre in sorted(capacidades):
+        if nombre == "ejecutar_total":
+            continue
+        referencia = capacidades[nombre]
+        try:
+            if callable(referencia):
+                fn = referencia
+            elif isinstance(referencia, str):
+                fn = globals().get(referencia)
+                if not callable(fn):
+                    raise ContratoInvalido(
+                        f"'{referencia}' no es callable"
+                    )
+            else:
+                raise ContratoInvalido(
+                    f"tipo inválido: {type(referencia).__name__}"
+                )
+
+            # Capacidades de SF con firma específica
+            if nombre == "oscilar":
+                hacia = peticion_normalizada.get("hacia")
+                contexto = peticion_normalizada.get("contexto")
+                resultados[nombre] = fn(hacia=hacia, contexto=contexto)
+                continue
+
+            if nombre == "elegir":
+                resultados[nombre] = fn(peticion_normalizada)
+                continue
+
+            firma = inspect.signature(fn)
+            params = list(firma.parameters.values())
+            obligatorios = [
+                p for p in params
+                if p.kind in (
+                    inspect.Parameter.POSITIONAL_ONLY,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                )
+                and p.default is inspect.Parameter.empty
+            ]
+            if not obligatorios:
+                resultados[nombre] = fn()
+            elif len(obligatorios) == 1:
+                resultados[nombre] = fn(peticion_normalizada)
+            else:
+                resultados[nombre] = fn()
+        except Exception as exc:
+            errores_ejecucion.append(f"{nombre}: {exc}")
+            resultados[nombre] = None
+
+    barrido = resultados.get("barrer")
+    coherente = (
+        isinstance(barrido, dict) and bool(barrido.get("coherente"))
+    )
+    ejecutadas = sorted(
+        n for n, r in resultados.items() if r is not None
+    )
+
     return {
-        "id": cfg.get("id"),
-        "modulo": cfg.get("nombre"),
-        "rol": cfg.get("rol"),
-        "version": cfg.get("version_modulo"),
-        "estado": "OPERATIVO" if b.get("coherente") else "DEGRADADO",
-        "coherente": b.get("coherente"),
-        "capa_activa": b.get("capa_activa"),
-        "altura_operativa": b.get("altura_operativa"),
-        "modo": b.get("modo"),
-        "casa": CASA_SELF,
-        "identidad_disponible": b.get("identidad_disponible"),
-        "n_declaraciones_self": b.get("n_declaraciones_self"),
-        "n_oscilaciones": b.get("n_oscilaciones"),
-        "n_elecciones": b.get("n_elecciones"),
-        "capacidades": sorted((cfg.get("capacidades") or {}).keys()),
-        "errores": list(b.get("errores") or []),
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": (
+            ESTADO_OPERATIVO
+            if coherente and not errores_ejecucion
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": coherente and not errores_ejecucion,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": sorted(capacidades.keys()),
     }
 
 
-def diagnostico(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Inspección estructural de SF.
+    Expone contrato y estado de fase sin calcular ni alterar.
+    """
     b = barrer()
-    problemas: List[Dict[str, Any]] = []
-    advertencias: List[str] = []
-    recomendaciones: List[str] = []
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+            "CASA_SELF": CASA_SELF,
+        },
+        "capacidades_contractuales": sorted(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": sorted(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "integridad": {
+            "coherente": b.get("coherente"),
+            "errores": b.get("errores"),
+            "identidad_disponible": b.get("identidad_disponible"),
+            "capa_activa": b.get("capa_activa"),
+            "altura_operativa": b.get("altura_operativa"),
+            "modo": b.get("modo"),
+            "n_declaraciones_self": b.get("n_declaraciones_self"),
+            "n_oscilaciones": b.get("n_oscilaciones"),
+            "n_elecciones": b.get("n_elecciones"),
+        },
+        "capas_validas": sorted(CAPAS_VALIDAS),
+        "modos_validos": sorted(MODOS_VALIDOS),
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone estructura de SF sin calcular "
+            "ni alterar el contrato ni el estado de fase."
+        ),
+    }
 
-    for e in b.get("errores") or []:
-        problemas.append({"tipo": "coherencia", "detalle": e})
 
-    if not b.get("identidad_disponible"):
-        advertencias.append("identidad axiomática self aún no disponible")
-        recomendaciones.append(
-            "cargar cuerpo axiomático self en AX para anclar yo_funcional"
-        )
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Instantánea determinista del inventario de SF.
+    No altera evidencia ni estado de fase.
+    """
+    inv = inventario(peticion)
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inv,
+        "nota": (
+            "Instantánea determinista del inventario de SF. "
+            "No modifica fase ni evidencia."
+        ),
+    }
 
-    if b.get("capa_activa") != CASA_SELF:
-        advertencias.append(
-            "Self fuera de casa ({0}); casa operativa es {1}".format(
-                b.get("capa_activa"), CASA_SELF
+# ===============================================================
+# 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# ===============================================================
+
+# ===============================================================
+# 10.1 — VALIDACIÓN DE CONTRATO
+# ===============================================================
+
+def _validar_contrato(cont: Dict[str, Any]) -> None:
+    obligatorias = (
+        "esquema", "version_contrato", "version_modulo",
+        "id", "nombre", "rol", "descripcion",
+        "funcion", "no_hace", "autoridad",
+        "conocimiento_exportable", "requiere",
+        "autoriza_engine", "consultas_soportadas",
+        "capacidades", "capacidades_meta",
+        "reporting", "estados_validos", "invariantes",
+        "estabilidad", "compatible_desde", "api_engine",
+    )
+    faltantes = [k for k in obligatorias if k not in cont]
+    if faltantes:
+        raise ContratoInvalido(
+            "{0}: CONTENEDOR incompleto. Faltan: {1}".format(
+                NOMBRE_MODULO, faltantes
             )
         )
+    if cont.get("esquema") != ESQUEMA_CONTRATO:
+        raise ContratoInvalido(
+            "{0}: esquema incompatible: {1}".format(
+                NOMBRE_MODULO, cont.get("esquema")
+            )
+        )
+    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
+        raise ContratoInvalido(
+            "{0}: version_contrato inválida: {1}".format(
+                NOMBRE_MODULO, cont.get("version_contrato")
+            )
+        )
+    meta_caps = cont.get("capacidades_meta") or {}
+    for nombre_cap in cont.get("capacidades") or {}:
+        if nombre_cap not in meta_caps:
+            raise ContratoInvalido(
+                "{0}: capacidad '{1}' sin capacidades_meta".format(
+                    NOMBRE_MODULO, nombre_cap
+                )
+            )
+        entrada = meta_caps[nombre_cap]
+        if not isinstance(entrada, dict):
+            raise ContratoInvalido(
+                "{0}: capacidades_meta['{1}'] debe ser dict".format(
+                    NOMBRE_MODULO, nombre_cap
+                )
+            )
+        for campo in ("descripcion", "entrada", "salida"):
+            if campo not in entrada or not isinstance(entrada[campo], str):
+                raise ContratoInvalido(
+                    "{0}: capacidades_meta['{1}'] requiere '{2}: str'".format(
+                        NOMBRE_MODULO, nombre_cap, campo
+                    )
+                )
 
-    estado = "OPERATIVO"
-    if problemas:
-        estado = "DEGRADADO"
-    elif not b.get("identidad_disponible"):
-        estado = "DEGRADADO"
+# ===============================================================
+# FIN 10.1
+# ===============================================================
 
-    return {
-        "id": "SF",
-        "modulo": "self",
-        "estado": estado,
-        "problemas": problemas,
-        "advertencias": advertencias,
-        "recomendaciones": recomendaciones,
-        "coherente": b.get("coherente"),
-        "capa_activa": b.get("capa_activa"),
-        "modo": b.get("modo"),
-        "casa": CASA_SELF,
-    }
 
-# ---------------------------------------------------------------------------
-# CONTRATO exclusivo
-# ---------------------------------------------------------------------------
+# ===============================================================
+# 10.2 — MAPA DE CAPACIDADES
+# ===============================================================
 
-CONTENEDOR: Dict[str, Any] = {
-    # ============================================================
-    # ESQUEMA
-    # ============================================================
-    "esquema": "VPSI-CONTRACT-1.0",
-    "version_contrato": "1.0",
-    "version_modulo": "1.0",
-    "estabilidad": "FASE",
-    "compatible_desde": "1.0",
-    "api_engine": ">=1.0",
+_CAP_MAP = {
+    # --- CENTINELA ---
+    "verificar": verificar,
+    "barrer": barrer,
+    "verificar_salida": verificar_salida,
 
-    # ============================================================
-    # IDENTIDAD
-    # ============================================================
-    "id": "SF",
-    "nombre": "self",
-    "rol": "SF",
-    "descripcion": (
-        "Yo funcional del sistema. Centro de elección e identidad de fase. "
-        "Casa operativa L4. Punto de acceso a perspectivas L1…L6. "
-        "Oscila entre alturas; registra actos de agency sin side-effects. "
-        "No orquesta. No calcula Tru."
-    ),
+    # --- IDENTIDAD Y FASE ---
+    "yo_funcional": yo_funcional,
+    "oscilar": oscilar,
+    "desde_donde": desde_donde,
+    "estado_self": estado_self,
+    "elegir": elegir,
 
-    # ============================================================
-    # PROPÓSITO
-    # ============================================================
-    "funcion": (
-        "Ser el punto de referencia de elección e identidad de fase: "
-        "exponer quién es el sistema en fase, desde qué altura opera, "
-        "en qué modo de lucidez está, registrar actos de elección, "
-        "y ofrecer a Engine las perspectivas L1…L6 como mecanismos "
-        "legibles para cálculo y resolución de problemas."
-    ),
-    "no_hace": [],
+    # --- INVENTARIO Y REPORTING ---
+    "inventario": inventario,
+    "reporte": reporte,
+    "diagnostico": diagnostico,
 
-    # ============================================================
-    # AUTORIDAD
-    # ============================================================
-    "autoridad": [
-        "Exponer identidad de fase (yo_funcional)",
-        "Reportar y cambiar altura operativa del Self (oscilar)",
-        "Declarar desde qué altura opera (desde_donde)",
-        "Clasificar modo de lucidez (estado_self)",
-        "Registrar actos de agency sin side-effects (elegir)",
-        "Declarar acceso a perspectivas L1…L6",
-        "Verificar coherencia interna y reportar estado propio",
-    ],
+    # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
+}
 
-    # ============================================================
-    # CONOCIMIENTO EXPORTABLE
-    # ============================================================
-    "conocimiento_exportable": [
-        "yo_funcional",
-        "oscilar",
-        "desde_donde",
-        "elegir",
-        "estado_self",
-        "barrer",
-        "verificar",
-        "inventario",
-        "reporte",
-        "diagnostico",
-    ],
+# ===============================================================
+# FIN 10.2
+# ===============================================================
 
-    # ============================================================
-    # ACCESO (obligatorio en el esquema)
-    # ============================================================
-    "acceso": {
-        "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
-    },
-    
-    # ============================================================
-    # DEPENDENCIAS
-    # ============================================================
-    "requiere": ["*"],
 
-    # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "acceso_archivos": ["*"],
+# ===============================================================
+# 10.3 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
 
-    # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "validar_esquema": ["*"],
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Resuelve referencias str → callables reales.
+    MUTA CONTENEDOR["capacidades"] para que Engine reciba callables.
+    """
+    resueltas: Dict[str, Any] = {}
+    for nombre, ref in cont["capacidades"].items():
+        if callable(ref):
+            resueltas[nombre] = ref
+            continue
+        if isinstance(ref, str):
+            if ref not in _CAP_MAP:
+                raise ContratoInvalido(
+                    "{0}: capacidad '{1}' referencia inexistente: '{2}'".format(
+                        NOMBRE_MODULO, nombre, ref
+                    )
+                )
+            fn = _CAP_MAP[ref]
+            if not callable(fn):
+                raise ContratoInvalido(
+                    "{0}: '{1}' no es callable".format(NOMBRE_MODULO, ref)
+                )
+            resueltas[nombre] = fn
+            continue
+        raise ContratoInvalido(
+            "{0}: capacidad '{1}' tipo inválido: {2}".format(
+                NOMBRE_MODULO, nombre, type(ref).__name__
+            )
+        )
+    cont["capacidades"] = resueltas
 
-    # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
-    # ============================================================
-    "autoriza_engine": {
-        # --- PERMISOS BASE ---
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
+# ===============================================================
+# FIN 10.3
+# ===============================================================
 
-        # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
-        "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
-        "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
-        "actualizar": False,
 
-        # --- PERMISOS DE PROCESAMIENTO ---
-        "validar": True,
-        "procesar": True,
-        "analizar": True,
-        "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
+# ===============================================================
+# 10.4 — VALIDAR Y RESOLVER AL IMPORTAR
+# ===============================================================
 
-        # --- PERMISOS DE DATOS ---
-        "exportar": True,
-        "importar": True,
-        "respaldar": True,
-        "recuperar": True,
-        "sincronizar": True,
+_validar_contrato(CONTENEDOR)
+_resolver_capacidades(CONTENEDOR)
 
-        # --- PERMISOS DE MONITOREO ---
-        "monitorear": True,
-        "metricas": True,
-        "diagnostico": True,
+# ===============================================================
+# FIN 10.4
+# ===============================================================
 
-        # --- PERMISOS DE ESTADO ---
-        "estado": True,
-        "version": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "contrato": True,
-        "conocimiento": True,
-        "reporte": True,
 
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
-    },
-
-    # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "yo_funcional",
-        "desde_donde",
-        "estado_self",
-        "oscilar",
-        "elegir",
-        "obtener_inventario",
-        "obtener_reporte",
-        "obtener_diagnostico",
-        "verificar_coherencia",
-    ],
-
-    # ============================================================
-    # CAPACIDADES
-    # ============================================================
-    "capacidades": {
-        "verificar": verificar,
-        "barrer": barrer,
-        "verificar_salida": verificar_salida,
-        "yo_funcional": yo_funcional,
-        "oscilar": oscilar,
-        "desde_donde": desde_donde,
-        "estado_self": estado_self,
-        "elegir": elegir,
-        "inventario": inventario,
-        "reporte": reporte,
-        "diagnostico": diagnostico,
-    },
-
-        # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
-    # ============================================================
-
-    "capacidades_meta": {
-        "verificar": {
-            "descripcion": (
-                "Alias de barrer. Verifica coherencia interna de SF."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con coherente, capa_activa, modo, errores"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "barrer": {
-            "descripcion": (
-                "Centinela de SF: identidad y estado interno."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con coherente, identidad_disponible, "
-                "capa_activa, modo, errores"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "verificar_salida": {
-            "descripcion": (
-                "Comprueba forma mínima de una salida de SF."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "bool",
-            "acceso_archivos": ["*"],
-        },
-
-        "yo_funcional": {
-            "descripcion": (
-                "Identidad de fase anclada en cuerpo axiomático self."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con capa_activa, modo, ax_self, "
-                "identidad_disponible, perspectivas"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "oscilar": {
-            "descripcion": (
-                "Cambia o reporta la altura operativa del Self (L1…L6)."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con ok, capa_activa, altura_operativa, "
-                "modo, cambio"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "desde_donde": {
-            "descripcion": (
-                "Reporta altura y modo actuales del Self."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con capa_activa, altura_operativa, modo, "
-                "en_casa, perspectivas"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "estado_self": {
-            "descripcion": (
-                "Clasifica lucidez: "
-                "REACTIVE|MECHANICAL|CONSCIOUS|META|INTEGRATED."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con modo, capa_activa, en_casa, coherente"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "elegir": {
-            "descripcion": (
-                "Registra un acto de agency sin ejecutar efectos externos."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con ok, eleccion, desde, modo, n_elecciones"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "inventario": {
-            "descripcion": (
-                "Inventario estructural del módulo SF."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, capacidades, capas_validas, "
-                "modos_validos, perspectivas"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "reporte": {
-            "descripcion": (
-                "Reporte de estado del módulo SF."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con estado, coherente, capa_activa, "
-                "modo, errores"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "diagnostico": {
-            "descripcion": (
-                "Diagnóstico: problemas, advertencias, recomendaciones."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con estado, problemas, advertencias, "
-                "recomendaciones"
-            ),
-            "acceso_archivos": ["*"],
-        },
-    },
-
-    # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
-    # ============================================================
-    "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
-        "estado": True,
-        "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
-        "inventario": True,
-        "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
-        "errores": True,
-        "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
-        "dependencias": True,
-        "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
-        "contrato": True,
-        "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
-        "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
-    },
-
-    # ============================================================
-    # ESTADOS VÁLIDOS
-    # ============================================================
-    "estados_validos": [
-        "NO_INICIADO",
-        "OPERATIVO",
-        "DEGRADADO",
-        "RECHAZADO",
-    ],
-
-    # ============================================================
-    # INVARIANTES
-    # ============================================================
-    "invariantes": [
-        "el id del módulo nunca cambia",
-        "el rol nunca cambia",
-        "la casa operativa del Self es L4_YO",
-        "oscilar no es elegir",
-        "elegir no ejecuta efectos externos",
-        "las perspectivas L1…L6 son mecanismos legibles, no dependencias de arranque",
-        "las capacidades declaradas son callables tras la resolución",
-        "este módulo no modifica el estado de otros módulos",
-        "este módulo no inventa capacidades no declaradas en CONTENEDOR",
-        "este módulo siempre puede reportar su propio estado",
-    ],
-
-}  # <--- CIERRE FINAL
+# ===============================================================
+# 10.5 — EXPORTACIONES
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
+    "ID_MODULO",
+    "NOMBRE_MODULO",
+    "ROL_MODULO",
+    "VERSION_MODULO",
+    "VERSION_CONTRATO",
+    "ESQUEMA_CONTRATO",
+    "ESTABILIDAD",
     "CAPAS_VALIDAS",
     "CASA_SELF",
     "MODOS_VALIDOS",
@@ -900,4 +1391,21 @@ __all__ = [
     "inventario",
     "reporte",
     "diagnostico",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
+    "ContratoInvalido",
 ]
+
+# ===============================================================
+# FIN 10.5
+# ===============================================================
+
+# ===============================================================
+# FIN 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# ===============================================================
+
+
+# ===============================================================
+# FIN DEL MÓDULO
+# ===============================================================

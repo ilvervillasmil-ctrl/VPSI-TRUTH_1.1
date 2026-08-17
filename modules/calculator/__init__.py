@@ -1228,440 +1228,69 @@ def leer_ids_escala() -> Dict[str, Any]:
 # ===============================================================
 
 # ===============================================================
-# 8.4 — BARRER / VERIFICAR
-# ===============================================================
-
-def barrer() -> Dict[str, Any]:
-    """
-    Centinela de integridad estructural del dominio CA.
-
-    Verifica, de forma determinista, la cadena contractual:
-        factor/capacidad declarada
-        → stem declarado
-        → archivo físico
-        → API cargada
-        → callable
-
-    También verifica:
-        - APIs no declaradas.
-        - Choques de stems por factor.
-        - Hashes calculables.
-        - APIs contractuales de conteos.
-        - API contractual de escalas.
-        - Ejecución segura de leer_ids_escala().
-        - Estructura e integridad de los IDs de escala.
-
-    No ejecuta ninguna fórmula.
-    No calcula C, L, K ni ningún otro factor.
-    No interpreta IDs.
-    No determina variables de cálculo.
-    No inventa capacidades.
-    """
-
-    errores: List[Dict[str, str]] = list(_ERRORES_CARGA)
-    choques: List[str] = []
-
-    # -----------------------------------------------------------
-    # 8.4.1 — INVENTARIO FÍSICO Y HASHES
-    # -----------------------------------------------------------
-    archivos = [p.name for p in _listar_py()]
-    hashes = _hashes_modulo()
-
-    for nombre, meta in hashes.items():
-        if meta.get("sha256") is None:
-            errores.append({
-                "archivo": nombre,
-                "error": meta.get("error") or "hash no calculable",
-            })
-
-    # -----------------------------------------------------------
-    # 8.4.2 — FACTORES:
-    # factor → stem → archivo → API → callable
-    # -----------------------------------------------------------
-    #
-    # _ARCHIVO_FACTOR constituye la relación declarada:
-    #     stem → factor
-    #
-    # Se invierte exclusivamente para verificar:
-    #     factor → stem
-    #
-    # No se crean factores nuevos.
-    # No se agregan nombres manualmente.
-    # -----------------------------------------------------------
-    stem_por_factor: Dict[str, str] = {}
-
-    for stem, factor in _ARCHIVO_FACTOR.items():
-        if factor in stem_por_factor:
-            choques.append(
-                "factor '{0}' declarado por múltiples stems: "
-                "'{1}' y '{2}'".format(
-                    factor,
-                    stem_por_factor[factor],
-                    stem,
-                )
-            )
-        else:
-            stem_por_factor[factor] = stem
-
-    factores_ok: List[str] = []
-    apis_factor: Dict[str, bool] = {}
-
-    for factor in _FACTORES_CANONICOS:
-        stem = stem_por_factor.get(factor)
-
-        # -------------------------------------------------------
-        # Factor sin stem contractual
-        # -------------------------------------------------------
-        if stem is None:
-            errores.append({
-                "archivo": "?",
-                "error": (
-                    "factor '{0}' sin stem declarado en "
-                    "_ARCHIVO_FACTOR".format(factor)
-                ),
-            })
-            apis_factor[factor] = False
-            continue
-
-        # -------------------------------------------------------
-        # Stem → archivo físico
-        # -------------------------------------------------------
-        path = _DIR / "{0}.py".format(stem)
-
-        if not path.exists():
-            errores.append({
-                "archivo": "{0}.py".format(stem),
-                "error": (
-                    "factor '{0}' declara stem '{1}' pero el "
-                    "archivo no existe fisicamente".format(
-                        factor,
-                        stem,
-                    )
-                ),
-            })
-            apis_factor[factor] = False
-            continue
-
-        # -------------------------------------------------------
-        # Archivo → API
-        # -------------------------------------------------------
-        fn = _APIS.get(factor)
-        es_callable = callable(fn)
-
-        apis_factor[factor] = es_callable
-
-        if not es_callable:
-            errores.append({
-                "archivo": "{0}.py".format(stem),
-                "error": (
-                    "factor '{0}' tiene archivo '{1}.py' pero "
-                    "API no callable en _APIS".format(
-                        factor,
-                        stem,
-                    )
-                ),
-            })
-            continue
-
-        factores_ok.append(factor)
-
-    # -----------------------------------------------------------
-    # 8.4.3 — APIs DE FACTORES NO DECLARADAS
-    # -----------------------------------------------------------
-    factores_no_declarados = sorted(
-        set(_APIS.keys()) - set(_FACTORES_CANONICOS)
-    )
-
-    for factor_extra in factores_no_declarados:
-        errores.append({
-            "archivo": "?",
-            "error": (
-                "API de factor '{0}' cargada en _APIS pero no "
-                "pertenece a _FACTORES_CANONICOS".format(
-                    factor_extra
-                )
-            ),
-        })
-
-    # -----------------------------------------------------------
-    # 8.4.4 — CHOQUES DE STEM → FACTOR
-    # -----------------------------------------------------------
-    #
-    # Además de detectar duplicidad en la inversión anterior,
-    # se verifica la relación física de los stems declarados.
-    # -----------------------------------------------------------
-    por_factor: Dict[str, List[str]] = {}
-
-    for stem, factor in _ARCHIVO_FACTOR.items():
-        if (_DIR / "{0}.py".format(stem)).exists():
-            por_factor.setdefault(factor, []).append(stem)
-
-    for factor, stems in por_factor.items():
-        if len(stems) > 1:
-            mensaje = "factor '{0}' reclamado por: {1}".format(
-                factor,
-                sorted(stems),
-            )
-            if mensaje not in choques:
-                choques.append(mensaje)
-
-    # -----------------------------------------------------------
-    # 8.4.5 — ARCHIVOS EXTRA
-    # -----------------------------------------------------------
-    #
-    # Un archivo adicional no constituye por sí mismo una
-    # contradicción contractual.
-    # -----------------------------------------------------------
-    stems_conocidos = set(_ARCHIVO_FACTOR.keys()) | {
-        "conteos",
-        "escalas_ids",
-    }
-
-    extra = [
-        p.stem
-        for p in _listar_py()
-        if p.stem not in stems_conocidos
-    ]
-
-    # -----------------------------------------------------------
-    # 8.4.6 — CONTEOS
-    # -----------------------------------------------------------
-    #
-    # Solo se validan las APIs contractuales existentes:
-    #     extraer_conteos
-    #     inyectar_en_peticion
-    #
-    # No se agrega ninguna API adicional.
-    # -----------------------------------------------------------
-    extraer_ok = (
-        _CONTEOS is not None
-        and callable(_CONTEOS.get("extraer_conteos"))
-    )
-
-    inyectar_ok = (
-        _CONTEOS is not None
-        and callable(_CONTEOS.get("inyectar_en_peticion"))
-    )
-
-    conteos_ok = extraer_ok and inyectar_ok
-
-    if _CONTEOS is None:
-        errores.append({
-            "archivo": "conteos.py",
-            "error": "API de conteos no cargada",
-        })
-    else:
-        if not extraer_ok:
-            errores.append({
-                "archivo": "conteos.py",
-                "error": "extraer_conteos no es callable",
-            })
-
-        if not inyectar_ok:
-            errores.append({
-                "archivo": "conteos.py",
-                "error": "inyectar_en_peticion no es callable",
-            })
-
-    apis_conteos = {
-        "extraer_conteos": extraer_ok,
-        "inyectar_en_peticion": inyectar_ok,
-    }
-
-    # -----------------------------------------------------------
-    # 8.4.7 — ESCALAS:
-    # API → callable → ejecución → estructura → cardinalidad
-    # -----------------------------------------------------------
-    escalas_ok = (
-        _ESCALAS is not None
-        and callable(_ESCALAS.get("ids"))
-    )
-
-    ids_escala: Dict[str, Any] = {
-        "ids": [],
-        "n": 0,
-        "origenes": [],
-        "disponible": False,
-    }
-
-    if _ESCALAS is None:
-        errores.append({
-            "archivo": "escalas_ids.py",
-            "error": "API de escalas_ids no cargada",
-        })
-        escalas_ok = False
-
-    elif not callable(_ESCALAS.get("ids")):
-        errores.append({
-            "archivo": "escalas_ids.py",
-            "error": "escalas_ids.ids no es callable",
-        })
-        escalas_ok = False
-
-    else:
-        try:
-            resultado = leer_ids_escala()
-
-            # ---------------------------------------------------
-            # Retorno contractual mínimo
-            # ---------------------------------------------------
-            if not (
-                isinstance(resultado, dict)
-                and "ids" in resultado
-                and "n" in resultado
-                and "disponible" in resultado
-            ):
-                errores.append({
-                    "archivo": "escalas_ids.py",
-                    "error": (
-                        "leer_ids_escala retorno estructura invalida"
-                    ),
-                })
-                escalas_ok = False
-
-            else:
-                ids_list = resultado.get("ids")
-                n_val = resultado.get("n")
-
-                # -----------------------------------------------
-                # ids debe ser list
-                # -----------------------------------------------
-                if not isinstance(ids_list, list):
-                    errores.append({
-                        "archivo": "escalas_ids.py",
-                        "error": (
-                            "leer_ids_escala: 'ids' no es list"
-                        ),
-                    })
-                    escalas_ok = False
-
-                # -----------------------------------------------
-                # n debe corresponder exactamente a ids
-                # -----------------------------------------------
-                elif n_val != len(ids_list):
-                    errores.append({
-                        "archivo": "escalas_ids.py",
-                        "error": (
-                            "leer_ids_escala: n={0} != "
-                            "len(ids)={1}".format(
-                                n_val,
-                                len(ids_list),
-                            )
-                        ),
-                    })
-                    escalas_ok = False
-
-                else:
-                    ids_escala = resultado
-                    escalas_ok = True
-
-        except Exception as e:  # noqa: BLE001
-            errores.append({
-                "archivo": "escalas_ids.py",
-                "error": (
-                    "leer_ids_escala fallo: {0}: {1}".format(
-                        type(e).__name__,
-                        e,
-                    )
-                ),
-            })
-            escalas_ok = False
-
-    # -----------------------------------------------------------
-    # 8.4.8 — COHERENCIA FINAL
-    # -----------------------------------------------------------
-    #
-    # No se ejecuta ninguna fórmula de cálculo.
-    #
-    # La coherencia depende exclusivamente de que no existan
-    # errores estructurales ni choques contractuales.
-    # -----------------------------------------------------------
-    coherente = not errores and not choques
-
-    # -----------------------------------------------------------
-    # 8.4.9 — RETORNO CONTRACTUAL
-    # -----------------------------------------------------------
-    return {
-        "contenedor": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "coherente": coherente,
-        "errores": errores,
-        "choques": choques,
-        "archivos": archivos,
-        "hashes": hashes,
-        "factores_api": sorted(factores_ok),
-        "factores_no_declarados": factores_no_declarados,
-        "archivos_extra": extra,
-        "conteos_disponible": conteos_ok,
-        "escalas_ids_disponible": escalas_ok,
-        "ids_escala": ids_escala,
-        "historial_n": len(_HISTORIAL),
-        "apis_factor": apis_factor,
-        "apis_conteos": apis_conteos,
-    }
-
-
-def verificar() -> Dict[str, Any]:
-    """
-    Alias contractual real de barrer.
-
-    Correspondencia:
-        verificar → barrer
-
-    Compatible con:
-        CONTENEDOR['capacidades']['verificar']
-        _CAP_MAP['verificar']
-        __all__
-
-    No reimplementa lógica.
-    No ejecuta cálculos.
-    No inventa comportamiento.
-    """
-    return barrer()
-
-
-# ===============================================================
-# FIN 8.4
-# ===============================================================
-# ===============================================================
 # 8.5 — CALCULAR C
 # ===============================================================
 
-def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def calcular_C(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
     Ejecuta exclusivamente el cálculo contractual del factor C.
 
+    Fórmula contractual ejecutada por la API C:
+        C = 1 - k/m
+
+    Correspondencia de variables:
+        m = compromisos
+        k = contradicciones
+
     Flujo determinista:
-        petición
+        entrada
         → método
         → precisión
-        → preparación de conteos cuando corresponde
-        → normalización de evidencia
-        → resolución de API C
-        → ejecución única de API C
-        → resolución del valor C
-        → normalización a Fraction
-        → representación contractual.
+        → conteos cuando corresponde
+        → evidencia
+        → API C
+        → resultado C
+        → normalización
+        → representación
+        → salida.
 
     No calcula L ni K.
-    No inventa fórmulas.
+    No implementa una fórmula paralela.
     No sustituye una API C ausente.
     """
 
+    # -----------------------------------------------------------
+    # 8.5.1 — ENTRADA
+    # -----------------------------------------------------------
     if peticion is None:
         peticion = {}
     elif not isinstance(peticion, dict):
         return {
-            "C": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "C": representar(
+                None,
+                PRECISION_DECIMAL_DEFAULT,
+            ),
             "ruta": None,
-            "notas": ["Peticion invalida: se esperaba dict"],
+            "notas": [
+                "Peticion invalida: se esperaba dict"
+            ],
             "evidencia": [],
         }
     else:
         peticion = dict(peticion)
 
-    metodo = str(peticion.get("metodo") or "operacional")
+    # -----------------------------------------------------------
+    # 8.5.2 — MÉTODO
+    # -----------------------------------------------------------
+    metodo = str(
+        peticion.get("metodo") or "operacional"
+    )
 
+    # -----------------------------------------------------------
+    # 8.5.3 — PRECISIÓN
+    # -----------------------------------------------------------
     try:
         prec = int(
             peticion.get("precision")
@@ -1673,6 +1302,9 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     if prec < 0:
         prec = PRECISION_DECIMAL_DEFAULT
 
+    # -----------------------------------------------------------
+    # 8.5.4 — CONTEOS
+    # -----------------------------------------------------------
     if metodo == "operacional":
         try:
             peticion = _asegurar_conteos(peticion)
@@ -1680,6 +1312,7 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             evidencia = _normalizar_evidencia(
                 peticion.get("evidencia")
             )
+
             evidencia.append({
                 "id_evidencia": _nuevo_id_evidencia(),
                 "modulo": NOMBRE_MODULO,
@@ -1689,10 +1322,9 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "version_contrato": VERSION_CONTRATO,
                 "rechazado": True,
             })
-            for evidencia_item in evidencia:
-                _REG_EVIDENCIA[
-                    evidencia_item["id_evidencia"]
-                ] = evidencia_item
+
+            for e in evidencia:
+                _REG_EVIDENCIA[e["id_evidencia"]] = e
 
             return {
                 "C": representar(None, prec),
@@ -1703,6 +1335,9 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "evidencia": evidencia,
             }
 
+    # -----------------------------------------------------------
+    # 8.5.5 — EVIDENCIA
+    # -----------------------------------------------------------
     evidencia = _normalizar_evidencia(
         peticion.get("evidencia")
     )
@@ -1717,33 +1352,43 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "rechazado": False,
     })
 
-    for evidencia_item in evidencia:
-        _REG_EVIDENCIA[
-            evidencia_item["id_evidencia"]
-        ] = evidencia_item
+    for e in evidencia:
+        _REG_EVIDENCIA[e["id_evidencia"]] = e
 
+    # -----------------------------------------------------------
+    # 8.5.6 — RESOLUCIÓN DE API C
+    # -----------------------------------------------------------
     fn = _APIS.get("C")
 
     if not callable(fn):
         evidencia[-1]["rechazado"] = True
+
         return {
             "C": representar(None, prec),
             "ruta": None,
-            "notas": ["API C no disponible"],
+            "notas": [
+                "API C no disponible"
+            ],
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.5.7 — EJECUCIÓN DE API C
+    # -----------------------------------------------------------
     try:
         if _acepta_dict(fn):
             raw = fn(peticion)
         else:
             raw = fn(
                 compromisos=peticion.get("compromisos"),
-                contradicciones=peticion.get("contradicciones"),
+                contradicciones=peticion.get(
+                    "contradicciones"
+                ),
                 metodo=metodo,
             )
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
+
         return {
             "C": representar(None, prec),
             "ruta": metodo,
@@ -1756,9 +1401,13 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.5.8 — RESULTADO C
+    # -----------------------------------------------------------
     if isinstance(raw, dict):
         if "C" not in raw:
             evidencia[-1]["rechazado"] = True
+
             return {
                 "C": representar(None, prec),
                 "ruta": metodo,
@@ -1767,27 +1416,39 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 ],
                 "evidencia": evidencia,
             }
+
         val = raw["C"]
     else:
         val = raw
 
+    # -----------------------------------------------------------
+    # 8.5.9 — UNDEFINED
+    # -----------------------------------------------------------
     if es_undefined(val):
+        obj = representar(
+            UNDEFINED,
+            prec,
+        )
+
         return {
-            "C": representar(UNDEFINED, prec),
+            "C": obj,
             "ruta": metodo,
             "notas": [],
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.5.10 — NORMALIZACIÓN
+    # -----------------------------------------------------------
     try:
         fraccion = (
             val
             if isinstance(val, Fraction)
             else _a_fraction(val)
         )
-        obj = representar(fraccion, prec)
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
+
         return {
             "C": representar(None, prec),
             "ruta": metodo,
@@ -1800,6 +1461,32 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.5.11 — REPRESENTACIÓN
+    # -----------------------------------------------------------
+    try:
+        obj = representar(
+            fraccion,
+            prec,
+        )
+    except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
+
+        return {
+            "C": representar(None, prec),
+            "ruta": metodo,
+            "notas": [
+                "Error representando C: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": evidencia,
+        }
+
+    # -----------------------------------------------------------
+    # 8.5.12 — SALIDA
+    # -----------------------------------------------------------
     return {
         "C": obj,
         "ruta": metodo,
@@ -1817,44 +1504,68 @@ def calcular_C(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # 8.6 — CALCULAR L
 # ===============================================================
 
-def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def calcular_L(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
     Ejecuta exclusivamente el cálculo contractual del factor L.
 
+    Fórmula contractual ejecutada por la API L:
+        L = 1 - r/p
+
+    Correspondencia de variables:
+        p = posturas
+        r = reversiones
+
     Flujo determinista:
-        petición
+        entrada
         → método
         → precisión
-        → preparación de conteos cuando corresponde
-        → normalización de evidencia
-        → resolución de API L
-        → ejecución única de API L
-        → resolución del valor L
-        → tratamiento de UNDEFINED
-        → normalización a Fraction
-        → representación contractual.
+        → conteos cuando corresponde
+        → evidencia
+        → API L
+        → resultado L
+        → normalización
+        → representación
+        → salida.
 
     No calcula C ni K.
-    No inventa fórmulas.
+    No implementa una fórmula paralela.
     No sustituye una API L ausente.
     """
 
+    # -----------------------------------------------------------
+    # 8.6.1 — ENTRADA
+    # -----------------------------------------------------------
     if peticion is None:
         peticion = {}
     elif not isinstance(peticion, dict):
         return {
-            "L": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "L": representar(
+                None,
+                PRECISION_DECIMAL_DEFAULT,
+            ),
             "p": None,
             "r": None,
             "ruta": None,
-            "notas": ["Peticion invalida: se esperaba dict"],
+            "notas": [
+                "Peticion invalida: se esperaba dict"
+            ],
             "evidencia": [],
         }
     else:
         peticion = dict(peticion)
 
-    metodo = str(peticion.get("metodo") or "operacional")
+    # -----------------------------------------------------------
+    # 8.6.2 — MÉTODO
+    # -----------------------------------------------------------
+    metodo = str(
+        peticion.get("metodo") or "operacional"
+    )
 
+    # -----------------------------------------------------------
+    # 8.6.3 — PRECISIÓN
+    # -----------------------------------------------------------
     try:
         prec = int(
             peticion.get("precision")
@@ -1866,6 +1577,9 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     if prec < 0:
         prec = PRECISION_DECIMAL_DEFAULT
 
+    # -----------------------------------------------------------
+    # 8.6.4 — CONTEOS
+    # -----------------------------------------------------------
     if metodo == "operacional":
         try:
             peticion = _asegurar_conteos(peticion)
@@ -1873,6 +1587,7 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             evidencia = _normalizar_evidencia(
                 peticion.get("evidencia")
             )
+
             evidencia.append({
                 "id_evidencia": _nuevo_id_evidencia(),
                 "modulo": NOMBRE_MODULO,
@@ -1882,10 +1597,9 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "version_contrato": VERSION_CONTRATO,
                 "rechazado": True,
             })
-            for evidencia_item in evidencia:
-                _REG_EVIDENCIA[
-                    evidencia_item["id_evidencia"]
-                ] = evidencia_item
+
+            for e in evidencia:
+                _REG_EVIDENCIA[e["id_evidencia"]] = e
 
             return {
                 "L": representar(None, prec),
@@ -1898,6 +1612,9 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "evidencia": evidencia,
             }
 
+    # -----------------------------------------------------------
+    # 8.6.5 — EVIDENCIA
+    # -----------------------------------------------------------
     evidencia = _normalizar_evidencia(
         peticion.get("evidencia")
     )
@@ -1912,35 +1629,45 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "rechazado": False,
     })
 
-    for evidencia_item in evidencia:
-        _REG_EVIDENCIA[
-            evidencia_item["id_evidencia"]
-        ] = evidencia_item
+    for e in evidencia:
+        _REG_EVIDENCIA[e["id_evidencia"]] = e
 
+    # -----------------------------------------------------------
+    # 8.6.6 — RESOLUCIÓN DE API L
+    # -----------------------------------------------------------
     fn = _APIS.get("L")
 
     if not callable(fn):
         evidencia[-1]["rechazado"] = True
+
         return {
             "L": representar(None, prec),
             "p": None,
             "r": None,
             "ruta": None,
-            "notas": ["API L no disponible"],
+            "notas": [
+                "API L no disponible"
+            ],
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.6.7 — EJECUCIÓN DE API L
+    # -----------------------------------------------------------
     try:
         if _acepta_dict(fn):
             raw = fn(peticion)
         else:
             raw = fn(
                 posturas=peticion.get("posturas"),
-                reversiones=peticion.get("reversiones"),
+                reversiones=peticion.get(
+                    "reversiones"
+                ),
                 metodo=metodo,
             )
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
+
         return {
             "L": representar(None, prec),
             "p": None,
@@ -1955,12 +1682,16 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.6.8 — RESULTADO L
+    # -----------------------------------------------------------
     p = None
     r = None
 
     if isinstance(raw, dict):
         if "L" not in raw:
             evidencia[-1]["rechazado"] = True
+
             return {
                 "L": representar(None, prec),
                 "p": None,
@@ -1978,25 +1709,38 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     else:
         val = raw
 
+    # -----------------------------------------------------------
+    # 8.6.9 — UNDEFINED
+    # -----------------------------------------------------------
     if es_undefined(val):
+        obj = representar(
+            UNDEFINED,
+            prec,
+        )
+
         return {
-            "L": representar(UNDEFINED, prec),
+            "L": obj,
             "p": p,
             "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": ["L=UNDEFINED (AM-D6)"],
+            "notas": [
+                "L=UNDEFINED (AM-D6)"
+            ],
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.6.10 — NORMALIZACIÓN
+    # -----------------------------------------------------------
     try:
         fraccion = (
             val
             if isinstance(val, Fraction)
             else _a_fraction(val)
         )
-        obj = representar(fraccion, prec)
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
+
         return {
             "L": representar(None, prec),
             "p": p,
@@ -2011,6 +1755,34 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "evidencia": evidencia,
         }
 
+    # -----------------------------------------------------------
+    # 8.6.11 — REPRESENTACIÓN
+    # -----------------------------------------------------------
+    try:
+        obj = representar(
+            fraccion,
+            prec,
+        )
+    except Exception as e:  # noqa: BLE001
+        evidencia[-1]["rechazado"] = True
+
+        return {
+            "L": representar(None, prec),
+            "p": p,
+            "r": str(r) if r is not None else None,
+            "ruta": metodo,
+            "notas": [
+                "Error representando L: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": evidencia,
+        }
+
+    # -----------------------------------------------------------
+    # 8.6.12 — SALIDA
+    # -----------------------------------------------------------
     return {
         "L": obj,
         "p": p,
@@ -2024,33 +1796,45 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # ===============================================================
 # FIN 8.6
 # ===============================================================
+
+
 # ===============================================================
 # 8.7 — CALCULAR K
 # ===============================================================
 
-def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def calcular_K(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
     Ejecuta exclusivamente el cálculo contractual del factor K.
 
+    Fórmula contractual ejecutada por la API K:
+        K = 1 - f/c
+
+    Correspondencia de variables:
+        c = afirmaciones
+        f = afirmaciones_falsas
+
+    Contexto contractual:
+        O_context = contexto / O_context / o_context
+
     Flujo determinista:
-        petición
+        entrada
         → método
         → precisión
-        → resolución explícita de O_context
-        → normalización de evidencia
-        → caso contractual K=None sin contexto/O
-        → preparación de conteos cuando corresponde
-        → resolución de API K
-        → ejecución única de API K
-        → resolución del valor K
-        → tratamiento de UNDEFINED
-        → normalización a Fraction
-        → representación contractual.
+        → O_context
+        → conteos cuando corresponde
+        → evidencia
+        → API K
+        → resultado K
+        → normalización
+        → representación
+        → salida.
 
     No calcula C ni L.
-    No inventa fórmulas.
+    No implementa una fórmula paralela.
+    No inventa un O_context.
     No sustituye una API K ausente.
-    No ejecuta la API K por una segunda firma ante TypeError.
     """
 
     # -----------------------------------------------------------
@@ -2060,7 +1844,10 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         peticion = {}
     elif not isinstance(peticion, dict):
         return {
-            "K": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "K": representar(
+                None,
+                PRECISION_DECIMAL_DEFAULT,
+            ),
             "ruta": None,
             "notas": [
                 "Peticion invalida: se esperaba dict"
@@ -2092,15 +1879,13 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         prec = PRECISION_DECIMAL_DEFAULT
 
     # -----------------------------------------------------------
-    # 8.7.4 — O_context
+    # 8.7.4 — O_CONTEXT
     # -----------------------------------------------------------
-    o_ctx = peticion.get("contexto")
-
-    if o_ctx is None:
-        o_ctx = peticion.get("O_context")
-
-    if o_ctx is None:
-        o_ctx = peticion.get("o_context")
+    o_ctx = (
+        peticion.get("contexto")
+        or peticion.get("O_context")
+        or peticion.get("o_context")
+    )
 
     # -----------------------------------------------------------
     # 8.7.5 — EVIDENCIA
@@ -2119,17 +1904,18 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "rechazado": False,
     })
 
-    for evidencia_item in evidencia:
-        _REG_EVIDENCIA[
-            evidencia_item["id_evidencia"]
-        ] = evidencia_item
+    for e in evidencia:
+        _REG_EVIDENCIA[e["id_evidencia"]] = e
 
     # -----------------------------------------------------------
-    # 8.7.6 — CASO CONTRACTUAL K SIN CONTEXTO/O
+    # 8.7.6 — AUSENCIA DE O_CONTEXT
     # -----------------------------------------------------------
     if o_ctx is None:
         return {
-            "K": representar(None, prec),
+            "K": representar(
+                None,
+                prec,
+            ),
             "ruta": metodo,
             "notas": [
                 "K=None sin contexto/O (Def-5.3.1)"
@@ -2138,7 +1924,7 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         }
 
     # -----------------------------------------------------------
-    # 8.7.7 — CONTEOS PARA MÉTODO OPERACIONAL
+    # 8.7.7 — CONTEOS
     # -----------------------------------------------------------
     if metodo == "operacional":
         try:
@@ -2173,14 +1959,16 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         }
 
     # -----------------------------------------------------------
-    # 8.7.9 — EJECUCIÓN ÚNICA DE API K
+    # 8.7.9 — EJECUCIÓN DE API K
     # -----------------------------------------------------------
     try:
         if _acepta_dict(fn):
             raw = fn(peticion)
         else:
             raw = fn(
-                afirmaciones=peticion.get("afirmaciones"),
+                afirmaciones=peticion.get(
+                    "afirmaciones"
+                ),
                 afirmaciones_falsas=peticion.get(
                     "afirmaciones_falsas"
                 ),
@@ -2203,7 +1991,7 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         }
 
     # -----------------------------------------------------------
-    # 8.7.10 — RESOLUCIÓN DEL RETORNO
+    # 8.7.10 — RESULTADO K
     # -----------------------------------------------------------
     if isinstance(raw, dict):
         if "K" not in raw:
@@ -2226,15 +2014,20 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # 8.7.11 — UNDEFINED
     # -----------------------------------------------------------
     if es_undefined(val):
+        obj = representar(
+            UNDEFINED,
+            prec,
+        )
+
         return {
-            "K": representar(UNDEFINED, prec),
+            "K": obj,
             "ruta": metodo,
             "notas": [],
             "evidencia": evidencia,
         }
 
     # -----------------------------------------------------------
-    # 8.7.12 — NORMALIZACIÓN A FRACCIÓN
+    # 8.7.12 — NORMALIZACIÓN
     # -----------------------------------------------------------
     try:
         fraccion = (
@@ -2258,10 +2051,13 @@ def calcular_K(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         }
 
     # -----------------------------------------------------------
-    # 8.7.13 — REPRESENTACIÓN CONTRACTUAL
+    # 8.7.13 — REPRESENTACIÓN
     # -----------------------------------------------------------
     try:
-        obj = representar(fraccion, prec)
+        obj = representar(
+            fraccion,
+            prec,
+        )
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
 
@@ -2315,89 +2111,303 @@ def calcular_factor(
 # FIN 8.8
 # ===============================================================
 
-
 # ===============================================================
 # 8.9 — CALCULAR (PIPELINE COMPLETO)
 # ===============================================================
 
 def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
-    Salida sin duplicacion:
-      C = {fraccion, numerador, denominador, decimal, display, ...}
-      L = {...}
-      K = {...}
-    display ejemplo: "7/9 = 0.778"
+    Pipeline completo y determinista de cálculo de CA.
+
+    8.9 no implementa fórmulas propias.
+    Las fórmulas pertenecen exclusivamente a sus capacidades:
+
+        C = 1 - k/m
+        L = 1 - r/p
+        K = 1 - f/c
+
+    8.9 únicamente:
+        1. valida la entrada;
+        2. determina método y precisión;
+        3. prepara los datos operacionales una sola vez;
+        4. conserva la evidencia recibida;
+        5. ejecuta calcular_C, calcular_L y calcular_K;
+        6. consolida sus resultados;
+        7. conserva trazabilidad de módulos, capacidades y versiones;
+        8. valida la salida consolidada;
+        9. registra el cálculo en historial;
+        10. devuelve el resultado completo.
+
+    No inventa fórmulas.
+    No modifica C, L ni K.
+    No sustituye una capacidad ausente.
+    No interpreta IDs de forma implícita.
+    No elimina resultados parciales.
     """
+
+    # -----------------------------------------------------------
+    # 8.9.1 — ENTRADA
+    # -----------------------------------------------------------
     t0 = datetime.now(timezone.utc)
-    peticion = dict(peticion or {})
-    metodo = str(peticion.get("metodo") or "operacional")
-    prec = int(peticion.get("precision") or PRECISION_DECIMAL_DEFAULT)
-    id_calculo = _nuevo_id_calculo()
-    errores: List[str] = []
 
-    # Validar evidencia entrante
-    val_ev = validar_evidencia(peticion.get("evidencia"))
-    evidencia = list(val_ev.get("evidencia_normalizada") or [])
-    if not val_ev.get("ok"):
-        errores.extend(val_ev.get("problemas") or [])
-
-    escala_id = _id_escala_pedido(peticion)
-    escala_meta = None
-    if escala_id:
-        inv = leer_ids_escala()
-        conocido = escala_id in (inv.get("ids") or [])
-        desc = None
-        if _ESCALAS and callable(_ESCALAS.get("por_id")):
-            try:
-                desc = _ESCALAS["por_id"](escala_id)
-            except Exception:  # noqa: BLE001
-                desc = None
-        escala_meta = {
-            "escala_id": escala_id,
-            "conocido": conocido,
-            "ids_disponibles": list(inv.get("ids") or []),
+    if peticion is None:
+        peticion = {}
+    elif not isinstance(peticion, dict):
+        return {
+            "id_calculo": None,
+            "C": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "L": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "K": representar(None, PRECISION_DECIMAL_DEFAULT),
+            "precision": PRECISION_DECIMAL_DEFAULT,
+            "errores": [
+                "Peticion invalida: se esperaba dict"
+            ],
+            "advertencias": [],
+            "metodo": None,
+            "evidencia": [],
+            "id_evidencias": [],
+            "versiones_utilizadas": {},
+            "contratos_utilizados": {},
+            "modulos_consultados": [],
+            "capacidades_consultadas": [],
+            "centinela": {
+                "ok": False,
+                "problemas": [
+                    "Peticion invalida: se esperaba dict"
+                ],
+            },
+            "inicio": t0.isoformat(),
+            "fin": datetime.now(timezone.utc).isoformat(),
+            "duracion_ms": 0,
+            "version_ca": VERSION_MODULO,
+            "esquema": ESQUEMA_CONTRATO,
         }
-        if isinstance(desc, dict):
-            escala_meta["material"] = desc.get("material")
-            escala_meta["nombre"] = desc.get("nombre")
 
+    peticion = dict(peticion)
+
+    # -----------------------------------------------------------
+    # 8.9.2 — MÉTODO
+    # -----------------------------------------------------------
+    metodo = str(
+        peticion.get("metodo") or "operacional"
+    )
+
+    # -----------------------------------------------------------
+    # 8.9.3 — PRECISIÓN
+    # -----------------------------------------------------------
+    try:
+        prec = int(
+            peticion.get("precision")
+            or PRECISION_DECIMAL_DEFAULT
+        )
+    except (TypeError, ValueError):
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    if prec < 0:
+        prec = PRECISION_DECIMAL_DEFAULT
+
+    # -----------------------------------------------------------
+    # 8.9.4 — IDENTIDAD DEL CÁLCULO
+    # -----------------------------------------------------------
+    id_calculo = _nuevo_id_calculo()
+
+    errores: List[str] = []
+    advertencias: List[str] = []
+
+    # -----------------------------------------------------------
+    # 8.9.5 — VALIDACIÓN DE EVIDENCIA ENTRANTE
+    # -----------------------------------------------------------
+    val_ev = validar_evidencia(
+        peticion.get("evidencia")
+    )
+
+    evidencia = list(
+        val_ev.get("evidencia_normalizada") or []
+    )
+
+    if not val_ev.get("ok"):
+        errores.extend(
+            val_ev.get("problemas") or []
+        )
+
+    # -----------------------------------------------------------
+    # 8.9.6 — PREPARACIÓN ÚNICA DE CONTEOS
+    # -----------------------------------------------------------
     if metodo == "operacional":
-        peticion = _asegurar_conteos(peticion)
-    meta_conteos = peticion.get("_conteos_meta")
+        try:
+            peticion = _asegurar_conteos(peticion)
+        except Exception as e:  # noqa: BLE001
+            errores.append(
+                "Error preparando conteos: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            )
 
+    meta_conteos = peticion.get(
+        "_conteos_meta"
+    )
+
+    # -----------------------------------------------------------
+    # 8.9.7 — PETICIÓN NORMALIZADA PARA LAS CAPACIDADES
+    # -----------------------------------------------------------
     peticion_ev = dict(peticion)
     peticion_ev["evidencia"] = evidencia
     peticion_ev["precision"] = prec
+    peticion_ev["metodo"] = metodo
 
-    out_c = calcular_C(peticion_ev)
-    out_l = calcular_L(peticion_ev)
-    out_k = calcular_K(peticion_ev)
+    # -----------------------------------------------------------
+    # 8.9.8 — EJECUCIÓN DE C
+    # -----------------------------------------------------------
+    try:
+        out_c = calcular_C(peticion_ev)
+    except Exception as e:  # noqa: BLE001
+        out_c = {
+            "C": representar(None, prec),
+            "ruta": metodo,
+            "notas": [
+                "Excepcion en calcular_C: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": [],
+        }
 
+    # -----------------------------------------------------------
+    # 8.9.9 — EJECUCIÓN DE L
+    # -----------------------------------------------------------
+    try:
+        out_l = calcular_L(peticion_ev)
+    except Exception as e:  # noqa: BLE001
+        out_l = {
+            "L": representar(None, prec),
+            "ruta": metodo,
+            "notas": [
+                "Excepcion en calcular_L: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": [],
+        }
+
+    # -----------------------------------------------------------
+    # 8.9.10 — EJECUCIÓN DE K
+    # -----------------------------------------------------------
+    try:
+        out_k = calcular_K(peticion_ev)
+    except Exception as e:  # noqa: BLE001
+        out_k = {
+            "K": representar(None, prec),
+            "ruta": metodo,
+            "notas": [
+                "Excepcion en calcular_K: {0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            ],
+            "evidencia": [],
+        }
+
+    # -----------------------------------------------------------
+    # 8.9.11 — RESULTADOS DE LOS FACTORES
+    # -----------------------------------------------------------
     C = out_c.get("C")
     L = out_l.get("L")
     K = out_k.get("K")
 
+    # -----------------------------------------------------------
+    # 8.9.12 — CONSOLIDACIÓN DE EVIDENCIA
+    # -----------------------------------------------------------
     ev_all: List[Dict[str, Any]] = []
     vistos_ev = set()
-    for bloque in (out_c, out_l, out_k):
+
+    for bloque in (
+        out_c,
+        out_l,
+        out_k,
+    ):
         for e in bloque.get("evidencia") or []:
             eid = e.get("id_evidencia")
-            if eid and eid not in vistos_ev:
+
+            if eid is None:
+                continue
+
+            if eid not in vistos_ev:
                 vistos_ev.add(eid)
                 ev_all.append(e)
-        for n in bloque.get("notas") or []:
-            if "Error" in str(n) or "no disponible" in str(n):
-                errores.append(str(n))
 
+    # -----------------------------------------------------------
+    # 8.9.13 — CONSOLIDACIÓN DE NOTAS Y ERRORES
+    # -----------------------------------------------------------
+    for nombre_factor, bloque in (
+        ("C", out_c),
+        ("L", out_l),
+        ("K", out_k),
+    ):
+        notas = bloque.get("notas") or []
+
+        for nota in notas:
+            texto = str(nota)
+
+            if (
+                "Error" in texto
+                or "Excepcion" in texto
+                or "no disponible" in texto
+                or "invalida" in texto
+            ):
+                errores.append(
+                    "{0}: {1}".format(
+                        nombre_factor,
+                        texto,
+                    )
+                )
+            else:
+                advertencias.append(
+                    "{0}: {1}".format(
+                        nombre_factor,
+                        texto,
+                    )
+                )
+
+    # -----------------------------------------------------------
+    # 8.9.14 — VERSIONES Y CONTRATOS UTILIZADOS
+    # -----------------------------------------------------------
     versiones_utilizadas: Dict[str, str] = {}
     contratos_utilizados: Dict[str, str] = {}
+
     for e in ev_all:
         mod = e.get("modulo")
-        if mod and e.get("version_modulo"):
-            versiones_utilizadas[str(mod)] = str(e["version_modulo"])
-        if mod and e.get("version_contrato"):
-            contratos_utilizados[str(mod)] = str(e["version_contrato"])
 
+        if mod and e.get("version_modulo"):
+            versiones_utilizadas[
+                str(mod)
+            ] = str(e["version_modulo"])
+
+        if mod and e.get("version_contrato"):
+            contratos_utilizados[
+                str(mod)
+            ] = str(e["version_contrato"])
+
+    # -----------------------------------------------------------
+    # 8.9.15 — TRAZABILIDAD DE CAPACIDADES
+    # -----------------------------------------------------------
+    modulos_consultados = sorted({
+        str(e.get("modulo"))
+        for e in ev_all
+        if e.get("modulo")
+    })
+
+    capacidades_consultadas = sorted({
+        str(e.get("capacidad"))
+        for e in ev_all
+        if e.get("capacidad")
+    })
+
+    # -----------------------------------------------------------
+    # 8.9.16 — SALIDA BASE
+    # -----------------------------------------------------------
     salida: Dict[str, Any] = {
         "id_calculo": id_calculo,
         "C": C,
@@ -2405,132 +2415,344 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "K": K,
         "precision": prec,
         "errores": errores,
+        "advertencias": advertencias,
         "metodo": metodo,
         "evidencia": ev_all,
-        "id_evidencias": [e.get("id_evidencia") for e in ev_all],
+        "id_evidencias": [
+            e.get("id_evidencia")
+            for e in ev_all
+            if e.get("id_evidencia") is not None
+        ],
         "versiones_utilizadas": versiones_utilizadas,
         "contratos_utilizados": contratos_utilizados,
-        "modulos_consultados": sorted({
-            e.get("modulo") for e in ev_all if e.get("modulo")
-        }),
-        "capacidades_consultadas": sorted({
-            e.get("capacidad") for e in ev_all if e.get("capacidad")
-        }),
+        "modulos_consultados": modulos_consultados,
+        "capacidades_consultadas": capacidades_consultadas,
     }
+
+    # -----------------------------------------------------------
+    # 8.9.17 — METADATOS DE CONTEOS
+    # -----------------------------------------------------------
     if meta_conteos is not None:
         salida["conteos"] = meta_conteos
-    if escala_meta is not None:
+
+    # -----------------------------------------------------------
+    # 8.9.18 — ESCALA SOLICITADA
+    # -----------------------------------------------------------
+    escala_id = _id_escala_pedido(peticion)
+
+    if escala_id:
+        try:
+            inv = leer_ids_escala()
+        except Exception:
+            inv = {
+                "ids": [],
+                "n": 0,
+                "origenes": [],
+                "disponible": False,
+            }
+
+        conocidos = inv.get("ids") or []
+        conocido = escala_id in conocidos
+
+        desc = None
+
+        if (
+            _ESCALAS
+            and callable(_ESCALAS.get("por_id"))
+        ):
+            try:
+                desc = _ESCALAS["por_id"](
+                    escala_id
+                )
+            except Exception:
+                desc = None
+
+        escala_meta = {
+            "escala_id": escala_id,
+            "conocido": conocido,
+            "ids_disponibles": list(conocidos),
+        }
+
+        if isinstance(desc, dict):
+            escala_meta["material"] = desc.get(
+                "material"
+            )
+            escala_meta["nombre"] = desc.get(
+                "nombre"
+            )
+
         salida["escala"] = escala_meta
 
-    cent = _centinela_resultado(salida, peticion, ev_all)
+    # -----------------------------------------------------------
+    # 8.9.19 — CENTINELA DE RESULTADO
+    # -----------------------------------------------------------
+    cent = _centinela_resultado(
+        salida,
+        peticion,
+        ev_all,
+    )
+
     salida["centinela"] = cent
-    if not cent["ok"]:
-        salida["errores"] = list(salida.get("errores") or []) + list(
-            cent["problemas"]
+
+    if not cent.get("ok"):
+        salida["errores"] = list(
+            salida.get("errores") or []
+        ) + list(
+            cent.get("problemas") or []
         )
 
+    # -----------------------------------------------------------
+    # 8.9.20 — METADATOS DE EJECUCIÓN
+    # -----------------------------------------------------------
     t1 = datetime.now(timezone.utc)
+
     salida["inicio"] = t0.isoformat()
     salida["fin"] = t1.isoformat()
-    salida["duracion_ms"] = int((t1 - t0).total_seconds() * 1000)
+    salida["duracion_ms"] = int(
+        (t1 - t0).total_seconds() * 1000
+    )
     salida["version_ca"] = VERSION_MODULO
     salida["esquema"] = ESQUEMA_CONTRATO
 
-    # Historial liviano (sin evidencia completa)
-    _EVIDENCIA_POR_CALC[id_calculo] = ev_all
+    # -----------------------------------------------------------
+    # 8.9.21 — REGISTRO DE EVIDENCIA
+    # -----------------------------------------------------------
+    _EVIDENCIA_POR_CALC[
+        id_calculo
+    ] = ev_all
+
+    # -----------------------------------------------------------
+    # 8.9.22 — HISTORIAL
+    # -----------------------------------------------------------
+    def _resumen_factor(
+        factor: Any,
+    ) -> Dict[str, Any]:
+        if not isinstance(factor, dict):
+            return {
+                "fraccion": None,
+                "numerador": None,
+                "denominador": None,
+                "decimal": None,
+                "display": None,
+            }
+
+        return {
+            "fraccion": factor.get(
+                "fraccion"
+            ),
+            "numerador": factor.get(
+                "numerador"
+            ),
+            "denominador": factor.get(
+                "denominador"
+            ),
+            "decimal": factor.get(
+                "decimal"
+            ),
+            "display": factor.get(
+                "display"
+            ),
+        }
+
     _HISTORIAL.append({
         "id_calculo": id_calculo,
         "timestamp": salida["fin"],
         "metodo": metodo,
         "resultado": {
-            "C": {
-                "fraccion": (C or {}).get("fraccion"),
-                "decimal": (C or {}).get("decimal"),
-                "display": (C or {}).get("display"),
-            },
-            "L": {
-                "fraccion": (L or {}).get("fraccion"),
-                "decimal": (L or {}).get("decimal"),
-                "display": (L or {}).get("display"),
-            },
-            "K": {
-                "fraccion": (K or {}).get("fraccion"),
-                "decimal": (K or {}).get("decimal"),
-                "display": (K or {}).get("display"),
-            },
+            "C": _resumen_factor(C),
+            "L": _resumen_factor(L),
+            "K": _resumen_factor(K),
         },
-        "id_evidencias": list(salida["id_evidencias"]),
-        "modulos_consultados": salida["modulos_consultados"],
-        "capacidades_consultadas": salida["capacidades_consultadas"],
-        "versiones_utilizadas": versiones_utilizadas,
-        "centinela_ok": cent["ok"],
-        "errores": list(salida["errores"]),
-        "duracion_ms": salida["duracion_ms"],
+        "id_evidencias": list(
+            salida["id_evidencias"]
+        ),
+        "modulos_consultados": list(
+            modulos_consultados
+        ),
+        "capacidades_consultadas": list(
+            capacidades_consultadas
+        ),
+        "versiones_utilizadas": dict(
+            versiones_utilizadas
+        ),
+        "contratos_utilizados": dict(
+            contratos_utilizados
+        ),
+        "centinela_ok": bool(
+            cent.get("ok")
+        ),
+        "errores": list(
+            salida.get("errores") or []
+        ),
+        "duracion_ms": salida[
+            "duracion_ms"
+        ],
         "escala_id": escala_id,
         "precision": prec,
     })
 
+    # -----------------------------------------------------------
+    # 8.9.23 — DIAGNÓSTICO GLOBAL
+    # -----------------------------------------------------------
     if salida["errores"]:
         try:
-            from core.diagnostico import DiagnosticoGlobal  # type: ignore
-            recibir = getattr(DiagnosticoGlobal, "recibir_reporte", None)
+            from core.diagnostico import (
+                DiagnosticoGlobal
+            )  # type: ignore
+
+            recibir = getattr(
+                DiagnosticoGlobal,
+                "recibir_reporte",
+                None,
+            )
+
             if callable(recibir):
                 recibir(
                     NOMBRE_MODULO,
                     [
-                        {"tipo": "error_calculo", "detalle": e}
-                        for e in salida["errores"]
+                        {
+                            "tipo": "error_calculo",
+                            "detalle": error,
+                        }
+                        for error in salida[
+                            "errores"
+                        ]
                     ],
                 )
-        except Exception:  # noqa: BLE001
-            pass
+            else:
+                advertencias.append(
+                    "DiagnosticoGlobal.reci" 
+                    "bir_reporte no es callable"
+                )
 
+        except Exception as e:  # noqa: BLE001
+            advertencias.append(
+                "DiagnosticoGlobal no disponible: "
+                "{0}: {1}".format(
+                    type(e).__name__,
+                    e,
+                )
+            )
+
+    # -----------------------------------------------------------
+    # 8.9.24 — SALIDA FINAL
+    # -----------------------------------------------------------
     return salida
+
 
 # ===============================================================
 # FIN 8.9
 # ===============================================================
-
-
 # ===============================================================
 # 8.10 — EXPLICAR CÁLCULO
 # ===============================================================
 
-def explicar_calculo(id_calculo: str) -> Optional[Dict[str, Any]]:
-    """Explicacion dinamica desde evidencia real del calculo."""
+def explicar_calculo(
+    id_calculo: str,
+) -> Optional[Dict[str, Any]]:
+    """
+    Explicación determinista de un cálculo previamente registrado.
+
+    La explicación se reconstruye exclusivamente desde:
+        1. id_calculo;
+        2. _HISTORIAL;
+        3. _EVIDENCIA_POR_CALC;
+        4. _REG_EVIDENCIA.
+
+    No ejecuta nuevamente C, L ni K.
+    No modifica el cálculo.
+    No inventa evidencia.
+    No inventa módulos.
+    No inventa capacidades.
+    No sustituye evidencia faltante por texto descriptivo.
+
+    Las fórmulas explicativas corresponden al contrato matemático
+    existente:
+
+        C = 1 - k/m
+        L = 1 - r/p
+        K = 1 - f/c
+
+    La función explica el cálculo registrado; no vuelve a calcularlo.
+    """
+
+    # -----------------------------------------------------------
+    # 8.10.1 — IDENTIFICACIÓN DEL CÁLCULO
+    # -----------------------------------------------------------
     key = str(id_calculo or "").strip()
+
+    if not key:
+        return None
+
+    # -----------------------------------------------------------
+    # 8.10.2 — LOCALIZACIÓN EN HISTORIAL
+    # -----------------------------------------------------------
     item = None
+
     for h in reversed(_HISTORIAL):
         if h.get("id_calculo") == key:
             item = h
             break
+
     if item is None:
         return None
 
-    evidencia = list(_EVIDENCIA_POR_CALC.get(key) or [])
-    # reconstruir desde ids si hace falta
+    # -----------------------------------------------------------
+    # 8.10.3 — RECUPERACIÓN DE EVIDENCIA
+    # -----------------------------------------------------------
+    evidencia = list(
+        _EVIDENCIA_POR_CALC.get(key) or []
+    )
+
+    # Si no existe evidencia directa asociada al cálculo,
+    # reconstruirla exclusivamente mediante los IDs registrados
+    # en el historial.
     if not evidencia:
         for eid in item.get("id_evidencias") or []:
             if eid in _REG_EVIDENCIA:
-                evidencia.append(_REG_EVIDENCIA[eid])
+                evidencia.append(
+                    _REG_EVIDENCIA[eid]
+                )
 
-    por_factor: Dict[str, List[Dict[str, Any]]] = {"C": [], "L": [], "K": []}
+    # -----------------------------------------------------------
+    # 8.10.4 — CLASIFICACIÓN CONTRACTUAL POR CAPACIDAD EXACTA
+    # -----------------------------------------------------------
+    por_factor: Dict[
+        str,
+        List[Dict[str, Any]]
+    ] = {
+        "C": [],
+        "L": [],
+        "K": [],
+    }
+
     otros: List[Dict[str, Any]] = []
+
     for e in evidencia:
-        cap = str(e.get("capacidad") or "")
-        if "calcular_C" in cap or cap.endswith("_C") or "coherencia" in cap:
+        capacidad = e.get("capacidad")
+
+        if capacidad == "calcular_C":
             por_factor["C"].append(e)
-        elif "calcular_L" in cap or "logica" in cap:
+
+        elif capacidad == "calcular_L":
             por_factor["L"].append(e)
-        elif "calcular_K" in cap or "correlacion" in cap:
+
+        elif capacidad == "calcular_K":
             por_factor["K"].append(e)
+
         else:
             otros.append(e)
 
-    def _lineas(evs: List[Dict[str, Any]]) -> List[str]:
-        lines = []
+    # -----------------------------------------------------------
+    # 8.10.5 — REPRESENTACIÓN DETERMINISTA DE EVIDENCIA
+    # -----------------------------------------------------------
+    def _lineas(
+        evs: List[Dict[str, Any]]
+    ) -> List[str]:
+        lineas: List[str] = []
+
         for e in evs:
-            lines.append(
+            lineas.append(
                 "{0}.{1} aporte={2} version={3}".format(
                     e.get("modulo"),
                     e.get("capacidad"),
@@ -2538,64 +2760,243 @@ def explicar_calculo(id_calculo: str) -> Optional[Dict[str, Any]]:
                     e.get("version_modulo"),
                 )
             )
-        return lines
 
-    res = item.get("resultado") or {}
+        return lineas
+
+    # -----------------------------------------------------------
+    # 8.10.6 — RESULTADO REGISTRADO
+    # -----------------------------------------------------------
+    resultado = item.get("resultado") or {}
+
+    C = resultado.get("C")
+    L = resultado.get("L")
+    K = resultado.get("K")
+
+    # -----------------------------------------------------------
+    # 8.10.7 — EXTRACCIÓN SEGURA DEL DISPLAY
+    # -----------------------------------------------------------
+    def _display(
+        factor: Any
+    ) -> Optional[Any]:
+        if not isinstance(factor, dict):
+            return None
+
+        return factor.get("display")
+
+    # -----------------------------------------------------------
+    # 8.10.8 — EXTRACCIÓN DE VARIABLES REGISTRADAS
+    # -----------------------------------------------------------
+    def _variables_factor(
+        evs: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        variables: Dict[str, Any] = {}
+
+        for e in evs:
+            datos = e.get("variables")
+
+            if isinstance(datos, dict):
+                for nombre, valor in datos.items():
+                    if nombre not in variables:
+                        variables[nombre] = valor
+
+        return variables
+
+    variables_C = _variables_factor(
+        por_factor["C"]
+    )
+
+    variables_L = _variables_factor(
+        por_factor["L"]
+    )
+
+    variables_K = _variables_factor(
+        por_factor["K"]
+    )
+
+    # -----------------------------------------------------------
+    # 8.10.9 — EXPLICACIÓN CONTRACTUAL DE C
+    # -----------------------------------------------------------
+    explicacion_C = {
+        "formula": "C = 1 - k/m",
+        "display": _display(C),
+        "variables": variables_C,
+        "evidencia": _lineas(
+            por_factor["C"]
+        ),
+    }
+
+    # -----------------------------------------------------------
+    # 8.10.10 — EXPLICACIÓN CONTRACTUAL DE L
+    # -----------------------------------------------------------
+    explicacion_L = {
+        "formula": "L = 1 - r/p",
+        "display": _display(L),
+        "variables": variables_L,
+        "evidencia": _lineas(
+            por_factor["L"]
+        ),
+    }
+
+    # -----------------------------------------------------------
+    # 8.10.11 — EXPLICACIÓN CONTRACTUAL DE K
+    # -----------------------------------------------------------
+    explicacion_K = {
+        "formula": "K = 1 - f/c",
+        "display": _display(K),
+        "variables": variables_K,
+        "evidencia": _lineas(
+            por_factor["K"]
+        ),
+    }
+
+    # -----------------------------------------------------------
+    # 8.10.12 — ANCLAS CONTRACTUALES
+    # -----------------------------------------------------------
+    anclas: List[str] = [
+        "C = 1 - k/m",
+        "L = 1 - r/p",
+        "K = 1 - f/c",
+    ]
+
+    # -----------------------------------------------------------
+    # 8.10.13 — ESTADO DE INFORMACIÓN DISPONIBLE
+    # -----------------------------------------------------------
+    faltantes: List[str] = []
+
+    if not por_factor["C"]:
+        faltantes.append(
+            "evidencia de calcular_C"
+        )
+
+    if not por_factor["L"]:
+        faltantes.append(
+            "evidencia de calcular_L"
+        )
+
+    if not por_factor["K"]:
+        faltantes.append(
+            "evidencia de calcular_K"
+        )
+
+    # -----------------------------------------------------------
+    # 8.10.14 — SALIDA
+    # -----------------------------------------------------------
     return {
         "id_calculo": key,
-        "resultado": res,
-        "C": {
-            "display": (res.get("C") or {}).get("display"),
-            "proviene_de": _lineas(por_factor["C"]) or [
-                "API coherencia / conteos compromisos-contradicciones"
-            ],
-        },
-        "L": {
-            "display": (res.get("L") or {}).get("display"),
-            "proviene_de": _lineas(por_factor["L"]) or [
-                "API logica / 1 - r/p (UNDEFINED si p=0)"
-            ],
-        },
-        "K": {
-            "display": (res.get("K") or {}).get("display"),
-            "proviene_de": _lineas(por_factor["K"]) or [
-                "API correlacion_k / requiere O_context"
-            ],
-        },
-        "evidencia_adicional": _lineas(otros),
-        "modulos_consultados": item.get("modulos_consultados"),
-        "capacidades_consultadas": item.get("capacidades_consultadas"),
-        "versiones_utilizadas": item.get("versiones_utilizadas"),
+        "resultado": resultado,
+
+        "C": explicacion_C,
+        "L": explicacion_L,
+        "K": explicacion_K,
+
+        "evidencia_adicional": _lineas(
+            otros
+        ),
+
+        "modulos_consultados": item.get(
+            "modulos_consultados"
+        ),
+
+        "capacidades_consultadas": item.get(
+            "capacidades_consultadas"
+        ),
+
+        "versiones_utilizadas": item.get(
+            "versiones_utilizadas"
+        ),
+
+        "contratos_utilizados": item.get(
+            "contratos_utilizados"
+        ),
+
         "evidencia": evidencia,
-        "anclas": [
-            "Def-5.3.1 (K sin O => None)",
-            "AM-D6 / AM-A3 (L con p=0 => UNDEFINED)",
-            "salida: un objeto por factor con fraccion = decimal",
-        ],
-        "centinela_ok": item.get("centinela_ok"),
-        "errores": item.get("errores"),
-        "timestamp": item.get("timestamp"),
-        "duracion_ms": item.get("duracion_ms"),
-        "precision": item.get("precision"),
+
+        "anclas": anclas,
+
+        "centinela_ok": item.get(
+            "centinela_ok"
+        ),
+
+        "errores": item.get(
+            "errores"
+        ),
+
+        "timestamp": item.get(
+            "timestamp"
+        ),
+
+        "duracion_ms": item.get(
+            "duracion_ms"
+        ),
+
+        "precision": item.get(
+            "precision"
+        ),
+
+        "evidencia_completa": not bool(
+            faltantes
+        ),
+
+        "evidencia_faltante": faltantes,
     }
+
 
 # ===============================================================
 # FIN 8.10
 # ===============================================================
-
-
 # ===============================================================
 # 8.11 — HISTORIAL
 # ===============================================================
 
 def historial(limite: Optional[int] = None) -> List[Dict[str, Any]]:
+    """
+    Consulta determinista del historial de cálculos.
+
+    Contrato:
+      limite is None -> devuelve todo el historial.
+      limite == 0    -> devuelve lista vacía.
+      limite > 0     -> devuelve los últimos N registros.
+      limite < 0     -> devuelve lista vacía.
+      limite inválido -> devuelve lista vacía.
+
+    No calcula C, L ni K.
+    No modifica _HISTORIAL.
+    No crea registros.
+    """
+
     items = list(_HISTORIAL)
-    if limite is not None:
-        try:
-            items = items[-max(0, int(limite)):]
-        except Exception:  # noqa: BLE001
-            pass
-    return items
+
+    # -----------------------------------------------------------
+    # 8.11.1 — SIN LÍMITE
+    # -----------------------------------------------------------
+    if limite is None:
+        return items
+
+    # -----------------------------------------------------------
+    # 8.11.2 — NORMALIZACIÓN DETERMINISTA DEL LÍMITE
+    # -----------------------------------------------------------
+    try:
+        n = int(limite)
+    except (TypeError, ValueError):
+        return []
+
+    # -----------------------------------------------------------
+    # 8.11.3 — LÍMITE CERO
+    # -----------------------------------------------------------
+    if n == 0:
+        return []
+
+    # -----------------------------------------------------------
+    # 8.11.4 — LÍMITE NEGATIVO
+    # -----------------------------------------------------------
+    if n < 0:
+        return []
+
+    # -----------------------------------------------------------
+    # 8.11.5 — ÚLTIMOS N REGISTROS
+    # -----------------------------------------------------------
+    return items[-n:]
+
 
 # ===============================================================
 # FIN 8.11
@@ -2607,51 +3008,206 @@ def historial(limite: Optional[int] = None) -> List[Dict[str, Any]]:
 # ===============================================================
 
 def verificar_salida(salida: Any) -> bool:
+    """
+    Verificador estructural de la salida contractual de calcular().
+
+    No calcula C, L ni K.
+    No modifica la salida.
+    No sustituye valores.
+    No interpreta fórmulas.
+
+    Comprueba únicamente que la estructura entregada sea compatible
+    con la representación contractual producida por calcular().
+    """
+
+    # -----------------------------------------------------------
+    # 8.12.1 — TIPO RAÍZ
+    # -----------------------------------------------------------
     if not isinstance(salida, dict):
         return False
-    if not all(k in salida for k in ("C", "L", "K", "id_calculo")):
+
+    # -----------------------------------------------------------
+    # 8.12.2 — CAMPOS RAÍZ OBLIGATORIOS
+    # -----------------------------------------------------------
+    campos_obligatorios = (
+        "id_calculo",
+        "C",
+        "L",
+        "K",
+    )
+
+    if not all(
+        campo in salida
+        for campo in campos_obligatorios
+    ):
         return False
-    for f in ("C", "L", "K"):
-        bloque = salida.get(f)
+
+    # -----------------------------------------------------------
+    # 8.12.3 — ID DE CÁLCULO
+    # -----------------------------------------------------------
+    id_calculo = salida.get("id_calculo")
+
+    if not isinstance(id_calculo, str):
+        return False
+
+    if not id_calculo.strip():
+        return False
+
+    # -----------------------------------------------------------
+    # 8.12.4 — VERIFICACIÓN DE BLOQUES C/L/K
+    # -----------------------------------------------------------
+    for factor in ("C", "L", "K"):
+        bloque = salida.get(factor)
+
+        # None representa dato no disponible.
         if bloque is None:
             continue
+
         if not isinstance(bloque, dict):
             return False
+
+        # -------------------------------------------------------
+        # 8.12.4.1 — REPRESENTACIÓN MÍNIMA
+        # -------------------------------------------------------
         if "display" not in bloque:
             return False
-        # no debe haber C_fraccion en la raiz
-    if any(k in salida for k in ("C_fraccion", "L_fraccion", "K_fraccion")):
+
+        if not isinstance(bloque.get("display"), str):
+            return False
+
+        # -------------------------------------------------------
+        # 8.12.4.2 — FRACCIÓN
+        # -------------------------------------------------------
+        if "fraccion" in bloque:
+            fraccion = bloque.get("fraccion")
+
+            if fraccion is not None and not isinstance(
+                fraccion,
+                str,
+            ):
+                return False
+
+        # -------------------------------------------------------
+        # 8.12.4.3 — NUMERADOR
+        # -------------------------------------------------------
+        if "numerador" in bloque:
+            numerador = bloque.get("numerador")
+
+            if numerador is not None and not isinstance(
+                numerador,
+                int,
+            ):
+                return False
+
+        # -------------------------------------------------------
+        # 8.12.4.4 — DENOMINADOR
+        # -------------------------------------------------------
+        if "denominador" in bloque:
+            denominador = bloque.get("denominador")
+
+            if denominador is not None and not isinstance(
+                denominador,
+                int,
+            ):
+                return False
+
+        # -------------------------------------------------------
+        # 8.12.4.5 — DECIMAL
+        # -------------------------------------------------------
+        if "decimal" in bloque:
+            decimal = bloque.get("decimal")
+
+            if decimal is not None and not isinstance(
+                decimal,
+                (int, float, str),
+            ):
+                return False
+
+    # -----------------------------------------------------------
+    # 8.12.5 — PROHIBICIÓN DE CAMPOS DE FRACCIÓN EN RAÍZ
+    # -----------------------------------------------------------
+    campos_raiz_prohibidos = (
+        "C_fraccion",
+        "L_fraccion",
+        "K_fraccion",
+        "C_numerador",
+        "C_denominador",
+        "L_numerador",
+        "L_denominador",
+        "K_numerador",
+        "K_denominador",
+    )
+
+    if any(
+        campo in salida
+        for campo in campos_raiz_prohibidos
+    ):
         return False
+
+    # -----------------------------------------------------------
+    # 8.12.6 — RESULTADO ESTRUCTURALMENTE VÁLIDO
+    # -----------------------------------------------------------
     return True
+
 
 # ===============================================================
 # FIN 8.12
 # ===============================================================
+
+
 # ===============================================================
 # 8.13 — VERIFICAR CÁLCULO DE C, L, K
 # ===============================================================
 
-def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
+def verificar_calculo_de_C_L_K(
+    calculo: Dict[str, Any],
+) -> Dict[str, Any]:
     """
-    Verifica la integridad y coherencia del cálculo de C, L y K.
+    Verifica estructura y coherencia matemática de C, L y K.
 
-    Args:
-        calculo: Diccionario con los resultados de C, L, K (salida de calcular())
+    Fórmulas contractuales:
 
-    Returns:
-        Dict con:
-            - valido: bool
-            - errores: List[str]
-            - advertencias: List[str]
-            - C: dict o None
-            - L: dict o None
-            - K: dict o None
-            - verificacion: dict con detalles por factor
+        C = 1 - k/m
+
+        L = 1 - r/p
+
+        K = 1 - f/c
+
+    Donde:
+
+        C:
+          m = compromisos
+          k = contradicciones
+
+        L:
+          p = posturas
+          r = reversiones
+
+        K:
+          c = afirmaciones
+          f = afirmaciones_falsas
+
+    Esta función NO sustituye los cálculos realizados por las APIs
+    C, L y K.
+
+    Si los operandos necesarios están disponibles en el resultado,
+    verifica el valor producido contra la fórmula correspondiente.
+
+    Si los operandos no están disponibles, no inventa valores:
+    informa que la verificación matemática no puede ejecutarse.
+
+    No modifica el cálculo recibido.
     """
+
+    # -----------------------------------------------------------
+    # 8.13.1 — VALIDACIÓN DE ENTRADA
+    # -----------------------------------------------------------
     if not isinstance(calculo, dict):
         return {
             "valido": False,
-            "errores": ["El calculo debe ser un dict"],
+            "errores": [
+                "El calculo debe ser un dict"
+            ],
             "advertencias": [],
             "C": None,
             "L": None,
@@ -2664,158 +3220,476 @@ def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
     verificacion: Dict[str, Any] = {}
 
     # -----------------------------------------------------------
-    # 8.13.1 — VERIFICAR C
+    # 8.13.2 — VALIDACIÓN ESTRUCTURAL DE LA SALIDA
+    # -----------------------------------------------------------
+    if not verificar_salida(calculo):
+        errores.append(
+            "La estructura del calculo no cumple el contrato de salida"
+        )
+
+    # -----------------------------------------------------------
+    # 8.13.3 — EXTRACCIÓN DE C/L/K
     # -----------------------------------------------------------
     C = calculo.get("C")
+    L = calculo.get("L")
+    K = calculo.get("K")
+
+    # -----------------------------------------------------------
+    # 8.13.4 — VALIDACIÓN ESTRUCTURAL DE C
+    # -----------------------------------------------------------
     if C is None:
-        errores.append("C no está presente en el cálculo")
-        verificacion["C"] = {"presente": False, "ok": False}
+        errores.append(
+            "C no está disponible en el cálculo"
+        )
+        verificacion["C"] = {
+            "presente": False,
+            "ok": False,
+        }
+
     elif not isinstance(C, dict):
-        errores.append("C debe ser un dict")
+        errores.append(
+            "C debe ser un dict o None"
+        )
         verificacion["C"] = {
             "presente": True,
             "ok": False,
             "tipo": type(C).__name__,
         }
+
     else:
         ok_c = True
-        detalles = {}
+        detalles_c: Dict[str, Any] = {}
 
-        for campo in [
-            "fraccion", "decimal", "display", "numerador", "denominador"
-        ]:
-            if campo not in C:
-                errores.append(f"C falta campo '{campo}'")
+        for campo in (
+            "fraccion",
+            "decimal",
+            "display",
+        ):
+            presente = campo in C
+            detalles_c[campo] = (
+                C.get(campo)
+                if presente
+                else None
+            )
+
+            if not presente:
+                errores.append(
+                    "C falta campo '{0}'".format(campo)
+                )
                 ok_c = False
-                detalles[campo] = "FALTANTE"
-            else:
-                detalles[campo] = C.get(campo)
 
-        if "fraccion" in C and "numerador" in C and "denominador" in C:
-            fraccion = C.get("fraccion")
+        if (
+            "numerador" in C
+            and "denominador" in C
+            and "fraccion" in C
+        ):
             num = C.get("numerador")
             den = C.get("denominador")
-            if fraccion and num is not None and den is not None:
-                esperado = f"{num}/{den}"
-                if str(fraccion) != esperado:
-                    advertencias.append(
-                        f"C: fraccion '{fraccion}' no coincide con "
-                        f"numerador/denominador '{esperado}'"
+            frac = C.get("fraccion")
+
+            if (
+                isinstance(num, int)
+                and isinstance(den, int)
+                and den != 0
+                and frac is not None
+            ):
+                esperado = "{0}/{1}".format(
+                    num,
+                    den,
+                )
+
+                if str(frac) != esperado:
+                    errores.append(
+                        "C: fraccion no coincide con "
+                        "numerador/denominador"
                     )
+                    ok_c = False
 
         verificacion["C"] = {
             "presente": True,
             "ok": ok_c,
-            "detalles": detalles,
+            "detalles": detalles_c,
         }
 
     # -----------------------------------------------------------
-    # 8.13.2 — VERIFICAR L
+    # 8.13.5 — VALIDACIÓN ESTRUCTURAL DE L
     # -----------------------------------------------------------
-    L = calculo.get("L")
     if L is None:
-        advertencias.append(
-            "L no está presente en el cálculo (puede ser UNDEFINED)"
-        )
         verificacion["L"] = {
             "presente": False,
             "ok": True,
-            "nota": "L puede ser UNDEFINED si p=0",
+            "estado": "None",
         }
+
     elif not isinstance(L, dict):
-        errores.append("L debe ser un dict")
+        errores.append(
+            "L debe ser un dict o None"
+        )
         verificacion["L"] = {
             "presente": True,
             "ok": False,
             "tipo": type(L).__name__,
         }
+
     else:
-        if L.get("undefined"):
+        if L.get("undefined") is True:
             verificacion["L"] = {
                 "presente": True,
                 "ok": True,
-                "undefined": True,
-                "detalles": {"display": L.get("display")},
+                "estado": "UNDEFINED",
+                "detalles": {
+                    "display": L.get("display"),
+                },
             }
         else:
             ok_l = True
-            detalles = {}
-            for campo in ["fraccion", "decimal", "display"]:
-                if campo not in L:
-                    errores.append(f"L falta campo '{campo}'")
+            detalles_l: Dict[str, Any] = {}
+
+            for campo in (
+                "fraccion",
+                "decimal",
+                "display",
+            ):
+                presente = campo in L
+                detalles_l[campo] = (
+                    L.get(campo)
+                    if presente
+                    else None
+                )
+
+                if not presente:
+                    errores.append(
+                        "L falta campo '{0}'".format(campo)
+                    )
                     ok_l = False
-                    detalles[campo] = "FALTANTE"
-                else:
-                    detalles[campo] = L.get(campo)
+
+            if (
+                "numerador" in L
+                and "denominador" in L
+                and "fraccion" in L
+            ):
+                num = L.get("numerador")
+                den = L.get("denominador")
+                frac = L.get("fraccion")
+
+                if (
+                    isinstance(num, int)
+                    and isinstance(den, int)
+                    and den != 0
+                    and frac is not None
+                ):
+                    esperado = "{0}/{1}".format(
+                        num,
+                        den,
+                    )
+
+                    if str(frac) != esperado:
+                        errores.append(
+                            "L: fraccion no coincide con "
+                            "numerador/denominador"
+                        )
+                        ok_l = False
+
             verificacion["L"] = {
                 "presente": True,
                 "ok": ok_l,
-                "detalles": detalles,
+                "detalles": detalles_l,
             }
 
     # -----------------------------------------------------------
-    # 8.13.3 — VERIFICAR K
+    # 8.13.6 — VALIDACIÓN ESTRUCTURAL DE K
     # -----------------------------------------------------------
-    K = calculo.get("K")
     if K is None:
-        advertencias.append(
-            "K no está presente (puede ser None sin contexto/O)"
-        )
         verificacion["K"] = {
             "presente": False,
             "ok": True,
-            "nota": "K=None es legitimo sin contexto/O (Def-5.3.1)",
+            "estado": "None",
         }
+
     elif not isinstance(K, dict):
-        errores.append("K debe ser un dict")
+        errores.append(
+            "K debe ser un dict o None"
+        )
         verificacion["K"] = {
             "presente": True,
             "ok": False,
             "tipo": type(K).__name__,
         }
+
     else:
         if K.get("valor") is None and K.get("fraccion") is None:
             verificacion["K"] = {
                 "presente": True,
                 "ok": True,
-                "none": True,
-                "detalles": {"display": K.get("display")},
+                "estado": "None",
+                "detalles": {
+                    "display": K.get("display"),
+                },
             }
         else:
             ok_k = True
-            detalles = {}
-            for campo in ["fraccion", "decimal", "display"]:
-                if campo not in K:
-                    errores.append(f"K falta campo '{campo}'")
+            detalles_k: Dict[str, Any] = {}
+
+            for campo in (
+                "fraccion",
+                "decimal",
+                "display",
+            ):
+                presente = campo in K
+                detalles_k[campo] = (
+                    K.get(campo)
+                    if presente
+                    else None
+                )
+
+                if not presente:
+                    errores.append(
+                        "K falta campo '{0}'".format(campo)
+                    )
                     ok_k = False
-                    detalles[campo] = "FALTANTE"
-                else:
-                    detalles[campo] = K.get(campo)
+
+            if (
+                "numerador" in K
+                and "denominador" in K
+                and "fraccion" in K
+            ):
+                num = K.get("numerador")
+                den = K.get("denominador")
+                frac = K.get("fraccion")
+
+                if (
+                    isinstance(num, int)
+                    and isinstance(den, int)
+                    and den != 0
+                    and frac is not None
+                ):
+                    esperado = "{0}/{1}".format(
+                        num,
+                        den,
+                    )
+
+                    if str(frac) != esperado:
+                        errores.append(
+                            "K: fraccion no coincide con "
+                            "numerador/denominador"
+                        )
+                        ok_k = False
+
             verificacion["K"] = {
                 "presente": True,
                 "ok": ok_k,
-                "detalles": detalles,
+                "detalles": detalles_k,
             }
 
     # -----------------------------------------------------------
-    # 8.13.4 — VERIFICACIONES ADICIONALES
+    # 8.13.7 — EXTRACCIÓN DE CONTEOS
     # -----------------------------------------------------------
-    if "id_calculo" not in calculo:
-        advertencias.append("Falta 'id_calculo' en el resultado")
+    conteos = calculo.get("conteos")
 
+    if not isinstance(conteos, dict):
+        advertencias.append(
+            "No hay conteos en la salida; "
+            "verificacion matematica de C/L/K no ejecutable"
+        )
+
+        verificacion["formulas"] = {
+            "ejecutable": False,
+            "motivo": "conteos no disponibles",
+        }
+
+    else:
+        # -------------------------------------------------------
+        # 8.13.7.1 — OPERANDOS DE C
+        # -------------------------------------------------------
+        m = conteos.get("compromisos")
+        k = conteos.get("contradicciones")
+
+        # -------------------------------------------------------
+        # 8.13.7.2 — OPERANDOS DE L
+        # -------------------------------------------------------
+        p = conteos.get("posturas")
+        r = conteos.get("reversiones")
+
+        # -------------------------------------------------------
+        # 8.13.7.3 — OPERANDOS DE K
+        # -------------------------------------------------------
+        c = conteos.get("afirmaciones")
+        f = conteos.get("afirmaciones_falsas")
+
+        formulas: Dict[str, Any] = {
+            "ejecutable": True,
+            "C": {
+                "formula": "1 - k/m",
+                "m": m,
+                "k": k,
+            },
+            "L": {
+                "formula": "1 - r/p",
+                "p": p,
+                "r": r,
+            },
+            "K": {
+                "formula": "1 - f/c",
+                "c": c,
+                "f": f,
+            },
+        }
+
+        # -------------------------------------------------------
+        # 8.13.7.4 — VALIDACIÓN DE OPERANDOS
+        # -------------------------------------------------------
+        operandos = {
+            "m": m,
+            "k": k,
+            "p": p,
+            "r": r,
+            "c": c,
+            "f": f,
+        }
+
+        operandos_validos = all(
+            isinstance(valor, int)
+            and valor >= 0
+            for valor in operandos.values()
+        )
+
+        if not operandos_validos:
+            formulas["ejecutable"] = False
+            formulas["motivo"] = (
+                "uno o más operandos no son enteros "
+                "no negativos"
+            )
+
+        # -------------------------------------------------------
+        # 8.13.7.5 — DIVISIÓN VÁLIDA
+        # -------------------------------------------------------
+        if formulas["ejecutable"]:
+            if m == 0:
+                formulas["C"]["ejecutable"] = False
+                formulas["C"]["motivo"] = "m=0"
+
+            if p == 0:
+                formulas["L"]["ejecutable"] = False
+                formulas["L"]["motivo"] = "p=0"
+
+            if c == 0:
+                formulas["K"]["ejecutable"] = False
+                formulas["K"]["motivo"] = "c=0"
+
+        # -------------------------------------------------------
+        # 8.13.7.6 — CÁLCULO DE REFERENCIA
+        # -------------------------------------------------------
+        if formulas["ejecutable"] and m != 0:
+            esperado_c = Fraction(m - k, m)
+            formulas["C"]["esperado"] = str(esperado_c)
+
+        # -------------------------------------------------------
+        # 8.13.7.7 — CÁLCULO DE REFERENCIA L
+        # -------------------------------------------------------
+        if formulas["ejecutable"] and p != 0:
+            esperado_l = Fraction(p - r, p)
+            formulas["L"]["esperado"] = str(esperado_l)
+
+        # -------------------------------------------------------
+        # 8.13.7.8 — CÁLCULO DE REFERENCIA K
+        # -------------------------------------------------------
+        if formulas["ejecutable"] and c != 0:
+            esperado_k = Fraction(c - f, c)
+            formulas["K"]["esperado"] = str(esperado_k)
+
+        # -------------------------------------------------------
+        # 8.13.7.9 — COMPARACIÓN CON C
+        # -------------------------------------------------------
+        if (
+            formulas.get("C", {}).get("ejecutable", False)
+            and isinstance(C, dict)
+            and "fraccion" in C
+        ):
+            esperado = formulas["C"]["esperado"]
+
+            if str(C.get("fraccion")) != esperado:
+                errores.append(
+                    "C no coincide con la formula C = 1 - k/m"
+                )
+
+        # -------------------------------------------------------
+        # 8.13.7.10 — COMPARACIÓN CON L
+        # -------------------------------------------------------
+        if (
+            formulas.get("L", {}).get("ejecutable", False)
+            and isinstance(L, dict)
+            and L.get("undefined") is not True
+            and "fraccion" in L
+        ):
+            esperado = formulas["L"]["esperado"]
+
+            if str(L.get("fraccion")) != esperado:
+                errores.append(
+                    "L no coincide con la formula L = 1 - r/p"
+                )
+
+        # -------------------------------------------------------
+        # 8.13.7.11 — COMPARACIÓN CON K
+        # -------------------------------------------------------
+        if (
+            formulas.get("K", {}).get("ejecutable", False)
+            and isinstance(K, dict)
+            and "fraccion" in K
+        ):
+            esperado = formulas["K"]["esperado"]
+
+            if str(K.get("fraccion")) != esperado:
+                errores.append(
+                    "K no coincide con la formula K = 1 - f/c"
+                )
+
+        verificacion["formulas"] = formulas
+
+    # -----------------------------------------------------------
+    # 8.13.8 — CENTINELA
+    # -----------------------------------------------------------
     centinela = calculo.get("centinela")
-    if centinela is None:
-        advertencias.append("Falta 'centinela' en el resultado")
-    elif not centinela.get("ok"):
-        errores.extend(centinela.get("problemas") or [])
 
-    if calculo.get("errores"):
-        errores.extend(calculo.get("errores") or [])
+    if centinela is None:
+        advertencias.append(
+            "Falta 'centinela' en el resultado"
+        )
+        centinela_ok = False
+    elif not isinstance(centinela, dict):
+        errores.append(
+            "'centinela' debe ser un dict"
+        )
+        centinela_ok = False
+    else:
+        centinela_ok = centinela.get("ok") is True
+
+        if not centinela_ok:
+            problemas = centinela.get("problemas") or []
+
+            for problema in problemas:
+                errores.append(str(problema))
 
     # -----------------------------------------------------------
-    # 8.13.5 — RESULTADO
+    # 8.13.9 — ERRORES PRODUCIDOS POR calcular()
+    # -----------------------------------------------------------
+    errores_calculo = calculo.get("errores")
+
+    if errores_calculo:
+        if isinstance(errores_calculo, list):
+            errores.extend(
+                str(error)
+                for error in errores_calculo
+            )
+        else:
+            errores.append(
+                "El campo 'errores' no es una lista"
+            )
+
+    # -----------------------------------------------------------
+    # 8.13.10 — RESULTADO FINAL
     # -----------------------------------------------------------
     valido = len(errores) == 0
+
     return {
         "valido": valido,
         "errores": errores,
@@ -2825,23 +3699,81 @@ def verificar_calculo_de_C_L_K(calculo: Dict[str, Any]) -> Dict[str, Any]:
         "K": K,
         "verificacion": verificacion,
         "resumen": {
-            "C_ok": verificacion.get("C", {}).get("ok", False),
-            "L_ok": verificacion.get("L", {}).get("ok", False),
-            "K_ok": verificacion.get("K", {}).get("ok", False),
-            "centinela_ok": centinela.get("ok") if centinela else False,
+            "C_ok": verificacion.get(
+                "C",
+                {},
+            ).get("ok", False),
+            "L_ok": verificacion.get(
+                "L",
+                {},
+            ).get("ok", False),
+            "K_ok": verificacion.get(
+                "K",
+                {},
+            ).get("ok", False),
+            "formulas_ejecutadas": verificacion.get(
+                "formulas",
+                {},
+            ).get("ejecutable", False),
+            "centinela_ok": centinela_ok,
         },
     }
 
+
 # ===============================================================
 # FIN 8.13
-# ===============================================================  
-    # ===============================================================
+# ===============================================================
+# ===============================================================
 # 8.14 — INVENTARIO
 # ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Inventario contractual del módulo CA.
+
+    8.14.1 — BARRER / FUENTE DE VERDAD
+    Utiliza barrer() como fuente única para el estado técnico
+    verificable del módulo.
+
+    8.14.2 — IDENTIDAD DEL MÓDULO
+    Expone únicamente la identidad contractual ya declarada:
+    ID, nombre, rol, versión, contrato, esquema y estabilidad.
+
+    8.14.3 — ESTADO ESTRUCTURAL
+    Expone archivos, hashes, factores, APIs y disponibilidad
+    exactamente según el resultado producido por barrer().
+
+    8.14.4 — DEPENDENCIAS Y CONTRATO
+    Expone las capacidades y dependencias declaradas por
+    CONTENEDOR sin modificarlas ni inferir otras.
+
+    8.14.5 — INVARIANTES
+    Expone los invariantes declarados por CONTENEDOR.
+
+    8.14.6 — HISTORIAL
+    Expone únicamente el número de cálculos registrados.
+
+    8.14.7 — PRECISIÓN Y SALIDA
+    Expone la precisión decimal predeterminada y la regla real
+    de representación contractual.
+
+    No calcula C, L ni K.
+    No ejecuta fórmulas.
+    No crea IDs.
+    No modifica la petición.
+    No agrega capacidades.
+    No interpreta capacidades que no estén declaradas.
+    """
+
+    # -----------------------------------------------------------
+    # 8.14.1 — FUENTE DE ESTADO VERIFICABLE
+    # -----------------------------------------------------------
     b = barrer()
-    return {
+
+    # -----------------------------------------------------------
+    # 8.14.2 — IDENTIDAD DEL MÓDULO
+    # -----------------------------------------------------------
+    resultado: Dict[str, Any] = {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
         "rol": ROL_MODULO,
@@ -2849,208 +3781,401 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
+
+        # -------------------------------------------------------
+        # 8.14.3 — ESTADO ESTRUCTURAL
+        # -------------------------------------------------------
         "archivos": b.get("archivos"),
         "hashes": b.get("hashes"),
         "factores_api": b.get("factores_api"),
-        "conteos_disponible": b.get("conteos_disponible"),
-        "escalas_ids_disponible": b.get("escalas_ids_disponible"),
-        "ids_escala": b.get("ids_escala"),
+        "factores_no_declarados": b.get(
+            "factores_no_declarados"
+        ),
+        "archivos_extra": b.get("archivos_extra"),
+        "apis_factor": b.get("apis_factor"),
+
+        # -------------------------------------------------------
+        # 8.14.4 — CONTEOS
+        # -------------------------------------------------------
+        "conteos_disponible": b.get(
+            "conteos_disponible"
+        ),
+        "apis_conteos": b.get(
+            "apis_conteos"
+        ),
+
+        # -------------------------------------------------------
+        # 8.14.5 — ESCALAS
+        # -------------------------------------------------------
+        "escalas_ids_disponible": b.get(
+            "escalas_ids_disponible"
+        ),
+        "ids_escala": b.get(
+            "ids_escala"
+        ),
+
+        # -------------------------------------------------------
+        # 8.14.6 — ESTADO DE COHERENCIA
+        # -------------------------------------------------------
         "coherente": b.get("coherente"),
+        "errores": b.get("errores"),
+        "choques": b.get("choques"),
+
+        # -------------------------------------------------------
+        # 8.14.7 — HISTORIAL
+        # -------------------------------------------------------
         "historial_n": b.get("historial_n"),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
+
+        # -------------------------------------------------------
+        # 8.14.8 — CAPACIDADES CONTRACTUALES
+        # -------------------------------------------------------
+        "capacidades": sorted(
+            CONTENEDOR["capacidades"].keys()
+        ),
+
+        # -------------------------------------------------------
+        # 8.14.9 — DEPENDENCIAS CONTRACTUALES
+        # -------------------------------------------------------
+        "requiere": sorted(
+            CONTENEDOR.get("requiere") or []
+        ),
+
+        # -------------------------------------------------------
+        # 8.14.10 — INVARIANTES CONTRACTUALES
+        # -------------------------------------------------------
         "invariantes": CONTENEDOR.get("invariantes"),
-        "precision_decimal_default": PRECISION_DECIMAL_DEFAULT,
+
+        # -------------------------------------------------------
+        # 8.14.11 — PRECISIÓN
+        # -------------------------------------------------------
+        "precision_decimal_default": (
+            PRECISION_DECIMAL_DEFAULT
+        ),
+
+        # -------------------------------------------------------
+        # 8.14.12 — REGLA DE REPRESENTACIÓN
+        # -------------------------------------------------------
         "regla_salida": (
-            "un objeto por factor: fraccion = decimal (7/9 = 0.778)"
+            "cada factor se representa mediante su objeto "
+            "contractual; cuando existe un valor definido, "
+            "el objeto contiene fraccion, numerador, "
+            "denominador, decimal y display"
         ),
     }
+
+    return resultado
+
 
 # ===============================================================
 # FIN 8.14
 # ===============================================================
 
-
 # ===============================================================
 # 8.15 — EJECUTAR TOTAL
 # ===============================================================
 
-def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
     """
     Autoridad total de ENGINE sobre CA.
-    Ejerce TODAS las unidades operativamente ejecutables del módulo
-    conforme a su contrato e inventario.
 
-    Todo es callable real. Nada es texto.
-    No inventa capacidades. No altera el contrato.
+    Ejecuta las capacidades declaradas por el contrato de CA
+    mediante sus callables reales.
+
+    Principios deterministas:
+
+        CONTENEDOR["capacidades"]
+            ↓
+        resolución en _CAP_MAP
+            ↓
+        callable real
+            ↓
+        ejecución
+            ↓
+        resultado
+            ↓
+        registro de estado
+
+    No ejecuta capacidades no declaradas.
+    No inventa capacidades.
+    No sustituye callables ausentes.
+    No ejecuta dos veces una misma capacidad.
+    No reimplementa la lógica de las capacidades.
+    No calcula fórmulas directamente.
+    No modifica el contrato.
     """
-    peticion = dict(peticion or {}) if isinstance(peticion, dict) else {}
+
+    # -----------------------------------------------------------
+    # 8.15.1 — NORMALIZACIÓN DE PETICIÓN
+    # -----------------------------------------------------------
+    if peticion is None:
+        peticion_base: Dict[str, Any] = {}
+    elif isinstance(peticion, dict):
+        peticion_base = dict(peticion)
+    else:
+        peticion_base = {}
+
     resultados: Dict[str, Any] = {}
     errores_ejecucion: List[str] = []
+    capacidades_declaradas = sorted(
+        CONTENEDOR.get("capacidades", {}).keys()
+    )
 
-    # 1. Centinela
-    try:
-        resultados["barrer"] = barrer()
-        resultados["verificar"] = resultados["barrer"]
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("barrer: {0}".format(e))
-        resultados["barrer"] = None
+    capacidades_ejecutadas: List[str] = []
+    capacidades_fallidas: List[str] = []
+    capacidades_no_resueltas: List[str] = []
 
-    # 2. Inventario y diagnóstico
-    try:
-        resultados["inventario"] = inventario(peticion)
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("inventario: {0}".format(e))
-        resultados["inventario"] = None
+    # -----------------------------------------------------------
+    # 8.15.2 — RESOLUCIÓN CONTRACTUAL
+    # -----------------------------------------------------------
+    #
+    # _CAP_MAP es la tabla de resolución contractual.
+    # Solamente se ejecutan capacidades que aparecen en
+    # CONTENEDOR["capacidades"].
+    #
+    # No se utiliza globals(), getattr() arbitrario ni una lista
+    # paralela de funciones.
+    # -----------------------------------------------------------
+    for capacidad in capacidades_declaradas:
 
-    try:
-        resultados["diagnostico"] = diagnostico()
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("diagnostico: {0}".format(e))
-        resultados["diagnostico"] = None
+        fn = _CAP_MAP.get(capacidad)
 
-    try:
-        resultados["reporte"] = reporte()
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("reporte: {0}".format(e))
-        resultados["reporte"] = None
-
-    # 3. Escalas e historial
-    try:
-        resultados["leer_ids_escala"] = leer_ids_escala()
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("leer_ids_escala: {0}".format(e))
-        resultados["leer_ids_escala"] = None
-
-    try:
-        resultados["historial"] = historial()
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("historial: {0}".format(e))
-        resultados["historial"] = None
-
-    # 4. Representación determinista
-    try:
-        resultados["representar"] = {
-            "ejemplo_fraccion": representar(Fraction(7, 9)),
-            "ejemplo_none": representar(None),
-            "ejemplo_undefined": representar(UNDEFINED),
-        }
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("representar: {0}".format(e))
-        resultados["representar"] = None
-
-    # 5. Validación de evidencia
-    try:
-        resultados["validar_evidencia"] = validar_evidencia(
-            peticion.get("evidencia")
-        )
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("validar_evidencia: {0}".format(e))
-        resultados["validar_evidencia"] = None
-
-    # 6. Factores C / L / K
-    try:
-        resultados["calcular_C"] = calcular_C(peticion)
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("calcular_C: {0}".format(e))
-        resultados["calcular_C"] = None
-
-    try:
-        resultados["calcular_L"] = calcular_L(peticion)
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("calcular_L: {0}".format(e))
-        resultados["calcular_L"] = None
-
-    try:
-        resultados["calcular_K"] = calcular_K(peticion)
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("calcular_K: {0}".format(e))
-        resultados["calcular_K"] = None
-
-    # 7. Pipeline completo
-    try:
-        resultados["calcular"] = calcular(peticion)
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("calcular: {0}".format(e))
-        resultados["calcular"] = None
-
-    # 8. Verificar salida del pipeline
-    calc_out = resultados.get("calcular")
-    if isinstance(calc_out, dict):
-        try:
-            resultados["verificar_salida"] = verificar_salida(calc_out)
-            resultados["verificar_calculo_de_C_L_K"] = (
-                verificar_calculo_de_C_L_K(calc_out)
-            )
-        except Exception as e:  # noqa: BLE001
+        if not callable(fn):
+            capacidades_no_resueltas.append(capacidad)
             errores_ejecucion.append(
-                "verificar_calculo: {0}".format(e)
+                "capacidad '{0}' declarada pero sin callable "
+                "resoluble en _CAP_MAP".format(capacidad)
             )
-    else:
-        resultados["verificar_salida"] = None
-        resultados["verificar_calculo_de_C_L_K"] = None
+            resultados[capacidad] = None
+            continue
 
-    # 9. Inspección y registro
+        # -------------------------------------------------------
+        # 8.15.3 — PROTECCIÓN CONTRA RECURSIÓN
+        # -------------------------------------------------------
+        if capacidad == "ejecutar_total":
+            resultados[capacidad] = None
+            capacidades_fallidas.append(capacidad)
+            errores_ejecucion.append(
+                "capacidad 'ejecutar_total' no puede invocarse "
+                "recursivamente desde ejecutar_total"
+            )
+            continue
+
+        # -------------------------------------------------------
+        # 8.15.4 — EJECUCIÓN ÚNICA
+        # -------------------------------------------------------
+        #
+        # Cada callable contractual recibe la misma petición base.
+        # No se ejecuta nuevamente una capacidad para comprobarla.
+        # La verificación se realiza sobre el resultado obtenido.
+        # -------------------------------------------------------
+        try:
+            resultado = fn(peticion_base)
+            resultados[capacidad] = resultado
+            capacidades_ejecutadas.append(capacidad)
+
+        except Exception as e:  # noqa: BLE001
+            resultados[capacidad] = None
+            capacidades_fallidas.append(capacidad)
+            errores_ejecucion.append(
+                "{0}: {1}: {2}".format(
+                    capacidad,
+                    type(e).__name__,
+                    e,
+                )
+            )
+
+    # -----------------------------------------------------------
+    # 8.15.5 — COBERTURA CONTRACTUAL
+    # -----------------------------------------------------------
+    #
+    # Toda capacidad declarada debe terminar en uno de estos
+    # estados:
+    #
+    #   ejecutada
+    #   fallida
+    #   no_resuelta
+    #
+    # Nunca se considera ejecutada una capacidad omitida.
+    # -----------------------------------------------------------
+    estados_capacidades: Dict[str, str] = {}
+
+    for capacidad in capacidades_declaradas:
+        if capacidad in capacidades_ejecutadas:
+            estados_capacidades[capacidad] = "ejecutada"
+        elif capacidad in capacidades_fallidas:
+            estados_capacidades[capacidad] = "fallida"
+        elif capacidad in capacidades_no_resueltas:
+            estados_capacidades[capacidad] = "no_resuelta"
+        else:
+            estados_capacidades[capacidad] = "no_ejecutada"
+
+    cobertura_completa = all(
+        estados_capacidades.get(capacidad) == "ejecutada"
+        for capacidad in capacidades_declaradas
+    )
+
+    # -----------------------------------------------------------
+    # 8.15.6 — ESTADO ESTRUCTURAL DEL MÓDULO
+    # -----------------------------------------------------------
+    #
+    # barrer() continúa siendo la fuente contractual de coherencia
+    # estructural. No se sustituye por la ejecución.
+    # -----------------------------------------------------------
     try:
-        resultados["inspeccionar"] = inspeccionar(peticion)
+        resultado_barrer = barrer()
     except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("inspeccionar: {0}".format(e))
-        resultados["inspeccionar"] = None
+        resultado_barrer = None
+        errores_ejecucion.append(
+            "barrer: {0}: {1}".format(
+                type(e).__name__,
+                e,
+            )
+        )
 
-    try:
-        resultados["registrar_inventario"] = registrar_inventario(peticion)
-    except Exception as e:  # noqa: BLE001
-        errores_ejecucion.append("registrar_inventario: {0}".format(e))
-        resultados["registrar_inventario"] = None
+    resultados["barrer"] = resultado_barrer
 
-    coherente = False
-    if isinstance(resultados.get("barrer"), dict):
-        coherente = bool(resultados["barrer"].get("coherente"))
+    coherente = (
+        isinstance(resultado_barrer, dict)
+        and resultado_barrer.get("coherente") is True
+    )
 
+    # -----------------------------------------------------------
+    # 8.15.7 — ESTADO FINAL DE EJECUCIÓN
+    # -----------------------------------------------------------
+    ejecucion_completa = (
+        cobertura_completa
+        and not capacidades_fallidas
+        and not capacidades_no_resueltas
+        and not errores_ejecucion
+    )
+
+    operativo = (
+        coherente
+        and ejecucion_completa
+    )
+
+    # -----------------------------------------------------------
+    # 8.15.8 — RESULTADO CONTRACTUAL
+    # -----------------------------------------------------------
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
         "operacion": "ejecutar_total",
-        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
+
+        "estado": (
+            ESTADO_OPERATIVO
+            if operativo
+            else ESTADO_DEGRADADO
+        ),
+
         "coherente": coherente,
-        "capacidades_ejecutadas": sorted([
-            k for k, v in resultados.items() if v is not None
-        ]),
+        "ejecucion_completa": ejecucion_completa,
+        "cobertura_completa": cobertura_completa,
+
+        "capacidades_declaradas": capacidades_declaradas,
+        "capacidades_ejecutadas": sorted(
+            capacidades_ejecutadas
+        ),
+        "capacidades_fallidas": sorted(
+            capacidades_fallidas
+        ),
+        "capacidades_no_resueltas": sorted(
+            capacidades_no_resueltas
+        ),
+        "estados_capacidades": estados_capacidades,
+
         "errores_ejecucion": errores_ejecucion,
+
         "resultados": resultados,
-        "capacidades_declaradas": list(
-            CONTENEDOR.get("capacidades", {}).keys()
-        ),
-        "nota": (
-            "ejecutar_total ejerce autoridad total de ENGINE sobre CA. "
-            "Todas las unidades son callables reales. "
-            "No inventa capacidades ni altera el contrato."
-        ),
     }
+
 
 # ===============================================================
 # FIN 8.15
 # ===============================================================
 
-
 # ===============================================================
 # 8.16 — INSPECCIONAR
 # ===============================================================
 
-def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
     Inspección estructural de CA.
-    Expone contrato, APIs y estado sin calcular factores.
+
+    Expone exclusivamente el contrato, las capacidades declaradas,
+    las APIs cargadas y el estado de integridad.
+
+    No ejecuta calcular_C, calcular_L, calcular_K ni calcular.
+    No altera historial, evidencia ni inventario.
+    No inventa capacidades.
     """
+
+    # -----------------------------------------------------------
+    # 8.16.1 — INTEGRIDAD ESTRUCTURAL
+    # -----------------------------------------------------------
     res_barrer = barrer()
+
+    # -----------------------------------------------------------
+    # 8.16.2 — CALLABILITY DE APIs DE FACTORES
+    # -----------------------------------------------------------
+    apis_factor: Dict[str, bool] = {}
+    for factor in _FACTORES_CANONICOS:
+        apis_factor[factor] = callable(_APIS.get(factor))
+
+    # -----------------------------------------------------------
+    # 8.16.3 — CALLABILITY DE CONTEOS
+    # -----------------------------------------------------------
+    apis_conteos = {
+        "extraer_conteos": (
+            _CONTEOS is not None
+            and callable(_CONTEOS.get("extraer_conteos"))
+        ),
+        "inyectar_en_peticion": (
+            _CONTEOS is not None
+            and callable(_CONTEOS.get("inyectar_en_peticion"))
+        ),
+    }
+
+    # -----------------------------------------------------------
+    # 8.16.4 — CALLABILITY DE ESCALAS
+    # -----------------------------------------------------------
+    apis_escalas = {
+        "ids": (
+            _ESCALAS is not None
+            and callable(_ESCALAS.get("ids"))
+        ),
+        "por_id": (
+            _ESCALAS is not None
+            and callable(_ESCALAS.get("por_id"))
+        ),
+    }
+
+    # -----------------------------------------------------------
+    # 8.16.5 — ESTRUCTURA CONTRACTUAL
+    # -----------------------------------------------------------
+    capacidades_contractuales = list(
+        CONTENEDOR.get("capacidades", {}).keys()
+    )
+    capacidades_meta = list(
+        CONTENEDOR.get("capacidades_meta", {}).keys()
+    )
+
+    # -----------------------------------------------------------
+    # 8.16.6 — RESULTADO
+    # -----------------------------------------------------------
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
         "operacion": "inspeccionar",
+
         "constantes": {
             "ID_MODULO": ID_MODULO,
             "NOMBRE_MODULO": NOMBRE_MODULO,
@@ -3059,34 +4184,46 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "VERSION_CONTRATO": VERSION_CONTRATO,
             "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
             "ESTABILIDAD": ESTABILIDAD,
-            "PRECISION_DECIMAL_DEFAULT": PRECISION_DECIMAL_DEFAULT,
+            "PRECISION_DECIMAL_DEFAULT": (
+                PRECISION_DECIMAL_DEFAULT
+            ),
             "FACTORES_CANONICOS": list(_FACTORES_CANONICOS),
         },
-        "capacidades_contractuales": list(
-            CONTENEDOR.get("capacidades", {}).keys()
-        ),
-        "capacidades_meta": list(
-            CONTENEDOR.get("capacidades_meta", {}).keys()
-        ),
+
+        "capacidades_contractuales": capacidades_contractuales,
+        "capacidades_meta": capacidades_meta,
+
         "apis": {
             "factores_cargados": sorted(_APIS.keys()),
+            "factores_callable": apis_factor,
             "errores_carga": list(_ERRORES_CARGA),
             "conteos_disponible": _CONTEOS is not None,
+            "conteos_callable": apis_conteos,
             "escalas_ids_disponible": _ESCALAS is not None,
+            "escalas_callable": apis_escalas,
         },
+
         "integridad": {
             "coherente": res_barrer.get("coherente"),
+            "errores": list(res_barrer.get("errores") or []),
+            "choques": list(res_barrer.get("choques") or []),
             "archivos": res_barrer.get("archivos"),
+            "archivos_extra": res_barrer.get("archivos_extra"),
+            "hashes": res_barrer.get("hashes"),
             "historial_n": res_barrer.get("historial_n"),
         },
+
         "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
         "reporting": CONTENEDOR.get("reporting"),
         "invariantes": list(INVARIANTES),
+
         "nota": (
-            "inspeccionar expone estructura de CA sin calcular "
-            "ni alterar el contrato."
+            "inspeccionar expone estructura, contrato, APIs y "
+            "estado de integridad de CA sin ejecutar factores "
+            "ni alterar el estado de calculos previos."
         ),
     }
+
 
 # ===============================================================
 # FIN 8.16
@@ -3101,25 +4238,40 @@ def registrar_inventario(
     peticion: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
-    Registra el inventario estructural de CA como instantánea determinista.
-    No altera evidencia de cálculos previos.
+    Genera una instantánea estructural del inventario de CA.
+
+    No modifica historial.
+    No modifica evidencia.
+    No ejecuta factores.
+    No crea capacidades.
+    No afirma persistencia que no exista.
     """
+
+    # -----------------------------------------------------------
+    # 8.17.1 — INVENTARIO ACTUAL
+    # -----------------------------------------------------------
     inv = inventario(peticion)
+
+    # -----------------------------------------------------------
+    # 8.17.2 — RESULTADO
+    # -----------------------------------------------------------
     return {
         "id": ID_MODULO,
         "operacion": "registrar_inventario",
         "registrado": True,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
         "inventario": inv,
         "nota": (
-            "Instantánea determinista del inventario de CA. "
-            "No modifica historial ni evidencia de cálculos."
+            "Instantanea del inventario estructural actual de CA. "
+            "La funcion no modifica historial ni evidencia y no "
+            "realiza persistencia externa."
         ),
     }
+
 
 # ===============================================================
 # FIN 8.17
 # ===============================================================
+
 
 # ===============================================================
 # FIN PARTE 8
@@ -3134,8 +4286,61 @@ def registrar_inventario(
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
+    """
+    Reporte estructural y operativo de CA.
+
+    El reporte utiliza exclusivamente el estado real obtenido
+    mediante barrer() y el contrato vigente de CONTENEDOR.
+
+    No ejecuta factores C/L/K.
+    No modifica historial.
+    No inventa capacidades.
+    """
+
+    # -----------------------------------------------------------
+    # 9.1.1 — ESTADO REAL DEL MÓDULO
+    # -----------------------------------------------------------
     b = barrer()
-    estado = ESTADO_OPERATIVO if b.get("coherente") else ESTADO_DEGRADADO
+
+    coherente = bool(b.get("coherente"))
+    estado = (
+        ESTADO_OPERATIVO
+        if coherente
+        else ESTADO_DEGRADADO
+    )
+
+    # -----------------------------------------------------------
+    # 9.1.2 — CAPACIDADES CONTRACTUALES
+    # -----------------------------------------------------------
+    capacidades = list(
+        CONTENEDOR.get("capacidades", {}).keys()
+    )
+
+    capacidades_callable = sorted(
+        nombre
+        for nombre, ref in CONTENEDOR.get(
+            "capacidades", {}
+        ).items()
+        if callable(ref)
+    )
+
+    # -----------------------------------------------------------
+    # 9.1.3 — OPERACIONES ARQUITECTÓNICAS REALES
+    # -----------------------------------------------------------
+    operaciones_arquitectonicas = {
+        nombre: callable(
+            CONTENEDOR.get("capacidades", {}).get(nombre)
+        )
+        for nombre in (
+            "ejecutar_total",
+            "inspeccionar",
+            "registrar_inventario",
+        )
+    }
+
+    # -----------------------------------------------------------
+    # 9.1.4 — RESULTADO
+    # -----------------------------------------------------------
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -3145,27 +4350,54 @@ def reporte() -> Dict[str, Any]:
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
         "estado": estado,
-        "coherente": b.get("coherente"),
+        "coherente": coherente,
+
         "factores_api": b.get("factores_api"),
+        "apis_factor": b.get("apis_factor"),
+
         "archivos": b.get("archivos"),
+        "archivos_extra": b.get("archivos_extra"),
         "hashes": b.get("hashes"),
-        "historial_n": b.get("historial_n"),
-        "errores_n": len(b.get("errores") or []),
-        "choques_n": len(b.get("choques") or []),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "regla_salida": (
-            "un objeto por factor: fraccion = decimal (7/9 = 0.778)"
+
+        "conteos_disponible": b.get(
+            "conteos_disponible"
         ),
-        "autoridad": CONTENEDOR.get("autoridad"),
+        "escalas_ids_disponible": b.get(
+            "escalas_ids_disponible"
+        ),
+
+        "historial_n": b.get("historial_n"),
+
+        "errores_n": len(
+            b.get("errores") or []
+        ),
+        "choques_n": len(
+            b.get("choques") or []
+        ),
+
+        "capacidades": capacidades,
+        "capacidades_callable": capacidades_callable,
+
+        "operaciones_arquitectonicas": (
+            operaciones_arquitectonicas
+        ),
+
+        "autoridad": CONTENEDOR.get(
+            "autoridad"
+        ),
+        "autoriza_engine": CONTENEDOR.get(
+            "autoriza_engine"
+        ),
         "conocimiento_exportable": CONTENEDOR.get(
             "conocimiento_exportable"
         ),
-        "operaciones_arquitectonicas": {
-            "ejecutar_total": True,
-            "inspeccionar": True,
-            "registrar_inventario": True,
-        },
+
+        "regla_salida": (
+            "un objeto por factor: "
+            "fraccion = decimal"
+        ),
     }
+
 
 # ===============================================================
 # FIN 9.1
@@ -3177,40 +4409,172 @@ def reporte() -> Dict[str, Any]:
 # ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
+    """
+    Diagnóstico determinista del estado de CA.
+
+    Clasifica únicamente condiciones observables del módulo.
+    No ejecuta cálculos.
+    No modifica el estado.
+    """
+
+    # -----------------------------------------------------------
+    # 9.2.1 — ESTADO BASE
+    # -----------------------------------------------------------
     b = barrer()
+
     problemas: List[Dict[str, Any]] = []
     advertencias: List[str] = []
     recomendaciones: List[str] = []
 
-    if b.get("errores"):
-        problemas.append({"tipo": "errores_carga", "detalle": b["errores"]})
-        recomendaciones.append("Revisar APIs C/L/K y hashes")
-    if b.get("choques"):
-        problemas.append({"tipo": "choques_factor", "detalle": b["choques"]})
-    if not b.get("conteos_disponible"):
-        advertencias.append("conteos.py no disponible")
-    if not b.get("factores_api"):
-        problemas.append({"tipo": "sin_apis", "detalle": "sin C/L/K"})
+    # -----------------------------------------------------------
+    # 9.2.2 — ERRORES ESTRUCTURALES
+    # -----------------------------------------------------------
+    errores = list(
+        b.get("errores") or []
+    )
+
+    if errores:
+        problemas.append({
+            "tipo": "errores_integridad",
+            "detalle": errores,
+        })
+
         recomendaciones.append(
-            "Verificar coherencia.py, logica.py, correlacion_k.py"
+            "Resolver los errores reportados por barrer() "
+            "antes de considerar CA coherente."
         )
 
-    estado = ESTADO_OPERATIVO if b.get("coherente") else ESTADO_DEGRADADO
+    # -----------------------------------------------------------
+    # 9.2.3 — CHOQUES CONTRACTUALES
+    # -----------------------------------------------------------
+    choques = list(
+        b.get("choques") or []
+    )
+
+    if choques:
+        problemas.append({
+            "tipo": "choques_factor",
+            "detalle": choques,
+        })
+
+        recomendaciones.append(
+            "Resolver los choques de asignacion "
+            "factor -> stem."
+        )
+
+    # -----------------------------------------------------------
+    # 9.2.4 — FACTORES CANÓNICOS
+    # -----------------------------------------------------------
+    apis_factor = dict(
+        b.get("apis_factor") or {}
+    )
+
+    factores_faltantes = sorted(
+        factor
+        for factor in _FACTORES_CANONICOS
+        if not apis_factor.get(factor, False)
+    )
+
+    if factores_faltantes:
+        problemas.append({
+            "tipo": "factores_no_callable",
+            "detalle": factores_faltantes,
+        })
+
+        recomendaciones.append(
+            "Resolver las APIs no callables de los "
+            "factores canonicos."
+        )
+
+    # -----------------------------------------------------------
+    # 9.2.5 — CONTEOS
+    # -----------------------------------------------------------
+    if not b.get("conteos_disponible"):
+        problemas.append({
+            "tipo": "conteos_no_disponible",
+            "detalle": (
+                "Las APIs contractuales de conteos "
+                "no estan completamente disponibles."
+            ),
+        })
+
+        recomendaciones.append(
+            "Resolver la disponibilidad callable de "
+            "extraer_conteos e inyectar_en_peticion."
+        )
+
+    # -----------------------------------------------------------
+    # 9.2.6 — ESCALAS
+    # -----------------------------------------------------------
+    if not b.get("escalas_ids_disponible"):
+        advertencias.append(
+            "La API de escalas_ids no esta disponible "
+            "o no supera su verificacion."
+        )
+
+    # -----------------------------------------------------------
+    # 9.2.7 — ARCHIVOS EXTRA
+    # -----------------------------------------------------------
+    archivos_extra = list(
+        b.get("archivos_extra") or []
+    )
+
+    if archivos_extra:
+        advertencias.append(
+            "Existen archivos no incluidos en el "
+            "mapa estructural conocido: {0}".format(
+                archivos_extra
+            )
+        )
+
+    # -----------------------------------------------------------
+    # 9.2.8 — ESTADO FINAL
+    # -----------------------------------------------------------
+    coherente = bool(
+        b.get("coherente")
+    )
+
+    estado = (
+        ESTADO_OPERATIVO
+        if coherente
+        else ESTADO_DEGRADADO
+    )
+
+    # -----------------------------------------------------------
+    # 9.2.9 — RESULTADO
+    # -----------------------------------------------------------
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "estado": estado,
+        "coherente": coherente,
+
         "problemas": problemas,
         "advertencias": advertencias,
         "recomendaciones": recomendaciones,
-        "coherente": b.get("coherente"),
-        "factores_api": b.get("factores_api"),
-        "historial_n": b.get("historial_n"),
+
+        "factores_api": b.get(
+            "factores_api"
+        ),
+        "apis_factor": apis_factor,
+
+        "conteos_disponible": b.get(
+            "conteos_disponible"
+        ),
+        "escalas_ids_disponible": b.get(
+            "escalas_ids_disponible"
+        ),
+
+        "historial_n": b.get(
+            "historial_n"
+        ),
     }
+
 
 # ===============================================================
 # FIN 9.2
 # ===============================================================
+
 
 # ===============================================================
 # FIN PARTE 9
@@ -3235,18 +4599,21 @@ _CAP_MAP = {
     "validar_evidencia": validar_evidencia,
     "explicar_calculo": explicar_calculo,
     "barrer": barrer,
-    "verificar": barrer,
+    "verificar": verificar,
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
     "leer_ids_escala": leer_ids_escala,
     "verificar_salida": verificar_salida,
     "historial": historial,
-    "verificar_calculo_de_C_L_K": verificar_calculo_de_C_L_K,
+    "verificar_calculo_de_C_L_K": (
+        verificar_calculo_de_C_L_K
+    ),
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
 }
+
 
 # ===============================================================
 # FIN 10.1
@@ -3257,29 +4624,113 @@ _CAP_MAP = {
 # 10.2 — RESOLUCIÓN DE CAPACIDADES
 # ===============================================================
 
-def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+def _resolver_capacidades(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Resuelve de forma estricta todas las capacidades
+    declaradas por CONTENEDOR.
+
+    Cada capacidad debe ser:
+      1. callable directamente; o
+      2. una cadena existente en _CAP_MAP.
+
+    No acepta referencias inexistentes.
+    No acepta tipos ambiguos.
+    No crea funciones.
+    """
+
+    capacidades = cont.get("capacidades")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            "{0}: 'capacidades' debe ser dict".format(
+                NOMBRE_MODULO
+            )
+        )
+
     resueltas: Dict[str, Any] = {}
-    for nombre, ref in cont["capacidades"].items():
+
+    for nombre, ref in capacidades.items():
+
+        # -------------------------------------------------------
+        # 10.2.1 — NOMBRE DE CAPACIDAD
+        # -------------------------------------------------------
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ContratoInvalido(
+                "{0}: nombre de capacidad invalido: {1!r}".format(
+                    NOMBRE_MODULO,
+                    nombre,
+                )
+            )
+
+        # -------------------------------------------------------
+        # 10.2.2 — REFERENCIA CALLABLE DIRECTA
+        # -------------------------------------------------------
         if callable(ref):
             resueltas[nombre] = ref
             continue
+
+        # -------------------------------------------------------
+        # 10.2.3 — REFERENCIA POR NOMBRE
+        # -------------------------------------------------------
         if isinstance(ref, str):
+
             if ref not in _CAP_MAP:
                 raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-                    f"referencia inexistente: '{ref}'"
+                    "{0}: capacidad '{1}' referencia "
+                    "inexistente: '{2}'".format(
+                        NOMBRE_MODULO,
+                        nombre,
+                        ref,
+                    )
                 )
+
             fn = _CAP_MAP[ref]
+
             if not callable(fn):
                 raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
+                    "{0}: referencia '{1}' de capacidad "
+                    "'{2}' no es callable".format(
+                        NOMBRE_MODULO,
+                        ref,
+                        nombre,
+                    )
                 )
+
             resueltas[nombre] = fn
             continue
+
+        # -------------------------------------------------------
+        # 10.2.4 — TIPO NO SOPORTADO
+        # -------------------------------------------------------
         raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidad '{nombre}' tipo invalido"
+            "{0}: capacidad '{1}' tiene referencia de "
+            "tipo invalido: {2}".format(
+                NOMBRE_MODULO,
+                nombre,
+                type(ref).__name__,
+            )
         )
+
+    # -----------------------------------------------------------
+    # 10.2.5 — VALIDACIÓN FINAL DE RESOLUCIÓN
+    # -----------------------------------------------------------
+    for nombre, fn in resueltas.items():
+        if not callable(fn):
+            raise ContratoInvalido(
+                "{0}: capacidad '{1}' no quedo callable "
+                "despues de resolver".format(
+                    NOMBRE_MODULO,
+                    nombre,
+                )
+            )
+
+    # -----------------------------------------------------------
+    # 10.2.6 — PUBLICACIÓN DE RESOLUCIÓN
+    # -----------------------------------------------------------
     cont["capacidades"] = resueltas
+
 
 # ===============================================================
 # FIN 10.2
@@ -3308,33 +4759,44 @@ __all__ = [
     "NOMBRE_MODULO",
     "ROL_MODULO",
     "VERSION_MODULO",
+    "VERSION_CONTRATO",
+    "ESQUEMA_CONTRATO",
     "UNDEFINED",
     "es_undefined",
+
     "calcular",
     "calcular_C",
     "calcular_L",
     "calcular_K",
     "calcular_factor",
+
     "representar",
     "validar_evidencia",
     "explicar_calculo",
+
     "barrer",
+    "verificar",
     "inventario",
     "reporte",
     "diagnostico",
     "leer_ids_escala",
+
     "verificar_salida",
     "historial",
     "verificar_calculo_de_C_L_K",
+
     "ejecutar_total",
     "inspeccionar",
     "registrar_inventario",
+
     "ContratoInvalido",
 ]
+
 
 # ===============================================================
 # FIN 10.4
 # ===============================================================
+
 
 # ===============================================================
 # FIN PARTE 10

@@ -1044,16 +1044,41 @@ def _ejecutar_capacidad(
 # 8 — FUNCIONES PRIVADAS
 # ===============================================================
 
+## ===============================================================
+# 8 — FUNCIONES PRIVADAS
+# ===============================================================
+
 # ===============================================================
 # 8.1 — NORMALIZACIÓN
 # ===============================================================
 
 def _norm_nombre(nombre: str) -> str:
+    """Normaliza un nombre de diccionario a clave determinista."""
     return (nombre or "").strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def _norm_palabra(p: str) -> str:
+    """Normaliza una palabra a lema determinista."""
     return (p or "").strip().lower()
+
+# ===============================================================
+# FIN 8.1
+# ===============================================================
+
+# ===============================================================
+# 8.1 — NORMALIZACIÓN
+# ===============================================================
+
+def _norm_nombre(nombre: str) -> str:
+    if not isinstance(nombre, str):
+        raise TypeError("nombre debe ser str")
+    return nombre.strip().lower().replace("-", "_").replace(" ", "_")
+
+
+def _norm_palabra(p: str) -> str:
+    if not isinstance(p, str):
+        raise TypeError("p debe ser str")
+    return p.strip().lower()
 
 # ===============================================================
 # FIN 8.1
@@ -1068,43 +1093,75 @@ def _extraer_definicion(entrada: Any) -> Optional[str]:
     if entrada is None:
         return None
     if isinstance(entrada, str):
-        return entrada.strip() or None
+        valor = entrada.strip()
+        return valor or None
     if isinstance(entrada, dict):
-        for k in ("definicion", "definición", "def", "meaning", "significado"):
-            v = entrada.get(k)
-            if v is not None and str(v).strip():
-                return str(v).strip()
+        for clave in ("definicion", "definición", "def", "meaning", "significado"):
+            valor = entrada.get(clave)
+            if isinstance(valor, str):
+                valor = valor.strip()
+                if valor:
+                    return valor
     return None
 
 
 def _extraer_significado(entrada: Any) -> Optional[str]:
     if not isinstance(entrada, dict):
         return _extraer_definicion(entrada)
-    for k in ("significado", "meaning", "interpretacion", "interpretación"):
-        v = entrada.get(k)
-        if v is not None and str(v).strip():
-            return str(v).strip()
+    for clave in ("significado", "meaning", "interpretacion", "interpretación"):
+        valor = entrada.get(clave)
+        if isinstance(valor, str):
+            valor = valor.strip()
+            if valor:
+                return valor
     return _extraer_definicion(entrada)
 
 # ===============================================================
 # FIN 8.2
 # ===============================================================
-
-
 # ===============================================================
 # 8.3 — CARGA DE MÓDULO
 # ===============================================================
 
 def _cargar_modulo(path: Path, clave: str) -> Optional[Any]:
+    """
+    Carga determinísticamente un archivo Python como módulo aislado.
+
+    No ejecuta ninguna capacidad del módulo.
+    Solo importa el archivo y devuelve su objeto módulo.
+    Si la especificación, el loader o la ejecución fallan, devuelve None.
+    """
+    if not isinstance(path, Path):
+        raise TypeError(
+            f"{NOMBRE_MODULO}: path debe ser Path, recibido: {type(path).__name__}"
+        )
+
+    if not isinstance(clave, str) or not clave.strip():
+        raise ValueError(
+            f"{NOMBRE_MODULO}: clave de módulo inválida"
+        )
+
+    if not path.is_file():
+        return None
+
     spec = importlib.util.spec_from_file_location(clave, path)
+
     if spec is None or spec.loader is None:
         return None
+
     mod = importlib.util.module_from_spec(spec)
+
+    if mod is None:
+        return None
+
     sys.modules[clave] = mod
+
     try:
         spec.loader.exec_module(mod)
     except Exception:
+        sys.modules.pop(clave, None)
         return None
+
     return mod
 
 # ===============================================================
@@ -1117,61 +1174,98 @@ def _cargar_modulo(path: Path, clave: str) -> Optional[Any]:
 # ===============================================================
 
 def _descubrir() -> None:
+    """
+    Descubre y registra determinísticamente todos los archivos Python
+    que declaren DICCIONARIO dentro del módulo y de fuentes/.
+
+    No modifica otros módulos.
+    No inventa entradas.
+    No ejecuta capacidades públicas del módulo descubierto.
+    """
     global _CARGADO
+
     if _CARGADO:
         return
 
     candidatos: List[Path] = []
+
     if _FUENTES.is_dir():
         candidatos.extend(sorted(_FUENTES.glob("*.py")))
+
     candidatos.extend(sorted(_DIR.glob("*.py")))
 
     vistos: Set[Path] = set()
+
     for f in candidatos:
+
         if f.name == "__init__.py" or f.name.startswith("_"):
             continue
+
         resolved = f.resolve()
+
         if resolved in vistos:
             continue
+
         vistos.add(resolved)
 
         clave = "diccionario_{0}".format(f.stem)
-        mod = _cargar_modulo(f, clave)
+
+        mod = _cargar_modulo(resolved, clave)
+
         if mod is None:
-            _META[f.stem] = {"error": "carga fallida", "archivo": f.name}
+            _META[f.stem] = {
+                "error": "carga fallida",
+                "archivo": f.name,
+            }
             continue
 
         datos = getattr(mod, "DICCIONARIO", None)
+
         if datos is None:
             continue
 
-        meta = getattr(mod, "META", None)
+        meta_modulo = getattr(mod, "META", None)
+
         nombre = None
-        if isinstance(meta, dict):
-            nombre = meta.get("nombre")
+
+        if isinstance(meta_modulo, dict):
+            nombre = meta_modulo.get("nombre")
+
         if not nombre:
             nombre = f.stem
+
         key = _norm_nombre(str(nombre))
 
+        if not key:
+            _META[f.stem] = {
+                "error": "nombre de diccionario inválido",
+                "archivo": f.name,
+            }
+            continue
+
         _REGISTRO[key] = datos
-        if isinstance(meta, dict):
-            _META[key] = dict(meta)
+
+        if isinstance(meta_modulo, dict):
+            _META[key] = dict(meta_modulo)
             _META[key]["archivo"] = f.name
         else:
-            _META[key] = {"nombre": key, "archivo": f.name}
+            _META[key] = {
+                "nombre": key,
+                "archivo": f.name,
+            }
 
     _CARGADO = True
 
 
 def _asegurar() -> None:
+    """
+    Garantiza que el descubrimiento haya ocurrido antes de acceder
+    al registro léxico.
+    """
     _descubrir()
 
 # ===============================================================
 # FIN 8.4
-# ===============================================================
-
-# ===============================================================
-# FIN 8 — FUNCIONES PRIVADAS
 # ===============================================================
 
 # ===============================================================
@@ -1189,33 +1283,69 @@ def listar() -> List[str]:
 # ===============================================================
 # FIN 9.1
 # ===============================================================
-
-
 # ===============================================================
 # 9.2 — LISTAR POR IDIOMA
 # ===============================================================
 
 def listar_por_idioma(idioma: str) -> List[str]:
     _asegurar()
-    idioma = (idioma or "").strip().lower()
-    out = []
-    for k, m in _META.items():
-        if k in _REGISTRO and str(m.get("idioma", "")).lower() == idioma:
-            out.append(k)
-    return sorted(out)
+
+    if not isinstance(idioma, str):
+        raise TypeError(
+            f"{NOMBRE_MODULO}: idioma debe ser str, "
+            f"recibido: {type(idioma).__name__}"
+        )
+
+    idioma_normalizado = idioma.strip().lower()
+
+    if not idioma_normalizado:
+        return []
+
+    resultado: List[str] = []
+
+    for nombre in sorted(_REGISTRO):
+        meta_registro = _META.get(nombre)
+
+        if not isinstance(meta_registro, dict):
+            continue
+
+        idioma_registro = meta_registro.get("idioma")
+
+        if not isinstance(idioma_registro, str):
+            continue
+
+        if idioma_registro.strip().lower() == idioma_normalizado:
+            resultado.append(nombre)
+
+    return resultado
 
 # ===============================================================
 # FIN 9.2
 # ===============================================================
-
-
 # ===============================================================
 # 9.3 — META
 # ===============================================================
 
 def meta(nombre: str) -> Optional[Dict[str, Any]]:
     _asegurar()
-    return _META.get(_norm_nombre(nombre))
+
+    if not isinstance(nombre, str):
+        raise TypeError(
+            "{0}: nombre debe ser str; recibido: {1}".format(
+                NOMBRE_MODULO,
+                type(nombre).__name__,
+            )
+        )
+
+    key = _norm_nombre(nombre)
+    if not key:
+        return None
+
+    registro = _META.get(key)
+    if registro is None:
+        return None
+
+    return dict(registro)
 
 # ===============================================================
 # FIN 9.3
@@ -1228,13 +1358,33 @@ def meta(nombre: str) -> Optional[Dict[str, Any]]:
 
 def cargar(nombre: str) -> Any:
     _asegurar()
-    key = _norm_nombre(nombre)
-    if key not in _REGISTRO:
-        raise KeyError(
-            "diccionario no encontrado: {0!r}. Disponibles: {1}".format(
-                nombre, listar()
+
+    if not isinstance(nombre, str):
+        raise TypeError(
+            "{0}: nombre debe ser str; recibido: {1}".format(
+                NOMBRE_MODULO,
+                type(nombre).__name__,
             )
         )
+
+    key = _norm_nombre(nombre)
+
+    if not key:
+        raise KeyError(
+            "{0}: nombre de diccionario vacío".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    if key not in _REGISTRO:
+        disponibles = sorted(_REGISTRO.keys())
+        raise KeyError(
+            "diccionario no encontrado: {0!r}. Disponibles: {1}".format(
+                nombre,
+                disponibles,
+            )
+        )
+
     return _REGISTRO[key]
 
 # ===============================================================
@@ -1248,7 +1398,11 @@ def cargar(nombre: str) -> Any:
 
 def cargar_todos() -> Dict[str, Any]:
     _asegurar()
-    return {k: _REGISTRO[k] for k in sorted(_REGISTRO)}
+
+    return {
+        nombre: _REGISTRO[nombre]
+        for nombre in sorted(_REGISTRO.keys())
+    }
 
 # ===============================================================
 # FIN 9.5
@@ -1260,7 +1414,27 @@ def cargar_todos() -> Dict[str, Any]:
 # ===============================================================
 
 def cargar_idioma(idioma: str) -> Dict[str, Any]:
-    return {n: cargar(n) for n in listar_por_idioma(idioma)}
+    _asegurar()
+
+    if not isinstance(idioma, str):
+        raise TypeError(
+            "{0}: idioma debe ser str; recibido: {1}".format(
+                NOMBRE_MODULO,
+                type(idioma).__name__,
+            )
+        )
+
+    idioma_normalizado = idioma.strip().lower()
+
+    if not idioma_normalizado:
+        return {}
+
+    nombres = listar_por_idioma(idioma_normalizado)
+
+    return {
+        nombre: _REGISTRO[nombre]
+        for nombre in nombres
+    }
 
 # ===============================================================
 # FIN 9.6
@@ -1273,37 +1447,98 @@ def cargar_idioma(idioma: str) -> Dict[str, Any]:
 
 def definir(palabra: str, *nombres: str) -> Optional[Dict[str, Any]]:
     _asegurar()
+
+    if not isinstance(palabra, str):
+        raise TypeError(
+            "{0}: palabra debe ser str; recibido: {1}".format(
+                NOMBRE_MODULO,
+                type(palabra).__name__,
+            )
+        )
+
+    for nombre in nombres:
+        if not isinstance(nombre, str):
+            raise TypeError(
+                "{0}: cada nombre de diccionario debe ser str; "
+                "recibido: {1}".format(
+                    NOMBRE_MODULO,
+                    type(nombre).__name__,
+                )
+            )
+
     p = _norm_palabra(palabra)
+
     if not p:
         return None
 
     fuentes = list(nombres) if nombres else listar()
+
     for nombre in fuentes:
-        try:
-            datos = cargar(nombre)
-        except KeyError:
-            continue
+        key = _norm_nombre(nombre)
+
+        if not key:
+            raise KeyError(
+                "{0}: nombre de diccionario vacío".format(
+                    NOMBRE_MODULO
+                )
+            )
+
+        if key not in _REGISTRO:
+            raise KeyError(
+                "diccionario no encontrado: {0!r}. Disponibles: {1}".format(
+                    nombre,
+                    sorted(_REGISTRO.keys()),
+                )
+            )
+
+        datos = _REGISTRO[key]
 
         if isinstance(datos, dict):
+            coincidencias = []
+
             for k, v in datos.items():
-                if _norm_palabra(str(k)) == p:
-                    return {
-                        "palabra": p,
-                        "definicion": _extraer_definicion(v),
-                        "significado": _extraer_significado(v),
-                        "fuente": _norm_nombre(nombre),
-                        "entrada": v,
-                    }
-        elif isinstance(datos, (set, frozenset, list, tuple)):
-            if p in {_norm_palabra(str(x)) for x in datos}:
+                termino = _norm_palabra(str(k))
+
+                if termino and termino == p:
+                    coincidencias.append((k, v))
+
+            if len(coincidencias) > 1:
+                raise ContratoInvalido(
+                    "{0}: diccionario '{1}' contiene múltiples "
+                    "entradas que normalizan a '{2}'".format(
+                        NOMBRE_MODULO,
+                        key,
+                        p,
+                    )
+                )
+
+            if coincidencias:
+                _, entrada = coincidencias[0]
+
                 return {
                     "palabra": p,
-                    "definicion": None,
-                    "significado": None,
-                    "fuente": _norm_nombre(nombre),
-                    "entrada": p,
-                    "nota": "término presente sin definición textual",
+                    "definicion": _extraer_definicion(entrada),
+                    "significado": _extraer_significado(entrada),
+                    "fuente": key,
+                    "entrada": entrada,
                 }
+
+        elif isinstance(datos, (set, frozenset, list, tuple)):
+            for elemento in datos:
+                termino = _norm_palabra(str(elemento))
+
+                if termino and termino == p:
+                    return {
+                        "palabra": p,
+                        "definicion": None,
+                        "significado": None,
+                        "fuente": key,
+                        "entrada": elemento,
+                        "nota": (
+                            "término presente sin definición textual"
+                        ),
+                    }
+
     return None
 
 # ===============================================================
@@ -1316,10 +1551,22 @@ def definir(palabra: str, *nombres: str) -> Optional[Dict[str, Any]]:
 # ===============================================================
 
 def significado(palabra: str, *nombres: str) -> Optional[str]:
-    r = definir(palabra, *nombres)
-    if r is None:
+    resultado = definir(palabra, *nombres)
+
+    if resultado is None:
         return None
-    return r.get("significado") or r.get("definicion")
+
+    significado_resultado = resultado.get("significado")
+
+    if isinstance(significado_resultado, str) and significado_resultado.strip():
+        return significado_resultado
+
+    definicion_resultado = resultado.get("definicion")
+
+    if isinstance(definicion_resultado, str) and definicion_resultado.strip():
+        return definicion_resultado
+
+    return None
 
 # ===============================================================
 # FIN 9.8
@@ -1332,23 +1579,64 @@ def significado(palabra: str, *nombres: str) -> Optional[str]:
 
 def palabras(*nombres: str) -> Set[str]:
     _asegurar()
+
+    for nombre in nombres:
+        if not isinstance(nombre, str):
+            raise TypeError(
+                "{0}: cada nombre de diccionario debe ser str; "
+                "recibido: {1}".format(
+                    NOMBRE_MODULO,
+                    type(nombre).__name__,
+                )
+            )
+
     fuentes = list(nombres) if nombres else listar()
     out: Set[str] = set()
+
     for nombre in fuentes:
-        try:
-            datos = cargar(nombre)
-        except KeyError:
-            continue
+        key = _norm_nombre(nombre)
+
+        if not key:
+            raise KeyError(
+                "{0}: nombre de diccionario vacío".format(
+                    NOMBRE_MODULO
+                )
+            )
+
+        if key not in _REGISTRO:
+            raise KeyError(
+                "diccionario no encontrado: {0!r}. Disponibles: {1}".format(
+                    nombre,
+                    sorted(_REGISTRO.keys()),
+                )
+            )
+
+        datos = _REGISTRO[key]
+
         if isinstance(datos, dict):
-            out |= {_norm_palabra(str(k)) for k in datos if k}
+            elementos = datos.keys()
         elif isinstance(datos, (set, frozenset, list, tuple)):
-            out |= {_norm_palabra(str(x)) for x in datos if x}
+            elementos = datos
+        else:
+            raise ContratoInvalido(
+                "{0}: DICCIONARIO '{1}' tiene tipo inválido: {2}".format(
+                    NOMBRE_MODULO,
+                    key,
+                    type(datos).__name__,
+                )
+            )
+
+        for elemento in elementos:
+            termino = _norm_palabra(str(elemento))
+
+            if termino:
+                out.add(termino)
+
     return out
 
 # ===============================================================
 # FIN 9.9
 # ===============================================================
-
 
 # ===============================================================
 # 9.10 — INYECTAR EN PETICIÓN
@@ -1359,16 +1647,57 @@ def inyectar_en_peticion(
     *nombres: str,
     clave: str = "diccionario",
 ) -> Dict[str, Any]:
-    base = dict(peticion or {})
-    lemas = sorted(palabras(*nombres))
+    _asegurar()
+
+    if peticion is not None and not isinstance(peticion, dict):
+        raise TypeError(
+            "{0}: peticion debe ser dict o None; recibido: {1}".format(
+                NOMBRE_MODULO,
+                type(peticion).__name__,
+            )
+        )
+
+    if not isinstance(clave, str):
+        raise TypeError(
+            "{0}: clave debe ser str; recibido: {1}".format(
+                NOMBRE_MODULO,
+                type(clave).__name__,
+            )
+        )
+
+    clave = clave.strip()
+
+    if not clave:
+        raise ValueError(
+            "{0}: clave no puede estar vacía".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    for nombre in nombres:
+        if not isinstance(nombre, str):
+            raise TypeError(
+                "{0}: cada nombre de diccionario debe ser str; "
+                "recibido: {1}".format(
+                    NOMBRE_MODULO,
+                    type(nombre).__name__,
+                )
+            )
+
+    fuentes = list(nombres) if nombres else listar()
+    lemas = sorted(palabras(*fuentes))
+
+    base = dict(peticion) if peticion is not None else {}
+
     base[clave] = lemas
     base["_diccionario_meta"] = {
-        "nombres": list(nombres) if nombres else listar(),
+        "nombres": list(fuentes),
         "size": len(lemas),
         "version": VERSION_MODULO,
-        "modulo": "diccionario",
-        "rol": "DI",
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
     }
+
     return base
 
 # ===============================================================
@@ -1380,51 +1709,185 @@ def inyectar_en_peticion(
 # 9.11 — RESOLVER
 # ===============================================================
 
-def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def resolver(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     _asegurar()
-    peticion = dict(peticion or {})
-    palabra = peticion.get("palabra") or peticion.get("termino")
-    idioma = peticion.get("idioma")
-    nombres = peticion.get("diccionarios") or peticion.get("nombres")
 
-    if palabra:
-        if nombres:
-            if isinstance(nombres, str):
-                nombres = [nombres]
-            r = definir(str(palabra), *nombres)
-        elif idioma:
-            r = definir(str(palabra), *listar_por_idioma(str(idioma)))
+    if peticion is not None and not isinstance(peticion, dict):
+        raise TypeError(
+            "{0}: peticion debe ser dict o None; recibido: {1}".format(
+                NOMBRE_MODULO,
+                type(peticion).__name__,
+            )
+        )
+
+    base = dict(peticion) if peticion is not None else {}
+
+    tiene_palabra = "palabra" in base
+    tiene_termino = "termino" in base
+
+    if tiene_palabra and tiene_termino:
+        raise ContratoInvalido(
+            "{0}: petición ambigua; no puede contener simultáneamente "
+            "'palabra' y 'termino'".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    if tiene_palabra:
+        palabra = base["palabra"]
+    elif tiene_termino:
+        palabra = base["termino"]
+    else:
+        palabra = None
+
+    if palabra is not None:
+        if not isinstance(palabra, str):
+            raise TypeError(
+                "{0}: 'palabra'/'termino' debe ser str; recibido: {1}".format(
+                    NOMBRE_MODULO,
+                    type(palabra).__name__,
+                )
+            )
+
+        if not palabra.strip():
+            return {
+                "ok": False,
+                "modulo": NOMBRE_MODULO,
+                "rol": ROL_MODULO,
+                "resultado": None,
+                "coherente": True,
+                "notas": [
+                    "Palabra vacía; no se realizó resolución."
+                ],
+            }
+
+    tiene_diccionarios = "diccionarios" in base
+    tiene_nombres = "nombres" in base
+
+    if tiene_diccionarios and tiene_nombres:
+        raise ContratoInvalido(
+            "{0}: petición ambigua; no puede contener simultáneamente "
+            "'diccionarios' y 'nombres'".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    if tiene_diccionarios:
+        nombres = base["diccionarios"]
+    elif tiene_nombres:
+        nombres = base["nombres"]
+    else:
+        nombres = None
+
+    if nombres is not None:
+        if isinstance(nombres, str):
+            nombres = [nombres]
+        elif isinstance(nombres, (list, tuple)):
+            nombres = list(nombres)
         else:
-            r = definir(str(palabra))
+            raise TypeError(
+                "{0}: 'diccionarios'/'nombres' debe ser str, "
+                "list o tuple; recibido: {1}".format(
+                    NOMBRE_MODULO,
+                    type(nombres).__name__,
+                )
+            )
+
+        for nombre in nombres:
+            if not isinstance(nombre, str):
+                raise TypeError(
+                    "{0}: cada nombre de diccionario debe ser str; "
+                    "recibido: {1}".format(
+                        NOMBRE_MODULO,
+                        type(nombre).__name__,
+                    )
+                )
+
+    tiene_idioma = "idioma" in base
+    idioma = base.get("idioma") if tiene_idioma else None
+
+    if idioma is not None:
+        if not isinstance(idioma, str):
+            raise TypeError(
+                "{0}: 'idioma' debe ser str; recibido: {1}".format(
+                    NOMBRE_MODULO,
+                    type(idioma).__name__,
+                )
+            )
+
+        idioma = idioma.strip().lower()
+
+        if not idioma:
+            raise ValueError(
+                "{0}: 'idioma' no puede estar vacío".format(
+                    NOMBRE_MODULO
+                )
+            )
+
+    # -----------------------------------------------------------
+    # RESOLUCIÓN DE PALABRA
+    # -----------------------------------------------------------
+
+    if palabra is not None and palabra.strip():
+
+        if nombres is not None:
+            resultado = definir(
+                palabra,
+                *nombres,
+            )
+
+        elif idioma is not None:
+            fuentes = listar_por_idioma(idioma)
+
+            resultado = definir(
+                palabra,
+                *fuentes,
+            ) if fuentes else None
+
+        else:
+            resultado = definir(palabra)
+
         return {
-            "ok": r is not None,
-            "modulo": "diccionario",
-            "rol": "DI",
-            "resultado": r,
+            "ok": resultado is not None,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "resultado": resultado,
             "coherente": True,
             "notas": [
                 "Definición entregada. No se calculó Tru ni se clasificó O."
             ],
         }
 
-    if idioma and not nombres:
-        datos = cargar_idioma(str(idioma))
-        usados = list(datos.keys())
-    elif nombres:
-        if isinstance(nombres, str):
-            nombres = [nombres]
-        datos = {n: cargar(n) for n in nombres}
-        usados = list(nombres)
+    # -----------------------------------------------------------
+    # RESOLUCIÓN DE MATERIA PRIMA
+    # -----------------------------------------------------------
+
+    if nombres is not None:
+        fuentes = list(nombres)
+
+    elif idioma is not None:
+        fuentes = listar_por_idioma(idioma)
+
     else:
-        datos = cargar_todos()
-        usados = list(datos.keys())
+        fuentes = listar()
+
+    datos = {
+        nombre: cargar(nombre)
+        for nombre in fuentes
+    }
+
+    total_palabras = len(
+        palabras(*fuentes)
+    )
 
     return {
         "ok": True,
-        "modulo": "diccionario",
-        "rol": "DI",
-        "diccionarios_usados": usados,
-        "palabras_n": len(palabras(*usados)),
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "diccionarios_usados": list(fuentes),
+        "palabras_n": total_palabras,
         "coherente": True,
         "notas": [
             "Materia prima entregada. No se calculó Tru ni se clasificó O."
@@ -1435,31 +1898,77 @@ def resolver(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # FIN 9.11
 # ===============================================================
 
-
 # ===============================================================
 # 9.12 — BARRER
 # ===============================================================
 
 def barrer() -> Dict[str, Any]:
+    """
+    Centinela estructural de DI.
+
+    Garantiza una salida determinista basada exclusivamente en el
+    contenido actualmente descubierto en _REGISTRO y _META.
+
+    No calcula Tru.
+    No clasifica O_context.
+    No modifica otros módulos.
+    """
     _asegurar()
+
     errores: List[str] = []
     notas: List[str] = []
     por_idioma: Dict[str, List[str]] = {}
 
-    for k, m in sorted(_META.items()):
-        if m.get("error"):
-            errores.append("{0}: {1}".format(k, m["error"]))
+    for nombre in sorted(_META):
+        metadata = _META[nombre]
+
+        if not isinstance(metadata, dict):
+            errores.append(
+                "{0}: metadatos inválidos: se esperaba dict".format(nombre)
+            )
             continue
-        if k not in _REGISTRO:
+
+        if metadata.get("error"):
+            errores.append(
+                "{0}: {1}".format(nombre, str(metadata["error"]))
+            )
             continue
-        idioma = str(m.get("idioma") or "?").lower()
-        por_idioma.setdefault(idioma, []).append(k)
-        datos = _REGISTRO[k]
+
+        if nombre not in _REGISTRO:
+            errores.append(
+                "{0}: existe metadata sin DICCIONARIO registrado".format(
+                    nombre
+                )
+            )
+            continue
+
+        idioma = str(metadata.get("idioma") or "?").strip().lower()
+        por_idioma.setdefault(idioma, []).append(nombre)
+
+        datos = _REGISTRO[nombre]
+
         if not isinstance(datos, (dict, set, frozenset, list, tuple)):
             errores.append(
-                "{0}: DICCIONARIO debe ser dict (definiciones) "
-                "o set/list (términos)".format(k)
+                "{0}: DICCIONARIO debe ser dict, set, frozenset, "
+                "list o tuple".format(nombre)
             )
+
+    for nombre in sorted(_REGISTRO):
+        if nombre not in _META:
+            metadata = {}
+            idioma = "?"
+            por_idioma.setdefault(idioma, []).append(nombre)
+
+            datos = _REGISTRO[nombre]
+
+            if not isinstance(datos, (dict, set, frozenset, list, tuple)):
+                errores.append(
+                    "{0}: DICCIONARIO debe ser dict, set, frozenset, "
+                    "list o tuple".format(nombre)
+                )
+
+    for idioma in por_idioma:
+        por_idioma[idioma] = sorted(set(por_idioma[idioma]))
 
     if not _REGISTRO:
         notas.append(
@@ -1467,25 +1976,33 @@ def barrer() -> Dict[str, Any]:
             "(vacío legítimo hasta montar fuentes)"
         )
 
+    resultado: Dict[str, Any] = {
+        "contenedor": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "coherente": not errores,
+        "errores": list(errores),
+        "diccionarios": sorted(_REGISTRO.keys()),
+        "total": len(_REGISTRO),
+        "por_idioma": por_idioma,
+        "notas": list(notas),
+    }
+
     if errores:
         try:
             DiagnosticoGlobal.recibir_reporte(
-                modulo="diccionario",
-                errores=[{"tipo": "error", "detalle": e} for e in errores],
+                modulo=NOMBRE_MODULO,
+                errores=[
+                    {
+                        "tipo": "error",
+                        "detalle": error,
+                    }
+                    for error in errores
+                ],
             )
         except Exception:
             pass
 
-    return {
-        "contenedor": "diccionario",
-        "rol": "DI",
-        "coherente": not errores,
-        "errores": errores,
-        "diccionarios": listar(),
-        "total": len(_REGISTRO),
-        "por_idioma": por_idioma,
-        "notas": notas,
-    }
+    return resultado
 
 # ===============================================================
 # FIN 9.12
@@ -1497,7 +2014,12 @@ def barrer() -> Dict[str, Any]:
 # ===============================================================
 
 def verificar() -> Dict[str, Any]:
-    """Alias contractual real de barrer."""
+    """
+    Callable contractual de verificación de DI.
+
+    Es un alias funcional de barrer(): no introduce una segunda
+    implementación de la validación.
+    """
     return barrer()
 
 # ===============================================================
@@ -1510,24 +2032,86 @@ def verificar() -> Dict[str, Any]:
 # ===============================================================
 
 def verificar_salida(salida: Dict[str, Any]) -> bool:
+    """
+    Valida la forma contractual mínima de una salida producida por DI.
+
+    La función no evalúa si DI está coherente; únicamente determina
+    si la salida tiene la estructura mínima exigida.
+    """
     if not isinstance(salida, dict):
         return False
-    if "coherente" not in salida:
+
+    campos_obligatorios = (
+        "contenedor",
+        "rol",
+        "coherente",
+        "errores",
+        "diccionarios",
+        "total",
+        "por_idioma",
+        "notas",
+    )
+
+    for campo in campos_obligatorios:
+        if campo not in salida:
+            return False
+
+    if salida["contenedor"] != NOMBRE_MODULO:
         return False
+
+    if salida["rol"] != ROL_MODULO:
+        return False
+
     if not isinstance(salida["coherente"], bool):
         return False
+
+    if not isinstance(salida["errores"], list):
+        return False
+
+    if not isinstance(salida["diccionarios"], list):
+        return False
+
+    if not isinstance(salida["total"], int):
+        return False
+
+    if isinstance(salida["total"], bool):
+        return False
+
+    if salida["total"] != len(salida["diccionarios"]):
+        return False
+
+    if not isinstance(salida["por_idioma"], dict):
+        return False
+
+    for idioma, nombres in salida["por_idioma"].items():
+        if not isinstance(idioma, str):
+            return False
+        if not isinstance(nombres, list):
+            return False
+        if not all(isinstance(nombre, str) for nombre in nombres):
+            return False
+
+    if not isinstance(salida["notas"], list):
+        return False
+
     return True
 
 # ===============================================================
 # FIN 9.14
 # ===============================================================
 
-
 # ===============================================================
 # 9.15 — AXIOMAS
 # ===============================================================
 
 def axiomas() -> List[Dict[str, Any]]:
+    """
+    Devuelve las declaraciones axiomáticas operativas propias de DI.
+
+    La función es determinista: no depende de estado externo,
+    archivos, tiempo ni resultados de otras capacidades.
+    Cada invocación construye una nueva colección de declaraciones.
+    """
     return [
         {
             "id": "DI-OP-1",
@@ -1548,7 +2132,7 @@ def axiomas() -> List[Dict[str, Any]]:
             "tipo": "axioma",
             "sujeto": "diccionario",
             "relacion": "no_calcula",
-            "objeto": "Tru_ni_C_L_K",
+            "objeto": "Tru_Ri_Tru_total_C_L_K",
             "polaridad": True,
             "enunciado": (
                 "DI no calcula Tru_Ri, Tru_total, C, L ni K."
@@ -1564,20 +2148,23 @@ def axiomas() -> List[Dict[str, Any]]:
             "objeto": "O_context",
             "polaridad": True,
             "enunciado": (
-                "DI no clasifica O_context (oficio CX)."
+                "DI no clasifica O_context; la clasificación de O_context "
+                "corresponde al oficio de CX."
             ),
             "depende_de": [],
-            "gobierna": ["diccionario", "contexto"],
+            "gobierna": ["diccionario"],
         },
         {
             "id": "DI-OP-4",
             "tipo": "axioma",
             "sujeto": "fuentes_de_diccionario",
-            "relacion": "se_leen",
+            "relacion": "se_descubren_y_cargan",
             "objeto": "automaticamente",
             "polaridad": True,
             "enunciado": (
-                "Todo archivo bajo el módulo que declare DICCIONARIO se carga solo."
+                "Los archivos Python elegibles descubiertos directamente "
+                "en las ubicaciones de fuentes del módulo que declaren "
+                "DICCIONARIO son cargados automáticamente por DI."
             ),
             "depende_de": [],
             "gobierna": ["diccionario"],
@@ -1588,34 +2175,58 @@ def axiomas() -> List[Dict[str, Any]]:
 # FIN 9.15
 # ===============================================================
 
-
 # ===============================================================
-# 9.16 — INVENTARIO
+# 10 — INVENTARIO
 # ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Genera el inventario estructural determinista de DI.
+
+    La petición se conserva por compatibilidad con la interfaz del Engine,
+    pero no modifica el inventario: esta capacidad reporta exclusivamente
+    el estado estructural actualmente descubierto por DI.
+    """
     b = barrer()
-    detalle = []
-    for n in listar():
-        m = meta(n) or {}
-        datos = _REGISTRO.get(n)
+
+    detalle: List[Dict[str, Any]] = []
+
+    for nombre in sorted(_REGISTRO):
+        metadata = _META.get(nombre)
+
+        if not isinstance(metadata, dict):
+            raise ContratoInvalido(
+                "{0}: metadata ausente o inválida para '{1}'".format(
+                    NOMBRE_MODULO,
+                    nombre,
+                )
+            )
+
+        datos = _REGISTRO[nombre]
+
         if isinstance(datos, dict):
+            tipo_estructural = "definiciones"
             size = len(datos)
-            tipo = m.get("tipo") or "definiciones"
         elif isinstance(datos, (set, frozenset, list, tuple)):
+            tipo_estructural = "terminos"
             size = len(datos)
-            tipo = m.get("tipo") or "terminos"
         else:
+            tipo_estructural = "invalido"
             size = None
-            tipo = m.get("tipo")
-        detalle.append({
-            "nombre": n,
-            "idioma": m.get("idioma"),
-            "tipo": tipo,
-            "size": size,
-            "version": m.get("version"),
-            "archivo": m.get("archivo"),
-        })
+
+        tipo = metadata.get("tipo") or tipo_estructural
+
+        detalle.append(
+            {
+                "nombre": nombre,
+                "idioma": metadata.get("idioma"),
+                "tipo": tipo,
+                "size": size,
+                "version": metadata.get("version"),
+                "archivo": metadata.get("archivo"),
+            }
+        )
+
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -1624,29 +2235,33 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "total": b.get("total"),
+        "total": b["total"],
         "diccionarios": detalle,
-        "por_idioma": b.get("por_idioma"),
-        "coherente": b.get("coherente"),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
-        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
-        "invariantes": CONTENEDOR.get("invariantes"),
+        "por_idioma": b["por_idioma"],
+        "coherente": b["coherente"],
+        "capacidades": sorted(CONTENEDOR["capacidades"].keys()),
+        "requiere": list(CONTENEDOR["requiere"]),
+        "autoridad": list(CONTENEDOR["autoridad"]),
+        "conocimiento_exportable": list(
+            CONTENEDOR["conocimiento_exportable"]
+        ),
+        "consultas_soportadas": list(
+            CONTENEDOR["consultas_soportadas"]
+        ),
+        "invariantes": list(CONTENEDOR["invariantes"]),
     }
 
 # ===============================================================
-# FIN 9.16
+# FIN 10
 # ===============================================================
 
-
 # ===============================================================
-# 9.17 — REPORTE
+# 11 — REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
     b = barrer()
+
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1656,27 +2271,22 @@ def reporte() -> Dict[str, Any]:
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
         "estado": (
-            ESTADO_OPERATIVO if b.get("coherente") else ESTADO_DEGRADADO
+            ESTADO_OPERATIVO
+            if b.get("coherente") is True
+            else ESTADO_DEGRADADO
         ),
-        "coherente": b.get("coherente"),
-        "diccionarios": b.get("total"),
+        "coherente": b.get("coherente") is True,
+        "diccionarios": b.get("total", 0),
         "errores": len(b.get("errores") or []),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades": sorted(CONTENEDOR["capacidades"].keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
-        "operaciones_arquitectonicas": {
-            "ejecutar_total": True,
-            "inspeccionar": True,
-            "registrar_inventario": True,
-        },
     }
 
 # ===============================================================
-# FIN 9.17
+# FIN 11
 # ===============================================================
-
-
 # ===============================================================
-# 9.18 — DIAGNÓSTICO
+# 12 — DIAGNÓSTICO
 # ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
@@ -1716,12 +2326,141 @@ def diagnostico() -> Dict[str, Any]:
     }
 
 # ===============================================================
-# FIN 9.18
+# FIN 
 # ===============================================================
 
 
 # ===============================================================
-# 9.19 — EJECUTAR TOTAL
+# 13 — EJECUTAR TOTAL
+# ===============================================================
+
+# ===============================================================
+# 13.1 — PREPARACIÓN DETERMINISTA DE ARGUMENTOS
+# ===============================================================
+
+def _preparar_argumentos_capacidad(
+    nombre: str,
+    funcion: Callable[..., Any],
+    peticion: Dict[str, Any],
+) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
+    """
+    Determina de forma estricta los argumentos que recibirá una capacidad.
+
+    Reglas contractuales:
+
+    1. La capacidad debe ser callable real.
+    2. Un parámetro llamado 'peticion' recibe la petición completa.
+    3. Un parámetro obligatorio recibe exclusivamente el valor de una
+       clave con el mismo nombre presente en la petición.
+    4. 'nombres' puede resolverse desde 'nombres' o 'diccionarios'.
+    5. Los parámetros con valor por defecto no requieren resolución.
+    6. Los parámetros *args y **kwargs no se inventan.
+    7. Si falta un argumento obligatorio, la capacidad no se ejecuta.
+    8. No se utiliza globals() para resolver referencias.
+    9. No se transforma silenciosamente una referencia inválida.
+    """
+    if not callable(funcion):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidad '{nombre}' no es callable"
+        )
+
+    try:
+        firma = inspect.signature(funcion)
+    except (TypeError, ValueError) as exc:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: no se puede inspeccionar la firma "
+            f"de la capacidad '{nombre}': {exc}"
+        ) from exc
+
+    args: List[Any] = []
+    kwargs: Dict[str, Any] = {}
+
+    for parametro in firma.parameters.values():
+
+        if parametro.kind is inspect.Parameter.VAR_POSITIONAL:
+            continue
+
+        if parametro.kind is inspect.Parameter.VAR_KEYWORD:
+            continue
+
+        if parametro.name == "peticion":
+            valor = peticion
+
+        elif parametro.name == "nombres":
+            if "nombres" in peticion:
+                valor = peticion["nombres"]
+            elif "diccionarios" in peticion:
+                valor = peticion["diccionarios"]
+            elif parametro.default is not inspect.Parameter.empty:
+                continue
+            else:
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' requiere "
+                    "el parámetro 'nombres' y la petición no lo proporciona"
+                )
+
+        elif parametro.name in peticion:
+            valor = peticion[parametro.name]
+
+        elif parametro.default is not inspect.Parameter.empty:
+            continue
+
+        else:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' requiere "
+                f"el parámetro '{parametro.name}' y no existe en la petición"
+            )
+
+        if parametro.kind is inspect.Parameter.POSITIONAL_ONLY:
+            args.append(valor)
+        else:
+            kwargs[parametro.name] = valor
+
+    return tuple(args), kwargs
+
+# ===============================================================
+# FIN 13.1
+# ===============================================================
+
+
+# ===============================================================
+# 13.2 — EJECUCIÓN DE UNA CAPACIDAD
+# ===============================================================
+
+def _ejecutar_capacidad(
+    nombre: str,
+    funcion: Callable[..., Any],
+    peticion: Dict[str, Any],
+) -> Any:
+    """
+    Ejecuta una única capacidad ya resuelta.
+
+    No acepta referencias string.
+    No busca funciones en globals().
+    No modifica la capacidad.
+    No convierte errores en resultados válidos.
+    """
+    if not callable(funcion):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+            "no está resuelta a callable"
+        )
+
+    args, kwargs = _preparar_argumentos_capacidad(
+        nombre,
+        funcion,
+        peticion,
+    )
+
+    return funcion(*args, **kwargs)
+
+# ===============================================================
+# FIN 13.2
+# ===============================================================
+
+
+# ===============================================================
+# 13.3 — EJECUTAR TOTAL
 # ===============================================================
 
 def ejecutar_total(
@@ -1729,16 +2468,58 @@ def ejecutar_total(
 ) -> Dict[str, Any]:
     """
     Autoridad total de ENGINE sobre DI.
-    Fuente única: CONTENEDOR["capacidades"].
-    No inventa. No autoinvoca. Todo callable real.
-    """
-    peticion_normalizada = (
-        dict(peticion) if isinstance(peticion, dict) else {}
-    )
-    resultados: Dict[str, Any] = {}
-    errores_ejecucion: List[str] = []
 
-    capacidades = CONTENEDOR.get("capacidades", {})
+    Fuente única:
+        CONTENEDOR["capacidades"]
+
+    Reglas:
+
+    - Solo ejecuta capacidades declaradas.
+    - Solo ejecuta callables ya resueltos.
+    - No resuelve strings.
+    - No utiliza globals() como mecanismo de resolución.
+    - No autoinvoca ejecutar_total.
+    - Ejecuta en orden determinista.
+    - No confunde resultado None con fallo.
+    - Registra separadamente capacidades ejecutadas y errores.
+    - No inventa argumentos.
+    """
+
+    # ============================================================
+    # 13.3.1 — NORMALIZACIÓN ESTRICTA DE PETICIÓN
+    # ============================================================
+
+    if peticion is None:
+        peticion_normalizada: Dict[str, Any] = {}
+    elif isinstance(peticion, dict):
+        peticion_normalizada = dict(peticion)
+    else:
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_DEGRADADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": [
+                (
+                    f"{NOMBRE_MODULO}: petición inválida; "
+                    f"se esperaba dict y se recibió "
+                    f"{type(peticion).__name__}"
+                )
+            ],
+            "resultados": {},
+            "capacidades_declaradas": [],
+        }
+
+    # ============================================================
+    # 13.3.2 — OBTENCIÓN CONTRACTUAL DE CAPACIDADES
+    # ============================================================
+
+    capacidades = CONTENEDOR.get("capacidades")
+
     if not isinstance(capacidades, dict):
         return {
             "id": ID_MODULO,
@@ -1750,71 +2531,123 @@ def ejecutar_total(
             "coherente": False,
             "capacidades_ejecutadas": [],
             "errores_ejecucion": [
-                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] no es dict"
+                (
+                    f"{NOMBRE_MODULO}: "
+                    "CONTENEDOR['capacidades'] no es dict"
+                )
             ],
             "resultados": {},
             "capacidades_declaradas": [],
         }
 
-    for nombre in sorted(capacidades):
+    # ============================================================
+    # 13.3.3 — VERIFICACIÓN PREVIA DE CALLABLES
+    # ============================================================
+
+    capacidades_declaradas = sorted(capacidades.keys())
+    errores_contractuales: List[str] = []
+
+    for nombre in capacidades_declaradas:
+        referencia = capacidades[nombre]
+
+        if not isinstance(nombre, str) or not nombre.strip():
+            errores_contractuales.append(
+                f"{NOMBRE_MODULO}: identificador de capacidad inválido"
+            )
+            continue
+
+        if not callable(referencia):
+            errores_contractuales.append(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                "no está resuelta a callable"
+            )
+
+    if errores_contractuales:
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_RECHAZADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": errores_contractuales,
+            "resultados": {},
+            "capacidades_declaradas": capacidades_declaradas,
+        }
+
+    # ============================================================
+    # 13.3.4 — EJECUCIÓN DETERMINISTA
+    # ============================================================
+
+    resultados: Dict[str, Any] = {}
+    capacidades_ejecutadas: List[str] = []
+    errores_ejecucion: List[str] = []
+
+    for nombre in capacidades_declaradas:
+
+        # --------------------------------------------------------
+        # ejecutar_total NO SE AUTOINVOCA
+        # --------------------------------------------------------
+
         if nombre == "ejecutar_total":
             continue
-        referencia = capacidades[nombre]
+
+        funcion = capacidades[nombre]
+
         try:
-            if callable(referencia):
-                firma = inspect.signature(referencia)
-                params = list(firma.parameters.values())
-                obligatorios = [
-                    p for p in params
-                    if p.kind in (
-                        inspect.Parameter.POSITIONAL_ONLY,
-                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                    )
-                    and p.default is inspect.Parameter.empty
-                ]
-                if not obligatorios:
-                    resultados[nombre] = referencia()
-                elif len(obligatorios) == 1:
-                    resultados[nombre] = referencia(peticion_normalizada)
-                else:
-                    resultados[nombre] = referencia()
-            elif isinstance(referencia, str):
-                fn = globals().get(referencia)
-                if not callable(fn):
-                    raise ContratoInvalido(
-                        f"'{referencia}' no es callable"
-                    )
-                firma = inspect.signature(fn)
-                params = list(firma.parameters.values())
-                obligatorios = [
-                    p for p in params
-                    if p.kind in (
-                        inspect.Parameter.POSITIONAL_ONLY,
-                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                    )
-                    and p.default is inspect.Parameter.empty
-                ]
-                if not obligatorios:
-                    resultados[nombre] = fn()
-                elif len(obligatorios) == 1:
-                    resultados[nombre] = fn(peticion_normalizada)
-                else:
-                    resultados[nombre] = fn()
-            else:
-                raise ContratoInvalido(
-                    f"tipo inválido: {type(referencia).__name__}"
-                )
+            resultado = _ejecutar_capacidad(
+                nombre,
+                funcion,
+                peticion_normalizada,
+            )
+
+            # None puede ser una salida legítima.
+            resultados[nombre] = resultado
+            capacidades_ejecutadas.append(nombre)
+
         except Exception as exc:
-            errores_ejecucion.append(f"{nombre}: {exc}")
+            errores_ejecucion.append(
+                f"{nombre}: {type(exc).__name__}: {exc}"
+            )
+
+            # Se conserva explícitamente la existencia del intento.
             resultados[nombre] = None
 
+    # ============================================================
+    # 13.3.5 — DETERMINACIÓN DE COHERENCIA
+    # ============================================================
+
     barrido = resultados.get("barrer")
-    coherente = (
-        isinstance(barrido, dict) and bool(barrido.get("coherente"))
+
+    barrer_ejecutado = "barrer" in capacidades_ejecutadas
+
+    coherencia_datos = (
+        isinstance(barrido, dict)
+        and isinstance(barrido.get("coherente"), bool)
+        and bool(barrido.get("coherente"))
     )
-    ejecutadas = sorted(
-        n for n, r in resultados.items() if r is not None
-    )
+
+    if not barrer_ejecutado:
+        coherente = False
+    else:
+        coherente = coherencia_datos and not errores_ejecucion
+
+    # ============================================================
+    # 13.3.6 — ESTADO FINAL
+    # ============================================================
+
+    if coherente:
+        estado = ESTADO_OPERATIVO
+    elif errores_ejecucion or not barrer_ejecutado:
+        estado = ESTADO_DEGRADADO
+    else:
+        estado = ESTADO_DEGRADADO
+
+    # ============================================================
+    # 13.3.7 — SALIDA CONTRACTUAL
+    # ============================================================
 
     return {
         "id": ID_MODULO,
@@ -1822,25 +2655,25 @@ def ejecutar_total(
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
         "operacion": "ejecutar_total",
-        "estado": (
-            ESTADO_OPERATIVO
-            if coherente and not errores_ejecucion
-            else ESTADO_DEGRADADO
-        ),
-        "coherente": coherente and not errores_ejecucion,
-        "capacidades_ejecutadas": ejecutadas,
+        "estado": estado,
+        "coherente": coherente,
+        "capacidades_ejecutadas": sorted(capacidades_ejecutadas),
         "errores_ejecucion": errores_ejecucion,
         "resultados": resultados,
-        "capacidades_declaradas": sorted(capacidades.keys()),
+        "capacidades_declaradas": capacidades_declaradas,
     }
 
 # ===============================================================
-# FIN 9.19
+# FIN 13.3
 # ===============================================================
 
 
 # ===============================================================
-# 9.20 — INSPECCIONAR
+# FIN 13 — EJECUTAR TOTAL
+# ===============================================================
+
+# ===============================================================
+# 14 — INSPECCIONAR
 # ===============================================================
 
 def inspeccionar(
@@ -1848,9 +2681,15 @@ def inspeccionar(
 ) -> Dict[str, Any]:
     """
     Inspección estructural de DI.
-    Expone contrato y estado sin calcular ni alterar.
+    Expone contrato, capacidades y estado estructural.
+    Obtiene la evidencia de estado mediante barrer().
+    No modifica el contrato ni las fuentes del módulo.
     """
     b = barrer()
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    capacidades_meta = CONTENEDOR.get("capacidades_meta", {})
+
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1866,132 +2705,264 @@ def inspeccionar(
             "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
             "ESTABILIDAD": ESTABILIDAD,
         },
-        "capacidades_contractuales": sorted(
-            CONTENEDOR.get("capacidades", {}).keys()
+        "capacidades_contractuales": (
+            sorted(capacidades.keys())
+            if isinstance(capacidades, dict)
+            else []
         ),
-        "capacidades_meta": sorted(
-            CONTENEDOR.get("capacidades_meta", {}).keys()
+        "capacidades_meta": (
+            sorted(capacidades_meta.keys())
+            if isinstance(capacidades_meta, dict)
+            else []
         ),
         "integridad": {
             "coherente": b.get("coherente"),
-            "errores": b.get("errores"),
-            "diccionarios": b.get("diccionarios"),
+            "errores": list(b.get("errores") or []),
+            "diccionarios": list(b.get("diccionarios") or []),
             "total": b.get("total"),
-            "por_idioma": b.get("por_idioma"),
+            "por_idioma": dict(b.get("por_idioma") or {}),
         },
-        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
-        "reporting": CONTENEDOR.get("reporting"),
+        "autoriza_engine": dict(
+            CONTENEDOR.get("autoriza_engine") or {}
+        ),
+        "reporting": dict(
+            CONTENEDOR.get("reporting") or {}
+        ),
         "invariantes": list(INVARIANTES),
         "nota": (
-            "inspeccionar expone estructura de DI sin calcular "
-            "ni alterar el contrato."
+            "Inspección estructural de DI. "
+            "La evidencia de estado procede de barrer(). "
+            "No modifica el contrato ni las fuentes."
         ),
     }
 
 # ===============================================================
-# FIN 9.20
+# FIN 14
 # ===============================================================
 
 
 # ===============================================================
-# 9.21 — REGISTRAR INVENTARIO
+# 15 — REGISTRAR INVENTARIO
 # ===============================================================
 
 def registrar_inventario(
     peticion: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
-    Instantánea determinista del inventario de DI.
-    No altera evidencia.
+    Genera una instantánea determinista del inventario actual de DI.
+    No persiste ni registra externamente la instantánea.
+    No modifica fuentes, contrato ni evidencia.
     """
     inv = inventario(peticion)
+
     return {
         "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
         "operacion": "registrar_inventario",
-        "registrado": True,
+        "registrado": False,
         "inventario": inv,
         "nota": (
-            "Instantánea determinista del inventario de DI. "
-            "No modifica fuentes ni evidencia."
+            "Instantánea determinista del inventario actual de DI. "
+            "La capacidad no persiste la instantánea ni modifica "
+            "fuentes, contrato o evidencia."
         ),
     }
 
 # ===============================================================
-# FIN 9.21
+# FIN 15
 # ===============================================================
 
-# ===============================================================
-# FIN 9 — CAPACIDADES PÚBLICAS
-# ===============================================================
 
 # ===============================================================
-# 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# FIN — CAPACIDADES PÚBLICAS
 # ===============================================================
-
 # ===============================================================
-# 10.1 — VALIDACIÓN DE CONTRATO
+# 16 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# ===============================================================
+# ===============================================================
+# 16.1 — VALIDACIÓN DE CONTRATO
 # ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
+    if not isinstance(cont, dict):
+        raise ContratoInvalido(
+            "{0}: CONTENEDOR debe ser dict".format(NOMBRE_MODULO)
+        )
+
     obligatorias = (
-        "esquema", "version_contrato", "version_modulo",
-        "id", "nombre", "rol", "descripcion",
-        "funcion", "no_hace", "autoridad",
-        "conocimiento_exportable", "requiere",
-        "autoriza_engine", "consultas_soportadas",
-        "capacidades", "capacidades_meta",
-        "reporting", "estados_validos", "invariantes",
-        "estabilidad", "compatible_desde", "api_engine",
+        "esquema",
+        "version_contrato",
+        "version_modulo",
+        "id",
+        "nombre",
+        "rol",
+        "descripcion",
+        "funcion",
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "requiere",
+        "autoriza_engine",
+        "consultas_soportadas",
+        "capacidades",
+        "capacidades_meta",
+        "reporting",
+        "estados_validos",
+        "invariantes",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
     )
+
     faltantes = [k for k in obligatorias if k not in cont]
+
     if faltantes:
         raise ContratoInvalido(
             "{0}: CONTENEDOR incompleto. Faltan: {1}".format(
-                NOMBRE_MODULO, faltantes
+                NOMBRE_MODULO,
+                faltantes,
             )
         )
+
     if cont.get("esquema") != ESQUEMA_CONTRATO:
         raise ContratoInvalido(
             "{0}: esquema incompatible: {1}".format(
-                NOMBRE_MODULO, cont.get("esquema")
+                NOMBRE_MODULO,
+                cont.get("esquema"),
             )
         )
+
     if str(cont.get("version_contrato")) != VERSION_CONTRATO:
         raise ContratoInvalido(
             "{0}: version_contrato inválida: {1}".format(
-                NOMBRE_MODULO, cont.get("version_contrato")
+                NOMBRE_MODULO,
+                cont.get("version_contrato"),
             )
         )
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
+
+    capacidades = cont.get("capacidades")
+    capacidades_meta = cont.get("capacidades_meta")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            "{0}: CONTENEDOR['capacidades'] debe ser dict".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    if not isinstance(capacidades_meta, dict):
+        raise ContratoInvalido(
+            "{0}: CONTENEDOR['capacidades_meta'] debe ser dict".format(
+                NOMBRE_MODULO
+            )
+        )
+
+    nombres_capacidades = set(capacidades.keys())
+    nombres_meta = set(capacidades_meta.keys())
+
+    sin_meta = sorted(nombres_capacidades - nombres_meta)
+    meta_sin_capacidad = sorted(nombres_meta - nombres_capacidades)
+
+    if sin_meta:
+        raise ContratoInvalido(
+            "{0}: capacidades sin capacidades_meta: {1}".format(
+                NOMBRE_MODULO,
+                sin_meta,
+            )
+        )
+
+    if meta_sin_capacidad:
+        raise ContratoInvalido(
+            "{0}: capacidades_meta sin capacidad declarada: {1}".format(
+                NOMBRE_MODULO,
+                meta_sin_capacidad,
+            )
+        )
+
+    capacidades_arquitectonicas = (
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
+    )
+
+    for nombre_cap in capacidades_arquitectonicas:
+        if nombre_cap not in capacidades:
             raise ContratoInvalido(
-                "{0}: capacidad '{1}' sin capacidades_meta".format(
-                    NOMBRE_MODULO, nombre_cap
+                "{0}: capacidad arquitectónica obligatoria ausente: '{1}'".format(
+                    NOMBRE_MODULO,
+                    nombre_cap,
                 )
             )
-        entrada = meta_caps[nombre_cap]
-        if not isinstance(entrada, dict):
+
+        if nombre_cap not in capacidades_meta:
             raise ContratoInvalido(
-                "{0}: capacidades_meta['{1}'] debe ser dict".format(
-                    NOMBRE_MODULO, nombre_cap
+                "{0}: capacidad arquitectónica '{1}' sin capacidades_meta".format(
+                    NOMBRE_MODULO,
+                    nombre_cap,
                 )
             )
-        for campo in ("descripcion", "entrada", "salida"):
-            if campo not in entrada or not isinstance(entrada[campo], str):
+
+    for nombre_cap in sorted(nombres_capacidades):
+        ref = capacidades[nombre_cap]
+
+        if not isinstance(ref, (str, type(lambda: None))):
+            if not callable(ref):
                 raise ContratoInvalido(
-                    "{0}: capacidades_meta['{1}'] requiere '{2}: str'".format(
-                        NOMBRE_MODULO, nombre_cap, campo
+                    "{0}: capacidad '{1}' tiene referencia inválida: {2}".format(
+                        NOMBRE_MODULO,
+                        nombre_cap,
+                        type(ref).__name__,
                     )
                 )
 
+        entrada = capacidades_meta[nombre_cap]
+
+        if not isinstance(entrada, dict):
+            raise ContratoInvalido(
+                "{0}: capacidades_meta['{1}'] debe ser dict".format(
+                    NOMBRE_MODULO,
+                    nombre_cap,
+                )
+            )
+
+        for campo in ("descripcion", "entrada", "salida"):
+            if campo not in entrada:
+                raise ContratoInvalido(
+                    "{0}: capacidades_meta['{1}'] requiere '{2}'".format(
+                        NOMBRE_MODULO,
+                        nombre_cap,
+                        campo,
+                    )
+                )
+
+            if not isinstance(entrada[campo], str):
+                raise ContratoInvalido(
+                    "{0}: capacidades_meta['{1}']['{2}'] debe ser str".format(
+                        NOMBRE_MODULO,
+                        nombre_cap,
+                        campo,
+                    )
+                )
+
+            if not entrada[campo].strip():
+                raise ContratoInvalido(
+                    "{0}: capacidades_meta['{1}']['{2}'] no puede estar vacío".format(
+                        NOMBRE_MODULO,
+                        nombre_cap,
+                        campo,
+                    )
+                )
+
+
 # ===============================================================
-# FIN 10.1
+# FIN 16.1
 # ===============================================================
 
 
 # ===============================================================
-# 10.2 — MAPA DE CAPACIDADES
+# 17 — MAPA DE CAPACIDADES
 # ===============================================================
 
 _CAP_MAP = {
@@ -2018,71 +2989,141 @@ _CAP_MAP = {
     "palabras": palabras,
     "inyectar_en_peticion": inyectar_en_peticion,
 
-    # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+    # --- CAPACIDADES ARQUITECTÓNICAS ---
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
 }
 
 # ===============================================================
-# FIN 10.2
+# FIN 17
 # ===============================================================
 
 
 # ===============================================================
-# 10.3 — RESOLUCIÓN DE CAPACIDADES
+# 18 — RESOLUCIÓN DE CAPACIDADES
 # ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     """
-    Resuelve referencias str → callables reales.
-    MUTA CONTENEDOR["capacidades"] para que Engine reciba callables.
+    Resuelve las referencias declaradas en CONTENEDOR["capacidades"]
+    y garantiza que todas terminen como callables reales.
+
+    Fuente de resolución:
+        CONTENEDOR["capacidades"] → _CAP_MAP → callable
+
+    No inventa capacidades.
+    No agrega capacidades.
+    No elimina capacidades.
     """
+
+    capacidades = cont.get("capacidades")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            "{0}: CONTENEDOR['capacidades'] debe ser dict".format(
+                NOMBRE_MODULO
+            )
+        )
+
     resueltas: Dict[str, Any] = {}
-    for nombre, ref in cont["capacidades"].items():
+
+    for nombre, ref in capacidades.items():
+
         if callable(ref):
             resueltas[nombre] = ref
             continue
+
         if isinstance(ref, str):
             if ref not in _CAP_MAP:
                 raise ContratoInvalido(
                     "{0}: capacidad '{1}' referencia inexistente: '{2}'".format(
-                        NOMBRE_MODULO, nombre, ref
+                        NOMBRE_MODULO,
+                        nombre,
+                        ref,
                     )
                 )
+
             fn = _CAP_MAP[ref]
+
             if not callable(fn):
                 raise ContratoInvalido(
-                    "{0}: '{1}' no es callable".format(NOMBRE_MODULO, ref)
+                    "{0}: referencia '{1}' de capacidad '{2}' no es callable".format(
+                        NOMBRE_MODULO,
+                        ref,
+                        nombre,
+                    )
                 )
+
             resueltas[nombre] = fn
             continue
+
         raise ContratoInvalido(
             "{0}: capacidad '{1}' tipo inválido: {2}".format(
-                NOMBRE_MODULO, nombre, type(ref).__name__
+                NOMBRE_MODULO,
+                nombre,
+                type(ref).__name__,
             )
         )
+
+    esperadas = set(capacidades.keys())
+    obtenidas = set(resueltas.keys())
+
+    faltantes = sorted(esperadas - obtenidas)
+    inesperadas = sorted(obtenidas - esperadas)
+
+    if faltantes:
+        raise ContratoInvalido(
+            "{0}: capacidades no resueltas: {1}".format(
+                NOMBRE_MODULO,
+                faltantes,
+            )
+        )
+
+    if inesperadas:
+        raise ContratoInvalido(
+            "{0}: capacidades no declaradas resueltas: {1}".format(
+                NOMBRE_MODULO,
+                inesperadas,
+            )
+        )
+
+    no_callable = sorted(
+        nombre
+        for nombre, fn in resueltas.items()
+        if not callable(fn)
+    )
+
+    if no_callable:
+        raise ContratoInvalido(
+            "{0}: capacidades finales no callables: {1}".format(
+                NOMBRE_MODULO,
+                no_callable,
+            )
+        )
+
     cont["capacidades"] = resueltas
 
+
 # ===============================================================
-# FIN 10.3
+# FIN 18
 # ===============================================================
 
 
 # ===============================================================
-# 10.4 — VALIDAR Y RESOLVER AL IMPORTAR
+# 19 — VALIDAR Y RESOLVER AL IMPORTAR
 # ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
 
 # ===============================================================
-# FIN 10.4
+# FIN 19
 # ===============================================================
 
 
 # ===============================================================
-# 10.5 — EXPORTACIONES
+# 20 — EXPORTACIONES
 # ===============================================================
 
 __all__ = [
@@ -2119,11 +3160,12 @@ __all__ = [
 ]
 
 # ===============================================================
-# FIN 10.5
+# FIN 20
 # ===============================================================
 
+
 # ===============================================================
-# FIN 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# FIN 20 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
 
 

@@ -78,10 +78,11 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import sys
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, 
-# --- Importación exacta desde la ubicación real del módulo ---
+from typing import Any, Callable, Dict, List, Optional, Set
+
 from modules.diagnosticoD import (
     DiagnosticoGlobal,
     DiagnosticoError,

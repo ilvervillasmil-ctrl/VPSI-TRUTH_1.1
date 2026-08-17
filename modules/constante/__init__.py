@@ -303,22 +303,10 @@ CONTENEDOR: Dict[str, Any] = {
     # ===========================================================
 
     "requiere": [
-        "CT",
-        "AX",
-        "FO",
-        "MC",
-        "SF",
-        "CA",
-        "CX",
-        "DI",
-        "RE",
-        "VX",
-        "TX",
-        "CH",
-        "CIT",
-        "TT",
-        "CE",
-        "CC",
+    "CE", "AX", "FO", "MC", "SF",
+    "CA", "CX", "DI", "RE", "VX",
+    "TX", "CH", "CIT", "DGCO", "UI",
+    "CC", "TT", "SC",
     ],
 
 

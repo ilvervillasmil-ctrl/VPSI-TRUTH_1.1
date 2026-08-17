@@ -2279,95 +2279,121 @@ def registrar_inventario(
 
 
 # ===============================================================
-# 10.1 — RESOLUCIÓN DE REFERENCIA CONTRACTUAL
+# 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
-def _resolver_referencia_capacidad(
-    nombre: str,
-    referencia: Any,
-) -> Callable[..., Any]:
+def _mapa_capacidades() -> Dict[str, Callable[..., Any]]:
     """
-    Resuelve una referencia contractual hasta una función callable real.
-
-    La referencia puede ser:
-        - un callable real;
-        - el nombre de una función exportada por este módulo.
+    Construye en tiempo de ejecución el mapa de capacidades públicas
+    realmente definidas en este módulo.
 
     No modifica CONTENEDOR.
-    No crea funciones.
-    No sustituye referencias inexistentes.
+    No crea capacidades.
+    No acepta referencias inexistentes.
     """
+    mapa: Dict[str, Callable[..., Any]] = {
+        "barrer": barrer,
+        "verificar": verificar,
+        "evaluar": evaluar,
+        "axiomas": axiomas,
+        "inventario": inventario,
+        "verificar_salida": verificar_salida,
+        "listar_mecanicas": listar_mecanicas,
+        "reporte": reporte,
+        "diagnostico": diagnostico,
+        "ejecutar_total": ejecutar_total,
+        "inspeccionar": inspeccionar,
+        "registrar_inventario": registrar_inventario,
+    }
 
-    if callable(referencia):
-        return referencia
+    for nombre, funcion in mapa.items():
+        if not callable(funcion):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad pública '{nombre}' "
+                "no es callable"
+            )
 
-    if isinstance(referencia, str):
-
-        funcion = globals().get(referencia)
-
-        if callable(funcion):
-            return funcion
-
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-            f"referencia inexistente o no callable: '{referencia}'"
-        )
-
-    raise ContratoInvalido(
-        f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-        f"tiene referencia inválida: "
-        f"{type(referencia).__name__}"
-    )
+    return mapa
 
 
 # ===============================================================
-# 10.2 — RESOLUCIÓN COMPLETA DE CAPACIDADES
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DETERMINISTA DE CAPACIDADES
 # ===============================================================
 
 def _resolver_capacidades(
     cont: Dict[str, Any],
 ) -> Dict[str, Callable[..., Any]]:
     """
-    Resuelve todas las capacidades declaradas en el contrato.
+    Resuelve las referencias declaradas en CONTENEDOR contra las
+    funciones reales del módulo.
 
-    La declaración contractual permanece intacta.
+    La resolución es determinista y no modifica CONTENEDOR.
 
-    La salida es un mapa independiente:
-        nombre -> callable real
-
-    No inventa capacidades.
-    No elimina capacidades.
-    No modifica CONTENEDOR.
+    Cada capacidad declarada debe resolverse exactamente a un callable.
     """
-
-    if not isinstance(cont, dict):
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: CONTENEDOR debe ser dict"
-        )
-
     capacidades = cont.get("capacidades")
 
     if not isinstance(capacidades, dict):
         raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] "
-            "debe ser dict"
+            f"{NOMBRE_MODULO}: capacidades debe ser dict"
         )
 
+    mapa = _mapa_capacidades()
     resueltas: Dict[str, Callable[..., Any]] = {}
 
     for nombre in sorted(capacidades):
+        referencia = capacidades[nombre]
 
         if not isinstance(nombre, str) or not nombre.strip():
             raise ContratoInvalido(
                 f"{NOMBRE_MODULO}: identificador de capacidad inválido"
             )
 
-        resueltas[nombre] = _resolver_referencia_capacidad(
-            nombre=nombre,
-            referencia=capacidades[nombre],
+        if callable(referencia):
+            if referencia not in mapa.values():
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                    "apunta a callable no perteneciente al mapa "
+                    "público del módulo"
+                )
+
+            resueltas[nombre] = referencia
+            continue
+
+        if isinstance(referencia, str):
+            if referencia not in mapa:
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                    f"referencia inexistente: '{referencia}'"
+                )
+
+            funcion = mapa[referencia]
+
+            if not callable(funcion):
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                    f"resuelve '{referencia}', pero no es callable"
+                )
+
+            resueltas[nombre] = funcion
+            continue
+
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+            f"tiene tipo inválido: {type(referencia).__name__}"
         )
 
     return resueltas
+
+
+# ===============================================================
+# FIN 10.2
+# ===============================================================
 
 
 # ===============================================================
@@ -2376,118 +2402,38 @@ def _resolver_capacidades(
 
 _validar_contrato_completo(CONTENEDOR)
 
-_CAP_RESUELTAS = _resolver_capacidades(
-    CONTENEDOR
-)
+_CAPACIDADES_RESUELTAS = _resolver_capacidades(CONTENEDOR)
 
 
 # ===============================================================
-# 10.4 — VALIDACIÓN DE COBERTURA CONTRACTUAL
+# FIN 10.3
 # ===============================================================
-
-def _validar_cobertura_capacidades() -> None:
-    """
-    Garantiza correspondencia exacta entre las capacidades declaradas
-    y las capacidades realmente resueltas.
-
-    No permite:
-        - capacidades declaradas sin resolución;
-        - capacidades resueltas no declaradas.
-    """
-
-    declaradas = set(
-        CONTENEDOR.get("capacidades", {}).keys()
-    )
-
-    resueltas = set(
-        _CAP_RESUELTAS.keys()
-    )
-
-    faltantes = sorted(
-        declaradas - resueltas
-    )
-
-    sobrantes = sorted(
-        resueltas - declaradas
-    )
-
-    if faltantes:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidades declaradas "
-            f"sin resolución callable: {faltantes}"
-        )
-
-    if sobrantes:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidades resueltas "
-            f"sin declaración contractual: {sobrantes}"
-        )
 
 
 # ===============================================================
-# 10.5 — EJECUCIÓN CONTRACTUAL REAL DE CAPACIDAD
+# 10.4 — VERIFICACIÓN DE RESOLUCIÓN
 # ===============================================================
 
-def _ejecutar_capacidad_resuelta(
-    nombre: str,
-    funcion: Callable[..., Any],
-    peticion: Any = None,
-) -> Any:
-    """
-    Ejecuta una capacidad ya resuelta.
-
-    La firma de la función determina de manera determinista
-    si requiere la petición contractual.
-
-    No inventa argumentos.
-    No descarta parámetros obligatorios.
-    """
-
-    if not callable(funcion):
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-            "no es callable"
-        )
-
-    firma = inspect.signature(funcion)
-
-    parametros = list(
-        firma.parameters.values()
-    )
-
-    obligatorios = [
-        parametro
-        for parametro in parametros
-        if parametro.default is inspect.Parameter.empty
-        and parametro.kind
-        in (
-            inspect.Parameter.POSITIONAL_ONLY,
-            inspect.Parameter.POSITIONAL_OR_KEYWORD,
-        )
-    ]
-
-    if not obligatorios:
-        return funcion()
-
-    if len(parametros) == 1 and len(obligatorios) == 1:
-        return funcion(peticion)
-
+if set(_CAPACIDADES_RESUELTAS) != set(CONTENEDOR["capacidades"]):
     raise ContratoInvalido(
-        f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-        "posee una firma incompatible con la interfaz "
-        "contractual de ENGINE"
+        f"{NOMBRE_MODULO}: resolución incompleta de capacidades"
     )
 
+for _nombre_capacidad, _funcion_capacidad in _CAPACIDADES_RESUELTAS.items():
+    if not callable(_funcion_capacidad):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidad '{_nombre_capacidad}' "
+            "no quedó resuelta a callable"
+        )
+
 
 # ===============================================================
-# 10.6 — VALIDACIÓN FINAL DE RESOLUCIÓN
+# FIN 10.4
 # ===============================================================
-
-_validar_cobertura_capacidades()
 
 
 # ===============================================================
-# 10.7 — EXPORTACIONES
+# 10.5 — EXPORTACIONES
 # ===============================================================
 
 __all__ = [
@@ -2519,7 +2465,7 @@ __all__ = [
 
 
 # ===============================================================
-# FIN 10.7
+# FIN 10.5
 # ===============================================================
 
 

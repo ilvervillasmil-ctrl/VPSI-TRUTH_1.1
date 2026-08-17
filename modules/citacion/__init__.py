@@ -3481,7 +3481,531 @@ def explicar(
 # FIN SECCIÓN 13
 # ===============================================================
 
+# ===============================================================
+# SECCIÓN 8 — EJECUCIÓN TOTAL CALLABLE
+# ===============================================================
 
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Ejecuta determinísticamente todas las capacidades callable
+    declaradas por CIT.
+
+    Regla fundamental:
+        CONTENEDOR["capacidades"] = autoridad declarativa.
+        Cada nombre debe resolver a un callable real.
+
+    ejecutar_total no se invoca a sí misma.
+    No inventa capacidades.
+    No elimina capacidades declaradas.
+    No modifica CONTENEDOR.
+    No modifica el contrato.
+    """
+
+    pet = peticion if isinstance(peticion, dict) else {}
+
+    capacidades_declaradas = list(
+        CONTENEDOR.get("capacidades", {}).keys()
+    )
+
+    resultados: Dict[str, Any] = {}
+    capacidades_ejecutadas: List[str] = []
+    errores_ejecucion: List[Dict[str, Any]] = []
+
+    # -----------------------------------------------------------
+    # 8.1 — RESOLUCIÓN CONTRACTUAL DE CALLABLES
+    # -----------------------------------------------------------
+
+    for nombre in capacidades_declaradas:
+
+        # ejecutar_total no puede ejecutarse recursivamente.
+        if nombre == "ejecutar_total":
+            continue
+
+        callable_obj = CONTENEDOR["capacidades"].get(nombre)
+
+        if not callable(callable_obj):
+            errores_ejecucion.append({
+                "capacidad": nombre,
+                "error": "capacidad declarada no resoluble a callable",
+            })
+            continue
+
+        # -------------------------------------------------------
+        # 8.1.1 — INVOCACIÓN DETERMINISTA
+        # -------------------------------------------------------
+
+        try:
+            if nombre in (
+                "verificar",
+                "barrer",
+                "inventario",
+                "reporte",
+                "diagnostico",
+                "anunciar",
+                "anunciar_todo",
+                "buscar",
+                "citar",
+                "resolver_enunciado",
+                "explicar",
+                "cadena",
+                "limpiar_ciclo",
+                "evaluar",
+                "inspeccionar",
+                "registrar_inventario",
+            ):
+                resultado = callable_obj(pet)
+
+            elif nombre == "verificar_salida":
+                resultado = callable_obj(pet.get("salida"))
+
+            elif nombre == "registrar":
+                resultado = callable_obj(
+                    pet.get("declaracion")
+                )
+
+            elif nombre == "resolver":
+                resultado = callable_obj(
+                    pet.get("id")
+                )
+
+            elif nombre == "relacionar":
+                resultado = callable_obj(
+                    pet.get("id_a"),
+                    pet.get("relacion"),
+                    pet.get("id_b"),
+                )
+
+            else:
+                errores_ejecucion.append({
+                    "capacidad": nombre,
+                    "error": "firma callable no definida contractualmente",
+                })
+                continue
+
+            resultados[nombre] = resultado
+            capacidades_ejecutadas.append(nombre)
+
+        except Exception as exc:
+            errores_ejecucion.append({
+                "capacidad": nombre,
+                "error": "{0}: {1}".format(
+                    type(exc).__name__,
+                    exc,
+                ),
+            })
+
+    # -----------------------------------------------------------
+    # 8.2 — ESTADO DETERMINISTA
+    # -----------------------------------------------------------
+
+    coherente = (
+        len(errores_ejecucion) == 0
+        and all(
+            nombre != "ejecutar_total"
+            for nombre in capacidades_ejecutadas
+        )
+    )
+
+    estado = "OK" if coherente else "DEGRADADO"
+
+    # -----------------------------------------------------------
+    # 8.3 — SALIDA CONTRACTUAL
+    # -----------------------------------------------------------
+
+    return {
+        "id": _ID,
+        "modulo": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "operacion": "ejecutar_total",
+        "estado": estado,
+        "coherente": coherente,
+        "capacidades_ejecutadas": capacidades_ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": capacidades_declaradas,
+    }
+
+# ===============================================================
+# 3.15.20 — INSPECCIONAR
+# ===============================================================
+#
+# Inspección estructural determinista de CIT.
+#
+# No ejecuta capacidades.
+# No modifica conocimiento.
+# No modifica contrato.
+# No depende de una lista cerrada de módulos.
+#
+# La fuente de verdad es CONTENEDOR.
+#
+# ===============================================================
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Expone el estado estructural y contractual de CIT.
+
+    Verifica la correspondencia entre:
+        capacidades declaradas
+        capacidades_meta
+        callables reales
+
+    No ejecuta las capacidades inspeccionadas.
+    """
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    capacidades_meta = CONTENEDOR.get("capacidades_meta", {})
+
+    errores: List[str] = []
+    advertencias: List[str] = []
+
+    capacidades_contractuales = list(capacidades.keys())
+    capacidades_meta_declaradas = list(capacidades_meta.keys())
+
+    # -----------------------------------------------------------
+    # 3.15.20.1 — RESOLUCIÓN DE CAPACIDADES
+    # -----------------------------------------------------------
+
+    resolubles: List[str] = []
+    no_resolubles: List[str] = []
+
+    for nombre in capacidades_contractuales:
+        callable_obj = capacidades.get(nombre)
+
+        if callable(callable_obj):
+            resolubles.append(nombre)
+        else:
+            no_resolubles.append(nombre)
+            errores.append(
+                "capacidad no resoluble a callable: {0}".format(nombre)
+            )
+
+    # -----------------------------------------------------------
+    # 3.15.20.2 — CORRESPONDENCIA CAPACIDAD / META
+    # -----------------------------------------------------------
+
+    sin_meta = [
+        nombre
+        for nombre in capacidades_contractuales
+        if nombre not in capacidades_meta
+    ]
+
+    metas_sin_capacidad = [
+        nombre
+        for nombre in capacidades_meta_declaradas
+        if nombre not in capacidades
+    ]
+
+    for nombre in sin_meta:
+        errores.append(
+            "capacidad sin capacidades_meta: {0}".format(nombre)
+        )
+
+    for nombre in metas_sin_capacidad:
+        errores.append(
+            "capacidades_meta sin capacidad declarada: {0}".format(nombre)
+        )
+
+    # -----------------------------------------------------------
+    # 3.15.20.3 — INTEGRIDAD ESTRUCTURAL
+    # -----------------------------------------------------------
+
+    integridad = {
+        "capacidades_declaradas": len(capacidades_contractuales),
+        "capacidades_resolubles": len(resolubles),
+        "capacidades_no_resolubles": len(no_resolubles),
+        "capacidades_meta": len(capacidades_meta_declaradas),
+        "sin_meta": sin_meta,
+        "metas_sin_capacidad": metas_sin_capacidad,
+        "orden_capacidades": capacidades_contractuales,
+        "orden_capacidades_meta": capacidades_meta_declaradas,
+        "completa": (
+            not no_resolubles
+            and not sin_meta
+            and not metas_sin_capacidad
+        ),
+    }
+
+    # -----------------------------------------------------------
+    # 3.15.20.4 — ESTADO
+    # -----------------------------------------------------------
+
+    coherente = not errores
+
+    estado = "OPERATIVO" if coherente else "DEGRADADO"
+
+    # -----------------------------------------------------------
+    # 3.15.20.5 — SALIDA CONTRACTUAL
+    # -----------------------------------------------------------
+
+    return {
+        "id": _ID,
+        "modulo": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "operacion": "inspeccionar",
+        "estado": estado,
+        "coherente": coherente,
+        "constantes": {
+            "_ID": _ID,
+            "_NOMBRE": _NOMBRE,
+            "_ROL": _ROL,
+            "_VERSION": _VERSION,
+            "_VERSION_CONTRATO": _VERSION_CONTRATO,
+            "_ESQUEMA": _ESQUEMA,
+            "_ESTABILIDAD": _ESTABILIDAD,
+            "_COMPATIBLE_DESDE": _COMPATIBLE_DESDE,
+            "_API_ENGINE": _API_ENGINE,
+        },
+        "capacidades_contractuales": capacidades_contractuales,
+        "capacidades_meta": capacidades_meta_declaradas,
+        "capacidades_resolubles": resolubles,
+        "capacidades_no_resolubles": no_resolubles,
+        "integridad": integridad,
+        "esquema": CONTENEDOR.get("esquema"),
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": CONTENEDOR.get("invariantes"),
+        "errores": errores,
+        "advertencias": advertencias,
+    }
+# ===============================================================
+# 3.15.21 — REGISTRAR INVENTARIO
+# ===============================================================
+#
+# Registra una instantánea determinista del inventario estructural
+# de CIT.
+#
+# REGLAS:
+#
+#   1. La fuente de verdad es CONTENEDOR.
+#   2. No modifica el contrato.
+#   3. No modifica el conocimiento declarado.
+#   4. No ejecuta capacidades ajenas.
+#   5. No depende de módulos concretos.
+#   6. El inventario registrado corresponde exactamente al estado
+#      contractual observado en el momento de la operación.
+#
+# ===============================================================
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Registra una instantánea determinista del inventario contractual
+    y estructural de CIT.
+
+    La operación no altera CONTENEDOR ni el conocimiento declarado.
+    """
+
+    # -----------------------------------------------------------
+    # 3.15.21.1 — CAPTURA DEL INVENTARIO
+    # -----------------------------------------------------------
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    capacidades_meta = CONTENEDOR.get("capacidades_meta", {})
+
+    capacidades_declaradas = list(capacidades.keys())
+
+    capacidades_resolubles = [
+        nombre
+        for nombre, callable_obj in capacidades.items()
+        if callable(callable_obj)
+    ]
+
+    capacidades_no_resolubles = [
+        nombre
+        for nombre in capacidades_declaradas
+        if nombre not in capacidades_resolubles
+    ]
+
+    metas_sin_capacidad = [
+        nombre
+        for nombre in capacidades_meta.keys()
+        if nombre not in capacidades
+    ]
+
+    capacidades_sin_meta = [
+        nombre
+        for nombre in capacidades_declaradas
+        if nombre not in capacidades_meta
+    ]
+
+    # -----------------------------------------------------------
+    # 3.15.21.2 — INTEGRIDAD DEL INVENTARIO
+    # -----------------------------------------------------------
+
+    integridad = (
+        not capacidades_no_resolubles
+        and not metas_sin_capacidad
+        and not capacidades_sin_meta
+    )
+
+    inventario_registrado = {
+        "id": _ID,
+        "nombre": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "version_contrato": _VERSION_CONTRATO,
+        "esquema": _ESQUEMA,
+        "estabilidad": _ESTABILIDAD,
+        "compatible_desde": _COMPATIBLE_DESDE,
+        "api_engine": _API_ENGINE,
+        "tipos_declaracion": list(TIPOS_DECLARACION),
+        "relaciones": list(RELACIONES),
+        "campos_obligatorios": list(CAMPOS_OBLIGATORIOS),
+        "campos_opcionales": list(CAMPOS_OPCIONALES),
+        "capacidades_declaradas": capacidades_declaradas,
+        "capacidades_resolubles": capacidades_resolubles,
+        "capacidades_no_resolubles": capacidades_no_resolubles,
+        "capacidades_meta": list(capacidades_meta.keys()),
+        "capacidades_sin_meta": capacidades_sin_meta,
+        "metas_sin_capacidad": metas_sin_capacidad,
+        "integridad": integridad,
+    }
+
+    # -----------------------------------------------------------
+    # 3.15.21.3 — RESULTADO CONTRACTUAL
+    # -----------------------------------------------------------
+
+    return {
+        "id": _ID,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inventario_registrado,
+        "nota": (
+            "Instantánea determinista del inventario estructural "
+            "de CIT. No modifica contrato ni conocimiento declarado."
+        ),
+    }
+
+# ===============================================================
+# SECCIÓN 8 — INTEGRIDAD CONTRACTUAL DE CAPACIDADES
+# ===============================================================
+
+def _verificar_capacidades_contractuales() -> Dict[str, Any]:
+    """
+    Verifica la correspondencia exacta entre:
+
+        CONTENEDOR["capacidades"]
+        CONTENEDOR["capacidades_meta"]
+        callable real
+
+    No ejecuta capacidades.
+    No modifica el contrato.
+    """
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    metas = CONTENEDOR.get("capacidades_meta", {})
+
+    declaradas = list(capacidades.keys())
+    declaradas_meta = list(metas.keys())
+
+    sin_meta = [
+        nombre
+        for nombre in declaradas
+        if nombre not in metas
+    ]
+
+    meta_sin_capacidad = [
+        nombre
+        for nombre in declaradas_meta
+        if nombre not in capacidades
+    ]
+
+    no_callable = [
+        nombre
+        for nombre, callable_obj in capacidades.items()
+        if not callable(callable_obj)
+    ]
+
+    orden_meta_incorrecto = (
+        declaradas != declaradas_meta
+    )
+
+    errores: List[str] = []
+
+    if sin_meta:
+        errores.append(
+            "capacidades sin capacidades_meta: {0}".format(
+                sin_meta
+            )
+        )
+
+    if meta_sin_capacidad:
+        errores.append(
+            "capacidades_meta sin capacidad: {0}".format(
+                meta_sin_capacidad
+            )
+        )
+
+    if no_callable:
+        errores.append(
+            "capacidades no resolubles a callable: {0}".format(
+                no_callable
+            )
+        )
+
+    if orden_meta_incorrecto:
+        errores.append(
+            "el orden de capacidades y capacidades_meta no coincide"
+        )
+
+    return {
+        "id": _ID,
+        "coherente": not errores,
+        "capacidades": declaradas,
+        "capacidades_meta": declaradas_meta,
+        "sin_meta": sin_meta,
+        "meta_sin_capacidad": meta_sin_capacidad,
+        "no_callable": no_callable,
+        "orden_coherente": not orden_meta_incorrecto,
+        "errores": errores,
+    }
+
+# ===============================================================
+# SECCIÓN 9 — EXPORTS
+# ===============================================================
+
+__all__ = [
+    "CONTENEDOR",
+    "TIPOS_DECLARACION",
+    "RELACIONES",
+    "CAMPOS_OBLIGATORIOS",
+    "CAMPOS_OPCIONALES",
+
+    "registrar",
+    "resolver",
+    "resolver_enunciado",
+    "buscar",
+    "citar",
+
+    "anunciar",
+    "anunciar_todo",
+
+    "cadena",
+    "explicar",
+    "relacionar",
+
+    "limpiar_ciclo",
+
+    "inventario",
+    "reporte",
+    "diagnostico",
+    "barrer",
+    "verificar",
+    "verificar_salida",
+
+    "evaluar",
+
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
+]
 
 
 

@@ -335,7 +335,7 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario",
     ],
 
-    # ============================================================
+        # ============================================================
     # 5.12 — CAPACIDADES
     # ============================================================
     "capacidades": {
@@ -350,6 +350,8 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total": "ejecutar_total",
         "inspeccionar": "inspeccionar",
         "registrar_inventario": "registrar_inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
     },
 
     # ============================================================
@@ -459,7 +461,7 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con estructura, capacidades y estado del modulo",
             "acceso_archivos": ["acceso_archivos"],
         },
-        "registrar_inventario": {
+                "registrar_inventario": {
             "descripcion": (
                 "Registra el inventario estructural de CE "
                 "como instantanea determinista. No altera evidencia."
@@ -469,27 +471,70 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con inventario registrado",
             "acceso_archivos": ["acceso_archivos"],
         },
+        "reporte": {
+            "descripcion": (
+                "Reporte de estado de CE: coherencia del inventario "
+                "de skills, ids, archivos y capacidades declaradas."
+            ),
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, coherente, ids, n, archivos, "
+                "capacidades, operaciones_arquitectonicas"
+            ),
+            "acceso_archivos": ["*"],
+        },
+        "diagnostico": {
+            "descripcion": (
+                "Diagnostico de problemas y recomendaciones "
+                "sobre el inventario operativo de skills de CE."
+            ),
+            "entrada": "ninguna",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, "
+                "recomendaciones, coherente, ids, archivos"
+            ),
+            "acceso_archivos": ["*"],
+        },
     },
 
-    # ============================================================
+        # ============================================================
     # 5.14 — REPORTING
     # ============================================================
     "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
         "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
         "acceso_archivos": True,
         "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": True,
         "inspeccionar": True,
         "registrar_inventario": True,
@@ -1679,7 +1724,142 @@ def registrar_inventario(
 # ===============================================================
 # FIN PARTE 8
 # ===============================================================
+# ===============================================================
+# PARTE 9 — REPORTES Y DIAGNÓSTICO
+# ===============================================================
 
+# ===============================================================
+# 9.1 — REPORTE
+# ===============================================================
+
+def reporte() -> Dict[str, Any]:
+    """
+    Genera un reporte estructural determinista del módulo CE.
+
+    No ejecuta skills.
+    No modifica el contrato.
+    No altera estado externo.
+    Utiliza la evidencia estructural producida por barrer().
+    """
+    b = barrer()
+    coherente = bool(b.get("coherente"))
+    estado = ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO
+
+    capacidades = CONTENEDOR.get("capacidades") or {}
+    capacidades_meta = CONTENEDOR.get("capacidades_meta") or {}
+
+    operaciones_arquitectonicas = {
+        "ejecutar_total": callable(ejecutar_total),
+        "inspeccionar": callable(inspeccionar),
+        "registrar_inventario": callable(registrar_inventario),
+    }
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "estado": estado,
+        "coherente": coherente,
+        "ids": list(b.get("ids") or []),
+        "n": int(b.get("n") or 0),
+        "archivos": list(b.get("archivos") or []),
+        "errores": list(b.get("errores") or []),
+        "errores_n": len(b.get("errores") or []),
+        "choques": list(b.get("choques") or []),
+        "notas": list(b.get("notas") or []),
+        "capacidades": list(capacidades.keys()),
+        "capacidades_meta": list(capacidades_meta.keys()),
+        "autoridad": list(CONTENEDOR.get("autoridad") or []),
+        "conocimiento_exportable": list(
+            CONTENEDOR.get("conocimiento_exportable") or []
+        ),
+        "operaciones_arquitectonicas": operaciones_arquitectonicas,
+    }
+
+# ===============================================================
+# FIN 9.1
+# ===============================================================
+
+
+# ===============================================================
+# 9.2 — DIAGNÓSTICO
+# ===============================================================
+
+def diagnostico() -> Dict[str, Any]:
+    """
+    Produce diagnóstico estructural determinista a partir de barrer().
+
+    No ejecuta skills.
+    No selecciona skills.
+    No modifica el contrato.
+    No convierte advertencias en coherencia.
+    """
+    b = barrer()
+
+    problemas: List[Dict[str, Any]] = []
+    advertencias: List[str] = []
+    recomendaciones: List[str] = []
+
+    errores = list(b.get("errores") or [])
+    notas = list(b.get("notas") or [])
+    ids_validos = list(b.get("ids") or [])
+    archivos = list(b.get("archivos") or [])
+
+    if errores:
+        problemas.append({
+            "tipo": "errores_skills",
+            "detalle": errores,
+        })
+        recomendaciones.append(
+            "Revisar los archivos *.py de CE y corregir toda "
+            "inconsistencia estructural de los skills descubiertos."
+        )
+
+    if not ids_validos:
+        problemas.append({
+            "tipo": "sin_skills",
+            "detalle": "ningún skill válido descubierto",
+        })
+        recomendaciones.append(
+            "Verificar que existan archivos *.py válidos con "
+            "SKILL/CAPACIDAD y un id."
+        )
+
+    if notas:
+        advertencias.extend(notas)
+
+    coherente = bool(b.get("coherente"))
+    estado = ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "estado": estado,
+        "coherente": coherente,
+        "problemas": problemas,
+        "advertencias": advertencias,
+        "recomendaciones": recomendaciones,
+        "ids": ids_validos,
+        "n": int(b.get("n") or 0),
+        "archivos": archivos,
+        "errores": errores,
+    }
+
+# ===============================================================
+# FIN 9.2
+# ===============================================================
+
+
+# ===============================================================
+# FIN PARTE 9
+# ===============================================================
 
 # ===============================================================
 # PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
@@ -1701,6 +1881,8 @@ _CAP_MAP = {
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
+    "reporte": reporte,
+    "diagnostico": diagnostico,
 }
 
 # ===============================================================
@@ -1713,27 +1895,63 @@ _CAP_MAP = {
 # ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    capacidades = cont.get("capacidades")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'capacidades' debe ser dict"
+        )
+
+    declaradas = set(capacidades.keys())
+    disponibles = set(_CAP_MAP.keys())
+
+    faltantes = sorted(declaradas - disponibles)
+    extras = sorted(disponibles - declaradas)
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades declaradas sin entrada "
+            f"en _CAP_MAP: {faltantes}"
+        )
+
+    if extras:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: _CAP_MAP contiene capacidades no "
+            f"declaradas en CONTENEDOR: {extras}"
+        )
+
     resueltas: Dict[str, Any] = {}
-    for nombre, ref in cont["capacidades"].items():
+
+    for nombre, ref in capacidades.items():
         if callable(ref):
-            resueltas[nombre] = ref
-            continue
-        if isinstance(ref, str):
+            fn = ref
+        elif isinstance(ref, str):
             if ref not in _CAP_MAP:
                 raise ContratoInvalido(
                     f"{NOMBRE_MODULO}: capacidad '{nombre}' "
                     f"referencia inexistente: '{ref}'"
                 )
             fn = _CAP_MAP[ref]
-            if not callable(fn):
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
-                )
-            resueltas[nombre] = fn
-            continue
+        else:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"tipo invalido: {type(ref).__name__}"
+            )
+
+        if not callable(fn):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"no resuelve a callable real"
+            )
+
+        resueltas[nombre] = fn
+
+    if set(resueltas.keys()) != declaradas:
         raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidad '{nombre}' tipo invalido"
+            f"{NOMBRE_MODULO}: resolución de capacidades no coincide "
+            f"1:1 con CONTENEDOR"
         )
+
     cont["capacidades"] = resueltas
 
 # ===============================================================
@@ -1774,6 +1992,8 @@ __all__ = [
     "ejecutar_total",
     "inspeccionar",
     "registrar_inventario",
+    "reporte",
+    "diagnostico",
     "ContratoInvalido",
 ]
 

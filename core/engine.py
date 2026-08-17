@@ -30,16 +30,26 @@
 # ===============================================================
 
 from __future__ import annotations
+# --- Estándar del lenguaje ---
+import sys
+import math
+import ast
+import copy
+import threading
 import importlib.util
 import inspect
 import re
-import sys
-import time
-from collections import defaultdict, deque
+# --- Fechas y tiempo ---
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+# --- Números y precisión ---
+from decimal import Decimal, getcontext
+from fractions import Fraction
+# --- Tipos y estructuras ---
+from typing import Any, Dict, List, Optional, Set, Tuple
+from collections import defaultdict, deque
 from core.centinela import Centinela, Veredicto
+
 
 
 # ===============================================================

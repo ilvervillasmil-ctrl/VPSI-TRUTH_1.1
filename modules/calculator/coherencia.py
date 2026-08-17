@@ -39,11 +39,34 @@
 # no cuenta compromisos, no orquesta. Recibe m, k, base_nula
 # ya resueltos y devuelve C.
 # ===============================================================
+# ===============================================================
+# IMPORTACIONES
+# ===============================================================
 
 from __future__ import annotations
 
+# --- Estándar del lenguaje ---
+import sys
+import math
+import ast
+import copy
+import threading
+import importlib.util
+
+# --- Tipos y estructuras ---
+from typing import Any, Dict, List, Optional, Set, Tuple
+from collections import defaultdict
+
+# --- Números y precisión ---
+from decimal import Decimal, getcontext
 from fractions import Fraction
-from typing import Any, Dict, Optional, Union
+
+# --- Fechas y tiempo ---
+from datetime import datetime, timezone
+
+# --- Sistema de archivos ---
+from pathlib import Path
+
 
 
 try:

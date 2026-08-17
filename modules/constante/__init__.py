@@ -343,7 +343,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
     # ===========================================================
-    # 4.10 — AUTORIZACIÓN AL ENGINE
+    # 5 — AUTORIZACIÓN AL ENGINE
     # ===========================================================
     #
     # Este bloque declara los permisos contractuales del Engine
@@ -359,7 +359,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.1 — PERMISOS BASE
+        # 5.1 — PERMISOS BASE
         # =======================================================
 
         "leer": True,
@@ -372,7 +372,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.2 — PERMISOS DE ESCRITURA
+        # 5.2 — PERMISOS DE ESCRITURA
         # =======================================================
 
         "alterar": False,
@@ -381,7 +381,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.3 — PERMISOS DE PROCESAMIENTO
+        # 5.3 — PERMISOS DE PROCESAMIENTO
         # =======================================================
 
         "validar": True,
@@ -391,7 +391,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.4 — PERMISOS DE DATOS
+        # 5.4 — PERMISOS DE DATOS
         # =======================================================
 
         "exportar": True,
@@ -402,7 +402,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.5 — PERMISOS DE MONITOREO
+        # 5.5 — PERMISOS DE MONITOREO
         # =======================================================
 
         "monitorear": True,
@@ -411,7 +411,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.6 — PERMISOS DE ESTADO
+        # 6 — PERMISOS DE ESTADO
         # =======================================================
 
         "estado": True,
@@ -428,7 +428,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.7 — CAPACIDADES ARQUITECTÓNICAS AUTORIZADAS
+        # 6.1 — CAPACIDADES ARQUITECTÓNICAS AUTORIZADAS
         # =======================================================
         #
         # Estas banderas autorizan explícitamente al Engine a
@@ -444,7 +444,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # =======================================================
-        # 4.10.8 — PERMISOS OBLIGATORIOS DE ENGINE
+        # 6.2 — PERMISOS OBLIGATORIOS DE ENGINE
         # =======================================================
 
         "validar_esquema": True,
@@ -456,8 +456,8 @@ CONTENEDOR: Dict[str, Any] = {
     # FIN SECCIÓN 4 — CONTINUACIÓN EN SIGUIENTES BLOQUES
     # ===========================================================
 
-        # ============================================================
-    # 1.15 — METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
+    # 7 — METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     #
     # Cada entrada de CONTENEDOR["capacidades"] DEBE poseer una
@@ -478,7 +478,7 @@ CONTENEDOR: Dict[str, Any] = {
     "capacidades_meta": {
 
         # ========================================================
-        # 1.15.1 — ALPHA
+        # 7.1 — ALPHA
         # ========================================================
 
         "alpha": {
@@ -493,7 +493,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.2 — BETA
+        # 7.2 — BETA
         # ========================================================
 
         "beta": {
@@ -508,7 +508,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.3 — DESCUBRIR CONSTANTES
+        # 7.3 — DESCUBRIR CONSTANTES
         # ========================================================
 
         "descubrir_constantes": {
@@ -527,7 +527,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.4 — LISTAR CONSTANTES
+        # 7.4 — LISTAR CONSTANTES
         # ========================================================
 
         "listar_constantes": {
@@ -544,7 +544,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.5 — BUSCAR CONSTANTE
+        # 7.5 — BUSCAR CONSTANTE
         # ========================================================
 
         "buscar_constante": {
@@ -559,7 +559,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.6 — VERIFICAR CONSTANTES
+        # 7.6 — VERIFICAR CONSTANTES
         # ========================================================
 
         "verificar_constantes": {
@@ -578,7 +578,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.7 — INVENTARIO
+        # 7.7 — INVENTARIO
         # ========================================================
 
         "inventario": {
@@ -596,7 +596,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.8 — REPORTE
+        # 7.8 — REPORTE
         # ========================================================
 
         "reporte": {
@@ -614,7 +614,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.9 — DIAGNOSTICO
+        # 7.9 — DIAGNOSTICO
         # ========================================================
 
         "diagnostico": {
@@ -632,7 +632,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.10 — VERIFICAR
+        # 7.10 — VERIFICAR
         # ========================================================
 
         "verificar": {
@@ -649,7 +649,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.11 — EJECUTAR TOTAL
+        # 7.11 — EJECUTAR TOTAL
         # ========================================================
         #
         # Capacidad arquitectónica de Engine.
@@ -679,7 +679,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.12 — INSPECCIONAR
+        # 7.12 — INSPECCIONAR
         # ========================================================
         #
         # Capacidad arquitectónica de inspección contractual.
@@ -705,7 +705,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.15.13 — REGISTRAR INVENTARIO
+        # 7.13 — REGISTRAR INVENTARIO
         # ========================================================
         #
         # Capacidad arquitectónica de registro de inventario.
@@ -729,7 +729,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
     # ============================================================
-    # 1.16 — REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # 8 — REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     #
     # Las banderas permiten a Engine determinar qué superficies
@@ -746,7 +746,7 @@ CONTENEDOR: Dict[str, Any] = {
     "reporting": {
 
         # ========================================================
-        # 1.16.1 — ESTADO Y SALUD
+        # 8.1 — ESTADO Y SALUD
         # ========================================================
 
         "estado": True,
@@ -754,7 +754,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.2 — INVENTARIO Y CAPACIDADES
+        # 2.2 — INVENTARIO Y CAPACIDADES
         # ========================================================
 
         "inventario": True,
@@ -762,7 +762,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.3 — ERRORES Y ADVERTENCIAS
+        # 8.3 — ERRORES Y ADVERTENCIAS
         # ========================================================
 
         "errores": True,
@@ -770,7 +770,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.4 — DEPENDENCIAS Y VERSION
+        # 8.4 — DEPENDENCIAS Y VERSION
         # ========================================================
 
         "dependencias": True,
@@ -778,7 +778,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.5 — CONTRATO Y CONOCIMIENTO
+        # 8.5 — CONTRATO Y CONOCIMIENTO
         # ========================================================
 
         "contrato": True,
@@ -786,7 +786,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.6 — MÉTRICAS Y DIAGNÓSTICO
+        # 8.6 — MÉTRICAS Y DIAGNÓSTICO
         # ========================================================
 
         "metricas": True,
@@ -794,28 +794,28 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.7 — REPORTE
+        # 8.7 — REPORTE
         # ========================================================
 
         "reporte": True,
 
 
         # ========================================================
-        # 1.16.8 — ACCESO A ARCHIVOS
+        # 8.8 — ACCESO A ARCHIVOS
         # ========================================================
 
         "acceso_archivos": True,
 
 
         # ========================================================
-        # 1.16.9 — VALIDACIÓN DE ESQUEMA
+        # 8.9 — VALIDACIÓN DE ESQUEMA
         # ========================================================
 
         "validar_esquema": True,
 
 
         # ========================================================
-        # 1.16.10 — EJECUCIÓN TOTAL
+        # 8.10 — EJECUCIÓN TOTAL
         # ========================================================
         #
         # Declara que el módulo expone la superficie arquitectónica
@@ -826,7 +826,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.11 — INSPECCIÓN
+        # 8.11 — INSPECCIÓN
         # ========================================================
         #
         # Declara que el módulo expone inspección estructural.
@@ -836,7 +836,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.16.12 — REGISTRO DE INVENTARIO
+        # 8.12 — REGISTRO DE INVENTARIO
         # ========================================================
         #
         # Declara que el módulo expone registro determinista de
@@ -848,7 +848,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
     # ============================================================
-    # 1.17 — CONSULTAS SOPORTADAS
+    # 9 — CONSULTAS SOPORTADAS
     # ============================================================
 
     "consultas_soportadas": [
@@ -874,7 +874,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
     # ============================================================
-    # 1.18 — CAPACIDADES
+    # 10 — CAPACIDADES
     # ============================================================
     #
     # Mapa contractual de nombre público -> callable o referencia
@@ -888,7 +888,7 @@ CONTENEDOR: Dict[str, Any] = {
     "capacidades": {
 
         # ========================================================
-        # 1.18.1 — CAPACIDADES FUNDACIONALES
+        # 10.1 — CAPACIDADES FUNDACIONALES
         # ========================================================
 
         "alpha": "get_alpha",
@@ -896,7 +896,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.18.2 — CAPACIDADES DE DESCUBRIMIENTO
+        # 10.2 — CAPACIDADES DE DESCUBRIMIENTO
         # ========================================================
 
         "descubrir_constantes": "descubrir_constantes",
@@ -905,7 +905,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.18.3 — CAPACIDADES DE VALIDACIÓN
+        # 10.3 — CAPACIDADES DE VALIDACIÓN
         # ========================================================
 
         "verificar_constantes": "verificar_constantes",
@@ -913,7 +913,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.18.4 — CAPACIDADES DE ESTADO
+        # 10.4 — CAPACIDADES DE ESTADO
         # ========================================================
 
         "inventario": "inventario",
@@ -922,7 +922,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
         # ========================================================
-        # 1.18.5 — CAPACIDADES ARQUITECTÓNICAS DE ENGINE
+        # 10.5 — CAPACIDADES ARQUITECTÓNICAS DE ENGINE
         # ========================================================
 
         "ejecutar_total": "ejecutar_total",
@@ -931,12 +931,12 @@ CONTENEDOR: Dict[str, Any] = {
     },
     
     # ============================================================
-    # ESTADOS VÁLIDOS
+    # 11 ESTADOS VÁLIDOS
     # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
 
     # ============================================================
-    # INVARIANTES
+    # 12 INVARIANTES
     # ============================================================
     "invariantes": list(INVARIANTES),
 
@@ -947,96 +947,356 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 
 # ===============================================================
-# FUNCIONES PRIVADAS
+# VPSI-TRUTH — modules/constante/__init__.py
+# SECCIÓN 5 — POLÍTICA ESTRICTA DE CONSTANTES
+# ===============================================================
+
+
+# ===============================================================
+# 13 — ALCANCE CONTRACTUAL
+# ===============================================================
+
+TIPOS_CONSTANTE_VALIDOS = frozenset({
+    "Fraction",
+    "int",
+    "str",
+    "bool",
+})
+
+TIPOS_CONSTANTE_EXACTOS = {
+    "Fraction": Fraction,
+    "int": int,
+    "str": str,
+    "bool": bool,
+}
+
+POLITICA_CONSTANTES = {
+    "aplica_a_todas_las_constantes_oficiales_del_modulo": True,
+    "identidad_obligatoria": True,
+    "nombre_no_vacio": True,
+    "valor_obligatorio": True,
+    "tipo_obligatorio": True,
+    "origen_obligatorio": True,
+    "descripcion_obligatoria": True,
+    "tipo_declarado_debe_coincidir": True,
+    "representacion_canonica_exacta": True,
+    "float_como_representacion_canonica": False,
+    "aritmetica_exacta": True,
+    "fracciones_exactas": True,
+    "representacion_float_operativa": True,
+    "conversion_exacta_a_float_permitida": True,
+    "float_como_constante_oficial": False,
+    "conversion_implicita": False,
+    "conversion_explicita_requerida": True,
+    "conversion_float_a_fraction": False,
+    "reconstruccion_desde_float": False,
+    "calculo_aproximado_canonico": False,
+    "representacion_aproximada_operativa": True,
+    "redondeo_automatico": False,
+    "tolerancia_numerica_canonica": Fraction(0),
+    "rechazar_nan": True,
+    "rechazar_inf": True,
+    "formula_externa_obligatoria": False,
+    "mutacion_despues_de_carga": False,
+}
+
+
+# ===============================================================
+# 13.1 — REPRESENTACIÓN CANÓNICA
+# ===============================================================
+
+def _validar_especificacion_constante(item: Dict[str, Any]) -> None:
+    if not isinstance(item, dict):
+        raise ContratoInvalido("CONSTANTE debe ser dict")
+
+    faltantes = [
+        campo
+        for campo in CAMPOS_OBLIGATORIOS_CONSTANTE
+        if campo not in item
+    ]
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"CONSTANTE incompleta. Faltan: {faltantes}"
+        )
+
+    nombre = item.get("nombre")
+    if not isinstance(nombre, str) or not nombre.strip():
+        raise ContratoInvalido(
+            "CONSTANTE requiere 'nombre: str' no vacio"
+        )
+
+    nombre = nombre.strip()
+
+    tipo = item.get("tipo")
+    if not isinstance(tipo, str) or not tipo.strip():
+        raise ContratoInvalido(
+            f"CONSTANTE '{nombre}' requiere 'tipo: str'"
+        )
+
+    tipo = tipo.strip()
+
+    if tipo not in TIPOS_CONSTANTE_VALIDOS:
+        raise ContratoInvalido(
+            f"CONSTANTE '{nombre}': tipo no autorizado: '{tipo}'. "
+            f"Tipos validos: {sorted(TIPOS_CONSTANTE_VALIDOS)}"
+        )
+
+    valor = item.get("valor")
+
+    if valor is None:
+        raise ContratoInvalido(
+            f"CONSTANTE '{nombre}': valor no puede ser None"
+        )
+
+    origen = item.get("origen")
+    if not isinstance(origen, str) or not origen.strip():
+        raise ContratoInvalido(
+            f"CONSTANTE '{nombre}': origen debe ser str no vacio"
+        )
+
+    descripcion = item.get("descripcion")
+    if not isinstance(descripcion, str) or not descripcion.strip():
+        raise ContratoInvalido(
+            f"CONSTANTE '{nombre}': descripcion debe ser str no vacio"
+        )
+
+    tipo_esperado = TIPOS_CONSTANTE_EXACTOS[tipo]
+
+    if type(valor) is not tipo_esperado:
+        raise ContratoInvalido(
+            f"CONSTANTE '{nombre}': incompatibilidad exacta. "
+            f"Tipo declarado='{tipo}', "
+            f"tipo real='{type(valor).__name__}'."
+        )
+
+    if tipo == "Fraction":
+        if type(valor) is not Fraction:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': Fraction invalido."
+            )
+
+    if tipo in {"Fraction", "int"}:
+        if POLITICA_CONSTANTES["calculo_aproximado_canonico"]:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': "
+                "calculo aproximado no permitido en canonico."
+            )
+
+        if POLITICA_CONSTANTES["redondeo_automatico"]:
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': "
+                "redondeo automatico no permitido."
+            )
+
+        if POLITICA_CONSTANTES[
+            "tolerancia_numerica_canonica"
+        ] != Fraction(0):
+            raise ContratoInvalido(
+                f"CONSTANTE '{nombre}': "
+                "tolerancia numerica canonica no permitida."
+            )
+
+
+# ===============================================================
+# 13.2 — PROYECCIÓN OPERATIVA
+# ===============================================================
+
+def proyectar_float(valor: Any) -> float:
+    if type(valor) is Fraction:
+        return float(valor)
+
+    if type(valor) is int:
+        return float(valor)
+
+    if type(valor) is float:
+        raise ContratoInvalido(
+            "Un float no puede utilizarse como fuente canonica."
+        )
+
+    raise ContratoInvalido(
+        f"No existe proyeccion float contractual para "
+        f"tipo '{type(valor).__name__}'."
+    )
+
+
+# ===============================================================
+# 13.3 — PROHIBICIÓN DE RECONSTRUCCIÓN
+# ===============================================================
+
+def reconstruir_exactitud_desde_float(valor: float) -> Fraction:
+    raise ContratoInvalido(
+        "No se permite reconstruir una constante exacta desde float."
+    )
+
+
+# ===============================================================
+# 13.4 — VALIDACIÓN DE REPRESENTACIÓN
+# ===============================================================
+
+def _validar_representacion_constante(
+    nombre: str,
+    valor: Any,
+    tipo: str,
+) -> None:
+    if tipo not in TIPOS_CONSTANTE_VALIDOS:
+        raise ContratoInvalido(
+            f"Constante '{nombre}': tipo no autorizado: '{tipo}'."
+        )
+
+    esperado = TIPOS_CONSTANTE_EXACTOS[tipo]
+
+    if type(valor) is not esperado:
+        raise ContratoInvalido(
+            f"Constante '{nombre}': "
+            f"se esperaba '{tipo}' y se recibió "
+            f"'{type(valor).__name__}'."
+        )
+
+    if type(valor) is float:
+        raise ContratoInvalido(
+            f"Constante '{nombre}': float prohibido como canonico."
+        )
+
+
+# ===============================================================
+# SECCIÓN 14 — DESCUBRIMIENTO DETERMINISTA
+# ===============================================================
+
+
+# ===============================================================
+# 14.1 — ARCHIVOS ELEGIBLES
+# ===============================================================
+
+def _archivos_constantes() -> List[Path]:
+    archivos = []
+
+    for archivo in sorted(_DIR.glob("*.py"), key=lambda p: p.name):
+        if archivo.name == "__init__.py":
+            continue
+
+        if archivo.name.startswith("_"):
+            continue
+
+        archivos.append(archivo)
+
+    return archivos
+
+
+# ===============================================================
+# 14.2 — INDICADOR DE DECLARACIÓN
 # ===============================================================
 
 def _archivo_declara_constante(archivo: Path) -> bool:
     try:
         texto = archivo.read_text(encoding="utf-8")
-    except Exception:  # noqa: BLE001
+    except Exception:
         return False
+
     return "CONSTANTE" in texto
 
+
+# ===============================================================
+# 14.3 — CARGA AISLADA DE ARCHIVO
+# ===============================================================
+
+def _cargar_archivo_constante(
+    archivo: Path,
+) -> tuple[Optional[Any], Optional[Dict[str, str]]]:
+
+    clave = f"_vpsi_ct_{archivo.stem}"
+
+    spec = importlib.util.spec_from_file_location(
+        clave,
+        archivo,
+    )
+
+    if spec is None or spec.loader is None:
+        return None, {
+            "archivo": archivo.name,
+            "error": "no se pudo crear spec de importacion",
+        }
+
+    mod = importlib.util.module_from_spec(spec)
+
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as exc:
+        return None, {
+            "archivo": archivo.name,
+            "error": (
+                f"archivo_corrupto: "
+                f"{type(exc).__name__}: {exc}"
+            ),
+        }
+
+    return getattr(mod, "CONSTANTE", None), None
+
+
+# ===============================================================
+# 14.4 — DESCUBRIMIENTO COMPLETO
+# ===============================================================
 
 def _descubrir_archivos() -> Dict[str, Any]:
     hallado: Dict[str, Any] = {}
     errores: List[Dict[str, str]] = []
     origen_por_nombre: Dict[str, List[str]] = {}
 
-    for archivo in sorted(_DIR.glob("*.py")):
-        if archivo.name.startswith("_") or archivo.name == "__init__.py":
-            continue
+    for archivo in _archivos_constantes():
+
         if not _archivo_declara_constante(archivo):
             continue
 
-        clave = f"constante_{archivo.stem}"
-        spec = importlib.util.spec_from_file_location(clave, archivo)
-        if spec is None or spec.loader is None:
-            errores.append({
-                "archivo": archivo.name,
-                "error": "no se pudo crear spec de importacion",
-            })
+        meta, error = _cargar_archivo_constante(archivo)
+
+        if error is not None:
+            errores.append(error)
             continue
 
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[clave] = mod
-        try:
-            spec.loader.exec_module(mod)
-        except Exception as e:  # noqa: BLE001
-            errores.append({
-                "archivo": archivo.name,
-                "error": f"archivo_corrupto: {type(e).__name__}: {e}",
-            })
-            continue
-
-        meta = getattr(mod, "CONSTANTE", None)
         if meta is None:
+            errores.append({
+                "archivo": archivo.name,
+                "error": "archivo marcado como CONSTANTE pero "
+                         "no expone CONSTANTE",
+            })
             continue
 
         items = meta if isinstance(meta, list) else [meta]
+
+        if not items:
+            errores.append({
+                "archivo": archivo.name,
+                "error": "CONSTANTE vacio",
+            })
+            continue
+
         for item in items:
-            if not isinstance(item, dict):
-                errores.append({
-                    "archivo": archivo.name,
-                    "error": "CONSTANTE no es dict ni list[dict]",
-                })
-                continue
 
             try:
                 _validar_especificacion_constante(item)
-            except ContratoInvalido as e:
+            except ContratoInvalido as exc:
                 errores.append({
                     "archivo": archivo.name,
-                    "error": f"constante_rechazada: {e}",
+                    "error": f"constante_rechazada: {exc}",
                 })
                 continue
 
-            nombre = str(item.get("nombre", "")).strip()
-            if not nombre:
-                errores.append({
-                    "archivo": archivo.name,
-                    "error": "CONSTANTE sin 'nombre'",
-                })
-                continue
+            nombre = str(item["nombre"]).strip()
 
             if nombre in FUNDACIONALES:
                 errores.append({
                     "archivo": archivo.name,
-                    "error": f"constante_fundacional_redefinida: {nombre}",
+                    "error": (
+                        f"constante_fundacional_redefinida: "
+                        f"{nombre}"
+                    ),
                 })
                 continue
 
-            faltan = [
-                c for c in CAMPOS_OBLIGATORIOS_CONSTANTE
-                if c not in item or item.get(c) in (None, "")
-            ]
-            if faltan:
-                errores.append({
-                    "archivo": archivo.name,
-                    "error": f"campos_faltantes en '{nombre}': {faltan}",
-                })
-
-            origen_por_nombre.setdefault(nombre, []).append(archivo.name)
+            origen_por_nombre.setdefault(
+                nombre,
+                [],
+            ).append(archivo.name)
 
             if nombre in hallado:
                 errores.append({
@@ -1047,104 +1307,162 @@ def _descubrir_archivos() -> Dict[str, Any]:
 
             hallado[nombre] = {
                 "nombre": nombre,
-                "valor": item.get("valor"),
-                "valor_str": str(item.get("valor")),
-                "tipo": str(item.get("tipo", "")),
-                "origen": str(item.get("origen", "")),
-                "descripcion": str(item.get("descripcion", "")),
+                "valor": item["valor"],
+                "valor_str": str(item["valor"]),
+                "tipo": item["tipo"],
+                "origen": item["origen"].strip(),
+                "descripcion": item["descripcion"].strip(),
                 "archivo": archivo.name,
                 "fundacional": False,
             }
 
-    for nombre, archivos in origen_por_nombre.items():
+    for nombre, archivos in sorted(
+        origen_por_nombre.items(),
+        key=lambda x: x[0],
+    ):
         if len(archivos) > 1:
             errores.append({
-                "archivo": ",".join(archivos),
-                "error": f"conflicto_entre_archivos: '{nombre}' en {archivos}",
+                "archivo": ",".join(sorted(archivos)),
+                "error": (
+                    f"conflicto_entre_archivos: "
+                    f"'{nombre}' en {sorted(archivos)}"
+                ),
             })
 
-    return {"constantes": hallado, "errores": errores}
+    return {
+        "constantes": dict(
+            sorted(
+                hallado.items(),
+                key=lambda x: x[0],
+            )
+        ),
+        "errores": sorted(
+            errores,
+            key=lambda x: (
+                x.get("archivo", ""),
+                x.get("error", ""),
+            ),
+        ),
+    }
+
+
+# ===============================================================
+# SECCIÓN 15 — DOMINIO CANÓNICO
+# ===============================================================
 
 
 def _fundacionales() -> Dict[str, Any]:
-    out: Dict[str, Any] = {}
-    for nombre, valor in CONSTANTES_FUNDACIONALES.items():
-        out[nombre] = {
-            "nombre": nombre,
-            "valor": valor,
-            "valor_str": str(valor),
-            "tipo": type(valor).__name__,
+    return {
+        "ALPHA": {
+            "nombre": "ALPHA",
+            "valor": ALPHA,
+            "valor_str": str(ALPHA),
+            "tipo": "Fraction",
             "origen": "cubo 3x3x3 en R3",
-            "descripcion": (
-                "Techo estructural" if nombre == "ALPHA" else "Piso estructural"
-            ),
+            "descripcion": "Techo estructural",
             "archivo": "__init__.py",
             "fundacional": True,
-        }
-    return out
+        },
+        "BETA": {
+            "nombre": "BETA",
+            "valor": BETA,
+            "valor_str": str(BETA),
+            "tipo": "Fraction",
+            "origen": "cubo 3x3x3 en R3",
+            "descripcion": "Piso estructural",
+            "archivo": "__init__.py",
+            "fundacional": True,
+        },
+    }
 
 
 def _todas() -> Dict[str, Any]:
     base = _fundacionales()
-    desc = _descubrir_archivos()
-    base.update(desc["constantes"])
+    descubierto = _descubrir_archivos()
+
+    base.update(descubierto["constantes"])
+
     return {
-        "constantes": base,
-        "errores_carga": desc["errores"],
-        "archivos": sorted({c["archivo"] for c in base.values()}),
+        "constantes": dict(
+            sorted(
+                base.items(),
+                key=lambda x: x[0],
+            )
+        ),
+        "errores_carga": descubierto["errores"],
+        "archivos": sorted(
+            {
+                constante["archivo"]
+                for constante in base.values()
+            }
+        ),
     }
 
 
-def _validar_contrato(cont: Dict[str, Any]) -> None:
-    obligatorias = (
-        "esquema", "version_contrato", "version_modulo",
-        "id", "nombre", "rol", "descripcion",
-        "funcion", "no_hace", "autoridad",
-        "conocimiento_exportable", "requiere",
-        "autoriza_engine", "consultas_soportadas",
-        "capacidades", "capacidades_meta",
-        "reporting", "estados_validos", "invariantes",
-        "estabilidad", "compatible_desde", "api_engine",
-    )
-    faltantes = [k for k in obligatorias if k not in cont]
-    if faltantes:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
-        )
-    if cont.get("esquema") != ESQUEMA_CONTRATO:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: esquema incompatible: {cont.get('esquema')}"
-        )
-    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: version_contrato invalida: {cont.get('version_contrato')}"
-        )
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
-            raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidad '{nombre_cap}' sin capacidades_meta"
+# ===============================================================
+# SECCIÓN 16 — VALIDACIÓN GLOBAL
+# ===============================================================
+
+
+def _validar_dominio_constantes(
+    pack: Dict[str, Any],
+) -> Dict[str, Any]:
+
+    problemas: List[Dict[str, Any]] = []
+
+    alpha = CONSTANTES_FUNDACIONALES["ALPHA"]
+    beta = CONSTANTES_FUNDACIONALES["BETA"]
+
+    if alpha + beta != Fraction(1):
+        problemas.append({
+            "tipo": "invariante_fundacional",
+            "detalle": (
+                f"ALPHA + BETA = {alpha + beta} != 1"
+            ),
+        })
+
+    for error in pack["errores_carga"]:
+        problemas.append({
+            "tipo": "error_carga_o_conflicto",
+            "detalle": error,
+        })
+
+    for nombre, meta in pack["constantes"].items():
+
+        try:
+            _validar_representacion_constante(
+                nombre,
+                meta["valor"],
+                meta["tipo"],
             )
-        entrada = meta_caps[nombre_cap]
-        if not isinstance(entrada, dict):
-            raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] debe ser dict"
-            )
-        for campo in ("descripcion", "entrada", "salida"):
-            if campo not in entrada or not isinstance(entrada[campo], str):
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] "
-                    f"requiere '{campo}: str'"
-                )
+        except ContratoInvalido as exc:
+            problemas.append({
+                "tipo": "representacion_invalida",
+                "detalle": str(exc),
+            })
+
+        if not meta.get("origen"):
+            problemas.append({
+                "tipo": "sin_origen",
+                "detalle": nombre,
+            })
+
+        if not meta.get("descripcion"):
+            problemas.append({
+                "tipo": "sin_descripcion",
+                "detalle": nombre,
+            })
+
+    return {
+        "coherente": not problemas,
+        "problemas": problemas,
+    }
+
 
 # ===============================================================
-# FIN FUNCIONES PRIVADAS
+# SECCIÓN 17 — CAPACIDADES PÚBLICAS
 # ===============================================================
 
-
-# ===============================================================
-# CAPACIDADES PÚBLICAS
-# ===============================================================
 
 def get_alpha(peticion=None) -> Fraction:
     return CONSTANTES_FUNDACIONALES["ALPHA"]
@@ -1154,20 +1472,21 @@ def get_beta(peticion=None) -> Fraction:
     return CONSTANTES_FUNDACIONALES["BETA"]
 
 
-def descubrir_constantes() -> Dict[str, Any]:
+def descubrir_constantes(peticion=None) -> Dict[str, Any]:
     pack = _todas()
+
     return {
         "constantes": {
-            k: {
-                "nombre": v["nombre"],
-                "valor_str": v["valor_str"],
-                "tipo": v["tipo"],
-                "origen": v["origen"],
-                "descripcion": v["descripcion"],
-                "archivo": v["archivo"],
-                "fundacional": v["fundacional"],
+            nombre: {
+                "nombre": meta["nombre"],
+                "valor_str": meta["valor_str"],
+                "tipo": meta["tipo"],
+                "origen": meta["origen"],
+                "descripcion": meta["descripcion"],
+                "archivo": meta["archivo"],
+                "fundacional": meta["fundacional"],
             }
-            for k, v in pack["constantes"].items()
+            for nombre, meta in pack["constantes"].items()
         },
         "errores_carga": pack["errores_carga"],
         "archivos": pack["archivos"],
@@ -1175,84 +1494,88 @@ def descubrir_constantes() -> Dict[str, Any]:
     }
 
 
-def listar_constantes() -> Dict[str, Any]:
+def listar_constantes(peticion=None) -> Dict[str, Any]:
     pack = _todas()
-    fund = sorted(k for k, v in pack["constantes"].items() if v["fundacional"])
-    aux = sorted(k for k, v in pack["constantes"].items() if not v["fundacional"])
+
+    fundacionales = sorted(
+        nombre
+        for nombre, meta in pack["constantes"].items()
+        if meta["fundacional"]
+    )
+
+    auxiliares = sorted(
+        nombre
+        for nombre, meta in pack["constantes"].items()
+        if not meta["fundacional"]
+    )
+
     return {
-        "fundacionales": fund,
-        "auxiliares": aux,
+        "fundacionales": fundacionales,
+        "auxiliares": auxiliares,
         "total": len(pack["constantes"]),
         "archivos": pack["archivos"],
     }
 
 
-def buscar_constante(nombre: str) -> Optional[Dict[str, Any]]:
+def buscar_constante(
+    nombre: str,
+    peticion=None,
+) -> Optional[Dict[str, Any]]:
+
+    if not isinstance(nombre, str):
+        raise ContratoInvalido(
+            "buscar_constante requiere nombre: str"
+        )
+
     pack = _todas()
-    c = pack["constantes"].get(str(nombre).strip())
-    if c is None:
+
+    meta = pack["constantes"].get(nombre.strip())
+
+    if meta is None:
         return None
+
     return {
-        "nombre": c["nombre"],
-        "valor_str": c["valor_str"],
-        "tipo": c["tipo"],
-        "origen": c["origen"],
-        "descripcion": c["descripcion"],
-        "archivo": c["archivo"],
-        "fundacional": c["fundacional"],
+        "nombre": meta["nombre"],
+        "valor_str": meta["valor_str"],
+        "tipo": meta["tipo"],
+        "origen": meta["origen"],
+        "descripcion": meta["descripcion"],
+        "archivo": meta["archivo"],
+        "fundacional": meta["fundacional"],
     }
 
 
-def verificar_constantes() -> Dict[str, Any]:
-    problemas: List[Dict[str, Any]] = []
-    advertencias: List[str] = []
+def verificar_constantes(peticion=None) -> Dict[str, Any]:
+    pack = _todas()
+
+    validacion = _validar_dominio_constantes(pack)
 
     alpha = CONSTANTES_FUNDACIONALES["ALPHA"]
     beta = CONSTANTES_FUNDACIONALES["BETA"]
-    suma = alpha + beta
-    if suma != Fraction(1):
-        problemas.append({
-            "tipo": "invariante_fundacional",
-            "detalle": f"ALPHA + BETA = {suma} != 1",
-        })
 
-    pack = _todas()
-    for err in pack["errores_carga"]:
-        problemas.append({
-            "tipo": "error_carga_o_conflicto",
-            "detalle": err,
-        })
-
-    for nombre, meta in pack["constantes"].items():
-        if meta["fundacional"]:
-            continue
-        if not meta.get("tipo"):
-            problemas.append({"tipo": "tipo_invalido_o_vacio", "detalle": nombre})
-        if not meta.get("origen"):
-            problemas.append({"tipo": "sin_origen", "detalle": nombre})
-        if not meta.get("descripcion"):
-            problemas.append({"tipo": "sin_descripcion", "detalle": nombre})
-        if meta.get("valor") is None and meta.get("valor_str") in ("None", ""):
-            problemas.append({"tipo": "constante_sin_valor", "detalle": nombre})
+    advertencias: List[str] = []
 
     if not pack["constantes"]:
-        advertencias.append("No hay constantes registradas")
+        advertencias.append(
+            "No hay constantes registradas"
+        )
 
     return {
-        "coherente": not problemas,
+        "coherente": validacion["coherente"],
         "ALPHA": str(alpha),
         "BETA": str(beta),
-        "suma": str(suma),
+        "suma": str(alpha + beta),
         "total_constantes": len(pack["constantes"]),
-        "problemas": problemas,
+        "problemas": validacion["problemas"],
         "advertencias": advertencias,
     }
 
 
-def verificar() -> Dict[str, Any]:
+def verificar(peticion=None) -> Dict[str, Any]:
     alpha = CONSTANTES_FUNDACIONALES["ALPHA"]
     beta = CONSTANTES_FUNDACIONALES["BETA"]
     suma = alpha + beta
+
     return {
         "coherente": suma == Fraction(1),
         "ALPHA": str(alpha),
@@ -1262,23 +1585,31 @@ def verificar() -> Dict[str, Any]:
     }
 
 
+# ===============================================================
+# SECCIÓN 18 — INVENTARIO
+# ===============================================================
+
+
 def inventario(peticion=None) -> Dict[str, Any]:
     pack = _todas()
-    fund = {
-        k: v["valor_str"]
-        for k, v in pack["constantes"].items()
-        if v["fundacional"]
+
+    fundacionales = {
+        nombre: meta["valor_str"]
+        for nombre, meta in pack["constantes"].items()
+        if meta["fundacional"]
     }
-    aux = {
-        k: {
-            "valor_str": v["valor_str"],
-            "archivo": v["archivo"],
-            "tipo": v["tipo"],
-            "origen": v["origen"],
+
+    auxiliares = {
+        nombre: {
+            "valor_str": meta["valor_str"],
+            "archivo": meta["archivo"],
+            "tipo": meta["tipo"],
+            "origen": meta["origen"],
         }
-        for k, v in pack["constantes"].items()
-        if not v["fundacional"]
+        for nombre, meta in pack["constantes"].items()
+        if not meta["fundacional"]
     }
+
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -1287,34 +1618,48 @@ def inventario(peticion=None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "ALPHA": str(CONSTANTES_FUNDACIONALES["ALPHA"]),
-        "BETA": str(CONSTANTES_FUNDACIONALES["BETA"]),
+        "ALPHA": str(ALPHA),
+        "BETA": str(BETA),
         "tipo_fundacionales": "Fraction",
         "origen_fundacionales": "cubo 3x3x3 en R3",
         "total_constantes": len(pack["constantes"]),
-        "constantes_fundacionales": fund,
-        "constantes_auxiliares": aux,
+        "constantes_fundacionales": fundacionales,
+        "constantes_auxiliares": auxiliares,
         "archivos": pack["archivos"],
         "errores_carga": pack["errores_carga"],
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "invariantes": CONTENEDOR.get("invariantes"),
+        "capacidades": sorted(
+            CONTENEDOR["capacidades"].keys()
+        ),
+        "requiere": list(
+            CONTENEDOR.get("requiere") or []
+        ),
+        "invariantes": list(
+            CONTENEDOR.get("invariantes") or []
+        ),
     }
 
+
 # ===============================================================
-# FIN CAPACIDADES PÚBLICAS
+# SECCIÓN 19 — REPORTING
 # ===============================================================
 
 
-# ===============================================================
-# REPORTING INTERNO
-# ===============================================================
-
-def reporte() -> Dict[str, Any]:
-    v = verificar()
-    vc = verificar_constantes()
+def reporte(peticion=None) -> Dict[str, Any]:
+    verificacion = verificar()
+    constantes = verificar_constantes()
     pack = _todas()
-    estado = ESTADO_OPERATIVO if (v["coherente"] and vc["coherente"]) else ESTADO_DEGRADADO
+
+    coherente = (
+        verificacion["coherente"]
+        and constantes["coherente"]
+    )
+
+    estado = (
+        ESTADO_OPERATIVO
+        if coherente
+        else ESTADO_DEGRADADO
+    )
+
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1324,61 +1669,269 @@ def reporte() -> Dict[str, Any]:
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
         "estado": estado,
-        "coherente": v["coherente"] and vc["coherente"],
-        "ALPHA": v["ALPHA"],
-        "BETA": v["BETA"],
-        "suma": v["suma"],
+        "coherente": coherente,
+        "ALPHA": verificacion["ALPHA"],
+        "BETA": verificacion["BETA"],
+        "suma": verificacion["suma"],
         "total_constantes": len(pack["constantes"]),
         "archivos": pack["archivos"],
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
-        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+        "capacidades": sorted(
+            CONTENEDOR["capacidades"].keys()
+        ),
+        "requiere": list(
+            CONTENEDOR.get("requiere") or []
+        ),
+        "autoridad": list(
+            CONTENEDOR.get("autoridad") or []
+        ),
+        "conocimiento_exportable": list(
+            CONTENEDOR.get(
+                "conocimiento_exportable"
+            ) or []
+        ),
+        "consultas_soportadas": list(
+            CONTENEDOR.get(
+                "consultas_soportadas"
+            ) or []
+        ),
     }
 
 
-def diagnostico() -> Dict[str, Any]:
-    v = verificar()
-    vc = verificar_constantes()
-    problemas = list(vc.get("problemas") or [])
-    advertencias = list(vc.get("advertencias") or [])
+def diagnostico(peticion=None) -> Dict[str, Any]:
+    verificacion = verificar()
+    constantes = verificar_constantes()
+
+    problemas = list(
+        constantes.get("problemas") or []
+    )
+
+    advertencias = list(
+        constantes.get("advertencias") or []
+    )
+
     recomendaciones: List[str] = []
 
-    if not v["coherente"]:
+    if not verificacion["coherente"]:
         recomendaciones.append(
-            "Verificar definicion de ALPHA y BETA en CONSTANTES_FUNDACIONALES"
-        )
-    if vc.get("problemas"):
-        recomendaciones.append("Resolver problemas del dominio de constantes")
-    if not _descubrir_archivos()["constantes"] and not problemas:
-        advertencias.append(
-            "Solo hay constantes fundacionales; no hay auxiliares declaradas"
+            "Verificar ALPHA y BETA."
         )
 
-    estado = ESTADO_OPERATIVO if (v["coherente"] and vc["coherente"]) else ESTADO_DEGRADADO
+    if problemas:
+        recomendaciones.append(
+            "Resolver los problemas del dominio de constantes."
+        )
+
+    if not problemas and not advertencias:
+        recomendaciones.append(
+            "Dominio de constantes coherente."
+        )
+
+    coherente = (
+        verificacion["coherente"]
+        and constantes["coherente"]
+    )
+
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
-        "estado": estado,
+        "estado": (
+            ESTADO_OPERATIVO
+            if coherente
+            else ESTADO_DEGRADADO
+        ),
         "problemas": problemas,
         "advertencias": advertencias,
         "recomendaciones": recomendaciones,
-        "coherente": v["coherente"] and vc["coherente"],
-        "ALPHA": v["ALPHA"],
-        "BETA": v["BETA"],
-        "suma": v["suma"],
-        "total_constantes": vc.get("total_constantes"),
+        "coherente": coherente,
+        "ALPHA": verificacion["ALPHA"],
+        "BETA": verificacion["BETA"],
+        "suma": verificacion["suma"],
+        "total_constantes": constantes[
+            "total_constantes"
+        ],
     }
 
+
 # ===============================================================
-# FIN REPORTING
+# SECCIÓN 20 — CAPACIDADES ARQUITECTÓNICAS DE ENGINE
 # ===============================================================
 
 
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Ejecuta todas las capacidades contractuales ordinarias de CT.
+
+    Esta función NO ejecuta las capacidades arquitectónicas
+    recursivamente. Las tres capacidades arquitectónicas de Engine
+    quedan fuera del conjunto operativo para evitar recursión.
+    """
+
+    if peticion is None:
+        peticion = {}
+
+    if not isinstance(peticion, dict):
+        raise ContratoInvalido(
+            "ejecutar_total requiere peticion: dict o None"
+        )
+
+    capacidades_arquitectonicas = {
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
+    }
+
+    nombres = sorted(
+        nombre
+        for nombre in CONTENEDOR["capacidades"].keys()
+        if nombre not in capacidades_arquitectonicas
+    )
+
+    resultados: Dict[str, Any] = {}
+    errores: List[Dict[str, str]] = []
+    ejecutadas: List[str] = []
+
+    for nombre in nombres:
+        fn = CONTENEDOR["capacidades"].get(nombre)
+
+        if not callable(fn):
+            errores.append({
+                "capacidad": nombre,
+                "error": "capacidad_no_callable",
+            })
+            continue
+
+        try:
+            resultados[nombre] = fn(peticion)
+            ejecutadas.append(nombre)
+        except TypeError:
+            try:
+                resultados[nombre] = fn()
+                ejecutadas.append(nombre)
+            except Exception as exc:
+                errores.append({
+                    "capacidad": nombre,
+                    "error": (
+                        f"{type(exc).__name__}: {exc}"
+                    ),
+                })
+        except Exception as exc:
+            errores.append({
+                "capacidad": nombre,
+                "error": (
+                    f"{type(exc).__name__}: {exc}"
+                ),
+            })
+
+    estado = (
+        ESTADO_OPERATIVO
+        if not errores
+        else ESTADO_DEGRADADO
+    )
+
+    coherente = (
+        verificar()["coherente"]
+        and verificar_constantes()["coherente"]
+        and not errores
+    )
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": estado,
+        "coherente": coherente,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores,
+        "resultados": resultados,
+        "capacidades_declaradas": sorted(
+            CONTENEDOR["capacidades"].keys()
+        ),
+    }
+
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Expone la estructura contractual de CT sin modificarla.
+    """
+
+    if peticion is not None and not isinstance(
+        peticion,
+        dict,
+    ):
+        raise ContratoInvalido(
+            "inspeccionar requiere peticion: dict o None"
+        )
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": descubrir_constantes(),
+        "capacidades_contractuales": sorted(
+            CONTENEDOR["capacidades"].keys()
+        ),
+        "capacidades_meta": {
+            nombre: dict(meta)
+            for nombre, meta in sorted(
+                CONTENEDOR[
+                    "capacidades_meta"
+                ].items()
+            )
+        },
+        "integridad": verificar_constantes(),
+        "esquema": ESQUEMA_CONTRATO,
+        "autoriza_engine": dict(
+            CONTENEDOR["autoriza_engine"]
+        ),
+        "reporting": dict(
+            CONTENEDOR["reporting"]
+        ),
+        "invariantes": list(
+            CONTENEDOR["invariantes"]
+        ),
+    }
+
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Produce una instantánea determinista del inventario de CT.
+    """
+
+    if peticion is not None and not isinstance(
+        peticion,
+        dict,
+    ):
+        raise ContratoInvalido(
+            "registrar_inventario requiere "
+            "peticion: dict o None"
+        )
+
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inventario(peticion),
+        "nota": (
+            "Instantanea determinista del dominio "
+            "de constantes de CT."
+        ),
+    }
+
+
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA
+# SECCIÓN 21 — MAPA CALLABLE
 # ===============================================================
+
 
 _CAP_MAP = {
     "get_alpha": get_alpha,
@@ -1391,37 +1944,111 @@ _CAP_MAP = {
     "reporte": reporte,
     "diagnostico": diagnostico,
     "verificar": verificar,
+
+    # -----------------------------------------------------------
+    # Capacidades arquitectónicas de Engine
+    # -----------------------------------------------------------
+
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
+
+    # -----------------------------------------------------------
+    # Proyección operacional explícita
+    # -----------------------------------------------------------
+
+    "proyectar_float": proyectar_float,
 }
 
 
-def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+# ===============================================================
+# SECCIÓN 22 — RESOLUCIÓN ESTRICTA
+# ===============================================================
+
+
+def _resolver_capacidades(
+    cont: Dict[str, Any],
+) -> None:
+
     resueltas: Dict[str, Any] = {}
-    for nombre, ref in cont["capacidades"].items():
+
+    for nombre in sorted(
+        cont["capacidades"].keys()
+    ):
+
+        ref = cont["capacidades"][nombre]
+
         if callable(ref):
             resueltas[nombre] = ref
             continue
-        if isinstance(ref, str):
-            if ref not in _CAP_MAP:
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-                    f"referencia inexistente: '{ref}'"
-                )
-            fn = _CAP_MAP[ref]
-            if not callable(fn):
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
-                )
-            resueltas[nombre] = fn
-            continue
-        raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-            f"tiene tipo invalido: {type(ref).__name__}"
-        )
+
+        if not isinstance(ref, str):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"tiene tipo invalido: "
+                f"{type(ref).__name__}"
+            )
+
+        if ref not in _CAP_MAP:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"referencia inexistente: '{ref}'"
+            )
+
+        fn = _CAP_MAP[ref]
+
+        if not callable(fn):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: '{ref}' no es callable"
+            )
+
+        resueltas[nombre] = fn
+
     cont["capacidades"] = resueltas
+
+
+# ===============================================================
+# SECCIÓN 23 — VALIDACIÓN FINAL DEL CONTENEDOR
+# ===============================================================
 
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+
+# ===============================================================
+# SECCIÓN 24 — VALIDACIÓN DE SUPERFICIE CALLABLE
+# ===============================================================
+
+
+def _validar_superficie_callable(
+    cont: Dict[str, Any],
+) -> None:
+
+    faltantes = []
+
+    for nombre in sorted(
+        cont["capacidades"].keys()
+    ):
+        if not callable(
+            cont["capacidades"][nombre]
+        ):
+            faltantes.append(nombre)
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades no callables: "
+            f"{faltantes}"
+        )
+
+
+_validar_superficie_callable(CONTENEDOR)
+
+
+# ===============================================================
+# SECCIÓN 25 — EXPORTACIONES
+# ===============================================================
+
 
 __all__ = [
     "CONTENEDOR",
@@ -1435,6 +2062,9 @@ __all__ = [
     "ALPHA",
     "BETA",
     "CONSTANTES_FUNDACIONALES",
+    "TIPOS_CONSTANTE_VALIDOS",
+    "TIPOS_CONSTANTE_EXACTOS",
+    "POLITICA_CONSTANTES",
     "get_alpha",
     "get_beta",
     "descubrir_constantes",
@@ -1445,14 +2075,14 @@ __all__ = [
     "verificar",
     "reporte",
     "diagnostico",
+    "proyectar_float",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
     "ContratoInvalido",
 ]
 
-# ===============================================================
-# FIN EXPORTACIONES
-# ===============================================================
-
 
 # ===============================================================
-# FIN DEL MÓDULO
+# FIN MÓDULO CT
 # ===============================================================

@@ -12,50 +12,21 @@
 # Compatible desde:    1.0
 # API Engine:          >=1.0
 #
-# Función:
-#   Glosario de IDs del repositorio.
-#   Lee y organiza categorias/*.py y expone esos IDs a Engine.
+# Glosario de IDs del repositorio.
+# Lee categorias/*.py. No calcula. No orquesta.
 #
-# Qué hace:
-#   - Descubre y normaliza categorias/*.py (CATEGORIA / CATEGORIAS / IDS)
-#   - Expone el catálogo de IDs ordenado
-#   - Responde por_id, ids, esquema
-#   - Reporta coherencia, inventario y diagnóstico propios
-#
-# Qué NO hace:
-#   - No calcula Tru_Ri / Tru_total / C / L / K
-#   - No aplica α / β
-#   - No hace conteos
-#   - No clasifica O
-#   - No orquesta el ciclo
-#   - No envía reportes a otros módulos (Engine los recolecta)
-#   - No sustituye CIT / CA / FO / AX / CX / MC / RE / TX / CH
-#
-# Responsabilidad:
-#   Ser el glosario pasivo de IDs. Cero cálculo. Cero orquestación.
-#
-# Autoridad:
-#   - Declarar los IDs disponibles
-#   - Resolver consulta por_id / ids / esquema
-#   - Reportar estado, inventario y diagnóstico propios
-#
-# Conocimiento exportable:
-#   categorias, ids, por_id, esquema, inventario, reporte, diagnostico
-#
-# Relación con Engine:
-#   Engine descubre este CONTENEDOR y consulta IDs cuando se
-#   piden citar / reportar / referenciar.
-#   Engine recolecta reporte() y diagnostico().
-#   Este módulo solo informa.
-#
-# Relación con Omega:
-#   Omega no calcula nada de CC. Solo presenta lo que Engine entrega.
+# Capacidades arquitectónicas (callables reales):
+#   ejecutar_total, inspeccionar, registrar_inventario
 #
 # ===============================================================
 
 
 # ===============================================================
-# IMPORTACIONES
+# PARTE 1 — PRINCIPIOS, BANDERAS Y ESPECIFICACIONES PRECISAS
+# ===============================================================
+
+# ===============================================================
+# 1.1 — IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
@@ -66,25 +37,42 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 # ===============================================================
-# FIN IMPORTACIONES
+# FIN 1.1
 # ===============================================================
 
 
 # ===============================================================
-# CONSTANTES
+# 1.2 — IDENTIDAD
 # ===============================================================
 
 ID_MODULO = "CC"
 NOMBRE_MODULO = "catalogo_citaciones"
 ROL_MODULO = "CC"
 
+# ===============================================================
+# FIN 1.2
+# ===============================================================
+
+
+# ===============================================================
+# 1.3 — VERSIONES Y ESTABILIDAD
+# ===============================================================
+
 VERSION_MODULO = "2.1"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-
 COMPATIBLE_DESDE = "1.0"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
+
+# ===============================================================
+# FIN 1.3
+# ===============================================================
+
+
+# ===============================================================
+# 1.4 — BANDERAS DE ESTADO
+# ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
@@ -97,6 +85,15 @@ ESTADOS_VALIDOS = (
     ESTADO_RECHAZADO,
 )
 
+# ===============================================================
+# FIN 1.4
+# ===============================================================
+
+
+# ===============================================================
+# 1.5 — INVARIANTES
+# ===============================================================
+
 INVARIANTES = (
     "el id del módulo nunca cambia",
     "el rol nunca cambia",
@@ -108,6 +105,15 @@ INVARIANTES = (
     "los IDs viven en categorias/, no en este INIT",
     "este módulo no inventa capacidades no declaradas en CONTENEDOR",
 )
+
+# ===============================================================
+# FIN 1.5
+# ===============================================================
+
+
+# ===============================================================
+# 1.6 — ESQUEMA DE CATEGORÍA
+# ===============================================================
 
 ESQUEMA_CATEGORIA: Dict[str, Any] = {
     "obligatorios": ["id", "nombre", "unidad", "enunciado"],
@@ -140,42 +146,54 @@ _CAMPOS_OBLIGATORIOS = tuple(ESQUEMA_CATEGORIA["obligatorios"])
 _VALORES_PROHIBIDOS = tuple(ESQUEMA_CATEGORIA["prohibidos"])
 
 # ===============================================================
-# FIN CONSTANTES
+# FIN 1.6
 # ===============================================================
 
 
 # ===============================================================
-# CONFIGURACIÓN
+# 1.7 — CONFIGURACIÓN
 # ===============================================================
 
 _DIR = Path(__file__).parent
 _CAT_DIR = _DIR / "categorias"
 
 # ===============================================================
-# FIN CONFIGURACIÓN
+# FIN 1.7
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 1
 # ===============================================================
 
 
 # ===============================================================
-# DEFINICIONES
+# PARTE 4 — DEFINICIONES
+# ===============================================================
+
+# ===============================================================
+# 4.1 — EXCEPCIONES
 # ===============================================================
 
 class ContratoInvalido(Exception):
     """El CONTENEDOR no cumple el esquema o la resolución falló."""
     pass
 
+# ===============================================================
+# FIN 4.1
+# ===============================================================
 
 # ===============================================================
-# FIN DEFINICIONES
+# FIN PARTE 4
 # ===============================================================
 
+
 # ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
+# PARTE 5 — CONTRATO OFICIAL (CONTENEDOR)
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
     # ============================================================
-    # ESQUEMA
+    # 5.1 — ESQUEMA
     # ============================================================
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
@@ -185,7 +203,7 @@ CONTENEDOR: Dict[str, Any] = {
     "api_engine": API_ENGINE,
 
     # ============================================================
-    # IDENTIDAD
+    # 5.2 — IDENTIDAD
     # ============================================================
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
@@ -198,7 +216,7 @@ CONTENEDOR: Dict[str, Any] = {
     ),
 
     # ============================================================
-    # PROPÓSITO
+    # 5.3 — PROPÓSITO
     # ============================================================
     "funcion": (
         "Exponer el catálogo de IDs del repositorio, "
@@ -216,7 +234,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # AUTORIDAD
+    # 5.4 — AUTORIDAD
     # ============================================================
     "autoridad": [
         "Declarar los IDs disponibles en el catálogo",
@@ -226,7 +244,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # CONOCIMIENTO EXPORTABLE
+    # 5.5 — CONOCIMIENTO EXPORTABLE
     # ============================================================
     "conocimiento_exportable": [
         "categorias",
@@ -236,33 +254,36 @@ CONTENEDOR: Dict[str, Any] = {
         "inventario",
         "reporte",
         "diagnostico",
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
     # ============================================================
-    # ACCESO (obligatorio en el esquema)
+    # 5.6 — ACCESO
     # ============================================================
     "acceso": {
         "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
+        "descripcion": "Acceso total a recursos del módulo",
     },
 
     # ============================================================
-    # DEPENDENCIAS
+    # 5.7 — DEPENDENCIAS
     # ============================================================
     "requiere": ["*"],
 
     # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # 5.8 — ACCESO A ARCHIVOS
     # ============================================================
     "acceso_archivos": ["*"],
 
     # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # 5.9 — VALIDAR ESQUEMA
     # ============================================================
     "validar_esquema": ["*"],
-    
+
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # 5.10 — AUTORIZACIÓN AL ENGINE
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -275,11 +296,8 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
@@ -287,7 +305,6 @@ CONTENEDOR: Dict[str, Any] = {
         "procesar": True,
         "analizar": True,
         "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
 
         # --- PERMISOS DE DATOS ---
         "exportar": True,
@@ -314,13 +331,18 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "reporte": True,
 
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
+        # --- PERMISOS OBLIGATORIOS ---
+        "validar_esquema": True,
+        "acceso_archivos": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
     # ============================================================
-    # CONSULTAS SOPORTADAS
+    # 5.11 — CONSULTAS SOPORTADAS
     # ============================================================
     "consultas_soportadas": [
         "listar_ids",
@@ -330,10 +352,13 @@ CONTENEDOR: Dict[str, Any] = {
         "obtener_reporte",
         "obtener_diagnostico",
         "verificar_coherencia",
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
     # ============================================================
-    # CAPACIDADES
+    # 5.12 — CAPACIDADES
     # ============================================================
     "capacidades": {
         "verificar": "barrer",
@@ -346,22 +371,22 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": "reporte",
         "diagnostico": "diagnostico",
         "verificar_salida": "verificar_salida",
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
     },
 
-        # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
+    # 5.13 — METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
         "verificar": {
             "descripcion": "Alias de barrer. Verifica coherencia del glosario.",
             "entrada": "*",
             "validar_esquema": ["*"],
-            "salida": (
-                "dict con coherente, categorias, ids, errores"
-            ),
+            "salida": "dict con coherente, categorias, ids, errores",
             "acceso_archivos": ["*"],
         },
-
         "barrer": {
             "descripcion": (
                 "Evalúa coherencia del glosario de IDs. No calcula."
@@ -373,11 +398,8 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "inventario": {
-            "descripcion": (
-                "Inventario completo del módulo y de los IDs."
-            ),
+            "descripcion": "Inventario completo del módulo y de los IDs.",
             "entrada": "*",
             "validar_esquema": ["*"],
             "salida": (
@@ -385,19 +407,15 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "categorias": {
             "descripcion": (
                 "Lista del catálogo si coherente; si no, lista vacía."
             ),
             "entrada": "*",
             "validar_esquema": ["*"],
-            "salida": (
-                "list[dict] de categorías normalizadas"
-            ),
+            "salida": "list[dict] de categorías normalizadas",
             "acceso_archivos": ["*"],
         },
-
         "por_id": {
             "descripcion": (
                 "Devuelve la categoría normalizada de un id, o None."
@@ -407,17 +425,13 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict | None",
             "acceso_archivos": ["*"],
         },
-
         "ids": {
-            "descripcion": (
-                "Lista de todos los ids del catálogo coherente."
-            ),
+            "descripcion": "Lista de todos los ids del catálogo coherente.",
             "entrada": "*",
             "validar_esquema": ["*"],
             "salida": "list[str]",
             "acceso_archivos": ["*"],
         },
-
         "esquema": {
             "descripcion": (
                 "Esquema de forma de una categoría "
@@ -428,11 +442,8 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict ESQUEMA_CATEGORIA",
             "acceso_archivos": ["*"],
         },
-
         "reporte": {
-            "descripcion": (
-                "Reporte interno de estado del módulo CC."
-            ),
+            "descripcion": "Reporte interno de estado del módulo CC.",
             "entrada": "*",
             "validar_esquema": ["*"],
             "salida": (
@@ -440,7 +451,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "diagnostico": {
             "descripcion": (
                 "Diagnóstico: qué falta o está mal en el glosario."
@@ -452,7 +462,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "verificar_salida": {
             "descripcion": (
                 "Comprueba forma de una salida de barrer: "
@@ -463,10 +472,43 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre CC. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de CC. "
+                "Expone constantes, capacidades, catálogo y estado "
+                "sin alterar el contrato ni calcular."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de CC "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
     },
 
     # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # 5.14 — REPORTING
     # ============================================================
     "reporting": {
         # --- BANDERAS DE ESTADO Y SALUD ---
@@ -497,28 +539,37 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
 
         # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+        "acceso_archivos": True,
+        "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
-
     # ============================================================
-    # ESTADOS VÁLIDOS
+    # 5.15 — ESTADOS VÁLIDOS
     # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
 
     # ============================================================
-    # INVARIANTES
+    # 5.16 — INVARIANTES
     # ============================================================
     "invariantes": list(INVARIANTES),
+}
 
-}  # <--- CIERRE FINAL
+# ===============================================================
+# FIN PARTE 5
+# ===============================================================
+
 
 # ===============================================================
-# FIN CONTRATO
+# PARTE 7 — FUNCIONES PRIVADAS
 # ===============================================================
+
 # ===============================================================
-# FUNCIONES PRIVADAS
+# 7.1 — CARGA DESDE ARCHIVO
 # ===============================================================
 
 def _cargar_desde_archivo(
@@ -578,6 +629,14 @@ def _cargar_desde_archivo(
         )
     return halladas, errores
 
+# ===============================================================
+# FIN 7.1
+# ===============================================================
+
+
+# ===============================================================
+# 7.2 — VALIDAR CATEGORÍA
+# ===============================================================
 
 def _validar_categoria(cat: Dict[str, Any], origen: str) -> List[str]:
     errs: List[str] = []
@@ -598,6 +657,14 @@ def _validar_categoria(cat: Dict[str, Any], origen: str) -> List[str]:
             )
     return errs
 
+# ===============================================================
+# FIN 7.2
+# ===============================================================
+
+
+# ===============================================================
+# 7.3 — NORMALIZAR
+# ===============================================================
 
 def _normalizar(cat: Dict[str, Any], origen: str) -> Dict[str, Any]:
     nivel = cat.get("nivel_fractal")
@@ -631,6 +698,14 @@ def _normalizar(cat: Dict[str, Any], origen: str) -> Dict[str, Any]:
         "notas": str(cat.get("notas") or ""),
     }
 
+# ===============================================================
+# FIN 7.3
+# ===============================================================
+
+
+# ===============================================================
+# 7.4 — RECOLECTAR
+# ===============================================================
 
 def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     cats: List[Dict[str, Any]] = []
@@ -688,6 +763,14 @@ def recolectar() -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     )
     return cats, errores
 
+# ===============================================================
+# FIN 7.4
+# ===============================================================
+
+
+# ===============================================================
+# 7.5 — VALIDAR CONTRATO
+# ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
     obligatorias = (
@@ -743,12 +826,20 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                 )
 
 # ===============================================================
-# FIN FUNCIONES PRIVADAS
+# FIN 7.5
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 7
 # ===============================================================
 
 
 # ===============================================================
-# CAPACIDADES PÚBLICAS
+# PARTE 8 — CAPACIDADES PÚBLICAS
+# ===============================================================
+
+# ===============================================================
+# 8.1 — BARRER
 # ===============================================================
 
 def barrer() -> Dict[str, Any]:
@@ -770,6 +861,27 @@ def barrer() -> Dict[str, Any]:
         "esquema": ESQUEMA_CATEGORIA,
     }
 
+# ===============================================================
+# FIN 8.1
+# ===============================================================
+
+
+# ===============================================================
+# 8.2 — VERIFICAR
+# ===============================================================
+
+def verificar() -> Dict[str, Any]:
+    """Alias contractual real de barrer."""
+    return barrer()
+
+# ===============================================================
+# FIN 8.2
+# ===============================================================
+
+
+# ===============================================================
+# 8.3 — CATEGORIAS
+# ===============================================================
 
 def categorias() -> List[Dict[str, Any]]:
     r = barrer()
@@ -778,6 +890,14 @@ def categorias() -> List[Dict[str, Any]]:
     cats, _ = recolectar()
     return cats
 
+# ===============================================================
+# FIN 8.3
+# ===============================================================
+
+
+# ===============================================================
+# 8.4 — POR ID
+# ===============================================================
 
 def por_id(cat_id: str) -> Optional[Dict[str, Any]]:
     key = str(cat_id or "").strip().lower()
@@ -786,14 +906,38 @@ def por_id(cat_id: str) -> Optional[Dict[str, Any]]:
             return dict(c)
     return None
 
+# ===============================================================
+# FIN 8.4
+# ===============================================================
+
+
+# ===============================================================
+# 8.5 — IDS
+# ===============================================================
 
 def ids() -> List[str]:
     return [c["id"] for c in categorias()]
 
+# ===============================================================
+# FIN 8.5
+# ===============================================================
+
+
+# ===============================================================
+# 8.6 — ESQUEMA
+# ===============================================================
 
 def esquema() -> Dict[str, Any]:
     return dict(ESQUEMA_CATEGORIA)
 
+# ===============================================================
+# FIN 8.6
+# ===============================================================
+
+
+# ===============================================================
+# 8.7 — INVENTARIO
+# ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     cats, errores = recolectar()
@@ -829,6 +973,14 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         ),
     }
 
+# ===============================================================
+# FIN 8.7
+# ===============================================================
+
+
+# ===============================================================
+# 8.8 — VERIFICAR SALIDA
+# ===============================================================
 
 def verificar_salida(salida: Dict[str, Any]) -> bool:
     if not isinstance(salida, dict):
@@ -847,17 +999,202 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
         return False
     return True
 
-
-def verificar() -> Dict[str, Any]:
-    return barrer()
-
 # ===============================================================
-# FIN CAPACIDADES PÚBLICAS
+# FIN 8.8
 # ===============================================================
 
 
 # ===============================================================
-# REPORTING INTERNO
+# 8.9 — EJECUTAR TOTAL
+# ===============================================================
+
+def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Autoridad total de ENGINE sobre CC.
+    Ejerce TODAS las unidades operativamente ejecutables del módulo.
+    Todo es callable real. No inventa capacidades.
+    """
+    peticion = dict(peticion or {}) if isinstance(peticion, dict) else {}
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    try:
+        resultados["barrer"] = barrer()
+        resultados["verificar"] = resultados["barrer"]
+    except Exception as e:
+        errores_ejecucion.append("barrer: {0}".format(e))
+        resultados["barrer"] = None
+
+    try:
+        resultados["inventario"] = inventario(peticion)
+    except Exception as e:
+        errores_ejecucion.append("inventario: {0}".format(e))
+        resultados["inventario"] = None
+
+    try:
+        resultados["categorias"] = categorias()
+    except Exception as e:
+        errores_ejecucion.append("categorias: {0}".format(e))
+        resultados["categorias"] = None
+
+    try:
+        resultados["ids"] = ids()
+    except Exception as e:
+        errores_ejecucion.append("ids: {0}".format(e))
+        resultados["ids"] = None
+
+    try:
+        resultados["esquema"] = esquema()
+    except Exception as e:
+        errores_ejecucion.append("esquema: {0}".format(e))
+        resultados["esquema"] = None
+
+    try:
+        resultados["reporte"] = reporte()
+    except Exception as e:
+        errores_ejecucion.append("reporte: {0}".format(e))
+        resultados["reporte"] = None
+
+    try:
+        resultados["diagnostico"] = diagnostico()
+    except Exception as e:
+        errores_ejecucion.append("diagnostico: {0}".format(e))
+        resultados["diagnostico"] = None
+
+    try:
+        resultados["inspeccionar"] = inspeccionar(peticion)
+    except Exception as e:
+        errores_ejecucion.append("inspeccionar: {0}".format(e))
+        resultados["inspeccionar"] = None
+
+    try:
+        resultados["registrar_inventario"] = registrar_inventario(peticion)
+    except Exception as e:
+        errores_ejecucion.append("registrar_inventario: {0}".format(e))
+        resultados["registrar_inventario"] = None
+
+    coherente = False
+    if isinstance(resultados.get("barrer"), dict):
+        coherente = bool(resultados["barrer"].get("coherente"))
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
+        "coherente": coherente,
+        "capacidades_ejecutadas": sorted([
+            k for k, v in resultados.items() if v is not None
+        ]),
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "nota": (
+            "ejecutar_total ejerce autoridad total de ENGINE sobre CC. "
+            "Todas las unidades son callables reales. "
+            "No inventa capacidades ni altera el contrato."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.9
+# ===============================================================
+
+
+# ===============================================================
+# 8.10 — INSPECCIONAR
+# ===============================================================
+
+def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """
+    Inspección estructural de CC.
+    Expone contrato, catálogo y estado sin calcular.
+    """
+    res_barrer = barrer()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+        },
+        "capacidades_contractuales": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": list(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "integridad": {
+            "coherente": res_barrer.get("coherente"),
+            "categorias": res_barrer.get("categorias"),
+            "ids": res_barrer.get("ids"),
+            "errores": res_barrer.get("errores"),
+        },
+        "esquema_categoria": ESQUEMA_CATEGORIA,
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone estructura de CC sin calcular "
+            "ni alterar el contrato."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.10
+# ===============================================================
+
+
+# ===============================================================
+# 8.11 — REGISTRAR INVENTARIO
+# ===============================================================
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Registra el inventario estructural de CC como instantánea determinista.
+    No altera evidencia.
+    """
+    inv = inventario(peticion)
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inv,
+        "nota": (
+            "Instantánea determinista del inventario de CC. "
+            "No modifica el glosario ni evidencia."
+        ),
+    }
+
+# ===============================================================
+# FIN 8.11
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 8
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 9 — REPORTING INTERNO
+# ===============================================================
+
+# ===============================================================
+# 9.1 — REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
@@ -885,8 +1222,21 @@ def reporte() -> Dict[str, Any]:
             "conocimiento_exportable"
         ),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": True,
+            "inspeccionar": True,
+            "registrar_inventario": True,
+        },
     }
 
+# ===============================================================
+# FIN 9.1
+# ===============================================================
+
+
+# ===============================================================
+# 9.2 — DIAGNÓSTICO
+# ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
     r = barrer()
@@ -925,12 +1275,20 @@ def diagnostico() -> Dict[str, Any]:
     }
 
 # ===============================================================
-# FIN REPORTING
+# FIN 9.2
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 9
 # ===============================================================
 
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA
+# PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
+# ===============================================================
+
+# ===============================================================
+# 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
 _CAP_MAP = {
@@ -944,8 +1302,19 @@ _CAP_MAP = {
     "reporte": reporte,
     "diagnostico": diagnostico,
     "verificar_salida": verificar_salida,
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
 
+# ===============================================================
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     resueltas: Dict[str, Any] = {}
@@ -974,9 +1343,26 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
         )
     cont["capacidades"] = resueltas
 
+# ===============================================================
+# FIN 10.2
+# ===============================================================
+
+
+# ===============================================================
+# 10.3 — EJECUCIÓN DE VALIDACIÓN Y RESOLUCIÓN
+# ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# FIN 10.3
+# ===============================================================
+
+
+# ===============================================================
+# 10.4 — EXPORTACIONES
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -999,32 +1385,18 @@ __all__ = [
     "verificar_salida",
     "reporte",
     "diagnostico",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
     "ContratoInvalido",
 ]
 
 # ===============================================================
-# FIN EXPORTACIONES
+# FIN 10.4
 # ===============================================================
 
-
 # ===============================================================
-# EXTENSIONES FUTURAS
-# ===============================================================
-#
-# Toda capacidad nueva DEBE agregarse simultáneamente en:
-#   1. capacidades
-#   2. capacidades_meta  (descripcion, entrada, salida: str)
-#   3. _CAP_MAP
-#   4. VERSION_MODULO
-#
-# Todo ID nuevo: agregar archivo en categorias/*.py
-# (CATEGORIA, CATEGORIAS o IDS). Este INIT los descubre solo.
-#
-# Si este módulo necesitara una capacidad de otro módulo,
-# se declara en requiere[]. Engine la resuelve y la entrega.
-#
-# ===============================================================
-# FIN EXTENSIONES FUTURAS
+# FIN PARTE 10
 # ===============================================================
 
 

@@ -40,17 +40,31 @@
 # 1.1 — IMPORTACIONES
 # ===============================================================
 
+
 from __future__ import annotations
 
+# --- Estándar del lenguaje ---
+import sys
+import math
 import ast
 import copy
-import importlib.util
-import sys
 import threading
-from collections import defaultdict
-from datetime import datetime, timezone
-from pathlib import Path
+import importlib.util
+
+# --- Tipos y estructuras ---
 from typing import Any, Dict, List, Optional, Set, Tuple
+from collections import defaultdict
+
+# --- Números y precisión ---
+from decimal import Decimal, getcontext
+from fractions import Fraction
+
+# --- Fechas y tiempo ---
+from datetime import datetime, timezone
+
+# --- Sistema de archivos ---
+from pathlib import Path
+
 
 # ===============================================================
 # FIN 1.1

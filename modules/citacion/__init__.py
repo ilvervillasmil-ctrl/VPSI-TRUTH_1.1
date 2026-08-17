@@ -363,19 +363,11 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
     ],
-}
 
-
-# ===============================================================
-# FIN SECCIÓN 3
-# ===============================================================
 
     # ===========================================================
     # 3.8 — ACCESO
     # ===========================================================
-    #
-    # Acceso declarado por el contrato del módulo.
-    #
 
     "acceso": {
         "nivel": "completo",
@@ -386,9 +378,6 @@ CONTENEDOR: Dict[str, Any] = {
     # ===========================================================
     # 3.9 — DEPENDENCIAS
     # ===========================================================
-    #
-    # Módulos requeridos por CIT para su operación contractual.
-    #
 
     "requiere": [
         "CT",
@@ -412,9 +401,6 @@ CONTENEDOR: Dict[str, Any] = {
     # ===========================================================
     # 3.10 — ACCESO A ARCHIVOS
     # ===========================================================
-    #
-    # Acceso declarado a los recursos de archivos.
-    #
 
     "acceso_archivos": ["*"],
 
@@ -422,9 +408,6 @@ CONTENEDOR: Dict[str, Any] = {
     # ===========================================================
     # 3.11 — VALIDACIÓN DE ESQUEMA
     # ===========================================================
-    #
-    # Ámbito declarado para validación de esquema a nivel módulo.
-    #
 
     "validar_esquema": ["*"],
 
@@ -452,10 +435,6 @@ CONTENEDOR: Dict[str, Any] = {
     # ===========================================================
     # 3.13 — AUTORIZACIÓN AL ENGINE
     # ===========================================================
-    #
-    # Este bloque declara permisos del Engine sobre CIT.
-    # No constituye por sí mismo una capacidad ejecutable.
-    #
 
     "autoriza_engine": {
 
@@ -537,17 +516,16 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
 
-       # ===========================================================
+    # ===========================================================
     # 3.14 — CAPACIDADES
     # ===========================================================
     #
     # Mapa contractual completo de capacidades ejecutables de CIT.
     # No se elimina ninguna capacidad existente.
-    # Las capacidades arquitectónicas de Engine forman parte
-    # explícita de la superficie callable del módulo.
     #
 
     "capacidades": {
+
         "verificar": verificar,
         "barrer": barrer,
         "inventario": inventario,
@@ -580,22 +558,9 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
 
-        # ============================================================
+    # ===========================================================
     # 3.15 — CAPACIDADES META
-    # ============================================================
-    #
-    # Describe formalmente cada capacidad callable declarada en
-    # CONTENEDOR["capacidades"].
-    #
-    # Regla:
-    #   cada capacidad declarada debe poseer una capacidades_meta
-    #   correspondiente.
-    #
-    # Las metacapacidades no ejecutan la función.
-    # Describen entrada, validación, salida y acceso contractual.
-    #
-    # Todas las capacidades deben ser resolubles a callables reales.
-    # ============================================================
+    # ===========================================================
 
     "capacidades_meta": {
 
@@ -865,10 +830,6 @@ CONTENEDOR: Dict[str, Any] = {
         # ========================================================
         # 3.15.19 — EJECUTAR TOTAL
         # ========================================================
-        #
-        # Autoridad operativa total del Engine sobre las unidades
-        # ejecutables declaradas por CIT.
-        #
 
         "ejecutar_total": {
             "descripcion": (
@@ -890,9 +851,6 @@ CONTENEDOR: Dict[str, Any] = {
         # ========================================================
         # 3.15.20 — INSPECCIONAR
         # ========================================================
-        #
-        # Exposición estructural del módulo sin cálculo.
-        #
 
         "inspeccionar": {
             "descripcion": (
@@ -915,9 +873,6 @@ CONTENEDOR: Dict[str, Any] = {
         # ========================================================
         # 3.15.21 — REGISTRAR INVENTARIO
         # ========================================================
-        #
-        # Instantánea contractual del inventario.
-        #
 
         "registrar_inventario": {
             "descripcion": (
@@ -934,10 +889,6 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-
-    # ===============================================================
-# SECCIÓN 7 — REPORTING, ESTADOS E INVARIANTES CONTRACTUALES
-# ===============================================================
 
     # ============================================================
     # 7.1 — REPORTING
@@ -1050,7 +1001,7 @@ CONTENEDOR: Dict[str, Any] = {
 # ===============================================================
 # FIN SECCIÓN 3 — CONTENEDOR
 # ===============================================================
-
+ 
 # ===============================================================
 # SECCIÓN 4 — REGISTRO DE DECLARACIONES
 # ===============================================================

@@ -4580,7 +4580,6 @@ def diagnostico() -> Dict[str, Any]:
 # FIN PARTE 9
 # ===============================================================
 
-
 # ===============================================================
 # PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
 # ===============================================================
@@ -4606,14 +4605,11 @@ _CAP_MAP = {
     "leer_ids_escala": leer_ids_escala,
     "verificar_salida": verificar_salida,
     "historial": historial,
-    "verificar_calculo_de_C_L_K": (
-        verificar_calculo_de_C_L_K
-    ),
+    "verificar_calculo_de_C_L_K": verificar_calculo_de_C_L_K,
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
 }
-
 
 # ===============================================================
 # FIN 10.1
@@ -4624,111 +4620,54 @@ _CAP_MAP = {
 # 10.2 — RESOLUCIÓN DE CAPACIDADES
 # ===============================================================
 
-def _resolver_capacidades(
-    cont: Dict[str, Any],
-) -> None:
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     """
-    Resuelve de forma estricta todas las capacidades
-    declaradas por CONTENEDOR.
+    Resuelve exclusivamente las capacidades declaradas
+    por el contrato.
 
-    Cada capacidad debe ser:
-      1. callable directamente; o
-      2. una cadena existente en _CAP_MAP.
-
-    No acepta referencias inexistentes.
-    No acepta tipos ambiguos.
-    No crea funciones.
+    Reglas deterministas:
+      1. Cada capacidad debe existir en CONTENEDOR["capacidades"].
+      2. Una referencia callable se acepta directamente.
+      3. Una referencia str debe existir exactamente en _CAP_MAP.
+      4. La referencia resuelta debe ser callable.
+      5. Una referencia de otro tipo invalida el contrato.
+      6. No se crean capacidades.
+      7. No se sustituyen capacidades.
+      8. No se infieren nombres.
+      9. No se modifican contratos externos.
     """
-
-    capacidades = cont.get("capacidades")
-
-    if not isinstance(capacidades, dict):
-        raise ContratoInvalido(
-            "{0}: 'capacidades' debe ser dict".format(
-                NOMBRE_MODULO
-            )
-        )
 
     resueltas: Dict[str, Any] = {}
 
-    for nombre, ref in capacidades.items():
+    for nombre, ref in cont["capacidades"].items():
 
-        # -------------------------------------------------------
-        # 10.2.1 — NOMBRE DE CAPACIDAD
-        # -------------------------------------------------------
-        if not isinstance(nombre, str) or not nombre.strip():
-            raise ContratoInvalido(
-                "{0}: nombre de capacidad invalido: {1!r}".format(
-                    NOMBRE_MODULO,
-                    nombre,
-                )
-            )
-
-        # -------------------------------------------------------
-        # 10.2.2 — REFERENCIA CALLABLE DIRECTA
-        # -------------------------------------------------------
         if callable(ref):
             resueltas[nombre] = ref
             continue
 
-        # -------------------------------------------------------
-        # 10.2.3 — REFERENCIA POR NOMBRE
-        # -------------------------------------------------------
         if isinstance(ref, str):
 
             if ref not in _CAP_MAP:
                 raise ContratoInvalido(
-                    "{0}: capacidad '{1}' referencia "
-                    "inexistente: '{2}'".format(
-                        NOMBRE_MODULO,
-                        nombre,
-                        ref,
-                    )
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                    f"referencia inexistente: '{ref}'"
                 )
 
             fn = _CAP_MAP[ref]
 
             if not callable(fn):
                 raise ContratoInvalido(
-                    "{0}: referencia '{1}' de capacidad "
-                    "'{2}' no es callable".format(
-                        NOMBRE_MODULO,
-                        ref,
-                        nombre,
-                    )
+                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
                 )
 
             resueltas[nombre] = fn
             continue
 
-        # -------------------------------------------------------
-        # 10.2.4 — TIPO NO SOPORTADO
-        # -------------------------------------------------------
         raise ContratoInvalido(
-            "{0}: capacidad '{1}' tiene referencia de "
-            "tipo invalido: {2}".format(
-                NOMBRE_MODULO,
-                nombre,
-                type(ref).__name__,
-            )
+            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+            f"tipo invalido: {type(ref).__name__}"
         )
 
-    # -----------------------------------------------------------
-    # 10.2.5 — VALIDACIÓN FINAL DE RESOLUCIÓN
-    # -----------------------------------------------------------
-    for nombre, fn in resueltas.items():
-        if not callable(fn):
-            raise ContratoInvalido(
-                "{0}: capacidad '{1}' no quedo callable "
-                "despues de resolver".format(
-                    NOMBRE_MODULO,
-                    nombre,
-                )
-            )
-
-    # -----------------------------------------------------------
-    # 10.2.6 — PUBLICACIÓN DE RESOLUCIÓN
-    # -----------------------------------------------------------
     cont["capacidades"] = resueltas
 
 
@@ -4761,37 +4700,31 @@ __all__ = [
     "VERSION_MODULO",
     "VERSION_CONTRATO",
     "ESQUEMA_CONTRATO",
+    "ESTABILIDAD",
     "UNDEFINED",
     "es_undefined",
-
     "calcular",
     "calcular_C",
     "calcular_L",
     "calcular_K",
     "calcular_factor",
-
     "representar",
     "validar_evidencia",
     "explicar_calculo",
-
     "barrer",
     "verificar",
     "inventario",
     "reporte",
     "diagnostico",
     "leer_ids_escala",
-
     "verificar_salida",
     "historial",
     "verificar_calculo_de_C_L_K",
-
     "ejecutar_total",
     "inspeccionar",
     "registrar_inventario",
-
     "ContratoInvalido",
 ]
-
 
 # ===============================================================
 # FIN 10.4

@@ -539,45 +539,83 @@ CONTENEDOR: Dict[str, Any] = {
 # FUNCIONES PRIVADAS
 # ===============================================================
 
+
+# ===============================================================
+# 1. LECTURA DE MECÁNICAS
+# ===============================================================
+
 def _leer() -> Dict[str, Any]:
     """
     Recorre absolutamente todos los archivos .py de esta carpeta
     y recoge cualquier declaración MECANICA que encuentre.
     """
     hallado: Dict[str, Any] = {}
+
     for archivo in sorted(_DIR.glob("*.py")):
         if archivo.name.startswith("_") or archivo.name == "__init__.py":
             continue
 
         clave = f"mecanica_{archivo.stem}"
         spec = importlib.util.spec_from_file_location(clave, archivo)
+
         if spec is None or spec.loader is None:
             continue
 
         mod = importlib.util.module_from_spec(spec)
         sys.modules[clave] = mod
+
         try:
             spec.loader.exec_module(mod)
         except Exception:
             continue
 
         meta = getattr(mod, "MECANICA", None)
+
         if isinstance(meta, dict):
             hallado[archivo.name] = meta
 
     return hallado
 
 
-def _nodos(meta: Dict[str, Any]) -> List[str]:
-    orden = meta.get("orden", [])
-    if isinstance(orden, (list, tuple)):
-        return [str(x) for x in orden]
-    return []
+# ===============================================================
+# 2. RESOLUCIÓN DE NODOS
+# ===============================================================
 
+def _nodos(meta: Dict[str, Any]) -> List[str]:
+    """
+    Extrae el orden nativo declarado por una MECANICA.
+    Una declaración sin orden legible no produce nodos.
+    """
+    if not isinstance(meta, dict):
+        return []
+
+    orden = meta.get("orden")
+
+    if not isinstance(orden, (list, tuple)):
+        return []
+
+    return [str(nodo) for nodo in orden]
+
+
+# ===============================================================
+# 3. CONSTRUCCIÓN DE PRECEDENCIAS
+# ===============================================================
 
 def _precedencias(nodos: List[str]) -> List[Tuple[str, str]]:
-    return [(a, b) for i, a in enumerate(nodos) for b in nodos[i + 1:]]
+    """
+    Convierte un orden lineal de nodos en relaciones de precedencia.
+    """
+    return [
+        (a, b)
+        for i, a in enumerate(nodos)
+        for b in nodos[i + 1:]
+        if a != b
+    ]
 
+
+# ===============================================================
+# 4. CONSTRUCCIÓN DE INFORME
+# ===============================================================
 
 def _informe(
     mecanica: List[str],
@@ -585,186 +623,1174 @@ def _informe(
     errores: List[str],
     hallado: Dict[str, Any],
 ) -> Dict[str, Any]:
+    """
+    Construye el informe determinista de correlación mecánica.
+    """
     limpio = not (choques or errores)
+
     return {
         "contenedor": NOMBRE_MODULO,
         "estado": APROBADO if limpio else RECHAZADO,
         "coherente": limpio,
-        "choques": choques,
-        "errores": errores,
-        "mecanica": mecanica if limpio else [],
+        "choques": list(choques),
+        "errores": list(errores),
+        "mecanica": list(mecanica) if limpio else [],
         "archivos": sorted(hallado.keys()),
         "total_mecanicas": len(hallado),
     }
 
 
+# ===============================================================
+# 5. VALIDACIÓN ESTRUCTURAL DEL CONTRATO
+# ===============================================================
+
 def _validar_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Valida la estructura del CONTENEDOR sin modificarlo,
+    sin inventar campos y sin resolver capacidades.
+    """
+    if not isinstance(cont, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR debe ser dict"
+        )
+
     obligatorias = (
-        "esquema", "version_contrato", "version_modulo",
-        "id", "nombre", "rol", "descripcion",
-        "funcion", "no_hace", "autoridad",
-        "conocimiento_exportable", "requiere",
-        "autoriza_engine", "consultas_soportadas",
-        "capacidades", "capacidades_meta",
-        "reporting", "estados_validos", "invariantes",
-        "estabilidad", "compatible_desde", "api_engine",
+        "esquema",
+        "version_contrato",
+        "version_modulo",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+        "id",
+        "nombre",
+        "rol",
+        "descripcion",
+        "funcion",
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "acceso",
+        "requiere",
+        "acceso_archivos",
+        "validar_esquema",
+        "autoriza_engine",
+        "consultas_soportadas",
+        "capacidades",
+        "capacidades_meta",
+        "reporting",
+        "estados_validos",
+        "invariantes",
     )
-    faltantes = [k for k in obligatorias if k not in cont]
+
+    faltantes = [
+        clave
+        for clave in obligatorias
+        if clave not in cont
+    ]
+
     if faltantes:
         raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
+            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. "
+            f"Faltan: {faltantes}"
         )
+
+
+# ===============================================================
+# 6. VALIDACIÓN DE IDENTIDAD Y ESQUEMA
+# ===============================================================
+
+def _validar_identidad_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica que la identidad declarada corresponda al módulo.
+    """
     if cont.get("esquema") != ESQUEMA_CONTRATO:
         raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: esquema incompatible: {cont.get('esquema')}"
+            f"{NOMBRE_MODULO}: esquema incompatible: "
+            f"{cont.get('esquema')}"
         )
+
     if str(cont.get("version_contrato")) != VERSION_CONTRATO:
         raise ContratoInvalido(
-            f"{NOMBRE_MODULO}: version_contrato inválida: {cont.get('version_contrato')}"
+            f"{NOMBRE_MODULO}: version_contrato inválida: "
+            f"{cont.get('version_contrato')}"
         )
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
+
+    if cont.get("id") != ID_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: id contractual inválido: "
+            f"{cont.get('id')}"
+        )
+
+    if cont.get("nombre") != NOMBRE_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: nombre contractual inválido: "
+            f"{cont.get('nombre')}"
+        )
+
+    if cont.get("rol") != ROL_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: rol contractual inválido: "
+            f"{cont.get('rol')}"
+        )
+
+
+# ===============================================================
+# 7. VALIDACIÓN DE TIPOS CONTRACTUALES
+# ===============================================================
+
+def _validar_tipos_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica los tipos estructurales exigidos por el contrato.
+    """
+    campos_str = (
+        "version_modulo",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+        "descripcion",
+        "funcion",
+    )
+
+    for campo in campos_str:
+        if not isinstance(cont.get(campo), str):
             raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidad '{nombre_cap}' sin capacidades_meta"
+                f"{NOMBRE_MODULO}: '{campo}' debe ser str"
             )
-        entrada = meta_caps[nombre_cap]
-        if not isinstance(entrada, dict):
+
+    campos_lista = (
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "consultas_soportadas",
+        "estados_validos",
+        "invariantes",
+    )
+
+    for campo in campos_lista:
+        if not isinstance(cont.get(campo), list):
             raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] debe ser dict"
+                f"{NOMBRE_MODULO}: '{campo}' debe ser list"
             )
-        for campo in ("descripcion", "entrada", "salida"):
-            if campo not in entrada or not isinstance(entrada[campo], str):
+
+
+# ===============================================================
+# 8. VALIDACIÓN DE ACCESO CONTRACTUAL
+# ===============================================================
+
+def _validar_acceso_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica la estructura de acceso declarada por el módulo.
+    """
+    acceso = cont.get("acceso")
+
+    if not isinstance(acceso, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: acceso debe ser dict"
+        )
+
+    if not isinstance(acceso.get("nivel"), str):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: acceso.nivel debe ser str"
+        )
+
+    if not isinstance(acceso.get("descripcion"), str):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: acceso.descripcion debe ser str"
+        )
+
+    acceso_archivos = cont.get("acceso_archivos")
+
+    if not isinstance(acceso_archivos, list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: acceso_archivos debe ser list"
+        )
+
+    validar_esquema = cont.get("validar_esquema")
+
+    if not isinstance(validar_esquema, list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: validar_esquema debe ser list"
+        )
+
+
+# ===============================================================
+# 9. VALIDACIÓN DE BLOQUES CONTRACTUALES
+# ===============================================================
+
+def _validar_bloques_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica que los bloques contractuales principales existan
+    con su estructura base.
+    """
+    autoriza_engine = cont.get("autoriza_engine")
+
+    if not isinstance(autoriza_engine, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: autoriza_engine debe ser dict"
+        )
+
+    reporting = cont.get("reporting")
+
+    if not isinstance(reporting, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: reporting debe ser dict"
+        )
+
+    capacidades = cont.get("capacidades")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades debe ser dict"
+        )
+
+    capacidades_meta = cont.get("capacidades_meta")
+
+    if not isinstance(capacidades_meta, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades_meta debe ser dict"
+        )
+
+
+# ===============================================================
+# 10. VALIDACIÓN 1:1 DE CAPACIDADES
+# ===============================================================
+
+def _validar_capacidades_meta(cont: Dict[str, Any]) -> None:
+    """
+    Garantiza correspondencia exacta 1:1 entre capacidades
+    y capacidades_meta.
+    """
+    capacidades = cont["capacidades"]
+    capacidades_meta = cont["capacidades_meta"]
+
+    nombres_capacidades = set(capacidades.keys())
+    nombres_meta = set(capacidades_meta.keys())
+
+    faltantes = sorted(
+        nombres_capacidades - nombres_meta
+    )
+
+    sobrantes = sorted(
+        nombres_meta - nombres_capacidades
+    )
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades sin capacidades_meta: "
+            f"{faltantes}"
+        )
+
+    if sobrantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades_meta sin capacidad declarada: "
+            f"{sobrantes}"
+        )
+
+
+# ===============================================================
+# 11. VALIDACIÓN DE REFERENCIAS DE CAPACIDADES
+# ===============================================================
+
+def _validar_referencias_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Verifica que cada capacidad posea una referencia resoluble
+    como str o callable. La resolución efectiva corresponde a
+    _resolver_capacidades().
+    """
+    for nombre, referencia in cont["capacidades"].items():
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: identificador de capacidad inválido"
+            )
+
+        if not isinstance(referencia, str) and not callable(referencia):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"debe contener referencia str o callable"
+            )
+
+
+# ===============================================================
+# 12. VALIDACIÓN DE METADATOS DE CAPACIDADES
+# ===============================================================
+
+def _validar_metadatos_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Verifica la estructura mínima determinista de cada metadata.
+    """
+    for nombre in sorted(cont["capacidades"]):
+        meta = cont["capacidades_meta"][nombre]
+
+        if not isinstance(meta, dict):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"debe ser dict"
+            )
+
+        for campo in (
+            "descripcion",
+            "entrada",
+            "salida",
+        ):
+            if campo not in meta:
                 raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] "
-                    f"requiere '{campo}: str'"
+                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                    f"requiere '{campo}'"
                 )
+
+            if not isinstance(meta[campo], str):
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                    f"'{campo}' debe ser str"
+                )
+
+        if "validar_esquema" not in meta:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"requiere 'validar_esquema'"
+            )
+
+        if not isinstance(meta["validar_esquema"], list):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"'validar_esquema' debe ser list"
+            )
+
+        if "acceso_archivos" not in meta:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"requiere 'acceso_archivos'"
+            )
+
+        if not isinstance(meta["acceso_archivos"], list):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"'acceso_archivos' debe ser list"
+            )
+
+
+# ===============================================================
+# 13. VALIDACIÓN CONTRACTUAL COMPLETA
+# ===============================================================
+
+def _validar_contrato_completo(cont: Dict[str, Any]) -> None:
+    """
+    Ejecuta todas las validaciones estructurales en orden determinista.
+    No modifica el CONTENEDOR.
+    """
+    _validar_contrato(cont)
+    _validar_identidad_contrato(cont)
+    _validar_tipos_contrato(cont)
+    _validar_acceso_contrato(cont)
+    _validar_bloques_contrato(cont)
+    _validar_capacidades_meta(cont)
+    _validar_referencias_capacidades(cont)
+    _validar_metadatos_capacidades(cont)
+
 
 # ===============================================================
 # FIN FUNCIONES PRIVADAS
 # ===============================================================
 
+# ===============================================================
+# FUNCIONES PRIVADAS
+# ===============================================================
+
 
 # ===============================================================
-# CAPACIDADES PÚBLICAS
+# 1. LECTURA DETERMINISTA DE MECÁNICAS
 # ===============================================================
 
-def axiomas() -> List[Dict[str, Any]]:
-    return list(DECLARACIONES)
+def _leer() -> Dict[str, Any]:
+    """
+    Recorre determinísticamente todos los archivos .py de esta carpeta,
+    excluye los archivos no declarativos y recoge únicamente MECANICA
+    cuando su valor es un dict válido.
+    """
+    hallado: Dict[str, Any] = {}
 
+    for archivo in sorted(_DIR.glob("*.py"), key=lambda p: p.name):
+        if archivo.name.startswith("_") or archivo.name == "__init__.py":
+            continue
+
+        clave = f"mecanica_{archivo.stem}"
+        spec = importlib.util.spec_from_file_location(clave, archivo)
+
+        if spec is None or spec.loader is None:
+            continue
+
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[clave] = mod
+
+        try:
+            spec.loader.exec_module(mod)
+        except Exception:
+            continue
+
+        meta = getattr(mod, "MECANICA", None)
+
+        if isinstance(meta, dict):
+            hallado[archivo.name] = meta
+
+    return hallado
+
+
+# ===============================================================
+# 2. RESOLUCIÓN DETERMINISTA DE NODOS
+# ===============================================================
+
+def _nodos(meta: Dict[str, Any]) -> List[str]:
+    """
+    Extrae exclusivamente el orden nativo declarado por MECANICA.
+    Una MECANICA sin orden iterable no produce nodos.
+    """
+    if not isinstance(meta, dict):
+        return []
+
+    orden = meta.get("orden")
+
+    if not isinstance(orden, (list, tuple)):
+        return []
+
+    return [str(nodo) for nodo in orden]
+
+
+# ===============================================================
+# 3. CONSTRUCCIÓN DETERMINISTA DE PRECEDENCIAS
+# ===============================================================
+
+def _precedencias(nodos: List[str]) -> List[Tuple[str, str]]:
+    """
+    Convierte un orden lineal de nodos en relaciones de precedencia
+    manteniendo exclusivamente pares distintos y su orden declarado.
+    """
+    return [
+        (a, b)
+        for i, a in enumerate(nodos)
+        for b in nodos[i + 1:]
+        if a != b
+    ]
+
+
+# ===============================================================
+# 4. CONSTRUCCIÓN DETERMINISTA DEL INFORME
+# ===============================================================
+
+def _informe(
+    mecanica: List[str],
+    choques: List[str],
+    errores: List[str],
+    hallado: Dict[str, Any],
+) -> Dict[str, Any]:
+    """
+    Construye el informe sin modificar ninguna entrada.
+    """
+    choques_final = list(choques)
+    errores_final = list(errores)
+    limpio = not (choques_final or errores_final)
+
+    return {
+        "contenedor": NOMBRE_MODULO,
+        "estado": APROBADO if limpio else RECHAZADO,
+        "coherente": limpio,
+        "choques": choques_final,
+        "errores": errores_final,
+        "mecanica": list(mecanica) if limpio else [],
+        "archivos": sorted(hallado.keys()),
+        "total_mecanicas": len(hallado),
+    }
+
+
+# ===============================================================
+# 5. VALIDACIÓN DE ESTRUCTURA BASE DEL CONTRATO
+# ===============================================================
+
+def _validar_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica que CONTENEDOR exista como dict y contenga exactamente
+    los bloques contractuales requeridos por este módulo.
+    No resuelve capacidades ni modifica el contrato.
+    """
+    if not isinstance(cont, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR debe ser dict"
+        )
+
+    obligatorias = (
+        "esquema",
+        "version_contrato",
+        "version_modulo",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+        "id",
+        "nombre",
+        "rol",
+        "descripcion",
+        "funcion",
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "acceso",
+        "requiere",
+        "acceso_archivos",
+        "validar_esquema",
+        "autoriza_engine",
+        "consultas_soportadas",
+        "capacidades",
+        "capacidades_meta",
+        "reporting",
+        "estados_validos",
+        "invariantes",
+    )
+
+    faltantes = [
+        clave
+        for clave in obligatorias
+        if clave not in cont
+    ]
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. "
+            f"Faltan: {faltantes}"
+        )
+
+
+# ===============================================================
+# 6. VALIDACIÓN DE IDENTIDAD CONTRACTUAL
+# ===============================================================
+
+def _validar_identidad_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica que los identificadores contractuales correspondan
+    exclusivamente a las constantes declaradas por este módulo.
+    """
+    if cont.get("esquema") != ESQUEMA_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: esquema incompatible: "
+            f"{cont.get('esquema')}"
+        )
+
+    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: version_contrato inválida: "
+            f"{cont.get('version_contrato')}"
+        )
+
+    if cont.get("id") != ID_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: id contractual inválido: "
+            f"{cont.get('id')}"
+        )
+
+    if cont.get("nombre") != NOMBRE_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: nombre contractual inválido: "
+            f"{cont.get('nombre')}"
+        )
+
+    if cont.get("rol") != ROL_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: rol contractual inválido: "
+            f"{cont.get('rol')}"
+        )
+
+
+# ===============================================================
+# 7. VALIDACIÓN DE TIPOS CONTRACTUALES
+# ===============================================================
+
+def _validar_tipos_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica los tipos estructurales mínimos del contrato.
+    """
+    campos_str = (
+        "version_modulo",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+        "descripcion",
+        "funcion",
+    )
+
+    for campo in campos_str:
+        if not isinstance(cont.get(campo), str):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: '{campo}' debe ser str"
+            )
+
+    campos_lista = (
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "consultas_soportadas",
+        "estados_validos",
+        "invariantes",
+        "requiere",
+        "acceso_archivos",
+        "validar_esquema",
+    )
+
+    for campo in campos_lista:
+        if not isinstance(cont.get(campo), list):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: '{campo}' debe ser list"
+            )
+
+
+# ===============================================================
+# 8. VALIDACIÓN DE ACCESO CONTRACTUAL
+# ===============================================================
+
+def _validar_acceso_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica los bloques de acceso sin reinterpretar sus permisos.
+    """
+    acceso = cont.get("acceso")
+
+    if not isinstance(acceso, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: acceso debe ser dict"
+        )
+
+    if not isinstance(acceso.get("nivel"), str):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: acceso.nivel debe ser str"
+        )
+
+    if not isinstance(acceso.get("descripcion"), str):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: acceso.descripcion debe ser str"
+        )
+
+
+# ===============================================================
+# 9. VALIDACIÓN DE BLOQUES CONTRACTUALES
+# ===============================================================
+
+def _validar_bloques_contrato(cont: Dict[str, Any]) -> None:
+    """
+    Verifica que los bloques operativos principales posean
+    el tipo estructural requerido.
+    """
+    bloques_dict = (
+        "autoriza_engine",
+        "reporting",
+        "capacidades",
+        "capacidades_meta",
+    )
+
+    for bloque in bloques_dict:
+        if not isinstance(cont.get(bloque), dict):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: '{bloque}' debe ser dict"
+            )
+
+
+# ===============================================================
+# 10. VALIDACIÓN EXACTA 1:1 DE CAPACIDADES
+# ===============================================================
+
+def _validar_capacidades_meta(cont: Dict[str, Any]) -> None:
+    """
+    Garantiza correspondencia exacta 1:1 entre capacidades declaradas
+    y sus metadatos. No permite faltantes ni sobrantes.
+    """
+    capacidades = cont["capacidades"]
+    capacidades_meta = cont["capacidades_meta"]
+
+    nombres_capacidades = set(capacidades.keys())
+    nombres_meta = set(capacidades_meta.keys())
+
+    faltantes = sorted(
+        nombres_capacidades - nombres_meta
+    )
+
+    sobrantes = sorted(
+        nombres_meta - nombres_capacidades
+    )
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades sin capacidades_meta: "
+            f"{faltantes}"
+        )
+
+    if sobrantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades_meta sin capacidad declarada: "
+            f"{sobrantes}"
+        )
+
+
+# ===============================================================
+# 11. VALIDACIÓN DE IDENTIFICADORES DE CAPACIDADES
+# ===============================================================
+
+def _validar_identificadores_capacidades(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Verifica que cada identificador de capacidad sea una cadena
+    no vacía y determinista.
+    """
+    for nombre in cont["capacidades"]:
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: identificador de capacidad inválido"
+            )
+
+
+# ===============================================================
+# 12. VALIDACIÓN DE REFERENCIAS CALLABLE
+# ===============================================================
+
+def _validar_referencias_capacidades(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Verifica que cada capacidad tenga una referencia válida.
+    Una referencia callable debe ser realmente callable.
+    Una referencia str debe ser no vacía y deberá resolverse
+    posteriormente mediante _resolver_capacidades().
+    """
+    for nombre, referencia in cont["capacidades"].items():
+        if not isinstance(referencia, str) and not callable(referencia):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"debe contener referencia str o callable"
+            )
+
+        if isinstance(referencia, str) and not referencia.strip():
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"contiene referencia str vacía"
+            )
+
+
+# ===============================================================
+# 13. VALIDACIÓN DE METADATOS DE CAPACIDADES
+# ===============================================================
+
+def _validar_metadatos_capacidades(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Verifica la estructura completa de metadata de cada capacidad.
+    Cada capacidad debe declarar descripción, entrada, salida,
+    validar_esquema y acceso_archivos.
+    """
+    for nombre in sorted(cont["capacidades"]):
+        meta = cont["capacidades_meta"][nombre]
+
+        if not isinstance(meta, dict):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"debe ser dict"
+            )
+
+        campos_str = (
+            "descripcion",
+            "entrada",
+            "salida",
+        )
+
+        for campo in campos_str:
+            if campo not in meta:
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                    f"requiere '{campo}'"
+                )
+
+            if not isinstance(meta[campo], str):
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                    f"'{campo}' debe ser str"
+                )
+
+        if "validar_esquema" not in meta:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"requiere 'validar_esquema'"
+            )
+
+        if not isinstance(meta["validar_esquema"], list):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"'validar_esquema' debe ser list"
+            )
+
+        if "acceso_archivos" not in meta:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"requiere 'acceso_archivos'"
+            )
+
+        if not isinstance(meta["acceso_archivos"], list):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre}'] "
+                f"'acceso_archivos' debe ser list"
+            )
+
+
+# ===============================================================
+# 14. VALIDACIÓN DE PERMISOS DEL ENGINE
+# ===============================================================
+
+def _validar_autorizacion_engine(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Verifica que las autorizaciones declaradas para Engine sean
+    booleanas. No agrega, elimina ni interpreta permisos.
+    """
+    autoriza_engine = cont["autoriza_engine"]
+
+    for permiso, valor in autoriza_engine.items():
+        if not isinstance(permiso, str) or not permiso.strip():
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: identificador de permiso inválido"
+            )
+
+        if not isinstance(valor, bool):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: permiso Engine '{permiso}' "
+                f"debe ser bool"
+            )
+
+
+# ===============================================================
+# 15. VALIDACIÓN DE REPORTING
+# ===============================================================
+
+def _validar_reporting(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Verifica que todas las banderas declaradas en reporting
+    sean booleanas y posean identificadores válidos.
+    """
+    reporting = cont["reporting"]
+
+    for nombre, valor in reporting.items():
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: identificador reporting inválido"
+            )
+
+        if not isinstance(valor, bool):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: reporting['{nombre}'] "
+                f"debe ser bool"
+            )
+
+
+# ===============================================================
+# 16. VALIDACIÓN CONTRACTUAL COMPLETA
+# ===============================================================
+
+def _validar_contrato_completo(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Ejecuta todas las validaciones estructurales en orden fijo.
+    No modifica CONTENEDOR, no resuelve capacidades y no introduce
+    ninguna premisa externa al contrato.
+    """
+    _validar_contrato(cont)
+    _validar_identidad_contrato(cont)
+    _validar_tipos_contrato(cont)
+    _validar_acceso_contrato(cont)
+    _validar_bloques_contrato(cont)
+    _validar_capacidades_meta(cont)
+    _validar_identificadores_capacidades(cont)
+    _validar_referencias_capacidades(cont)
+    _validar_metadatos_capacidades(cont)
+    _validar_autorizacion_engine(cont)
+    _validar_reporting(cont)
+
+
+# ===============================================================
+# FIN FUNCIONES PRIVADAS
+# ===============================================================
+
+# ===============================================================
+# CAPACIDADES PÚBLICAS — CORRELACIÓN MECÁNICA
+# ===============================================================
+
+# ===============================================================
+# CAPACIDAD: BARRER
+# ===============================================================
+
+
+# ===============================================================
+# 14. DECLARACIÓN DE LA CAPACIDAD BARRER
+# ===============================================================
 
 def barrer() -> Dict[str, Any]:
     """
-    Lee todas las MECANICA declaradas en la carpeta,
-    calcula el orden resultante, detecta contradicciones o ciclos
-    y notifica a DiagnosticoGlobal si hay problemas.
+    Ejecuta la capacidad completa de barrido mecánico del módulo MC.
+
+    Alcance:
+        - Descubre todos los archivos .py pertenecientes al módulo.
+        - Descubre las declaraciones MECANICA presentes en ellos.
+        - Valida que cada declaración sea estructuralmente utilizable.
+        - Extrae el orden nativo de cada MECANICA.
+        - Construye todas las precedencias declaradas.
+        - Detecta contradicciones entre órdenes.
+        - Detecta ciclos de precedencia.
+        - Determina el orden mecánico resultante cuando existe.
+        - Construye un informe determinista.
+        - Notifica a DiagnosticoGlobal cuando existen errores o choques.
+
+    La capacidad no:
+        - modifica archivos.
+        - modifica otros módulos.
+        - inventa MECANICA.
+        - inventa nodos.
+        - altera las declaraciones descubiertas.
+        - calcula Tru_total.
+        - calcula Tru_Ri.
+        - clasifica entradas.
+        - orquesta otras capacidades.
+
+    Entrada:
+        Ninguna.
+
+    Salida:
+        Dict[str, Any] determinista con:
+            contenedor
+            estado
+            coherente
+            choques
+            errores
+            mecanica
+            archivos
+            total_mecanicas
     """
+
+    # ===========================================================
+    # 14.1 — DESCUBRIMIENTO DEL CONTENIDO DEL MÓDULO
+    # ===========================================================
+
     hallado = _leer()
+
+    # ===========================================================
+    # 14.2 — ACUMULADORES DETERMINISTAS
+    # ===========================================================
+
     choques: List[str] = []
     errores: List[str] = []
-
-    if not hallado:
-        errores.append("ninguna mecánica declarada en la carpeta")
-        informe = _informe([], choques, errores, hallado)
-        _notificar_diagnostico(choques, errores)
-        return informe
-
     precede: Dict[Tuple[str, str], List[str]] = {}
 
+    # ===========================================================
+    # 14.3 — AUSENCIA TOTAL DE MECÁNICAS
+    # ===========================================================
+
+    if not hallado:
+        errores.append(
+            f"{NOMBRE_MODULO}: no se encontró ninguna declaración "
+            "MECANICA válida en el contenido del módulo"
+        )
+
+        informe = _informe(
+            mecanica=[],
+            choques=choques,
+            errores=errores,
+            hallado=hallado,
+        )
+
+        _notificar_diagnostico(choques, errores)
+
+        return informe
+
+    # ===========================================================
+    # 14.4 — INSPECCIÓN DETERMINISTA DE CADA MECÁNICA
+    # ===========================================================
+
     for archivo, meta in sorted(hallado.items()):
-        nodos = _nodos(meta)
-        if len(nodos) < 2:
-            errores.append(f"{archivo}: sin orden nativo legible")
-            continue
-        for a, b in _precedencias(nodos):
-            precede.setdefault((a, b), []).append(archivo)
 
-    for (a, b), quienes in sorted(precede.items()):
-        contrarios = precede.get((b, a))
-        if contrarios and (a, b) < (b, a):
-            choques.append(
-                f"nodo '{a}'/'{b}': {quienes} lo ponen en un orden y "
-                f"{contrarios} en el contrario"
+        # -------------------------------------------------------
+        # 14.4.1 — VALIDACIÓN DEL CONTENEDOR MECÁNICO
+        # -------------------------------------------------------
+
+        if not isinstance(meta, dict):
+            errores.append(
+                f"{archivo}: MECANICA debe ser dict"
             )
+            continue
 
-    universo = {x for par in precede for x in par}
+        # -------------------------------------------------------
+        # 14.4.2 — IDENTIFICACIÓN DEL ORDEN NATIVO
+        # -------------------------------------------------------
+
+        nodos = _nodos(meta)
+
+        if not nodos:
+            errores.append(
+                f"{archivo}: MECANICA sin orden nativo legible"
+            )
+            continue
+
+        # -------------------------------------------------------
+        # 14.4.3 — VALIDACIÓN DE NODOS
+        # -------------------------------------------------------
+
+        nodos_vistos: set[str] = set()
+
+        for posicion, nodo in enumerate(nodos):
+
+            if not str(nodo).strip():
+                errores.append(
+                    f"{archivo}: nodo vacío en posición {posicion}"
+                )
+                continue
+
+            if nodo in nodos_vistos:
+                errores.append(
+                    f"{archivo}: nodo duplicado en orden nativo: '{nodo}'"
+                )
+                continue
+
+            nodos_vistos.add(nodo)
+
+        # -------------------------------------------------------
+        # 14.4.4 — CONSTRUCCIÓN DE PRECEDENCIAS
+        # -------------------------------------------------------
+
+        relaciones = _precedencias(nodos)
+
+        for relacion in relaciones:
+            precede.setdefault(relacion, []).append(archivo)
+
+    # ===========================================================
+    # 14.5 — NORMALIZACIÓN DETERMINISTA DE PRECEDENCIAS
+    # ===========================================================
+
+    for relacion in precede:
+        precede[relacion] = sorted(
+            set(precede[relacion])
+        )
+
+    # ===========================================================
+    # 14.6 — DETECCIÓN DE CONTRADICCIONES DE ORDEN
+    # ===========================================================
+
+    relaciones = sorted(precede.keys())
+
+    for a, b in relaciones:
+
+        inversa = (b, a)
+
+        if inversa not in precede:
+            continue
+
+        # -------------------------------------------------------
+        # Solo registrar una vez cada contradicción.
+        # -------------------------------------------------------
+
+        if (b, a) < (a, b):
+            continue
+
+        origen_directo = precede[(a, b)]
+        origen_inverso = precede[(b, a)]
+
+        choques.append(
+            f"nodo '{a}'/'{b}': "
+            f"{origen_directo} establece '{a}' antes de '{b}', "
+            f"mientras {origen_inverso} establece "
+            f"'{b}' antes de '{a}'"
+        )
+
+    # ===========================================================
+    # 14.7 — CONSTRUCCIÓN DEL UNIVERSO MECÁNICO
+    # ===========================================================
+
+    universo: set[str] = set()
+
+    for a, b in precede:
+        universo.add(a)
+        universo.add(b)
+
+    # ===========================================================
+    # 14.8 — RESOLUCIÓN DETERMINISTA DEL ORDEN
+    # ===========================================================
+
     pendientes = set(universo)
     mecanica: List[str] = []
 
     while pendientes:
-        libres = sorted(
-            n for n in pendientes
-            if not any((o, n) in precede for o in pendientes if o != n)
-        )
-        if not libres:
-            choques.append(
-                f"nodos {sorted(pendientes)}: la secuencia se muerde la cola, "
-                "no hay orden posible"
-            )
-            break
-        mecanica.extend(libres)
-        pendientes -= set(libres)
 
-    informe = _informe(mecanica, choques, errores, hallado)
-    _notificar_diagnostico(choques, errores)
+        libres = sorted(
+            nodo
+            for nodo in pendientes
+            if not any(
+                (origen, nodo) in precede
+                for origen in pendientes
+                if origen != nodo
+            )
+        )
+
+        # -------------------------------------------------------
+        # 14.8.1 — CICLO DETECTADO
+        # -------------------------------------------------------
+
+        if not libres:
+
+            ciclo = sorted(pendientes)
+
+            choques.append(
+                f"nodos {ciclo}: "
+                "la secuencia contiene un ciclo de precedencia; "
+                "no existe orden mecánico válido"
+            )
+
+            break
+
+        # -------------------------------------------------------
+        # 14.8.2 — INCORPORACIÓN DETERMINISTA
+        # -------------------------------------------------------
+
+        mecanica.extend(libres)
+        pendientes.difference_update(libres)
+
+    # ===========================================================
+    # 14.9 — VALIDACIÓN FINAL DEL RESULTADO
+    # ===========================================================
+
+    if pendientes:
+        mecanica = []
+
+    # ===========================================================
+    # 14.10 — CONSTRUCCIÓN DEL INFORME
+    # ===========================================================
+
+    informe = _informe(
+        mecanica=mecanica,
+        choques=choques,
+        errores=errores,
+        hallado=hallado,
+    )
+
+    # ===========================================================
+    # 14.11 — NOTIFICACIÓN DIAGNÓSTICA
+    # ===========================================================
+
+    _notificar_diagnostico(
+        choques=choques,
+        errores=errores,
+    )
+
+    # ===========================================================
+    # 14.12 — SALIDA CONTRACTUAL
+    # ===========================================================
+
     return informe
 
 
-def _notificar_diagnostico(choques: List[str], errores: List[str]) -> None:
-    if not (choques or errores):
-        return
-    if DiagnosticoGlobal is None:
-        return
-    try:
-        DiagnosticoGlobal.recibir_reporte(
-            modulo=NOMBRE_MODULO,
-            errores=(
-                [{"tipo": "choque", "detalle": c} for c in choques]
-                + [{"tipo": "error", "detalle": e} for e in errores]
-            ),
-        )
-    except Exception:  # noqa: BLE001
-        pass
-
-
-def inventario() -> Dict[str, Any]:
-    hallado = _leer()
-    return {
-        "id": ID_MODULO,
-        "nombre": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "version": VERSION_MODULO,
-        "version_contrato": VERSION_CONTRATO,
-        "esquema": ESQUEMA_CONTRATO,
-        "estabilidad": ESTABILIDAD,
-        "total_mecanicas": len(hallado),
-        "archivos": sorted(hallado.keys()),
-        "declaran": {
-            archivo: {
-                "nombre": meta.get("nombre", "Sin nombre"),
-                "longitud_orden": len(meta.get("orden", [])),
-            }
-            for archivo, meta in sorted(hallado.items())
-        },
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
-        "invariantes": CONTENEDOR.get("invariantes"),
-    }
-
-
-def verificar_salida(salida: Dict[str, Any]) -> bool:
-    return bool(salida.get("coherente", False))
-
-
-def listar_mecanicas() -> Dict[str, Any]:
-    return _leer()
-
-
-def verificar() -> Dict[str, Any]:
-    return barrer()
-
 # ===============================================================
-# FIN CAPACIDADES PÚBLICAS
+# FIN CAPACIDAD: BARRER
 # ===============================================================
 
 

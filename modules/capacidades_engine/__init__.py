@@ -557,16 +557,21 @@ def _extraer_meta(mod: Any) -> Optional[Dict[str, Any]]:
 # FIN 7.1
 # ===============================================================
 
-
 # ===============================================================
 # 7.2 — CARGA DE SKILLS
 # ===============================================================
 
 def _cargar_skills() -> Dict[str, Dict[str, Any]]:
     """
-    Lee TODOS los *.py del directorio CE.
-    Cada archivo válido implementa uno o más skills de la
-    capacidad estructural CE. Engine tiene derecho a ver cada uno.
+    Lee los *.py del directorio CE y conserva toda la evidencia
+    estructural encontrada.
+
+    Cada archivo válido puede implementar uno o más skills de la
+    capacidad estructural CE.
+
+    Los IDs duplicados no se sobrescriben silenciosamente: se
+    conservan como evidencia estructural para que el centinela
+    pueda declarar el choque de forma determinista.
     """
     hallado: Dict[str, Dict[str, Any]] = {}
     if not _CAP.is_dir():
@@ -575,13 +580,20 @@ def _cargar_skills() -> Dict[str, Dict[str, Any]]:
     for f in sorted(_CAP.glob("*.py")):
         if f.name.startswith("_"):
             continue
+
         clave = "ce_skill_{0}".format(f.stem)
         spec = importlib.util.spec_from_file_location(clave, str(f))
+
         if spec is None or spec.loader is None:
-            hallado[f.stem] = {"archivo": f.name, "error": "spec_invalido"}
+            hallado[f.stem] = {
+                "archivo": f.name,
+                "error": "spec_invalido",
+            }
             continue
+
         mod = importlib.util.module_from_spec(spec)
         sys.modules[clave] = mod
+
         try:
             spec.loader.exec_module(mod)
         except Exception as e:
@@ -592,6 +604,7 @@ def _cargar_skills() -> Dict[str, Dict[str, Any]]:
             continue
 
         meta = _extraer_meta(mod)
+
         if meta is None:
             hallado[f.stem] = {
                 "archivo": f.name,
@@ -600,7 +613,8 @@ def _cargar_skills() -> Dict[str, Dict[str, Any]]:
             continue
 
         sid = str(meta["id"]).strip().lower()
-        hallado[sid] = {
+
+        registro = {
             "archivo": f.name,
             "id": sid,
             "nombre": meta.get("nombre"),
@@ -611,6 +625,25 @@ def _cargar_skills() -> Dict[str, Dict[str, Any]]:
             "requiere_catalogo": meta.get("requiere_catalogo"),
             "raw": meta,
         }
+
+        existente = hallado.get(sid)
+
+        if existente is None:
+            hallado[sid] = registro
+            continue
+
+        if "_choques" not in hallado:
+            hallado["_choques"] = []
+
+        hallado["_choques"].append({
+            "tipo": "id_duplicado",
+            "id": sid,
+            "archivos": [
+                existente.get("archivo"),
+                f.name,
+            ],
+        })
+
     return hallado
 
 # ===============================================================
@@ -647,7 +680,6 @@ def _validar_skills(hallado: Dict[str, Dict[str, Any]]) -> List[str]:
 # FIN 7.3
 # ===============================================================
 
-
 # ===============================================================
 # 7.4 — VALIDACIÓN DEL CONTRATO
 # ===============================================================
@@ -668,21 +700,62 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
         raise ContratoInvalido(
             f"{NOMBRE_MODULO}: CONTENEDOR incompleto. Faltan: {faltantes}"
         )
+
     if cont.get("esquema") != ESQUEMA_CONTRATO:
-        raise ContratoInvalido(f"{NOMBRE_MODULO}: esquema incompatible")
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: esquema incompatible"
+        )
+
     if str(cont.get("version_contrato")) != VERSION_CONTRATO:
-        raise ContratoInvalido(f"{NOMBRE_MODULO}: version_contrato invalida")
-    meta_caps = cont.get("capacidades_meta") or {}
-    for nombre_cap in cont.get("capacidades") or {}:
-        if nombre_cap not in meta_caps:
-            raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidad '{nombre_cap}' sin capacidades_meta"
-            )
-        entrada = meta_caps[nombre_cap]
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: version_contrato invalida"
+        )
+
+    capacidades = cont.get("capacidades")
+    capacidades_meta = cont.get("capacidades_meta")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'capacidades' debe ser dict"
+        )
+
+    if not isinstance(capacidades_meta, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'capacidades_meta' debe ser dict"
+        )
+
+    nombres_capacidades = set(capacidades.keys())
+    nombres_meta = set(capacidades_meta.keys())
+
+    faltantes_meta = sorted(
+        nombres_capacidades - nombres_meta
+    )
+
+    if faltantes_meta:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades sin capacidades_meta: "
+            f"{faltantes_meta}"
+        )
+
+    metas_sin_capacidad = sorted(
+        nombres_meta - nombres_capacidades
+    )
+
+    if metas_sin_capacidad:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades_meta sin capacidad declarada: "
+            f"{metas_sin_capacidad}"
+        )
+
+    for nombre_cap in capacidades:
+        entrada = capacidades_meta[nombre_cap]
+
         if not isinstance(entrada, dict):
             raise ContratoInvalido(
-                f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] debe ser dict"
+                f"{NOMBRE_MODULO}: capacidades_meta['{nombre_cap}'] "
+                f"debe ser dict"
             )
+
         for campo in ("descripcion", "entrada", "salida"):
             if campo not in entrada or not isinstance(entrada[campo], str):
                 raise ContratoInvalido(
@@ -711,12 +784,30 @@ def skills() -> List[Dict[str, Any]]:
     """
     Todos los skills válidos de la capacidad CE — a disposición
     del Engine. Nombre histórico de la API.
+
+    Los skills con errores estructurales no se convierten en
+    capacidades válidas ni se descartan silenciosamente: su
+    existencia y error quedan expuestos en la salida para mantener
+    la trazabilidad contractual.
     """
     hallado = _cargar_skills()
     out: List[Dict[str, Any]] = []
+
     for sid, meta in sorted(hallado.items()):
         if meta.get("error"):
+            out.append({
+                "id": meta.get("id") or sid,
+                "nombre": meta.get("nombre"),
+                "version": meta.get("version"),
+                "descripcion": meta.get("descripcion"),
+                "archivo": meta.get("archivo"),
+                "oficio": meta.get("oficio"),
+                "material": meta.get("material"),
+                "error": meta.get("error"),
+                "valido": False,
+            })
             continue
+
         out.append({
             "id": meta.get("id"),
             "nombre": meta.get("nombre"),
@@ -725,7 +816,9 @@ def skills() -> List[Dict[str, Any]]:
             "archivo": meta.get("archivo"),
             "oficio": meta.get("oficio"),
             "material": meta.get("material"),
+            "valido": True,
         })
+
     return out
 
 # ===============================================================
@@ -738,8 +831,8 @@ def skills() -> List[Dict[str, Any]]:
 # ===============================================================
 
 def ids() -> List[str]:
-    """Todos los ids de skills — Engine los usa cuando quiera."""
-    return [s["id"] for s in skills() if s.get("id")]
+    """Todos los ids de skills válidos — Engine los usa cuando quiera."""
+    return [s["id"] for s in skills() if s.get("id") and s.get("valido", True)]
 
 # ===============================================================
 # FIN 8.2
@@ -755,7 +848,7 @@ def por_id(skill_id: str) -> Optional[Dict[str, Any]]:
         return None
     clave = str(skill_id).strip().lower()
     for s in skills():
-        if s.get("id") == clave:
+        if s.get("id") == clave and s.get("valido", True):
             return s
     return None
 
@@ -781,39 +874,229 @@ def listar_archivos() -> List[str]:
     ]
 
 # ===============================================================
-# FIN 8.4
-# ===============================================================
-
-
-# ===============================================================
 # 8.5 — BARRER
 # ===============================================================
 
 def barrer() -> Dict[str, Any]:
     """
-    Centinela: ¿el inventario operativo de skills de CE es coherente?
-    No calcula. No deposita. No restringe el uso.
-    No decide. No selecciona. No coordina. No interpreta.
-    No ejecuta skills (solo Engine ejecuta).
+    Centinela contractual determinista de CE.
+
+    Verifica exclusivamente la estructura demostrable del módulo:
+    contrato → capacidades declaradas → capacidades_meta → callable real,
+    y archivo físico → módulo cargable → metadatos válidos → id canónico.
+
+    No ejecuta skills.
+    No selecciona skills.
+    No interpreta peticiones.
+    No calcula.
+    No deposita evidencia.
+    No modifica el contrato.
+    No crea capacidades.
+    No promueve archivos extra a capacidades.
     """
+    errores: List[str] = []
+    choques: List[str] = []
+
+    # -----------------------------------------------------------
+    # 8.5.1 — VALIDACIÓN DEL CONTRATO
+    # -----------------------------------------------------------
+
+    try:
+        _validar_contrato(CONTENEDOR)
+    except Exception as e:
+        errores.append(
+            "contrato: {0}: {1}".format(type(e).__name__, e)
+        )
+
+    # -----------------------------------------------------------
+    # 8.5.2 — CARGA DETERMINISTA DEL INVENTARIO FÍSICO
+    # -----------------------------------------------------------
+
     hallado = _cargar_skills()
-    errores = _validar_skills(hallado)
-    lista_ids = [
-        sid for sid, m in sorted(hallado.items()) if not m.get("error")
-    ]
     archivos = listar_archivos()
-    notas: List[str] = []
-    if not _CAP.is_dir():
-        notas.append("directorio CE no existe")
-    elif not lista_ids:
-        notas.append(
-            "ningún skill válido; archivos en CE: {0}".format(
-                archivos or "(ninguno)"
+
+    # -----------------------------------------------------------
+    # 8.5.3 — VALIDACIÓN DE SKILLS
+    # -----------------------------------------------------------
+
+    errores.extend(_validar_skills(hallado))
+
+    # -----------------------------------------------------------
+    # 8.5.4 — IDS CANÓNICOS
+    # -----------------------------------------------------------
+
+    lista_ids = sorted(
+        sid
+        for sid, meta in hallado.items()
+        if not meta.get("error")
+    )
+
+    # -----------------------------------------------------------
+    # 8.5.5 — CORRESPONDENCIA ARCHIVO ↔ SKILL
+    # -----------------------------------------------------------
+
+    archivos_validos = sorted(
+        str(meta.get("archivo"))
+        for meta in hallado.values()
+        if not meta.get("error") and meta.get("archivo")
+    )
+
+    archivos_sin_skill = sorted(
+        archivo
+        for archivo in archivos
+        if archivo not in archivos_validos
+    )
+
+    for archivo in archivos_sin_skill:
+        errores.append(
+            "archivo '{0}' no posee skill válido declarado".format(
+                archivo
             )
         )
-        for sid, m in hallado.items():
-            if m.get("error"):
-                notas.append("  {0}: {1}".format(sid, m["error"]))
+
+    # -----------------------------------------------------------
+    # 8.5.6 — CORRESPONDENCIA CAPACIDADES ↔ META
+    # -----------------------------------------------------------
+
+    capacidades = CONTENEDOR.get("capacidades")
+
+    if not isinstance(capacidades, dict):
+        errores.append(
+            "capacidades: debe ser dict"
+        )
+        capacidades = {}
+
+    capacidades_meta = CONTENEDOR.get("capacidades_meta")
+
+    if not isinstance(capacidades_meta, dict):
+        errores.append(
+            "capacidades_meta: debe ser dict"
+        )
+        capacidades_meta = {}
+
+    nombres_capacidades = sorted(capacidades.keys())
+    nombres_meta = sorted(capacidades_meta.keys())
+
+    faltantes_meta = sorted(
+        set(nombres_capacidades) - set(nombres_meta)
+    )
+
+    extras_meta = sorted(
+        set(nombres_meta) - set(nombres_capacidades)
+    )
+
+    for nombre in faltantes_meta:
+        errores.append(
+            "capacidad '{0}' declarada sin capacidades_meta".format(
+                nombre
+            )
+        )
+
+    for nombre in extras_meta:
+        errores.append(
+            "capacidades_meta '{0}' no corresponde a capacidad declarada".format(
+                nombre
+            )
+        )
+
+    # -----------------------------------------------------------
+    # 8.5.7 — RESOLUCIÓN REAL DE CAPACIDADES
+    # -----------------------------------------------------------
+
+    for nombre in nombres_capacidades:
+        referencia = capacidades.get(nombre)
+
+        if not callable(referencia):
+            errores.append(
+                "capacidad '{0}' no resuelve a callable real".format(
+                    nombre
+                )
+            )
+
+    # -----------------------------------------------------------
+    # 8.5.8 — CORRESPONDENCIA 1:1 DECLARADA ↔ RESUELTA
+    # -----------------------------------------------------------
+
+    if nombres_capacidades != nombres_meta:
+        choques.append(
+            "capacidades y capacidades_meta no mantienen correspondencia 1:1"
+        )
+
+    # -----------------------------------------------------------
+    # 8.5.9 — IDS DUPLICADOS
+    # -----------------------------------------------------------
+
+    ids_vistos: Dict[str, List[str]] = {}
+
+    for sid, meta in sorted(hallado.items()):
+        if meta.get("error"):
+            continue
+
+        archivo = str(meta.get("archivo") or sid)
+        ids_vistos.setdefault(sid, []).append(archivo)
+
+    for sid, fuentes in sorted(ids_vistos.items()):
+        if len(fuentes) > 1:
+            choques.append(
+                "id '{0}' repetido en {1}".format(
+                    sid,
+                    sorted(fuentes),
+                )
+            )
+
+    # -----------------------------------------------------------
+    # 8.5.10 — ERRORES DE CARGA NO SILENCIADOS
+    # -----------------------------------------------------------
+
+    for sid, meta in sorted(hallado.items()):
+        if not meta.get("error"):
+            continue
+
+        error = str(meta.get("error") or "").strip()
+
+        if not error:
+            errores.append(
+                "skill '{0}' presenta error de carga no descrito".format(
+                    sid
+                )
+            )
+            continue
+
+        errores.append(
+            "skill '{0}': {1}".format(sid, error)
+        )
+
+    # -----------------------------------------------------------
+    # 8.5.11 — DETERMINACIÓN DE COHERENCIA
+    # -----------------------------------------------------------
+
+    errores = sorted(set(errores))
+    choques = sorted(set(choques))
+
+    coherente = not errores and not choques
+
+    # -----------------------------------------------------------
+    # 8.5.12 — NOTAS ESTRUCTURALES
+    # -----------------------------------------------------------
+
+    notas: List[str] = []
+
+    if not _CAP.is_dir():
+        notas.append("directorio CE no existe")
+
+    if not lista_ids:
+        notas.append(
+            "ningún skill válido encontrado en CE"
+        )
+
+    if archivos_sin_skill:
+        notas.append(
+            "existen archivos físicos sin skill contractual válido"
+        )
+
+    # -----------------------------------------------------------
+    # 8.5.13 — SALIDA CONTRACTUAL DETERMINISTA
+    # -----------------------------------------------------------
 
     return {
         "id": ID_MODULO,
@@ -824,18 +1107,38 @@ def barrer() -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "coherente": not errores,
+        "coherente": coherente,
         "errores": errores,
-        "choques": [],
+        "choques": choques,
         "ids": lista_ids,
         "n": len(lista_ids),
         "archivos": archivos,
-        "notas": notas,
+        "archivos_validos": archivos_validos,
+        "archivos_sin_skill": archivos_sin_skill,
+        "capacidades_declaradas": nombres_capacidades,
+        "capacidades_meta": nombres_meta,
+        "capacidades_callable": sorted(
+            nombre
+            for nombre in nombres_capacidades
+            if callable(capacidades.get(nombre))
+        ),
+        "n_capacidades": len(nombres_capacidades),
+        "n_capacidades_meta": len(nombres_meta),
+        "n_capacidades_callable": len(
+            [
+                nombre
+                for nombre in nombres_capacidades
+                if callable(capacidades.get(nombre))
+            ]
+        ),
+        "notas": sorted(set(notas)),
         "ruta_capacidades": str(_CAP),
         "nota": (
             "CE es la capacidad estructural del Engine que agrupa "
             "skills nativos. Engine es la única autoridad de ejecución. "
-            "CE solo descubre, valida y expone."
+            "CE solo descubre, valida y expone. La coherencia contractual "
+            "requiere correspondencia 1:1 entre capacidades declaradas, "
+            "capacidades_meta y callables reales."
         ),
     }
 
@@ -863,10 +1166,28 @@ def verificar() -> Dict[str, Any]:
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     """
-    Inventario operativo de las capacidades nativas del Engine
-    expuestas por CE.
+    Inventario operativo y estructural de CE.
+
+    Expone únicamente información demostrable del contrato,
+    las capacidades resueltas, los skills descubiertos y el
+    estado producido por el centinela.
     """
     b = barrer()
+
+    capacidades_declaradas = sorted(
+        CONTENEDOR.get("capacidades", {}).keys()
+    )
+
+    capacidades_meta = sorted(
+        CONTENEDOR.get("capacidades_meta", {}).keys()
+    )
+
+    capacidades_callable = sorted(
+        nombre
+        for nombre in capacidades_declaradas
+        if callable(CONTENEDOR["capacidades"].get(nombre))
+    )
+
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -878,13 +1199,22 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "estabilidad": ESTABILIDAD,
         "compatible_desde": COMPATIBLE_DESDE,
         "api_engine": API_ENGINE,
-        "ids": b.get("ids"),
-        "n": b.get("n"),
-        "archivos": b.get("archivos"),
-        "coherente": b.get("coherente"),
+        "ids": list(b.get("ids", [])),
+        "n": int(b.get("n", 0)),
+        "archivos": list(b.get("archivos", [])),
+        "archivos_validos": list(b.get("archivos_validos", [])),
+        "archivos_sin_skill": list(b.get("archivos_sin_skill", [])),
+        "coherente": bool(b.get("coherente")),
+        "errores": list(b.get("errores", [])),
+        "choques": list(b.get("choques", [])),
+        "notas": list(b.get("notas", [])),
         "skills": skills(),
-        "notas": b.get("notas"),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades": capacidades_declaradas,
+        "capacidades_meta": capacidades_meta,
+        "capacidades_callable": capacidades_callable,
+        "n_capacidades": len(capacidades_declaradas),
+        "n_capacidades_meta": len(capacidades_meta),
+        "n_capacidades_callable": len(capacidades_callable),
         "funcion": (
             "Capacidad estructural del Engine. "
             "Mantiene el inventario operativo de skills nativos. "
@@ -904,9 +1234,79 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
 # ===============================================================
 
 def verificar_salida(salida: Any) -> bool:
+    """
+    Verifica la forma mínima demostrable de una salida estructural
+    de CE.
+
+    La salida debe ser un dict perteneciente inequívocamente a CE.
+    Si contiene 'coherente', debe ser bool.
+    Si contiene 'errores' o 'choques', deben ser listas.
+    Debe contener al menos un campo estructural reconocido.
+    """
     if not isinstance(salida, dict):
         return False
-    return "id" in salida or "coherente" in salida or "ids" in salida
+
+    if salida.get("id") != ID_MODULO:
+        return False
+
+    campos_estructurales = (
+        "nombre",
+        "modulo",
+        "contenedor",
+        "rol",
+        "version",
+        "operacion",
+        "coherente",
+        "ids",
+        "capacidades",
+        "capacidades_ejecutadas",
+        "resultados",
+        "inventario",
+    )
+
+    if not any(
+        campo in salida
+        for campo in campos_estructurales
+    ):
+        return False
+
+    if "coherente" in salida and not isinstance(
+        salida["coherente"],
+        bool,
+    ):
+        return False
+
+    if "errores" in salida and not isinstance(
+        salida["errores"],
+        list,
+    ):
+        return False
+
+    if "choques" in salida and not isinstance(
+        salida["choques"],
+        list,
+    ):
+        return False
+
+    if "ids" in salida and not isinstance(
+        salida["ids"],
+        list,
+    ):
+        return False
+
+    if "capacidades" in salida and not isinstance(
+        salida["capacidades"],
+        list,
+    ):
+        return False
+
+    if "capacidades_ejecutadas" in salida and not isinstance(
+        salida["capacidades_ejecutadas"],
+        list,
+    ):
+        return False
+
+    return True
 
 # ===============================================================
 # FIN 8.8
@@ -917,92 +1317,190 @@ def verificar_salida(salida: Any) -> bool:
 # 8.9 — EJECUTAR TOTAL
 # ===============================================================
 
-def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
     Autoridad total de ENGINE sobre CE.
-    Ejerce TODAS las unidades operativamente ejecutables del módulo
-    conforme a su contrato e inventario.
-    Todo es callable real. No inventa capacidades.
+
+    Recorre las capacidades declaradas en CONTENEDOR después
+    de su resolución contractual y ejerce únicamente los
+    callables reales que pertenecen al contrato.
+
+    No mantiene una lista paralela de capacidades.
+    No inventa capacidades.
+    No incorpora funciones externas.
+    No ejecuta recursivamente ejecutar_total.
     """
-    peticion = dict(peticion or {}) if isinstance(peticion, dict) else {}
+    peticion = (
+        dict(peticion)
+        if isinstance(peticion, dict)
+        else {}
+    )
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+
+    if not isinstance(capacidades, dict):
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_RECHAZADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "capacidades_declaradas": [],
+            "errores_ejecucion": [
+                "CONTENEDOR['capacidades'] no es dict"
+            ],
+            "resultados": {},
+            "nota": (
+                "ejecutar_total no puede ejercer el contrato porque "
+                "las capacidades no tienen estructura contractual válida."
+            ),
+        }
+
     resultados: Dict[str, Any] = {}
     errores_ejecucion: List[str] = []
+    capacidades_declaradas = sorted(capacidades.keys())
 
-    try:
-        resultados["barrer"] = barrer()
-        resultados["verificar"] = resultados["barrer"]
-    except Exception as e:
-        errores_ejecucion.append("barrer: {0}".format(e))
-        resultados["barrer"] = None
+    # -----------------------------------------------------------
+    # 8.9.1 — RECORRIDO CONTRACTUAL
+    # -----------------------------------------------------------
 
-    try:
-        resultados["inventario"] = inventario(peticion)
-    except Exception as e:
-        errores_ejecucion.append("inventario: {0}".format(e))
-        resultados["inventario"] = None
+    for nombre in capacidades_declaradas:
+        # ejecutar_total es la autoridad que está ejecutándose;
+        # invocarlo desde sí mismo produciría recursión contractual.
+        if nombre == "ejecutar_total":
+            continue
 
-    try:
-        resultados["skills"] = skills()
-    except Exception as e:
-        errores_ejecucion.append("skills: {0}".format(e))
-        resultados["skills"] = None
+        callable_real = capacidades.get(nombre)
 
-    try:
-        resultados["ids"] = ids()
-    except Exception as e:
-        errores_ejecucion.append("ids: {0}".format(e))
-        resultados["ids"] = None
+        # -------------------------------------------------------
+        # 8.9.2 — COMPROBACIÓN DE CALLABLE
+        # -------------------------------------------------------
 
-    try:
-        resultados["listar_archivos"] = listar_archivos()
-    except Exception as e:
-        errores_ejecucion.append("listar_archivos: {0}".format(e))
-        resultados["listar_archivos"] = None
+        if not callable(callable_real):
+            errores_ejecucion.append(
+                "capacidad '{0}': referencia no callable".format(
+                    nombre
+                )
+            )
+            resultados[nombre] = None
+            continue
 
-    try:
-        resultados["inspeccionar"] = inspeccionar(peticion)
-    except Exception as e:
-        errores_ejecucion.append("inspeccionar: {0}".format(e))
-        resultados["inspeccionar"] = None
+        # -------------------------------------------------------
+        # 8.9.3 — EJECUCIÓN REAL
+        # -------------------------------------------------------
 
-    try:
-        resultados["registrar_inventario"] = registrar_inventario(peticion)
-    except Exception as e:
-        errores_ejecucion.append("registrar_inventario: {0}".format(e))
-        resultados["registrar_inventario"] = None
+        try:
+            if nombre in (
+                "inventario",
+                "inspeccionar",
+                "registrar_inventario",
+            ):
+                resultado = callable_real(peticion)
+            else:
+                resultado = callable_real()
 
-    coherente = False
-    if isinstance(resultados.get("barrer"), dict):
-        coherente = bool(resultados["barrer"].get("coherente"))
+            resultados[nombre] = resultado
+
+        except Exception as e:
+            errores_ejecucion.append(
+                "capacidad '{0}': {1}: {2}".format(
+                    nombre,
+                    type(e).__name__,
+                    e,
+                )
+            )
+            resultados[nombre] = None
+
+    # -----------------------------------------------------------
+    # 8.9.4 — CAPACIDADES EJECUTADAS
+    # -----------------------------------------------------------
+
+    capacidades_ejecutadas = sorted(
+        nombre
+        for nombre, resultado in resultados.items()
+        if resultado is not None
+    )
+
+    # -----------------------------------------------------------
+    # 8.9.5 — VALIDACIÓN DE SALIDAS
+    # -----------------------------------------------------------
+
+    for nombre in capacidades_ejecutadas:
+        resultado = resultados.get(nombre)
+
+        if isinstance(resultado, dict):
+            if not verificar_salida(resultado):
+                errores_ejecucion.append(
+                    "capacidad '{0}': salida estructural inválida".format(
+                        nombre
+                    )
+                )
+
+    # -----------------------------------------------------------
+    # 8.9.6 — COHERENCIA CONTRACTUAL FINAL
+    # -----------------------------------------------------------
+
+    coherente = not errores_ejecucion
+
+    if not capacidades_declaradas:
+        coherente = False
+        errores_ejecucion.append(
+            "el contrato no declara capacidades ejecutables"
+        )
+
+    # -----------------------------------------------------------
+    # 8.9.7 — ESTADO OPERATIVO
+    # -----------------------------------------------------------
+
+    estado = (
+        ESTADO_OPERATIVO
+        if coherente
+        else ESTADO_DEGRADADO
+    )
+
+    # -----------------------------------------------------------
+    # 8.9.8 — SALIDA DETERMINISTA
+    # -----------------------------------------------------------
 
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
         "operacion": "ejecutar_total",
-        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
+        "estado": estado,
         "coherente": coherente,
-        "capacidades_ejecutadas": sorted([
-            k for k, v in resultados.items() if v is not None
-        ]),
-        "errores_ejecucion": errores_ejecucion,
-        "resultados": resultados,
-        "capacidades_declaradas": list(
-            CONTENEDOR.get("capacidades", {}).keys()
+        "capacidades_declaradas": capacidades_declaradas,
+        "capacidades_ejecutadas": capacidades_ejecutadas,
+        "n_capacidades_declaradas": len(
+            capacidades_declaradas
         ),
+        "n_capacidades_ejecutadas": len(
+            capacidades_ejecutadas
+        ),
+        "errores_ejecucion": sorted(
+            set(errores_ejecucion)
+        ),
+        "resultados": resultados,
         "nota": (
-            "ejecutar_total ejerce autoridad total de ENGINE sobre CE. "
-            "Todas las unidades son callables reales. "
-            "No inventa capacidades ni altera el contrato."
+            "ejecutar_total ejerce autoridad total de ENGINE sobre CE "
+            "recorriendo exclusivamente las capacidades declaradas "
+            "en el contrato y resueltas a callables reales. "
+            "No utiliza listas manuales paralelas, no inventa "
+            "capacidades y no ejecuta recursivamente ejecutar_total."
         ),
     }
 
 # ===============================================================
 # FIN 8.9
 # ===============================================================
-
-
 # ===============================================================
 # 8.10 — INSPECCIONAR
 # ===============================================================
@@ -1010,15 +1508,51 @@ def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Inspección estructural de CE.
-    Expone contrato, skills y estado sin ejecutar skills.
+
+    Expone el contrato, las capacidades declaradas, sus metadatos,
+    el mapa de resolución, el inventario de skills y el estado
+    estructural del módulo.
+
+    No ejecuta skills.
+    No selecciona skills.
+    No modifica CONTENEDOR.
+    No modifica estado de otros módulos.
     """
+    if peticion is not None and not isinstance(peticion, dict):
+        raise TypeError(
+            f"{NOMBRE_MODULO}: 'peticion' debe ser dict o None"
+        )
+
     res_barrer = barrer()
+
+    capacidades_declaradas = list(
+        CONTENEDOR.get("capacidades", {}).keys()
+    )
+
+    capacidades_meta = list(
+        CONTENEDOR.get("capacidades_meta", {}).keys()
+    )
+
+    capacidades_resueltas = {
+        nombre: callable(ref)
+        for nombre, ref in CONTENEDOR.get("capacidades", {}).items()
+    }
+
+    capacidades_no_resueltas = sorted(
+        nombre
+        for nombre, resoluble in capacidades_resueltas.items()
+        if not resoluble
+    )
+
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
         "operacion": "inspeccionar",
+
         "constantes": {
             "ID_MODULO": ID_MODULO,
             "NOMBRE_MODULO": NOMBRE_MODULO,
@@ -1026,27 +1560,69 @@ def inspeccionar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "VERSION_MODULO": VERSION_MODULO,
             "VERSION_CONTRATO": VERSION_CONTRATO,
             "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "COMPATIBLE_DESDE": COMPATIBLE_DESDE,
+            "API_ENGINE": API_ENGINE,
             "ESTABILIDAD": ESTABILIDAD,
         },
-        "capacidades_contractuales": list(
-            CONTENEDOR.get("capacidades", {}).keys()
-        ),
-        "capacidades_meta": list(
-            CONTENEDOR.get("capacidades_meta", {}).keys()
-        ),
-        "integridad": {
-            "coherente": res_barrer.get("coherente"),
-            "ids": res_barrer.get("ids"),
-            "n": res_barrer.get("n"),
-            "archivos": res_barrer.get("archivos"),
-            "errores": res_barrer.get("errores"),
+
+        "contrato": {
+            "esquema": CONTENEDOR.get("esquema"),
+            "version_contrato": CONTENEDOR.get("version_contrato"),
+            "version_modulo": CONTENEDOR.get("version_modulo"),
+            "id": CONTENEDOR.get("id"),
+            "nombre": CONTENEDOR.get("nombre"),
+            "rol": CONTENEDOR.get("rol"),
+            "estabilidad": CONTENEDOR.get("estabilidad"),
+            "compatible_desde": CONTENEDOR.get("compatible_desde"),
+            "api_engine": CONTENEDOR.get("api_engine"),
         },
-        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
-        "reporting": CONTENEDOR.get("reporting"),
+
+        "capacidades": {
+            "declaradas": capacidades_declaradas,
+            "meta": capacidades_meta,
+            "resueltas": sorted(
+                nombre
+                for nombre, resoluble in capacidades_resueltas.items()
+                if resoluble
+            ),
+            "no_resueltas": capacidades_no_resueltas,
+            "correspondencia_1_a_1": (
+                capacidades_declaradas == capacidades_meta
+                and not capacidades_no_resueltas
+            ),
+        },
+
+        "inventario_skills": {
+            "ids": list(res_barrer.get("ids") or []),
+            "n": int(res_barrer.get("n") or 0),
+            "archivos": list(res_barrer.get("archivos") or []),
+        },
+
+        "integridad": {
+            "coherente": bool(res_barrer.get("coherente"))
+            and not capacidades_no_resueltas,
+            "ids": list(res_barrer.get("ids") or []),
+            "n": int(res_barrer.get("n") or 0),
+            "archivos": list(res_barrer.get("archivos") or []),
+            "errores": list(res_barrer.get("errores") or []),
+            "choques": list(res_barrer.get("choques") or []),
+        },
+
+        "autoriza_engine": dict(
+            CONTENEDOR.get("autoriza_engine") or {}
+        ),
+
+        "reporting": dict(
+            CONTENEDOR.get("reporting") or {}
+        ),
+
         "invariantes": list(INVARIANTES),
+
         "nota": (
-            "inspeccionar expone estructura de CE sin ejecutar "
-            "skills ni alterar el contrato."
+            "inspeccionar realiza únicamente inspección estructural. "
+            "No ejecuta skills ni altera el contrato. "
+            "La resolución de capacidades se considera válida únicamente "
+            "cuando cada capacidad declarada apunta a un callable real."
         ),
     }
 
@@ -1063,18 +1639,36 @@ def registrar_inventario(
     peticion: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
-    Registra el inventario estructural de CE como instantánea determinista.
-    No altera evidencia.
+    Produce una instantánea determinista del inventario estructural de CE.
+
+    No persiste.
+    No modifica CONTENEDOR.
+    No modifica skills.
+    No deposita evidencia.
+    No ejecuta skills.
     """
+    if peticion is not None and not isinstance(peticion, dict):
+        raise TypeError(
+            f"{NOMBRE_MODULO}: 'peticion' debe ser dict o None"
+        )
+
     inv = inventario(peticion)
+
     return {
         "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
         "operacion": "registrar_inventario",
         "registrado": True,
+        "persistido": False,
         "inventario": inv,
         "nota": (
-            "Instantánea determinista del inventario de CE. "
-            "No modifica estado de skills ni evidencia."
+            "Instantánea estructural determinista del inventario de CE. "
+            "Registrar significa producir y devolver la instantánea; "
+            "no implica persistencia ni modificación de evidencia."
         ),
     }
 

@@ -247,9 +247,13 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # DEPENDENCIAS
+    # 5.7 — DEPENDENCIAS
     # ============================================================
-    "requiere": ["*"],
+    "requiere": [
+        "CT", "AX", "FO", "SF", "CA", "CX",
+        "DI", "RE", "VX", "TX", "CH", "CIT", "TT",
+        "CE", "CC",
+    ],
 
     # ============================================================
     # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
@@ -314,11 +318,15 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "reporte": True,
 
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
-    },
+       # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,
+        "acceso_archivos": True,
 
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+    },
     # ============================================================
     # CONSULTAS SOPORTADAS
     # ============================================================
@@ -345,9 +353,12 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": "reporte",
         "diagnostico": "diagnostico",
         "listar_mecanicas": "listar_mecanicas",
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
     },
 
-    # ============================================================
+        # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
     "capacidades_meta": {
@@ -358,7 +369,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con coherente, choques, errores, mecanica, archivos",
             "acceso_archivos": ["*"],
         },
-
         "barrer": {
             "descripcion": (
                 "Lee todas las MECANICA de la carpeta, calcula orden, "
@@ -372,7 +382,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "evaluar": {
             "descripcion": "Alias de barrer. Evalúa coherencia del núcleo MC.",
             "entrada": "ninguna",
@@ -382,7 +391,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "axiomas": {
             "descripcion": (
                 "Declaraciones internas de correlación "
@@ -393,7 +401,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "list[dict] de declaraciones",
             "acceso_archivos": ["*"],
         },
-
         "inventario": {
             "descripcion": (
                 "Inventario objetivo de mecánicas declaradas en la carpeta."
@@ -403,7 +410,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con total_mecanicas, archivos, declaran",
             "acceso_archivos": ["*"],
         },
-
         "verificar_salida": {
             "descripcion": "Comprueba si una salida de barrer es coherente.",
             "entrada": "salida: dict",
@@ -411,7 +417,6 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
-
         "reporte": {
             "descripcion": "Reporte interno de estado del módulo MC.",
             "entrada": "ninguna",
@@ -421,7 +426,6 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "diagnostico": {
             "descripcion": "Diagnóstico: qué falta, qué está mal en MC.",
             "entrada": "ninguna",
@@ -431,13 +435,47 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
         "listar_mecanicas": {
-            "descripcion": "Lista todas las MECANICA descubiertas en la carpeta.",
+            "descripcion": (
+                "Lista todas las MECANICA descubiertas en la carpeta."
+            ),
             "entrada": "ninguna",
             "validar_esquema": ["*"],
             "salida": "dict archivo → meta MECANICA",
             "acceso_archivos": ["*"],
+        },
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre MC. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de MC. "
+                "Expone constantes, capacidades, mecanicas y estado "
+                "sin alterar el contrato ni calcular."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de MC "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
         },
     },
     
@@ -473,8 +511,13 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
 
         # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+        "acceso_archivos": True,
+        "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
     
     # ============================================================

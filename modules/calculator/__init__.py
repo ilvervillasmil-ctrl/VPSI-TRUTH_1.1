@@ -44,6 +44,10 @@ from decimal import Decimal, ROUND_HALF_UP, getcontext
 from fractions import Fraction
 from pathlib import Path
 from typing import Any, Deque, Dict, List, Optional, Tuple
+from .factor_c import calcular_C
+from .factor_l import calcular_L
+from .factor_k import calcular_K
+
 
 getcontext().prec = 50
 

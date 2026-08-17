@@ -1516,77 +1516,38 @@ def _validar_contrato_completo(
 # ===============================================================
 
 # ===============================================================
-# CAPACIDADES PÚBLICAS — CORRELACIÓN MECÁNICA
+# CAPACIDADES PÚBLICAS — CORRELACIÓN MECÁNICA (MC)
+# ===============================================================
+# Todas son funciones reales y callables.
+# Todas operan sobre el contenido real del módulo.
+# Ninguna inventa mecánicas.
+# Ninguna modifica archivos.
+# Ninguna modifica otros módulos.
+# La ejecución total se resuelve desde CONTENEDOR["capacidades"].
 # ===============================================================
 
-# ===============================================================
-# CAPACIDAD: BARRER
-# ===============================================================
-
 
 # ===============================================================
-# 14. DECLARACIÓN DE LA CAPACIDAD BARRER
+# 14. BARRER
 # ===============================================================
 
 def barrer() -> Dict[str, Any]:
     """
-    Ejecuta la capacidad completa de barrido mecánico del módulo MC.
+    Ejecuta el barrido determinista completo de Correlación Mecánica.
 
-    Alcance:
-        - Descubre todos los archivos .py pertenecientes al módulo.
-        - Descubre las declaraciones MECANICA presentes en ellos.
-        - Valida que cada declaración sea estructuralmente utilizable.
-        - Extrae el orden nativo de cada MECANICA.
-        - Construye todas las precedencias declaradas.
-        - Detecta contradicciones entre órdenes.
-        - Detecta ciclos de precedencia.
-        - Determina el orden mecánico resultante cuando existe.
-        - Construye un informe determinista.
-        - Notifica a DiagnosticoGlobal cuando existen errores o choques.
+    Descubre las MECANICA declaradas en el contenido del módulo,
+    valida su estructura, extrae sus órdenes nativos, construye
+    precedencias, detecta contradicciones, detecta ciclos y resuelve
+    el orden mecánico resultante cuando existe.
 
-    La capacidad no:
-        - modifica archivos.
-        - modifica otros módulos.
-        - inventa MECANICA.
-        - inventa nodos.
-        - altera las declaraciones descubiertas.
-        - calcula Tru_total.
-        - calcula Tru_Ri.
-        - clasifica entradas.
-        - orquesta otras capacidades.
-
-    Entrada:
-        Ninguna.
-
-    Salida:
-        Dict[str, Any] determinista con:
-            contenedor
-            estado
-            coherente
-            choques
-            errores
-            mecanica
-            archivos
-            total_mecanicas
+    No modifica evidencia, archivos, declaraciones ni otros módulos.
     """
 
-    # ===========================================================
-    # 14.1 — DESCUBRIMIENTO DEL CONTENIDO DEL MÓDULO
-    # ===========================================================
-
     hallado = _leer()
-
-    # ===========================================================
-    # 14.2 — ACUMULADORES DETERMINISTAS
-    # ===========================================================
 
     choques: List[str] = []
     errores: List[str] = []
     precede: Dict[Tuple[str, str], List[str]] = {}
-
-    # ===========================================================
-    # 14.3 — AUSENCIA TOTAL DE MECÁNICAS
-    # ===========================================================
 
     if not hallado:
         errores.append(
@@ -1601,29 +1562,20 @@ def barrer() -> Dict[str, Any]:
             hallado=hallado,
         )
 
-        _notificar_diagnostico(choques, errores)
+        _notificar_diagnostico(
+            choques=choques,
+            errores=errores,
+        )
 
         return informe
 
-    # ===========================================================
-    # 14.4 — INSPECCIÓN DETERMINISTA DE CADA MECÁNICA
-    # ===========================================================
-
     for archivo, meta in sorted(hallado.items()):
-
-        # -------------------------------------------------------
-        # 14.4.1 — VALIDACIÓN DEL CONTENEDOR MECÁNICO
-        # -------------------------------------------------------
 
         if not isinstance(meta, dict):
             errores.append(
                 f"{archivo}: MECANICA debe ser dict"
             )
             continue
-
-        # -------------------------------------------------------
-        # 14.4.2 — IDENTIFICACIÓN DEL ORDEN NATIVO
-        # -------------------------------------------------------
 
         nodos = _nodos(meta)
 
@@ -1633,15 +1585,13 @@ def barrer() -> Dict[str, Any]:
             )
             continue
 
-        # -------------------------------------------------------
-        # 14.4.3 — VALIDACIÓN DE NODOS
-        # -------------------------------------------------------
-
         nodos_vistos: set[str] = set()
 
         for posicion, nodo in enumerate(nodos):
 
-            if not str(nodo).strip():
+            nodo = str(nodo)
+
+            if not nodo.strip():
                 errores.append(
                     f"{archivo}: nodo vacío en posición {posicion}"
                 )
@@ -1649,35 +1599,29 @@ def barrer() -> Dict[str, Any]:
 
             if nodo in nodos_vistos:
                 errores.append(
-                    f"{archivo}: nodo duplicado en orden nativo: '{nodo}'"
+                    f"{archivo}: nodo duplicado en orden nativo: "
+                    f"'{nodo}'"
                 )
                 continue
 
             nodos_vistos.add(nodo)
 
-        # -------------------------------------------------------
-        # 14.4.4 — CONSTRUCCIÓN DE PRECEDENCIAS
-        # -------------------------------------------------------
+        if len(nodos_vistos) != len(nodos):
+            continue
 
         relaciones = _precedencias(nodos)
 
         for relacion in relaciones:
             precede.setdefault(relacion, []).append(archivo)
 
-    # ===========================================================
-    # 14.5 — NORMALIZACIÓN DETERMINISTA DE PRECEDENCIAS
-    # ===========================================================
-
-    for relacion in precede:
+    for relacion in sorted(precede):
         precede[relacion] = sorted(
             set(precede[relacion])
         )
 
-    # ===========================================================
-    # 14.6 — DETECCIÓN DE CONTRADICCIONES DE ORDEN
-    # ===========================================================
+    relaciones = sorted(precede)
 
-    relaciones = sorted(precede.keys())
+    contradicciones_vistas: set[Tuple[str, str]] = set()
 
     for a, b in relaciones:
 
@@ -1686,12 +1630,12 @@ def barrer() -> Dict[str, Any]:
         if inversa not in precede:
             continue
 
-        # -------------------------------------------------------
-        # Solo registrar una vez cada contradicción.
-        # -------------------------------------------------------
+        par = tuple(sorted((a, b)))
 
-        if (b, a) < (a, b):
+        if par in contradicciones_vistas:
             continue
+
+        contradicciones_vistas.add(par)
 
         origen_directo = precede[(a, b)]
         origen_inverso = precede[(b, a)]
@@ -1703,19 +1647,11 @@ def barrer() -> Dict[str, Any]:
             f"'{b}' antes de '{a}'"
         )
 
-    # ===========================================================
-    # 14.7 — CONSTRUCCIÓN DEL UNIVERSO MECÁNICO
-    # ===========================================================
-
     universo: set[str] = set()
 
     for a, b in precede:
         universo.add(a)
         universo.add(b)
-
-    # ===========================================================
-    # 14.8 — RESOLUCIÓN DETERMINISTA DEL ORDEN
-    # ===========================================================
 
     pendientes = set(universo)
     mecanica: List[str] = []
@@ -1732,10 +1668,6 @@ def barrer() -> Dict[str, Any]:
             )
         )
 
-        # -------------------------------------------------------
-        # 14.8.1 — CICLO DETECTADO
-        # -------------------------------------------------------
-
         if not libres:
 
             ciclo = sorted(pendientes)
@@ -1746,25 +1678,12 @@ def barrer() -> Dict[str, Any]:
                 "no existe orden mecánico válido"
             )
 
+            mecanica = []
+            pendientes.clear()
             break
-
-        # -------------------------------------------------------
-        # 14.8.2 — INCORPORACIÓN DETERMINISTA
-        # -------------------------------------------------------
 
         mecanica.extend(libres)
         pendientes.difference_update(libres)
-
-    # ===========================================================
-    # 14.9 — VALIDACIÓN FINAL DEL RESULTADO
-    # ===========================================================
-
-    if pendientes:
-        mecanica = []
-
-    # ===========================================================
-    # 14.10 — CONSTRUCCIÓN DEL INFORME
-    # ===========================================================
 
     informe = _informe(
         mecanica=mecanica,
@@ -1773,33 +1692,197 @@ def barrer() -> Dict[str, Any]:
         hallado=hallado,
     )
 
-    # ===========================================================
-    # 14.11 — NOTIFICACIÓN DIAGNÓSTICA
-    # ===========================================================
-
     _notificar_diagnostico(
         choques=choques,
         errores=errores,
     )
 
-    # ===========================================================
-    # 14.12 — SALIDA CONTRACTUAL
-    # ===========================================================
-
     return informe
 
 
 # ===============================================================
-# FIN CAPACIDAD: BARRER
+# 15. VERIFICAR
 # ===============================================================
+
+def verificar() -> Dict[str, Any]:
+    """
+    Verifica la coherencia mecánica del módulo mediante barrer().
+    """
+    return barrer()
 
 
 # ===============================================================
-# REPORTING INTERNO
+# 16. EVALUAR
+# ===============================================================
+
+def evaluar() -> Dict[str, Any]:
+    """
+    Evalúa la coherencia mecánica del núcleo MC mediante barrer().
+    """
+    return barrer()
+
+
+# ===============================================================
+# 17. AXIOMAS
+# ===============================================================
+
+def axiomas() -> List[Dict[str, Any]]:
+    """
+    Expone las declaraciones axiomáticas internas de MC.
+    No filtra, modifica ni interpreta las declaraciones.
+    """
+    return list(DECLARACIONES)
+
+
+# ===============================================================
+# 18. LISTAR MECÁNICAS
+# ===============================================================
+
+def listar_mecanicas() -> Dict[str, Any]:
+    """
+    Expone todas las MECANICA descubiertas en el contenido real
+    del módulo.
+    """
+    hallado = _leer()
+
+    return {
+        archivo: dict(meta) if isinstance(meta, dict) else meta
+        for archivo, meta in sorted(hallado.items())
+    }
+
+
+# ===============================================================
+# 19. INVENTARIO
+# ===============================================================
+
+def inventario(
+    peticion: Any = None,
+) -> Dict[str, Any]:
+    """
+    Construye una instantánea determinista del inventario mecánico
+    y contractual del módulo.
+    """
+    hallado = _leer()
+    resultado = barrer()
+
+    return {
+        "id": ID_MODULO,
+        "nombre": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "total_mecanicas": len(hallado),
+        "archivos": sorted(hallado.keys()),
+        "declaran": {
+            archivo: {
+                "nombre": (
+                    meta.get("nombre")
+                    if isinstance(meta, dict)
+                    else None
+                ),
+                "version": (
+                    meta.get("version")
+                    if isinstance(meta, dict)
+                    else None
+                ),
+                "n_nodos": (
+                    len(_nodos(meta))
+                    if isinstance(meta, dict)
+                    else 0
+                ),
+            }
+            for archivo, meta in sorted(hallado.items())
+        },
+        "coherente": resultado.get("coherente"),
+        "choques": resultado.get("choques"),
+        "errores": resultado.get("errores"),
+        "mecanica": resultado.get("mecanica"),
+        "capacidades": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "requiere": list(
+            CONTENEDOR.get("requiere") or []
+        ),
+        "invariantes": CONTENEDOR.get("invariantes"),
+        "declaraciones_n": len(DECLARACIONES),
+    }
+
+
+# ===============================================================
+# 20. VERIFICAR SALIDA
+# ===============================================================
+
+def verificar_salida(
+    salida: Dict[str, Any],
+) -> bool:
+    """
+    Verifica la forma estructural mínima de una salida de barrer().
+    No interpreta semánticamente sus contenidos.
+    """
+    if not isinstance(salida, dict):
+        return False
+
+    campos_bool = ("coherente",)
+
+    for campo in campos_bool:
+        if campo not in salida:
+            return False
+
+        if not isinstance(salida[campo], bool):
+            return False
+
+    campos_str = (
+        "contenedor",
+        "estado",
+    )
+
+    for campo in campos_str:
+        if campo in salida and not isinstance(
+            salida[campo],
+            str,
+        ):
+            return False
+
+    campos_lista = (
+        "choques",
+        "errores",
+        "mecanica",
+        "archivos",
+    )
+
+    for campo in campos_lista:
+        if campo in salida and not isinstance(
+            salida[campo],
+            list,
+        ):
+            return False
+
+    if "total_mecanicas" in salida:
+        if not isinstance(
+            salida["total_mecanicas"],
+            int,
+        ):
+            return False
+
+        if salida["total_mecanicas"] < 0:
+            return False
+
+    return True
+
+
+# ===============================================================
+# 21. REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
-    r = barrer()
+    """
+    Produce una única instantánea determinista del estado operativo
+    y contractual de MC.
+    """
+    resultado = barrer()
+
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1808,41 +1891,92 @@ def reporte() -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "estado": ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO,
-        "coherente": r.get("coherente"),
-        "choques": r.get("choques"),
-        "errores": r.get("errores"),
-        "mecanica": r.get("mecanica"),
-        "archivos": r.get("archivos"),
-        "total_mecanicas": r.get("total_mecanicas"),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
-        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "estado": (
+            ESTADO_OPERATIVO
+            if resultado.get("coherente")
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": resultado.get("coherente"),
+        "choques": resultado.get("choques"),
+        "errores": resultado.get("errores"),
+        "mecanica": resultado.get("mecanica"),
+        "archivos": resultado.get("archivos"),
+        "total_mecanicas": resultado.get(
+            "total_mecanicas"
+        ),
+        "capacidades": list(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "requiere": list(
+            CONTENEDOR.get("requiere") or []
+        ),
         "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
-        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+        "conocimiento_exportable": CONTENEDOR.get(
+            "conocimiento_exportable"
+        ),
+        "consultas_soportadas": CONTENEDOR.get(
+            "consultas_soportadas"
+        ),
     }
 
 
+# ===============================================================
+# 22. DIAGNÓSTICO
+# ===============================================================
+
 def diagnostico() -> Dict[str, Any]:
-    r = barrer()
-    problemas = []
-    advertencias = []
-    recomendaciones = []
+    """
+    Construye el diagnóstico estructural de MC a partir del resultado
+    determinista de barrer().
+    """
+    resultado = barrer()
 
-    if r.get("errores"):
-        problemas.append({"tipo": "errores_lectura", "detalle": r["errores"]})
-        recomendaciones.append("Revisar archivos MECANICA con errores")
+    problemas: List[Dict[str, Any]] = []
+    advertencias: List[str] = []
+    recomendaciones: List[str] = []
 
-    if r.get("choques"):
-        problemas.append({"tipo": "choques_orden", "detalle": r["choques"]})
-        recomendaciones.append("Resolver contradicciones o ciclos de orden")
+    errores = resultado.get("errores") or []
+    choques = resultado.get("choques") or []
 
-    if not r.get("total_mecanicas"):
-        advertencias.append("Ninguna mecánica declarada en la carpeta")
-        recomendaciones.append("Agregar archivos .py con variable MECANICA")
+    if errores:
+        problemas.append({
+            "tipo": "errores_lectura",
+            "detalle": list(errores),
+        })
 
-    estado = ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO
-    if not r.get("total_mecanicas") and not problemas:
+        recomendaciones.append(
+            "Revisar las declaraciones MECANICA que presentan "
+            "errores estructurales o de carga"
+        )
+
+    if choques:
+        problemas.append({
+            "tipo": "choques_orden",
+            "detalle": list(choques),
+        })
+
+        recomendaciones.append(
+            "Resolver contradicciones o ciclos de precedencia "
+            "entre las mecánicas declaradas"
+        )
+
+    total = resultado.get("total_mecanicas", 0)
+
+    if not total:
+        advertencias.append(
+            "Ninguna mecánica declarada en el contenido del módulo"
+        )
+
+        recomendaciones.append(
+            "Agregar declaraciones MECANICA válidas al módulo"
+        )
+
+    if resultado.get("coherente"):
+        estado = ESTADO_OPERATIVO
+    else:
+        estado = ESTADO_DEGRADADO
+
+    if not total and not problemas:
         estado = ESTADO_NO_INICIADO
 
     return {
@@ -1852,72 +1986,509 @@ def diagnostico() -> Dict[str, Any]:
         "problemas": problemas,
         "advertencias": advertencias,
         "recomendaciones": recomendaciones,
-        "coherente": r.get("coherente"),
-        "choques_n": len(r.get("choques") or []),
-        "errores_n": len(r.get("errores") or []),
-        "total_mecanicas": r.get("total_mecanicas"),
+        "coherente": resultado.get("coherente"),
+        "choques_n": len(choques),
+        "errores_n": len(errores),
+        "total_mecanicas": total,
     }
 
-# ===============================================================
-# FIN REPORTING
-# ===============================================================
-
 
 # ===============================================================
-# VERIFICACIÓN / INVENTARIO
+# 23. RESOLUCIÓN REAL DE CAPACIDADES
 # ===============================================================
 
-# verificar() e inventario() en CAPACIDADES PÚBLICAS
+def _resolver_capacidad(
+    nombre: str,
+    referencia: Any,
+) -> Callable[..., Any]:
+    """
+    Resuelve una capacidad contractual hasta una función callable real.
+
+    Una capacidad puede estar declarada mediante una referencia callable
+    directa o mediante el nombre de una función existente en este módulo.
+
+    No crea funciones ni sustituye referencias inexistentes.
+    """
+    if callable(referencia):
+        return referencia
+
+    if isinstance(referencia, str):
+        funcion = globals().get(referencia)
+
+        if callable(funcion):
+            return funcion
+
+    raise ContratoInvalido(
+        f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+        "no resuelve a una función callable real"
+    )
+
 
 # ===============================================================
-# FIN VERIFICACIÓN / INVENTARIO
+# 24. EJECUCIÓN REAL DE UNA CAPACIDAD
+# ===============================================================
+
+def _ejecutar_capacidad(
+    nombre: str,
+    referencia: Any,
+    peticion: Any,
+) -> Any:
+    """
+    Ejecuta una capacidad contractual real.
+
+    La firma de la función determina de forma determinista si acepta
+    una petición explícita o si debe ejecutarse sin argumentos.
+
+    Una capacidad con parámetros obligatorios distintos de una única
+    petición no es ejecutable mediante la interfaz contractual y
+    produce error en lugar de recibir argumentos inventados.
+    """
+    funcion = _resolver_capacidad(
+        nombre=nombre,
+        referencia=referencia,
+    )
+
+    firma = inspect.signature(funcion)
+
+    parametros = list(
+        firma.parameters.values()
+    )
+
+    obligatorios = [
+        parametro
+        for parametro in parametros
+        if parametro.kind
+        in (
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        )
+        and parametro.default
+        is inspect.Parameter.empty
+    ]
+
+    if not obligatorios:
+        return funcion()
+
+    if len(obligatorios) == 1 and len(parametros) == 1:
+        return funcion(peticion)
+
+    raise ContratoInvalido(
+        f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+        "no posee una firma compatible con la interfaz contractual"
+    )
+
+
+# ===============================================================
+# 25. EJECUTAR TOTAL
+# ===============================================================
+
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Ejecuta todas las capacidades declaradas en el contrato de MC.
+
+    La autoridad no mantiene una lista manual de capacidades.
+    La fuente única de verdad es:
+
+        CONTENEDOR["capacidades"]
+
+    Cada entrada debe resolver a una función callable real.
+
+    Una falla de una capacidad no impide intentar las restantes.
+    Ninguna capacidad inexistente se inventa o sustituye.
+    """
+    peticion_normalizada = (
+        dict(peticion)
+        if isinstance(peticion, dict)
+        else {}
+    )
+
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    capacidades = CONTENEDOR.get(
+        "capacidades",
+        {},
+    )
+
+    if not isinstance(capacidades, dict):
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_DEGRADADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": [
+                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] "
+                "no es dict"
+            ],
+            "resultados": {},
+            "capacidades_declaradas": [],
+        }
+
+    for nombre in sorted(capacidades):
+
+        referencia = capacidades[nombre]
+
+        try:
+            resultados[nombre] = _ejecutar_capacidad(
+                nombre=nombre,
+                referencia=referencia,
+                peticion=peticion_normalizada,
+            )
+
+        except Exception as exc:
+            errores_ejecucion.append(
+                f"{nombre}: {exc}"
+            )
+
+            resultados[nombre] = None
+
+    barrido = resultados.get("barrer")
+
+    coherente = (
+        isinstance(barrido, dict)
+        and bool(barrido.get("coherente"))
+    )
+
+    ejecutadas = sorted(
+        nombre
+        for nombre, resultado in resultados.items()
+        if resultado is not None
+    )
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": (
+            ESTADO_OPERATIVO
+            if coherente and not errores_ejecucion
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": coherente and not errores_ejecucion,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": sorted(
+            capacidades.keys()
+        ),
+    }
+
+
+# ===============================================================
+# 26. INSPECCIONAR
+# ===============================================================
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Expone el estado estructural del módulo sin modificarlo.
+    """
+    hallado = _leer()
+    resultado = barrer()
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+            "APROBADO": APROBADO,
+            "RECHAZADO": RECHAZADO,
+        },
+        "capacidades_contractuales": sorted(
+            CONTENEDOR.get(
+                "capacidades",
+                {},
+            ).keys()
+        ),
+        "capacidades_meta": sorted(
+            CONTENEDOR.get(
+                "capacidades_meta",
+                {},
+            ).keys()
+        ),
+        "integridad": {
+            "coherente": resultado.get("coherente"),
+            "estado": resultado.get("estado"),
+            "choques": resultado.get("choques"),
+            "errores": resultado.get("errores"),
+            "mecanica": resultado.get("mecanica"),
+            "total_mecanicas": resultado.get(
+                "total_mecanicas"
+            ),
+            "archivos": resultado.get("archivos"),
+        },
+        "mecanicas_descubiertas": sorted(
+            hallado.keys()
+        ),
+        "declaraciones": list(DECLARACIONES),
+        "autoriza_engine": CONTENEDOR.get(
+            "autoriza_engine"
+        ),
+        "reporting": CONTENEDOR.get(
+            "reporting"
+        ),
+        "invariantes": list(INVARIANTES),
+    }
+
+
+# ===============================================================
+# 27. REGISTRAR INVENTARIO
+# ===============================================================
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Produce una instantánea registrable del inventario.
+    No modifica las mecánicas ni la evidencia.
+    """
+    resultado = inventario(peticion)
+
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": resultado,
+    }
+
+
+# ===============================================================
+# FIN CAPACIDADES PÚBLICAS — CORRELACIÓN MECÁNICA
+# ===============================================================
+# ===============================================================
+# PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
 # ===============================================================
 
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA
+# 10.1 — RESOLUCIÓN DE REFERENCIA CONTRACTUAL
 # ===============================================================
 
-_CAP_MAP = {
-    "barrer": barrer,
-    "axiomas": axiomas,
-    "inventario": inventario,
-    "verificar_salida": verificar_salida,
-    "reporte": reporte,
-    "diagnostico": diagnostico,
-    "listar_mecanicas": listar_mecanicas,
-    "verificar": verificar,
-}
+def _resolver_referencia_capacidad(
+    nombre: str,
+    referencia: Any,
+) -> Callable[..., Any]:
+    """
+    Resuelve una referencia contractual hasta una función callable real.
 
+    La referencia puede ser:
+        - un callable real;
+        - el nombre de una función exportada por este módulo.
 
-def _resolver_capacidades(cont: Dict[str, Any]) -> None:
-    resueltas: Dict[str, Any] = {}
-    for nombre, ref in cont["capacidades"].items():
-        if callable(ref):
-            resueltas[nombre] = ref
-            continue
-        if isinstance(ref, str):
-            if ref not in _CAP_MAP:
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-                    f"referencia inexistente: '{ref}'"
-                )
-            fn = _CAP_MAP[ref]
-            if not callable(fn):
-                raise ContratoInvalido(
-                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
-                )
-            resueltas[nombre] = fn
-            continue
+    No modifica CONTENEDOR.
+    No crea funciones.
+    No sustituye referencias inexistentes.
+    """
+
+    if callable(referencia):
+        return referencia
+
+    if isinstance(referencia, str):
+
+        funcion = globals().get(referencia)
+
+        if callable(funcion):
+            return funcion
+
         raise ContratoInvalido(
             f"{NOMBRE_MODULO}: capacidad '{nombre}' "
-            f"tiene tipo inválido: {type(ref).__name__}"
+            f"referencia inexistente o no callable: '{referencia}'"
         )
-    cont["capacidades"] = resueltas
+
+    raise ContratoInvalido(
+        f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+        f"tiene referencia inválida: "
+        f"{type(referencia).__name__}"
+    )
 
 
-_validar_contrato(CONTENEDOR)
-_resolver_capacidades(CONTENEDOR)
+# ===============================================================
+# 10.2 — RESOLUCIÓN COMPLETA DE CAPACIDADES
+# ===============================================================
+
+def _resolver_capacidades(
+    cont: Dict[str, Any],
+) -> Dict[str, Callable[..., Any]]:
+    """
+    Resuelve todas las capacidades declaradas en el contrato.
+
+    La declaración contractual permanece intacta.
+
+    La salida es un mapa independiente:
+        nombre -> callable real
+
+    No inventa capacidades.
+    No elimina capacidades.
+    No modifica CONTENEDOR.
+    """
+
+    if not isinstance(cont, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR debe ser dict"
+        )
+
+    capacidades = cont.get("capacidades")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] "
+            "debe ser dict"
+        )
+
+    resueltas: Dict[str, Callable[..., Any]] = {}
+
+    for nombre in sorted(capacidades):
+
+        if not isinstance(nombre, str) or not nombre.strip():
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: identificador de capacidad inválido"
+            )
+
+        resueltas[nombre] = _resolver_referencia_capacidad(
+            nombre=nombre,
+            referencia=capacidades[nombre],
+        )
+
+    return resueltas
+
+
+# ===============================================================
+# 10.3 — VALIDACIÓN Y RESOLUCIÓN CONTRACTUAL
+# ===============================================================
+
+_validar_contrato_completo(CONTENEDOR)
+
+_CAP_RESUELTAS = _resolver_capacidades(
+    CONTENEDOR
+)
+
+
+# ===============================================================
+# 10.4 — VALIDACIÓN DE COBERTURA CONTRACTUAL
+# ===============================================================
+
+def _validar_cobertura_capacidades() -> None:
+    """
+    Garantiza correspondencia exacta entre las capacidades declaradas
+    y las capacidades realmente resueltas.
+
+    No permite:
+        - capacidades declaradas sin resolución;
+        - capacidades resueltas no declaradas.
+    """
+
+    declaradas = set(
+        CONTENEDOR.get("capacidades", {}).keys()
+    )
+
+    resueltas = set(
+        _CAP_RESUELTAS.keys()
+    )
+
+    faltantes = sorted(
+        declaradas - resueltas
+    )
+
+    sobrantes = sorted(
+        resueltas - declaradas
+    )
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades declaradas "
+            f"sin resolución callable: {faltantes}"
+        )
+
+    if sobrantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades resueltas "
+            f"sin declaración contractual: {sobrantes}"
+        )
+
+
+# ===============================================================
+# 10.5 — EJECUCIÓN CONTRACTUAL REAL DE CAPACIDAD
+# ===============================================================
+
+def _ejecutar_capacidad_resuelta(
+    nombre: str,
+    funcion: Callable[..., Any],
+    peticion: Any = None,
+) -> Any:
+    """
+    Ejecuta una capacidad ya resuelta.
+
+    La firma de la función determina de manera determinista
+    si requiere la petición contractual.
+
+    No inventa argumentos.
+    No descarta parámetros obligatorios.
+    """
+
+    if not callable(funcion):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+            "no es callable"
+        )
+
+    firma = inspect.signature(funcion)
+
+    parametros = list(
+        firma.parameters.values()
+    )
+
+    obligatorios = [
+        parametro
+        for parametro in parametros
+        if parametro.default is inspect.Parameter.empty
+        and parametro.kind
+        in (
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        )
+    ]
+
+    if not obligatorios:
+        return funcion()
+
+    if len(parametros) == 1 and len(obligatorios) == 1:
+        return funcion(peticion)
+
+    raise ContratoInvalido(
+        f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+        "posee una firma incompatible con la interfaz "
+        "contractual de ENGINE"
+    )
+
+
+# ===============================================================
+# 10.6 — VALIDACIÓN FINAL DE RESOLUCIÓN
+# ===============================================================
+
+_validar_cobertura_capacidades()
+
+
+# ===============================================================
+# 10.7 — EXPORTACIONES
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -1931,34 +2502,29 @@ __all__ = [
     "DECLARACIONES",
     "axiomas",
     "barrer",
+    "verificar",
+    "evaluar",
     "inventario",
     "verificar_salida",
     "listar_mecanicas",
-    "verificar",
     "reporte",
     "diagnostico",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
     "APROBADO",
     "RECHAZADO",
     "ContratoInvalido",
 ]
 
+
 # ===============================================================
-# FIN EXPORTACIONES
+# FIN 10.7
 # ===============================================================
 
 
 # ===============================================================
-# EXTENSIONES FUTURAS
-# ===============================================================
-#
-# Toda capacidad nueva DEBE agregarse simultáneamente en:
-#   1. capacidades
-#   2. capacidades_meta  (descripcion, entrada, salida: str)
-#   3. _CAP_MAP
-#   4. VERSION_MODULO
-#
-# ===============================================================
-# FIN EXTENSIONES FUTURAS
+# FIN PARTE 10
 # ===============================================================
 
 

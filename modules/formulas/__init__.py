@@ -58,15 +58,28 @@
 
 from __future__ import annotations
 
-import importlib.util
+# --- Estándar del lenguaje ---
 import sys
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+import math
+import ast
+import copy
+import threading
+import importlib.util
 
-try:
-    from core.diagnostico import DiagnosticoGlobal  # type: ignore
-except Exception:  # noqa: BLE001
-    DiagnosticoGlobal = None  # type: ignore
+# --- Tipos y estructuras ---
+from typing import Any, Dict, List, Optional, Set, Tuple
+from collections import defaultdict
+
+# --- Números y precisión ---
+from decimal import Decimal, getcontext
+from fractions import Fraction
+
+# --- Fechas y tiempo ---
+from datetime import datetime, timezone
+
+# --- Sistema de archivos ---
+from pathlib import Path
+
 
 # ===============================================================
 # FIN IMPORTACIONES

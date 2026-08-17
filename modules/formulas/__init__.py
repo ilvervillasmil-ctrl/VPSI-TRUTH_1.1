@@ -312,9 +312,14 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "reporte": True,
 
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
+       # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,
+        "acceso_archivos": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
 
@@ -344,9 +349,16 @@ CONTENEDOR: Dict[str, Any] = {
         "axiomas": "axiomas",
         "tru_ri": "tru_ri",
         "tru_total": "tru_total",
+        
         "reporte": "reporte",
         "diagnostico": "diagnostico",
         "listar_formulas": "listar_formulas",
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+
     },
 
     # ============================================================
@@ -471,7 +483,7 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
-        "listar_formulas": {
+                "listar_formulas": {
             "descripcion": (
                 "Lista todas las fórmulas descubiertas y registradas."
             ),
@@ -481,6 +493,41 @@ CONTENEDOR: Dict[str, Any] = {
                 "dict con descubiertas y registradas"
             ),
             "acceso_archivos": ["*"],
+        },
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre FO. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de FO. "
+                "Expone constantes, capacidades, formulas y estado "
+                "sin alterar el contrato ni calcular."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de FO "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
         },
     },
 
@@ -516,8 +563,13 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
 
         # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+        "acceso_archivos": True,
+        "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
 
@@ -829,12 +881,194 @@ def verificar() -> Dict[str, Any]:
     return barrer()
 
 # ===============================================================
+# CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE)
+# ===============================================================
+
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Autoridad total de ENGINE sobre FO.
+    Fuente única: CONTENEDOR["capacidades"].
+    No inventa. No autoinvoca. Todo callable real.
+    """
+    peticion_normalizada = (
+        dict(peticion) if isinstance(peticion, dict) else {}
+    )
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    if not isinstance(capacidades, dict):
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_DEGRADADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": [
+                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] no es dict"
+            ],
+            "resultados": {},
+            "capacidades_declaradas": [],
+        }
+
+    for nombre in sorted(capacidades):
+        if nombre == "ejecutar_total":
+            continue
+        referencia = capacidades[nombre]
+        try:
+            if callable(referencia):
+                fn = referencia
+            elif isinstance(referencia, str):
+                fn = globals().get(referencia)
+                if not callable(fn):
+                    raise ContratoInvalido(
+                        f"'{referencia}' no es callable"
+                    )
+            else:
+                raise ContratoInvalido(
+                    f"tipo inválido: {type(referencia).__name__}"
+                )
+
+            # tru_ri / tru_total requieren C, L, K — no se ejecutan a ciegas
+            if nombre in ("tru_ri", "tru_total"):
+                C = peticion_normalizada.get("C")
+                L = peticion_normalizada.get("L")
+                K = peticion_normalizada.get("K")
+                if C is None or L is None or K is None:
+                    resultados[nombre] = {
+                        "omitido": True,
+                        "motivo": "faltan C, L o K en peticion",
+                    }
+                    continue
+                resultados[nombre] = fn(C, L, K)
+                continue
+
+            firma = inspect.signature(fn)
+            params = list(firma.parameters.values())
+            obligatorios = [
+                p for p in params
+                if p.kind in (
+                    inspect.Parameter.POSITIONAL_ONLY,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                )
+                and p.default is inspect.Parameter.empty
+            ]
+            if not obligatorios:
+                resultados[nombre] = fn()
+            elif len(obligatorios) == 1:
+                resultados[nombre] = fn(peticion_normalizada)
+            else:
+                resultados[nombre] = fn()
+        except Exception as exc:
+            errores_ejecucion.append(f"{nombre}: {exc}")
+            resultados[nombre] = None
+
+    barrido = resultados.get("barrer")
+    coherente = (
+        isinstance(barrido, dict) and bool(barrido.get("coherente"))
+    )
+    ejecutadas = sorted(
+        n for n, r in resultados.items() if r is not None
+    )
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": (
+            ESTADO_OPERATIVO
+            if coherente and not errores_ejecucion
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": coherente and not errores_ejecucion,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": sorted(capacidades.keys()),
+    }
+
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Inspección estructural de FO.
+    Expone contrato y estado sin calcular ni alterar.
+    """
+    r = barrer()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+            "PISO_FORMULAS": PISO_FORMULAS,
+        },
+        "capacidades_contractuales": sorted(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": sorted(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "integridad": {
+            "coherente": r.get("coherente"),
+            "faltas": r.get("faltas"),
+            "reglas": r.get("reglas"),
+            "formulas": r.get("formulas"),
+        },
+        "formulas_registradas": list(_FORMULAS.keys()),
+        "formulas_descubiertas": _descubrir_formulas(),
+        "declaraciones_n": len(_DECLARACIONES),
+        "reglas_n": len(_REGLAS),
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone estructura de FO sin calcular "
+            "ni alterar el contrato."
+        ),
+    }
+
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Instantánea determinista del inventario de FO.
+    No altera evidencia.
+    """
+    inv = inventario(peticion)
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inv,
+        "nota": (
+            "Instantánea determinista del inventario de FO. "
+            "No modifica fórmulas ni evidencia."
+        ),
+    }
+
+# ===============================================================
+# FIN CAPACIDADES ARQUITECTÓNICAS
+# ===============================================================
+# ===============================================================
 # FIN CAPACIDADES PÚBLICAS
-# ===============================================================
-
-
-# ===============================================================
-# REPORTING INTERNO
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
@@ -847,7 +1081,9 @@ def reporte() -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "estado": ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO,
+        "estado": (
+            ESTADO_OPERATIVO if r.get("coherente") else ESTADO_DEGRADADO
+        ),
         "coherente": r.get("coherente"),
         "faltas": r.get("faltas"),
         "formulas": r.get("formulas"),
@@ -857,6 +1093,11 @@ def reporte() -> Dict[str, Any]:
         "autoridad": CONTENEDOR.get("autoridad"),
         "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
         "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": True,
+            "inspeccionar": True,
+            "registrar_inventario": True,
+        },
     }
 
 
@@ -899,35 +1140,41 @@ def diagnostico() -> Dict[str, Any]:
 
 
 # ===============================================================
-# VERIFICACIÓN / INVENTARIO
-# ===============================================================
-
-# verificar() e inventario() en CAPACIDADES PÚBLICAS
-
-# ===============================================================
-# FIN VERIFICACIÓN / INVENTARIO
-# ===============================================================
-
-
-# ===============================================================
 # EXPORTACIONES + RESOLUCIÓN ESTRICTA
 # ===============================================================
 
 _CAP_MAP = {
+    # --- CENTINELA ---
     "barrer": barrer,
+    "verificar": verificar,
+    "evaluar": barrer,
     "verificar_salida": verificar_salida,
+
+    # --- INVENTARIO Y REPORTING ---
     "inventario": inventario,
-    "axiomas": axiomas,
-    "tru_ri": tru_ri,
-    "tru_total": tru_total,
     "reporte": reporte,
     "diagnostico": diagnostico,
+
+    # --- CONOCIMIENTO ---
+    "axiomas": axiomas,
     "listar_formulas": listar_formulas,
-    "verificar": verificar,
+
+    # --- FÓRMULAS CANÓNICAS ---
+    "tru_ri": tru_ri,
+    "tru_total": tru_total,
+
+    # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
 
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Resuelve referencias str → callables reales.
+    MUTA CONTENEDOR["capacidades"] para que Engine reciba callables.
+    """
     resueltas: Dict[str, Any] = {}
     for nombre, ref in cont["capacidades"].items():
         if callable(ref):
@@ -966,15 +1213,18 @@ __all__ = [
     "ESQUEMA_CONTRATO",
     "ESTABILIDAD",
     "barrer",
+    "verificar",
     "verificar_salida",
     "inventario",
     "axiomas",
     "tru_ri",
     "tru_total",
     "listar_formulas",
-    "verificar",
     "reporte",
     "diagnostico",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
     "FormulaError",
     "FormulaNoEncontradaError",
     "ContratoInvalido",
@@ -983,26 +1233,6 @@ __all__ = [
 # ===============================================================
 # FIN EXPORTACIONES
 # ===============================================================
-
-
-# ===============================================================
-# EXTENSIONES FUTURAS
-# ===============================================================
-#
-# Toda capacidad nueva DEBE agregarse simultáneamente en:
-#   1. capacidades
-#   2. capacidades_meta  (descripcion, entrada, salida: str)
-#   3. _CAP_MAP
-#   4. VERSION_MODULO
-#
-# Cualquier archivo .py nuevo en este módulo será descubierto
-# automáticamente por _descubrir_formulas().
-#
-# ===============================================================
-# FIN EXTENSIONES FUTURAS
-# ===============================================================
-
-
 # ===============================================================
 # FIN DEL MÓDULO
 # ===============================================================

@@ -29,15 +29,30 @@
 # ===============================================================
 
 # ===============================================================
-# 1.1 — IMPORTACIONES
+# IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
 
-import importlib.util
+# --- Estándar del lenguaje ---
 import sys
+import math
+import ast
+import copy
+import threading
+import importlib.util
+
+# --- Tipos y estructuras ---
+from typing import Any, Dict, List, Optional, Set, Tuple
+from collections import defaultdict
+
+# --- Números y precisión ---
+from decimal import Decimal, getcontext
+from fractions import Fraction
+
+# --- Sistema de archivos ---
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+
 
 # ===============================================================
 # FIN 1.1

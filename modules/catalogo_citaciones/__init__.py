@@ -273,8 +273,8 @@ CONTENEDOR: Dict[str, Any] = {
     "requiere": [
     "CE", "AX", "FO", "MC", "SF",
     "CA", "CX", "DI", "RE", "VX",
-    "TX", "CH", "DGCO", "UI",
-    "CC", "TT", "SC",
+    "TX", "CH", "CIT", "DGCO", "UI",
+    "TT", "SC",
     ],
     # ============================================================
     # 5.8 — ACCESO A ARCHIVOS

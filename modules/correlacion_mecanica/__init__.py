@@ -60,15 +60,20 @@
 
 from __future__ import annotations
 
+import inspect
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import importlib.util
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 try:
-    from core.diagnostico import DiagnosticoGlobal  # type: ignore
-except Exception:  # noqa: BLE001
-    DiagnosticoGlobal = None  # type: ignore
+    from core.diagnostico import DiagnosticoGlobal
+except Exception as e:
+    raise ImportError(
+        f"FALLO CRÍTICO: no se pudo importar 'DiagnosticoGlobal' desde core.diagnostico: {e}"
+    )
 
 # ===============================================================
 # FIN IMPORTACIONES
@@ -2280,9 +2285,6 @@ def registrar_inventario(
 # ===============================================================
 # 10.0 — IMPORTS REQUERIDOS
 # ===============================================================
-
-import inspect
-from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # ===============================================================
 # FIN 10.0

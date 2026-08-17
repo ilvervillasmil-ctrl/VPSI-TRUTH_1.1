@@ -80,8 +80,7 @@ from __future__ import annotations
 import importlib.util
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
-
+from typing import Any, Callable, Dict, List, Optional, Set
 try:
     from core.diagnostico import DiagnosticoGlobal
 except Exception:
@@ -170,6 +169,433 @@ _CARGADO = False
 # ===============================================================
 # FIN ESTADO INTERNO
 # ===============================================================
+# ===============================================================
+# CONTRATO OFICIAL DEL MÓDULO
+# ===============================================================
+
+CONTENEDOR: Dict[str, Any] = {
+
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
+    "esquema": ESQUEMA_CONTRATO,
+    "version_contrato": VERSION_CONTRATO,
+    "version_modulo": VERSION_MODULO,
+    "estabilidad": ESTABILIDAD,
+    "compatible_desde": COMPATIBLE_DESDE,
+    "api_engine": API_ENGINE,
+
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
+    "id": ID_MODULO,
+    "nombre": NOMBRE_MODULO,
+    "rol": ROL_MODULO,
+    "descripcion": (
+        "Biblioteca de definiciones. Rol DI. "
+        "Materia prima léxica: palabra → definición → significado. "
+        "Herramienta para contrastar y correlacionar a nivel de significado. "
+        "Auto-carga todos los archivos debajo del módulo. "
+        "Engine puede solicitar y distribuir definiciones según contexto. "
+        "No calcula Tru. No clasifica O. No trae dominios externos."
+    ),
+
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
+    "funcion": (
+        "Biblioteca de definiciones para contrastar y correlacionar a nivel "
+        "léxico-significado. Materia prima: palabra → definición → significado. "
+        "Auto-carga todo lo que está debajo del módulo."
+    ),
+    "no_hace": [
+        "No calcula C, L, K, Tru_Ri ni Tru_total",
+        "No clasifica O_context (eso es CX)",
+        "No trae material externo de dominios (eso es RE)",
+        "No orquesta el ciclo (eso es Engine)",
+        "No sustituye AX, MC, CA, FO, CIT",
+    ],
+
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
+    "autoridad": [
+        "Exponer definiciones y significados",
+        "Auto-cargar todos los archivos que declaren DICCIONARIO",
+        "Entregar materia prima léxica a Engine y otros módulos",
+        "Reportar estado, inventario y diagnóstico propios",
+    ],
+
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
+    "conocimiento_exportable": [
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "listar",
+        "cargar",
+        "cargar_todos",
+        "definir",
+        "significado",
+        "palabras",
+        "inyectar_en_peticion",
+        "verificar",
+        "barrer",
+        "resolver",
+        "axiomas",
+    ],
+
+    # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
+    "requiere": ["*"],
+
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
+
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
+    
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
+    "autoriza_engine": {
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
+
+
+    
+    # ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
+    "consultas_soportadas": [
+        "listar",
+        "cargar",
+        "cargar_todos",
+        "definir",
+        "significado",
+        "palabras",
+        "inyectar_en_peticion",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "verificar",
+        "barrer",
+        "resolver",
+        "axiomas",
+    ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
+    "capacidades": {
+        "verificar": "verificar",
+        "barrer": "barrer",
+        "inventario": "inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
+        "axiomas": "axiomas",
+        "resolver": "resolver",
+        "listar": "listar",
+        "cargar": "cargar",
+        "cargar_todos": "cargar_todos",
+        "definir": "definir",
+        "significado": "significado",
+        "palabras": "palabras",
+        "inyectar_en_peticion": "inyectar_en_peticion",
+        "verificar_salida": "verificar_salida",
+    },
+
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
+
+    "capacidades_meta": {
+        "verificar": {
+            "descripcion": (
+                "Alias de barrer. Verifica coherencia del diccionario."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, errores, diccionarios, total"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "barrer": {
+            "descripcion": (
+                "Centinela de DI: valida forma de las fuentes, "
+                "reporta errores de carga. No calcula Tru."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, errores, diccionarios, "
+                "total, por_idioma"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "inventario": {
+            "descripcion": (
+                "Inventario de diccionarios descubiertos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, version, total, diccionarios, por_idioma"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "reporte": {
+            "descripcion": (
+                "Reporte interno de estado del módulo DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, coherente, diccionarios, capacidades"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "diagnostico": {
+            "descripcion": (
+                "Diagnóstico del módulo DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, problemas, advertencias, "
+                "recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "axiomas": {
+            "descripcion": (
+                "Declaraciones axiomáticas del módulo DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "list[dict] de declaraciones",
+            "acceso_archivos": ["*"],
+        },
+
+        "resolver": {
+            "descripcion": (
+                "Entrega definiciones según palabra, idioma o fuente."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con definiciones o materia prima"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "listar": {
+            "descripcion": (
+                "Nombres de todos los diccionarios descubiertos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "list[str]",
+            "acceso_archivos": ["*"],
+        },
+
+        "cargar": {
+            "descripcion": (
+                "Carga un diccionario por nombre."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con el DICCIONARIO",
+            "acceso_archivos": ["*"],
+        },
+
+        "cargar_todos": {
+            "descripcion": (
+                "Carga todos los diccionarios descubiertos."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict nombre → datos",
+            "acceso_archivos": ["*"],
+        },
+
+        "definir": {
+            "descripcion": (
+                "Busca definición de una palabra en fuentes."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con definicion, significado, fuente o None"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "significado": {
+            "descripcion": (
+                "Atajo para obtener significado/definición de una palabra."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "str o None",
+            "acceso_archivos": ["*"],
+        },
+
+        "palabras": {
+            "descripcion": (
+                "Conjunto de lemas de las fuentes indicadas."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "set[str]",
+            "acceso_archivos": ["*"],
+        },
+
+        "inyectar_en_peticion": {
+            "descripcion": (
+                "Entrega lemas a una petición para el ciclo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "peticion con lemas inyectados",
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar_salida": {
+            "descripcion": (
+                "Comprueba forma mínima de una salida de DI."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "bool",
+            "acceso_archivos": ["*"],
+        },
+    },
+
+     # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
+    "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
+        "estado": True,
+        "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+        "inventario": True,
+        "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+        "errores": True,
+        "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+        "dependencias": True,
+        "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+        "contrato": True,
+        "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
+        "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
+    },
+
+
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
+    "estados_validos": list(ESTADOS_VALIDOS),
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
+    "invariantes": list(INVARIANTES),
+
+}  # <--- CIERRE FINAL
+
+# ===============================================================
+# FIN CONTRATO
+# ===============================================================
+
 
 # ===============================================================
 # FUNCIONES PRIVADAS
@@ -667,432 +1093,6 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
 # FIN REPORTING
 # ===============================================================
 
-# ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
-# ===============================================================
-
-CONTENEDOR: Dict[str, Any] = {
-
-    # ============================================================
-    # ESQUEMA
-    # ============================================================
-    "esquema": ESQUEMA_CONTRATO,
-    "version_contrato": VERSION_CONTRATO,
-    "version_modulo": VERSION_MODULO,
-    "estabilidad": ESTABILIDAD,
-    "compatible_desde": COMPATIBLE_DESDE,
-    "api_engine": API_ENGINE,
-
-    # ============================================================
-    # IDENTIDAD
-    # ============================================================
-    "id": ID_MODULO,
-    "nombre": NOMBRE_MODULO,
-    "rol": ROL_MODULO,
-    "descripcion": (
-        "Biblioteca de definiciones. Rol DI. "
-        "Materia prima léxica: palabra → definición → significado. "
-        "Herramienta para contrastar y correlacionar a nivel de significado. "
-        "Auto-carga todos los archivos debajo del módulo. "
-        "Engine puede solicitar y distribuir definiciones según contexto. "
-        "No calcula Tru. No clasifica O. No trae dominios externos."
-    ),
-
-    # ============================================================
-    # PROPÓSITO
-    # ============================================================
-    "funcion": (
-        "Biblioteca de definiciones para contrastar y correlacionar a nivel "
-        "léxico-significado. Materia prima: palabra → definición → significado. "
-        "Auto-carga todo lo que está debajo del módulo."
-    ),
-    "no_hace": [
-        "No calcula C, L, K, Tru_Ri ni Tru_total",
-        "No clasifica O_context (eso es CX)",
-        "No trae material externo de dominios (eso es RE)",
-        "No orquesta el ciclo (eso es Engine)",
-        "No sustituye AX, MC, CA, FO, CIT",
-    ],
-
-    # ============================================================
-    # AUTORIDAD
-    # ============================================================
-    "autoridad": [
-        "Exponer definiciones y significados",
-        "Auto-cargar todos los archivos que declaren DICCIONARIO",
-        "Entregar materia prima léxica a Engine y otros módulos",
-        "Reportar estado, inventario y diagnóstico propios",
-    ],
-
-    # ============================================================
-    # CONOCIMIENTO EXPORTABLE
-    # ============================================================
-    "conocimiento_exportable": [
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "listar",
-        "cargar",
-        "cargar_todos",
-        "definir",
-        "significado",
-        "palabras",
-        "inyectar_en_peticion",
-        "verificar",
-        "barrer",
-        "resolver",
-        "axiomas",
-    ],
-
-    # ============================================================
-    # ACCESO (obligatorio en el esquema)
-    # ============================================================
-    "acceso": {
-        "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
-    },
-
-    # ============================================================
-    # DEPENDENCIAS
-    # ============================================================
-    "requiere": ["*"],
-
-    # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "acceso_archivos": ["*"],
-
-    # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "validar_esquema": ["*"],
-    
-    # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
-    # ============================================================
-    "autoriza_engine": {
-        # --- PERMISOS BASE ---
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-
-        # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
-        "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
-        "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
-        "actualizar": False,
-
-        # --- PERMISOS DE PROCESAMIENTO ---
-        "validar": True,
-        "procesar": True,
-        "analizar": True,
-        "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
-
-        # --- PERMISOS DE DATOS ---
-        "exportar": True,
-        "importar": True,
-        "respaldar": True,
-        "recuperar": True,
-        "sincronizar": True,
-
-        # --- PERMISOS DE MONITOREO ---
-        "monitorear": True,
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- PERMISOS DE ESTADO ---
-        "estado": True,
-        "version": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "contrato": True,
-        "conocimiento": True,
-        "reporte": True,
-
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
-    },
-
-
-    
-    # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "listar",
-        "cargar",
-        "cargar_todos",
-        "definir",
-        "significado",
-        "palabras",
-        "inyectar_en_peticion",
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "verificar",
-        "barrer",
-        "resolver",
-        "axiomas",
-    ],
-
-    # ============================================================
-    # CAPACIDADES
-    # ============================================================
-    "capacidades": {
-        "verificar": "verificar",
-        "barrer": "barrer",
-        "inventario": "inventario",
-        "reporte": "reporte",
-        "diagnostico": "diagnostico",
-        "axiomas": "axiomas",
-        "resolver": "resolver",
-        "listar": "listar",
-        "cargar": "cargar",
-        "cargar_todos": "cargar_todos",
-        "definir": "definir",
-        "significado": "significado",
-        "palabras": "palabras",
-        "inyectar_en_peticion": "inyectar_en_peticion",
-        "verificar_salida": "verificar_salida",
-    },
-
-    # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
-    # ============================================================
-
-    "capacidades_meta": {
-        "verificar": {
-            "descripcion": (
-                "Alias de barrer. Verifica coherencia del diccionario."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con coherente, errores, diccionarios, total"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "barrer": {
-            "descripcion": (
-                "Centinela de DI: valida forma de las fuentes, "
-                "reporta errores de carga. No calcula Tru."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con coherente, errores, diccionarios, "
-                "total, por_idioma"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "inventario": {
-            "descripcion": (
-                "Inventario de diccionarios descubiertos."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, version, total, diccionarios, por_idioma"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "reporte": {
-            "descripcion": (
-                "Reporte interno de estado del módulo DI."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, estado, coherente, diccionarios, capacidades"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "diagnostico": {
-            "descripcion": (
-                "Diagnóstico del módulo DI."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, estado, problemas, advertencias, "
-                "recomendaciones"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "axiomas": {
-            "descripcion": (
-                "Declaraciones axiomáticas del módulo DI."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "list[dict] de declaraciones",
-            "acceso_archivos": ["*"],
-        },
-
-        "resolver": {
-            "descripcion": (
-                "Entrega definiciones según palabra, idioma o fuente."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con definiciones o materia prima"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "listar": {
-            "descripcion": (
-                "Nombres de todos los diccionarios descubiertos."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "list[str]",
-            "acceso_archivos": ["*"],
-        },
-
-        "cargar": {
-            "descripcion": (
-                "Carga un diccionario por nombre."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con el DICCIONARIO",
-            "acceso_archivos": ["*"],
-        },
-
-        "cargar_todos": {
-            "descripcion": (
-                "Carga todos los diccionarios descubiertos."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict nombre → datos",
-            "acceso_archivos": ["*"],
-        },
-
-        "definir": {
-            "descripcion": (
-                "Busca definición de una palabra en fuentes."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con definicion, significado, fuente o None"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "significado": {
-            "descripcion": (
-                "Atajo para obtener significado/definición de una palabra."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "str o None",
-            "acceso_archivos": ["*"],
-        },
-
-        "palabras": {
-            "descripcion": (
-                "Conjunto de lemas de las fuentes indicadas."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "set[str]",
-            "acceso_archivos": ["*"],
-        },
-
-        "inyectar_en_peticion": {
-            "descripcion": (
-                "Entrega lemas a una petición para el ciclo."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "peticion con lemas inyectados",
-            "acceso_archivos": ["*"],
-        },
-
-        "verificar_salida": {
-            "descripcion": (
-                "Comprueba forma mínima de una salida de DI."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "bool",
-            "acceso_archivos": ["*"],
-        },
-    },
-
-     # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
-    # ============================================================
-    "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
-        "estado": True,
-        "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
-        "inventario": True,
-        "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
-        "errores": True,
-        "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
-        "dependencias": True,
-        "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
-        "contrato": True,
-        "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
-        "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
-    },
-
-
-    # ============================================================
-    # ESTADOS VÁLIDOS
-    # ============================================================
-    "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ============================================================
-    # INVARIANTES
-    # ============================================================
-    "invariantes": list(INVARIANTES),
-
-}  # <--- CIERRE FINAL
-
-# ===============================================================
-# FIN CONTRATO
-# ===============================================================
 
 # ===============================================================
 # VALIDACIÓN Y RESOLUCIÓN (después de definir todo)

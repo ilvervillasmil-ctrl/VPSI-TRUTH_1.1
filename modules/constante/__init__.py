@@ -70,8 +70,15 @@ from typing import Any, Dict, List, Optional
 # ===============================================================
 # FIN IMPORTACIONES
 # ===============================================================
+
+
 # ===============================================================
-# CONSTANTES
+# SECCIÓN 1 — CONSTANTES
+# ===============================================================
+
+
+# ===============================================================
+# 1.1 — IDENTIDAD DEL MÓDULO
 # ===============================================================
 
 ID_MODULO = "CT"
@@ -86,16 +93,27 @@ COMPATIBLE_DESDE = "1.0"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
 
+
+# ===============================================================
+# 1.2 — ESTADOS CONTRACTUALES
+# ===============================================================
+
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
 ESTADO_DEGRADADO = "DEGRADADO"
 ESTADO_RECHAZADO = "RECHAZADO"
+
 ESTADOS_VALIDOS = (
     ESTADO_NO_INICIADO,
     ESTADO_OPERATIVO,
     ESTADO_DEGRADADO,
     ESTADO_RECHAZADO,
 )
+
+
+# ===============================================================
+# 1.3 — INVARIANTES CONTRACTUALES
+# ===============================================================
 
 INVARIANTES = (
     "el id del módulo nunca cambia",
@@ -108,6 +126,11 @@ INVARIANTES = (
     "este módulo siempre puede reportar su propio estado",
 )
 
+
+# ===============================================================
+# 1.4 — CONSTANTES FUNDACIONALES
+# ===============================================================
+
 ALPHA = Fraction(26, 27)
 BETA = Fraction(1, 27)
 
@@ -118,44 +141,71 @@ CONSTANTES_FUNDACIONALES: Dict[str, Any] = {
 
 FUNDACIONALES = frozenset(CONSTANTES_FUNDACIONALES.keys())
 
-CAMPOS_OBLIGATORIOS_CONSTANTE = ("nombre", "valor", "tipo", "origen", "descripcion")
 
 # ===============================================================
-# FIN CONSTANTES
+# 1.5 — ESPECIFICACIÓN DE CONSTANTES
+# ===============================================================
+
+CAMPOS_OBLIGATORIOS_CONSTANTE = (
+    "nombre",
+    "valor",
+    "tipo",
+    "origen",
+    "descripcion",
+)
+
+
+# ===============================================================
+# FIN SECCIÓN 1
 # ===============================================================
 
 
 # ===============================================================
-# CONFIGURACIÓN
+# SECCIÓN 2 — CONFIGURACIÓN
+# ===============================================================
+
+
+# ===============================================================
+# 2.1 — RUTA DEL MÓDULO
 # ===============================================================
 
 _DIR = Path(__file__).parent
 
+
 # ===============================================================
-# FIN CONFIGURACIÓN
+# FIN SECCIÓN 2
 # ===============================================================
 
 
 # ===============================================================
-# DEFINICIONES
+# SECCIÓN 3 — DEFINICIONES
+# ===============================================================
+
+
+# ===============================================================
+# 3.1 — EXCEPCIONES CONTRACTUALES
 # ===============================================================
 
 class ContratoInvalido(Exception):
     """El CONTENEDOR no cumple el esquema o la resolución falló."""
     pass
 
+
 # ===============================================================
-# FIN DEFINICIONES
+# FIN SECCIÓN 3
 # ===============================================================
 
 # ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
+# SECCIÓN 4 — CONTRATO OFICIAL DEL MÓDULO
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
-    # ============================================================
-    # ESQUEMA
-    # ============================================================
+
+
+    # ===========================================================
+    # 4.1 — ESQUEMA CONTRACTUAL
+    # ===========================================================
+
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
@@ -163,12 +213,15 @@ CONTENEDOR: Dict[str, Any] = {
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
 
-    # ============================================================
-    # IDENTIDAD
-    # ============================================================
+
+    # ===========================================================
+    # 4.2 — IDENTIDAD DEL MÓDULO
+    # ===========================================================
+
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
+
     "descripcion": (
         "Unica autoridad del dominio de constantes del sistema VPSI. "
         "Toda constante oficial utilizada por cualquier modulo debe ser "
@@ -176,15 +229,18 @@ CONTENEDOR: Dict[str, Any] = {
         "constantes fundacionales estructurales (cubo 3x3x3 en R3)."
     ),
 
-    # ============================================================
-    # PROPÓSITO
-    # ============================================================
+
+    # ===========================================================
+    # 4.3 — PROPÓSITO Y FUNCIÓN
+    # ===========================================================
+
     "funcion": (
         "Ser la unica autoridad del dominio de constantes del sistema VPSI. "
         "Descubrir, validar, integrar, auditar y exportar todas las "
         "constantes oficiales. ALPHA y BETA constituyen las constantes "
         "fundacionales del sistema."
     ),
+
     "no_hace": [
         "No calcula Tru_total ni Tru_Ri",
         "No clasifica entrada de usuario",
@@ -193,9 +249,11 @@ CONTENEDOR: Dict[str, Any] = {
         "No permite que FO, AX o MC definan constantes",
     ],
 
-    # ============================================================
-    # AUTORIDAD
-    # ============================================================
+
+    # ===========================================================
+    # 4.4 — AUTORIDAD
+    # ===========================================================
+
     "autoridad": [
         "Unica autoridad del dominio de constantes",
         "Exponer ALPHA = 26/27 y BETA = 1/27",
@@ -206,9 +264,11 @@ CONTENEDOR: Dict[str, Any] = {
         "Reportar estado y diagnostico propios",
     ],
 
-    # ============================================================
-    # CONOCIMIENTO EXPORTABLE
-    # ============================================================
+
+    # ===========================================================
+    # 4.5 — CONOCIMIENTO EXPORTABLE
+    # ===========================================================
+
     "conocimiento_exportable": [
         "ALPHA",
         "BETA",
@@ -219,36 +279,81 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico",
     ],
 
-    # ============================================================
-    # ACCESO (obligatorio en el esquema)
-    # ============================================================
+
+    # ===========================================================
+    # 4.6 — ACCESO CONTRACTUAL
+    # ===========================================================
+
     "acceso": {
         "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
+        "descripcion": "Acceso total a recursos del módulo",
     },
 
-    # ============================================================
-    # DEPENDENCIAS
-    # ============================================================
-    "requiere": ["CT", "AX", "FO", "MC", "SF", "CA", "CX", 
-                 "DI", "RE", "VX", "TX", "CH", "CIT", "TT", 
-                 "CE", "CC",],
 
-    # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
-    # ============================================================
+    # ===========================================================
+    # 4.7 — DEPENDENCIAS
+    # ===========================================================
+
+    "requiere": [
+        "CT",
+        "AX",
+        "FO",
+        "MC",
+        "SF",
+        "CA",
+        "CX",
+        "DI",
+        "RE",
+        "VX",
+        "TX",
+        "CH",
+        "CIT",
+        "TT",
+        "CE",
+        "CC",
+    ],
+
+
+    # ===========================================================
+    # 4.8 — ACCESO A ARCHIVOS
+    # ===========================================================
+    #
+    # Acceso declarado por el contrato del módulo.
+    #
+
     "acceso_archivos": ["*"],
 
-    # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
-    # ============================================================
+
+    # ===========================================================
+    # 4.9 — VALIDACIÓN DE ESQUEMA
+    # ===========================================================
+    #
+    # Ámbito declarado para validación de esquema a nivel módulo.
+    #
+
     "validar_esquema": ["*"],
 
-    # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
-    # ============================================================
+
+    # ===========================================================
+    # 4.10 — AUTORIZACIÓN AL ENGINE
+    # ===========================================================
+    #
+    # Este bloque declara los permisos contractuales del Engine
+    # sobre CT.
+    #
+    # La autorización no constituye por sí misma una implementación.
+    # Las capacidades ejecutables serán declaradas y resueltas
+    # posteriormente en la superficie "capacidades".
+    #
+
+
     "autoriza_engine": {
-        # --- PERMISOS BASE ---
+
+
+        # =======================================================
+        # 4.10.1 — PERMISOS BASE
+        # =======================================================
+
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -257,34 +362,50 @@ CONTENEDOR: Dict[str, Any] = {
         "auditar": True,
         "inventariar": True,
 
-        # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
+
+        # =======================================================
+        # 4.10.2 — PERMISOS DE ESCRITURA
+        # =======================================================
+
         "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
-        # --- PERMISOS DE PROCESAMIENTO ---
+
+        # =======================================================
+        # 4.10.3 — PERMISOS DE PROCESAMIENTO
+        # =======================================================
+
         "validar": True,
         "procesar": True,
         "analizar": True,
         "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
 
-        # --- PERMISOS DE DATOS ---
+
+        # =======================================================
+        # 4.10.4 — PERMISOS DE DATOS
+        # =======================================================
+
         "exportar": True,
         "importar": True,
         "respaldar": True,
         "recuperar": True,
         "sincronizar": True,
 
-        # --- PERMISOS DE MONITOREO ---
+
+        # =======================================================
+        # 4.10.5 — PERMISOS DE MONITOREO
+        # =======================================================
+
         "monitorear": True,
         "metricas": True,
         "diagnostico": True,
 
-        # --- PERMISOS DE ESTADO ---
+
+        # =======================================================
+        # 4.10.6 — PERMISOS DE ESTADO
+        # =======================================================
+
         "estado": True,
         "version": True,
         "salud": True,
@@ -297,16 +418,61 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "reporte": True,
 
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
+
+        # =======================================================
+        # 4.10.7 — CAPACIDADES ARQUITECTÓNICAS AUTORIZADAS
+        # =======================================================
+        #
+        # Estas banderas autorizan explícitamente al Engine a
+        # ejercer las tres capacidades arquitectónicas incorporadas
+        # a la superficie callable de CT.
+        #
+        # La implementación callable se declara posteriormente.
+        #
+
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+
+
+        # =======================================================
+        # 4.10.8 — PERMISOS OBLIGATORIOS DE ENGINE
+        # =======================================================
+
+        "validar_esquema": True,
+        "acceso_archivos": True,
     },
 
-    
+
+    # ===========================================================
+    # FIN SECCIÓN 4 — CONTINUACIÓN EN SIGUIENTES BLOQUES
+    # ===========================================================
+
+        # ============================================================
+    # 1.15 — METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    #
+    # Cada entrada de CONTENEDOR["capacidades"] DEBE poseer una
+    # entrada correspondiente en CONTENEDOR["capacidades_meta"].
+    #
+    # Las tres capacidades arquitectónicas de Engine forman parte
+    # explícita del contrato de CT y deberán resolverse posteriormente
+    # a callables reales:
+    #
+    #   ejecutar_total
+    #   inspeccionar
+    #   registrar_inventario
+    #
+    # Las metacapacidades describen el contrato de ejecución.
+    # No ejecutan por sí mismas ninguna operación.
     # ============================================================
+
     "capacidades_meta": {
+
+        # ========================================================
+        # 1.15.1 — ALPHA
+        # ========================================================
+
         "alpha": {
             "descripcion": (
                 "Devuelve la constante fundacional ALPHA = 26/27."
@@ -317,6 +483,11 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
+
+        # ========================================================
+        # 1.15.2 — BETA
+        # ========================================================
+
         "beta": {
             "descripcion": (
                 "Devuelve la constante fundacional BETA = 1/27."
@@ -326,6 +497,11 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "Fraction(1, 27)",
             "acceso_archivos": ["*"],
         },
+
+
+        # ========================================================
+        # 1.15.3 — DESCUBRIR CONSTANTES
+        # ========================================================
 
         "descubrir_constantes": {
             "descripcion": (
@@ -341,6 +517,11 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
+
+        # ========================================================
+        # 1.15.4 — LISTAR CONSTANTES
+        # ========================================================
+
         "listar_constantes": {
             "descripcion": (
                 "Lista nombres de constantes fundacionales y auxiliares."
@@ -353,6 +534,11 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
+
+        # ========================================================
+        # 1.15.5 — BUSCAR CONSTANTE
+        # ========================================================
+
         "buscar_constante": {
             "descripcion": (
                 "Busca una constante oficial por nombre."
@@ -362,6 +548,11 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict de la constante o None",
             "acceso_archivos": ["*"],
         },
+
+
+        # ========================================================
+        # 1.15.6 — VERIFICAR CONSTANTES
+        # ========================================================
 
         "verificar_constantes": {
             "descripcion": (
@@ -377,6 +568,11 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
+
+        # ========================================================
+        # 1.15.7 — INVENTARIO
+        # ========================================================
+
         "inventario": {
             "descripcion": (
                 "Inventario completo de constantes del modulo."
@@ -389,6 +585,11 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+
+
+        # ========================================================
+        # 1.15.8 — REPORTE
+        # ========================================================
 
         "reporte": {
             "descripcion": (
@@ -403,6 +604,11 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
+
+        # ========================================================
+        # 1.15.9 — DIAGNOSTICO
+        # ========================================================
+
         "diagnostico": {
             "descripcion": (
                 "Diagnostico de coherencia del dominio de constantes."
@@ -416,6 +622,11 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
+
+        # ========================================================
+        # 1.15.10 — VERIFICAR
+        # ========================================================
+
         "verificar": {
             "descripcion": (
                 "Verifica la invariante fundacional ALPHA + BETA == 1."
@@ -427,46 +638,211 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+
+
+        # ========================================================
+        # 1.15.11 — EJECUTAR TOTAL
+        # ========================================================
+        #
+        # Capacidad arquitectónica de Engine.
+        # Ejecuta el conjunto contractual de capacidades de CT
+        # que hayan sido autorizadas y resueltas.
+        #
+        # No constituye autoridad para alterar el contrato.
+        # La autoridad de dominio continúa perteneciendo a CT.
+        #
+
+        "ejecutar_total": {
+            "descripcion": (
+                "Ejecuta el conjunto completo de capacidades "
+                "operativamente ejercibles por Engine sobre CT, "
+                "respetando el contrato, las autorizaciones y las "
+                "capacidades realmente declaradas."
+            ),
+            "entrada": "dict opcional de peticion",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, modulo, rol, version, operacion, estado, "
+                "coherente, capacidades_ejecutadas, errores_ejecucion, "
+                "resultados y capacidades_declaradas"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+
+        # ========================================================
+        # 1.15.12 — INSPECCIONAR
+        # ========================================================
+        #
+        # Capacidad arquitectónica de inspección contractual.
+        # Expone estructura sin modificar el conocimiento declarado.
+        #
+
+        "inspeccionar": {
+            "descripcion": (
+                "Inspecciona estructuralmente CT y expone su contrato, "
+                "capacidades, constantes, integridad, autorizaciones "
+                "y estado sin modificar el conocimiento declarado."
+            ),
+            "entrada": "dict opcional de peticion",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, modulo, rol, version, operacion, "
+                "constantes, capacidades_contractuales, "
+                "capacidades_meta, integridad, esquema, "
+                "autoriza_engine, reporting e invariantes"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+
+        # ========================================================
+        # 1.15.13 — REGISTRAR INVENTARIO
+        # ========================================================
+        #
+        # Capacidad arquitectónica de registro de inventario.
+        # Produce una instantánea determinista del estado estructural.
+        #
+
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra una instantánea determinista del inventario "
+                "estructural y contractual de CT sin modificar las "
+                "constantes declaradas ni el contrato del modulo."
+            ),
+            "entrada": "dict opcional de peticion",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, operacion, registrado, inventario y nota"
+            ),
+            "acceso_archivos": ["*"],
+        },
     },
 
+
     # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # 1.16 — REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
+    #
+    # Las banderas permiten a Engine determinar qué superficies
+    # contractuales puede consultar, ejecutar o reportar.
+    #
+    # Las tres capacidades arquitectónicas se reflejan mediante
+    # las banderas de capacidades, inventario, contrato, estado,
+    # errores y diagnostico ya declaradas.
+    #
+    # Las banderas específicas de acceso a archivos y validación
+    # de esquema son obligatorias para el acoplamiento Engine.
+    # ============================================================
+
     "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
+
+        # ========================================================
+        # 1.16.1 — ESTADO Y SALUD
+        # ========================================================
+
         "estado": True,
         "salud": True,
 
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+
+        # ========================================================
+        # 1.16.2 — INVENTARIO Y CAPACIDADES
+        # ========================================================
+
         "inventario": True,
         "capacidades": True,
 
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+
+        # ========================================================
+        # 1.16.3 — ERRORES Y ADVERTENCIAS
+        # ========================================================
+
         "errores": True,
         "advertencias": True,
 
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+
+        # ========================================================
+        # 1.16.4 — DEPENDENCIAS Y VERSION
+        # ========================================================
+
         "dependencias": True,
         "version": True,
 
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+
+        # ========================================================
+        # 1.16.5 — CONTRATO Y CONOCIMIENTO
+        # ========================================================
+
         "contrato": True,
         "conocimiento": True,
 
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+
+        # ========================================================
+        # 1.16.6 — MÉTRICAS Y DIAGNÓSTICO
+        # ========================================================
+
         "metricas": True,
         "diagnostico": True,
 
-        # --- BANDERA DE REPORTE ---
+
+        # ========================================================
+        # 1.16.7 — REPORTE
+        # ========================================================
+
         "reporte": True,
 
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+
+        # ========================================================
+        # 1.16.8 — ACCESO A ARCHIVOS
+        # ========================================================
+
+        "acceso_archivos": True,
+
+
+        # ========================================================
+        # 1.16.9 — VALIDACIÓN DE ESQUEMA
+        # ========================================================
+
+        "validar_esquema": True,
+
+
+        # ========================================================
+        # 1.16.10 — EJECUCIÓN TOTAL
+        # ========================================================
+        #
+        # Declara que el módulo expone la superficie arquitectónica
+        # de ejecución total para Engine.
+        #
+
+        "ejecutar_total": True,
+
+
+        # ========================================================
+        # 1.16.11 — INSPECCIÓN
+        # ========================================================
+        #
+        # Declara que el módulo expone inspección estructural.
+        #
+
+        "inspeccionar": True,
+
+
+        # ========================================================
+        # 1.16.12 — REGISTRO DE INVENTARIO
+        # ========================================================
+        #
+        # Declara que el módulo expone registro determinista de
+        # inventario para Engine.
+        #
+
+        "registrar_inventario": True,
     },
-# ============================================================
-    # CONSULTAS SOPORTADAS
+
+
     # ============================================================
+    # 1.17 — CONSULTAS SOPORTADAS
+    # ============================================================
+
     "consultas_soportadas": [
         "alpha",
         "beta",
@@ -478,22 +854,72 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte",
         "diagnostico",
         "verificar",
+
+        # --------------------------------------------------------
+        # Capacidades arquitectónicas de Engine
+        # --------------------------------------------------------
+
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
+
     # ============================================================
-    # CAPACIDADES
+    # 1.18 — CAPACIDADES
     # ============================================================
+    #
+    # Mapa contractual de nombre público -> callable o referencia
+    # resoluble.
+    #
+    # Las tres capacidades arquitectónicas se declaran aquí para
+    # que el resolvedor contractual pueda exigir posteriormente
+    # sus callables reales.
+    # ============================================================
+
     "capacidades": {
+
+        # ========================================================
+        # 1.18.1 — CAPACIDADES FUNDACIONALES
+        # ========================================================
+
         "alpha": "get_alpha",
         "beta": "get_beta",
+
+
+        # ========================================================
+        # 1.18.2 — CAPACIDADES DE DESCUBRIMIENTO
+        # ========================================================
+
         "descubrir_constantes": "descubrir_constantes",
         "listar_constantes": "listar_constantes",
         "buscar_constante": "buscar_constante",
+
+
+        # ========================================================
+        # 1.18.3 — CAPACIDADES DE VALIDACIÓN
+        # ========================================================
+
         "verificar_constantes": "verificar_constantes",
+        "verificar": "verificar",
+
+
+        # ========================================================
+        # 1.18.4 — CAPACIDADES DE ESTADO
+        # ========================================================
+
         "inventario": "inventario",
         "reporte": "reporte",
         "diagnostico": "diagnostico",
-        "verificar": "verificar",
+
+
+        # ========================================================
+        # 1.18.5 — CAPACIDADES ARQUITECTÓNICAS DE ENGINE
+        # ========================================================
+
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
     },
     
     # ============================================================

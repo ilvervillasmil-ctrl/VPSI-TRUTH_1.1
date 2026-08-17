@@ -83,12 +83,10 @@ import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
 
-from modules.diagnosticoD import (
-    DiagnosticoGlobal,
-    DiagnosticoError,
-    PESOS,
-    barrer_diagnostico,
-)
+try:
+    from core.diagnostico import DiagnosticoGlobal  # type: ignore
+except Exception:  # noqa: BLE001
+    DiagnosticoGlobal = None  # type: ignore
 
 
 # ===============================================================

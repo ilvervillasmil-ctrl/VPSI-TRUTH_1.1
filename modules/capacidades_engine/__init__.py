@@ -261,10 +261,12 @@ CONTENEDOR: Dict[str, Any] = {
     # 5.7 — DEPENDENCIAS
     # ============================================================
     "requiere": [
-        "CT", "AX", "FO", "MC", "SF", "CA", "CX",
-        "DI", "RE", "VX", "TX", "CH", "CIT", "TT",
-        "CE", "CC",
+    "AX", "FO", "MC", "SF",
+    "CA", "CX", "DI", "RE", "VX",
+    "TX", "CH", "CIT", "DGCO", "UI",
+    "CC", "TT", "SC",
     ],
+
 
     # ============================================================
     # 5.8 — ACCESO A ARCHIVOS

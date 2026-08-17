@@ -550,9 +550,9 @@ CONTENEDOR: Dict[str, Any] = {
     # 5.7 — DEPENDENCIAS
     # ============================================================
     "requiere": [
-    "CT", "AX", "FO", "MC", "SF",
+    "CE", "AX", "FO", "MC", "SF",
     "CA", "CX", "DI", "RE", "VX",
-    "TX", "CH", "CIT", "DGCO", "UI",
+    "TX", "CIT", "DGCO", "UI",
     "CC", "TT", "SC",
     ],
 

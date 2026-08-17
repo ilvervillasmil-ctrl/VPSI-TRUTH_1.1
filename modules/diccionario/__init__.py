@@ -4,7 +4,7 @@
 #
 # MÓDULO:              diccionario
 # ID:                  DI
-# Rol:                 DI
+# Rol:                 DI 
 # Versión módulo:      1.0
 # Versión contrato:    1.0
 # Esquema contrato:    VPSI-CONTRACT-1.0

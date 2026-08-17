@@ -2008,6 +2008,491 @@ def _resolver_capacidades(
 
 
 # ===============================================================
+# SECCIÓN 22 — RESOLUCIÓN ESTRICTA
+# ===============================================================
+
+
+def _resolver_capacidades(
+    cont: Dict[str, Any],
+) -> None:
+
+    resueltas: Dict[str, Any] = {}
+
+    for nombre in sorted(
+        cont["capacidades"].keys()
+    ):
+
+        ref = cont["capacidades"][nombre]
+
+        if callable(ref):
+            resueltas[nombre] = ref
+            continue
+
+        if not isinstance(ref, str):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"tiene tipo invalido: "
+                f"{type(ref).__name__}"
+            )
+
+        if ref not in _CAP_MAP:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"referencia inexistente: '{ref}'"
+            )
+
+        fn = _CAP_MAP[ref]
+
+        if not callable(fn):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: '{ref}' no es callable"
+            )
+
+        resueltas[nombre] = fn
+
+    cont["capacidades"] = resueltas
+
+
+# ===============================================================
+# SECCIÓN 23 — VALIDACIÓN DEL CONTRATO
+# ===============================================================
+
+
+def _validar_contrato(
+    cont: Dict[str, Any],
+) -> None:
+    """
+    Valida estructuralmente el CONTENEDOR contractual de CT.
+
+    Esta validación ocurre antes de la resolución de capacidades.
+    Por tanto, únicamente valida la estructura y los valores
+    contractuales declarados; no exige todavía que las capacidades
+    sean callables.
+    """
+
+    if not isinstance(cont, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR debe ser dict"
+        )
+
+    campos_obligatorios = (
+        "esquema",
+        "version_contrato",
+        "version_modulo",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+        "id",
+        "nombre",
+        "rol",
+        "descripcion",
+        "funcion",
+        "no_hace",
+        "autoridad",
+        "conocimiento_exportable",
+        "acceso",
+        "requiere",
+        "acceso_archivos",
+        "validar_esquema",
+        "autoriza_engine",
+        "capacidades_meta",
+        "reporting",
+        "consultas_soportadas",
+        "capacidades",
+        "estados_validos",
+        "invariantes",
+    )
+
+    faltantes = [
+        campo
+        for campo in campos_obligatorios
+        if campo not in cont
+    ]
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: CONTENEDOR incompleto. "
+            f"Faltan: {faltantes}"
+        )
+
+    if cont["esquema"] != ESQUEMA_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: esquema contractual invalido: "
+            f"'{cont['esquema']}' != '{ESQUEMA_CONTRATO}'"
+        )
+
+    if cont["version_contrato"] != VERSION_CONTRATO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: version de contrato invalida: "
+            f"'{cont['version_contrato']}' != '{VERSION_CONTRATO}'"
+        )
+
+    if cont["version_modulo"] != VERSION_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: version de modulo invalida: "
+            f"'{cont['version_modulo']}' != '{VERSION_MODULO}'"
+        )
+
+    if cont["estabilidad"] != ESTABILIDAD:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: estabilidad invalida: "
+            f"'{cont['estabilidad']}' != '{ESTABILIDAD}'"
+        )
+
+    if cont["compatible_desde"] != COMPATIBLE_DESDE:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: compatible_desde invalido: "
+            f"'{cont['compatible_desde']}' != '{COMPATIBLE_DESDE}'"
+        )
+
+    if cont["api_engine"] != API_ENGINE:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: api_engine invalido: "
+            f"'{cont['api_engine']}' != '{API_ENGINE}'"
+        )
+
+    if cont["id"] != ID_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: id contractual invalido: "
+            f"'{cont['id']}' != '{ID_MODULO}'"
+        )
+
+    if cont["nombre"] != NOMBRE_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: nombre contractual invalido: "
+            f"'{cont['nombre']}' != '{NOMBRE_MODULO}'"
+        )
+
+    if cont["rol"] != ROL_MODULO:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: rol contractual invalido: "
+            f"'{cont['rol']}' != '{ROL_MODULO}'"
+        )
+
+    if not isinstance(cont["no_hace"], list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'no_hace' debe ser list"
+        )
+
+    if not isinstance(cont["autoridad"], list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'autoridad' debe ser list"
+        )
+
+    if not isinstance(
+        cont["conocimiento_exportable"],
+        list,
+    ):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'conocimiento_exportable' debe ser list"
+        )
+
+    if not isinstance(cont["acceso"], dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'acceso' debe ser dict"
+        )
+
+    if not isinstance(cont["requiere"], list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'requiere' debe ser list"
+        )
+
+    if not isinstance(cont["acceso_archivos"], list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'acceso_archivos' debe ser list"
+        )
+
+    if not isinstance(cont["validar_esquema"], list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'validar_esquema' debe ser list"
+        )
+
+    autoriza_engine = cont["autoriza_engine"]
+
+    if not isinstance(autoriza_engine, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'autoriza_engine' debe ser dict"
+        )
+
+    reporting = cont["reporting"]
+
+    if not isinstance(reporting, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'reporting' debe ser dict"
+        )
+
+    capacidades_meta = cont["capacidades_meta"]
+
+    if not isinstance(capacidades_meta, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'capacidades_meta' debe ser dict"
+        )
+
+    capacidades = cont["capacidades"]
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'capacidades' debe ser dict"
+        )
+
+    consultas = cont["consultas_soportadas"]
+
+    if not isinstance(consultas, list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'consultas_soportadas' debe ser list"
+        )
+
+    estados_validos = cont["estados_validos"]
+
+    if not isinstance(estados_validos, list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'estados_validos' debe ser list"
+        )
+
+    invariantes = cont["invariantes"]
+
+    if not isinstance(invariantes, list):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'invariantes' debe ser list"
+        )
+
+    nombres_capacidades = set(
+        capacidades.keys()
+    )
+
+    nombres_meta = set(
+        capacidades_meta.keys()
+    )
+
+    if nombres_capacidades != nombres_meta:
+        faltan_meta = sorted(
+            nombres_capacidades - nombres_meta
+        )
+
+        sobran_meta = sorted(
+            nombres_meta - nombres_capacidades
+        )
+
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "capacidades y capacidades_meta no tienen "
+            f"correspondencia 1:1. "
+            f"faltan_meta={faltan_meta}, "
+            f"sobran_meta={sobran_meta}"
+        )
+
+    for nombre, meta in sorted(
+        capacidades_meta.items()
+    ):
+        if not isinstance(meta, dict):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: "
+                f"metadata de capacidad '{nombre}' "
+                "debe ser dict"
+            )
+
+        campos_meta = (
+            "descripcion",
+            "entrada",
+            "validar_esquema",
+            "salida",
+            "acceso_archivos",
+        )
+
+        faltantes_meta = [
+            campo
+            for campo in campos_meta
+            if campo not in meta
+        ]
+
+        if faltantes_meta:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: metadata de capacidad "
+                f"'{nombre}' incompleta. "
+                f"Faltan: {faltantes_meta}"
+            )
+
+        if not isinstance(
+            meta["validar_esquema"],
+            list,
+        ):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}': "
+                "'validar_esquema' debe ser list"
+            )
+
+        if not isinstance(
+            meta["acceso_archivos"],
+            list,
+        ):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}': "
+                "'acceso_archivos' debe ser list"
+            )
+
+    capacidades_autorizadas = (
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
+    )
+
+    for nombre in capacidades_autorizadas:
+        if nombre not in capacidades:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: "
+                f"capacidad arquitectónica obligatoria "
+                f"ausente: '{nombre}'"
+            )
+
+        if nombre not in capacidades_meta:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: "
+                f"metadata arquitectónica obligatoria "
+                f"ausente: '{nombre}'"
+            )
+
+        if not autoriza_engine.get(nombre, False):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: Engine no está autorizado "
+                f"para capacidad arquitectónica '{nombre}'"
+            )
+
+        if not reporting.get(nombre, False):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: reporting no declara "
+                f"capacidad arquitectónica '{nombre}'"
+            )
+
+    if "capacidades" not in autoriza_engine:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: autoriza_engine debe declarar "
+            "'capacidades'"
+        )
+
+    if not autoriza_engine["capacidades"]:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "autoriza_engine['capacidades'] debe ser True"
+        )
+
+    if not reporting.get("capacidades", False):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: reporting['capacidades'] "
+            "debe ser True"
+        )
+
+    if "ejecutar_total" not in consultas:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'ejecutar_total' debe estar en "
+            "'consultas_soportadas'"
+        )
+
+    if "inspeccionar" not in consultas:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'inspeccionar' debe estar en "
+            "'consultas_soportadas'"
+        )
+
+    if "registrar_inventario" not in consultas:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "'registrar_inventario' debe estar en "
+            "'consultas_soportadas'"
+        )
+
+    if ESTADO_NO_INICIADO not in estados_validos:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: falta estado "
+            f"'{ESTADO_NO_INICIADO}'"
+        )
+
+    if ESTADO_OPERATIVO not in estados_validos:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: falta estado "
+            f"'{ESTADO_OPERATIVO}'"
+        )
+
+    if ESTADO_DEGRADADO not in estados_validos:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: falta estado "
+            f"'{ESTADO_DEGRADADO}'"
+        )
+
+    if ESTADO_RECHAZADO not in estados_validos:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: falta estado "
+            f"'{ESTADO_RECHAZADO}'"
+        )
+
+    if cont["invariantes"] != list(INVARIANTES):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "invariantes contractuales no coinciden "
+            "con la definición del módulo"
+        )
+
+    if cont["acceso_archivos"] != ["*"]:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "acceso_archivos contractual invalido"
+        )
+
+    if cont["validar_esquema"] != ["*"]:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "validar_esquema contractual invalido"
+        )
+
+    if not autoriza_engine.get(
+        "validar_esquema",
+        False,
+    ):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "Engine debe estar autorizado para validar_esquema"
+        )
+
+    if not autoriza_engine.get(
+        "acceso_archivos",
+        False,
+    ):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "Engine debe estar autorizado para acceso_archivos"
+        )
+
+    if not reporting.get(
+        "validar_esquema",
+        False,
+    ):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "reporting debe declarar validar_esquema"
+        )
+
+    if not reporting.get(
+        "acceso_archivos",
+        False,
+    ):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: "
+            "reporting debe declarar acceso_archivos"
+        )
+
+
+# ===============================================================
 # SECCIÓN 23 — VALIDACIÓN FINAL DEL CONTENEDOR
 # ===============================================================
 

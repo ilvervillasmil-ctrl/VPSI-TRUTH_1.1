@@ -71,6 +71,450 @@ from typing import Any, Dict, List, Optional
 # FIN IMPORTACIONES
 # ===============================================================
 # ===============================================================
+# CONSTANTES
+# ===============================================================
+
+ID_MODULO = "CT"
+NOMBRE_MODULO = "constante"
+ROL_MODULO = "CT"
+
+VERSION_MODULO = "2.1"
+VERSION_CONTRATO = "1.0"
+ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
+
+COMPATIBLE_DESDE = "1.0"
+API_ENGINE = ">=1.0"
+ESTABILIDAD = "ESTABLE"
+
+ESTADO_NO_INICIADO = "NO_INICIADO"
+ESTADO_OPERATIVO = "OPERATIVO"
+ESTADO_DEGRADADO = "DEGRADADO"
+ESTADO_RECHAZADO = "RECHAZADO"
+ESTADOS_VALIDOS = (
+    ESTADO_NO_INICIADO,
+    ESTADO_OPERATIVO,
+    ESTADO_DEGRADADO,
+    ESTADO_RECHAZADO,
+)
+
+INVARIANTES = (
+    "el id del módulo nunca cambia",
+    "el rol nunca cambia",
+    "ALPHA y BETA son invariantes del cubo 3x3x3 en R³",
+    "ALPHA + BETA == 1",
+    "CT es la única autoridad del dominio de constantes",
+    "las capacidades declaradas son siempre callables tras la resolución",
+    "este módulo no modifica el estado de otros módulos",
+    "este módulo siempre puede reportar su propio estado",
+)
+
+ALPHA = Fraction(26, 27)
+BETA = Fraction(1, 27)
+
+CONSTANTES_FUNDACIONALES: Dict[str, Any] = {
+    "ALPHA": ALPHA,
+    "BETA": BETA,
+}
+
+FUNDACIONALES = frozenset(CONSTANTES_FUNDACIONALES.keys())
+
+CAMPOS_OBLIGATORIOS_CONSTANTE = ("nombre", "valor", "tipo", "origen", "descripcion")
+
+# ===============================================================
+# FIN CONSTANTES
+# ===============================================================
+
+
+# ===============================================================
+# CONFIGURACIÓN
+# ===============================================================
+
+_DIR = Path(__file__).parent
+
+# ===============================================================
+# FIN CONFIGURACIÓN
+# ===============================================================
+
+
+# ===============================================================
+# DEFINICIONES
+# ===============================================================
+
+class ContratoInvalido(Exception):
+    """El CONTENEDOR no cumple el esquema o la resolución falló."""
+    pass
+
+# ===============================================================
+# FIN DEFINICIONES
+# ===============================================================
+
+# ===============================================================
+# CONTRATO OFICIAL DEL MÓDULO
+# ===============================================================
+
+CONTENEDOR: Dict[str, Any] = {
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
+    "esquema": ESQUEMA_CONTRATO,
+    "version_contrato": VERSION_CONTRATO,
+    "version_modulo": VERSION_MODULO,
+    "estabilidad": ESTABILIDAD,
+    "compatible_desde": COMPATIBLE_DESDE,
+    "api_engine": API_ENGINE,
+
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
+    "id": ID_MODULO,
+    "nombre": NOMBRE_MODULO,
+    "rol": ROL_MODULO,
+    "descripcion": (
+        "Unica autoridad del dominio de constantes del sistema VPSI. "
+        "Toda constante oficial utilizada por cualquier modulo debe ser "
+        "declarada, validada y exportada por CT. ALPHA y BETA son las "
+        "constantes fundacionales estructurales (cubo 3x3x3 en R3)."
+    ),
+
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
+    "funcion": (
+        "Ser la unica autoridad del dominio de constantes del sistema VPSI. "
+        "Descubrir, validar, integrar, auditar y exportar todas las "
+        "constantes oficiales. ALPHA y BETA constituyen las constantes "
+        "fundacionales del sistema."
+    ),
+    "no_hace": [
+        "No calcula Tru_total ni Tru_Ri",
+        "No clasifica entrada de usuario",
+        "No orquesta el sistema (eso es Engine)",
+        "No modifica otros modulos",
+        "No permite que FO, AX o MC definan constantes",
+    ],
+
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
+    "autoridad": [
+        "Unica autoridad del dominio de constantes",
+        "Exponer ALPHA = 26/27 y BETA = 1/27",
+        "Descubrir y validar constantes oficiales del modulo",
+        "Listar y buscar constantes",
+        "Auditar coherencia del dominio de constantes",
+        "Reportar inventario completo de constantes",
+        "Reportar estado y diagnostico propios",
+    ],
+
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
+    "conocimiento_exportable": [
+        "ALPHA",
+        "BETA",
+        "constantes",
+        "inventario",
+        "estado",
+        "reporte",
+        "diagnostico",
+    ],
+
+    # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
+    "requiere": ["CT", "AX", "FO", "MC", "SF", "CA", "CX", 
+                 "DI", "RE", "VX", "TX", "CH", "CIT", "TT", 
+                 "CE", "CC",],
+
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
+
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
+    "autoriza_engine": {
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,     # ← AGREGADO
+        "acceso_archivos": True,     # ← AGREGADO
+    },
+
+    
+    # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
+    "capacidades_meta": {
+        "alpha": {
+            "descripcion": (
+                "Devuelve la constante fundacional ALPHA = 26/27."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "Fraction(26, 27)",
+            "acceso_archivos": ["*"],
+        },
+
+        "beta": {
+            "descripcion": (
+                "Devuelve la constante fundacional BETA = 1/27."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "Fraction(1, 27)",
+            "acceso_archivos": ["*"],
+        },
+
+        "descubrir_constantes": {
+            "descripcion": (
+                "Descubre todas las constantes oficiales declaradas "
+                "dentro del modulo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict nombre -> meta de constante + "
+                "errores_carga + total"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "listar_constantes": {
+            "descripcion": (
+                "Lista nombres de constantes fundacionales y auxiliares."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con fundacionales, auxiliares, total"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "buscar_constante": {
+            "descripcion": (
+                "Busca una constante oficial por nombre."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict de la constante o None",
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar_constantes": {
+            "descripcion": (
+                "Audita el dominio de constantes: invariante fundacional, "
+                "duplicados, tipos, campos obligatorios, conflictos y carga."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, problemas, advertencias, "
+                "total_constantes"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "inventario": {
+            "descripcion": (
+                "Inventario completo de constantes del modulo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con total, fundacionales, auxiliares, "
+                "constantes descubiertas"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "reporte": {
+            "descripcion": (
+                "Reporte interno de estado del modulo CT."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, ALPHA, BETA, "
+                "total_constantes, capacidades"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "diagnostico": {
+            "descripcion": (
+                "Diagnostico de coherencia del dominio de constantes."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con estado, problemas, advertencias, "
+                "recomendaciones"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar": {
+            "descripcion": (
+                "Verifica la invariante fundacional ALPHA + BETA == 1."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con coherente, ALPHA, BETA, suma"
+            ),
+            "acceso_archivos": ["*"],
+        },
+    },
+
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
+    "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
+        "estado": True,
+        "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+        "inventario": True,
+        "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+        "errores": True,
+        "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+        "dependencias": True,
+        "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+        "contrato": True,
+        "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
+        "reporte": True,
+
+        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
+    },
+# ============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
+    "consultas_soportadas": [
+        "alpha",
+        "beta",
+        "descubrir_constantes",
+        "listar_constantes",
+        "buscar_constante",
+        "verificar_constantes",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "verificar",
+    ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
+    "capacidades": {
+        "alpha": "get_alpha",
+        "beta": "get_beta",
+        "descubrir_constantes": "descubrir_constantes",
+        "listar_constantes": "listar_constantes",
+        "buscar_constante": "buscar_constante",
+        "verificar_constantes": "verificar_constantes",
+        "inventario": "inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
+        "verificar": "verificar",
+    },
+    
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
+    "estados_validos": list(ESTADOS_VALIDOS),
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
+    "invariantes": list(INVARIANTES),
+
+}  # <--- CIERRE FINAL
+
+# ===============================================================
+# FIN CONTRATO
+# ===============================================================
+
+
+
+# ===============================================================
 # POLÍTICA ESTRICTA DE CONSTANTES
 # ===============================================================
 
@@ -327,447 +771,6 @@ def _validar_especificacion_constante(item: Dict[str, Any]) -> None:
 # ===============================================================
 # FIN POLÍTICA ESTRICTA DE CONSTANTES
 # ===============================================================
-# ===============================================================
-# CONSTANTES
-# ===============================================================
-
-ID_MODULO = "CT"
-NOMBRE_MODULO = "constante"
-ROL_MODULO = "CT"
-
-VERSION_MODULO = "2.1"
-VERSION_CONTRATO = "1.0"
-ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-
-COMPATIBLE_DESDE = "1.0"
-API_ENGINE = ">=1.0"
-ESTABILIDAD = "ESTABLE"
-
-ESTADO_NO_INICIADO = "NO_INICIADO"
-ESTADO_OPERATIVO = "OPERATIVO"
-ESTADO_DEGRADADO = "DEGRADADO"
-ESTADO_RECHAZADO = "RECHAZADO"
-ESTADOS_VALIDOS = (
-    ESTADO_NO_INICIADO,
-    ESTADO_OPERATIVO,
-    ESTADO_DEGRADADO,
-    ESTADO_RECHAZADO,
-)
-
-INVARIANTES = (
-    "el id del módulo nunca cambia",
-    "el rol nunca cambia",
-    "ALPHA y BETA son invariantes del cubo 3x3x3 en R³",
-    "ALPHA + BETA == 1",
-    "CT es la única autoridad del dominio de constantes",
-    "las capacidades declaradas son siempre callables tras la resolución",
-    "este módulo no modifica el estado de otros módulos",
-    "este módulo siempre puede reportar su propio estado",
-)
-
-ALPHA = Fraction(26, 27)
-BETA = Fraction(1, 27)
-
-CONSTANTES_FUNDACIONALES: Dict[str, Any] = {
-    "ALPHA": ALPHA,
-    "BETA": BETA,
-}
-
-FUNDACIONALES = frozenset(CONSTANTES_FUNDACIONALES.keys())
-
-CAMPOS_OBLIGATORIOS_CONSTANTE = ("nombre", "valor", "tipo", "origen", "descripcion")
-
-# ===============================================================
-# FIN CONSTANTES
-# ===============================================================
-
-
-# ===============================================================
-# CONFIGURACIÓN
-# ===============================================================
-
-_DIR = Path(__file__).parent
-
-# ===============================================================
-# FIN CONFIGURACIÓN
-# ===============================================================
-
-
-# ===============================================================
-# DEFINICIONES
-# ===============================================================
-
-class ContratoInvalido(Exception):
-    """El CONTENEDOR no cumple el esquema o la resolución falló."""
-    pass
-
-# ===============================================================
-# FIN DEFINICIONES
-# ===============================================================
-
-# ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
-# ===============================================================
-
-CONTENEDOR: Dict[str, Any] = {
-    # ============================================================
-    # ESQUEMA
-    # ============================================================
-    "esquema": ESQUEMA_CONTRATO,
-    "version_contrato": VERSION_CONTRATO,
-    "version_modulo": VERSION_MODULO,
-    "estabilidad": ESTABILIDAD,
-    "compatible_desde": COMPATIBLE_DESDE,
-    "api_engine": API_ENGINE,
-
-    # ============================================================
-    # IDENTIDAD
-    # ============================================================
-    "id": ID_MODULO,
-    "nombre": NOMBRE_MODULO,
-    "rol": ROL_MODULO,
-    "descripcion": (
-        "Unica autoridad del dominio de constantes del sistema VPSI. "
-        "Toda constante oficial utilizada por cualquier modulo debe ser "
-        "declarada, validada y exportada por CT. ALPHA y BETA son las "
-        "constantes fundacionales estructurales (cubo 3x3x3 en R3)."
-    ),
-
-    # ============================================================
-    # PROPÓSITO
-    # ============================================================
-    "funcion": (
-        "Ser la unica autoridad del dominio de constantes del sistema VPSI. "
-        "Descubrir, validar, integrar, auditar y exportar todas las "
-        "constantes oficiales. ALPHA y BETA constituyen las constantes "
-        "fundacionales del sistema."
-    ),
-    "no_hace": [
-        "No calcula Tru_total ni Tru_Ri",
-        "No clasifica entrada de usuario",
-        "No orquesta el sistema (eso es Engine)",
-        "No modifica otros modulos",
-        "No permite que FO, AX o MC definan constantes",
-    ],
-
-    # ============================================================
-    # AUTORIDAD
-    # ============================================================
-    "autoridad": [
-        "Unica autoridad del dominio de constantes",
-        "Exponer ALPHA = 26/27 y BETA = 1/27",
-        "Descubrir y validar constantes oficiales del modulo",
-        "Listar y buscar constantes",
-        "Auditar coherencia del dominio de constantes",
-        "Reportar inventario completo de constantes",
-        "Reportar estado y diagnostico propios",
-    ],
-
-    # ============================================================
-    # CONOCIMIENTO EXPORTABLE
-    # ============================================================
-    "conocimiento_exportable": [
-        "ALPHA",
-        "BETA",
-        "constantes",
-        "inventario",
-        "estado",
-        "reporte",
-        "diagnostico",
-    ],
-
-    # ============================================================
-    # ACCESO (obligatorio en el esquema)
-    # ============================================================
-    "acceso": {
-        "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
-    },
-
-    # ============================================================
-    # DEPENDENCIAS
-    # ============================================================
-    "requiere": ["CT", "AX", "FO", "MC", "SF", "CA", "CX", 
-                 "DI", "RE", "VX", "TX", "CH", "CIT", "TT", 
-                 "CE", "CC",],
-
-    # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "acceso_archivos": ["*"],
-
-    # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "validar_esquema": ["*"],
-
-    # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
-    # ============================================================
-    "autoriza_engine": {
-        # --- PERMISOS BASE ---
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-
-        # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
-        "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
-        "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
-        "actualizar": False,
-
-        # --- PERMISOS DE PROCESAMIENTO ---
-        "validar": True,
-        "procesar": True,
-        "analizar": True,
-        "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
-
-        # --- PERMISOS DE DATOS ---
-        "exportar": True,
-        "importar": True,
-        "respaldar": True,
-        "recuperar": True,
-        "sincronizar": True,
-
-        # --- PERMISOS DE MONITOREO ---
-        "monitorear": True,
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- PERMISOS DE ESTADO ---
-        "estado": True,
-        "version": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "contrato": True,
-        "conocimiento": True,
-        "reporte": True,
-
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
-    },
-
-    # ============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "alpha",
-        "beta",
-        "descubrir_constantes",
-        "listar_constantes",
-        "buscar_constante",
-        "verificar_constantes",
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "verificar",
-    ],
-
-    # ============================================================
-    # CAPACIDADES
-    # ============================================================
-    "capacidades": {
-        "alpha": "get_alpha",
-        "beta": "get_beta",
-        "descubrir_constantes": "descubrir_constantes",
-        "listar_constantes": "listar_constantes",
-        "buscar_constante": "buscar_constante",
-        "verificar_constantes": "verificar_constantes",
-        "inventario": "inventario",
-        "reporte": "reporte",
-        "diagnostico": "diagnostico",
-        "verificar": "verificar",
-    },
-    # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
-    # ============================================================
-    "capacidades_meta": {
-        "alpha": {
-            "descripcion": (
-                "Devuelve la constante fundacional ALPHA = 26/27."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "Fraction(26, 27)",
-            "acceso_archivos": ["*"],
-        },
-
-        "beta": {
-            "descripcion": (
-                "Devuelve la constante fundacional BETA = 1/27."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "Fraction(1, 27)",
-            "acceso_archivos": ["*"],
-        },
-
-        "descubrir_constantes": {
-            "descripcion": (
-                "Descubre todas las constantes oficiales declaradas "
-                "dentro del modulo."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict nombre -> meta de constante + "
-                "errores_carga + total"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "listar_constantes": {
-            "descripcion": (
-                "Lista nombres de constantes fundacionales y auxiliares."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con fundacionales, auxiliares, total"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "buscar_constante": {
-            "descripcion": (
-                "Busca una constante oficial por nombre."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict de la constante o None",
-            "acceso_archivos": ["*"],
-        },
-
-        "verificar_constantes": {
-            "descripcion": (
-                "Audita el dominio de constantes: invariante fundacional, "
-                "duplicados, tipos, campos obligatorios, conflictos y carga."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con coherente, problemas, advertencias, "
-                "total_constantes"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "inventario": {
-            "descripcion": (
-                "Inventario completo de constantes del modulo."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con total, fundacionales, auxiliares, "
-                "constantes descubiertas"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "reporte": {
-            "descripcion": (
-                "Reporte interno de estado del modulo CT."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con estado, ALPHA, BETA, "
-                "total_constantes, capacidades"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "diagnostico": {
-            "descripcion": (
-                "Diagnostico de coherencia del dominio de constantes."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con estado, problemas, advertencias, "
-                "recomendaciones"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "verificar": {
-            "descripcion": (
-                "Verifica la invariante fundacional ALPHA + BETA == 1."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con coherente, ALPHA, BETA, suma"
-            ),
-            "acceso_archivos": ["*"],
-        },
-    },
-
-    # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
-    # ============================================================
-    "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
-        "estado": True,
-        "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
-        "inventario": True,
-        "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
-        "errores": True,
-        "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
-        "dependencias": True,
-        "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
-        "contrato": True,
-        "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
-        "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
-    },
-
-    # ============================================================
-    # ESTADOS VÁLIDOS
-    # ============================================================
-    "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ============================================================
-    # INVARIANTES
-    # ============================================================
-    "invariantes": list(INVARIANTES),
-
-}  # <--- CIERRE FINAL
-
-# ===============================================================
-# FIN CONTRATO
-# ===============================================================
-
 
 # ===============================================================
 # FUNCIONES PRIVADAS
@@ -1273,25 +1276,6 @@ __all__ = [
 
 # ===============================================================
 # FIN EXPORTACIONES
-# ===============================================================
-
-
-# ===============================================================
-# EXTENSIONES FUTURAS
-# ===============================================================
-#
-# Archivos nuevos solo si declaran CONSTANTE:
-#
-#   CONSTANTE = {
-#       "nombre": "PI",
-#       "valor": ...,
-#       "tipo": "Fraction",
-#       "origen": "...",
-#       "descripcion": "...",
-#   }
-#
-# ===============================================================
-# FIN EXTENSIONES FUTURAS
 # ===============================================================
 
 

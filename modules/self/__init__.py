@@ -381,21 +381,21 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
         "capacidades": {
         # --- CENTINELA ---
-        "verificar": verificar,
-        "barrer": barrer,
-        "verificar_salida": verificar_salida,
+        "verificar": "verificar",
+        "barrer": "barrer",
+        "verificar_salida": "verificar_salida",
 
         # --- IDENTIDAD Y FASE ---
-        "yo_funcional": yo_funcional,
-        "oscilar": oscilar,
-        "desde_donde": desde_donde,
-        "estado_self": estado_self,
-        "elegir": elegir,
+        "yo_funcional": "yo_funcional",
+        "oscilar": "oscilar",
+        "desde_donde": "desde_donde",
+        "estado_self": "estado_self",
+        "elegir": "elegir",
 
         # --- INVENTARIO Y REPORTING ---
-        "inventario": inventario,
-        "reporte": reporte,
-        "diagnostico": diagnostico,
+        "inventario": "inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
 
         # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": "ejecutar_total",

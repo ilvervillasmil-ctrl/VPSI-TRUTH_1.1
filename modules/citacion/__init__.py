@@ -1131,7 +1131,7 @@ def registrar_inventario(
             "Instantanea determinista del inventario de CIT. "
             "No modifica conocimiento declarado."
         ),
-    }
+    },
 # ===============================================================
 # SECCIÓN 8 — CONTENEDOR (VPSI-CONTRACT-1.0)
 # ===============================================================

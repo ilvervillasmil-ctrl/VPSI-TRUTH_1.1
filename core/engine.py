@@ -32,6 +32,7 @@
 from __future__ import annotations
 # --- Estándar del lenguaje ---
 import sys
+import time
 import math
 import ast
 import copy

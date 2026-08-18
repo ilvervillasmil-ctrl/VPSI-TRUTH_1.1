@@ -3906,17 +3906,23 @@ def _verificar_capacidades_contractuales() -> Dict[str, Any]:
         "errores": errores,
     }
 
+      
 # ===============================================================
 # PARTE 11 — RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
 
 _CAP_MAP = {
+    # --- CENTINELA ---
     "verificar": verificar,
     "barrer": barrer,
     "verificar_salida": verificar_salida,
+
+    # --- INVENTARIO Y REPORTING ---
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
+
+    # --- OPERACIONES DE CITACIÓN ---
     "anunciar": anunciar,
     "anunciar_todo": anunciar_todo,
     "citar": citar,
@@ -3928,7 +3934,11 @@ _CAP_MAP = {
     "explicar": explicar,
     "relacionar": relacionar,
     "limpiar_ciclo": limpiar_ciclo,
+
+    # --- COMPATIBILIDAD ENGINE ---
     "evaluar": anunciar,
+
+    # --- CAPACIDADES ARQUITECTÓNICAS ---
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
@@ -3984,15 +3994,15 @@ __all__ = [
     "inventario",
     "reporte",
     "diagnostico",
+    "anunciar",
+    "anunciar_todo",
+    "citar",
     "registrar",
     "resolver",
     "resolver_enunciado",
     "buscar",
     "cadena",
     "explicar",
-    "citar",
-    "anunciar",
-    "anunciar_todo",
     "relacionar",
     "limpiar_ciclo",
     "evaluar",

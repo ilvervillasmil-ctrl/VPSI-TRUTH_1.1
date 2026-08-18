@@ -1671,33 +1671,6 @@ def registrar_inventario(
 # FIN PARTE 8
 # ===============================================================
 
-# ===============================================================
-# PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
-# ===============================================================
-
-# ===============================================================
-# 10.1 — MAPA DE CAPACIDADES
-# ===============================================================
-
-_CAP_MAP = {
-    "barrer": barrer,
-    "verificar": verificar,
-    "inventario": inventario,
-    "categorias": categorias,
-    "por_id": por_id,
-    "ids": ids,
-    "esquema": esquema,
-    "reporte": reporte,
-    "diagnostico": diagnostico,
-    "verificar_salida": verificar_salida,
-    "ejecutar_total": ejecutar_total,
-    "inspeccionar": inspeccionar,
-    "registrar_inventario": registrar_inventario,
-}
-
-# ===============================================================
-# FIN 10.1
-# ===============================================================
 
 # ===============================================================
 # PARTE 9 — REPORTING INTERNO

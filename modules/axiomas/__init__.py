@@ -1384,7 +1384,7 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # ===============================================================
 
 # ===============================================================
-# VPSI-TRUTH — 7.1 LÍMITE AXIOMÁTICO
+# 7.1 — LÍMITE AXIOMÁTICO
 # ===============================================================
 
 def limite_axiomático(
@@ -1393,407 +1393,226 @@ def limite_axiomático(
     errores: Optional[List[Dict]] = None,
 ) -> Dict[str, Any]:
     """
-    Determina de forma determinista el límite axiomático efectivo.
+    Determina exclusivamente las dependencias declaradas que no pueden
+    resolverse dentro de la instantánea axiomática disponible.
 
-    IMPORTANTE:
-    - Una dependencia circular NO es automáticamente un error.
-    - Una dependencia no entregada NO es automáticamente una contradicción.
-    - El límite solo identifica exactamente hasta dónde puede resolverse
-      una cadena dentro de la instantánea disponible.
-    - Las contradicciones se separan de las ausencias.
-    - Cada dependencia se rastrea mediante su cadena completa.
-    - Se identifica el tipo de cada nodo y, cuando existe, su anclaje
-      axiomático.
+    No presupone que toda declaración deba depender de otra.
+    Una declaración puede ser independiente por construcción.
+
+    La circularidad NO constituye por sí misma un límite ni una contradicción.
+    Un ciclo de dependencias puede representar una estructura cerrada válida.
+
+    El límite axiomático solamente informa:
+        1. qué dependencia fue declarada;
+        2. desde qué declaración se alcanza;
+        3. qué declaración requerida no está disponible.
+
+    No inventa anclas, raíces, jerarquías ni requisitos externos.
     """
 
+    # -----------------------------------------------------------
+    # Recolección única
+    # -----------------------------------------------------------
     if decls is None or errores is None:
         decls, errores = recolectar(declaraciones_externas)
 
     # -----------------------------------------------------------
-    # NORMALIZACIÓN
+    # Traducción canónica de claves
     # -----------------------------------------------------------
-
     def _valor(d: Dict[str, Any], clave: str, defecto=None):
-        clave_real = TRADUCCION_CLAVES.get(clave, clave)
-        return d.get(clave_real, defecto)
+        return d.get(clave, d.get(TRADUCCION_CLAVES.get(clave, clave), defecto))
 
-    indice: Dict[str, Dict[str, Any]] = {
-        str(_valor(d, "id", d.get("id"))): d
+    # -----------------------------------------------------------
+    # Índice de declaraciones disponibles
+    # -----------------------------------------------------------
+    por_id: Dict[str, Dict[str, Any]] = {
+        str(_valor(d, "id", "")): d
         for d in decls
-        if _valor(d, "id", d.get("id")) is not None
+        if _valor(d, "id", "")
     }
 
-    ids_presentes: Set[str] = set(indice)
+    ids_presentes: Set[str] = set(por_id)
 
     # -----------------------------------------------------------
-    # GRAFO
+    # Grafo de dependencias declaradas
     # -----------------------------------------------------------
-
     grafo: Dict[str, List[str]] = {}
 
-    for identificador, d in indice.items():
+    for d in decls:
+        ident = str(_valor(d, "id", ""))
         dependencias = _valor(d, "depends_on", []) or []
+
         if isinstance(dependencias, str):
             dependencias = [dependencias]
-        grafo[identificador] = [str(x) for x in dependencias]
+
+        grafo[ident] = [
+            str(dep)
+            for dep in dependencias
+            if dep is not None and str(dep)
+        ]
 
     # -----------------------------------------------------------
-    # ÍNDICE DE AXIOMAS
+    # Resolver dependencias transitivamente.
+    #
+    # IMPORTANTE:
+    # Un ciclo no es una falta.
+    # Se detiene la expansión cuando un nodo ya fue visitado.
     # -----------------------------------------------------------
+    def _resolver_dependencias(
+        inicio: str,
+    ) -> List[Dict[str, Any]]:
 
-    axiomas = {
-        identificador: d
-        for identificador, d in indice.items()
-        if str(_valor(d, "type", "")).lower() == "axioma"
-    }
+        resultado: List[Dict[str, Any]] = []
+        visitados: Set[str] = set()
 
-    # -----------------------------------------------------------
-    # ÍNDICE DE RELACIONES AXIOMÁTICAS
-    # -----------------------------------------------------------
+        def recorrer(
+            actual: str,
+            cadena: List[str],
+        ) -> None:
 
-    def _axiomas_relacionados(identificador: str) -> List[str]:
-        """
-        Determina qué axiomas están directamente relacionados con una
-        declaración mediante sus dependencias.
+            if actual in visitados:
+                return
 
-        No inventa relaciones. Solo utiliza información presente en
-        la instantánea.
-        """
+            visitados.add(actual)
 
-        resultado: Set[str] = set()
+            for dependencia in grafo.get(actual, []):
 
-        for ax_id, ax in axiomas.items():
-            deps = grafo.get(ax_id, [])
-            if identificador in deps:
-                resultado.add(ax_id)
+                nueva_cadena = cadena + [dependencia]
 
-        return sorted(resultado)
+                # ------------------------------------------------
+                # La dependencia existe: continuar resolución.
+                # ------------------------------------------------
+                if dependencia in ids_presentes:
+                    recorrer(dependencia, nueva_cadena)
+                    continue
 
-    # -----------------------------------------------------------
-    # RESOLUCIÓN DE CADENA
-    # -----------------------------------------------------------
-
-    def _resolver(
-        origen: str,
-        nodo: str,
-        cadena: Optional[List[str]] = None,
-        visitados: Optional[Set[str]] = None,
-    ) -> Dict[str, Any]:
-
-        if cadena is None:
-            cadena = []
-
-        if visitados is None:
-            visitados = set()
-
-        cadena_actual = cadena + [nodo]
-
-        # -------------------------------------------------------
-        # CICLO ESTRUCTURAL
-        # -------------------------------------------------------
-
-        if nodo in visitados:
-            inicio = cadena_actual.index(nodo)
-            ciclo = cadena_actual[inicio:]
-
-            return {
-                "estado": "CIRCULARIDAD_ESTRUCTURAL",
-                "origen": origen,
-                "nodo": nodo,
-                "cadena_dependencia": cadena_actual,
-                "ciclo": ciclo,
-                "nivel": len(cadena_actual) - 1,
-                "razon": (
-                    "La cadena retorna a un nodo previamente recorrido. "
-                    "La circularidad se registra como estructura y no "
-                    "se clasifica como contradicción por sí misma."
-                ),
-            }
-
-        # -------------------------------------------------------
-        # NODO NO ENTREGADO
-        # -------------------------------------------------------
-
-        if nodo not in indice:
-            return {
-                "estado": "DEPENDENCIA_NO_ENTREGADA",
-                "origen": origen,
-                "id": nodo,
-                "tipo": "NO ENTREGADO POR ENGINE",
-                "cadena_dependencia": cadena_actual,
-                "nivel": len(cadena_actual) - 1,
-                "razon": (
-                    "La dependencia declarada no existe en la "
-                    "instantánea disponible."
-                ),
-                "axiomas_relacionados": [],
-            }
-
-        # -------------------------------------------------------
-        # NODO EXISTENTE
-        # -------------------------------------------------------
-
-        d = indice[nodo]
-        tipo = _valor(d, "type", d.get("tipo", "DESCONOCIDO"))
-
-        nuevos_visitados = set(visitados)
-        nuevos_visitados.add(nodo)
-
-        dependencias = grafo.get(nodo, [])
-
-        # -------------------------------------------------------
-        # HOJA
-        # -------------------------------------------------------
-
-        if not dependencias:
-            return {
-                "estado": "RESUELTA",
-                "origen": origen,
-                "id": nodo,
-                "tipo": tipo,
-                "cadena_dependencia": cadena_actual,
-                "nivel": len(cadena_actual) - 1,
-                "axiomas_relacionados": _axiomas_relacionados(nodo),
-            }
-
-        # -------------------------------------------------------
-        # RESOLVER HIJOS
-        # -------------------------------------------------------
-
-        resultados = []
-
-        for dependencia in dependencias:
-            resultados.append(
-                _resolver(
-                    origen,
-                    dependencia,
-                    cadena_actual,
-                    nuevos_visitados,
-                )
-            )
-
-        return {
-            "estado": "RESUELTA",
-            "origen": origen,
-            "id": nodo,
-            "tipo": tipo,
-            "cadena_dependencia": cadena_actual,
-            "nivel": len(cadena_actual) - 1,
-            "axiomas_relacionados": _axiomas_relacionados(nodo),
-            "dependencias": resultados,
-        }
-
-    # -----------------------------------------------------------
-    # ANÁLISIS GLOBAL
-    # -----------------------------------------------------------
-
-    limites: List[Dict[str, Any]] = []
-    dependencias_faltantes: List[Dict[str, Any]] = []
-    circularidades: List[Dict[str, Any]] = []
-    anclajes_faltantes: List[Dict[str, Any]] = []
-
-    for identificador, declaracion in indice.items():
-
-        resultado = _resolver(identificador, identificador)
-
-        encontrados: Set[str] = set()
-
-        def _recorrer(nodo: Dict[str, Any]) -> None:
-
-            estado = nodo.get("estado")
-
-            if estado == "DEPENDENCIA_NO_ENTREGADA":
-                clave = (
-                    nodo["origen"],
-                    nodo["id"],
-                    tuple(nodo["cadena_dependencia"]),
-                )
-
-                if clave not in encontrados:
-                    encontrados.add(clave)
-
-                    dependencias_faltantes.append({
-                        "declaracion": nodo["origen"],
-                        "faltante": nodo["id"],
-                        "tipo": nodo["tipo"],
-                        "cadena_dependencia": nodo["cadena_dependencia"],
-                        "nivel": nodo["nivel"],
-                        "razon": nodo["razon"],
-                        "axiomas_relacionados": nodo[
-                            "axiomas_relacionados"
-                        ],
-                    })
-
-            elif estado == "CIRCULARIDAD_ESTRUCTURAL":
-                circularidades.append({
-                    "declaracion": nodo["origen"],
-                    "ciclo": nodo["ciclo"],
-                    "cadena_dependencia": nodo["cadena_dependencia"],
-                    "nivel": nodo["nivel"],
-                    "estado": "CIRCULARIDAD_ESTRUCTURAL",
-                    "contradiccion": False,
-                })
-
-            for hijo in nodo.get("dependencias", []):
-                _recorrer(hijo)
-
-        _recorrer(resultado)
-
-        # -------------------------------------------------------
-        # ANCLA AXIOMÁTICA
-        # -------------------------------------------------------
-
-        tipo_actual = str(
-            _valor(
-                declaracion,
-                "type",
-                declaracion.get("tipo", ""),
-            )
-        ).lower()
-
-        if tipo_actual != "axioma":
-            axiomas_directos = _axiomas_relacionados(identificador)
-
-            if not axiomas_directos:
-                anclajes_faltantes.append({
-                    "declaracion": identificador,
-                    "tipo": tipo_actual,
-                    "estado": "ANCLA_AXIOMATICA_FALTANTE",
+                # ------------------------------------------------
+                # La dependencia declarada NO existe.
+                # Este es el único caso que constituye
+                # PREMISA_FALTANTE.
+                # ------------------------------------------------
+                resultado.append({
+                    "id": dependencia,
+                    "tipo": "NO ENTREGADO POR ENGINE",
+                    "cadena_dependencia": nueva_cadena,
+                    "nivel": len(nueva_cadena) - 1,
                     "razon": (
-                        "No se encontró un axioma relacionado "
-                        "directamente en la instantánea disponible."
+                        "La dependencia declarada no existe en "
+                        "la instantánea disponible."
                     ),
                 })
 
-    # -----------------------------------------------------------
-    # ELIMINAR DUPLICADOS
-    # -----------------------------------------------------------
+        recorrer(inicio, [inicio])
 
-    def _unico(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        vistos = set()
-        salida = []
+        # -------------------------------------------------------
+        # Eliminar duplicados conservando orden.
+        # -------------------------------------------------------
+        unicos: List[Dict[str, Any]] = []
+        vistos_ids: Set[str] = set()
 
-        for item in items:
-            clave = repr(sorted(item.items(), key=lambda x: x[0]))
+        for item in resultado:
+            ident = item["id"]
 
-            if clave not in vistos:
-                vistos.add(clave)
-                salida.append(item)
+            if ident in vistos_ids:
+                continue
 
-        return salida
+            vistos_ids.add(ident)
+            unicos.append(item)
 
-    dependencias_faltantes = _unico(dependencias_faltantes)
-    circularidades = _unico(circularidades)
-    anclajes_faltantes = _unico(anclajes_faltantes)
+        return unicos
 
     # -----------------------------------------------------------
-    # CONTRADICCIONES
+    # Detectar únicamente dependencias realmente ausentes.
+    #
+    # NO se consideran:
+    #   - declaraciones independientes;
+    #   - axiomas sin depends_on;
+    #   - teoremas sin depends_on;
+    #   - ciclos cerrados;
+    #   - recombinaciones circulares.
     # -----------------------------------------------------------
+    premisas_faltantes: List[Dict[str, Any]] = []
+    dependencias_no_satisfechas: List[Dict[str, Any]] = []
 
-    contradicciones: List[Dict[str, Any]] = []
+    for d in decls:
 
-    for identificador, d in indice.items():
+        ident = str(_valor(d, "id", ""))
 
-        polaridad = _valor(d, "polarity", None)
-
-        if polaridad is None:
+        if not ident:
             continue
 
-        relacionadas = [
-            otro
-            for otro_id, otro in indice.items()
-            if otro_id != identificador
-            and _valor(otro, "subject", None)
-            == _valor(d, "subject", None)
-            and _valor(otro, "relation", None)
-            == _valor(d, "relation", None)
-            and _valor(otro, "object", None)
-            == _valor(d, "object", None)
-        ]
+        faltantes = _resolver_dependencias(ident)
 
-        for otra in relacionadas:
+        if not faltantes:
+            continue
 
-            otra_polaridad = _valor(otra, "polarity", None)
-
-            if otra_polaridad is not None and otra_polaridad != polaridad:
-                contradicciones.append({
-                    "declaracion": identificador,
-                    "contradictoria": otra.get("id"),
-                    "polaridad": polaridad,
-                    "polaridad_contraria": otra_polaridad,
-                    "tipo": "CONTRADICCION",
-                })
-
-    contradicciones = _unico(contradicciones)
-
-    # -----------------------------------------------------------
-    # LÍMITES REALES
-    # -----------------------------------------------------------
-
-    for faltante in dependencias_faltantes:
-        limites.append({
-            "tipo": "DEPENDENCIA_NO_ENTREGADA",
-            "estado": "LIMITE_DE_RESOLUCION",
-            **faltante,
+        premisas_faltantes.append({
+            "declaracion": ident,
+            "tipo": _valor(d, "type", _valor(d, "tipo", "")),
+            "faltantes": faltantes,
+            "ubicacion": ref(d),
         })
 
-    for ancla in anclajes_faltantes:
-        limites.append({
-            "tipo": "ANCLA_AXIOMATICA_FALTANTE",
-            "estado": "LIMITE_AXIOMATICO",
-            **ancla,
+        dependencias_no_satisfechas.append({
+            "declaracion": ident,
+            "dependencias_faltantes": [
+                item["id"] for item in faltantes
+            ],
+            "mensaje": (
+                "La declaración '{0}' declara dependencias que "
+                "no están presentes en la instantánea: {1}"
+            ).format(
+                ident,
+                [item["id"] for item in faltantes],
+            ),
         })
 
     # -----------------------------------------------------------
-    # RESULTADO
+    # Límites
     # -----------------------------------------------------------
+    limites: List[Dict[str, Any]] = []
 
+    if premisas_faltantes:
+        limites.append({
+            "tipo": "PREMISA_FALTANTE",
+            "cantidad": len(premisas_faltantes),
+            "detalle": premisas_faltantes,
+        })
+
+    # -----------------------------------------------------------
+    # Alcance
+    # -----------------------------------------------------------
+    declaraciones_con_dependencias_faltantes = len(
+        dependencias_no_satisfechas
+    )
+
+    alcance = {
+        "total_declaraciones": len(decls),
+        "dependencias_no_satisfechas": (
+            declaraciones_con_dependencias_faltantes
+        ),
+        "premisas_faltantes": len(premisas_faltantes),
+    }
+
+    # -----------------------------------------------------------
+    # Resultado
+    # -----------------------------------------------------------
     return {
         "contenedor": NOMBRE_MODULO,
-
-        "premisas_disponibles": sorted(ids_presentes),
-
-        "dependencias_no_entregadas": dependencias_faltantes,
-
-        "anclajes_axiomaticos_faltantes": anclajes_faltantes,
-
-        "dependencias_circulares": circularidades,
-
-        "contradicciones": contradicciones,
-
+        "premisas_faltantes": premisas_faltantes,
+        "dependencias_no_satisfechas": dependencias_no_satisfechas,
         "limites": limites,
-
-        "alcance": {
-            "total_declaraciones": len(indice),
-            "dependencias_no_entregadas": len(
-                dependencias_faltantes
-            ),
-            "anclajes_axiomaticos_faltantes": len(
-                anclajes_faltantes
-            ),
-            "circularidades_estructurales": len(
-                circularidades
-            ),
-            "contradicciones": len(
-                contradicciones
-            ),
-        },
-
-        "coherente": len(contradicciones) == 0,
-
+        "alcance": alcance,
         "errores_recoleccion": errores,
-
         "nota": (
-            "El límite axiomático identifica el punto exacto hasta "
-            "el cual puede resolverse una cadena de dependencias "
-            "con la instantánea disponible. Una dependencia no "
-            "entregada no constituye por sí misma una contradicción. "
-            "Una circularidad estructural tampoco constituye por sí "
-            "misma una contradicción. Las contradicciones se "
-            "determinan separadamente mediante incompatibilidad "
-            "de declaraciones."
+            "El límite axiomático informa exclusivamente dependencias "
+            "declaradas que no están disponibles en la instantánea. "
+            "Una declaración sin dependencias es válida como declaración "
+            "independiente. La circularidad no constituye por sí misma "
+            "una contradicción ni un límite axiomático."
         ),
     }
+
 # ===============================================================
 # FIN VPSI-TRUTH — 7.1 LÍMITE AXIOMÁTICO
 # ===============================================================

@@ -190,6 +190,538 @@ CAMPOS_OPCIONALES = (
 
 
 
+# ===============================================================
+# SECCIÓN  — CONTENEDOR (VPSI-CONTRACT-1.0)
+# ===============================================================
+
+CONTENEDOR: Dict[str, Any] = {
+    "esquema": _ESQUEMA,
+    "version_contrato": _VERSION_CONTRATO,
+    "version_modulo": _VERSION,
+    "id": _ID,
+    "nombre": _NOMBRE,
+    "rol": _ROL,
+    "estabilidad": _ESTABILIDAD,
+    "compatible_desde": _COMPATIBLE_DESDE,
+    "api_engine": _API_ENGINE,
+    "descripcion": (
+        "Autoridad universal de fundamentación del VPSI. "
+        "Conserva conocimiento resoluble de todas las declaraciones "
+        "públicas del sistema. Puede resolver, relacionar y citar "
+        "cualquier declaración formal proveniente de cualquier módulo "
+        "presente o futuro. Autoridad absoluta sobre la fundamentación, "
+        "la resolución, la citación, la cadena normativa y la explicación "
+        "documental. No altera el conocimiento declarado."
+    ),
+    "funcion": (
+        "Resolver, organizar, relacionar y citar cualquier declaración "
+        "pública perteneciente al VPSI. "
+        "Modo Engine: cadena documental del ciclo. "
+        "Modo Consulta: resolución y explicación bajo demanda."
+    ),
+    "no_hace": [
+        "Ninguna capacidad de CIT puede modificar el conocimiento declarado",
+    ],
+    "autoridad": [
+        "Autoridad absoluta sobre la fundamentación",
+        "Autoridad absoluta sobre la resolución de declaraciones",
+        "Autoridad absoluta sobre la citación",
+        "Autoridad absoluta sobre la cadena normativa",
+        "Autoridad absoluta sobre la explicación documental de cualquier cálculo",
+        "Autoridad absoluta sobre la relación entre declaraciones",
+        "Autoridad absoluta para responder consultas sobre el conocimiento declarado",
+    ],
+    "poderes": [
+        "Puede resolver cualquier declaración registrada",
+        "Puede localizar cualquier norma",
+        "Puede construir cadenas normativas",
+        "Puede relacionar declaraciones",
+        "Puede explicar por qué un cálculo produjo determinado resultado (solo con declaraciones existentes)",
+        "Puede responder consultas documentales",
+        "Puede anunciar cualquier declaración existente",
+        "Puede producir evidencia documental durante la ejecución del Engine",
+        "Puede producir evidencia documental fuera del Engine",
+        "Puede citar cualquier conocimiento declarado",
+    ],
+    "conocimiento_exportable": [
+        "declaraciones",
+        "resolver",
+        "buscar",
+        "cadena",
+        "explicar",
+        "citar",
+        "anunciar",
+        "relacionar",
+        "inventario",
+        "reporte",
+        "diagnostico",
+    ],
+    # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+        # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
+    "requiere": [
+        "CE",
+        "AX",
+        "FO",
+        "MC",
+        "SF",
+        "CA",
+        "CX",
+        "DI",
+        "RE",
+        "VX",
+        "TX",
+        "CH",
+        "CIT",
+        "DGCO",
+        "UI",
+        "CC",
+        "TT",
+        "SC",
+        "CT",
+    ],
+
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
+
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
+
+    
+    "consultas_soportadas": [
+        "resolver",
+        "buscar",
+        "buscar_por_tipo",
+        "buscar_por_fuente",
+        "cadena",
+        "explicar",
+        "citar",
+        "anunciar",
+        "relacionar",
+        "obtener_inventario",
+        "obtener_reporte",
+        "obtener_diagnostico",
+    ],
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
+    "autoriza_engine": {
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+
+                # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,
+        "acceso_archivos": True,
+
+        # --- CAPACIDADES ARQUITECTÓNICAS ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+    },
+  
+        # ============================================================
+    # 17 — CAPACIDADES
+    # ============================================================
+    "capacidades": {
+
+        # --- CENTINELA ---
+        "verificar": "verificar",
+        "barrer": "barrer",
+        "verificar_salida": "verificar_salida",
+
+        # --- INVENTARIO Y REPORTING ---
+        "inventario": "inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
+
+        # --- OPERACIONES DE CITACIÓN ---
+        "anunciar": "anunciar",
+        "anunciar_todo": "anunciar_todo",
+        "citar": "citar",
+        "registrar": "registrar",
+        "resolver": "resolver",
+        "resolver_enunciado": "resolver_enunciado",
+        "buscar": "buscar",
+        "cadena": "cadena",
+        "explicar": "explicar",
+        "relacionar": "relacionar",
+        "limpiar_ciclo": "limpiar_ciclo",
+
+        # --- COMPATIBILIDAD ENGINE ---
+        "evaluar": "anunciar",
+
+        # --- CAPACIDADES ARQUITECTÓNICAS ---
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+    },
+
+    # ============================================================
+    # METACITAS
+    # ============================================================
+    "capacidades_meta": {
+        "verificar": {
+            "descripcion": "Centinela del oficio de fundamentación.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, coherente, errores, choques"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "barrer": {
+            "descripcion": "Alias de verificar.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, coherente, errores, choques"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "inventario": {
+            "descripcion": "Inventario contractual de CIT.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, nombre, rol, version, capacidades, "
+                "tipos_declaracion"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "reporte": {
+            "descripcion": "Reporte de estado de CIT.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, coherente, registro_n"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "diagnostico": {
+            "descripcion": "Diagnóstico propio de CIT.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con id, estado, problemas, advertencias"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar_salida": {
+            "descripcion": "Forma mínima de salida de CIT.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "bool",
+            "acceso_archivos": ["*"],
+        },
+
+        "anunciar": {
+            "descripcion": (
+                "Modo Engine (paquete) o Consulta (declaración). "
+                "Fundamentación documental sin recálculo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con anuncios / cadena documental"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "anunciar_todo": {
+            "descripcion": (
+                "Anuncia todas las declaraciones del registro operativo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con anuncios, n",
+            "acceso_archivos": ["*"],
+        },
+
+        "citar": {
+            "descripcion": (
+                "Representación citable de declaraciones."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con citas, n",
+            "acceso_archivos": ["*"],
+        },
+
+        "registrar": {
+            "descripcion": (
+                "Incorpora declaración al registro operativo. "
+                "No altera origen."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con ok, declaracion",
+            "acceso_archivos": ["*"],
+        },
+
+        "resolver": {
+            "descripcion": "Resuelve una declaración por id.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con resuelto, declaracion",
+            "acceso_archivos": ["*"],
+        },
+
+        "resolver_enunciado": {
+            "descripcion": (
+                "Alias de resolución orientado a enunciado."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con resuelto, enunciado",
+            "acceso_archivos": ["*"],
+        },
+
+        "buscar": {
+            "descripcion": (
+                "Consulta declaraciones del registro operativo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con declaraciones, n",
+            "acceso_archivos": ["*"],
+        },
+
+        "cadena": {
+            "descripcion": (
+                "Construye cadena normativa a partir de ids resolubles."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con cadena, faltantes, completa"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "explicar": {
+            "descripcion": (
+                "Explicación documental solo con declaraciones existentes."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con explicacion, n, completa"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "relacionar": {
+            "descripcion": (
+                "Documenta relación entre dos declaraciones resolubles."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, declaracion de enlace"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        "limpiar_ciclo": {
+            "descripcion": (
+                "Limpia registro operativo del ciclo."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict con ok, limpiadas"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+                # ============================================================
+        # evaluar
+        # ============================================================
+        "evaluar": {
+            "descripcion": (
+                "Alias de anunciar (compatibilidad Engine)."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": (
+                "dict de anuncio / fundamentación"
+            ),
+            "acceso_archivos": ["*"],
+        },
+
+        # ============================================================
+        # ejecutar_total
+        # ============================================================
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre CIT. "
+                "Ejerce todas las unidades ejecutables. No inventa."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades",
+            "acceso_archivos": ["*"],
+        },
+
+        # ============================================================
+        # inspeccionar
+        # ============================================================
+        "inspeccionar": {
+            "descripcion": (
+                "Inspeccion estructural de CIT sin alterar contrato."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura y estado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+
+        # ============================================================
+        # registrar_inventario
+        # ============================================================
+        "registrar_inventario": {
+            "descripcion": (
+                "Instantanea determinista del inventario de CIT."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+    },
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
+    "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
+        "estado": True,
+        "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+        "inventario": True,
+        "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+        "errores": True,
+        "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+        "dependencias": True,
+        "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+        "contrato": True,
+        "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
+        "reporte": True,
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        
+        "registrar_inventario": True,
+        
+        # --- BANDERAS OBLIGATORIAS  ENGINE ---
+        "acceso_archivos": True,      # ← AGREGADA
+        "validar_esquema": True,      # ← AGREGADA
+    },
+    
+    "estados_validos": [
+        "NO_INICIADO",
+        "OPERATIVO",
+        "DEGRADADO",
+        "RECHAZADO",
+    ],
+    
+    "invariantes": [
+        "CIT conserva conocimiento declarativo universal resoluble",
+        "CIT puede resolver cualquier declaración registrada",
+        "CIT puede citar cualquier declaración registrada",
+        "CIT puede construir cadenas de fundamentación",
+        "CIT puede responder consultas documentales",
+        "CIT nunca altera el conocimiento declarado",
+        "CIT nunca modifica resultados",
+        "CIT nunca reemplaza la autoridad de otros módulos",
+        "CIT únicamente documenta y fundamenta",
+        "Toda explicación producida por CIT debe provenir de declaraciones existentes",
+        "Toda cita debe ser resoluble",
+        "Toda cadena normativa debe ser trazable",
+        "el id del módulo nunca cambia",
+        "el rol nunca cambia",
+        "las capacidades declaradas son callables tras la resolución",
+        "este módulo no inventa capacidades no declaradas en CONTENEDOR",
+        "este módulo siempre puede reportar su propio estado",
+        "inventario() siempre incluye id, nombre, rol, version",
+    ],
+}
+
 
 # ===============================================================
 # SECCIÓN 3 — REGISTRO DE DECLARACIONES (proceso de ciclo)
@@ -1131,519 +1663,75 @@ def registrar_inventario(
             "Instantanea determinista del inventario de CIT. "
             "No modifica conocimiento declarado."
         ),
-    },
-# ===============================================================
-# SECCIÓN 8 — CONTENEDOR (VPSI-CONTRACT-1.0)
-# ===============================================================
-
-CONTENEDOR: Dict[str, Any] = {
-    "esquema": _ESQUEMA,
-    "version_contrato": _VERSION_CONTRATO,
-    "version_modulo": _VERSION,
-    "id": _ID,
-    "nombre": _NOMBRE,
-    "rol": _ROL,
-    "estabilidad": _ESTABILIDAD,
-    "compatible_desde": _COMPATIBLE_DESDE,
-    "api_engine": _API_ENGINE,
-    "descripcion": (
-        "Autoridad universal de fundamentación del VPSI. "
-        "Conserva conocimiento resoluble de todas las declaraciones "
-        "públicas del sistema. Puede resolver, relacionar y citar "
-        "cualquier declaración formal proveniente de cualquier módulo "
-        "presente o futuro. Autoridad absoluta sobre la fundamentación, "
-        "la resolución, la citación, la cadena normativa y la explicación "
-        "documental. No altera el conocimiento declarado."
-    ),
-    "funcion": (
-        "Resolver, organizar, relacionar y citar cualquier declaración "
-        "pública perteneciente al VPSI. "
-        "Modo Engine: cadena documental del ciclo. "
-        "Modo Consulta: resolución y explicación bajo demanda."
-    ),
-    "no_hace": [
-        "Ninguna capacidad de CIT puede modificar el conocimiento declarado",
-    ],
-    "autoridad": [
-        "Autoridad absoluta sobre la fundamentación",
-        "Autoridad absoluta sobre la resolución de declaraciones",
-        "Autoridad absoluta sobre la citación",
-        "Autoridad absoluta sobre la cadena normativa",
-        "Autoridad absoluta sobre la explicación documental de cualquier cálculo",
-        "Autoridad absoluta sobre la relación entre declaraciones",
-        "Autoridad absoluta para responder consultas sobre el conocimiento declarado",
-    ],
-    "poderes": [
-        "Puede resolver cualquier declaración registrada",
-        "Puede localizar cualquier norma",
-        "Puede construir cadenas normativas",
-        "Puede relacionar declaraciones",
-        "Puede explicar por qué un cálculo produjo determinado resultado (solo con declaraciones existentes)",
-        "Puede responder consultas documentales",
-        "Puede anunciar cualquier declaración existente",
-        "Puede producir evidencia documental durante la ejecución del Engine",
-        "Puede producir evidencia documental fuera del Engine",
-        "Puede citar cualquier conocimiento declarado",
-    ],
-    "conocimiento_exportable": [
-        "declaraciones",
-        "resolver",
-        "buscar",
-        "cadena",
-        "explicar",
-        "citar",
-        "anunciar",
-        "relacionar",
-        "inventario",
-        "reporte",
-        "diagnostico",
-    ],
-    # ============================================================
-    # ACCESO (obligatorio en el esquema)
-    # ============================================================
-    "acceso": {
-        "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
-    },
-
-    # ============================================================
-    # DEPENDENCIAS
-    # ============================================================
-    "requiere": ["*"],
-
-    # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "acceso_archivos": ["*"],
-
-    # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "validar_esquema": ["*"],
-
-    
-    "consultas_soportadas": [
-        "resolver",
-        "buscar",
-        "buscar_por_tipo",
-        "buscar_por_fuente",
-        "cadena",
-        "explicar",
-        "citar",
-        "anunciar",
-        "relacionar",
-        "obtener_inventario",
-        "obtener_reporte",
-        "obtener_diagnostico",
-    ],
-
-    # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
-    # ============================================================
-    "autoriza_engine": {
-        # --- PERMISOS BASE ---
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-
-        # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
-        "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
-        "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
-        "actualizar": False,
-
-        # --- PERMISOS DE PROCESAMIENTO ---
-        "validar": True,
-        "procesar": True,
-        "analizar": True,
-        "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
-
-        # --- PERMISOS DE DATOS ---
-        "exportar": True,
-        "importar": True,
-        "respaldar": True,
-        "recuperar": True,
-        "sincronizar": True,
-
-        # --- PERMISOS DE MONITOREO ---
-        "monitorear": True,
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- PERMISOS DE ESTADO ---
-        "estado": True,
-        "version": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "contrato": True,
-        "conocimiento": True,
-        "reporte": True,
-
-                # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,
-        "acceso_archivos": True,
-
-        # --- CAPACIDADES ARQUITECTÓNICAS ---
-        "ejecutar_total": True,
-        "inspeccionar": True,
-        "registrar_inventario": True,
-    },
-  
-        # ============================================================
-    # 17 — CAPACIDADES
-    # ============================================================
-    "capacidades": {
-
-        # --- CENTINELA ---
-        "verificar": "verificar",
-        "barrer": "barrer",
-        "verificar_salida": "verificar_salida",
-
-        # --- INVENTARIO Y REPORTING ---
-        "inventario": "inventario",
-        "reporte": "reporte",
-        "diagnostico": "diagnostico",
-
-        # --- OPERACIONES DE CITACIÓN ---
-        "anunciar": "anunciar",
-        "anunciar_todo": "anunciar_todo",
-        "citar": "citar",
-        "registrar": "registrar",
-        "resolver": "resolver",
-        "resolver_enunciado": "resolver_enunciado",
-        "buscar": "buscar",
-        "cadena": "cadena",
-        "explicar": "explicar",
-        "relacionar": "relacionar",
-        "limpiar_ciclo": "limpiar_ciclo",
-
-        # --- COMPATIBILIDAD ENGINE ---
-        "evaluar": "anunciar",
-
-        # --- CAPACIDADES ARQUITECTÓNICAS ---
-        "ejecutar_total": "ejecutar_total",
-        "inspeccionar": "inspeccionar",
-        "registrar_inventario": "registrar_inventario",
-    },
-
-    # ============================================================
-    # METACITAS
-    # ============================================================
-    "capacidades_meta": {
-        "verificar": {
-            "descripcion": "Centinela del oficio de fundamentación.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, coherente, errores, choques"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "barrer": {
-            "descripcion": "Alias de verificar.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, coherente, errores, choques"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "inventario": {
-            "descripcion": "Inventario contractual de CIT.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, nombre, rol, version, capacidades, "
-                "tipos_declaracion"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "reporte": {
-            "descripcion": "Reporte de estado de CIT.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, estado, coherente, registro_n"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "diagnostico": {
-            "descripcion": "Diagnóstico propio de CIT.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, estado, problemas, advertencias"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "verificar_salida": {
-            "descripcion": "Forma mínima de salida de CIT.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "bool",
-            "acceso_archivos": ["*"],
-        },
-
-        "anunciar": {
-            "descripcion": (
-                "Modo Engine (paquete) o Consulta (declaración). "
-                "Fundamentación documental sin recálculo."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con anuncios / cadena documental"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "anunciar_todo": {
-            "descripcion": (
-                "Anuncia todas las declaraciones del registro operativo."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con anuncios, n",
-            "acceso_archivos": ["*"],
-        },
-
-        "citar": {
-            "descripcion": (
-                "Representación citable de declaraciones."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con citas, n",
-            "acceso_archivos": ["*"],
-        },
-
-        "registrar": {
-            "descripcion": (
-                "Incorpora declaración al registro operativo. "
-                "No altera origen."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con ok, declaracion",
-            "acceso_archivos": ["*"],
-        },
-
-        "resolver": {
-            "descripcion": "Resuelve una declaración por id.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con resuelto, declaracion",
-            "acceso_archivos": ["*"],
-        },
-
-        "resolver_enunciado": {
-            "descripcion": (
-                "Alias de resolución orientado a enunciado."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con resuelto, enunciado",
-            "acceso_archivos": ["*"],
-        },
-
-        "buscar": {
-            "descripcion": (
-                "Consulta declaraciones del registro operativo."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con declaraciones, n",
-            "acceso_archivos": ["*"],
-        },
-
-        "cadena": {
-            "descripcion": (
-                "Construye cadena normativa a partir de ids resolubles."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con cadena, faltantes, completa"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "explicar": {
-            "descripcion": (
-                "Explicación documental solo con declaraciones existentes."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con explicacion, n, completa"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "relacionar": {
-            "descripcion": (
-                "Documenta relación entre dos declaraciones resolubles."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con ok, declaracion de enlace"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        "limpiar_ciclo": {
-            "descripcion": (
-                "Limpia registro operativo del ciclo."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict con ok, limpiadas"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-                # ============================================================
-        # evaluar
-        # ============================================================
-        "evaluar": {
-            "descripcion": (
-                "Alias de anunciar (compatibilidad Engine)."
-            ),
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": (
-                "dict de anuncio / fundamentación"
-            ),
-            "acceso_archivos": ["*"],
-        },
-
-        # ============================================================
-        # ejecutar_total
-        # ============================================================
-        "ejecutar_total": {
-            "descripcion": (
-                "Autoridad total de ENGINE sobre CIT. "
-                "Ejerce todas las unidades ejecutables. No inventa."
-            ),
-            "entrada": "peticion opcional (dict)",
-            "validar_esquema": ["*"],
-            "salida": "dict con resultados de todas las unidades",
-            "acceso_archivos": ["*"],
-        },
-
-        # ============================================================
-        # inspeccionar
-        # ============================================================
-        "inspeccionar": {
-            "descripcion": (
-                "Inspeccion estructural de CIT sin alterar contrato."
-            ),
-            "entrada": "peticion opcional (dict)",
-            "validar_esquema": ["acceso_archivos"],
-            "salida": "dict con estructura y estado",
-            "acceso_archivos": ["acceso_archivos"],
-        },
-
-        # ============================================================
-        # registrar_inventario
-        # ============================================================
-        "registrar_inventario": {
-            "descripcion": (
-                "Instantanea determinista del inventario de CIT."
-            ),
-            "entrada": "peticion opcional (dict)",
-            "validar_esquema": ["acceso_archivos"],
-            "salida": "dict con inventario registrado",
-            "acceso_archivos": ["acceso_archivos"],
-        },
-    },
-    # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
-    # ============================================================
-    "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
-        "estado": True,
-        "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
-        "inventario": True,
-        "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
-        "errores": True,
-        "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
-        "dependencias": True,
-        "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
-        "contrato": True,
-        "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
-        "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
-    },
-    
-    "estados_validos": [
-        "NO_INICIADO",
-        "OPERATIVO",
-        "DEGRADADO",
-        "RECHAZADO",
-    ],
-    
-    "invariantes": [
-        "CIT conserva conocimiento declarativo universal resoluble",
-        "CIT puede resolver cualquier declaración registrada",
-        "CIT puede citar cualquier declaración registrada",
-        "CIT puede construir cadenas de fundamentación",
-        "CIT puede responder consultas documentales",
-        "CIT nunca altera el conocimiento declarado",
-        "CIT nunca modifica resultados",
-        "CIT nunca reemplaza la autoridad de otros módulos",
-        "CIT únicamente documenta y fundamenta",
-        "Toda explicación producida por CIT debe provenir de declaraciones existentes",
-        "Toda cita debe ser resoluble",
-        "Toda cadena normativa debe ser trazable",
-        "el id del módulo nunca cambia",
-        "el rol nunca cambia",
-        "las capacidades declaradas son callables tras la resolución",
-        "este módulo no inventa capacidades no declaradas en CONTENEDOR",
-        "este módulo siempre puede reportar su propio estado",
-        "inventario() siempre incluye id, nombre, rol, version",
-    ],
-},
-
+    }
 
 # ===============================================================
-# SECCIÓN 9 — EXPORTS
+# RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
+
+_CAP_MAP = {
+    # --- CENTINELA ---
+    "verificar": verificar,
+    "barrer": barrer,
+    "verificar_salida": verificar_salida,
+
+    # --- INVENTARIO Y REPORTING ---
+    "inventario": inventario,
+    "reporte": reporte,
+    "diagnostico": diagnostico,
+
+    # --- OPERACIONES DE CITACIÓN ---
+    "anunciar": anunciar,
+    "anunciar_todo": anunciar_todo,
+    "citar": citar,
+    "registrar": registrar,
+    "resolver": resolver,
+    "resolver_enunciado": resolver_enunciado,
+    "buscar": buscar,
+    "cadena": cadena,
+    "explicar": explicar,
+    "relacionar": relacionar,
+    "limpiar_ciclo": limpiar_ciclo,
+
+    # --- COMPATIBILIDAD ENGINE ---
+    "evaluar": anunciar,
+
+    # --- CAPACIDADES ARQUITECTÓNICAS ---
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
+}
+
+
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    resueltas: Dict[str, Any] = {}
+    for nombre, ref in cont["capacidades"].items():
+        if callable(ref):
+            resueltas[nombre] = ref
+            continue
+        if isinstance(ref, str):
+            if ref not in _CAP_MAP:
+                raise RuntimeError(
+                    "{0}: capacidad '{1}' referencia inexistente: '{2}'".format(
+                        _NOMBRE, nombre, ref
+                    )
+                )
+            fn = _CAP_MAP[ref]
+            if not callable(fn):
+                raise RuntimeError(
+                    "{0}: '{1}' no es callable".format(_NOMBRE, ref)
+                )
+            resueltas[nombre] = fn
+            continue
+        raise RuntimeError(
+            "{0}: capacidad '{1}' tipo inválido: {2}".format(
+                _NOMBRE, nombre, type(ref).__name__
+            )
+        )
+    cont["capacidades"] = resueltas
+
+
+_resolver_capacidades(CONTENEDOR)
 
 __all__ = [
     "CONTENEDOR",
@@ -1675,5 +1763,7 @@ __all__ = [
 ]
 
 # ===============================================================
-# FIN SECCIÓN 9
+# FIN RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
+
+

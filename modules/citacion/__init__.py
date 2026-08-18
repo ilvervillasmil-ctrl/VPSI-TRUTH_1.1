@@ -102,6 +102,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from core.diagnosticoD import (
+    DiagnosticoGlobal,
+    DiagnosticoError,
+    PESOS,
+    barrer_diagnostico,
+)
 # ===============================================================
 # SECCIÓN 1 — IDENTIDAD
 # ===============================================================

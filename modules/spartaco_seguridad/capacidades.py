@@ -47,6 +47,8 @@ import importlib.util
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+import math
+from modules.constante import ALPHA, BETA
 
 # ===============================================================
 # FIN IMPORTACIONES

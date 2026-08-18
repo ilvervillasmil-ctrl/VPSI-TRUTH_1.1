@@ -1080,52 +1080,110 @@ class Engine:
                         f"{nombre}: capacidad '{k}' no es callable (tipo={type(v).__name__})"
                     )
 
+    # ===========================================================
+    # Parte 17.8 VALIDACIÓN CRUZADA CAPACIDAD ↔ META CAPACIDAD
+    # ===========================================================
+
+    def _validar_capacidades_meta(
+        self,
+        meta: Dict[str, Any],
+        nombre: str
+    ) -> List[str]:
+
+        errores: List[str] = []
+
         # =======================================================
-        # Parte 17.8 METADATOS DE CAPACIDADES
+        # Parte 17.8.1 CAPACIDADES
         # =======================================================
 
-        meta_caps = meta.get("capacidades_meta")
+        capacidades = meta.get("capacidades")
 
-        if not isinstance(meta_caps, dict):
+        if not isinstance(capacidades, dict):
 
             errores.append(
-                f"{nombre}: 'capacidades_meta' debe ser dict"
+                f"{nombre}: 'capacidades' debe ser dict"
             )
 
-        elif isinstance(caps, dict):
+            return errores
 
-            for k in caps:
+        # =======================================================
+        # Parte 17.8.2 META CAPACIDAD
+        # =======================================================
 
-                if k not in meta_caps:
+        meta_capacidad = meta.get("meta_capacidad")
 
-                    errores.append(
-                        f"{nombre}: capacidad '{k}' sin entrada en capacidades_meta"
-                    )
-                    continue
+        if not isinstance(meta_capacidad, dict):
 
-                entrada_meta = meta_caps[k]
+            errores.append(
+                f"{nombre}: 'meta_capacidad' debe ser dict"
+            )
 
-                if not isinstance(entrada_meta, dict):
+            return errores
 
-                    errores.append(
-                        f"{nombre}: capacidades_meta['{k}'] debe ser dict, es {type(entrada_meta).__name__}"
-                    )
-                    continue
+        # =======================================================
+        # Parte 17.8.3 CORRESPONDENCIA 1:1
+        # =======================================================
 
-                for campo in CLAVES_META_CAPACIDAD:
+        claves_capacidades = set(capacidades.keys())
+        claves_meta = set(meta_capacidad.keys())
 
-                    if campo not in entrada_meta:
+        faltantes_meta = sorted(
+            claves_capacidades - claves_meta
+        )
 
-                        errores.append(
-                            f"{nombre}: capacidades_meta['{k}'] falta '{campo}'"
-                        )
+        faltantes_capacidad = sorted(
+            claves_meta - claves_capacidades
+        )
 
-                    elif not isinstance(entrada_meta[campo], (str, list)):    # ← ACEPTA str O list
+        if faltantes_meta:
 
-                        errores.append(
-                            f"{nombre}: capacidades_meta['{k}']['{campo}'] debe ser str o list"
-                        )
+            errores.append(
+                f"{nombre}: capacidades sin meta_capacidad: "
+                f"{faltantes_meta}"
+            )
 
+        if faltantes_capacidad:
+
+            errores.append(
+                f"{nombre}: meta_capacidad sin capacidad: "
+                f"{faltantes_capacidad}"
+            )
+
+        # =======================================================
+        # Parte 17.8.4 VALIDACIÓN DEL CALLABLE
+        # =======================================================
+
+        for clave, callable_ref in capacidades.items():
+
+            if clave not in meta_capacidad:
+                continue
+
+            if not callable(callable_ref):
+
+                errores.append(
+                    f"{nombre}: capacidad '{clave}' "
+                    f"no es callable"
+                )
+
+        # =======================================================
+        # Parte 17.8.5 VALIDACIÓN DE LA META
+        # =======================================================
+
+        for clave, descripcion in meta_capacidad.items():
+
+            if not isinstance(descripcion, str):
+
+                errores.append(
+                    f"{nombre}: meta_capacidad '{clave}' "
+                    f"debe ser str, es "
+                    f"{type(descripcion).__name__}"
+                )
+
+        return errores
+
+    # ===========================================================
+    # FIN Parte 17.8
+    # ===========================================================
         # =======================================================
         # Parte 17.9 AUTORIZACIÓN ENGINE
         # =======================================================

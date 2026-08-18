@@ -320,10 +320,14 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
 
         # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
-    },
+        "validar_esquema": True,
+        "acceso_archivos": True,
 
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+    },
 
     # ============================================================
     # CONSULTAS SOPORTADAS
@@ -340,16 +344,26 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     # CAPACIDADES
     # ============================================================
-    "capacidades": {
+        "capacidades": {
+        # --- CENTINELA ---
         "verificar": "verificar",
         "barrer": "barrer",
+        "verificar_salida": "verificar_salida",
+
+        # --- INVENTARIO Y REPORTING ---
         "inventario": "inventario",
         "reporte": "reporte",
         "diagnostico": "diagnostico",
-        "registrar_resultado_dominio": "registrar_resultado_dominio",
-        "verificar_salida": "verificar_salida",
-    },
 
+        # --- SIMBIOSIS ---
+        "registrar_resultado_dominio": "registrar_resultado_dominio",
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+    },
+    
     # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
@@ -431,7 +445,7 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
-        "verificar_salida": {
+                "verificar_salida": {
             "descripcion": (
                 "Forma mínima de una salida de RE."
             ),
@@ -440,8 +454,42 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
-    },
 
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre RE. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de RE. "
+                "Expone constantes, capacidades, funciones y simbiosis "
+                "sin alterar el contrato ni calcular."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de RE "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+    },
     # ============================================================
     # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
@@ -474,14 +522,19 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
 
         # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
+        "acceso_archivos": True,
+        "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
 
     # ============================================================
     # ESTADOS VÁLIDOS
-    # ============================================================
+    # ===========================================================
     "estados_validos": list(ESTADOS_VALIDOS),
 
     # ============================================================
@@ -799,11 +852,206 @@ def verificar_salida(salida: Any) -> bool:
     )
 
 # ===============================================================
-# FIN CAPACIDADES PÚBLICAS
+# CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE)
+# ===============================================================
+
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Autoridad total de ENGINE sobre RE.
+    Fuente única: CONTENEDOR["capacidades"].
+    No inventa. No autoinvoca. Todo callable real.
+    """
+    peticion_normalizada = (
+        dict(peticion) if isinstance(peticion, dict) else {}
+    )
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    if not isinstance(capacidades, dict):
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_DEGRADADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": [
+                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] no es dict"
+            ],
+            "resultados": {},
+            "capacidades_declaradas": [],
+        }
+
+    for nombre in sorted(capacidades):
+        if nombre == "ejecutar_total":
+            continue
+        referencia = capacidades[nombre]
+        try:
+            if callable(referencia):
+                fn = referencia
+            elif isinstance(referencia, str):
+                fn = globals().get(referencia)
+                if not callable(fn):
+                    raise ContratoInvalido(
+                        f"'{referencia}' no es callable"
+                    )
+            else:
+                raise ContratoInvalido(
+                    f"tipo inválido: {type(referencia).__name__}"
+                )
+
+            if nombre == "registrar_resultado_dominio":
+                resultados[nombre] = fn(
+                    nombre_dominio=peticion_normalizada.get(
+                        "nombre_dominio", ""
+                    ),
+                    material_id=peticion_normalizada.get(
+                        "material_id", ""
+                    ),
+                    resultado_engine=peticion_normalizada.get(
+                        "resultado_engine"
+                    )
+                    if isinstance(
+                        peticion_normalizada.get("resultado_engine"),
+                        dict,
+                    )
+                    else {},
+                    aprobacion_dominio=bool(
+                        peticion_normalizada.get("aprobacion_dominio")
+                    ),
+                )
+            elif nombre == "verificar_salida":
+                resultados[nombre] = fn(
+                    peticion_normalizada.get("salida")
+                    if "salida" in peticion_normalizada
+                    else {}
+                )
+            elif nombre in ("inventario",):
+                resultados[nombre] = fn(peticion_normalizada)
+            else:
+                resultados[nombre] = fn()
+        except Exception as exc:
+            errores_ejecucion.append(f"{nombre}: {exc}")
+            resultados[nombre] = None
+
+    barrido = resultados.get("barrer")
+    coherente = (
+        isinstance(barrido, dict) and bool(barrido.get("coherente"))
+    )
+    ejecutadas = sorted(
+        n for n, r in resultados.items() if r is not None
+    )
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": (
+            ESTADO_OPERATIVO
+            if coherente and not errores_ejecucion
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": coherente and not errores_ejecucion,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": sorted(capacidades.keys()),
+    }
+
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Inspección estructural de RE.
+    Expone contrato, funciones y simbiosis sin calcular ni alterar.
+    """
+    b = barrer()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+            "ESTADOS_MATERIAL": list(ESTADOS_MATERIAL),
+            "CLAVES_FUNCION": list(CLAVES_FUNCION),
+        },
+        "capacidades_contractuales": sorted(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": sorted(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "integridad": {
+            "coherente": b.get("coherente"),
+            "choques": b.get("choques"),
+            "errores": b.get("errores"),
+            "funciones": b.get("funciones"),
+            "dominios_simbiosis": b.get("dominios_simbiosis"),
+            "notas": b.get("notas"),
+        },
+        "acceso": {
+            "canal": "acceso.Canal",
+            "hay_requests": HAY_REQUESTS,
+            "hay_acceso": hay_acceso(timeout=2),
+        },
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone estructura de RE sin calcular "
+            "ni alterar el contrato ni el material."
+        ),
+    }
+
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Instantánea determinista del inventario de RE.
+    No altera evidencia ni material.
+    """
+    inv = inventario(peticion)
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inv,
+        "nota": (
+            "Instantánea determinista del inventario de RE. "
+            "No modifica funciones, simbiosis ni material."
+        ),
+    }
+
+# ===============================================================
+# FIN CAPACIDADES ARQUITECTÓNICAS
 # ===============================================================
 
 # ===============================================================
-# REPORTING INTERNO
+# FIN CAPACIDADES PÚBLICAS
+# ===============================================================
+# ===============================================================
+# PARTE 9 — REPORTING INTERNO
+# ===============================================================
+
+# ===============================================================
+# 9.1 — REPORTE
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
@@ -826,14 +1074,31 @@ def reporte() -> Dict[str, Any]:
         "funciones": b.get("funciones"),
         "dominios_simbiosis": b.get("dominios_simbiosis"),
         "autoridad": CONTENEDOR.get("autoridad"),
-        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+        "conocimiento_exportable": CONTENEDOR.get(
+            "conocimiento_exportable"
+        ),
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": True,
+            "inspeccionar": True,
+            "registrar_inventario": True,
+        },
     }
 
+# ===============================================================
+# FIN 9.1
+# ===============================================================
+
+
+# ===============================================================
+# 9.2 — DIAGNÓSTICO
+# ===============================================================
 
 def diagnostico() -> Dict[str, Any]:
     """Problemas y advertencias propios de RE."""
     b = barrer()
-    problemas = list(b.get("choques") or []) + list(b.get("errores") or [])
+    problemas = list(b.get("choques") or []) + list(
+        b.get("errores") or []
+    )
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -847,25 +1112,56 @@ def diagnostico() -> Dict[str, Any]:
     }
 
 # ===============================================================
-# FIN REPORTING
+# FIN 9.2
 # ===============================================================
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA
+# FIN PARTE 9
+# ===============================================================
+
+
+# ===============================================================
+# PARTE 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# ===============================================================
+
+# ===============================================================
+# 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
 _CAP_MAP = {
+    # --- CENTINELA ---
     "verificar": verificar,
     "barrer": barrer,
+    "verificar_salida": verificar_salida,
+
+    # --- INVENTARIO Y REPORTING ---
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
+
+    # --- SIMBIOSIS ---
     "registrar_resultado_dominio": registrar_resultado_dominio,
-    "verificar_salida": verificar_salida,
+
+    # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
 
+# ===============================================================
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Resuelve referencias str → callables reales.
+    MUTA CONTENEDOR["capacidades"] para que Engine reciba callables.
+    """
     resueltas: Dict[str, Any] = {}
     for nombre, ref in cont["capacidades"].items():
         if callable(ref):
@@ -881,7 +1177,9 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
             fn = _CAP_MAP[ref]
             if not callable(fn):
                 raise ContratoInvalido(
-                    "{0}: '{1}' no es callable".format(NOMBRE_MODULO, ref)
+                    "{0}: '{1}' no es callable".format(
+                        NOMBRE_MODULO, ref
+                    )
                 )
             resueltas[nombre] = fn
             continue
@@ -892,9 +1190,26 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
         )
     cont["capacidades"] = resueltas
 
+# ===============================================================
+# FIN 10.2
+# ===============================================================
+
+
+# ===============================================================
+# 10.3 — VALIDAR Y RESOLVER AL IMPORTAR
+# ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# FIN 10.3
+# ===============================================================
+
+
+# ===============================================================
+# 10.4 — EXPORTACIONES
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -917,32 +1232,21 @@ __all__ = [
     "diagnostico",
     "registrar_resultado_dominio",
     "verificar_salida",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
     "ContratoInvalido",
 ]
 
 # ===============================================================
-# FIN EXPORTACIONES
+# FIN 10.4
 # ===============================================================
 
 # ===============================================================
-# EXTENSIONES FUTURAS
+# FIN PARTE 10
 # ===============================================================
-#
-# Capacidad nueva:
-#   1. Implementar función
-#   2. _CAP_MAP
-#   3. CONTENEDOR["capacidades"]
-#   4. CONTENEDOR["capacidades_meta"] 1:1
-#   5. consultas_soportadas / conocimiento_exportable si aplica
-#   6. VERSION_MODULO
-#   7. _validar_contrato / _resolver_capacidades
-#
-# Dominio nuevo:
-#   - *.py en este directorio o subcarpeta con FUNCION = {...}
-#   - El init lo descubre; no listar por nombre
-#
-# Engine y Omega no requieren cambios de código para capacidades nuevas.
-#
+
+
 # ===============================================================
 # FIN DEL MÓDULO
 # ===============================================================

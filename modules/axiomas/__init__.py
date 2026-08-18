@@ -1383,449 +1383,421 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # FIN 6.6
 # ===============================================================
 
+# ===============================================================
+# VPSI-TRUTH — 7.1 LÍMITE AXIOMÁTICO
+# ===============================================================
 
-# ===============================================================
-# VPSI-TRUTH — 7.1 — LÍMITE AXIOMÁTICO
-# ===============================================================
 def limite_axiomático(
     declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
     decls: Optional[List[Dict]] = None,
     errores: Optional[List[Dict]] = None,
 ) -> Dict[str, Any]:
     """
-    Determina de forma determinista el límite axiomático del corpus VPSI.
-    PRINCIPIOS:
-    - depende_de define la dependencia estructural.
-    - Las dependencias se resuelven transitivamente.
-    - Una dependencia inexistente constituye PREMISA_FALTANTE.
-    - La circularidad NO constituye por sí misma un error.
-    - Un ciclo completamente presente puede ser una estructura cerrada válida.
-    - Las contradicciones son el fallo prioritario.
-    - Cada faltante debe identificarse con su ID y con la cadena completa
-      que conduce hasta él.
-    - No se inventan premisas ni dependencias.
-    - El resultado es determinista para una misma instantánea de entrada.
+    Determina de forma determinista el límite axiomático efectivo.
+
+    IMPORTANTE:
+    - Una dependencia circular NO es automáticamente un error.
+    - Una dependencia no entregada NO es automáticamente una contradicción.
+    - El límite solo identifica exactamente hasta dónde puede resolverse
+      una cadena dentro de la instantánea disponible.
+    - Las contradicciones se separan de las ausencias.
+    - Cada dependencia se rastrea mediante su cadena completa.
+    - Se identifica el tipo de cada nodo y, cuando existe, su anclaje
+      axiomático.
     """
-    # -----------------------------------------------------------
-    # 1. Recolección de instantánea
-    # -----------------------------------------------------------
+
     if decls is None or errores is None:
         decls, errores = recolectar(declaraciones_externas)
-    decls = list(decls or [])
-    errores = list(errores or [])
+
     # -----------------------------------------------------------
-    # 2. Traducción contractual de claves
+    # NORMALIZACIÓN
     # -----------------------------------------------------------
-    traduccion = {
-        "type": "tipo",
-        "subject": "sujeto",
-        "relation": "relacion",
-        "object": "objeto",
-        "polarity": "polaridad",
-        "statement": "enunciado",
-        "depends_on": "depende_de",
-        "governs": "gobierna",
-        "cota": "cota",
+
+    def _valor(d: Dict[str, Any], clave: str, defecto=None):
+        clave_real = TRADUCCION_CLAVES.get(clave, clave)
+        return d.get(clave_real, defecto)
+
+    indice: Dict[str, Dict[str, Any]] = {
+        str(_valor(d, "id", d.get("id"))): d
+        for d in decls
+        if _valor(d, "id", d.get("id")) is not None
     }
-    def _valor(declaracion: Dict[str, Any], clave: str, defecto=None):
-        """
-        Obtiene una propiedad utilizando primero la clave canónica VPSI
-        y después su traducción contractual.
-        """
-        clave_es = traduccion.get(clave, clave)
-        if clave_es in declaracion:
-            return declaracion.get(clave_es)
-        if clave in declaracion:
-            return declaracion.get(clave)
-        return defecto
-    # -----------------------------------------------------------
-    # 3. Índice determinista de declaraciones
-    # -----------------------------------------------------------
-    indice: Dict[str, Dict[str, Any]] = {}
-    for declaracion in decls:
-        identificador = declaracion.get("id")
-        if identificador is None:
-            continue
-        identificador = str(identificador)
-        if identificador not in indice:
-            indice[identificador] = declaracion
+
     ids_presentes: Set[str] = set(indice)
-    premisas_disponibles: List[str] = sorted(ids_presentes)
+
     # -----------------------------------------------------------
-    # 4. Grafo contractual de dependencias
+    # GRAFO
     # -----------------------------------------------------------
+
     grafo: Dict[str, List[str]] = {}
-    for identificador in sorted(indice):
-        declaracion = indice[identificador]
-        dependencias = _valor(
-            declaracion,
-            "depends_on",
-            [],
-        )
-        if dependencias is None:
-            dependencias = []
+
+    for identificador, d in indice.items():
+        dependencias = _valor(d, "depends_on", []) or []
         if isinstance(dependencias, str):
             dependencias = [dependencias]
-        normalizadas: List[str] = []
-        for dependencia in dependencias:
-            if dependencia is None:
-                continue
-            dependencia = str(dependencia)
-            if dependencia not in normalizadas:
-                normalizadas.append(dependencia)
-        grafo[identificador] = sorted(normalizadas)
+        grafo[identificador] = [str(x) for x in dependencias]
+
     # -----------------------------------------------------------
-    # 5. Estructuras de salida
+    # ÍNDICE DE AXIOMAS
     # -----------------------------------------------------------
-    premisas_faltantes: List[Dict[str, Any]] = []
-    dependencias_no_satisfechas: List[Dict[str, Any]] = []
-    dependencias_circulares: List[Dict[str, Any]] = []
-    contradicciones: List[Dict[str, Any]] = []
-    limites: List[Dict[str, Any]] = []
+
+    axiomas = {
+        identificador: d
+        for identificador, d in indice.items()
+        if str(_valor(d, "type", "")).lower() == "axioma"
+    }
+
     # -----------------------------------------------------------
-    # 6. Resolución transitiva exacta
+    # ÍNDICE DE RELACIONES AXIOMÁTICAS
     # -----------------------------------------------------------
-    def _resolver_dependencias(
-        inicio: str,
+
+    def _axiomas_relacionados(identificador: str) -> List[str]:
+        """
+        Determina qué axiomas están directamente relacionados con una
+        declaración mediante sus dependencias.
+
+        No inventa relaciones. Solo utiliza información presente en
+        la instantánea.
+        """
+
+        resultado: Set[str] = set()
+
+        for ax_id, ax in axiomas.items():
+            deps = grafo.get(ax_id, [])
+            if identificador in deps:
+                resultado.add(ax_id)
+
+        return sorted(resultado)
+
+    # -----------------------------------------------------------
+    # RESOLUCIÓN DE CADENA
+    # -----------------------------------------------------------
+
+    def _resolver(
+        origen: str,
+        nodo: str,
+        cadena: Optional[List[str]] = None,
+        visitados: Optional[Set[str]] = None,
     ) -> Dict[str, Any]:
-        faltantes: Dict[str, Dict[str, Any]] = {}
-        visitados: Set[str] = set()
-        ciclos: List[List[str]] = []
-        def recorrer(
-            actual: str,
-            ruta: List[str],
-            en_ruta: Set[str],
-        ) -> None:
-            if actual in en_ruta:
-                if actual in ruta:
-                    posicion = ruta.index(actual)
-                    ciclo = ruta[posicion:] + [actual]
-                else:
-                    ciclo = [actual, actual]
-                if ciclo not in ciclos:
-                    ciclos.append(ciclo)
-                return
-            if actual in visitados:
-                return
-            visitados.add(actual)
-            if actual not in indice:
-                cadena = list(ruta)
-                if not cadena or cadena[-1] != actual:
-                    cadena.append(actual)
-                faltantes[actual] = {
-                    "id": actual,
-                    "cadena": cadena,
-                }
-                return
-            nuevas_ruta = ruta + [actual]
-            nueva_ruta_set = set(en_ruta)
-            nueva_ruta_set.add(actual)
-            for dependencia in grafo.get(actual, []):
-                recorrer(
-                    dependencia,
-                    nuevas_ruta,
-                    nueva_ruta_set,
-                )
-        recorrer(
-            inicio,
-            [],
-            set(),
-        )
-        return {
-            "faltantes": faltantes,
-            "ciclos": ciclos,
-        }
-    # -----------------------------------------------------------
-    # 7. Resolver todas las declaraciones
-    # -----------------------------------------------------------
-    resoluciones: Dict[str, Dict[str, Any]] = {}
-    for identificador in sorted(indice):
-        resoluciones[identificador] = _resolver_dependencias(
-            identificador
-        )
-    # -----------------------------------------------------------
-    # 8. Registrar faltantes EXACTOS
-    # -----------------------------------------------------------
-    for identificador in sorted(resoluciones):
-        resolucion = resoluciones[identificador]
-        faltantes = resolucion["faltantes"]
-        if not faltantes:
-            continue
-        declaracion = indice[identificador]
-        detalles: List[Dict[str, Any]] = []
-        for faltante_id in sorted(faltantes):
-            detalle = faltantes[faltante_id]
-            cadena = detalle["cadena"]
-            detalles.append({
-                "id": faltante_id,
-                "tipo": None,
-                "cadena_dependencia": cadena,
-                "nivel": max(0, len(cadena) - 1),
+
+        if cadena is None:
+            cadena = []
+
+        if visitados is None:
+            visitados = set()
+
+        cadena_actual = cadena + [nodo]
+
+        # -------------------------------------------------------
+        # CICLO ESTRUCTURAL
+        # -------------------------------------------------------
+
+        if nodo in visitados:
+            inicio = cadena_actual.index(nodo)
+            ciclo = cadena_actual[inicio:]
+
+            return {
+                "estado": "CIRCULARIDAD_ESTRUCTURAL",
+                "origen": origen,
+                "nodo": nodo,
+                "cadena_dependencia": cadena_actual,
+                "ciclo": ciclo,
+                "nivel": len(cadena_actual) - 1,
+                "razon": (
+                    "La cadena retorna a un nodo previamente recorrido. "
+                    "La circularidad se registra como estructura y no "
+                    "se clasifica como contradicción por sí misma."
+                ),
+            }
+
+        # -------------------------------------------------------
+        # NODO NO ENTREGADO
+        # -------------------------------------------------------
+
+        if nodo not in indice:
+            return {
+                "estado": "DEPENDENCIA_NO_ENTREGADA",
+                "origen": origen,
+                "id": nodo,
+                "tipo": "NO ENTREGADO POR ENGINE",
+                "cadena_dependencia": cadena_actual,
+                "nivel": len(cadena_actual) - 1,
                 "razon": (
                     "La dependencia declarada no existe en la "
                     "instantánea disponible."
                 ),
-            })
-        registro = {
-            "declaracion": identificador,
-            "tipo": _valor(declaracion, "type"),
-            "faltantes": detalles,
-            "ubicacion": ref(declaracion),
+                "axiomas_relacionados": [],
+            }
+
+        # -------------------------------------------------------
+        # NODO EXISTENTE
+        # -------------------------------------------------------
+
+        d = indice[nodo]
+        tipo = _valor(d, "type", d.get("tipo", "DESCONOCIDO"))
+
+        nuevos_visitados = set(visitados)
+        nuevos_visitados.add(nodo)
+
+        dependencias = grafo.get(nodo, [])
+
+        # -------------------------------------------------------
+        # HOJA
+        # -------------------------------------------------------
+
+        if not dependencias:
+            return {
+                "estado": "RESUELTA",
+                "origen": origen,
+                "id": nodo,
+                "tipo": tipo,
+                "cadena_dependencia": cadena_actual,
+                "nivel": len(cadena_actual) - 1,
+                "axiomas_relacionados": _axiomas_relacionados(nodo),
+            }
+
+        # -------------------------------------------------------
+        # RESOLVER HIJOS
+        # -------------------------------------------------------
+
+        resultados = []
+
+        for dependencia in dependencias:
+            resultados.append(
+                _resolver(
+                    origen,
+                    dependencia,
+                    cadena_actual,
+                    nuevos_visitados,
+                )
+            )
+
+        return {
+            "estado": "RESUELTA",
+            "origen": origen,
+            "id": nodo,
+            "tipo": tipo,
+            "cadena_dependencia": cadena_actual,
+            "nivel": len(cadena_actual) - 1,
+            "axiomas_relacionados": _axiomas_relacionados(nodo),
+            "dependencias": resultados,
         }
-        premisas_faltantes.append(registro)
-        dependencias_no_satisfechas.append({
-            "declaracion": identificador,
-            "dependencias_faltantes": [
-                detalle["id"] for detalle in detalles
-            ],
-            "cadenas_dependencia": [
-                detalle["cadena_dependencia"]
-                for detalle in detalles
-            ],
-            "mensaje": (
-                "La declaración '{0}' contiene dependencias no "
-                "presentes en el corpus.".format(identificador)
-            ),
-        })
-        limites.append({
-            "tipo": "PREMISA_FALTANTE",
-            "declaracion": identificador,
-            "faltantes": detalles,
-            "estado": "NO_DERIVABLE",
-        })
+
     # -----------------------------------------------------------
-    # 9. Registrar ciclos como estructura, NO como error
+    # ANÁLISIS GLOBAL
     # -----------------------------------------------------------
-    ciclos_unicos: Set[tuple] = set()
-    for identificador in sorted(resoluciones):
-        for ciclo in resoluciones[identificador]["ciclos"]:
-            nodos = ciclo[:-1] if (
-                len(ciclo) > 1 and ciclo[0] == ciclo[-1]
-            ) else ciclo
-            clave = tuple(sorted(set(nodos)))
-            if not clave or clave in ciclos_unicos:
-                continue
-            ciclos_unicos.add(clave)
-            ciclo_ordenado = list(ciclo)
-            dependencias_circulares.append({
-                "ciclo": ciclo_ordenado,
-                "nodos": sorted(set(nodos)),
-                "estado": "CERRADA",
-                "valida": all(
-                    nodo in ids_presentes
-                    for nodo in set(nodos)
-                ),
-                "mensaje": (
-                    "Circularidad estructural detectada. "
-                    "La circularidad no constituye por sí misma "
-                    "una contradicción ni una premisa faltante."
-                ),
-            })
+
+    limites: List[Dict[str, Any]] = []
+    dependencias_faltantes: List[Dict[str, Any]] = []
+    circularidades: List[Dict[str, Any]] = []
+    anclajes_faltantes: List[Dict[str, Any]] = []
+
+    for identificador, declaracion in indice.items():
+
+        resultado = _resolver(identificador, identificador)
+
+        encontrados: Set[str] = set()
+
+        def _recorrer(nodo: Dict[str, Any]) -> None:
+
+            estado = nodo.get("estado")
+
+            if estado == "DEPENDENCIA_NO_ENTREGADA":
+                clave = (
+                    nodo["origen"],
+                    nodo["id"],
+                    tuple(nodo["cadena_dependencia"]),
+                )
+
+                if clave not in encontrados:
+                    encontrados.add(clave)
+
+                    dependencias_faltantes.append({
+                        "declaracion": nodo["origen"],
+                        "faltante": nodo["id"],
+                        "tipo": nodo["tipo"],
+                        "cadena_dependencia": nodo["cadena_dependencia"],
+                        "nivel": nodo["nivel"],
+                        "razon": nodo["razon"],
+                        "axiomas_relacionados": nodo[
+                            "axiomas_relacionados"
+                        ],
+                    })
+
+            elif estado == "CIRCULARIDAD_ESTRUCTURAL":
+                circularidades.append({
+                    "declaracion": nodo["origen"],
+                    "ciclo": nodo["ciclo"],
+                    "cadena_dependencia": nodo["cadena_dependencia"],
+                    "nivel": nodo["nivel"],
+                    "estado": "CIRCULARIDAD_ESTRUCTURAL",
+                    "contradiccion": False,
+                })
+
+            for hijo in nodo.get("dependencias", []):
+                _recorrer(hijo)
+
+        _recorrer(resultado)
+
+        # -------------------------------------------------------
+        # ANCLA AXIOMÁTICA
+        # -------------------------------------------------------
+
+        tipo_actual = str(
+            _valor(
+                declaracion,
+                "type",
+                declaracion.get("tipo", ""),
+            )
+        ).lower()
+
+        if tipo_actual != "axioma":
+            axiomas_directos = _axiomas_relacionados(identificador)
+
+            if not axiomas_directos:
+                anclajes_faltantes.append({
+                    "declaracion": identificador,
+                    "tipo": tipo_actual,
+                    "estado": "ANCLA_AXIOMATICA_FALTANTE",
+                    "razon": (
+                        "No se encontró un axioma relacionado "
+                        "directamente en la instantánea disponible."
+                    ),
+                })
+
     # -----------------------------------------------------------
-    # 10. Análisis de polaridad
+    # ELIMINAR DUPLICADOS
     # -----------------------------------------------------------
-    def _clave_proposicional(
-        declaracion: Dict[str, Any],
-    ) -> Optional[tuple]:
-        sujeto = _valor(declaracion, "subject")
-        relacion = _valor(declaracion, "relation")
-        objeto = _valor(declaracion, "object")
-        if sujeto is None and relacion is None and objeto is None:
-            return None
-        return (
-            str(sujeto),
-            str(relacion),
-            str(objeto),
-        )
-    proposiciones: Dict[tuple, Dict[str, List[str]]] = {}
-    for identificador in sorted(indice):
-        declaracion = indice[identificador]
-        clave = _clave_proposicional(declaracion)
-        if clave is None:
-            continue
-        polaridad = _valor(declaracion, "polarity")
+
+    def _unico(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        vistos = set()
+        salida = []
+
+        for item in items:
+            clave = repr(sorted(item.items(), key=lambda x: x[0]))
+
+            if clave not in vistos:
+                vistos.add(clave)
+                salida.append(item)
+
+        return salida
+
+    dependencias_faltantes = _unico(dependencias_faltantes)
+    circularidades = _unico(circularidades)
+    anclajes_faltantes = _unico(anclajes_faltantes)
+
+    # -----------------------------------------------------------
+    # CONTRADICCIONES
+    # -----------------------------------------------------------
+
+    contradicciones: List[Dict[str, Any]] = []
+
+    for identificador, d in indice.items():
+
+        polaridad = _valor(d, "polarity", None)
+
         if polaridad is None:
             continue
-        polaridad = str(polaridad).strip().lower()
-        if polaridad in {
-            "true",
-            "verdadero",
-            "1",
-            "positive",
-            "positivo",
-        }:
-            signo = "positiva"
-        elif polaridad in {
-            "false",
-            "falso",
-            "0",
-            "negative",
-            "negativo",
-        }:
-            signo = "negativa"
-        else:
-            continue
-        if clave not in proposiciones:
-            proposiciones[clave] = {
-                "positiva": [],
-                "negativa": [],
-            }
-        proposiciones[clave][signo].append(
-            identificador
-        )
+
+        relacionadas = [
+            otro
+            for otro_id, otro in indice.items()
+            if otro_id != identificador
+            and _valor(otro, "subject", None)
+            == _valor(d, "subject", None)
+            and _valor(otro, "relation", None)
+            == _valor(d, "relation", None)
+            and _valor(otro, "object", None)
+            == _valor(d, "object", None)
+        ]
+
+        for otra in relacionadas:
+
+            otra_polaridad = _valor(otra, "polarity", None)
+
+            if otra_polaridad is not None and otra_polaridad != polaridad:
+                contradicciones.append({
+                    "declaracion": identificador,
+                    "contradictoria": otra.get("id"),
+                    "polaridad": polaridad,
+                    "polaridad_contraria": otra_polaridad,
+                    "tipo": "CONTRADICCION",
+                })
+
+    contradicciones = _unico(contradicciones)
+
     # -----------------------------------------------------------
-    # 11. Contradicciones explícitas
+    # LÍMITES REALES
     # -----------------------------------------------------------
-    for clave in sorted(proposiciones):
-        datos = proposiciones[clave]
-        positivas = sorted(set(datos["positiva"]))
-        negativas = sorted(set(datos["negativa"]))
-        if not positivas or not negativas:
-            continue
-        contradicciones.append({
-            "sujeto": clave[0],
-            "relacion": clave[1],
-            "objeto": clave[2],
-            "positivas": positivas,
-            "negativas": negativas,
-            "estado": "CONTRADICTORIA",
-            "mensaje": (
-                "La misma proposición estructural aparece con "
-                "polaridades incompatibles."
-            ),
-        })
+
+    for faltante in dependencias_faltantes:
         limites.append({
-            "tipo": "CONTRADICCION",
-            "sujeto": clave[0],
-            "relacion": clave[1],
-            "objeto": clave[2],
-            "positivas": positivas,
-            "negativas": negativas,
-            "estado": "CONTRADICTORIA",
+            "tipo": "DEPENDENCIA_NO_ENTREGADA",
+            "estado": "LIMITE_DE_RESOLUCION",
+            **faltante,
         })
+
+    for ancla in anclajes_faltantes:
+        limites.append({
+            "tipo": "ANCLA_AXIOMATICA_FALTANTE",
+            "estado": "LIMITE_AXIOMATICO",
+            **ancla,
+        })
+
     # -----------------------------------------------------------
-    # 12. Estado determinista de cada declaración
+    # RESULTADO
     # -----------------------------------------------------------
-    estados: Dict[str, Dict[str, Any]] = {}
-    for identificador in sorted(indice):
-        resolucion = resoluciones[identificador]
-        faltantes = sorted(
-            resolucion["faltantes"]
-        )
-        ciclos = resolucion["ciclos"]
-        declaracion = indice[identificador]
-        clave = _clave_proposicional(declaracion)
-        tiene_contradiccion = False
-        if clave is not None and clave in proposiciones:
-            datos = proposiciones[clave]
-            tiene_contradiccion = bool(
-                datos["positiva"] and datos["negativa"]
-            )
-        if tiene_contradiccion:
-            estado = "CONTRADICTORIA"
-        elif faltantes:
-            estado = "NO_DERIVABLE"
-        elif ciclos:
-            estado = "CERRADA"
-        else:
-            estado = "DERIVABLE"
-        estados[identificador] = {
-            "id": identificador,
-            "tipo": _valor(declaracion, "type"),
-            "estado": estado,
-            "dependencias": list(
-                grafo.get(identificador, [])
-            ),
-            "faltantes": [
-                {
-                    "id": faltante_id,
-                    "cadena": resolucion["faltantes"][
-                        faltante_id
-                    ]["cadena"],
-                }
-                for faltante_id in faltantes
-            ],
-            "ciclos": cycles if False else ciclos,
-        }
-    # -----------------------------------------------------------
-    # 13. Alcance
-    # -----------------------------------------------------------
-    total = len(indice)
-    derivables = sum(
-        1
-        for estado in estados.values()
-        if estado["estado"] == "DERIVABLE"
-    )
-    cerradas = sum(
-        1
-        for estado in estados.values()
-        if estado["estado"] == "CERRADA"
-    )
-    no_derivables = sum(
-        1
-        for estado in estados.values()
-        if estado["estado"] == "NO_DERIVABLE"
-    )
-    contradictorias = sum(
-        1
-        for estado in estados.values()
-        if estado["estado"] == "CONTRADICTORIA"
-    )
-    # -----------------------------------------------------------
-    # 14. Estado global
-    # -----------------------------------------------------------
-    if contradictorias:
-        estado_global = "CONTRADICTORIA"
-    elif no_derivables:
-        estado_global = "INCOMPLETA"
-    else:
-        estado_global = "ANCLADA"
-    # -----------------------------------------------------------
-    # 15. Resultado
-    # -----------------------------------------------------------
+
     return {
         "contenedor": NOMBRE_MODULO,
-        "estado": estado_global,
-        "premisas_disponibles": premisas_disponibles,
-        "premisas_faltantes": premisas_faltantes,
-        "dependencias_no_satisfechas": (
-            dependencias_no_satisfechas
-        ),
-        "dependencias_circulares": (
-            dependencias_circulares
-        ),
+
+        "premisas_disponibles": sorted(ids_presentes),
+
+        "dependencias_no_entregadas": dependencias_faltantes,
+
+        "anclajes_axiomaticos_faltantes": anclajes_faltantes,
+
+        "dependencias_circulares": circularidades,
+
         "contradicciones": contradicciones,
-        "estados": estados,
+
         "limites": limites,
+
         "alcance": {
-            "total_declaraciones": total,
-            "derivables": derivables,
-            "cerradas": cerradas,
-            "no_derivables": no_derivables,
-            "contradictorias": contradictorias,
-            "con_dependencias_circulares": len(
-                dependencias_circulares
+            "total_declaraciones": len(indice),
+            "dependencias_no_entregadas": len(
+                dependencias_faltantes
             ),
-            "con_premisas_faltantes": len(
-                premisas_faltantes
+            "anclajes_axiomaticos_faltantes": len(
+                anclajes_faltantes
+            ),
+            "circularidades_estructurales": len(
+                circularidades
+            ),
+            "contradicciones": len(
+                contradicciones
             ),
         },
+
+        "coherente": len(contradicciones) == 0,
+
         "errores_recoleccion": errores,
+
         "nota": (
-            "El límite axiomático identifica el punto exacto "
-            "donde una estructura deja de estar sustentada. "
-            "La circularidad estructural no se considera "
-            "contradicción ni premisa faltante. Una dependencia "
-            "ausente se reporta con su identificador y con la "
-            "cadena transitiva completa. Las contradicciones "
-            "explícitas constituyen el fallo prioritario. "
-            "No se inventan premisas."
+            "El límite axiomático identifica el punto exacto hasta "
+            "el cual puede resolverse una cadena de dependencias "
+            "con la instantánea disponible. Una dependencia no "
+            "entregada no constituye por sí misma una contradicción. "
+            "Una circularidad estructural tampoco constituye por sí "
+            "misma una contradicción. Las contradicciones se "
+            "determinan separadamente mediante incompatibilidad "
+            "de declaraciones."
         ),
     }
 # ===============================================================
-# FIN 7.1
+# FIN VPSI-TRUTH — 7.1 LÍMITE AXIOMÁTICO
 # ===============================================================
- 
+
 # ===============================================================
 # PARTE 8 — CAPACIDADES PÚBLICAS
 # ===============================================================

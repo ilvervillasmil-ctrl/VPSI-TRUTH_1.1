@@ -1885,7 +1885,21 @@ def diagnostico() -> Dict[str, Any]:
 # ===============================================================
 # 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
-
+_CAP_MAP = {
+    "verificar": verificar,
+    "barrer": barrer,
+    "inventario": inventario,
+    "skills": skills,
+    "ids": ids,
+    "por_id": por_id,
+    "listar_archivos": listar_archivos,
+    "verificar_salida": verificar_salida,
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
+    "reporte": reporte,
+    "diagnostico": diagnostico,
+}
 # ===============================================================
 # FIN 10.1
 # ===============================================================

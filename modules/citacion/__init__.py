@@ -1639,7 +1639,34 @@ def resolver(id_decl: str) -> Dict[str, Any]:
 # FIN SECCIÓN 5
 # ===============================================================
 
+# ===============================================================
+# SECCIÓN — CAPACIDAD: VERIFICAR_SALIDA
+# ===============================================================
 
+def verificar_salida(salida: Any) -> bool:
+    """
+    Forma mínima de una salida de CIT.
+    No interpreta contenido semántico.
+    """
+    if not isinstance(salida, dict):
+        return False
+    return (
+        "id" in salida
+        or "coherente" in salida
+        or "ok" in salida
+        or "resuelto" in salida
+        or "declaraciones" in salida
+        or "cadena" in salida
+        or "citas" in salida
+        or "anuncios" in salida
+        or "explicacion" in salida
+        or "registrado" in salida
+        or "operacion" in salida
+    )
+
+# ===============================================================
+# FIN CAPACIDAD: VERIFICAR_SALIDA
+# ===============================================================
 # ===============================================================
 # SECCIÓN 6 — ANUNCIO Y FUNDAMENTACIÓN DOCUMENTAL UNIVERSAL
 # ===============================================================

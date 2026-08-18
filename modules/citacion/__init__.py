@@ -1335,7 +1335,7 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total": "ejecutar_total",
         "inspeccionar": "inspeccionar",
         "registrar_inventario": "registrar_inventario",
-    },
+        },
     },
     # ============================================================
     # METACITAS

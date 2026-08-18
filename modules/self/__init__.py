@@ -1216,7 +1216,46 @@ def registrar_inventario(
 # ===============================================================
 # 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
+# ===============================================================
+# 8.x — REPORTE
+# ===============================================================
 
+def reporte(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Reporte de estado del módulo SF. No diagnostica el sistema."""
+    b = barrer()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "version_contrato": VERSION_CONTRATO,
+        "esquema": ESQUEMA_CONTRATO,
+        "estabilidad": ESTABILIDAD,
+        "estado": (
+            ESTADO_OPERATIVO if b.get("coherente") else ESTADO_DEGRADADO
+        ),
+        "coherente": b.get("coherente"),
+        "capa_activa": b.get("capa_activa"),
+        "altura_operativa": b.get("altura_operativa"),
+        "modo": b.get("modo"),
+        "casa": CASA_SELF,
+        "identidad_disponible": b.get("identidad_disponible"),
+        "n_declaraciones_self": b.get("n_declaraciones_self"),
+        "n_oscilaciones": b.get("n_oscilaciones"),
+        "n_elecciones": b.get("n_elecciones"),
+        "errores": b.get("errores"),
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "operaciones_arquitectonicas": {
+            "ejecutar_total": True,
+            "inspeccionar": True,
+            "registrar_inventario": True,
+        },
+    }
+
+# ===============================================================
+# FIN 8.x
+# ===============================================================
 # ===============================================================
 # 10.1 — VALIDACIÓN DE CONTRATO
 # ===============================================================

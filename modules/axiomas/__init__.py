@@ -1383,11 +1383,6 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # FIN 6.6
 # ===============================================================
 
-Sí. Lo rehacemos como corresponde al VPSI: el módulo no decide que una dependencia circular sea un error; determina si la red de dependencias está anclada, qué elementos faltan y, sobre todo, si existe una contradicción real.
-
-El propio VPSI define la coherencia precisamente en términos de contradicción: una estructura es coherente cuando no permite derivar simultáneamente una proposición y su negación. ACADEMIAEDU-VPSI_Principle_of_Structural_Invariance(2).pdf Además, el documento separa explícitamente las familias A, F, E y TA, y los teoremas T, por lo que el diagnóstico debe conservar el tipo de cada declaración. ACADEMIAEDU-VPSI_Principle_of_Structural_Invariance(2).pdf
-
-Este sería el 7.1 desde cero:
 
 # ===============================================================
 # VPSI-TRUTH — 7.1 — LÍMITE AXIOMÁTICO
@@ -1830,48 +1825,7 @@ def limite_axiomático(
 # ===============================================================
 # FIN 7.1
 # ===============================================================
-
-Hay una corrección pequeña que haría inmediatamente al bloque anterior: esa línea cycles if False else ciclos es innecesaria y no pertenece al diseño final. Debe quedar simplemente:
-
-"ciclos": ciclos,
-
-La lógica importante queda así:
-
-A depende de B
-B depende de C
-C depende de A
-
-→ CERRADA, no error.
-
-A depende de B
-B depende de C
-C depende de X
-X no existe
-
-→ NO_DERIVABLE
-
-y devuelve exactamente:
-
-A → B → C → X
-              ↑
-         FALTA X
-
-Mientras que:
-
-P = verdadero
-P = falso
-
-con la misma tripleta (sujeto, relación, objeto):
-
-→ CONTRADICTORIA.
-
-Eso está alineado con la definición de coherencia del propio VPSI: el problema no es que el grafo tenga retroalimentación, sino que permita simultáneamente una proposición y su negación. ACADEMIAEDU-VPSI_Principle_of_Structural_Invariance(2).pdf
-
-Además, el módulo no presupone que todas las dependencias sean axiomas. Puede encontrar A, F, E, TA, T, etc., porque el propio corpus clasifica esas familias explícitamente. ACADEMIAEDU-VPSI_Principle_of_Structural_Invariance(2).pdf
-
-Hay una última cuestión importante: yo no metería en 7.1 reglas semánticas inventadas para decidir que A5 “debe” depender de A1, A2, etc. El módulo debe descubrir las dependencias que estén declaradas en depende_de. Si una declaración afirma explícitamente una dependencia, 7.1 la sigue; si el ID no está, te dice exactamente cuál falta. La estructura documental de VPSI ya distingue además que la ausencia de Ocontext, por ejemplo, hace que K sea indefinida y no cero; ese tipo de regla específica pertenece a su contrato correspondiente, no debe ser fabricada dentro del resolvedor genérico. ACADEMIAEDU-VPSI_Principle_of_Structural_Invariance(2).pdf
-
-Así 7.1 queda como una pieza genérica, escalable y determinista, pero estrictamente subordinada al corpus VPSI y a sus declaraciones reales.
+ 
 # ===============================================================
 # PARTE 8 — CAPACIDADES PÚBLICAS
 # ===============================================================

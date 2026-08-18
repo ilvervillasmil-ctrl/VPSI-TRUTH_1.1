@@ -13,18 +13,16 @@
 # API Engine:          >=1.0
 #
 # Diagnóstico global por conteo de capacidades.
-# No calcula Tru. No orquesta. No altera evidencia.
-# Sin pesos. Solo conteo determinista.
+# No importa core. No usa pesos. No calcula Tru. No orquesta.
 #
 # Regla por módulo:
 #   total = len(capacidades)
 #   faltantes = no callables
-#   presentes = total - faltantes
 #   OPERATIVO si faltantes == 0 y total > 0
 #   DEGRADADO en cualquier otro caso
 #
 # Regla global:
-#   suma de totales / presentes / faltantes de todos los módulos
+#   suma de totales / presentes / faltantes
 #   coherente si faltantes_global == 0 y total_global > 0
 #
 # ===============================================================
@@ -63,12 +61,13 @@ INVARIANTES = (
     "DGCO no orquesta el ciclo",
     "DGCO no altera evidencia recibida",
     "DGCO diagnostica solo por conteo de capacidades",
+    "DGCO no usa pesos",
     "las capacidades declaradas son callables tras la resolución",
     "este módulo no inventa capacidades no declaradas en CONTENEDOR",
 )
 
 # ===============================================================
-# 2 — EXCEPCIONES Y ESTADO INTERNO
+# 2 — EXCEPCIONES Y ESTADO
 # ===============================================================
 
 class DiagnosticoError(Exception):
@@ -87,8 +86,6 @@ _HISTORIAL: List[Dict[str, Any]] = []
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
-
-    # --- esquema ---
     "esquema": ESQUEMA_CONTRATO,
     "version_contrato": VERSION_CONTRATO,
     "version_modulo": VERSION_MODULO,
@@ -96,16 +93,13 @@ CONTENEDOR: Dict[str, Any] = {
     "compatible_desde": COMPATIBLE_DESDE,
     "api_engine": API_ENGINE,
 
-    # --- identidad ---
     "id": ID_MODULO,
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
     "descripcion": (
         "Diagnóstico global por conteo de capacidades de todos los "
-        "módulos. Solo lectura. No calcula Tru. No orquesta."
+        "módulos. Solo lectura. No calcula Tru. No orquesta. Sin pesos."
     ),
-
-    # --- propósito ---
     "funcion": (
         "Contar capacidades presentes y faltantes por módulo, "
         "sumar el sistema completo y exponer censo/diagnóstico global."
@@ -116,17 +110,14 @@ CONTENEDOR: Dict[str, Any] = {
         "No orquesta el ciclo",
         "No modifica módulos auditados",
         "No altera evidencia recibida",
+        "No importa core.diagnosticoD",
     ],
-
-    # --- autoridad ---
     "autoridad": [
         "Auditar capacidades de cada módulo",
         "Consolidar censo global por conteo",
         "Recibir reportes de módulos",
         "Exponer inventario y diagnóstico propios",
     ],
-
-    # --- conocimiento exportable ---
     "conocimiento_exportable": [
         "censo",
         "verificar",
@@ -140,21 +131,14 @@ CONTENEDOR: Dict[str, Any] = {
         "inspeccionar",
         "registrar_inventario",
     ],
-
-    # --- acceso ---
     "acceso": {
         "nivel": "completo",
         "descripcion": "Acceso total a recursos del módulo",
     },
-
-    # --- dependencias ---
     "requiere": ["*"],
-
-    # --- archivos / esquema ---
     "acceso_archivos": ["*"],
     "validar_esquema": ["*"],
 
-    # --- autoriza engine ---
     "autoriza_engine": {
         "leer": True,
         "ejecutar": True,
@@ -196,7 +180,6 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": True,
     },
 
-    # --- consultas ---
     "consultas_soportadas": [
         "censo",
         "verificar",
@@ -211,7 +194,6 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario",
     ],
 
-    # --- capacidades ---
     "capacidades": {
         "censo": "censo",
         "verificar": "verificar",
@@ -226,7 +208,6 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": "registrar_inventario",
     },
 
-    # --- capacidades meta ---
     "capacidades_meta": {
         "censo": {
             "descripcion": "Censo global por conteo de capacidades.",
@@ -307,7 +288,6 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
 
-    # --- reporting ---
     "reporting": {
         "estado": True,
         "salud": True,
@@ -329,13 +309,12 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": True,
     },
 
-    # --- estados e invariantes ---
     "estados_validos": list(ESTADOS_VALIDOS),
     "invariantes": list(INVARIANTES),
 }
 
 # ===============================================================
-# 4 — PRIVADAS (regla de conteo)
+# 4 — PRIVADAS
 # ===============================================================
 
 def _auditar_capacidades_modulo(cont: Dict[str, Any]) -> Dict[str, Any]:
@@ -441,15 +420,12 @@ def censo(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
         "modulos": resultados,
         "coherente": coherente,
         "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
-        "nota": "DGCO: diagnóstico por conteo de capacidades. Sin pesos.",
+        "nota": "DGCO: diagnóstico por conteo de capacidades. Sin pesos. Sin core.",
     }
 
 
 def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
-    out = censo(engine, **kwargs)
-    if isinstance(out, dict):
-        out = dict(out)
-    return out
+    return censo(engine, **kwargs)
 
 
 def presentar(
@@ -520,7 +496,7 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         ),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "invariantes": list(INVARIANTES),
-        "nota": "DGCO autónomo. Diagnóstico por conteo. Sin pesos.",
+        "nota": "DGCO autónomo. Sin core. Sin pesos.",
     }
 
 
@@ -633,6 +609,10 @@ def registrar_inventario(
         "inventario": inventario(peticion),
     }
 
+
+def barrer_diagnostico(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
+    return censo(engine, **kwargs)
+
 # ===============================================================
 # 6 — RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
@@ -697,10 +677,6 @@ __all__ = [
     "registrar_inventario",
     "barrer_diagnostico",
 ]
-
-
-def barrer_diagnostico(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
-    return censo(engine, **kwargs)
 
 # ===============================================================
 # FIN DEL MÓDULO

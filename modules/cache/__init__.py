@@ -553,7 +553,7 @@ CONTENEDOR: Dict[str, Any] = {
     "CE", "AX", "FO", "MC", "SF",
     "CA", "CX", "DI", "RE", "VX",
     "TX", "CIT", "DGCO", "UI",
-    "CC", "TT", "SC",
+    "CC", "TT", "SC", "CT",
     ],
 
 

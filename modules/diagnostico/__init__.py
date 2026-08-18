@@ -34,6 +34,13 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from core.diagnosticoD import (
+    DiagnosticoGlobal,
+    DiagnosticoError,
+    PESOS,
+    barrer_diagnostico,
+)
+
 # ===============================================================
 # FIN 1.1
 # ===============================================================

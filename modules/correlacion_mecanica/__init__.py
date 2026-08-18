@@ -1537,20 +1537,27 @@ def _validar_contrato_completo(
 
 def barrer() -> Dict[str, Any]:
     """
-    Ejecuta el barrido determinista completo de Correlación Mecánica.
+    Ejecuta el barrido determinista completo del módulo.
 
-    Descubre las MECANICA declaradas en el contenido del módulo,
-    valida su estructura, extrae sus órdenes nativos, construye
-    precedencias, detecta contradicciones, detecta ciclos y resuelve
-    el orden mecánico resultante cuando existe.
+    Descubre todas las MECANICA declaradas en los archivos del módulo,
+    valida su estructura, extrae sus órdenes nativos, construye las
+    precedencias globales, detecta contradicciones y ciclos, resuelve
+    el orden mecánico y construye el mapa causal global a partir de
+    los documentos realmente descubiertos.
 
-    No modifica evidencia, archivos, declaraciones ni otros módulos.
+    El barrido no modifica evidencia, archivos, declaraciones ni otros
+    módulos. No notifica a DiagnosticoGlobal ni comunica directamente
+    con DGCO. Engine consume el informe resultante.
     """
 
+    # -----------------------------------------------------------
+    # 1. DESCUBRIMIENTO COMPLETO
+    # -----------------------------------------------------------
     hallado = _leer()
 
     choques: List[str] = []
     errores: List[str] = []
+
     precede: Dict[Tuple[str, str], List[str]] = {}
 
     if not hallado:
@@ -1559,19 +1566,17 @@ def barrer() -> Dict[str, Any]:
             "MECANICA válida en el contenido del módulo"
         )
 
-        informe = _informe(
+        return _informe(
             mecanica=[],
             choques=choques,
             errores=errores,
             hallado=hallado,
         )
 
-        _notificar_diagnostico(
-            choques=choques,
-            errores=errores,
-        )
-
-        return informe
+    # -----------------------------------------------------------
+    # 2. VALIDACIÓN Y EXTRACCIÓN DE NODOS
+    # -----------------------------------------------------------
+    por_archivo: Dict[str, List[str]] = {}
 
     for archivo, meta in sorted(hallado.items()):
 
@@ -1613,6 +1618,13 @@ def barrer() -> Dict[str, Any]:
         if len(nodos_vistos) != len(nodos):
             continue
 
+        por_archivo[archivo] = nodos
+
+    # -----------------------------------------------------------
+    # 3. PRECEDENCIAS GLOBALES
+    # -----------------------------------------------------------
+    for archivo, nodos in sorted(por_archivo.items()):
+
         relaciones = _precedencias(nodos)
 
         for relacion in relaciones:
@@ -1623,11 +1635,12 @@ def barrer() -> Dict[str, Any]:
             set(precede[relacion])
         )
 
-    relaciones = sorted(precede)
-
+    # -----------------------------------------------------------
+    # 4. CONTRADICCIONES
+    # -----------------------------------------------------------
     contradicciones_vistas: set[Tuple[str, str]] = set()
 
-    for a, b in relaciones:
+    for a, b in sorted(precede):
 
         inversa = (b, a)
 
@@ -1651,6 +1664,9 @@ def barrer() -> Dict[str, Any]:
             f"'{b}' antes de '{a}'"
         )
 
+    # -----------------------------------------------------------
+    # 5. CONSTRUCCIÓN DEL ORDEN MECÁNICO
+    # -----------------------------------------------------------
     universo: set[str] = set()
 
     for a, b in precede:
@@ -1689,6 +1705,70 @@ def barrer() -> Dict[str, Any]:
         mecanica.extend(libres)
         pendientes.difference_update(libres)
 
+    # -----------------------------------------------------------
+    # 6. BARRIDO CAUSAL PROFUNDO
+    # -----------------------------------------------------------
+    #
+    # El mapa causal se construye exclusivamente sobre la evidencia
+    # documental ya descubierta. No crea nodos, IDs ni relaciones
+    # externas a lo declarado por el módulo.
+    #
+    # La información disponible para esta capa es:
+    #
+    #   hallado
+    #   por_archivo
+    #   precede
+    #   mecanica
+    #
+    # Por tanto, esta sección debe utilizar únicamente las estructuras
+    # y declaraciones que el módulo ya expone.
+    #
+    # -----------------------------------------------------------
+
+    causal: Dict[str, Any] = {
+        "archivos": sorted(por_archivo),
+        "nodos": sorted(universo),
+        "precedencias": {
+            f"{a}->{b}": sorted(origenes)
+            for (a, b), origenes in sorted(precede.items())
+        },
+        "orden": list(mecanica),
+    }
+
+    # -----------------------------------------------------------
+    # 7. GRADO CAUSAL
+    # -----------------------------------------------------------
+    grado: Dict[str, Dict[str, Any]] = {}
+
+    for nodo in sorted(universo):
+
+        entrantes = sorted(
+            origen
+            for origen, destino in precede
+            if destino == nodo
+        )
+
+        salientes = sorted(
+            destino
+            for origen, destino in precede
+            if origen == nodo
+        )
+
+        grado[nodo] = {
+            "entrantes": entrantes,
+            "salientes": salientes,
+            "grado_entrante": len(entrantes),
+            "grado_saliente": len(salientes),
+            "grado_total": len(
+                set(entrantes) | set(salientes)
+            ),
+        }
+
+    causal["grado"] = grado
+
+    # -----------------------------------------------------------
+    # 8. INFORME DETERMINISTA
+    # -----------------------------------------------------------
     informe = _informe(
         mecanica=mecanica,
         choques=choques,
@@ -1696,13 +1776,14 @@ def barrer() -> Dict[str, Any]:
         hallado=hallado,
     )
 
-    _notificar_diagnostico(
-        choques=choques,
-        errores=errores,
-    )
+    if isinstance(informe, dict):
+        informe["causal"] = causal
 
     return informe
 
+# ===============================================================
+# FIN BARRER
+# ===============================================================
 
 # ===============================================================
 # 15. VERIFICAR

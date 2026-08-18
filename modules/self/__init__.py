@@ -1027,6 +1027,52 @@ def inventario(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "invariantes": list(cfg.get("invariantes") or []),
     }
 
+# ===============================================================
+# 8.x — DIAGNÓSTICO
+# ===============================================================
+
+def diagnostico(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Problemas y advertencias propios de SF. No diagnostica el sistema."""
+    b = barrer()
+    problemas = list(b.get("errores") or [])
+    advertencias: List[str] = []
+    recomendaciones: List[str] = []
+
+    if not b.get("identidad_disponible"):
+        advertencias.append("identidad axiomática self no disponible")
+        recomendaciones.append(
+            "Verificar cuerpo axiomático self en AX"
+        )
+
+    if b.get("capa_activa") != CASA_SELF:
+        advertencias.append(
+            "Self fuera de casa operativa ({0})".format(
+                b.get("capa_activa")
+            )
+        )
+
+    if not problemas and not advertencias:
+        recomendaciones.append("SF coherente")
+
+    coherente = bool(b.get("coherente"))
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "estado": (
+            ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO
+        ),
+        "problemas": problemas,
+        "advertencias": advertencias,
+        "recomendaciones": recomendaciones,
+        "coherente": coherente,
+        "capa_activa": b.get("capa_activa"),
+        "modo": b.get("modo"),
+        "identidad_disponible": b.get("identidad_disponible"),
+    }
+
+# ===============================================================
+# FIN 8.x
+# ===============================================================
 
 
 # ===============================================================

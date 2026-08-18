@@ -4010,7 +4010,49 @@ def barrer(
 # ===============================================================
 # FIN CAPACIDAD: VERIFICAR
 # ===============================================================
+# ===============================================================
+# SECCIÓN — CAPACIDAD: INVENTARIO
+# ===============================================================
 
+def inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Inventario contractual de CIT.
+    Forma mínima alineada a VPSI-CONTRACT-1.0.
+    No modifica conocimiento declarado.
+    """
+    capacidades = CONTENEDOR.get("capacidades") or {}
+    return {
+        "id": _ID,
+        "nombre": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "version_contrato": _VERSION_CONTRATO,
+        "esquema": _ESQUEMA,
+        "estabilidad": _ESTABILIDAD,
+        "compatible_desde": _COMPATIBLE_DESDE,
+        "api_engine": _API_ENGINE,
+        "capacidades": list(capacidades.keys()),
+        "tipos_declaracion": list(TIPOS_DECLARACION),
+        "relaciones": list(RELACIONES),
+        "campos_obligatorios": list(CAMPOS_OBLIGATORIOS),
+        "campos_opcionales": list(CAMPOS_OPCIONALES),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "conocimiento_exportable": list(
+            CONTENEDOR.get("conocimiento_exportable") or []
+        ),
+        "autoridad": list(CONTENEDOR.get("autoridad") or []),
+        "funcion": CONTENEDOR.get("funcion"),
+        "nota": (
+            "Inventario estructural de CIT. "
+            "No modifica conocimiento declarado."
+        ),
+    }
+
+# ===============================================================
+# FIN CAPACIDAD: INVENTARIO
+# ===============================================================
 # ===============================================================
 # SECCIÓN 8 — INTEGRIDAD CONTRACTUAL DE CAPACIDADES
 # ===============================================================

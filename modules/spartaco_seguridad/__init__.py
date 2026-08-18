@@ -775,26 +775,217 @@ def verificar_salida(salida: Any) -> bool:
         "coherente" in salida or "id" in salida or "recursos" in salida
     )
 
+
+# ===============================================================
+# CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE)
+# ===============================================================
+
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Autoridad total de ENGINE sobre SC.
+    Fuente única: CONTENEDOR["capacidades"].
+    No inventa. No autoinvoca. Todo callable real.
+    """
+    peticion_normalizada = (
+        dict(peticion) if isinstance(peticion, dict) else {}
+    )
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    if not isinstance(capacidades, dict):
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_DEGRADADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": [
+                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] no es dict"
+            ],
+            "resultados": {},
+            "capacidades_declaradas": [],
+        }
+
+    for nombre in sorted(capacidades):
+        if nombre == "ejecutar_total":
+            continue
+        referencia = capacidades[nombre]
+        try:
+            if callable(referencia):
+                fn = referencia
+            elif isinstance(referencia, str):
+                fn = globals().get(referencia)
+                if not callable(fn):
+                    raise ContratoInvalido(
+                        f"'{referencia}' no es callable"
+                    )
+            else:
+                raise ContratoInvalido(
+                    f"tipo inválido: {type(referencia).__name__}"
+                )
+
+            if nombre == "verificar_salida":
+                resultados[nombre] = fn(
+                    peticion_normalizada.get("salida")
+                    if "salida" in peticion_normalizada
+                    else {}
+                )
+            elif nombre in ("inventario", "verificar"):
+                resultados[nombre] = fn(peticion_normalizada)
+            else:
+                resultados[nombre] = fn()
+        except Exception as exc:
+            errores_ejecucion.append(f"{nombre}: {exc}")
+            resultados[nombre] = None
+
+    barrido = resultados.get("barrer")
+    coherente = (
+        isinstance(barrido, dict) and bool(barrido.get("coherente"))
+    )
+    ejecutadas = sorted(
+        n for n, r in resultados.items() if r is not None
+    )
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": (
+            ESTADO_OPERATIVO
+            if coherente and not errores_ejecucion
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": coherente and not errores_ejecucion,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": sorted(capacidades.keys()),
+    }
+
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Inspección estructural de SC.
+    Expone contrato, catálogo y estado sin calcular ni alterar.
+    """
+    b = barrer()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+        },
+        "capacidades_contractuales": sorted(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": sorted(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "integridad": {
+            "coherente": b.get("coherente"),
+            "errores": b.get("errores"),
+            "choques": b.get("choques"),
+            "recursos": b.get("recursos"),
+            "conceptos": b.get("conceptos"),
+            "total_validos": b.get("total_validos"),
+            "archivos": b.get("archivos"),
+        },
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone estructura de SC sin calcular "
+            "ni alterar el contrato ni el árbol."
+        ),
+    }
+
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Instantánea determinista del inventario de SC.
+    No altera evidencia ni el árbol.
+    """
+    inv = inventario(peticion)
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inv,
+        "nota": (
+            "Instantánea determinista del inventario de SC. "
+            "No modifica el árbol ni evidencia."
+        ),
+    }
+
+# ===============================================================
+# FIN CAPACIDADES ARQUITECTÓNICAS
+# ===============================================================
 # ===============================================================
 # FIN CAPACIDADES PÚBLICAS
 # ===============================================================
+# ===============================================================
+# 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# ===============================================================
 
 # ===============================================================
-# EXPORTACIONES + RESOLUCIÓN ESTRICTA DEL CONTRATO
+# 10.1 — MAPA DE CAPACIDADES
 # ===============================================================
 
 _CAP_MAP = {
+    # --- CENTINELA ---
     "verificar": verificar,
     "barrer": barrer,
+    "verificar_salida": verificar_salida,
+
+    # --- INVENTARIO Y REPORTING ---
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
+
+    # --- CATÁLOGO ---
     "catalogo": catalogo,
-    "verificar_salida": verificar_salida,
+
+    # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
 
+# ===============================================================
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Resuelve referencias str → callables reales.
+    MUTA CONTENEDOR["capacidades"] para que Engine reciba callables.
+    """
     resueltas: Dict[str, Any] = {}
     for nombre, ref in cont["capacidades"].items():
         if callable(ref):
@@ -821,9 +1012,26 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
         )
     cont["capacidades"] = resueltas
 
+# ===============================================================
+# FIN 10.2
+# ===============================================================
+
+
+# ===============================================================
+# 10.3 — VALIDAR Y RESOLVER AL IMPORTAR
+# ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# FIN 10.3
+# ===============================================================
+
+
+# ===============================================================
+# 10.4 — EXPORTACIONES
+# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -841,8 +1049,20 @@ __all__ = [
     "diagnostico",
     "catalogo",
     "verificar_salida",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
     "ContratoInvalido",
 ]
+
+# ===============================================================
+# FIN 10.4
+# ===============================================================
+
+# ===============================================================
+# FIN 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
+# ===============================================================
+
 
 # ===============================================================
 # FIN DEL MÓDULO

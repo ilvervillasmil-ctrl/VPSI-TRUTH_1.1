@@ -338,6 +338,7 @@ CONTENEDOR: Dict[str, Any] = {
         # --- PERMISOS OBLIGATORIOS ---
         "validar_esquema": True,
         "acceso_archivos": True,
+        "verificar": True,
 
         # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": True,
@@ -541,6 +542,7 @@ CONTENEDOR: Dict[str, Any] = {
 
         # --- BANDERA DE REPORTE ---
         "reporte": True,
+        "verificar": True,
 
         # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
         "acceso_archivos": True,

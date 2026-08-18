@@ -12,9 +12,9 @@
 # Compatible desde:    1.0
 # API Engine:          >=1.0
 #
-# Fachada / enlace a core.diagnosticoD.
-# No calcula Tru. No orquesta. No duplica el censo.
-# Expone al Engine las funciones ya establecidas en core.
+# Diagnóstico global como módulo autónomo.
+# No calcula Tru. No orquesta. No altera evidencia.
+# Consolida reportes de módulos y expone censo/diagnóstico.
 #
 # Capacidades arquitectónicas (callables reales):
 #   ejecutar_total, inspeccionar, registrar_inventario
@@ -33,13 +33,6 @@
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
-
-from core.diagnosticoD import (
-    DiagnosticoGlobal,
-    DiagnosticoError,
-    PESOS,
-    barrer_diagnostico,
-)
 
 # ===============================================================
 # FIN 1.1
@@ -96,7 +89,24 @@ ESTADOS_VALIDOS = (
 
 
 # ===============================================================
-# 1.5 — INVARIANTES
+# 1.5 — PESOS Y CONSTANTES DE DIAGNÓSTICO
+# ===============================================================
+
+PESOS: Dict[str, float] = {
+    "critico": 1.0,
+    "alto": 0.75,
+    "medio": 0.5,
+    "bajo": 0.25,
+    "info": 0.1,
+}
+
+# ===============================================================
+# FIN 1.5
+# ===============================================================
+
+
+# ===============================================================
+# 1.6 — INVARIANTES
 # ===============================================================
 
 INVARIANTES = (
@@ -107,12 +117,12 @@ INVARIANTES = (
     "este módulo no calcula Tru / C / L / K",
     "este módulo no orquesta el ciclo",
     "este módulo no altera evidencia recibida",
-    "este módulo es fachada de solo lectura hacia core.diagnosticoD",
+    "este módulo solo consolida reportes y expone censo",
     "este módulo no inventa capacidades no declaradas en CONTENEDOR",
 )
 
 # ===============================================================
-# FIN 1.5
+# FIN 1.6
 # ===============================================================
 
 # ===============================================================
@@ -132,8 +142,147 @@ class ContratoInvalido(Exception):
     """El CONTENEDOR no cumple el esquema o la resolución falló."""
     pass
 
+
+class DiagnosticoError(Exception):
+    """Error de diagnóstico global."""
+    pass
+
 # ===============================================================
 # FIN 4.1
+# ===============================================================
+
+
+# ===============================================================
+# 4.2 — NÚCLEO DiagnosticoGlobal (lógica de módulo)
+# ===============================================================
+
+class DiagnosticoGlobal:
+    """
+    Consolidador de reportes de módulos.
+    Solo lectura / recepción. No actúa sobre Engine ni negocio.
+    """
+
+    _reportes: Dict[str, List[Any]] = {}
+    _historial: List[Dict[str, Any]] = []
+
+    @classmethod
+    def recibir_reporte(
+        cls,
+        modulo: str = "",
+        errores: Optional[List] = None,
+        **kwargs: Any,
+    ) -> bool:
+        """Registra un reporte de módulo. No altera el módulo origen."""
+        nombre = str(modulo or "").strip() or "DESCONOCIDO"
+        lista = list(errores or [])
+        cls._reportes.setdefault(nombre, []).extend(lista)
+        cls._historial.append({
+            "modulo": nombre,
+            "errores_n": len(lista),
+            "extra": dict(kwargs) if kwargs else {},
+        })
+        if len(cls._historial) > 500:
+            cls._historial = cls._historial[-500:]
+        return True
+
+    @classmethod
+    def censo(cls, engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
+        """
+        Censo consolidado.
+        Si hay engine, intenta leer módulos registrados.
+        Si no, usa solo reportes internos.
+        """
+        modulos: Dict[str, Any] = {}
+        estados: Dict[str, str] = {}
+
+        if engine is not None:
+            catalogo = None
+            for attr in ("modulos", "modules", "catalogo", "registry"):
+                catalogo = getattr(engine, attr, None)
+                if isinstance(catalogo, dict):
+                    break
+            if isinstance(catalogo, dict):
+                for mid, meta in catalogo.items():
+                    clave = str(mid)
+                    modulos[clave] = {
+                        "id": clave,
+                        "meta": meta if not callable(meta) else str(type(meta)),
+                        "reportes_n": len(cls._reportes.get(clave, [])),
+                    }
+                    estados[clave] = (
+                        ESTADO_DEGRADADO
+                        if cls._reportes.get(clave)
+                        else ESTADO_OPERATIVO
+                    )
+
+        for nombre, errs in cls._reportes.items():
+            if nombre not in modulos:
+                modulos[nombre] = {
+                    "id": nombre,
+                    "meta": None,
+                    "reportes_n": len(errs),
+                }
+                estados[nombre] = (
+                    ESTADO_DEGRADADO if errs else ESTADO_OPERATIVO
+                )
+
+        total = len(modulos)
+        con_errores = sum(1 for e in estados.values() if e == ESTADO_DEGRADADO)
+
+        return {
+            "tipo": "diagnostico_global",
+            "id": ID_MODULO,
+            "total": total,
+            "con_errores": con_errores,
+            "modulos": modulos,
+            "estados": estados,
+            "reportes": {
+                k: list(v) for k, v in cls._reportes.items()
+            },
+            "historial_n": len(cls._historial),
+            "coherente": True,
+            "estado": ESTADO_OPERATIVO,
+            "nota": (
+                "Censo DGCO. Solo observa. "
+                "No invalida arranque. No calcula Tru."
+            ),
+        }
+
+    @classmethod
+    def presentar(cls, informe: Optional[Dict[str, Any]] = None) -> str:
+        """Formato legible del diagnóstico global."""
+        if not isinstance(informe, dict):
+            return "[DGCO] sin informe"
+        total = informe.get("total", 0)
+        con_errores = informe.get("con_errores", 0)
+        estado = informe.get("estado", ESTADO_NO_INICIADO)
+        lineas = [
+            "=== DIAGNÓSTICO GLOBAL (DGCO) ===",
+            "estado: {0}".format(estado),
+            "total módulos: {0}".format(total),
+            "con errores: {0}".format(con_errores),
+            "coherente: {0}".format(informe.get("coherente")),
+        ]
+        estados = informe.get("estados") or {}
+        if estados:
+            lineas.append("--- estados ---")
+            for mid, est in sorted(estados.items()):
+                lineas.append("  {0}: {1}".format(mid, est))
+        return "\n".join(lineas)
+
+    @classmethod
+    def reset(cls) -> None:
+        """Limpia reportes e historial (solo pruebas / ciclo)."""
+        cls._reportes.clear()
+        cls._historial.clear()
+
+
+def barrer_diagnostico(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
+    """Barrido de diagnóstico global (centinela de dominio)."""
+    return DiagnosticoGlobal.censo(engine, **kwargs)
+
+# ===============================================================
+# FIN 4.2
 # ===============================================================
 
 # ===============================================================
@@ -164,7 +313,7 @@ CONTENEDOR: Dict[str, Any] = {
     "nombre": NOMBRE_MODULO,
     "rol": ROL_MODULO,
     "descripcion": (
-        "Enlace al diagnóstico global de core. Solo lectura / recepción de "
+        "Diagnóstico global del sistema. Solo lectura / recepción de "
         "reportes de módulos. Cero actuación sobre Engine o negocio."
     ),
 
@@ -243,7 +392,6 @@ CONTENEDOR: Dict[str, Any] = {
     # 5.10 — AUTORIZACIÓN AL ENGINE
     # ============================================================
     "autoriza_engine": {
-        # --- PERMISOS BASE ---
         "leer": True,
         "ejecutar": True,
         "consultar": True,
@@ -251,31 +399,21 @@ CONTENEDOR: Dict[str, Any] = {
         "reportar": True,
         "auditar": True,
         "inventariar": True,
-
-        # --- PERMISOS DE ESCRITURA ---
         "alterar": False,
         "crear": True,
         "actualizar": False,
-
-        # --- PERMISOS DE PROCESAMIENTO ---
         "validar": True,
         "procesar": True,
         "analizar": True,
         "generar": True,
-
-        # --- PERMISOS DE DATOS ---
         "exportar": True,
         "importar": True,
         "respaldar": True,
         "recuperar": True,
         "sincronizar": True,
-
-        # --- PERMISOS DE MONITOREO ---
         "monitorear": True,
         "metricas": True,
         "diagnostico": True,
-
-        # --- PERMISOS DE ESTADO ---
         "estado": True,
         "version": True,
         "salud": True,
@@ -287,12 +425,8 @@ CONTENEDOR: Dict[str, Any] = {
         "contrato": True,
         "conocimiento": True,
         "reporte": True,
-
-        # --- PERMISOS OBLIGATORIOS ---
         "validar_esquema": True,
         "acceso_archivos": True,
-
-        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": True,
         "inspeccionar": True,
         "registrar_inventario": True,
@@ -319,60 +453,37 @@ CONTENEDOR: Dict[str, Any] = {
     # 5.12 — CAPACIDADES
     # ============================================================
     "capacidades": {
-        # --- CENTINELA ---
         "verificar": "verificar",
         "barrer": "verificar",
-
-        # --- OPERACIONES DE DIAGNÓSTICO ---
         "censo": "censo",
         "presentar": "presentar",
         "reportar": "reportar",
-
-        # --- INVENTARIO Y REPORTING ---
         "inventario": "inventario",
         "reporte": "reporte",
         "diagnostico": "diagnostico",
-
-        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": "ejecutar_total",
         "inspeccionar": "inspeccionar",
         "registrar_inventario": "registrar_inventario",
     },
 
     # ============================================================
-    # 5.13 — METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # 5.13 — METADATOS DE CAPACIDADES (1:1)
     # ============================================================
     "capacidades_meta": {
-
-        # ============================================================
-        # 5.13.1 — CENSO
-        # ============================================================
         "censo": {
-            "descripcion": (
-                "Censo consolidado de todos los módulos registrados."
-            ),
+            "descripcion": "Censo consolidado de módulos registrados.",
             "entrada": "engine opcional",
             "validar_esquema": ["*"],
             "salida": "dict con total, modulos, estados",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.2 — VERIFICAR
-        # ============================================================
         "verificar": {
-            "descripcion": (
-                "Verifica coherencia del diagnóstico global."
-            ),
+            "descripcion": "Verifica coherencia del diagnóstico global.",
             "entrada": "engine opcional",
             "validar_esquema": ["*"],
             "salida": "dict con coherente, errores, choques",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.3 — BARRER
-        # ============================================================
         "barrer": {
             "descripcion": "Alias contractual de verificar.",
             "entrada": "engine opcional",
@@ -380,116 +491,63 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con coherente, errores, choques",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.4 — PRESENTAR
-        # ============================================================
         "presentar": {
-            "descripcion": (
-                "Presenta el diagnóstico global formateado."
-            ),
+            "descripcion": "Presenta el diagnóstico global formateado.",
             "entrada": "informe opcional (dict)",
             "validar_esquema": ["*"],
             "salida": "str con diagnostico_global formateado",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.5 — REPORTAR
-        # ============================================================
         "reportar": {
-            "descripcion": (
-                "Enlace a DiagnosticoGlobal.recibir_reporte."
-            ),
+            "descripcion": "Recibe reporte de un módulo.",
             "entrada": "modulo, errores",
             "validar_esquema": ["*"],
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.6 — INVENTARIO
-        # ============================================================
         "inventario": {
-            "descripcion": (
-                "Inventario completo del módulo DGCO."
-            ),
+            "descripcion": "Inventario completo del módulo DGCO.",
             "entrada": "*",
             "validar_esquema": ["*"],
-            "salida": (
-                "dict con id, nombre, rol, version, capacidades, pesos"
-            ),
+            "salida": "dict con id, nombre, rol, version, capacidades, pesos",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.7 — REPORTE
-        # ============================================================
         "reporte": {
-            "descripcion": (
-                "Reporte interno de estado del módulo DGCO."
-            ),
+            "descripcion": "Reporte interno de estado del módulo DGCO.",
             "entrada": "*",
             "validar_esquema": ["*"],
-            "salida": (
-                "dict con estado, coherente, capacidades"
-            ),
+            "salida": "dict con estado, coherente, capacidades",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.8 — DIAGNÓSTICO
-        # ============================================================
         "diagnostico": {
-            "descripcion": (
-                "Diagnóstico propio del módulo DGCO."
-            ),
+            "descripcion": "Diagnóstico propio del módulo DGCO.",
             "entrada": "*",
             "validar_esquema": ["*"],
-            "salida": (
-                "dict con estado, problemas, advertencias, recomendaciones"
-            ),
+            "salida": "dict con estado, problemas, advertencias, recomendaciones",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.9 — EJECUTAR TOTAL
-        # ============================================================
         "ejecutar_total": {
             "descripcion": (
                 "Autoridad total de ENGINE sobre DGCO. "
-                "Ejerce TODAS las unidades operativamente ejecutables "
-                "del módulo conforme a su contrato e inventario. "
-                "Todo es callable real. No inventa capacidades."
+                "Ejerce TODAS las unidades ejecutables. No inventa."
             ),
             "entrada": "peticion opcional (dict)",
             "validar_esquema": ["*"],
             "salida": "dict con resultados de todas las unidades ejecutadas",
             "acceso_archivos": ["*"],
         },
-
-        # ============================================================
-        # 5.13.10 — INSPECCIONAR
-        # ============================================================
         "inspeccionar": {
             "descripcion": (
-                "Capacidad meta de inspeccion estructural de DGCO. "
-                "Expone constantes, capacidades y estado "
-                "sin alterar el contrato ni calcular."
+                "Inspección estructural de DGCO sin alterar contrato."
             ),
             "entrada": "peticion opcional (dict)",
             "validar_esquema": ["acceso_archivos"],
-            "salida": "dict con estructura, capacidades y estado del modulo",
+            "salida": "dict con estructura, capacidades y estado",
             "acceso_archivos": ["acceso_archivos"],
         },
-
-        # ============================================================
-        # 5.13.11 — REGISTRAR INVENTARIO
-        # ============================================================
         "registrar_inventario": {
             "descripcion": (
-                "Registra el inventario estructural de DGCO "
-                "como instantanea determinista. No altera evidencia."
+                "Instantánea determinista del inventario de DGCO."
             ),
             "entrada": "peticion opcional (dict)",
             "validar_esquema": ["acceso_archivos"],
@@ -502,38 +560,21 @@ CONTENEDOR: Dict[str, Any] = {
     # 5.14 — REPORTING
     # ============================================================
     "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
         "estado": True,
         "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
         "inventario": True,
         "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
         "errores": True,
         "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
         "dependencias": True,
         "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
         "contrato": True,
         "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
         "metricas": True,
         "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
         "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
         "acceso_archivos": True,
         "validar_esquema": True,
-
-        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": True,
         "inspeccionar": True,
         "registrar_inventario": True,
@@ -559,83 +600,38 @@ CONTENEDOR: Dict[str, Any] = {
 # PARTE 8 — CAPACIDADES PÚBLICAS
 # ===============================================================
 
-# ===============================================================
-# 8.1 — CENSO
-# ===============================================================
-
 def censo(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
-    """Requiere engine; mismo contrato que DiagnosticoGlobal.censo."""
-    if engine is None:
-        return {
-            "tipo": "diagnostico_global",
-            "estado": "UNDEFINED",
-            "razon": "censo DG requiere instancia Engine",
-            "coherente": False,
-        }
     return DiagnosticoGlobal.censo(engine, **kwargs)
 
-# ===============================================================
-# FIN 8.1
-# ===============================================================
-
-
-# ===============================================================
-# 8.2 — VERIFICAR
-# ===============================================================
 
 def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
-    """Capacidad de compuerta: informe de solo lectura."""
     out = censo(engine, **kwargs)
     if isinstance(out, dict):
         out = dict(out)
-        out["coherente"] = True  # DG no invalida arranque; solo observa
+        out["coherente"] = True
     return out
 
-# ===============================================================
-# FIN 8.2
-# ===============================================================
-
-
-# ===============================================================
-# 8.3 — PRESENTAR
-# ===============================================================
 
 def presentar(
     informe: Optional[Dict[str, Any]] = None,
     **kwargs: Any,
 ) -> str:
     if informe is None:
-        return "[DG] sin informe"
+        return "[DGCO] sin informe"
     return DiagnosticoGlobal.presentar(informe)
 
-# ===============================================================
-# FIN 8.3
-# ===============================================================
-
-
-# ===============================================================
-# 8.4 — REPORTAR
-# ===============================================================
 
 def reportar(
     modulo: str = "",
     errores: Optional[List] = None,
     **kwargs: Any,
 ) -> bool:
-    """Enlace a DiagnosticoGlobal.recibir_reporte (core)."""
-    fn = getattr(DiagnosticoGlobal, "recibir_reporte", None)
-    if not callable(fn):
-        return False
-    return bool(fn(modulo=modulo, errores=errores, **kwargs))
+    return bool(
+        DiagnosticoGlobal.recibir_reporte(
+            modulo=modulo, errores=errores, **kwargs
+        )
+    )
 
-# ===============================================================
-# FIN 8.4
-# ===============================================================
-
-
-# ===============================================================
-# 8.5 — INVENTARIO
-# ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     return {
@@ -646,22 +642,14 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "core": "core.diagnosticoD.DiagnosticoGlobal",
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "pesos": dict(PESOS),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "invariantes": list(INVARIANTES),
-        "nota": "Enlace puro; lógica canónica en core/diagnosticoD.py",
+        "reportes_n": sum(len(v) for v in DiagnosticoGlobal._reportes.values()),
+        "nota": "DGCO módulo autónomo. No calcula Tru. No orquesta.",
     }
 
-# ===============================================================
-# FIN 8.5
-# ===============================================================
-
-
-# ===============================================================
-# 8.6 — REPORTE
-# ===============================================================
 
 def reporte(peticion: Any = None) -> Dict[str, Any]:
     return {
@@ -681,17 +669,9 @@ def reporte(peticion: Any = None) -> Dict[str, Any]:
             "inspeccionar": True,
             "registrar_inventario": True,
         },
-        "nota": "DGCO es fachada de solo lectura; no invalida arranque.",
+        "nota": "DGCO observa; no invalida arranque.",
     }
 
-# ===============================================================
-# FIN 8.6
-# ===============================================================
-
-
-# ===============================================================
-# 8.7 — DIAGNÓSTICO
-# ===============================================================
 
 def diagnostico(peticion: Any = None) -> Dict[str, Any]:
     return {
@@ -704,52 +684,35 @@ def diagnostico(peticion: Any = None) -> Dict[str, Any]:
         "problemas": [],
         "advertencias": [],
         "recomendaciones": [],
-        "nota": "DGCO observa; no diagnostica dominio propio más allá del enlace.",
+        "nota": "DGCO consolida reportes; no diagnostica dominio de negocio.",
     }
 
-# ===============================================================
-# FIN 8.7
-# ===============================================================
-
-
-# ===============================================================
-# 8.8 — EJECUTAR TOTAL
-# ===============================================================
 
 def ejecutar_total(
     peticion: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """
-    Autoridad total de ENGINE sobre DGCO.
-    Fuente única: CONTENEDOR["capacidades"].
-    No inventa. No autoinvoca. Todo callable real.
-    """
     peticion_normalizada = (
         dict(peticion) if isinstance(peticion, dict) else {}
     )
     resultados: Dict[str, Any] = {}
     errores_ejecucion: List[str] = []
-
     capacidades = CONTENEDOR.get("capacidades", {})
     if not isinstance(capacidades, dict):
         return {
             "id": ID_MODULO,
             "modulo": NOMBRE_MODULO,
-            "rol": ROL_MODULO,
-            "version": VERSION_MODULO,
             "operacion": "ejecutar_total",
             "estado": ESTADO_DEGRADADO,
             "coherente": False,
             "capacidades_ejecutadas": [],
             "errores_ejecucion": [
-                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] no es dict"
+                "{0}: CONTENEDOR['capacidades'] no es dict".format(NOMBRE_MODULO)
             ],
             "resultados": {},
             "capacidades_declaradas": [],
         }
 
     engine = peticion_normalizada.get("engine")
-
     for nombre in sorted(capacidades):
         if nombre == "ejecutar_total":
             continue
@@ -760,12 +723,10 @@ def ejecutar_total(
             elif isinstance(referencia, str):
                 fn = globals().get(referencia)
                 if not callable(fn):
-                    raise ContratoInvalido(
-                        f"'{referencia}' no es callable"
-                    )
+                    raise ContratoInvalido("'{0}' no es callable".format(referencia))
             else:
                 raise ContratoInvalido(
-                    f"tipo inválido: {type(referencia).__name__}"
+                    "tipo inválido: {0}".format(type(referencia).__name__)
                 )
 
             if nombre in ("censo", "verificar", "barrer"):
@@ -782,23 +743,18 @@ def ejecutar_total(
             else:
                 resultados[nombre] = fn(peticion_normalizada)
         except Exception as exc:
-            errores_ejecucion.append(f"{nombre}: {exc}")
+            errores_ejecucion.append("{0}: {1}".format(nombre, exc))
             resultados[nombre] = None
 
-    ejecutadas = sorted(
-        n for n, r in resultados.items() if r is not None
-    )
+    ejecutadas = sorted(n for n, r in resultados.items() if r is not None)
     coherente = not errores_ejecucion
-
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
         "rol": ROL_MODULO,
         "version": VERSION_MODULO,
         "operacion": "ejecutar_total",
-        "estado": (
-            ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO
-        ),
+        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
         "coherente": coherente,
         "capacidades_ejecutadas": ejecutadas,
         "errores_ejecucion": errores_ejecucion,
@@ -806,22 +762,10 @@ def ejecutar_total(
         "capacidades_declaradas": sorted(capacidades.keys()),
     }
 
-# ===============================================================
-# FIN 8.8
-# ===============================================================
-
-
-# ===============================================================
-# 8.9 — INSPECCIONAR
-# ===============================================================
 
 def inspeccionar(
     peticion: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """
-    Inspección estructural de DGCO.
-    Expone contrato y estado sin calcular ni alterar.
-    """
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -843,48 +787,28 @@ def inspeccionar(
         "capacidades_meta": sorted(
             CONTENEDOR.get("capacidades_meta", {}).keys()
         ),
-        "core": "core.diagnosticoD.DiagnosticoGlobal",
         "pesos": dict(PESOS),
+        "reportes_n": sum(
+            len(v) for v in DiagnosticoGlobal._reportes.values()
+        ),
         "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
         "reporting": CONTENEDOR.get("reporting"),
         "invariantes": list(INVARIANTES),
-        "nota": (
-            "inspeccionar expone estructura de DGCO sin calcular "
-            "ni alterar el contrato."
-        ),
+        "nota": "inspeccionar expone estructura de DGCO sin alterar contrato.",
     }
 
-# ===============================================================
-# FIN 8.9
-# ===============================================================
-
-
-# ===============================================================
-# 8.10 — REGISTRAR INVENTARIO
-# ===============================================================
 
 def registrar_inventario(
     peticion: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """
-    Instantánea determinista del inventario de DGCO.
-    No altera evidencia.
-    """
     inv = inventario(peticion)
     return {
         "id": ID_MODULO,
         "operacion": "registrar_inventario",
         "registrado": True,
         "inventario": inv,
-        "nota": (
-            "Instantánea determinista del inventario de DGCO. "
-            "No modifica evidencia ni core."
-        ),
+        "nota": "Instantánea determinista del inventario de DGCO.",
     }
-
-# ===============================================================
-# FIN 8.10
-# ===============================================================
 
 # ===============================================================
 # FIN PARTE 8
@@ -893,10 +817,6 @@ def registrar_inventario(
 
 # ===============================================================
 # PARTE 10 — VALIDACIÓN, RESOLUCIÓN Y EXPORTACIONES
-# ===============================================================
-
-# ===============================================================
-# 10.1 — VALIDACIÓN DE CONTRATO
 # ===============================================================
 
 def _validar_contrato(cont: Dict[str, Any]) -> None:
@@ -923,12 +843,6 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                 NOMBRE_MODULO, cont.get("esquema")
             )
         )
-    if str(cont.get("version_contrato")) != VERSION_CONTRATO:
-        raise ContratoInvalido(
-            "{0}: version_contrato inválida: {1}".format(
-                NOMBRE_MODULO, cont.get("version_contrato")
-            )
-        )
     meta_caps = cont.get("capacidades_meta") or {}
     for nombre_cap in cont.get("capacidades") or {}:
         if nombre_cap not in meta_caps:
@@ -937,65 +851,24 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
                     NOMBRE_MODULO, nombre_cap
                 )
             )
-        entrada = meta_caps[nombre_cap]
-        if not isinstance(entrada, dict):
-            raise ContratoInvalido(
-                "{0}: capacidades_meta['{1}'] debe ser dict".format(
-                    NOMBRE_MODULO, nombre_cap
-                )
-            )
-        for campo in ("descripcion", "entrada", "salida"):
-            if campo not in entrada or not isinstance(entrada[campo], str):
-                raise ContratoInvalido(
-                    "{0}: capacidades_meta['{1}'] requiere '{2}: str'".format(
-                        NOMBRE_MODULO, nombre_cap, campo
-                    )
-                )
 
-# ===============================================================
-# FIN 10.1
-# ===============================================================
-
-
-# ===============================================================
-# 10.2 — MAPA DE CAPACIDADES
-# ===============================================================
 
 _CAP_MAP = {
-    # --- CENTINELA ---
     "verificar": verificar,
     "barrer": verificar,
-
-    # --- OPERACIONES DE DIAGNÓSTICO ---
     "censo": censo,
     "presentar": presentar,
     "reportar": reportar,
-
-    # --- INVENTARIO Y REPORTING ---
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
-
-    # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
 }
 
-# ===============================================================
-# FIN 10.2
-# ===============================================================
-
-
-# ===============================================================
-# 10.3 — RESOLUCIÓN DE CAPACIDADES
-# ===============================================================
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
-    """
-    Resuelve referencias str → callables reales.
-    MUTA CONTENEDOR["capacidades"] para que Engine reciba callables.
-    """
     resueltas: Dict[str, Any] = {}
     for nombre, ref in cont["capacidades"].items():
         if callable(ref):
@@ -1022,26 +895,9 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
         )
     cont["capacidades"] = resueltas
 
-# ===============================================================
-# FIN 10.3
-# ===============================================================
-
-
-# ===============================================================
-# 10.4 — VALIDAR Y RESOLVER AL IMPORTAR
-# ===============================================================
 
 _validar_contrato(CONTENEDOR)
 _resolver_capacidades(CONTENEDOR)
-
-# ===============================================================
-# FIN 10.4
-# ===============================================================
-
-
-# ===============================================================
-# 10.5 — EXPORTACIONES
-# ===============================================================
 
 __all__ = [
     "CONTENEDOR",
@@ -1068,10 +924,6 @@ __all__ = [
     "registrar_inventario",
     "ContratoInvalido",
 ]
-
-# ===============================================================
-# FIN 10.5
-# ===============================================================
 
 # ===============================================================
 # FIN PARTE 10

@@ -102,7 +102,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from core.diagnosticoD import (
+from core.diagnostics import (
     DiagnosticoGlobal,
     DiagnosticoError,
     PESOS,

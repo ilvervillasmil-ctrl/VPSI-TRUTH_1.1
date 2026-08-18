@@ -547,15 +547,7 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": "registrar_inventario",
     },
 
-        # =======================================================
-        # CAPACIDADES ARQUITECTÓNICAS DE ENGINE
-        # =======================================================
-
-        "ejecutar_total": ejecutar_total,
-        "inspeccionar": inspeccionar,
-        "registrar_inventario": registrar_inventario,
-    },
-
+    
 
     # ===========================================================
     # 3.15 — CAPACIDADES META

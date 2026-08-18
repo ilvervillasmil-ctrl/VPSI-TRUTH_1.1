@@ -1384,10 +1384,6 @@ def _validar_contrato(cont: Dict[str, Any]) -> None:
 # ===============================================================
 
 # ===============================================================
-# PARTE 7 — LÍMITE AXIOMÁTICO
-# ===============================================================
-
-# ===============================================================
 # 7.1 — LÍMITE AXIOMÁTICO
 # ===============================================================
 
@@ -1397,148 +1393,259 @@ def limite_axiomático(
     errores: Optional[List[Dict]] = None,
 ) -> Dict[str, Any]:
     """
-    Determina el límite de derivación axiomática.
-    CORRECCIONES 9, 10, 27:
-    - resolución transitiva de dependencias
-    - detección de ciclos de cualquier longitud
-    - estados: NO_DERIVABLE, PREMISA_FALTANTE, CIRCULAR
+    Determina el límite axiomático de las declaraciones recolectadas.
+
+    PRINCIPIO:
+    Una declaración solo puede considerarse derivable hasta donde sus
+    dependencias declaradas estén disponibles y no exista una dependencia
+    circular.
+
+    Esta función:
+    - trabaja sobre la instantánea recibida o recolecta una nueva;
+    - no inventa premisas;
+    - no modifica declaraciones;
+    - no interpreta el contenido matemático de las declaraciones;
+    - resuelve dependencias de forma transitiva;
+    - detecta ciclos de cualquier longitud;
+    - distingue ausencia de premisa de circularidad;
+    - conserva los errores de recolección;
+    - informa exclusivamente el límite estructural de derivación.
     """
 
     # -----------------------------------------------------------
-    # Si no se recibe una instantánea, se recolecta una nueva
+    # 1. Obtener la instantánea de declaraciones
     # -----------------------------------------------------------
     if decls is None or errores is None:
         decls, errores = recolectar(declaraciones_externas)
 
-    # -----------------------------------------------------------
-    # Conjuntos de trabajo
-    # -----------------------------------------------------------
-    ids_presentes: Set[str] = {d["id"] for d in decls}
-    premisas_disponibles: List[str] = sorted(ids_presentes)
-    premisas_faltantes: List[Dict[str, Any]] = []
-    dependencias_no_satisfechas: List[Dict[str, Any]] = []
-    dependencias_circulares: List[Dict[str, Any]] = []
-    limites: List[Dict[str, Any]] = []
+    decls = list(decls or [])
+    errores = list(errores or [])
 
     # -----------------------------------------------------------
-    # Grafo de dependencias:
-    # cada declaración apunta a las que necesita (depende_de)
+    # 2. Índice de declaraciones presentes
     # -----------------------------------------------------------
-    grafo: Dict[str, List[str]] = {
-        d["id"]: list(d.get("depende_de") or []) for d in decls
+    por_id: Dict[str, Dict[str, Any]] = {
+        d["id"]: d for d in decls if isinstance(d, dict) and "id" in d
     }
 
-    # -----------------------------------------------------------
-    # Detección de ciclos de cualquier longitud (CORRECCIÓN 10)
-    # Usa DFS para encontrar ciclos en el grafo
-    # -----------------------------------------------------------
-    def _detectar_ciclos() -> List[List[str]]:
-        ciclos: List[List[str]] = []
-        visitado: Set[str] = set()
-        stack: List[str] = []
-        en_stack: Set[str] = set()
+    ids_presentes: Set[str] = set(por_id)
 
-        def dfs(nodo: str) -> None:
-            visitado.add(nodo)
-            stack.append(nodo)
-            en_stack.add(nodo)
-            for vecino in grafo.get(nodo, []):
-                if vecino not in grafo:
-                    continue
-                if vecino not in visitado:
-                    dfs(vecino)
-                elif vecino in en_stack:
-                    idx = stack.index(vecino)
-                    ciclo = stack[idx:] + [vecino]
-                    ciclo_norm = tuple(sorted(set(ciclo[:-1])))
-                    if ciclo_norm and ciclo_norm not in {
-                        tuple(sorted(set(c[:-1]))) for c in ciclos
-                    }:
-                        ciclos.append(ciclo)
-            stack.pop()
-            en_stack.discard(nodo)
-
-        for n in list(grafo.keys()):
-            if n not in visitado:
-                dfs(n)
-        return ciclos
+    premisas_disponibles: List[str] = sorted(ids_presentes)
 
     # -----------------------------------------------------------
-    # Registrar cada ciclo encontrado
+    # 3. Grafo axiomático
+    #
+    # Cada declaración D declara de qué otras declaraciones depende.
+    # No se agregan dependencias implícitas.
     # -----------------------------------------------------------
-    for ciclo in _detectar_ciclos():
+    grafo: Dict[str, List[str]] = {}
+
+    for declaracion_id, declaracion in por_id.items():
+        dependencias = declaracion.get("depende_de") or []
+
+        if isinstance(dependencias, str):
+            dependencias = [dependencias]
+
+        grafo[declaracion_id] = [
+            dep for dep in dependencias
+            if isinstance(dep, str) and dep
+        ]
+
+    # -----------------------------------------------------------
+    # 4. Detección de ciclos
+    #
+    # El ciclo es una propiedad del grafo, no una premisa faltante.
+    # Se registra cada componente circular una sola vez.
+    # -----------------------------------------------------------
+    ciclos_encontrados: List[List[str]] = []
+    ciclos_normalizados: Set[tuple] = set()
+
+    estado_dfs: Dict[str, int] = {}
+    pila: List[str] = []
+    posicion_pila: Dict[str, int] = {}
+
+    def _dfs_ciclo(nodo: str) -> None:
+        estado_dfs[nodo] = 1
+        posicion_pila[nodo] = len(pila)
+        pila.append(nodo)
+
+        for dependencia in grafo.get(nodo, []):
+            if dependencia not in grafo:
+                continue
+
+            estado = estado_dfs.get(dependencia, 0)
+
+            if estado == 0:
+                _dfs_ciclo(dependencia)
+
+            elif estado == 1:
+                inicio = posicion_pila[dependencia]
+                ciclo = pila[inicio:] + [dependencia]
+
+                miembros = tuple(sorted(set(ciclo[:-1])))
+
+                if miembros and miembros not in ciclos_normalizados:
+                    ciclos_normalizados.add(miembros)
+                    ciclos_encontrados.append(ciclo)
+
+        pila.pop()
+        posicion_pila.pop(nodo, None)
+        estado_dfs[nodo] = 2
+
+    for declaracion_id in grafo:
+        if estado_dfs.get(declaracion_id, 0) == 0:
+            _dfs_ciclo(declaracion_id)
+
+    # -----------------------------------------------------------
+    # 5. Conjunto de declaraciones afectadas por circularidad
+    # -----------------------------------------------------------
+    ids_circulares: Set[str] = {
+        nodo
+        for ciclo in ciclos_encontrados
+        for nodo in ciclo[:-1]
+    }
+
+    dependencias_circulares: List[Dict[str, Any]] = []
+
+    for ciclo in ciclos_encontrados:
         dependencias_circulares.append({
             "ciclo": ciclo,
-            "mensaje": "Dependencia circular: {0}".format(" → ".join(ciclo)),
-        })
-        limites.append({
-            "tipo": "CIRCULAR",
-            "ciclo": ciclo,
-            "estado": "CIRCULAR",
+            "declaraciones": sorted(set(ciclo[:-1])),
+            "mensaje": (
+                "Dependencia circular: {0}".format(
+                    " → ".join(ciclo)
+                )
+            ),
         })
 
     # -----------------------------------------------------------
-    # Resolución transitiva de premisas faltantes (CORRECCIÓN 9)
+    # 6. Resolución transitiva de dependencias faltantes
+    #
+    # IMPORTANTE:
+    # El conjunto 'camino' representa solamente la rama actual.
+    # No se utiliza un conjunto global de visitados que pueda ocultar
+    # dependencias legítimas de otra rama.
+    #
+    # La circularidad ya fue determinada estructuralmente arriba.
     # -----------------------------------------------------------
-    def _premisas_transitivas(
-        start: str, vistos: Optional[Set[str]] = None
+    def _resolver_faltantes(
+        inicio: str,
+        camino: Optional[Set[str]] = None,
     ) -> Set[str]:
-        if vistos is None:
-            vistos = set()
-        if start in vistos:
+
+        camino_actual: Set[str] = set(camino or ())
+
+        if inicio in camino_actual:
             return set()
-        vistos.add(start)
+
+        camino_actual.add(inicio)
+
         faltantes: Set[str] = set()
-        for dep in grafo.get(start, []):
-            if dep not in ids_presentes:
-                faltantes.add(dep)
-            else:
-                faltantes |= _premisas_transitivas(dep, vistos)
+
+        for dependencia in grafo.get(inicio, []):
+            if dependencia not in ids_presentes:
+                faltantes.add(dependencia)
+                continue
+
+            if dependencia in ids_circulares:
+                continue
+
+            faltantes.update(
+                _resolver_faltantes(
+                    dependencia,
+                    camino_actual,
+                )
+            )
+
         return faltantes
 
     # -----------------------------------------------------------
-    # Revisar cada declaración y registrar premisas faltantes
+    # 7. Clasificación de cada declaración
     # -----------------------------------------------------------
-    for d in decls:
-        faltantes = sorted(_premisas_transitivas(d["id"]))
-        if faltantes:
-            premisas_faltantes.append({
-                "declaracion": d["id"],
-                "tipo": d["tipo"],
-                "premisas_faltantes": faltantes,
-                "ubicacion": ref(d),
+    premisas_faltantes: List[Dict[str, Any]] = []
+    dependencias_no_satisfechas: List[Dict[str, Any]] = []
+    limites: List[Dict[str, Any]] = []
+
+    ids_no_derivables: Set[str] = set()
+
+    for declaracion_id in sorted(por_id):
+        declaracion = por_id[declaracion_id]
+
+        # -------------------------------------------------------
+        # Circularidad: tiene prioridad estructural.
+        # -------------------------------------------------------
+        if declaracion_id in ids_circulares:
+            limites.append({
+                "tipo": "CIRCULAR",
+                "declaracion": declaracion_id,
+                "estado": "CIRCULAR",
+                "ubicacion": ref(declaracion),
             })
+            continue
+
+        # -------------------------------------------------------
+        # Dependencias ausentes, incluyendo las transitivas.
+        # -------------------------------------------------------
+        faltantes = sorted(
+            _resolver_faltantes(declaracion_id)
+        )
+
+        if faltantes:
+            ids_no_derivables.add(declaracion_id)
+
+            premisas_faltantes.append({
+                "declaracion": declaracion_id,
+                "tipo": declaracion.get("tipo"),
+                "premisas_faltantes": faltantes,
+                "ubicacion": ref(declaracion),
+            })
+
             dependencias_no_satisfechas.append({
-                "declaracion": d["id"],
+                "declaracion": declaracion_id,
                 "dependencias_faltantes": faltantes,
                 "mensaje": (
-                    "La declaración '{0}' depende transitivamente de premisas "
-                    "no presentes: {1}".format(d["id"], faltantes)
+                    "La declaración '{0}' depende de premisas no "
+                    "presentes: {1}".format(
+                        declaracion_id,
+                        faltantes,
+                    )
                 ),
             })
+
             limites.append({
                 "tipo": "PREMISA_FALTANTE",
-                "declaracion": d["id"],
+                "declaracion": declaracion_id,
                 "premisas_faltantes": faltantes,
                 "estado": "NO_DERIVABLE",
+                "ubicacion": ref(declaracion),
             })
 
     # -----------------------------------------------------------
-    # Resumen de alcance
+    # 8. Estados estructurales por declaración
+    #
+    # Una declaración solo cuenta como satisfecha si:
+    # - existe;
+    # - no pertenece a un ciclo;
+    # - no depende transitivamente de una premisa ausente.
+    # -----------------------------------------------------------
+    ids_satisfechos: Set[str] = (
+        ids_presentes
+        - ids_circulares
+        - ids_no_derivables
+    )
+
+    # -----------------------------------------------------------
+    # 9. Resumen de alcance
     # -----------------------------------------------------------
     alcance = {
-        "total_declaraciones": len(decls),
-        "con_dependencias_satisfechas": (
-            len(decls)
-            - len(dependencias_no_satisfechas)
-            - len(dependencias_circulares)
-        ),
+        "total_declaraciones": len(ids_presentes),
+        "con_dependencias_satisfechas": len(ids_satisfechos),
         "con_premisas_faltantes": len(premisas_faltantes),
-        "con_dependencias_circulares": len(dependencias_circulares),
+        "con_dependencias_circulares": len(ids_circulares),
     }
 
     # -----------------------------------------------------------
-    # Resultado final
+    # 10. Resultado final
     # -----------------------------------------------------------
     return {
         "contenedor": NOMBRE_MODULO,
@@ -1551,11 +1658,15 @@ def limite_axiomático(
         "errores_recoleccion": errores,
         "nota": (
             "Límite axiomático ≠ contradicción. "
-            "Si falta una premisa requerida (incluso transitiva), se declara el límite. "
-            "No se inventan premisas."
+            "Una premisa ausente establece un límite de derivación; "
+            "una dependencia circular establece circularidad. "
+            "Las premisas no se inventan ni se sustituyen."
         ),
     }
 
+# ===============================================================
+# FIN 7.1
+# ===============================================================
 # ===============================================================
 # FIN 7.1
 # ===============================================================

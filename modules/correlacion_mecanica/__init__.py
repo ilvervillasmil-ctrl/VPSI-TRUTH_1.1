@@ -1532,38 +1532,51 @@ def _validar_contrato_completo(
 
 
 # ===============================================================
-# 14. BARRER
+# 16. BARRER
 # ===============================================================
 
 def barrer() -> Dict[str, Any]:
     """
-    Ejecuta el barrido estructural y mecánico completo del módulo.
+    Ejecuta el barrido determinista completo del módulo.
 
-    Descubre todos los archivos *.py internos, inspecciona sus
-    componentes estructurales, conserva las MECANICA declaradas,
-    construye precedencias, dependencias estructurales y grafo
-    mecánico, detecta contradicciones y ciclos y determina el
-    orden mecánico resultante cuando existe.
+    Descubre todas las MECANICA declaradas en los archivos del módulo,
+    valida su estructura, extrae sus órdenes nativos, construye las
+    precedencias globales, detecta contradicciones y ciclos, resuelve
+    el orden mecánico y construye el mapa causal global a partir de
+    los documentos realmente descubiertos.
 
-    No modifica archivos.
-    No modifica declaraciones.
-    No modifica inventario.
-    No ejecuta componentes.
-    No notifica a DiagnosticoGlobal.
-    No habla con DGCO.
-    Engine recibe el resultado y decide su utilización.
+    El barrido no modifica evidencia, archivos, declaraciones ni otros
+    módulos. No notifica a DiagnosticoGlobal ni comunica directamente
+    con DGCO. Engine consume el informe resultante.
     """
 
+    # -----------------------------------------------------------
+    # 1. DESCUBRIMIENTO COMPLETO
+    # -----------------------------------------------------------
     hallado = _leer()
 
     choques: List[str] = []
     errores: List[str] = []
 
-    # -----------------------------------------------------------
-    # 1. INVENTARIO ESTRUCTURAL DEL CONTENIDO PY
-    # -----------------------------------------------------------
+    precede: Dict[Tuple[str, str], List[str]] = {}
 
-    estructura: Dict[str, Dict[str, Any]] = {}
+    if not hallado:
+        errores.append(
+            f"{NOMBRE_MODULO}: no se encontró ninguna declaración "
+            "MECANICA válida en el contenido del módulo"
+        )
+
+        return _informe(
+            mecanica=[],
+            choques=choques,
+            errores=errores,
+            hallado=hallado,
+        )
+
+    # -----------------------------------------------------------
+    # 2. VALIDACIÓN Y EXTRACCIÓN DE NODOS
+    # -----------------------------------------------------------
+    por_archivo: Dict[str, List[str]] = {}
 
     for archivo, meta in sorted(hallado.items()):
 
@@ -1605,178 +1618,27 @@ def barrer() -> Dict[str, Any]:
         if len(nodos_vistos) != len(nodos):
             continue
 
-        estructura[archivo] = {
-            "nodos": list(nodos),
-            "precedencias": list(_precedencias(nodos)),
-        }
+        por_archivo[archivo] = nodos
 
     # -----------------------------------------------------------
-    # 2. DESCUBRIMIENTO DE TODOS LOS *.PY INTERNOS
+    # 3. PRECEDENCIAS GLOBALES
     # -----------------------------------------------------------
+    for archivo, nodos in sorted(por_archivo.items()):
 
-    archivos_py: List[str] = []
+        relaciones = _precedencias(nodos)
 
-    try:
-        raiz = Path(__file__).resolve().parent
-
-        for ruta in sorted(raiz.rglob("*.py")):
-
-            if not ruta.is_file():
-                continue
-
-            try:
-                relativo = ruta.relative_to(raiz)
-            except ValueError:
-                continue
-
-            archivos_py.append(str(relativo))
-
-    except Exception as exc:
-
-        errores.append(
-            f"{NOMBRE_MODULO}: error durante descubrimiento "
-            f"estructural de *.py: {exc}"
-        )
-
-    # -----------------------------------------------------------
-    # 3. MAPA DE COMPONENTES POR ARCHIVO
-    # -----------------------------------------------------------
-
-    componentes: Dict[str, Dict[str, List[str]]] = {}
-
-    for archivo in archivos_py:
-
-        ruta = raiz / archivo
-
-        funciones: List[str] = []
-        clases: List[str] = []
-        constantes: List[str] = []
-        imports: List[str] = []
-
-        try:
-
-            contenido = ruta.read_text(
-                encoding="utf-8"
-            )
-
-            arbol = ast.parse(
-                contenido,
-                filename=str(ruta)
-            )
-
-            for nodo in ast.walk(arbol):
-
-                if isinstance(
-                    nodo,
-                    (ast.FunctionDef, ast.AsyncFunctionDef)
-                ):
-                    funciones.append(nodo.name)
-
-                elif isinstance(nodo, ast.ClassDef):
-                    clases.append(nodo.name)
-
-                elif isinstance(nodo, ast.Import):
-                    for alias in nodo.names:
-                        imports.append(alias.name)
-
-                elif isinstance(nodo, ast.ImportFrom):
-                    modulo = nodo.module or ""
-                    imports.append(modulo)
-
-                elif isinstance(nodo, ast.Assign):
-
-                    for objetivo in nodo.targets:
-
-                        if isinstance(
-                            objetivo,
-                            ast.Name
-                        ):
-                            nombre = objetivo.id
-
-                            if nombre.isupper():
-                                constantes.append(nombre)
-
-            componentes[archivo] = {
-                "funciones": sorted(set(funciones)),
-                "clases": sorted(set(clases)),
-                "constantes": sorted(set(constantes)),
-                "imports": sorted(set(imports)),
-            }
-
-        except Exception as exc:
-
-            errores.append(
-                f"{archivo}: error estructural: {exc}"
-            )
-
-            componentes[archivo] = {
-                "funciones": [],
-                "clases": [],
-                "constantes": [],
-                "imports": [],
-            }
-
-    # -----------------------------------------------------------
-    # 4. DEPENDENCIAS ESTRUCTURALES ENTRE ARCHIVOS
-    # -----------------------------------------------------------
-
-    dependencias: Dict[str, List[str]] = {}
-
-    nombres_archivos = {
-        Path(archivo).stem: archivo
-        for archivo in archivos_py
-    }
-
-    for archivo, datos in componentes.items():
-
-        dependencias[archivo] = []
-
-        for importado in datos["imports"]:
-
-            nombre = importado.split(".")[-1]
-
-            if nombre in nombres_archivos:
-
-                destino = nombres_archivos[nombre]
-
-                if destino != archivo:
-                    dependencias[archivo].append(destino)
-
-        dependencias[archivo] = sorted(
-            set(dependencias[archivo])
-        )
-
-    # -----------------------------------------------------------
-    # 5. PRECEDENCIAS MECÁNICAS DECLARADAS
-    # -----------------------------------------------------------
-
-    precede: Dict[
-        Tuple[str, str],
-        List[str]
-    ] = {}
-
-    for archivo, datos in sorted(estructura.items()):
-
-        for relacion in datos["precedencias"]:
-
-            precede.setdefault(
-                relacion,
-                []
-            ).append(archivo)
+        for relacion in relaciones:
+            precede.setdefault(relacion, []).append(archivo)
 
     for relacion in sorted(precede):
-
         precede[relacion] = sorted(
             set(precede[relacion])
         )
 
     # -----------------------------------------------------------
-    # 6. CONTRADICCIONES DIRECTAS
+    # 4. CONTRADICCIONES
     # -----------------------------------------------------------
-
-    contradicciones_vistas: set[
-        Tuple[str, str]
-    ] = set()
+    contradicciones_vistas: set[Tuple[str, str]] = set()
 
     for a, b in sorted(precede):
 
@@ -1785,87 +1647,31 @@ def barrer() -> Dict[str, Any]:
         if inversa not in precede:
             continue
 
-        par = tuple(
-            sorted((a, b))
-        )
+        par = tuple(sorted((a, b)))
 
         if par in contradicciones_vistas:
             continue
 
         contradicciones_vistas.add(par)
 
+        origen_directo = precede[(a, b)]
+        origen_inverso = precede[(b, a)]
+
         choques.append(
             f"nodo '{a}'/'{b}': "
-            f"{precede[(a, b)]} establece "
-            f"'{a}' antes de '{b}', "
-            f"mientras {precede[(b, a)]} establece "
+            f"{origen_directo} establece '{a}' antes de '{b}', "
+            f"mientras {origen_inverso} establece "
             f"'{b}' antes de '{a}'"
         )
 
     # -----------------------------------------------------------
-    # 7. UNIVERSO DEL GRAFO MECÁNICO
+    # 5. CONSTRUCCIÓN DEL ORDEN MECÁNICO
     # -----------------------------------------------------------
-
     universo: set[str] = set()
 
     for a, b in precede:
-
         universo.add(a)
         universo.add(b)
-
-    # -----------------------------------------------------------
-    # 8. CONSTRUCCIÓN DEL GRAFO
-    # -----------------------------------------------------------
-
-    grafo: Dict[str, List[str]] = {
-        nodo: []
-        for nodo in sorted(universo)
-    }
-
-    for a, b in sorted(precede):
-
-        if (b, a) in precede:
-            continue
-
-        grafo[a].append(b)
-
-    for nodo in grafo:
-        grafo[nodo] = sorted(
-            set(grafo[nodo])
-        )
-
-    # -----------------------------------------------------------
-    # 9. GRADO MECÁNICO
-    # -----------------------------------------------------------
-
-    grado: Dict[str, Dict[str, Any]] = {}
-
-    for nodo in sorted(grafo):
-
-        salientes = list(
-            grafo[nodo]
-        )
-
-        entrantes = sorted(
-            origen
-            for origen, destinos in grafo.items()
-            if nodo in destinos
-        )
-
-        grado[nodo] = {
-            "entrantes": entrantes,
-            "salientes": salientes,
-            "grado_entrada": len(entrantes),
-            "grado_salida": len(salientes),
-            "grado_total": (
-                len(entrantes) +
-                len(salientes)
-            ),
-        }
-
-    # -----------------------------------------------------------
-    # 10. RESOLUCIÓN DEL ORDEN MECÁNICO
-    # -----------------------------------------------------------
 
     pendientes = set(universo)
     mecanica: List[str] = []
@@ -1876,10 +1682,7 @@ def barrer() -> Dict[str, Any]:
             nodo
             for nodo in pendientes
             if not any(
-                (
-                    origen,
-                    nodo
-                ) in precede
+                (origen, nodo) in precede
                 for origen in pendientes
                 if origen != nodo
             )
@@ -1887,68 +1690,85 @@ def barrer() -> Dict[str, Any]:
 
         if not libres:
 
-            ciclo = sorted(
-                pendientes
-            )
+            ciclo = sorted(pendientes)
 
             choques.append(
                 f"nodos {ciclo}: "
-                "la secuencia contiene un ciclo "
-                "de precedencia; no existe orden "
-                "mecánico válido"
+                "la secuencia contiene un ciclo de precedencia; "
+                "no existe orden mecánico válido"
             )
 
             mecanica = []
             pendientes.clear()
             break
 
-        mecanica.extend(
-            libres
-        )
-
-        pendientes.difference_update(
-            libres
-        )
+        mecanica.extend(libres)
+        pendientes.difference_update(libres)
 
     # -----------------------------------------------------------
-    # 11. ARCHIVOS AISLADOS DEL GRAFO
+    # 6. BARRIDO CAUSAL PROFUNDO
+    # -----------------------------------------------------------
+    #
+    # El mapa causal se construye exclusivamente sobre la evidencia
+    # documental ya descubierta. No crea nodos, IDs ni relaciones
+    # externas a lo declarado por el módulo.
+    #
+    # La información disponible para esta capa es:
+    #
+    #   hallado
+    #   por_archivo
+    #   precede
+    #   mecanica
+    #
+    # Por tanto, esta sección debe utilizar únicamente las estructuras
+    # y declaraciones que el módulo ya expone.
+    #
     # -----------------------------------------------------------
 
-    archivos_con_mecanica = set(
-        estructura.keys()
-    )
-
-    archivos_sin_mecanica = sorted(
-        set(archivos_py)
-        - archivos_con_mecanica
-    )
-
-    # -----------------------------------------------------------
-    # 12. MAPA COMPLETO DEL BARRIDO
-    # -----------------------------------------------------------
-
-    mapa = {
-        "archivos_py": sorted(
-            archivos_py
-        ),
-        "componentes": componentes,
-        "dependencias": dependencias,
-        "mecanica_declarada": estructura,
+    causal: Dict[str, Any] = {
+        "archivos": sorted(por_archivo),
+        "nodos": sorted(universo),
         "precedencias": {
-            f"{a}->{b}": origen
-            for (a, b), origen
-            in sorted(precede.items())
+            f"{a}->{b}": sorted(origenes)
+            for (a, b), origenes in sorted(precede.items())
         },
-        "grafo": grafo,
-        "grado": grado,
-        "archivos_sin_mecanica": archivos_sin_mecanica,
-        "orden_mecanico": mecanica,
+        "orden": list(mecanica),
     }
 
     # -----------------------------------------------------------
-    # 13. INFORME CONTRACTUAL
+    # 7. GRADO CAUSAL
     # -----------------------------------------------------------
+    grado: Dict[str, Dict[str, Any]] = {}
 
+    for nodo in sorted(universo):
+
+        entrantes = sorted(
+            origen
+            for origen, destino in precede
+            if destino == nodo
+        )
+
+        salientes = sorted(
+            destino
+            for origen, destino in precede
+            if origen == nodo
+        )
+
+        grado[nodo] = {
+            "entrantes": entrantes,
+            "salientes": salientes,
+            "grado_entrante": len(entrantes),
+            "grado_saliente": len(salientes),
+            "grado_total": len(
+                set(entrantes) | set(salientes)
+            ),
+        }
+
+    causal["grado"] = grado
+
+    # -----------------------------------------------------------
+    # 8. INFORME DETERMINISTA
+    # -----------------------------------------------------------
     informe = _informe(
         mecanica=mecanica,
         choques=choques,
@@ -1956,20 +1776,14 @@ def barrer() -> Dict[str, Any]:
         hallado=hallado,
     )
 
-    # -----------------------------------------------------------
-    # 14. EXTENSIÓN DEL INFORME CON EL MAPA DEL BARRIDO
-    # -----------------------------------------------------------
-
     if isinstance(informe, dict):
-
-        informe["barrido"] = mapa
+        informe["causal"] = causal
 
     return informe
 
 # ===============================================================
 # FIN BARRER
 # ===============================================================
-
 
 # ===============================================================
 # 17. AXIOMAS

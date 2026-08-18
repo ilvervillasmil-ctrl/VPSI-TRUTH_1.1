@@ -499,10 +499,11 @@ CONTENEDOR: Dict[str, Any] = {
         # =======================================================
         # 3.13.7 — PERMISOS OBLIGATORIOS AGREGADOS
         # =======================================================
-
         "validar_esquema": True,
         "acceso_archivos": True,
+        "ejecutar_total": True,
     },
+
 
 
     # ===========================================================
@@ -3873,6 +3874,7 @@ def registrar_inventario(
         ),
     }
 
+
 # ===============================================================
 # SECCIÓN 8 — INTEGRIDAD CONTRACTUAL DE CAPACIDADES
 # ===============================================================
@@ -3956,9 +3958,107 @@ def _verificar_capacidades_contractuales() -> Dict[str, Any]:
         "orden_coherente": not orden_meta_incorrecto,
         "errores": errores,
     }
+# ===============================================================
+# SECCIÓN 10 — VALIDACIÓN, RESOLUCIÓN Y CIERRE
+# ===============================================================
 
 # ===============================================================
-# SECCIÓN 9 — EXPORTS
+# 10.1 — MAPA DE CAPACIDADES
+# ===============================================================
+
+_CAP_MAP = {
+    # --- CENTINELA ---
+    "verificar": verificar,
+    "barrer": barrer,
+    "verificar_salida": verificar_salida,
+
+    # --- INVENTARIO Y REPORTING ---
+    "inventario": inventario,
+    "reporte": reporte,
+    "diagnostico": diagnostico,
+
+    # --- OPERACIONES DE CITACIÓN ---
+    "anunciar": anunciar,
+    "anunciar_todo": anunciar_todo,
+    "citar": citar,
+    "registrar": registrar,
+    "resolver": resolver,
+    "resolver_enunciado": resolver_enunciado,
+    "buscar": buscar,
+    "cadena": cadena,
+    "explicar": explicar,
+    "relacionar": relacionar,
+    "limpiar_ciclo": limpiar_ciclo,
+
+    # --- COMPATIBILIDAD ENGINE ---
+    "evaluar": anunciar,
+
+    # --- CAPACIDADES ARQUITECTÓNICAS ---
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
+}
+
+# ===============================================================
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
+
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    """
+    Resuelve referencias str → callables reales.
+    MUTA CONTENEDOR["capacidades"] para que Engine reciba callables.
+    """
+    resueltas: Dict[str, Any] = {}
+    for nombre, ref in cont["capacidades"].items():
+        if callable(ref):
+            resueltas[nombre] = ref
+            continue
+        if isinstance(ref, str):
+            if ref not in _CAP_MAP:
+                raise RuntimeError(
+                    "{0}: capacidad '{1}' referencia inexistente: '{2}'".format(
+                        _NOMBRE, nombre, ref
+                    )
+                )
+            fn = _CAP_MAP[ref]
+            if not callable(fn):
+                raise RuntimeError(
+                    "{0}: '{1}' no es callable".format(_NOMBRE, ref)
+                )
+            resueltas[nombre] = fn
+            continue
+        raise RuntimeError(
+            "{0}: capacidad '{1}' tipo inválido: {2}".format(
+                _NOMBRE, nombre, type(ref).__name__
+            )
+        )
+    cont["capacidades"] = resueltas
+
+# ===============================================================
+# FIN 10.2
+# ===============================================================
+
+
+# ===============================================================
+# 10.3 — VALIDAR Y RESOLVER AL IMPORTAR
+# ===============================================================
+
+_resolver_capacidades(CONTENEDOR)
+
+# ===============================================================
+# FIN 10.3
+# ===============================================================
+
+# ===============================================================
+# FIN SECCIÓN 10
+# ===============================================================
+# ===============================================================
+# 11
 # ===============================================================
 
 __all__ = [

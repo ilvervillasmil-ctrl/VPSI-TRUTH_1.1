@@ -69,7 +69,9 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from modules.constante import Math
+import math
+from fractions import Fraction
+from modules.constante import ALPHA, BETA
 
 # ===============================================================
 # FIN 1.1

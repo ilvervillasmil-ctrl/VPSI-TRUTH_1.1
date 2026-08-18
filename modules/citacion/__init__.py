@@ -3874,6 +3874,115 @@ def registrar_inventario(
         ),
     }
 
+# ===============================================================
+# SECCIÓN — CAPACIDAD: VERIFICAR
+# ===============================================================
+
+def verificar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Centinela del oficio de fundamentación de CIT.
+
+    Verifica coherencia contractual del registro operativo:
+      - capacidades declaradas vs callables
+      - capacidades vs capacidades_meta
+      - integridad estructural del CONTENEDOR
+
+    No modifica conocimiento.
+    No calcula.
+    No interpreta.
+    """
+    errores: List[str] = []
+    choques: List[str] = []
+
+    capacidades = CONTENEDOR.get("capacidades") or {}
+    metas = CONTENEDOR.get("capacidades_meta") or {}
+
+    if not isinstance(capacidades, dict):
+        errores.append("CONTENEDOR['capacidades'] no es dict")
+        capacidades = {}
+
+    if not isinstance(metas, dict):
+        errores.append("CONTENEDOR['capacidades_meta'] no es dict")
+        metas = {}
+
+    # -----------------------------------------------------------
+    # Capacidad sin meta
+    # -----------------------------------------------------------
+    for nombre in capacidades:
+        if nombre not in metas:
+            errores.append(
+                "capacidad sin capacidades_meta: {0}".format(nombre)
+            )
+
+    # -----------------------------------------------------------
+    # Meta sin capacidad
+    # -----------------------------------------------------------
+    for nombre in metas:
+        if nombre not in capacidades:
+            errores.append(
+                "capacidades_meta sin capacidad: {0}".format(nombre)
+            )
+
+    # -----------------------------------------------------------
+    # Capacidad no resoluble a callable
+    # -----------------------------------------------------------
+    for nombre, ref in capacidades.items():
+        if callable(ref):
+            continue
+        if isinstance(ref, str):
+            fn = globals().get(ref)
+            if not callable(fn):
+                errores.append(
+                    "capacidad no resoluble a callable: {0}".format(nombre)
+                )
+            continue
+        errores.append(
+            "capacidad tipo inválido: {0} ({1})".format(
+                nombre, type(ref).__name__
+            )
+        )
+
+    # -----------------------------------------------------------
+    # Choques de id duplicado en meta vs declaración (orden)
+    # -----------------------------------------------------------
+    caps_keys = list(capacidades.keys())
+    meta_keys = list(metas.keys())
+    if caps_keys and meta_keys and set(caps_keys) == set(meta_keys):
+        if caps_keys != meta_keys:
+            choques.append(
+                "orden de capacidades y capacidades_meta no coincide"
+            )
+
+    coherente = not errores and not choques
+
+    return {
+        "id": _ID,
+        "modulo": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "coherente": coherente,
+        "errores": errores,
+        "choques": choques,
+        "capacidades_n": len(capacidades),
+        "capacidades_meta_n": len(metas),
+        "nota": (
+            "Centinela de fundamentación CIT. "
+            "No modifica conocimiento declarado."
+        ),
+    }
+
+
+def barrer(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """Alias de verificar."""
+    return verificar(peticion)
+
+# ===============================================================
+# FIN CAPACIDAD: VERIFICAR
+# ===============================================================
 
 # ===============================================================
 # SECCIÓN 8 — INTEGRIDAD CONTRACTUAL DE CAPACIDADES

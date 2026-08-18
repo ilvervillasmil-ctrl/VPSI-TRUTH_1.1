@@ -22,6 +22,9 @@
 #   No calcula Tru. No escribe C/L/K. No orquesta el ciclo.
 #   No aprueba su propia salida de diseño.
 #
+# Capacidades arquitectónicas (callables reales):
+#   ejecutar_total, inspeccionar, registrar_inventario
+#
 # ===============================================================
 
 
@@ -94,6 +97,15 @@ ESTADOS_OPERACION = ("PROPUESTO", "PARCIAL", "RETENIDO")
 
 
 # ===============================================================
+# Parte 2.1 — EXCEPCIONES
+# ===============================================================
+
+class ContratoInvalido(Exception):
+    """El CONTENEDOR no cumple el esquema o la resolución falló."""
+    pass
+
+
+# ===============================================================
 # Parte 3 — CONTRATO OFICIAL (CONTENEDOR)
 # ===============================================================
 
@@ -151,18 +163,26 @@ CONTENEDOR: Dict[str, Any] = {
     # Parte 3.5 — Conocimiento exportable
     # -----------------------------------------------------------
     "conocimiento_exportable": [
-        "componer", "observar", "inventario", "inventario_paquetes",
-        "barrer", "verificar", "axiomas",
+        "componer",
+        "observar",
+        "inventario",
+        "inventario_paquetes",
+        "barrer",
+        "verificar",
+        "axiomas",
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
     # -----------------------------------------------------------
     # Parte 3.6 — Dependencias
     # -----------------------------------------------------------
     "requiere": [
-    "CE", "AX", "FO", "MC", "SF",
-    "CA", "CX", "DI", "RE", "VX",
-    "TX", "CH", "CIT", "DGCO",
-    "CC", "TT", "SC", "CT"
+        "CE", "AX", "FO", "MC", "SF",
+        "CA", "CX", "DI", "RE", "VX",
+        "TX", "CH", "CIT", "DGCO",
+        "CC", "TT", "SC", "CT",
     ],
 
     # -----------------------------------------------------------
@@ -179,14 +199,39 @@ CONTENEDOR: Dict[str, Any] = {
     # Parte 3.8 — Consultas soportadas
     # -----------------------------------------------------------
     "consultas_soportadas": [
-        "componer", "observar", "inventario", "inventario_paquetes",
-        "barrer", "verificar",
+        "componer",
+        "observar",
+        "inventario",
+        "inventario_paquetes",
+        "barrer",
+        "verificar",
+        "ejecutar_total",
+        "inspeccionar",
+        "registrar_inventario",
     ],
 
     # -----------------------------------------------------------
     # Parte 3.9 — Capacidades
     # -----------------------------------------------------------
-    "capacidades": {},
+    "capacidades": {
+        # --- CENTINELA ---
+        "verificar": "verificar",
+        "barrer": "barrer",
+
+        # --- DISEÑO ---
+        "componer": "componer",
+        "observar": "observar",
+        "axiomas": "axiomas",
+
+        # --- INVENTARIO ---
+        "inventario": "inventario",
+        "inventario_paquetes": "inventario_paquetes",
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+    },
 
     # -----------------------------------------------------------
     # Parte 3.10 — Metadatos de capacidades
@@ -241,6 +286,39 @@ CONTENEDOR: Dict[str, Any] = {
             "validar_esquema": ["*"],
             "acceso_archivos": ["*"],
         },
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre UI. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "validar_esquema": ["*"],
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de UI. "
+                "Expone constantes, capacidades, paquetes y estado "
+                "sin alterar el contrato ni calcular."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "validar_esquema": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de UI "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "salida": "dict con inventario registrado",
+            "validar_esquema": ["acceso_archivos"],
+            "acceso_archivos": ["acceso_archivos"],
+        },
     },
 
     # -----------------------------------------------------------
@@ -282,6 +360,11 @@ CONTENEDOR: Dict[str, Any] = {
         "sincronizar": False,
         "monitorear": True,
         "acceso_archivos": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
     # -----------------------------------------------------------
@@ -303,6 +386,11 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
         "acceso_archivos": True,
         "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
     # -----------------------------------------------------------
@@ -340,6 +428,7 @@ def _leer_manifiesto(ruta: Path) -> Optional[Dict[str, Any]]:
         }
     return None
 
+
 def _descubrir_paquetes() -> Dict[str, Dict[str, Any]]:
     hallado: Dict[str, Dict[str, Any]] = {}
     if not _PAQUETES.is_dir():
@@ -373,6 +462,7 @@ def _descubrir_paquetes() -> Dict[str, Dict[str, Any]]:
             "implicit": bool(meta.get("implicit")),
         }
     return hallado
+
 
 def _detectar_choques_paquetes(paquetes: Dict[str, Dict[str, Any]]) -> List[str]:
     """Validación declarativa del manifiesto. No analiza código ejecutable."""
@@ -456,9 +546,11 @@ def barrer() -> Dict[str, Any]:
         "superficies_admitidas": list(SUPERFICIES_ADMITIDAS),
     }
 
+
 def verificar() -> Dict[str, Any]:
     """Alias contractual de barrer."""
     return barrer()
+
 
 def observar(
     pedido: Optional[Dict[str, Any]] = None,
@@ -486,6 +578,7 @@ def observar(
         },
         "nota": "Observación de solo lectura. Sin O_uso claro la composición queda PARCIAL.",
     }
+
 
 def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Genera descripción de interfaz (esquema). No inventa controles."""
@@ -572,6 +665,7 @@ def componer(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         ),
     }
 
+
 def inventario_paquetes() -> Dict[str, Any]:
     paquetes = _descubrir_paquetes()
     return {
@@ -582,6 +676,7 @@ def inventario_paquetes() -> Dict[str, Any]:
         "n": len(paquetes),
         "paquetes": paquetes,
     }
+
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     return {
@@ -596,6 +691,7 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "estados_operacion": list(ESTADOS_OPERACION),
         "nota": "presentar no forma parte de v1.0",
     }
+
 
 def axiomas() -> List[Dict[str, Any]]:
     return [
@@ -647,18 +743,195 @@ def axiomas() -> List[Dict[str, Any]]:
 
 
 # ===============================================================
+# Parte 5.1 — CAPACIDADES ARQUITECTÓNICAS
+# ===============================================================
+
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Autoridad total de ENGINE sobre UI.
+    Fuente única: CONTENEDOR["capacidades"].
+    No inventa. No autoinvoca. Todo callable real.
+    """
+    peticion_normalizada = (
+        dict(peticion) if isinstance(peticion, dict) else {}
+    )
+    resultados: Dict[str, Any] = {}
+    errores_ejecucion: List[str] = []
+
+    capacidades = CONTENEDOR.get("capacidades", {})
+    if not isinstance(capacidades, dict):
+        return {
+            "id": ID_MODULO,
+            "modulo": NOMBRE_MODULO,
+            "rol": ROL_MODULO,
+            "version": VERSION_MODULO,
+            "operacion": "ejecutar_total",
+            "estado": ESTADO_DEGRADADO,
+            "coherente": False,
+            "capacidades_ejecutadas": [],
+            "errores_ejecucion": [
+                f"{NOMBRE_MODULO}: CONTENEDOR['capacidades'] no es dict"
+            ],
+            "resultados": {},
+            "capacidades_declaradas": [],
+        }
+
+    for nombre in sorted(capacidades):
+        if nombre == "ejecutar_total":
+            continue
+        referencia = capacidades[nombre]
+        try:
+            if callable(referencia):
+                fn = referencia
+            elif isinstance(referencia, str):
+                fn = globals().get(referencia)
+                if not callable(fn):
+                    raise ContratoInvalido(
+                        f"'{referencia}' no es callable"
+                    )
+            else:
+                raise ContratoInvalido(
+                    f"tipo inválido: {type(referencia).__name__}"
+                )
+
+            if nombre == "componer":
+                resultados[nombre] = fn(peticion_normalizada)
+            elif nombre == "observar":
+                resultados[nombre] = fn(
+                    pedido=peticion_normalizada,
+                    cache_snapshot=peticion_normalizada.get("cache_snapshot"),
+                )
+            elif nombre in ("inventario",):
+                resultados[nombre] = fn(peticion_normalizada)
+            else:
+                resultados[nombre] = fn()
+        except Exception as exc:
+            errores_ejecucion.append(f"{nombre}: {exc}")
+            resultados[nombre] = None
+
+    barrido = resultados.get("barrer")
+    coherente = (
+        isinstance(barrido, dict) and bool(barrido.get("coherente"))
+    )
+    ejecutadas = sorted(
+        n for n, r in resultados.items() if r is not None
+    )
+
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": (
+            ESTADO_OPERATIVO
+            if coherente and not errores_ejecucion
+            else ESTADO_DEGRADADO
+        ),
+        "coherente": coherente and not errores_ejecucion,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": sorted(capacidades.keys()),
+    }
+
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Inspección estructural de UI.
+    Expone contrato y estado sin calcular ni alterar.
+    """
+    b = barrer()
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "constantes": {
+            "ID_MODULO": ID_MODULO,
+            "NOMBRE_MODULO": NOMBRE_MODULO,
+            "ROL_MODULO": ROL_MODULO,
+            "VERSION_MODULO": VERSION_MODULO,
+            "VERSION_CONTRATO": VERSION_CONTRATO,
+            "ESQUEMA_CONTRATO": ESQUEMA_CONTRATO,
+            "ESTABILIDAD": ESTABILIDAD,
+            "SUPERFICIES_ADMITIDAS": list(SUPERFICIES_ADMITIDAS),
+            "ZONAS_CANONICAS": list(_ZONAS_CANONICAS),
+            "ESTADOS_OPERACION": list(ESTADOS_OPERACION),
+        },
+        "capacidades_contractuales": sorted(
+            CONTENEDOR.get("capacidades", {}).keys()
+        ),
+        "capacidades_meta": sorted(
+            CONTENEDOR.get("capacidades_meta", {}).keys()
+        ),
+        "integridad": {
+            "coherente": b.get("coherente"),
+            "errores": b.get("errores"),
+            "choques": b.get("choques"),
+            "advertencias": b.get("advertencias"),
+            "paquetes_n": b.get("paquetes_n"),
+            "paquetes": b.get("paquetes"),
+        },
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": list(INVARIANTES),
+        "nota": (
+            "inspeccionar expone estructura de UI sin calcular "
+            "ni alterar el contrato ni los paquetes."
+        ),
+    }
+
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Instantánea determinista del inventario de UI.
+    No altera evidencia ni paquetes.
+    """
+    inv = inventario(peticion)
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inv,
+        "nota": (
+            "Instantánea determinista del inventario de UI. "
+            "No modifica paquetes ni evidencia."
+        ),
+    }
+
+
+# ===============================================================
 # Parte 6 — RESOLUCIÓN DE CAPACIDADES + EXPORTACIONES
 # ===============================================================
 
 _CAP_MAP = {
+    # --- CENTINELA ---
     "verificar": verificar,
     "barrer": barrer,
+
+    # --- DISEÑO ---
     "componer": componer,
-    "inventario": inventario,
-    "inventario_paquetes": inventario_paquetes,
     "observar": observar,
     "axiomas": axiomas,
+
+    # --- INVENTARIO ---
+    "inventario": inventario,
+    "inventario_paquetes": inventario_paquetes,
+
+    # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
+
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     resueltas: Dict[str, Any] = {}
@@ -668,25 +941,24 @@ def _resolver_capacidades(cont: Dict[str, Any]) -> None:
             continue
         if isinstance(ref, str):
             if ref not in _CAP_MAP:
-                raise Exception(f"{NOMBRE_MODULO}: capacidad '{nombre}' referencia inexistente: '{ref}'")
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                    f"referencia inexistente: '{ref}'"
+                )
             fn = _CAP_MAP[ref]
             if not callable(fn):
-                raise Exception(f"{NOMBRE_MODULO}: '{ref}' no es callable")
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: '{ref}' no es callable"
+                )
             resueltas[nombre] = fn
             continue
-        raise Exception(f"{NOMBRE_MODULO}: capacidad '{nombre}' tiene tipo inválido")
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidad '{nombre}' tiene tipo inválido"
+        )
     cont["capacidades"] = resueltas
 
-# Materialización directa (compatible con Engine)
-CONTENEDOR["capacidades"] = {
-    "verificar": verificar,
-    "barrer": barrer,
-    "componer": componer,
-    "inventario": inventario,
-    "inventario_paquetes": inventario_paquetes,
-    "observar": observar,
-    "axiomas": axiomas,
-}
+
+_resolver_capacidades(CONTENEDOR)
 
 __all__ = [
     "CONTENEDOR",
@@ -694,6 +966,9 @@ __all__ = [
     "NOMBRE_MODULO",
     "ROL_MODULO",
     "VERSION_MODULO",
+    "VERSION_CONTRATO",
+    "ESQUEMA_CONTRATO",
+    "ESTABILIDAD",
     "SUPERFICIES_ADMITIDAS",
     "ESTADOS_OPERACION",
     "barrer",
@@ -703,4 +978,12 @@ __all__ = [
     "inventario",
     "inventario_paquetes",
     "axiomas",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
+    "ContratoInvalido",
 ]
+
+# ===============================================================
+# FIN DEL MÓDULO
+# ===============================================================

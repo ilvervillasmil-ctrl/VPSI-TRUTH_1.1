@@ -55,7 +55,11 @@
 # ===============================================================
 
 # ===============================================================
-# IMPORTACIONES
+# PARTE 1 — PRINCIPIOS, BANDERAS Y ESPECIFICACIONES PRECISAS
+# ===============================================================
+
+# ===============================================================
+# 1.1 — IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
@@ -65,25 +69,45 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# ===============================================================
-# FIN IMPORTACIONES
-# ===============================================================
+from modules.constante import Math
 
 # ===============================================================
-# CONSTANTES
+# FIN 1.1
+# ===============================================================
+
+
+# ===============================================================
+# 1.2 — IDENTIDAD
 # ===============================================================
 
 ID_MODULO = "SC"
 NOMBRE_MODULO = "spartaco_seguridad"
 ROL_MODULO = "SC"
 
+# ===============================================================
+# FIN 1.2
+# ===============================================================
+
+
+# ===============================================================
+# 1.3 — VERSIONES Y ESTABILIDAD
+# ===============================================================
+
 VERSION_MODULO = "1.7"
 VERSION_CONTRATO = "1.0"
 ESQUEMA_CONTRATO = "VPSI-CONTRACT-1.0"
-
 COMPATIBLE_DESDE = "1.0"
 API_ENGINE = ">=1.0"
 ESTABILIDAD = "ESTABLE"
+
+# ===============================================================
+# FIN 1.3
+# ===============================================================
+
+
+# ===============================================================
+# 1.4 — BANDERAS DE ESTADO
+# ===============================================================
 
 ESTADO_NO_INICIADO = "NO_INICIADO"
 ESTADO_OPERATIVO = "OPERATIVO"
@@ -95,6 +119,15 @@ ESTADOS_VALIDOS = (
     ESTADO_DEGRADADO,
     ESTADO_RECHAZADO,
 )
+
+# ===============================================================
+# FIN 1.4
+# ===============================================================
+
+
+# ===============================================================
+# 1.5 — INVARIANTES
+# ===============================================================
 
 INVARIANTES = (
     "el id del módulo nunca cambia",
@@ -108,17 +141,22 @@ INVARIANTES = (
 )
 
 # ===============================================================
-# FIN CONSTANTES
+# FIN 1.5
 # ===============================================================
 
+
 # ===============================================================
-# CONFIGURACIÓN
+# 1.6 — CONFIGURACIÓN
 # ===============================================================
 
 _DIR = Path(__file__).parent
 
 # ===============================================================
-# FIN CONFIGURACIÓN
+# FIN 1.6
+# ===============================================================
+
+# ===============================================================
+# FIN PARTE 1
 # ===============================================================
 
 # ===============================================================
@@ -132,6 +170,348 @@ class ContratoInvalido(Exception):
 # FIN DEFINICIONES
 # ===============================================================
 
+# ===============================================================
+# CONTRATO OFICIAL DEL MÓDULO
+# ===============================================================
+
+CONTENEDOR: Dict[str, Any] = {
+    # ============================================================
+    # ESQUEMA
+    # ============================================================
+    "esquema": ESQUEMA_CONTRATO,
+    "version_contrato": VERSION_CONTRATO,
+    "version_modulo": VERSION_MODULO,
+    "estabilidad": ESTABILIDAD,
+    "compatible_desde": COMPATIBLE_DESDE,
+    "api_engine": API_ENGINE,
+
+    # ============================================================
+    # IDENTIDAD
+    # ============================================================
+    "id": ID_MODULO,
+    "nombre": NOMBRE_MODULO,
+    "rol": ROL_MODULO,
+    "descripcion": (
+        "Adaptador Spartaco (SC). Mantiene sincronizado el catálogo "
+        "con el estado real del árbol de directorios."
+    ),
+
+    # ============================================================
+    # PROPÓSITO
+    # ============================================================
+    "funcion": (
+        "Mantener sincronizado el catálogo del módulo con el estado "
+        "real del árbol de directorios."
+    ),
+    "no_hace": [
+        "No implementa la lógica de los archivos del árbol",
+        "No calcula C/L/K/Tru",
+        "No orquesta ciclos",
+        "No define vocabulario fijo de conceptos de seguridad",
+    ],
+
+    # ============================================================
+    # AUTORIDAD
+    # ============================================================
+    "autoridad": [
+        "Sincronizar el catálogo con el árbol",
+        "Exponer recursos y conceptos descubiertos",
+        "Reportar el estado estructural del módulo",
+    ],
+
+    # ============================================================
+    # CONOCIMIENTO EXPORTABLE
+    # ============================================================
+    "conocimiento_exportable": [
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "catalogo",
+        "conceptos",
+    ],
+
+    # ============================================================
+    # ACCESO (obligatorio en el esquema)
+    # ============================================================
+    "acceso": {
+        "nivel": "completo",
+        "descripcion": "Acceso total a recursos del módulo"
+    },
+
+    # ============================================================
+    # DEPENDENCIAS
+    # ============================================================
+    "requiere": [
+    "CE", "AX", "FO", "MC", "SF",
+    "CA", "CX", "DI", "RE", "VX",
+    "TX", "CH", "CIT", "DGCO", "UI",
+    "CC", "TT", "CT",
+    ],
+
+    # ============================================================
+    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "acceso_archivos": ["*"],
+
+    # ============================================================
+    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # ============================================================
+    "validar_esquema": ["*"],
+
+    # 
+
+    # ============================================================
+    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # ============================================================
+    "autoriza_engine": {
+        # --- PERMISOS BASE ---
+        "leer": True,
+        "ejecutar": True,
+        "consultar": True,
+        "recombinar": True,
+        "reportar": True,
+        "auditar": True,
+        "inventariar": True,
+
+        # --- PERMISOS DE ESCRITURA ---
+        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "alterar": False,
+        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "crear": True,
+        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "actualizar": False,
+
+        # --- PERMISOS DE PROCESAMIENTO ---
+        "validar": True,
+        "procesar": True,
+        "analizar": True,
+        "generar": True,
+        # "transformar": False,  # ← ELIMINADO (no permitido)
+
+        # --- PERMISOS DE DATOS ---
+        "exportar": True,
+        "importar": True,
+        "respaldar": True,
+        "recuperar": True,
+        "sincronizar": True,
+
+        # --- PERMISOS DE MONITOREO ---
+        "monitorear": True,
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- PERMISOS DE ESTADO ---
+        "estado": True,
+        "version": True,
+        "salud": True,
+        "inventario": True,
+        "capacidades": True,
+        "errores": True,
+        "advertencias": True,
+        "dependencias": True,
+        "contrato": True,
+        "conocimiento": True,
+        "reporte": True,
+        
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        "validar_esquema": True,
+        "acceso_archivos": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+    },
+       
+
+    #============================================================
+    # CONSULTAS SOPORTADAS
+    # ============================================================
+    "consultas_soportadas": [
+        "verificar",
+        "barrer",
+        "inventario",
+        "reporte",
+        "diagnostico",
+        "catalogo",
+        "verificar_salida",
+    ],
+
+    # ============================================================
+    # CAPACIDADES
+    # ============================================================
+    "capacidades": {
+        # --- CENTINELA ---
+        "verificar": "verificar",
+        "barrer": "barrer",
+        "verificar_salida": "verificar_salida",
+
+        # --- INVENTARIO Y REPORTING ---
+        "inventario": "inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
+
+        # --- CATÁLOGO ---
+        "catalogo": "catalogo",
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+    },
+
+        # ============================================================
+    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
+    # ============================================================
+    "capacidades_meta": {
+        "verificar": {
+            "descripcion": "Garantiza la coherencia del catálogo sincronizado.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con coherente, errores, choques, recursos",
+            "acceso_archivos": ["*"],
+        },
+
+        "barrer": {
+            "descripcion": "Sincroniza el árbol y reporta coherencia.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con coherente, recursos, conceptos",
+            "acceso_archivos": ["*"],
+        },
+
+        "inventario": {
+            "descripcion": "Garantiza la enumeración de recursos y conceptos.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con id, version, recursos, conceptos",
+            "acceso_archivos": ["*"],
+        },
+
+        "reporte": {
+            "descripcion": "Garantiza el estado actual del módulo.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con estado, version, recursos",
+            "acceso_archivos": ["*"],
+        },
+
+        "diagnostico": {
+            "descripcion": "Garantiza problemas y advertencias del catálogo.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con estado, problemas, advertencias",
+            "acceso_archivos": ["*"],
+        },
+
+        "catalogo": {
+            "descripcion": "Recursos y conceptos descubiertos en el árbol.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con n, recursos, conceptos",
+            "acceso_archivos": ["*"],
+        },
+
+        "verificar_salida": {
+            "descripcion": "Forma mínima de una salida del módulo.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "bool",
+            "acceso_archivos": ["*"],
+        },
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre SC. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de SC. "
+                "Expone constantes, capacidades, catálogo y estado "
+                "sin alterar el contrato ni calcular."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de SC "
+                "como instantanea determinista. No altera evidencia."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+    },
+    
+    # ============================================================
+    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # ============================================================
+    "reporting": {
+        # --- BANDERAS DE ESTADO Y SALUD ---
+        "estado": True,
+        "salud": True,
+
+        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
+        "inventario": True,
+        "capacidades": True,
+
+        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
+        "errores": True,
+        "advertencias": True,
+
+        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
+        "dependencias": True,
+        "version": True,
+
+        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
+        "contrato": True,
+        "conocimiento": True,
+
+        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
+        "metricas": True,
+        "diagnostico": True,
+
+        # --- BANDERA DE REPORTE ---
+        "reporte": True,
+
+       # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        "acceso_archivos": True,
+        "validar_esquema": True,
+
+        # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
+    },
+
+    # ============================================================
+    # ESTADOS VÁLIDOS
+    # ============================================================
+    "estados_validos": list(ESTADOS_VALIDOS),
+
+    # ============================================================
+    # INVARIANTES
+    # ============================================================
+    "invariantes": list(INVARIANTES),
+
+}  # <--- CIERRE FINAL
+
+# ===============================================================
+# FIN CONTRATO
+# ===============================================================
 # ===============================================================
 # FUNCIONES PRIVADAS — descubrimiento del árbol
 # ===============================================================
@@ -210,292 +590,6 @@ def _conceptos_descubiertos(ok: Dict[str, Dict[str, Any]]) -> List[str]:
 # CONTRATO OFICIAL DEL MÓDULO
 # ===============================================================
 
-# ===============================================================
-# CONTRATO OFICIAL DEL MÓDULO
-# ===============================================================
-
-CONTENEDOR: Dict[str, Any] = {
-    # ============================================================
-    # ESQUEMA
-    # ============================================================
-    "esquema": ESQUEMA_CONTRATO,
-    "version_contrato": VERSION_CONTRATO,
-    "version_modulo": VERSION_MODULO,
-    "estabilidad": ESTABILIDAD,
-    "compatible_desde": COMPATIBLE_DESDE,
-    "api_engine": API_ENGINE,
-
-    # ============================================================
-    # IDENTIDAD
-    # ============================================================
-    "id": ID_MODULO,
-    "nombre": NOMBRE_MODULO,
-    "rol": ROL_MODULO,
-    "descripcion": (
-        "Adaptador Spartaco (SC). Mantiene sincronizado el catálogo "
-        "con el estado real del árbol de directorios."
-    ),
-
-    # ============================================================
-    # PROPÓSITO
-    # ============================================================
-    "funcion": (
-        "Mantener sincronizado el catálogo del módulo con el estado "
-        "real del árbol de directorios."
-    ),
-    "no_hace": [
-        "No implementa la lógica de los archivos del árbol",
-        "No calcula C/L/K/Tru",
-        "No orquesta ciclos",
-        "No define vocabulario fijo de conceptos de seguridad",
-    ],
-
-    # ============================================================
-    # AUTORIDAD
-    # ============================================================
-    "autoridad": [
-        "Sincronizar el catálogo con el árbol",
-        "Exponer recursos y conceptos descubiertos",
-        "Reportar el estado estructural del módulo",
-    ],
-
-    # ============================================================
-    # CONOCIMIENTO EXPORTABLE
-    # ============================================================
-    "conocimiento_exportable": [
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "catalogo",
-        "conceptos",
-    ],
-
-    # ============================================================
-    # ACCESO (obligatorio en el esquema)
-    # ============================================================
-    "acceso": {
-        "nivel": "completo",
-        "descripcion": "Acceso total a recursos del módulo"
-    },
-
-    # ============================================================
-    # DEPENDENCIAS
-    # ============================================================
-    "requiere": [
-    "CE", "AX", "FO", "MC", "SF",
-    "CA", "CX", "DI", "RE", "VX",
-    "TX", "CH", "CIT", "DGCO", "UI",
-    "CC", "TT",
-    ],
-
-    # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "acceso_archivos": ["*"],
-
-    # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
-    # ============================================================
-    "validar_esquema": ["*"],
-
-    # 
-
-    # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
-    # ============================================================
-    "autoriza_engine": {
-        # --- PERMISOS BASE ---
-        "leer": True,
-        "ejecutar": True,
-        "consultar": True,
-        "recombinar": True,
-        "reportar": True,
-        "auditar": True,
-        "inventariar": True,
-
-        # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
-        "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
-        "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
-        "actualizar": False,
-
-        # --- PERMISOS DE PROCESAMIENTO ---
-        "validar": True,
-        "procesar": True,
-        "analizar": True,
-        "generar": True,
-        # "transformar": False,  # ← ELIMINADO (no permitido)
-
-        # --- PERMISOS DE DATOS ---
-        "exportar": True,
-        "importar": True,
-        "respaldar": True,
-        "recuperar": True,
-        "sincronizar": True,
-
-        # --- PERMISOS DE MONITOREO ---
-        "monitorear": True,
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- PERMISOS DE ESTADO ---
-        "estado": True,
-        "version": True,
-        "salud": True,
-        "inventario": True,
-        "capacidades": True,
-        "errores": True,
-        "advertencias": True,
-        "dependencias": True,
-        "contrato": True,
-        "conocimiento": True,
-        "reporte": True,
-
-        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
-        "validar_esquema": True,     # ← AGREGADO
-        "acceso_archivos": True,     # ← AGREGADO
-    },
-
-    #============================================================
-    # CONSULTAS SOPORTADAS
-    # ============================================================
-    "consultas_soportadas": [
-        "verificar",
-        "barrer",
-        "inventario",
-        "reporte",
-        "diagnostico",
-        "catalogo",
-        "verificar_salida",
-    ],
-
-    # ============================================================
-    # CAPACIDADES
-    # ============================================================
-    "capacidades": {
-        "verificar": "verificar",
-        "barrer": "barrer",
-        "inventario": "inventario",
-        "reporte": "reporte",
-        "diagnostico": "diagnostico",
-        "catalogo": "catalogo",
-        "verificar_salida": "verificar_salida",
-    },
-
-    # ============================================================
-    # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
-    # ============================================================
-    "capacidades_meta": {
-        "verificar": {
-            "descripcion": "Garantiza la coherencia del catálogo sincronizado.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con coherente, errores, choques, recursos",
-            "acceso_archivos": ["*"],
-        },
-
-        "barrer": {
-            "descripcion": "Sincroniza el árbol y reporta coherencia.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con coherente, recursos, conceptos",
-            "acceso_archivos": ["*"],
-        },
-
-        "inventario": {
-            "descripcion": "Garantiza la enumeración de recursos y conceptos.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con id, version, recursos, conceptos",
-            "acceso_archivos": ["*"],
-        },
-
-        "reporte": {
-            "descripcion": "Garantiza el estado actual del módulo.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con estado, version, recursos",
-            "acceso_archivos": ["*"],
-        },
-
-        "diagnostico": {
-            "descripcion": "Garantiza problemas y advertencias del catálogo.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con estado, problemas, advertencias",
-            "acceso_archivos": ["*"],
-        },
-
-        "catalogo": {
-            "descripcion": "Recursos y conceptos descubiertos en el árbol.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "dict con n, recursos, conceptos",
-            "acceso_archivos": ["*"],
-        },
-
-        "verificar_salida": {
-            "descripcion": "Forma mínima de una salida del módulo.",
-            "entrada": "*",
-            "validar_esquema": ["*"],
-            "salida": "bool",
-            "acceso_archivos": ["*"],
-        },
-    },
-    
-    # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
-    # ============================================================
-    "reporting": {
-        # --- BANDERAS DE ESTADO Y SALUD ---
-        "estado": True,
-        "salud": True,
-
-        # --- BANDERAS DE INVENTARIO Y CAPACIDADES ---
-        "inventario": True,
-        "capacidades": True,
-
-        # --- BANDERAS DE ERRORES Y ADVERTENCIAS ---
-        "errores": True,
-        "advertencias": True,
-
-        # --- BANDERAS DE DEPENDENCIAS Y VERSION ---
-        "dependencias": True,
-        "version": True,
-
-        # --- BANDERAS DE CONTRATO Y CONOCIMIENTO ---
-        "contrato": True,
-        "conocimiento": True,
-
-        # --- BANDERAS DE METRICAS Y DIAGNOSTICO ---
-        "metricas": True,
-        "diagnostico": True,
-
-        # --- BANDERA DE REPORTE ---
-        "reporte": True,
-
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
-        "acceso_archivos": True,      # ← AGREGADA
-        "validar_esquema": True,      # ← AGREGADA
-    },
-
-    # ============================================================
-    # ESTADOS VÁLIDOS
-    # ============================================================
-    "estados_validos": list(ESTADOS_VALIDOS),
-
-    # ============================================================
-    # INVARIANTES
-    # ============================================================
-    "invariantes": list(INVARIANTES),
-
-}  # <--- CIERRE FINAL
-
-# ===============================================================
-# FIN CONTRATO
-# ===============================================================
 # ===============================================================
 # FUNCIONES PRIVADAS — validación de contrato
 # ===============================================================

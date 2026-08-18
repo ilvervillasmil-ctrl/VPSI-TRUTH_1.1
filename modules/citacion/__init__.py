@@ -1300,7 +1300,7 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": True,
     },
   
-    # ============================================================
+        # ============================================================
     # 17 — CAPACIDADES
     # ============================================================
     "capacidades": {
@@ -1335,8 +1335,8 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total": "ejecutar_total",
         "inspeccionar": "inspeccionar",
         "registrar_inventario": "registrar_inventario",
-        },
     },
+
     # ============================================================
     # METACITAS
     # ============================================================

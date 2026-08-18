@@ -505,7 +505,7 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
 
-    # ===========================================================
+        # ===========================================================
     # 3.14 — CAPACIDADES
     # ===========================================================
     #
@@ -515,27 +515,37 @@ CONTENEDOR: Dict[str, Any] = {
 
     "capacidades": {
 
-        "verificar": verificar,
-        "barrer": barrer,
-        "inventario": inventario,
-        "reporte": reporte,
-        "diagnostico": diagnostico,
-        "verificar_salida": verificar_salida,
+        # --- CENTINELA ---
+        "verificar": "verificar",
+        "barrer": "barrer",
+        "verificar_salida": "verificar_salida",
 
-        "anunciar": anunciar,
-        "anunciar_todo": anunciar_todo,
-        "citar": citar,
-        "registrar": registrar,
-        "resolver": resolver,
-        "resolver_enunciado": resolver_enunciado,
-        "buscar": buscar,
-        "cadena": cadena,
-        "explicar": explicar,
-        "relacionar": relacionar,
-        "limpiar_ciclo": limpiar_ciclo,
+        # --- INVENTARIO Y REPORTING ---
+        "inventario": "inventario",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
 
-        # Compatibilidad Engine.
-        "evaluar": anunciar,
+        # --- OPERACIONES DE CITACIÓN ---
+        "anunciar": "anunciar",
+        "anunciar_todo": "anunciar_todo",
+        "citar": "citar",
+        "registrar": "registrar",
+        "resolver": "resolver",
+        "resolver_enunciado": "resolver_enunciado",
+        "buscar": "buscar",
+        "cadena": "cadena",
+        "explicar": "explicar",
+        "relacionar": "relacionar",
+        "limpiar_ciclo": "limpiar_ciclo",
+
+        # --- COMPATIBILIDAD ENGINE ---
+        "evaluar": "anunciar",
+
+        # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
+    },
 
         # =======================================================
         # CAPACIDADES ARQUITECTÓNICAS DE ENGINE
@@ -876,6 +886,57 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        # ========================================================
+        # 3.15.19 — EJECUTAR TOTAL
+        # ========================================================
+
+        "ejecutar_total": {
+            "descripcion": (
+                "Autoridad total de ENGINE sobre CIT. "
+                "Ejerce TODAS las unidades operativamente ejecutables "
+                "del módulo conforme a su contrato e inventario. "
+                "Todo es callable real. No inventa capacidades."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "acceso_archivos": ["*"],
+        },
+
+
+        # ========================================================
+        # 3.15.20 — INSPECCIONAR
+        # ========================================================
+
+        "inspeccionar": {
+            "descripcion": (
+                "Capacidad meta de inspeccion estructural de CIT. "
+                "Expone constantes, capacidades y estado "
+                "sin alterar el contrato ni el conocimiento declarado."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con estructura, capacidades y estado del modulo",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+
+
+        # ========================================================
+        # 3.15.21 — REGISTRAR INVENTARIO
+        # ========================================================
+
+        "registrar_inventario": {
+            "descripcion": (
+                "Registra el inventario estructural de CIT "
+                "como instantanea determinista. No altera evidencia "
+                "ni conocimiento declarado."
+            ),
+            "entrada": "peticion opcional (dict)",
+            "validar_esquema": ["acceso_archivos"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["acceso_archivos"],
+        },
+
     },
 
 

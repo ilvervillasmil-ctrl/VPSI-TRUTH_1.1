@@ -1877,6 +1877,101 @@ def diagnostico() -> Dict[str, Any]:
 # ===============================================================
 # FIN PARTE 9
 # ===============================================================
+# ===============================================================
+# PARTE 10 — RESOLUCIÓN ESTRICTA Y EXPORTACIONES
+# ===============================================================
+
+# ===============================================================
+# 10.1 — MAPA DE CAPACIDADES
+# ===============================================================
+_CAP_MAP = {
+    "verificar": verificar,
+    "barrer": barrer,
+    "inventario": inventario,
+    "skills": skills,
+    "ids": ids,
+    "por_id": por_id,
+    "listar_archivos": listar_archivos,
+    "verificar_salida": verificar_salida,
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
+    "reporte": reporte,
+    "diagnostico": diagnostico,
+}
+# ===============================================================
+# FIN 10.1
+# ===============================================================
+
+
+# ===============================================================
+# 10.2 — RESOLUCIÓN DE CAPACIDADES
+# ===============================================================
+
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
+    capacidades = cont.get("capacidades")
+
+    if not isinstance(capacidades, dict):
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: 'capacidades' debe ser dict"
+        )
+
+    declaradas = set(capacidades.keys())
+    disponibles = set(_CAP_MAP.keys())
+
+    faltantes = sorted(declaradas - disponibles)
+    extras = sorted(disponibles - declaradas)
+
+    if faltantes:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: capacidades declaradas sin entrada "
+            f"en _CAP_MAP: {faltantes}"
+        )
+
+    if extras:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: _CAP_MAP contiene capacidades no "
+            f"declaradas en CONTENEDOR: {extras}"
+        )
+
+    resueltas: Dict[str, Any] = {}
+
+    for nombre, ref in capacidades.items():
+        if callable(ref):
+            fn = ref
+        elif isinstance(ref, str):
+            if ref not in _CAP_MAP:
+                raise ContratoInvalido(
+                    f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                    f"referencia inexistente: '{ref}'"
+                )
+            fn = _CAP_MAP[ref]
+        else:
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"tipo invalido: {type(ref).__name__}"
+            )
+
+        if not callable(fn):
+            raise ContratoInvalido(
+                f"{NOMBRE_MODULO}: capacidad '{nombre}' "
+                f"no resuelve a callable real"
+            )
+
+        resueltas[nombre] = fn
+
+    if set(resueltas.keys()) != declaradas:
+        raise ContratoInvalido(
+            f"{NOMBRE_MODULO}: resolución de capacidades no coincide "
+            f"1:1 con CONTENEDOR"
+        )
+
+    cont["capacidades"] = resueltas
+
+# ===============================================================
+# FIN 10.2
+# ===============================================================
+
 
 
 # ===============================================================

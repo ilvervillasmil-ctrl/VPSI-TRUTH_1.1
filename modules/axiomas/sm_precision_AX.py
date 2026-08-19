@@ -1,34 +1,38 @@
-# -*- coding: utf-8 -*-
-"""
-SM_PRECISION — Extensión axiomática: Precisión del mecanismo causal
-y origen de la distorsión de representación.
-
-Versión: 1.0
-Dependencias estructurales: SM_MAPA, SM_MEMORIA, SM_AF, TA3–TA5, T12, T14.
-
-NOTA GENERAL (para humanos)
----------------------------
-Este cuerpo formaliza la capa anterior a la medición de verdad:
-
-1. Un mecanismo μ funciona porque es preciso (determinista bajo anclas).
-2. Sin Prec(μ) no hay medición fiable de C, L, K ni de Tru_Ri.
-3. La probabilidad es herramienta; su objetivo sigue siendo un invariante.
-4. Si el mapa X está distorsionado respecto de R, la causa reside en las
-   anclas suministradas (A_sum) o en la frontera del diseñador (∂D),
-   no en la ejecución de μ.
-5. Registrar ∂D convierte el límite del conocimiento del diseñador en
-   información estructural que delimita toda maximización posterior.
-
-Símbolos nuevos (no contradictorios):
-  μ            = mecanismo causal de ejecución
-  Prec(μ)      = predicado de precisión (determinismo bajo anclas)
-  A_sum        = anclas efectivamente suministradas
-  A_pos        = anclas posibles respecto de R
-  ∂D           = A_pos \ A_sum  (frontera del diseñador)
-  Prob         = procedimiento probabilístico usado como herramienta
-
-Cada declaración lleva nota operativa, ejemplo y demostración comentada.
-"""
+# ===============================================================
+# SM_PRECISION — Extensión axiomática: Precisión del mecanismo
+# causal y origen de la distorsión de representación.
+#
+# Versión: 1.0
+# Dependencias estructurales:
+#   SM_MAPA, SM_MEMORIA, SM_AF, TA3–TA5, T12, T14.
+#
+# NOTA GENERAL (para humanos)
+# ---------------------------------------------------------------
+# Este cuerpo formaliza la capa anterior a la medición de verdad:
+#
+# 1. Un mecanismo μ funciona porque es preciso
+#    (determinista bajo anclas).
+# 2. Sin Prec(μ) no hay medición fiable de C, L, K ni de Tru_Ri.
+# 3. La probabilidad es herramienta; su objetivo sigue siendo
+#    un invariante.
+# 4. Si el mapa X está distorsionado respecto de R, la causa
+#    reside en las anclas suministradas (A_sum) o en la frontera
+#    del diseñador (∂D), no en la ejecución de μ.
+# 5. Registrar ∂D convierte el límite del conocimiento del
+#    diseñador en información estructural que delimita toda
+#    maximización posterior.
+#
+# Símbolos nuevos (no contradictorios):
+#   μ         = mecanismo causal de ejecución
+#   Prec(μ)   = predicado de precisión (determinismo bajo anclas)
+#   A_sum     = anclas efectivamente suministradas
+#   A_pos     = anclas posibles respecto de R
+#   ∂D        = A_pos \ A_sum  (frontera del diseñador)
+#   Prob      = procedimiento probabilístico usado como herramienta
+#
+# Cada declaración lleva nota operativa, ejemplo y demostración
+# comentada.
+# ===============================================================
 
 from __future__ import annotations
 from typing import List, Dict, Any

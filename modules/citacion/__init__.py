@@ -156,7 +156,9 @@ TIPOS_DECLARACION = (
     "ch",
     "sf",
 )
-
+# ===============================================================
+# SECCIÓN 3 — 
+# ===============================================================
 RELACIONES = (
     "depende_de",
     "fundamenta",
@@ -170,7 +172,9 @@ RELACIONES = (
     "requiere",
     "gobierna",
 )
-
+# ===============================================================
+# SECCIÓN 4 —
+# ===============================================================
 CAMPOS_OBLIGATORIOS = (
     "id",
     "tipo",
@@ -178,7 +182,10 @@ CAMPOS_OBLIGATORIOS = (
     "enunciado",
 )
 
-CAMPOS_OPCIONALES = (
+# ===============================================================
+# SECCIÓN 4
+# ===============================================================
+CAMPOS_OBLIGATORIOS = (
     "descripcion",
     "evidencia_ref",
     "o_ref",
@@ -191,7 +198,7 @@ CAMPOS_OPCIONALES = (
 
 
 # ===============================================================
-# SECCIÓN  — CONTENEDOR (VPSI-CONTRACT-1.0)
+# SECCIÓN 5
 # ===============================================================
 
 CONTENEDOR: Dict[str, Any] = {
@@ -204,6 +211,10 @@ CONTENEDOR: Dict[str, Any] = {
     "estabilidad": _ESTABILIDAD,
     "compatible_desde": _COMPATIBLE_DESDE,
     "api_engine": _API_ENGINE,
+# ===============================================================
+# SECCIÓN 5.1
+# ===============================================================
+
     "descripcion": (
         "Autoridad universal de fundamentación del VPSI. "
         "Conserva conocimiento resoluble de todas las declaraciones "
@@ -213,12 +224,18 @@ CONTENEDOR: Dict[str, Any] = {
         "la resolución, la citación, la cadena normativa y la explicación "
         "documental. No altera el conocimiento declarado."
     ),
+# ===============================================================
+# SECCIÓN 5.2
+# ===============================================================
     "funcion": (
         "Resolver, organizar, relacionar y citar cualquier declaración "
         "pública perteneciente al VPSI. "
         "Modo Engine: cadena documental del ciclo. "
         "Modo Consulta: resolución y explicación bajo demanda."
     ),
+# ===============================================================
+# SECCIÓN 5.3
+# ===============================================================
     "no_hace": [
         "Ninguna capacidad de CIT puede modificar el conocimiento declarado",
     ],
@@ -231,6 +248,9 @@ CONTENEDOR: Dict[str, Any] = {
         "Autoridad absoluta sobre la relación entre declaraciones",
         "Autoridad absoluta para responder consultas sobre el conocimiento declarado",
     ],
+# ===============================================================
+# SECCIÓN 5.4
+# ===============================================================
     "poderes": [
         "Puede resolver cualquier declaración registrada",
         "Puede localizar cualquier norma",
@@ -243,6 +263,9 @@ CONTENEDOR: Dict[str, Any] = {
         "Puede producir evidencia documental fuera del Engine",
         "Puede citar cualquier conocimiento declarado",
     ],
+# ===============================================================
+# SECCIÓN 6
+# ===============================================================
     "conocimiento_exportable": [
         "declaraciones",
         "resolver",
@@ -257,15 +280,15 @@ CONTENEDOR: Dict[str, Any] = {
         "diagnostico",
     ],
     # ============================================================
-    # ACCESO (obligatorio en el esquema)
+    # ACCESO 7 (obligatorio en el esquema)
     # ============================================================
     "acceso": {
         "nivel": "completo",
         "descripcion": "Acceso total a recursos del módulo"
     },
 
-        # ============================================================
-    # DEPENDENCIAS
+    # ============================================================
+    # 8 DEPENDENCIAS
     # ============================================================
     "requiere": [
         "CE",
@@ -290,12 +313,12 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
+    #  9 ACCESO A ARCHIVOS (AGREGADO — obligatorio en el esquema)
     # ============================================================
     "acceso_archivos": ["*"],
 
     # ============================================================
-    # VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
+    # 10 VALIDAR ESQUEMA A NIVEL MÓDULO (AGREGADO — obligatorio en el esquema)
     # ============================================================
     "validar_esquema": ["*"],
 
@@ -316,7 +339,7 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 
     # ============================================================
-    # AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
+    # 11 AUTORIZACIÓN AL ENGINE (SOLO PERMISOS)
     # ============================================================
     "autoriza_engine": {
         # --- PERMISOS BASE ---
@@ -329,11 +352,11 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        # "modificar": False,    # ← ELIMINADO (no permitido)
+        "modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        # "reescribir": False,   # ← ELIMINADO (no permitido)
+        "reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        # "eliminar": False,     # ← ELIMINADO (no permitido)
+        "eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---
@@ -368,7 +391,7 @@ CONTENEDOR: Dict[str, Any] = {
         "conocimiento": True,
         "reporte": True,
 
-                # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
+        # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
         "validar_esquema": True,
         "acceso_archivos": True,
 
@@ -378,8 +401,8 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": True,
     },
   
-        # ============================================================
-    # 17 — CAPACIDADES
+    # ============================================================
+    # 12— CAPACIDADES
     # ============================================================
     "capacidades": {
 
@@ -416,9 +439,13 @@ CONTENEDOR: Dict[str, Any] = {
     },
 
     # ============================================================
-    # METACITAS
+    # 13 CAOACIDADES META 1:1
     # ============================================================
     "capacidades_meta": {
+        
+        # ============================================================
+        # 1ra CAPADIDA VERIFICAR
+        # ============================================================
         "verificar": {
             "descripcion": "Centinela del oficio de fundamentación.",
             "entrada": "*",
@@ -428,6 +455,10 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 2DA CAPADIDA BARRER
+        # ============================================================
 
         "barrer": {
             "descripcion": "Alias de verificar.",
@@ -438,6 +469,10 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 3ra CAPADIDA INVENTARIO
+        # ============================================================
 
         "inventario": {
             "descripcion": "Inventario contractual de CIT.",
@@ -449,6 +484,10 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 4ta CAPADIDA REPORTE
+        # ============================================================
 
         "reporte": {
             "descripcion": "Reporte de estado de CIT.",
@@ -459,6 +498,10 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 5ta CAPACIDAD DIGNOSTICO
+        # ============================================================
 
         "diagnostico": {
             "descripcion": "Diagnóstico propio de CIT.",
@@ -469,6 +512,10 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 6ta CAPACIDAD VERIFICAR SALIDA
+        # ============================================================
 
         "verificar_salida": {
             "descripcion": "Forma mínima de salida de CIT.",
@@ -477,6 +524,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "bool",
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 7ma CAPACIDAD ANUNCIAR
+        # ============================================================
 
         "anunciar": {
             "descripcion": (
@@ -490,6 +541,10 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 8va CAPACIDAD ANUNCIAR TODO
+        # ============================================================
 
         "anunciar_todo": {
             "descripcion": (
@@ -500,6 +555,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con anuncios, n",
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 9na CAPACIDAD CITAR
+        # ============================================================
 
         "citar": {
             "descripcion": (
@@ -510,6 +569,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con citas, n",
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 10MA CAPACIDAD REGISTRAR
+        # ============================================================
 
         "registrar": {
             "descripcion": (
@@ -521,6 +584,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con ok, declaracion",
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 11ra CAPACIDAD RESOLVER
+        # ============================================================
 
         "resolver": {
             "descripcion": "Resuelve una declaración por id.",
@@ -529,6 +596,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con resuelto, declaracion",
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 12da CAPACIDAD RESOLVER ENUNCIADO
+        # ============================================================
 
         "resolver_enunciado": {
             "descripcion": (
@@ -539,6 +610,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con resuelto, enunciado",
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 13ra CAPACIDAD BUSCAR
+        # ============================================================
 
         "buscar": {
             "descripcion": (
@@ -549,6 +624,10 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con declaraciones, n",
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 14ta CAPACIDAD CADENA
+        # ============================================================
 
         "cadena": {
             "descripcion": (
@@ -561,6 +640,10 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        
+        # ============================================================
+        # 15ta CAPACIDAD EXPLICAR
+        # ============================================================
 
         "explicar": {
             "descripcion": (
@@ -573,6 +656,9 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        # ============================================================
+        # 16 CAPACIDAD RELACIONAR
+        # ============================================================
 
         "relacionar": {
             "descripcion": (
@@ -585,6 +671,9 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        # ============================================================
+        # 17ma CAPACIDAD LIMPIAR CICLO
+        # ============================================================
 
         "limpiar_ciclo": {
             "descripcion": (
@@ -598,8 +687,8 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
-                # ============================================================
-        # evaluar
+        # ============================================================
+        #  18va CAPACIDAD EVALUAR
         # ============================================================
         "evaluar": {
             "descripcion": (
@@ -614,7 +703,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
 
         # ============================================================
-        # ejecutar_total
+        #  19na CAPACIDAD ejecutar_total
         # ============================================================
         "ejecutar_total": {
             "descripcion": (
@@ -628,7 +717,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
 
         # ============================================================
-        # inspeccionar
+        # 20ma CAPACIDAD inspeccionar
         # ============================================================
         "inspeccionar": {
             "descripcion": (
@@ -641,7 +730,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
 
         # ============================================================
-        # registrar_inventario
+        # 21ra CAPACIDAD registrar_inventario
         # ============================================================
         "registrar_inventario": {
             "descripcion": (
@@ -654,7 +743,7 @@ CONTENEDOR: Dict[str, Any] = {
         },
     },
     # ============================================================
-    # REPORTING (OBLIGATORIO EN EL ESQUEMA)
+    # 14 REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
     "reporting": {
         # --- BANDERAS DE ESTADO Y SALUD ---
@@ -693,6 +782,9 @@ CONTENEDOR: Dict[str, Any] = {
         "validar_esquema": True,      # ← AGREGADA
     },
     
+    # ============================================================
+    # 15
+    # ============================================================
     "estados_validos": [
         "NO_INICIADO",
         "OPERATIVO",
@@ -700,6 +792,9 @@ CONTENEDOR: Dict[str, Any] = {
         "RECHAZADO",
     ],
     
+    # ============================================================
+    # 16
+    # ============================================================
     "invariantes": [
         "CIT conserva conocimiento declarativo universal resoluble",
         "CIT puede resolver cualquier declaración registrada",
@@ -724,7 +819,7 @@ CONTENEDOR: Dict[str, Any] = {
 
 
 # ===============================================================
-# SECCIÓN 3 — REGISTRO DE DECLARACIONES (proceso de ciclo)
+# SECCIÓN 17 — REGISTRO DE DECLARACIONES (proceso de ciclo)
 # ===============================================================
 #
 # Memoria operativa del ciclo / consulta.
@@ -734,6 +829,9 @@ CONTENEDOR: Dict[str, Any] = {
 
 _REGISTRO: List[Dict[str, Any]] = []
 
+#===============================================================
+# SECCIÓN 18 — validar_declaracion
+#===============================================================
 
 def _validar_declaracion(decl: Dict[str, Any]) -> List[str]:
     errores: List[str] = []
@@ -755,7 +853,10 @@ def _validar_declaracion(decl: Dict[str, Any]) -> List[str]:
         if decl.get(campo) in (None, ""):
             errores.append("falta campo obligatorio: {0}".format(campo))
     return errores
-
+    
+#===============================================================
+# SECCIÓN 19 normalizar_declaracion
+#===============================================================
 
 def _normalizar_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
     fuente = decl.get("fuente") or decl.get("fuente_modulo") or ""
@@ -779,7 +880,7 @@ def _normalizar_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 4 — RESOLUCIÓN / REGISTRO / CONSULTA BASE
+# SECCIÓN 20 — RESOLUCIÓN / REGISTRO / CONSULTA BASE/ limpiar_ciclo
 # ===============================================================
 
 def limpiar_ciclo() -> Dict[str, Any]:
@@ -788,6 +889,9 @@ def limpiar_ciclo() -> Dict[str, Any]:
     _REGISTRO.clear()
     return {"ok": True, "limpiadas": n, "id": _ID}
 
+# ===============================================================
+# SECCIÓN 21 — REGISTRAR
+# ===============================================================
 
 def registrar(declaracion: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -806,6 +910,9 @@ def registrar(declaracion: Dict[str, Any]) -> Dict[str, Any]:
         "id": _ID,
     }
 
+# ===============================================================
+# SECCIÓN 22 — RESOLVER
+# ===============================================================
 
 def resolver(id_decl: str) -> Dict[str, Any]:
     """
@@ -868,7 +975,9 @@ def resolver(id_decl: str) -> Dict[str, Any]:
         "declaracion": None,
         "nota": "sin declaración resoluble en registro ni fuentes cargadas",
     }
-
+# ===============================================================
+# SECCIÓN 23 BUSCAR
+# ===============================================================
 
 def buscar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -905,7 +1014,9 @@ def buscar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "filtro": pet,
         "nota": "solo exposición; sin recálculo; sin modificación",
     }
-
+# ===============================================================
+# SECCIÓN 24 CITAR
+# ===============================================================
 
 def citar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -920,7 +1031,9 @@ def citar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "n": len(citas),
         "nota": "citas = representación de declaraciones; sin recálculo",
     }
-
+# ===============================================================
+# SECCIÓN 25 RESOLVER ENUNCIADO
+# ===============================================================
 
 def resolver_enunciado(id_norma: str) -> Dict[str, Any]:
     """Alias de resolución orientado a enunciado (modo consulta)."""
@@ -938,7 +1051,7 @@ def resolver_enunciado(id_norma: str) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 5 — RELACIONES Y CADENA NORMATIVA
+# SECCIÓN 26 RELACIONAR
 # ===============================================================
 
 def relacionar(
@@ -979,6 +1092,9 @@ def relacionar(
     }
     return registrar(enlace)
 
+# ===============================================================
+# SECCIÓN 27 CADENA
+# ===============================================================
 
 def cadena(ids: Optional[List[str]] = None) -> Dict[str, Any]:
     """
@@ -1005,7 +1121,9 @@ def cadena(ids: Optional[List[str]] = None) -> Dict[str, Any]:
             "Solo declaraciones resolubles; sin recálculo."
         ),
     }
-
+# ===============================================================
+# SECCIÓN 28 EXPLICAR
+# ===============================================================
 
 def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -1037,8 +1155,11 @@ def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 6 — ANUNCIO (forma + modo Engine)
+# SECCIÓN 29 ANRNCIO DE DECLARACIONES 
 # ===============================================================
+
+
+
 
 def _anuncio_de_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
     errores = _validar_declaracion(decl)
@@ -1058,7 +1179,9 @@ def _anuncio_de_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
             "relaciones": c.get("relaciones") or [],
         },
     }
-
+# ===============================================================
+# SECCIÓN 30
+# ===============================================================
 
 def anunciar_todo(filtro: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     pack = buscar(filtro)

@@ -3,26 +3,87 @@
 # ===============================================================
 #
 # ENGINE
-# Versión:            19.0
+# Versión:            20.0
 # Esquema contrato:   VPSI-CONTRACT-2.0
 # API Engine:         1.0
-# 
+#
 # Función:
-#   Agente ejecutor del sistema.
+#   Agente ejecutor y director arquitectónico del sistema.
+#
+#   El Engine constituye la capa de coordinación entre los contratos
+#   y las capacidades de los módulos. No sustituye la autoridad de
+#   ningún módulo ni reproduce internamente las operaciones que el
+#   contrato asigna a cada uno.
+#
 #   Descubre módulos. Lee contratos. Valida contratos.
 #   Registra módulos. Resuelve dependencias.
-#   Construye grafo estructural. Ejecuta capacidades declaradas.
-#   Entrega contenido al módulo correspondiente.
-#   Recibe el resultado real del módulo.
-#   Registra trazas. Registra mapa de ruta de ejecución.
-#   Consolida reportes. Entrega paquete_omega().
+#   Construye el grafo estructural.
+#   Resuelve capacidades declaradas.
+#   Ejecuta capacidades autorizadas.
+#   Entrega el contenido al módulo correspondiente.
+#   Recibe el resultado real producido por el módulo.
+#   Registra trazas.
+#   Registra el mapa de ruta de ejecución.
+#   Consolida reportes.
+#   Entrega paquete_omega().
 #
-# Qué NO hace:
-#   No inventa capacidades. No adivina 
-#   No interpreta reportes.
+#   Para la Fórmula de la Verdad, el Engine incorpora la capacidad
+#   de evaluación global. Esta capacidad no reemplaza las funciones
+#   matemáticas de Calculator ni de Formulas: coordina la evaluación
+#   de los módulos, integra sus resultados y conduce la información
+#   resultante por la cadena contractual hasta obtener la Verdad
+#   Cuantificada.
 #
-# Principio:
-#   Agencia limitada por la unión coherente de los contratos.
+#   La evaluación global se estructura de la siguiente manera:
+#
+#                         ENGINE
+#                           │
+#                        evaluar
+#                           │
+#             ┌─────────────┼─────────────┐
+#             ▼             ▼             ▼
+#           Módulo        Módulo        Módulo
+#             │             │             │
+#             └─────────────┼─────────────┘
+#                           ▼
+#                       Calculator
+#                         C L K
+#                           ▼
+#                        Formulas
+#                         Tru_Ri
+#                           ▼
+#                        Tru_total
+#                           ▼
+#                   VERDAD CUANTIFICADA
+#
+#   En esta arquitectura:
+#
+#     ENGINE
+#       → dirige y coordina.
+#
+#     evaluar
+#       → reúne y encadena la evaluación contractual necesaria.
+#
+#     MÓDULOS
+#       → ejecutan sus propias capacidades y producen sus resultados.
+#
+#     Calculator
+#       → calcula los factores C, L y K conforme a su contrato.
+#
+#     Formulas
+#       → aplica las fórmulas de Tru_Ri y Tru_total conforme a su
+#         contrato.
+#
+#     ENGINE
+#       → recibe, registra, consolida y entrega el resultado final.
+#
+#   El Engine no inventa capacidades, parámetros, resultados ni
+#   contratos. Toda operación debe existir y estar autorizada por
+#   la arquitectura contractual correspondiente.
+#
+#   La capacidad de evaluación está limitada por la unión coherente
+#   de los contratos, capacidades, entradas, salidas, dependencias
+#   e invariantes declarados por los módulos.
 #
 # ===============================================================
 # ===============================================================
@@ -46,7 +107,7 @@ from core.centinela import Centinela, Veredicto
 # Parte 2 CONSTANTES /el esquema de contrato requerido,
 #  la versión de contrato exigida y la API actual del Engine
 # ===============================================================
-VERSION_ENGINE = "19"
+VERSION_ENGINE = "20"
 ESQUEMA_CONTRATO_REQUERIDO = "VPSI-CONTRACT-1.0"
 VERSION_CONTRATO_REQUERIDA = "1.0"
 API_ENGINE_ACTUAL = "1.0"

@@ -1560,6 +1560,92 @@ def _anuncio_de_declaracion(
         },
     }
 
+# ===============================================================
+
+# SECCIÓN 30 — ANUNCIAR
+
+# ===============================================================
+
+def anunciar(arg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+
+    """
+
+    Capacidad pública contractual de CIT.
+
+    Dos modos:
+
+      1. paquete de ciclo -> fundamentación documental del ciclo;
+
+      2. declaración suelta -> registro y anuncio de la declaración.
+
+    None -> anuncia el registro operativo actual.
+
+    No calcula.
+
+    No modifica conocimiento de origen.
+
+    No inventa declaraciones.
+
+    """
+
+    if arg is None:
+
+        return anunciar_todo()
+
+    if _es_paquete_ciclo(arg):
+
+        return _anunciar_paquete(arg)
+
+    if _es_declaracion_suelta(arg):
+
+        registro = registrar(arg)
+
+        if not registro.get("ok"):
+
+            return {
+
+                "ok": False,
+
+                "estado": "ERROR_DECLARACION",
+
+                "errores": registro.get("errores") or [
+
+                    "declaracion inválida"
+
+                ],
+
+                "anuncio": None,
+
+                "id": _ID,
+
+            }
+
+        return _anuncio_de_declaracion(
+
+            registro.get("declaracion") or arg
+
+        )
+
+    return {
+
+        "ok": False,
+
+        "estado": "ERROR_FORMA",
+
+        "errores": [
+
+            "anunciar: se esperaba paquete de ciclo, "
+
+            "declaración suelta o None"
+
+        ],
+
+        "anuncio": None,
+
+        "id": _ID,
+
+    }
+
 
 # ===============================================================
 # SECCIÓN 30 — ANUNCIAR TODO

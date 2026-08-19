@@ -350,6 +350,12 @@ CONTENEDOR: Dict[str, Any] = {
         # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
         "validar_esquema": True,     # ← AGREGADO
         "acceso_archivos": True,     # ← AGREGADO
+    
+
+        # --- CAPACIDADES ARQUITECTÓNICAS ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
 
     # -----------------------------------------------------------
@@ -363,19 +369,21 @@ CONTENEDOR: Dict[str, Any] = {
         "validar_entrada",
         "leer_evidencia",
     ],
-
-    # -----------------------------------------------------------
-    # CAPACIDADES
-    # -----------------------------------------------------------
-
+ # ===============================================================
+# EN capacidades — 
+# ===============================================================
     "capacidades": {
         "verificar": "verificar",
         "inventario": "inventario",
         "generar_reporte": "generar_reporte",
         "validar_entrada": "validar_entrada",
         "leer_evidencia": "leer_evidencia",
+        "reporte": "reporte",
+        "diagnostico": "diagnostico",
+        "ejecutar_total": "ejecutar_total",
+        "inspeccionar": "inspeccionar",
+        "registrar_inventario": "registrar_inventario",
     },
-
     # ============================================================
     # METADATOS DE CAPACIDADES (1:1 OBLIGATORIO)
     # ============================================================
@@ -436,8 +444,56 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con evidencia persistente",
             "acceso_archivos": ["*"],
         },
-    },
 
+        "reporte": {
+            "descripcion": "Reporte de estado de DGS.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con id, estado, capacidades",
+            "acceso_archivos": ["*"],
+        },
+
+        "diagnostico": {
+            "descripcion": "Diagnóstico propio de DGS.",
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con estado, problemas, advertencias",
+            "acceso_archivos": ["*"],
+        },
+
+        "ejecutar_total": {
+            "descripcion": (
+                "Ejecuta todas las capacidades públicas de DGS "
+                "excepto ejecutar_total."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con resultados por capacidad",
+            "acceso_archivos": ["*"],
+        },
+
+        "inspeccionar": {
+            "descripcion": (
+                "Meta-inspección estructural de contrato y callables."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con resolubles, errores, coherente",
+            "acceso_archivos": ["*"],
+        },
+
+        "registrar_inventario": {
+            "descripcion": (
+                "Instantánea determinista del inventario. "
+                "No altera evidencia."
+            ),
+            "entrada": "*",
+            "validar_esquema": ["*"],
+            "salida": "dict con inventario registrado",
+            "acceso_archivos": ["*"],
+        },
+    },
+    
     # ============================================================
     # REPORTING (OBLIGATORIO EN EL ESQUEMA)
     # ============================================================
@@ -469,10 +525,16 @@ CONTENEDOR: Dict[str, Any] = {
         # --- BANDERA DE REPORTE ---
         "reporte": True,
 
-        # --- BANDERAS OBLIGATORIAS SEGÚN ENGINE ---
+        # --- BANDERAS OBLIGATORIAS ENGINE ---
         "acceso_archivos": True,      # ← AGREGADA
         "validar_esquema": True,      # ← AGREGADA
+
+        # --- CAPACIDADES ARQUITECTÓNICAS ---
+        "ejecutar_total": True,
+        "inspeccionar": True,
+        "registrar_inventario": True,
     },
+    
 
     # -----------------------------------------------------------
     # ESTADOS
@@ -1295,17 +1357,11 @@ def inventario(
                 _ruta_evaluaciones()
             ),
     }
-
-
 # ===============================================================
 # REPORTING
 # ===============================================================
 
 def reporte() -> Dict[str, Any]:
-    """
-    Estado actual de DGS.
-    """
-
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1315,36 +1371,15 @@ def reporte() -> Dict[str, Any]:
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
         "estado": ESTADO_OPERATIVO,
-        "capacidades": list(
-            CONTENEDOR[
-                "capacidades"
-            ].keys()
-        ),
-        "requiere": list(
-            CONTENEDOR.get(
-                "requiere"
-            ) or []
-        ),
-        "autoridad":
-            CONTENEDOR.get(
-                "autoridad"
-            ),
-        "conocimiento_exportable":
-            CONTENEDOR.get(
-                "conocimiento_exportable"
-            ),
-        "consultas_soportadas":
-            CONTENEDOR.get(
-                "consultas_soportadas"
-            ),
+        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "requiere": list(CONTENEDOR.get("requiere") or []),
+        "autoridad": CONTENEDOR.get("autoridad"),
+        "conocimiento_exportable": CONTENEDOR.get("conocimiento_exportable"),
+        "consultas_soportadas": CONTENEDOR.get("consultas_soportadas"),
     }
 
 
 def diagnostico() -> Dict[str, Any]:
-    """
-    Estado diagnóstico del propio DGS.
-    """
-
     return {
         "id": ID_MODULO,
         "modulo": NOMBRE_MODULO,
@@ -1353,6 +1388,144 @@ def diagnostico() -> Dict[str, Any]:
         "advertencias": [],
         "recomendaciones": [],
     }
+
+# ===============================================================
+# FIN REPORTING
+# ===============================================================
+
+
+# ===============================================================
+# EJECUTAR_TOTAL
+# ===============================================================
+
+def ejecutar_total(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    pet = dict(peticion) if isinstance(peticion, dict) else {}
+    caps = list((CONTENEDOR.get("capacidades") or {}).keys())
+    resultados: Dict[str, Any] = {}
+    ejecutadas: List[str] = []
+    errores_ejecucion: List[Dict[str, Any]] = []
+
+    for nombre in caps:
+        if nombre == "ejecutar_total":
+            continue
+
+        fn = CONTENEDOR["capacidades"].get(nombre)
+        if not callable(fn):
+            errores_ejecucion.append({
+                "capacidad": nombre,
+                "error": "no resoluble a callable",
+            })
+            continue
+
+        try:
+            if nombre == "verificar":
+                resultados[nombre] = fn(pet if pet else None)
+            elif nombre == "validar_entrada":
+                resultados[nombre] = fn(pet)
+            elif nombre == "generar_reporte":
+                resultados[nombre] = {
+                    "omitido": True,
+                    "nota": "requiere datos reales del Engine",
+                }
+            else:
+                resultados[nombre] = fn()
+            ejecutadas.append(nombre)
+        except Exception as exc:
+            errores_ejecucion.append({
+                "capacidad": nombre,
+                "error": "{0}: {1}".format(type(exc).__name__, exc),
+            })
+
+    coherente = len(errores_ejecucion) == 0
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "ejecutar_total",
+        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
+        "coherente": coherente,
+        "capacidades_ejecutadas": ejecutadas,
+        "errores_ejecucion": errores_ejecucion,
+        "resultados": resultados,
+        "capacidades_declaradas": caps,
+    }
+
+# ===============================================================
+# FIN EJECUTAR_TOTAL
+# ===============================================================
+
+
+# ===============================================================
+# INSPECCIONAR
+# ===============================================================
+
+def inspeccionar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    capacidades = CONTENEDOR.get("capacidades") or {}
+    metas = CONTENEDOR.get("capacidades_meta") or {}
+    errores: List[str] = []
+
+    resolubles = [n for n, r in capacidades.items() if callable(r)]
+    no_resolubles = [n for n in capacidades if n not in resolubles]
+    sin_meta = [n for n in capacidades if n not in metas]
+    metas_sin = [n for n in metas if n not in capacidades]
+
+    for n in no_resolubles:
+        errores.append("capacidad no resoluble: {0}".format(n))
+    for n in sin_meta:
+        errores.append("capacidad sin meta: {0}".format(n))
+    for n in metas_sin:
+        errores.append("meta sin capacidad: {0}".format(n))
+
+    coherente = not errores
+    return {
+        "id": ID_MODULO,
+        "modulo": NOMBRE_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "operacion": "inspeccionar",
+        "estado": ESTADO_OPERATIVO if coherente else ESTADO_DEGRADADO,
+        "coherente": coherente,
+        "capacidades_contractuales": list(capacidades.keys()),
+        "capacidades_meta": list(metas.keys()),
+        "capacidades_resolubles": resolubles,
+        "capacidades_no_resolubles": no_resolubles,
+        "errores": errores,
+        "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
+        "reporting": CONTENEDOR.get("reporting"),
+        "invariantes": CONTENEDOR.get("invariantes"),
+    }
+
+# ===============================================================
+# FIN INSPECCIONAR
+# ===============================================================
+
+
+# ===============================================================
+# REGISTRAR_INVENTARIO
+# ===============================================================
+
+def registrar_inventario(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    return {
+        "id": ID_MODULO,
+        "operacion": "registrar_inventario",
+        "registrado": True,
+        "inventario": inventario(),
+        "nota": (
+            "Instantánea determinista del inventario de DGS. "
+            "No modifica evidencia."
+        ),
+    }
+
+# ===============================================================
+# FIN REGISTRAR_INVENTARIO
+# ===============================================================
 
 
 # ===============================================================
@@ -1367,75 +1540,61 @@ _CAP_MAP = {
     "leer_evidencia": leer_evidencia,
     "reporte": reporte,
     "diagnostico": diagnostico,
+    "ejecutar_total": ejecutar_total,
+    "inspeccionar": inspeccionar,
+    "registrar_inventario": registrar_inventario,
 }
+
+# ===============================================================
+# FIN MAPA DE CAPACIDADES
+# ===============================================================
 
 
 # ===============================================================
 # RESOLUCIÓN ESTRICTA
 # ===============================================================
 
-def _resolver_capacidades(
-    cont: Dict[str, Any],
-) -> None:
-
+def _resolver_capacidades(cont: Dict[str, Any]) -> None:
     resueltas: Dict[str, Any] = {}
 
-    for nombre, ref in cont[
-        "capacidades"
-    ].items():
-
+    for nombre, ref in cont["capacidades"].items():
         if callable(ref):
             resueltas[nombre] = ref
             continue
 
         if isinstance(ref, str):
-
-            if ref not in _CAP_MAP:
+            if ref not in _CAP_MAP or not callable(_CAP_MAP[ref]):
                 raise ContratoInvalido(
-                    "{0}: capacidad '{1}' "
-                    "referencia inexistente: '{2}'".format(
-                        NOMBRE_MODULO,
-                        nombre,
-                        ref,
+                    "{0}: capacidad '{1}' no resoluble: '{2}'".format(
+                        NOMBRE_MODULO, nombre, ref
                     )
                 )
-
-            fn = _CAP_MAP[ref]
-
-            if not callable(fn):
-                raise ContratoInvalido(
-                    "{0}: '{1}' no es callable".format(
-                        NOMBRE_MODULO,
-                        ref,
-                    )
-                )
-
-            resueltas[nombre] = fn
+            resueltas[nombre] = _CAP_MAP[ref]
             continue
 
         raise ContratoInvalido(
-            "{0}: capacidad '{1}' tiene "
-            "tipo inválido: {2}".format(
-                NOMBRE_MODULO,
-                nombre,
-                type(ref).__name__,
+            "{0}: capacidad '{1}' tipo inválido: {2}".format(
+                NOMBRE_MODULO, nombre, type(ref).__name__
             )
         )
 
     cont["capacidades"] = resueltas
+
+# ===============================================================
+# FIN RESOLUCIÓN ESTRICTA
+# ===============================================================
 
 
 # ===============================================================
 # VALIDACIÓN + RESOLUCIÓN
 # ===============================================================
 
-_validar_contrato(
-    CONTENEDOR
-)
+_validar_contrato(CONTENEDOR)
+_resolver_capacidades(CONTENEDOR)
 
-_resolver_capacidades(
-    CONTENEDOR
-)
+# ===============================================================
+# FIN VALIDACIÓN + RESOLUCIÓN
+# ===============================================================
 
 
 # ===============================================================
@@ -1463,8 +1622,10 @@ __all__ = [
     "generar_reporte",
     "validar_entrada",
     "leer_evidencia",
+    "ejecutar_total",
+    "inspeccionar",
+    "registrar_inventario",
 ]
-
 
 # ===============================================================
 # FIN DEL MÓDULO DGS

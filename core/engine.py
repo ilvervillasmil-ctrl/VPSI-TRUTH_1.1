@@ -30,27 +30,16 @@
 # ===============================================================
 
 from __future__ import annotations
-# --- Estándar del lenguaje ---
-import sys
-import time
-import math
-import ast
-import copy
-import threading
 import importlib.util
 import inspect
 import re
-# --- Fechas y tiempo ---
+import sys
+import time
+from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
-# --- Números y precisión ---
-from decimal import Decimal, getcontext
-from fractions import Fraction
-# --- Tipos y estructuras ---
-from typing import Any, Dict, List, Optional, Set, Tuple
-from collections import defaultdict, deque
+from typing import Any, Dict, List, Optional, Tuple
 from core.centinela import Centinela, Veredicto
-
 
 
 # ===============================================================
@@ -212,10 +201,8 @@ class ContratoError(Exception):
 # ROLES
 # ===============================================================
 ROLES: Tuple[str, ...] = (
-    "CE", "AX", "FO", "MC", "SF",
-    "CA", "CX", "DI", "RE", "VX",
-    "TX", "CH", "CIT", "DGCO", "UI",
-    "CC", "TT", "SC", "CT",
+    "CT", "AX", "FO", "MC", "SF", "CA", "CX", "DI",
+    "RE", "VX", "TX", "CH", "CIT",
 )
 OBLIGATORIOS: Tuple[str, ...] = ("CT", "AX", "FO", "MC", "SF")  
 
@@ -1081,110 +1068,52 @@ class Engine:
                         f"{nombre}: capacidad '{k}' no es callable (tipo={type(v).__name__})"
                     )
 
-    # ===========================================================
-    # Parte 17.8 VALIDACIÓN CRUZADA CAPACIDAD ↔ META CAPACIDAD
-    # ===========================================================
-
-    def _validar_capacidades_meta(
-        self,
-        meta: Dict[str, Any],
-        nombre: str
-    ) -> List[str]:
-
-        errores: List[str] = []
-
         # =======================================================
-        # Parte 17.8.1 CAPACIDADES
+        # Parte 17.8 METADATOS DE CAPACIDADES
         # =======================================================
 
-        capacidades = meta.get("capacidades")
+        meta_caps = meta.get("capacidades_meta")
 
-        if not isinstance(capacidades, dict):
+        if not isinstance(meta_caps, dict):
 
             errores.append(
-                f"{nombre}: 'capacidades' debe ser dict"
+                f"{nombre}: 'capacidades_meta' debe ser dict"
             )
 
-            return errores
+        elif isinstance(caps, dict):
 
-        # =======================================================
-        # Parte 17.8.2 META CAPACIDAD
-        # =======================================================
+            for k in caps:
 
-        meta_capacidad = meta.get("meta_capacidad")
+                if k not in meta_caps:
 
-        if not isinstance(meta_capacidad, dict):
+                    errores.append(
+                        f"{nombre}: capacidad '{k}' sin entrada en capacidades_meta"
+                    )
+                    continue
 
-            errores.append(
-                f"{nombre}: 'meta_capacidad' debe ser dict"
-            )
+                entrada_meta = meta_caps[k]
 
-            return errores
+                if not isinstance(entrada_meta, dict):
 
-        # =======================================================
-        # Parte 17.8.3 CORRESPONDENCIA 1:1
-        # =======================================================
+                    errores.append(
+                        f"{nombre}: capacidades_meta['{k}'] debe ser dict, es {type(entrada_meta).__name__}"
+                    )
+                    continue
 
-        claves_capacidades = set(capacidades.keys())
-        claves_meta = set(meta_capacidad.keys())
+                for campo in CLAVES_META_CAPACIDAD:
 
-        faltantes_meta = sorted(
-            claves_capacidades - claves_meta
-        )
+                    if campo not in entrada_meta:
 
-        faltantes_capacidad = sorted(
-            claves_meta - claves_capacidades
-        )
+                        errores.append(
+                            f"{nombre}: capacidades_meta['{k}'] falta '{campo}'"
+                        )
 
-        if faltantes_meta:
+                    elif not isinstance(entrada_meta[campo], (str, list)):    # ← ACEPTA str O list
 
-            errores.append(
-                f"{nombre}: capacidades sin meta_capacidad: "
-                f"{faltantes_meta}"
-            )
+                        errores.append(
+                            f"{nombre}: capacidades_meta['{k}']['{campo}'] debe ser str o list"
+                        )
 
-        if faltantes_capacidad:
-
-            errores.append(
-                f"{nombre}: meta_capacidad sin capacidad: "
-                f"{faltantes_capacidad}"
-            )
-
-        # =======================================================
-        # Parte 17.8.4 VALIDACIÓN DEL CALLABLE
-        # =======================================================
-
-        for clave, callable_ref in capacidades.items():
-
-            if clave not in meta_capacidad:
-                continue
-
-            if not callable(callable_ref):
-
-                errores.append(
-                    f"{nombre}: capacidad '{clave}' "
-                    f"no es callable"
-                )
-
-        # =======================================================
-        # Parte 17.8.5 VALIDACIÓN DE LA META
-        # =======================================================
-
-        for clave, descripcion in meta_capacidad.items():
-
-            if not isinstance(descripcion, str):
-
-                errores.append(
-                    f"{nombre}: meta_capacidad '{clave}' "
-                    f"debe ser str, es "
-                    f"{type(descripcion).__name__}"
-                )
-
-        return errores
-
-    # ===========================================================
-    # FIN Parte 17.8
-    # ===========================================================
         # =======================================================
         # Parte 17.9 AUTORIZACIÓN ENGINE
         # =======================================================

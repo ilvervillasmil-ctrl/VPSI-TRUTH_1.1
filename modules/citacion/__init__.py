@@ -185,7 +185,7 @@ CAMPOS_OBLIGATORIOS = (
 # ===============================================================
 # SECCIÓN 4
 # ===============================================================
-CAMPOS_OBLIGATORIOS = (
+CAMPOS_OPCIONALES = (
     "descripcion",
     "evidencia_ref",
     "o_ref",

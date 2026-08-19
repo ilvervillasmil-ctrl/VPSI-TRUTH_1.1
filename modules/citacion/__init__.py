@@ -1544,8 +1544,15 @@ def anunciar(arg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 7 — REPORTING ESTÁNDAR
+# SECCIÓN 31 INVENTARIO
 # ===============================================================
+
+
+
+
+
+
+
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
     return {
@@ -1571,6 +1578,10 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "modos": ["engine", "consulta"],
         "requiere": [],
     }
+
+# ===============================================================
+# SECCIÓN 32 REPORTE
+# ===============================================================
 
 
 def reporte(peticion: Any = None) -> Dict[str, Any]:
@@ -1604,24 +1615,429 @@ def diagnostico(peticion: Any = None) -> Dict[str, Any]:
         "nota": "Diagnóstico propio de CIT. No consulta autoridades ajenas.",
     }
 
+# ===============================================================
+# SECCIÓN 32 BARRER
+# ===============================================================
 
 def barrer(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Barrido estructural determinista del módulo CIT.
+
+    PRINCIPIOS:
+    - No modifica conocimiento.
+    - Una declaración se identifica por (módulo, id).
+    - Un mismo id en módulos distintos NO es duplicado.
+    - Una dependencia se resuelve dentro de su módulo cuando éste está
+      explícitamente determinado.
+    - Una dependencia sin módulo puede resolverse contra el módulo de origen.
+    - Una dependencia no encontrada se registra como ausente; no se inventa.
+    - Las raíces sin depende_de son válidas.
+    - La existencia de una dependencia no constituye contradicción.
+    - Las relaciones se conservan como aristas estructurales.
+    """
+
     errores: List[str] = []
     choques: List[str] = []
 
+    # -----------------------------------------------------------
+    # 1. Validación contractual existente
+    # -----------------------------------------------------------
     for t in TIPOS_DECLARACION:
         if not isinstance(t, str) or not t:
             errores.append("tipo inválido en TIPOS_DECLARACION")
 
-    # Restricción única: ninguna capacidad puede modificar conocimiento
-    for cap in CONTENEDOR["capacidades"]:
+    capacidades = CONTENEDOR.get("capacidades", {})
+    if not isinstance(capacidades, dict):
+        capacidades = {}
+
+    for cap in capacidades:
         nombre = str(cap).lower()
-        if any(x in nombre for x in ("modificar", "alterar", "reescribir", "borrar_corpus")):
+        if any(
+            x in nombre
+            for x in ("modificar", "alterar", "reescribir", "borrar_corpus")
+        ):
             choques.append(
                 "capacidad incompatible con restricción única de CIT: {0}".format(cap)
             )
 
+    # -----------------------------------------------------------
+    # 2. Determinar módulo de cada registro
+    # -----------------------------------------------------------
+    def _modulo_de(registro: Any) -> str:
+        if not isinstance(registro, dict):
+            return str(_ID)
+        for clave in (
+            "modulo",
+            "module",
+            "contenedor",
+            "cuerpo",
+            "namespace",
+        ):
+            valor = registro.get(clave)
+            if isinstance(valor, str) and valor.strip():
+                return valor.strip()
+        return str(_ID)
+
+    def _id_de(registro: Any) -> Optional[str]:
+        if not isinstance(registro, dict):
+            return None
+        for clave in ("id", "ID"):
+            valor = registro.get(clave)
+            if isinstance(valor, str) and valor.strip():
+                return valor.strip()
+        return None
+
+    def _deps_de(registro: Any) -> List[str]:
+        if not isinstance(registro, dict):
+            return []
+        valor = registro.get("depende_de")
+        if valor is None:
+            valor = registro.get("depends_on")
+        if valor is None:
+            return []
+        if isinstance(valor, str):
+            valor = [valor]
+        if not isinstance(valor, (list, tuple, set)):
+            return []
+        return sorted(
+            {
+                str(x).strip()
+                for x in valor
+                if str(x).strip()
+            }
+        )
+
+    # -----------------------------------------------------------
+    # 3. Construir índice contextual módulo -> id
+    # -----------------------------------------------------------
+    indice: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    declaraciones: List[Dict[str, Any]] = []
+
+    if isinstance(_REGISTRO, (list, tuple)):
+        fuente = list(_REGISTRO)
+    elif isinstance(_REGISTRO, dict):
+        fuente = list(_REGISTRO.values())
+    else:
+        fuente = []
+
+    for registro in fuente:
+        if not isinstance(registro, dict):
+            errores.append("registro inválido en _REGISTRO")
+            continue
+
+        rid = _id_de(registro)
+        if rid is None:
+            errores.append("registro sin id")
+            continue
+
+        modulo = _modulo_de(registro)
+
+        indice.setdefault(modulo, {})
+
+        # -------------------------------------------------------
+        # ID repetido: solamente error dentro del mismo módulo
+        # -------------------------------------------------------
+        if rid in indice[modulo]:
+            existente = indice[modulo][rid]
+
+            if existente != registro:
+                errores.append(
+                    "id duplicado dentro del mismo módulo: {0}::{1}".format(
+                        modulo, rid
+                    )
+                )
+            continue
+
+        copia = dict(registro)
+        copia["_modulo"] = modulo
+        copia["_id"] = rid
+        indice[modulo][rid] = copia
+        declaraciones.append(copia)
+
+    # -----------------------------------------------------------
+    # 4. Índice global contextual
+    # -----------------------------------------------------------
+    nodos: Dict[str, Dict[str, Any]] = {}
+
+    for registro in declaraciones:
+        modulo = registro["_modulo"]
+        rid = registro["_id"]
+        clave = "{0}::{1}".format(modulo, rid)
+
+        nodos[clave] = {
+            "clave": clave,
+            "modulo": modulo,
+            "id": rid,
+            "tipo": registro.get("tipo"),
+            "sujeto": registro.get("sujeto"),
+            "relacion": registro.get("relacion"),
+            "objeto": registro.get("objeto"),
+            "polaridad": registro.get("polaridad"),
+            "enunciado": registro.get("enunciado"),
+            "depende_de": _deps_de(registro),
+            "dependencias": [],
+            "dependencias_ausentes": [],
+            "raiz": len(_deps_de(registro)) == 0,
+        }
+
+    # -----------------------------------------------------------
+    # 5. Resolver dependencias
+    # -----------------------------------------------------------
+    aristas: List[Dict[str, Any]] = []
+    dependencias_ausentes: List[Dict[str, Any]] = []
+    dependencias_compartidas: Dict[str, List[str]] = {}
+
+    def _resolver_dependencia(
+        modulo_origen: str,
+        dependencia: str,
+    ) -> Optional[str]:
+
+        texto = str(dependencia).strip()
+
+        if not texto:
+            return None
+
+        # -------------------------------------------------------
+        # Forma explícita: MODULO::ID
+        # -------------------------------------------------------
+        if "::" in texto:
+            modulo_destino, id_destino = texto.split("::", 1)
+            modulo_destino = modulo_destino.strip()
+            id_destino = id_destino.strip()
+
+            if id_destino in indice.get(modulo_destino, {}):
+                return "{0}::{1}".format(
+                    modulo_destino,
+                    id_destino,
+                )
+
+            return None
+
+        # -------------------------------------------------------
+        # Primero: mismo módulo que el origen
+        # -------------------------------------------------------
+        if texto in indice.get(modulo_origen, {}):
+            return "{0}::{1}".format(
+                modulo_origen,
+                texto,
+            )
+
+        # -------------------------------------------------------
+        # Segundo: búsqueda determinista entre módulos.
+        # Solo se resuelve si existe UNA única coincidencia.
+        # -------------------------------------------------------
+        coincidencias = [
+            "{0}::{1}".format(modulo, texto)
+            for modulo in sorted(indice)
+            if texto in indice.get(modulo, {})
+        ]
+
+        if len(coincidencias) == 1:
+            return coincidencias[0]
+
+        # Cero o múltiples coincidencias ambiguas.
+        return None
+
+    for clave, nodo in nodos.items():
+        modulo = nodo["modulo"]
+
+        for dependencia in nodo["depende_de"]:
+            destino = _resolver_dependencia(
+                modulo,
+                dependencia,
+            )
+
+            if destino is None:
+                nodo["dependencias_ausentes"].append(dependencia)
+
+                dependencias_ausentes.append({
+                    "origen": clave,
+                    "modulo_origen": modulo,
+                    "id_origen": nodo["id"],
+                    "dependencia": dependencia,
+                    "estado": "NO_RESUELTA",
+                })
+
+                aristas.append({
+                    "desde": clave,
+                    "hacia": dependencia,
+                    "tipo": "depende_de",
+                    "estado": "ausente",
+                })
+
+                continue
+
+            nodo["dependencias"].append(destino)
+
+            aristas.append({
+                "desde": clave,
+                "hacia": destino,
+                "tipo": "depende_de",
+                "estado": "resuelta",
+            })
+
+            dependencias_compartidas.setdefault(
+                destino,
+                [],
+            ).append(clave)
+
+    # -----------------------------------------------------------
+    # 6. Normalización determinista
+    # -----------------------------------------------------------
+    for nodo in nodos.values():
+        nodo["dependencias"] = sorted(set(nodo["dependencias"]))
+        nodo["dependencias_ausentes"] = sorted(
+            set(nodo["dependencias_ausentes"])
+        )
+
+    for destino in list(dependencias_compartidas):
+        dependencias_compartidas[destino] = sorted(
+            set(dependencias_compartidas[destino])
+        )
+
+    # -----------------------------------------------------------
+    # 7. Dependencias transitivas
+    # -----------------------------------------------------------
+    def _transitivas(origen: str) -> Dict[str, Any]:
+        alcanzadas: List[str] = []
+        ciclos: List[List[str]] = []
+        camino: List[str] = []
+        visitados: Set[str] = set()
+
+        def dfs(actual: str) -> None:
+            if actual in camino:
+                inicio = camino.index(actual)
+                ciclos.append(
+                    camino[inicio:] + [actual]
+                )
+                return
+
+            if actual in visitados:
+                return
+
+            visitados.add(actual)
+            camino.append(actual)
+
+            nodo_actual = nodos.get(actual)
+
+            if nodo_actual is not None:
+                for destino in nodo_actual["dependencias"]:
+                    if destino not in alcanzadas:
+                        alcanzadas.append(destino)
+                    dfs(destino)
+
+            camino.pop()
+
+        dfs(origen)
+
+        return {
+            "dependencias_transitivas": sorted(
+                set(x for x in alcanzadas if x != origen)
+            ),
+            "ciclos": ciclos,
+        }
+
+    ciclos: List[List[str]] = []
+
+    for clave in sorted(nodos):
+        resultado = _transitivas(clave)
+
+        nodos[clave]["dependencias_transitivas"] = resultado[
+            "dependencias_transitivas"
+        ]
+
+        nodos[clave]["ciclos"] = resultado["ciclos"]
+
+        ciclos.extend(resultado["ciclos"])
+
+    # -----------------------------------------------------------
+    # 8. Deduplicar ciclos
+    # -----------------------------------------------------------
+    ciclos_unicos: List[List[str]] = []
+    ciclos_vistos: Set[Tuple[str, ...]] = set()
+
+    for ciclo in ciclos:
+        if not ciclo:
+            continue
+
+        canonico = tuple(
+            sorted(set(ciclo))
+        )
+
+        if canonico not in ciclos_vistos:
+            ciclos_vistos.add(canonico)
+            ciclos_unicos.append(ciclo)
+
+    # -----------------------------------------------------------
+    # 9. Raíces
+    # -----------------------------------------------------------
+    raices = sorted(
+        clave
+        for clave, nodo in nodos.items()
+        if nodo["raiz"]
+    )
+
+    # -----------------------------------------------------------
+    # 10. Relaciones por tipo
+    # -----------------------------------------------------------
+    por_tipo: Dict[str, List[str]] = {}
+
+    for clave, nodo in nodos.items():
+        tipo = nodo.get("tipo")
+
+        if tipo is None:
+            tipo = "sin_tipo"
+
+        por_tipo.setdefault(
+            str(tipo),
+            [],
+        ).append(clave)
+
+    for tipo in por_tipo:
+        por_tipo[tipo] = sorted(
+            set(por_tipo[tipo])
+        )
+
+    # -----------------------------------------------------------
+    # 11. Coherencia contractual propia del módulo
+    # -----------------------------------------------------------
     coherente = not errores and not choques
+
+    # -----------------------------------------------------------
+    # 12. Grafo completo
+    # -----------------------------------------------------------
+    grafo = {
+        "nodos": nodos,
+        "aristas": aristas,
+        "raices": raices,
+        "ciclos": ciclos_unicos,
+        "dependencias_ausentes": dependencias_ausentes,
+        "dependencias_compartidas": {
+            k: sorted(set(v))
+            for k, v in sorted(
+                dependencias_compartidas.items()
+            )
+        },
+        "por_tipo": por_tipo,
+        "total_nodos": len(nodos),
+        "total_aristas": len(aristas),
+        "aristas_resueltas": sum(
+            1
+            for a in aristas
+            if a["estado"] == "resuelta"
+        ),
+        "aristas_ausentes": sum(
+            1
+            for a in aristas
+            if a["estado"] == "ausente"
+        ),
+        "total_raices": len(raices),
+        "total_ciclos": len(ciclos_unicos),
+    }
+
+    # -----------------------------------------------------------
+    # 13. Salida contractual
+    # -----------------------------------------------------------
     return {
         "id": _ID,
         "nombre": _NOMBRE,
@@ -1630,11 +2046,22 @@ def barrer(peticion: Any = None) -> Dict[str, Any]:
         "coherente": coherente,
         "choques": choques,
         "errores": errores,
-        "registro_n": len(_REGISTRO),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "registro_n": len(declaraciones),
+        "capacidades": list(capacidades.keys()),
+        "grafo": grafo,
+        "declaraciones": nodos,
+        "dependencias": aristas,
+        "dependencias_ausentes": dependencias_ausentes,
+        "raices": raices,
+        "ciclos": ciclos_unicos,
         "nota": (
-            "Centinela CIT: integridad del oficio de fundamentación. "
-            "Sin juicio de verdad numérica."
+            "Barrido estructural determinista. La identidad de una "
+            "declaración es módulo::id. Un mismo id en módulos distintos "
+            "no constituye duplicación. Las dependencias se resuelven "
+            "contra el índice contextual; las no resueltas se registran "
+            "sin inventar premisas. Las raíces son declaraciones válidas "
+            "sin depende_de. La circularidad se registra estructuralmente "
+            "y no se clasifica por sí misma como contradicción."
         ),
     }
 
@@ -1646,15 +2073,18 @@ def verificar(peticion: Any = None) -> Dict[str, Any]:
 def verificar_salida(salida: Any) -> bool:
     if not isinstance(salida, dict):
         return False
+
     return (
         "id" in salida
-        or "coherente" in salida
-        or "anuncios" in salida
-        or "declaraciones" in salida
-        or "citas" in salida
-        or "resuelto" in salida
+        and "nombre" in salida
+        and "coherente" in salida
+        and "grafo" in salida
+        and isinstance(salida.get("grafo"), dict)
     )
 
+# ===============================================================
+# FIN SECCIÓN 32 BARRER
+# ===============================================================
 # ===============================================================
 # ejecutar_total
 # ===============================================================

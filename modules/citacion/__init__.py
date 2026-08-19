@@ -900,6 +900,48 @@ def _normalizar_declaracion(
         out["relaciones"] = list(decl.get("relaciones") or [])
 
     return out
+# ===============================================================
+# VERIFICAR_SALIDA
+# ===============================================================
+#
+# Capacidad: verificar_salida
+# Función:   Validar cualquier salida de cualquier módulo.
+# Criterio:  módulo que la dicta + origen + tipo/id.
+# No hace:   no recalcula, no interpreta, no inventa campos.
+#
+
+def verificar_salida(salida: Any) -> bool:
+    """
+    Verifica cualquier salida de cualquier módulo.
+
+    Criterio:
+      - la dicta un módulo (id / modulo / contenedor / nombre / rol)
+      - declara origen (origen / fuente / capacidad / operacion)
+      - declara tipo de id (tipo_id / tipo / rol) o un id usable
+
+    No recalcula. No interpreta. No restringe la forma del payload.
+    """
+    if not isinstance(salida, dict) or not salida:
+        return False
+
+    tiene_modulo = any(
+        salida.get(k) is not None
+        for k in ("id", "modulo", "contenedor", "nombre", "rol")
+    )
+    tiene_origen = any(
+        salida.get(k) is not None
+        for k in ("origen", "fuente", "fuente_modulo", "capacidad", "operacion")
+    )
+    tiene_tipo_o_id = any(
+        salida.get(k) is not None
+        for k in ("tipo_id", "tipo", "rol", "id")
+    )
+
+    return tiene_modulo and tiene_origen and tiene_tipo_o_id
+
+# ===============================================================
+# FIN VERIFICAR_SALIDA
+# ===============================================================
 
 
 # ===============================================================

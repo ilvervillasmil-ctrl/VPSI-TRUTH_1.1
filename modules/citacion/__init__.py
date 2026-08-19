@@ -962,40 +962,334 @@ def limpiar_ciclo() -> Dict[str, Any]:
     }
 
 
-def _clasificar_ids() -> Dict[str, Any]:
+# ===============================================================
+# CLASIFICAR_IDS
+# ===============================================================
+#
+# Capacidad: clasificar_ids
+# Función:   Clasificar cada id del repo por módulo, carpeta,
+#            archivo, tipo, origen y dueño.
+#            ID repetido se clasifica (mismo archivo / distinta
+#            carpeta / necesario), no se borra.
+# No hace:   no modifica archivos, no inventa ids, no calcula Tru.
+#
+
+def clasificar_ids(
+    peticion: Optional[Dict[str, Any]] = None,
+    **kwargs: Any,
+) -> Dict[str, Any]:
     """
-    Clasificación documental de ids presentes en el registro.
+    Clasifica todos los ids encontrados en el árbol de módulos.
 
-    Un id repetido NO constituye error contractual.
-    Las declaraciones se conservan como ocurrencias independientes.
+    Por cada id:
+      - módulo
+      - carpeta
+      - archivo .py
+      - tipo (axioma, lema, teorema, corolario, definicion,
+              capacidad, constante, otro)
+      - origen / dueño
+      - repeticiones y si cruzan carpetas distintas
+
+    Barrido: modules/**/*.py + CONTENEDOR + DECLARACIONES + MECANICA.
     """
+    from pathlib import Path
+    import ast
+    import importlib.util
+    import sys
 
-    grupos: Dict[str, List[Dict[str, Any]]] = {}
+    pet = dict(peticion) if isinstance(peticion, dict) else {}
+    root = pet.get("root") or kwargs.get("root")
+    if root is None:
+        # modules/ relativo al caller
+        root = Path(__file__).resolve().parent.parent
+    else:
+        root = Path(root)
 
-    for d in _REGISTRO:
-        clave = str(d.get("id") or "")
-        grupos.setdefault(clave, []).append(d)
+    modules_dir = root / "modules" if (root / "modules").is_dir() else root
 
+    # id → lista de ocurrencias
+    ocurrencias: Dict[str, List[Dict[str, Any]]] = {}
+
+    def _reg(
+        id_val: str,
+        *,
+        modulo: str,
+        carpeta: str,
+        archivo: str,
+        tipo: str,
+        origen: str,
+        dueno: str,
+        clase: str,
+    ) -> None:
+        iid = str(id_val).strip()
+        if not iid:
+            return
+        ocurrencias.setdefault(iid, []).append({
+            "id": iid,
+            "modulo": modulo,
+            "carpeta": carpeta,
+            "archivo": archivo,
+            "tipo": tipo,
+            "origen": origen,
+            "dueno": dueno,
+            "clase": clase,
+        })
+
+    # -----------------------------------------------------------
+    # 1. Recorrer modules/**/*.py
+    # -----------------------------------------------------------
+    py_files = sorted(modules_dir.rglob("*.py")) if modules_dir.is_dir() else []
+
+    for path in py_files:
+        try:
+            rel = path.relative_to(modules_dir)
+        except ValueError:
+            rel = path.name
+
+        parts = rel.parts
+        modulo = parts[0] if parts else path.stem
+        carpeta = str(Path(*parts[:-1]) if len(parts) > 1 else parts[0] if parts else "")
+        archivo = path.name
+        dueno = modulo
+
+        # --- carga segura del módulo para atributos conocidos ---
+        clave = "clasificar_{0}_{1}".format(modulo, path.stem)
+        meta_mod = None
+        try:
+            spec = importlib.util.spec_from_file_location(clave, path)
+            if spec and spec.loader:
+                meta_mod = importlib.util.module_from_spec(spec)
+                sys.modules[clave] = meta_mod
+                spec.loader.exec_module(meta_mod)
+        except Exception:
+            meta_mod = None
+
+        if meta_mod is not None:
+            # CONTENEDOR.id + capacidades
+            cont = getattr(meta_mod, "CONTENEDOR", None)
+            if isinstance(cont, dict):
+                if cont.get("id"):
+                    _reg(
+                        cont["id"],
+                        modulo=modulo,
+                        carpeta=carpeta,
+                        archivo=archivo,
+                        tipo="modulo",
+                        origen="CONTENEDOR.id",
+                        dueno=str(cont.get("nombre") or dueno),
+                        clase="identidad",
+                    )
+                caps = cont.get("capacidades")
+                if isinstance(caps, dict):
+                    for cn in caps.keys():
+                        _reg(
+                            cn,
+                            modulo=modulo,
+                            carpeta=carpeta,
+                            archivo=archivo,
+                            tipo="capacidad",
+                            origen="CONTENEDOR.capacidades",
+                            dueno=dueno,
+                            clase="capacidad",
+                        )
+
+            # DECLARACIONES (lista)
+            decls = getattr(meta_mod, "DECLARACIONES", None)
+            if isinstance(decls, list):
+                for d in decls:
+                    if not isinstance(d, dict) or not d.get("id"):
+                        continue
+                    _reg(
+                        d["id"],
+                        modulo=modulo,
+                        carpeta=carpeta,
+                        archivo=archivo,
+                        tipo=str(d.get("tipo") or "declaracion"),
+                        origen="DECLARACIONES",
+                        dueno=dueno,
+                        clase="declaracion",
+                    )
+
+            # MECANICA
+            mec = getattr(meta_mod, "MECANICA", None)
+            if isinstance(mec, dict):
+                if mec.get("id"):
+                    _reg(
+                        mec["id"],
+                        modulo=modulo,
+                        carpeta=carpeta,
+                        archivo=archivo,
+                        tipo="mecanica",
+                        origen="MECANICA",
+                        dueno=dueno,
+                        clase="mecanica",
+                    )
+                orden = mec.get("orden")
+                if isinstance(orden, (list, tuple)):
+                    for n in orden:
+                        _reg(
+                            n,
+                            modulo=modulo,
+                            carpeta=carpeta,
+                            archivo=archivo,
+                            tipo="nodo_mecanica",
+                            origen="MECANICA.orden",
+                            dueno=dueno,
+                            clase="mecanica",
+                        )
+
+            # ID_MODULO / constantes de identidad
+            for attr in ("ID_MODULO", "NOMBRE_MODULO", "ROL_MODULO"):
+                v = getattr(meta_mod, attr, None)
+                if isinstance(v, str) and v.strip():
+                    _reg(
+                        v,
+                        modulo=modulo,
+                        carpeta=carpeta,
+                        archivo=archivo,
+                        tipo="constante",
+                        origen=attr,
+                        dueno=dueno,
+                        clase="identidad",
+                    )
+
+        # --- AST: ids literales en asignaciones tipo "id": "..." ---
+        try:
+            src = path.read_text(encoding="utf-8")
+            tree = ast.parse(src, filename=str(path))
+        except Exception:
+            continue
+
+        class _Visitor(ast.NodeVisitor):
+            def visit_Dict(self, node: ast.Dict) -> None:
+                keys = node.keys
+                vals = node.values
+                for k, v in zip(keys, vals):
+                    if isinstance(k, ast.Constant) and k.value == "id":
+                        if isinstance(v, ast.Constant) and isinstance(v.value, str):
+                            _reg(
+                                v.value,
+                                modulo=modulo,
+                                carpeta=carpeta,
+                                archivo=archivo,
+                                tipo="ast_id",
+                                origen="ast.dict.id",
+                                dueno=dueno,
+                                clase="ast",
+                            )
+                    if isinstance(k, ast.Constant) and k.value == "tipo":
+                        pass
+                self.generic_visit(node)
+
+        try:
+            _Visitor().visit(tree)
+        except Exception:
+            pass
+
+    # -----------------------------------------------------------
+    # 2. Clasificación global
+    # -----------------------------------------------------------
+    por_modulo: Dict[str, List[str]] = {}
+    por_carpeta: Dict[str, List[str]] = {}
+    por_archivo: Dict[str, List[str]] = {}
+    por_tipo: Dict[str, List[str]] = {}
+    por_clase: Dict[str, List[str]] = {}
+    por_origen: Dict[str, List[str]] = {}
+
+    ids_duplicados: Dict[str, Any] = {}
+    ids_duplicados_misma_carpeta: Dict[str, Any] = {}
+    ids_duplicados_distinta_carpeta: Dict[str, Any] = {}
     ids_unicos: List[str] = []
-    ids_repetidos: List[str] = []
-    ocurrencias_repetidas: Dict[str, int] = {}
 
-    for clave, declaraciones in grupos.items():
-        if len(declaraciones) == 1:
-            ids_unicos.append(clave)
+    for iid, items in sorted(ocurrencias.items()):
+        if len(items) == 1:
+            ids_unicos.append(iid)
         else:
-            ids_repetidos.append(clave)
-            ocurrencias_repetidas[clave] = len(declaraciones)
+            carpetas = sorted({x["carpeta"] for x in items})
+            modulos = sorted({x["modulo"] for x in items})
+            archivos = sorted({x["archivo"] for x in items})
+            tipos = sorted({x["tipo"] for x in items})
+            entry = {
+                "id": iid,
+                "ocurrencias": len(items),
+                "modulos": modulos,
+                "carpetas": carpetas,
+                "archivos": archivos,
+                "tipos": tipos,
+                "detalle": items,
+                "necesario": True,  # repetición no implica error
+            }
+            ids_duplicados[iid] = entry
+            if len(carpetas) > 1:
+                ids_duplicados_distinta_carpeta[iid] = entry
+            else:
+                ids_duplicados_misma_carpeta[iid] = entry
+
+        for x in items:
+            por_modulo.setdefault(x["modulo"], [])
+            por_carpeta.setdefault(x["carpeta"], [])
+            por_archivo.setdefault(
+                "{0}/{1}".format(x["carpeta"], x["archivo"]), []
+            )
+            por_tipo.setdefault(x["tipo"], [])
+            por_clase.setdefault(x["clase"], [])
+            por_origen.setdefault(x["origen"], [])
+            for bucket, key in (
+                (por_modulo, x["modulo"]),
+                (por_carpeta, x["carpeta"]),
+                (por_archivo, "{0}/{1}".format(x["carpeta"], x["archivo"])),
+                (por_tipo, x["tipo"]),
+                (por_clase, x["clase"]),
+                (por_origen, x["origen"]),
+            ):
+                if iid not in bucket[key]:
+                    bucket[key].append(iid)
+
+    for d in (
+        por_modulo, por_carpeta, por_archivo,
+        por_tipo, por_clase, por_origen,
+    ):
+        for k in d:
+            d[k] = sorted(d[k])
+
+    archivos_py = [
+        str(p.relative_to(modules_dir)) if modules_dir in p.parents or p.parent == modules_dir
+        else str(p)
+        for p in py_files
+    ]
 
     return {
+        "operacion": "clasificar_ids",
+        "root": str(modules_dir),
+        "archivos_py": sorted(set(archivos_py)),
+        "archivos_py_n": len(set(archivos_py)),
+        "total_ids_unicos": len(ocurrencias),
+        "total_ocurrencias": sum(len(v) for v in ocurrencias.values()),
+        "ids_unicos_n": len(ids_unicos),
+        "ids_duplicados_n": len(ids_duplicados),
+        "ids_duplicados_misma_carpeta_n": len(ids_duplicados_misma_carpeta),
+        "ids_duplicados_distinta_carpeta_n": len(ids_duplicados_distinta_carpeta),
+        "por_modulo": por_modulo,
+        "por_carpeta": por_carpeta,
+        "por_archivo": por_archivo,
+        "por_tipo": por_tipo,
+        "por_clase": por_clase,
+        "por_origen": por_origen,
+        "ids_duplicados": ids_duplicados,
+        "ids_duplicados_misma_carpeta": ids_duplicados_misma_carpeta,
+        "ids_duplicados_distinta_carpeta": ids_duplicados_distinta_carpeta,
         "ids_unicos": ids_unicos,
-        "ids_repetidos": ids_repetidos,
-        "ocurrencias_repetidas": ocurrencias_repetidas,
-        "n_ids_distintos": len(grupos),
-        "n_ocurrencias": len(_REGISTRO),
-        "hay_repetidos": bool(ids_repetidos),
-        "repetidos_son_error": False,
+        "nota": (
+            "Clasificación total de ids del repo. "
+            "ID repetido se clasifica por módulo/carpeta/archivo/tipo. "
+            "Repetido en distinta carpeta ≠ error; se reporta aparte. "
+            "necesario=True: la repetición no se elimina."
+        ),
     }
+
+# ===============================================================
+# FIN CLASIFICAR_IDS
+# ===============================================================
 
 
 # ===============================================================
@@ -1050,112 +1344,267 @@ def registrar(
 
 
 # ===============================================================
-# SECCIÓN 22 — RESOLVER
+# RESOLVER
 # ===============================================================
+#
+# Capacidad: resolver
+# Función:   Resolver declaraciones por conexión de ids.
+#            Ve cómo se conectan. Si A con B resuelve C,
+#            dice exactamente qué id es y cómo lo resolvió.
+# No hace:   no inventa declaraciones, no recalcula True,
+#            no modifica el cuerpo de origen.
+#
 
 def resolver(
-    id_decl: str,
+    peticion: Optional[Any] = None,
+    **kwargs: Any,
 ) -> Dict[str, Any]:
-
     """
-    Resuelve una declaración por id.
+    Resuelve por combinación de ids.
 
-    1) registro operativo
-    2) fuentes registradas del sistema
+    Entrada admitida:
+      - str                  → un id
+      - list[str]            → conjunto de ids
+      - dict con:
+          id / ids / a / b   → ids a conectar
+          declaraciones      → cuerpo opcional (list[dict])
 
-    Los ids repetidos no son error.
-    Se conserva la multiplicidad documental.
-    No inventa enunciados.
+    Salida:
+      - ids exactos resueltos
+      - conexiones usadas
+      - cadena de resolución
+      - cómo se resolvió cada uno
     """
+    # -----------------------------------------------------------
+    # 1. Normalizar ids pedidos
+    # -----------------------------------------------------------
+    ids_pedido: List[str] = []
+    decls_ext: Optional[List[Dict[str, Any]]] = None
 
-    if not id_decl or not str(id_decl).strip():
+    if isinstance(peticion, str):
+        ids_pedido = [peticion.strip()] if peticion.strip() else []
+    elif isinstance(peticion, (list, tuple)):
+        ids_pedido = [str(x).strip() for x in peticion if str(x).strip()]
+    elif isinstance(peticion, dict):
+        if peticion.get("id"):
+            ids_pedido.append(str(peticion["id"]).strip())
+        for k in ("ids", "cadena"):
+            v = peticion.get(k)
+            if isinstance(v, (list, tuple)):
+                for x in v:
+                    s = str(x).strip()
+                    if s and s not in ids_pedido:
+                        ids_pedido.append(s)
+        for k in ("a", "b"):
+            if peticion.get(k):
+                s = str(peticion[k]).strip()
+                if s and s not in ids_pedido:
+                    ids_pedido.append(s)
+        if isinstance(peticion.get("declaraciones"), list):
+            decls_ext = peticion["declaraciones"]
+    elif peticion is None:
+        ids_pedido = []
+    else:
         return {
-            "id": id_decl,
             "resuelto": False,
-            "declaracion": None,
-            "nota": "id vacío",
+            "ids": [],
+            "resoluciones": [],
+            "conexiones": [],
+            "nota": "entrada no admitida",
         }
 
-    clave = str(id_decl).strip()
-    coincidencias: List[Dict[str, Any]] = []
+    # kwargs extras
+    for k in ("id", "a", "b"):
+        if kwargs.get(k):
+            s = str(kwargs[k]).strip()
+            if s and s not in ids_pedido:
+                ids_pedido.append(s)
+    if isinstance(kwargs.get("ids"), (list, tuple)):
+        for x in kwargs["ids"]:
+            s = str(x).strip()
+            if s and s not in ids_pedido:
+                ids_pedido.append(s)
 
-    for d in _REGISTRO:
-        if d.get("id") == clave and d.get("enunciado"):
-            coincidencias.append(d)
+    # -----------------------------------------------------------
+    # 2. Cuerpo de declaraciones (instantánea)
+    # -----------------------------------------------------------
+    decls: List[Dict[str, Any]] = []
+    if isinstance(decls_ext, list):
+        decls = [d for d in decls_ext if isinstance(d, dict)]
+    elif "recolectar" in globals() and callable(recolectar):
+        try:
+            decls, _err = recolectar()
+        except Exception:
+            decls = []
+    elif "_REGISTRO" in globals():
+        decls = [d for d in list(_REGISTRO) if isinstance(d, dict)]
 
-    if coincidencias:
-        repetido = len(coincidencias) > 1
+    por_id: Dict[str, Dict[str, Any]] = {}
+    for d in decls:
+        did = str(d.get("id") or "").strip()
+        if did:
+            por_id[did] = d
 
-        return {
-            "id": clave,
-            "resuelto": True,
-            "declaracion": coincidencias[0],
-            "ocurrencias": coincidencias,
-            "n_ocurrencias": len(coincidencias),
-            "id_repetido": repetido,
-            "clasificacion_id": "repetido" if repetido else "unico",
-            "origen": "registro_ciclo",
-            "nota": (
-                "id repetido; se conservan todas las ocurrencias "
-                "documentales del registro operativo."
-                if repetido
-                else
-                "resuelto desde registro operativo de CIT"
-            ),
-        }
+    # -----------------------------------------------------------
+    # 3. Grafo de conexiones (depende_de + relaciones)
+    # -----------------------------------------------------------
+    # hacia: id → ids de los que depende
+    # desde: id → ids que dependen de él
+    hacia: Dict[str, List[str]] = {i: [] for i in por_id}
+    desde: Dict[str, List[str]] = {i: [] for i in por_id}
 
-    try:
-        from modules.citacion.fuentes import ax as fuente_ax
+    for did, d in por_id.items():
+        deps = d.get("depende_de") or d.get("depends_on") or []
+        if not isinstance(deps, (list, tuple)):
+            deps = []
+        for dep in deps:
+            dep_s = str(dep).strip()
+            if not dep_s:
+                continue
+            if dep_s not in hacia[did]:
+                hacia[did].append(dep_s)
+            desde.setdefault(dep_s, [])
+            if did not in desde[dep_s]:
+                desde[dep_s].append(did)
 
-        r = fuente_ax.anunciar_id(
-            clave,
-            evidencia_ref="cit.resolver",
-            registrar=False,
-        )
+        rels = d.get("relaciones") or []
+        if isinstance(rels, list):
+            for r in rels:
+                if not isinstance(r, dict):
+                    continue
+                # Normalización limpia de extremos origen (origen_id) y destino (destino_id)
+                origen_id = str(r.get("de") or r.get("a") or "").strip()
+                destino_id = str(r.get("hacia") or r.get("b") or "").strip()
+                
+                # Si el par usa únicamente 'a' y 'b', resolvemos la ambigüedad
+                if not origen_id and r.get("a"):
+                    origen_id = str(r.get("a")).strip()
+                if not destino_id and r.get("a") and r.get("a") != origen_id:
+                    destino_id = str(r.get("a")).strip()
 
-        if r.get("resuelto") and r.get("cita"):
-            c = r["cita"]
+                if origen_id and destino_id:
+                    hacia.setdefault(origen_id, [])
+                    desde.setdefault(destino_id, [])
+                    if destino_id not in hacia[origen_id]:
+                        hacia[origen_id].append(destino_id)
+                    if origen_id not in desde[destino_id]:
+                        desde[destino_id].append(origen_id)
 
-            decl = _normalizar_declaracion({
-                "id": clave,
-                "tipo": c.get("tipo") or "axioma",
-                "fuente": c.get("fuente_modulo") or "ax",
-                "enunciado": c.get("enunciado"),
-                "descripcion": c.get("descripcion"),
-                "evidencia_ref": c.get("evidencia_ref"),
+    # -----------------------------------------------------------
+    # 4. Resolver cada id pedido
+    # -----------------------------------------------------------
+    resoluciones: List[Dict[str, Any]] = []
+    conexiones: List[Dict[str, Any]] = []
+    resueltos: List[str] = []
+
+    for iid in ids_pedido:
+        if iid in por_id:
+            d = por_id[iid]
+            deps_ok = [x for x in hacia.get(iid, []) if x in por_id]
+            deps_falta = [x for x in hacia.get(iid, []) if x not in por_id]
+            hijos = [x for x in desde.get(iid, []) if x in por_id]
+            resoluciones.append({
+                "id": iid,
+                "resuelto": True,
+                "como": "directo",
+                "declaracion": d,
+                "conecta_hacia": deps_ok,
+                "conecta_hacia_ausentes": deps_falta,
+                "conecta_desde": hijos,
+            })
+            resueltos.append(iid)
+            for dep in deps_ok:
+                conexiones.append({
+                    "de": iid,
+                    "a": dep,
+                    "tipo": "depende_de",
+                    "modo": "directo",
+                })
+        else:
+            resoluciones.append({
+                "id": iid,
+                "resuelto": False,
+                "como": None,
+                "declaracion": None,
+                "conecta_hacia": [],
+                "conecta_hacia_ausentes": [],
+                "conecta_desde": [],
             })
 
-            return {
-                "id": clave,
-                "resuelto": True,
-                "declaracion": decl,
-                "ocurrencias": [decl],
-                "n_ocurrencias": 1,
-                "id_repetido": False,
-                "clasificacion_id": "fuente_sistema",
-                "origen": "fuente_sistema",
-                "nota": (
-                    "resuelto desde fuente de declaraciones "
-                    "del sistema"
-                ),
-            }
+    # -----------------------------------------------------------
+    # 5. Combinación: A con B resuelve C
+    #    C es resoluble por combinación si A y B están pedidos
+    #    (o resueltos) y ambos conectan a C, o C depende de ambos.
+    # -----------------------------------------------------------
+    combinaciones: List[Dict[str, Any]] = []
+    pedido_set = set(ids_pedido) | set(resueltos)
 
-    except Exception:
-        pass
+    if len(pedido_set) >= 2:
+        for cid, d in por_id.items():
+            deps = [str(x).strip() for x in (d.get("depende_de") or d.get("depends_on") or [])]
+            deps = [x for x in deps if x]
+            cubiertas = [x for x in deps if x in pedido_set]
+            if len(cubiertas) >= 2 and set(deps).issubset(set(por_id.keys()) | pedido_set):
+                # A,B,... en el pedido cubren las premisas de C
+                if set(deps).issubset(pedido_set) or len(cubiertas) >= 2:
+                    como = {
+                        "id": cid,
+                        "resuelto": cid in por_id,
+                        "como": "combinacion",
+                        "premisas": deps,
+                        "premisas_en_pedido": cubiertas,
+                        "regla": "{0} se resuelve con {1}".format(
+                            cid, " + ".join(cubiertas)
+                        ),
+                        "declaracion": d,
+                    }
+                    combinaciones.append(como)
+                    if cid not in resueltos and cid in por_id:
+                        resoluciones.append({
+                            "id": cid,
+                            "resuelto": True,
+                            "como": "combinacion",
+                            "declaracion": d,
+                            "conecta_hacia": [x for x in deps if x in por_id],
+                            "conecta_hacia_ausentes": [x for x in deps if x not in por_id],
+                            "conecta_desde": [x for x in desde.get(cid, []) if x in por_id],
+                            "premisas_usadas": cubiertas,
+                            "regla": como["regla"],
+                        })
+                        resueltos.append(cid)
+                        for p in cubiertas:
+                            conexiones.append({
+                                "de": cid,
+                                "a": p,
+                                "tipo": "depende_de",
+                                "modo": "combinacion",
+                            })
 
+    # -----------------------------------------------------------
+    # 6. Salida
+    # -----------------------------------------------------------
     return {
-        "id": clave,
-        "resuelto": False,
-        "declaracion": None,
-        "ocurrencias": [],
-        "n_ocurrencias": 0,
-        "id_repetido": False,
-        "clasificacion_id": "no_resuelto",
+        "resuelto": len(resueltos) > 0,
+        "ids": list(ids_pedido),
+        "ids_resueltos": list(resueltos),
+        "ids_no_resueltos": [i for i in ids_pedido if i not in resueltos],
+        "resoluciones": resoluciones,
+        "combinaciones": combinaciones,
+        "conexiones": conexiones,
+        "n_resueltos": len(resueltos),
+        "n_conexiones": len(conexiones),
         "nota": (
-            "sin declaración resoluble en registro "
-            "ni fuentes cargadas"
+            "Resolver por conexión de ids. "
+            "Directo: id presente en el cuerpo. "
+            "Combinación: A + B resuelve C cuando las premisas de C "
+            "están en el pedido. "
+            "Dice el id exacto y cómo lo resolvió."
         ),
     }
+
+# ===============================================================
+# FIN RESOLVER
+# ===============================================================
 
 
 # ===============================================================

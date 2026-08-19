@@ -469,7 +469,7 @@ class Engine:
     # ===========================================================
     
     PROPOSITO_FUNDAMENTAL = "Calcular la verdad de cualquier descripcion"
-    CLAVE_PROPOSITO = "EJECUTAR_LA_FORMULA_DE_LA_VERDAD"
+    CLAVE_PROPOSITO = "evaluar_universal"
     
     def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
         # =======================================================
@@ -565,7 +565,7 @@ class Engine:
             "proposito": self.proposito,
             "clave": self.clave_proposito
         }
-        # ===========================================================
+    # ===========================================================
     # Parte 12.9 EJECUCIÓN DEL PROPÓSITO FUNDAMENTAL
     # ===========================================================
 

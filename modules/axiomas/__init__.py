@@ -1975,7 +1975,7 @@ def generatividad() -> dict:
 # FIN 8.3
 # ===============================================================
 # ===============================================================
-# 8.4 — BARRIDO ESTRUCTURAL COMPLETO
+# 8.4 — COHERENCIA Y BARRIDO ESTRUCTURAL COMPLETO
 # ===============================================================
 
 def barrer(
@@ -1984,332 +1984,404 @@ def barrer(
     """
     Barrido estructural completo del cuerpo axiomático VPSI.
 
-    RESPONSABILIDAD:
-    - realizar una única recolección;
-    - construir el índice completo de declaraciones;
-    - registrar todos los tipos;
-    - registrar todas las dependencias declaradas;
-    - resolver dependencias presentes y ausentes;
+    RESPONSABILIDADES:
+    - recolectar una única instantánea determinista;
+    - ejecutar las verificaciones de contradicción ya existentes;
     - construir el grafo completo de dependencias;
-    - construir las cadenas transitivas de dependencia;
-    - identificar declaraciones raíz sin dependencias;
-    - registrar relaciones de unión/recombinación cuando estén
-      expresamente declaradas por la estructura disponible;
-    - conservar la información de sujeto, relación, objeto,
-      polaridad, enunciado, gobierno y cota;
-    - detectar referencias a IDs inexistentes;
-    - conservar errores de recolección;
-    - ejecutar las comprobaciones de contradicción ya existentes.
+    - registrar cada relación declaración -> dependencia;
+    - resolver dependencias presentes y ausentes;
+    - conservar declaraciones raíz que no dependen de ninguna otra;
+    - detectar ciclos estructurales sin tratarlos como contradicción;
+    - construir relaciones inversas de dependencia;
+    - identificar declaraciones que comparten dependencias;
+    - identificar relaciones de recombinación estructural;
+    - conservar tipo, cuerpo, sujeto, relación, objeto, polaridad, cota y
+      enunciado cuando existan;
+    - dejar el límite axiomático como información estructural derivada del grafo;
+    - no inventar "anclas axiomáticas";
+    - no convertir circularidad en incoherencia;
+    - no introducir premisas externas;
+    - no modificar ninguna declaración.
 
-    NO RESPONSABILIDAD:
-    - no inventa dependencias;
-    - no inventa axiomas;
-    - no convierte circularidad en contradicción;
-    - no declara una declaración inválida solamente por tener
-      dependencia circular;
-    - no invoca limite_axiomático;
-    - no introduce "anclas axiomáticas";
-    - no modifica ninguna declaración;
-    - no realiza una segunda recolección.
-
-    La salida constituye la instantánea estructural que las
-    capacidades posteriores pueden consultar.
+    Una sola recolección.
+    Todo el resultado se deriva de esa instantánea.
     """
 
     # -----------------------------------------------------------
-    # 1. ÚNICA RECOLECCIÓN
+    # 1. RECOLECCIÓN ÚNICA
     # -----------------------------------------------------------
-
     decls, errores = recolectar(declaraciones_externas)
 
     # -----------------------------------------------------------
-    # 2. ÍNDICE COMPLETO POR ID
+    # 2. ÍNDICE CANÓNICO
     # -----------------------------------------------------------
-
-    indice: Dict[str, Dict[str, Any]] = {}
+    por_id: Dict[str, Dict[str, Any]] = {}
     ids_duplicados: List[str] = []
 
     for d in decls:
-        ident = d.get("id")
-
-        if not ident:
+        did = str(d.get("id", "")).strip()
+        if not did:
             continue
-
-        if ident in indice:
-            ids_duplicados.append(ident)
+        if did in por_id:
+            ids_duplicados.append(did)
             continue
+        por_id[did] = d
 
-        indice[ident] = d
-
-    ids_presentes: Set[str] = set(indice)
+    ids_presentes: Set[str] = set(por_id)
 
     # -----------------------------------------------------------
-    # 3. TRADUCCIÓN CONTRACTUAL DE CAMPOS
+    # 3. NORMALIZACIÓN DETERMINISTA DE DEPENDENCIAS
     # -----------------------------------------------------------
+    def _dependencias(d: Dict[str, Any]) -> List[str]:
+        valor = d.get("depende_de")
 
-    traduccion = {
-        "type": "tipo",
-        "subject": "sujeto",
-        "relation": "relacion",
-        "object": "objeto",
-        "polarity": "polaridad",
-        "statement": "enunciado",
-        "depends_on": "depende_de",
-        "governs": "gobierna",
-        "cota": "cota",
+        if valor is None:
+            valor = d.get("depends_on")
+
+        if valor is None:
+            return []
+
+        if isinstance(valor, str):
+            valores = [valor]
+        elif isinstance(valor, (list, tuple, set)):
+            valores = list(valor)
+        else:
+            return []
+
+        resultado: List[str] = []
+
+        for item in valores:
+            if isinstance(item, dict):
+                item = (
+                    item.get("id")
+                    or item.get("ID")
+                    or item.get("declaracion")
+                    or item.get("depends_on")
+                    or item.get("depende_de")
+                )
+
+            if item is None:
+                continue
+
+            item = str(item).strip()
+
+            if item and item not in resultado:
+                resultado.append(item)
+
+        return sorted(resultado)
+
+    # -----------------------------------------------------------
+    # 4. GRAFO DIRECTO
+    # declaración -> declaraciones requeridas
+    # -----------------------------------------------------------
+    grafo: Dict[str, List[str]] = {
+        did: _dependencias(d)
+        for did, d in por_id.items()
     }
 
     # -----------------------------------------------------------
-    # 4. NODO ESTRUCTURAL DE CADA DECLARACIÓN
+    # 5. METADATOS CANÓNICOS DE CADA DECLARACIÓN
     # -----------------------------------------------------------
-
-    nodos: Dict[str, Dict[str, Any]] = {}
-
-    for ident, d in indice.items():
-
-        depende_de = list(d.get("depende_de") or [])
-
-        nodos[ident] = {
-            "id": ident,
-            "tipo": d.get("tipo"),
+    def _metadatos(d: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "id": d.get("id"),
+            "tipo": d.get("tipo", d.get("type")),
             "cuerpo": d.get("cuerpo"),
-            "sujeto": d.get("sujeto"),
-            "relacion": d.get("relacion"),
-            "objeto": d.get("objeto"),
-            "polaridad": d.get("polaridad"),
-            "enunciado": d.get("enunciado"),
-            "depende_de": depende_de,
-            "gobierna": list(d.get("gobierna") or []),
+            "sujeto": d.get("sujeto", d.get("subject")),
+            "relacion": d.get("relacion", d.get("relation")),
+            "objeto": d.get("objeto", d.get("object")),
+            "polaridad": d.get("polaridad", d.get("polarity")),
+            "enunciado": d.get("enunciado", d.get("statement")),
+            "depende_de": list(grafo.get(str(d.get("id")), [])),
+            "gobierna": d.get("gobierna", d.get("governs")),
+            "cota": d.get("cota"),
+            "ubicacion": ref(d),
+        }
+
+    nodos: List[Dict[str, Any]] = [
+        _metadatos(por_id[did])
+        for did in sorted(por_id)
+    ]
+
+    # -----------------------------------------------------------
+    # 6. ARISTAS COMPLETAS
+    # -----------------------------------------------------------
+    dependencias: List[Dict[str, Any]] = []
+    dependencias_faltantes: List[Dict[str, Any]] = []
+
+    for origen in sorted(grafo):
+        origen_tipo = por_id[origen].get(
+            "tipo",
+            por_id[origen].get("type"),
+        )
+
+        for destino in grafo[origen]:
+            destino_existe = destino in ids_presentes
+
+            arista = {
+                "desde": origen,
+                "hasta": destino,
+                "tipo_desde": origen_tipo,
+                "tipo_hasta": (
+                    por_id[destino].get("tipo",
+                                        por_id[destino].get("type"))
+                    if destino_existe
+                    else None
+                ),
+                "estado": "RESUELTA" if destino_existe else "FALTANTE",
+            }
+
+            dependencias.append(arista)
+
+            if not destino_existe:
+                dependencias_faltantes.append({
+                    "declaracion": origen,
+                    "dependencia": destino,
+                    "tipo_declaracion": origen_tipo,
+                    "ubicacion": ref(por_id[origen]),
+                    "estado": "NO_PRESENTE_EN_INSTANTANEA",
+                })
+
+    # -----------------------------------------------------------
+    # 7. DEPENDENCIAS INVERSAS
+    # -----------------------------------------------------------
+    requeridos_por: Dict[str, List[str]] = {
+        did: [] for did in sorted(ids_presentes)
+    }
+
+    for origen in sorted(grafo):
+        for destino in grafo[origen]:
+            if destino in requeridos_por:
+                requeridos_por[destino].append(origen)
+
+    for did in requeridos_por:
+        requeridos_por[did] = sorted(set(requeridos_por[did]))
+
+    # -----------------------------------------------------------
+    # 8. DECLARACIONES RAÍZ
+    #
+    # No depender de ninguna declaración NO ES un error.
+    # Un axioma fundamental puede ser raíz.
+    # -----------------------------------------------------------
+    raices: List[str] = sorted(
+        did for did, deps in grafo.items()
+        if not deps
+    )
+
+    # -----------------------------------------------------------
+    # 9. RESOLUCIÓN TRANSITIVA
+    # -----------------------------------------------------------
+    def _resolver_transitivamente(
+        inicio: str,
+    ) -> Dict[str, Any]:
+        visitados: Set[str] = set()
+        faltantes: Set[str] = set()
+        alcanzados: Set[str] = set()
+
+        def recorrer(actual: str) -> None:
+            if actual in visitados:
+                return
+
+            visitados.add(actual)
+
+            for dep in grafo.get(actual, []):
+                alcanzados.add(dep)
+
+                if dep not in ids_presentes:
+                    faltantes.add(dep)
+                    continue
+
+                recorrer(dep)
+
+        recorrer(inicio)
+
+        return {
+            "alcanzadas": sorted(alcanzados),
+            "faltantes": sorted(faltantes),
+        }
+
+    dependencias_transitivas: Dict[str, Dict[str, Any]] = {}
+
+    for did in sorted(ids_presentes):
+        dependencias_transitivas[did] = _resolver_transitivamente(did)
+
+    # -----------------------------------------------------------
+    # 10. DETECCIÓN DE CICLOS ESTRUCTURALES
+    #
+    # IMPORTANTE:
+    # ciclo != contradicción
+    # ciclo != incoherencia
+    # ciclo != error
+    #
+    # El ciclo se reporta como propiedad topológica del grafo.
+    # -----------------------------------------------------------
+    ciclos: List[List[str]] = []
+    visitado: Set[str] = set()
+    en_pila: Set[str] = set()
+    pila: List[str] = []
+    ciclos_vistos: Set[Tuple[str, ...]] = set()
+
+    def _dfs_ciclo(nodo: str) -> None:
+        visitado.add(nodo)
+        en_pila.add(nodo)
+        pila.append(nodo)
+
+        for vecino in grafo.get(nodo, []):
+            if vecino not in ids_presentes:
+                continue
+
+            if vecino not in visitado:
+                _dfs_ciclo(vecino)
+
+            elif vecino in en_pila:
+                try:
+                    inicio = pila.index(vecino)
+                except ValueError:
+                    continue
+
+                ciclo = pila[inicio:] + [vecino]
+
+                # Representación determinista del conjunto del ciclo.
+                miembros = tuple(sorted(set(ciclo[:-1])))
+
+                if miembros and miembros not in ciclos_vistos:
+                    ciclos_vistos.add(miembros)
+                    ciclos.append(ciclo)
+
+        pila.pop()
+        en_pila.discard(nodo)
+
+    for did in sorted(grafo):
+        if did not in visitado:
+            _dfs_ciclo(did)
+
+    ciclos.sort(key=lambda c: tuple(c))
+
+    # -----------------------------------------------------------
+    # 11. COMPONENTES DE CICLO
+    # -----------------------------------------------------------
+    nodos_circulares: Set[str] = set()
+
+    for ciclo in ciclos:
+        nodos_circulares.update(ciclo[:-1])
+
+    # -----------------------------------------------------------
+    # 12. DECLARACIONES QUE COMPARTEN DEPENDENCIAS
+    #
+    # Esto permite observar recombinaciones estructurales sin
+    # afirmar que la combinación sea matemáticamente válida.
+    # -----------------------------------------------------------
+    dependencia_compartida: Dict[str, List[str]] = defaultdict(list)
+
+    for origen in sorted(grafo):
+        for dep in grafo[origen]:
+            dependencia_compartida[dep].append(origen)
+
+    for dep in dependencia_compartida:
+        dependencia_compartida[dep] = sorted(
+            set(dependencia_compartida[dep])
+        )
+
+    uniones: List[Dict[str, Any]] = []
+
+    for dep in sorted(dependencia_compartida):
+        miembros = dependencia_compartida[dep]
+
+        if len(miembros) > 1:
+            uniones.append({
+                "dependencia_compartida": dep,
+                "declaraciones": miembros,
+                "cantidad": len(miembros),
+            })
+
+    # -----------------------------------------------------------
+    # 13. RECOMBINACIONES POR INTERSECCIÓN DE DEPENDENCIAS
+    #
+    # No declara compatibilidad TR1.
+    # Solo registra que dos declaraciones tienen una base
+    # dependencial común.
+    # -----------------------------------------------------------
+    recombinaciones: List[Dict[str, Any]] = []
+
+    ids_grafo = sorted(grafo)
+
+    for i, a in enumerate(ids_grafo):
+        deps_a = set(grafo[a])
+
+        if not deps_a:
+            continue
+
+        for b in ids_grafo[i + 1:]:
+            deps_b = set(grafo[b])
+
+            if not deps_b:
+                continue
+
+            comunes = sorted(deps_a & deps_b)
+
+            if comunes:
+                recombinaciones.append({
+                    "declaracion_a": a,
+                    "declaracion_b": b,
+                    "dependencias_compartidas": comunes,
+                    "interseccion_n": len(comunes),
+                })
+
+    # -----------------------------------------------------------
+    # 14. RELACIÓN COMPLETA DE CADA DECLARACIÓN
+    # -----------------------------------------------------------
+    mapa_declaraciones: Dict[str, Dict[str, Any]] = {}
+
+    for did in sorted(ids_presentes):
+        d = por_id[did]
+        transitivas = dependencias_transitivas[did]
+
+        mapa_declaraciones[did] = {
+            "id": did,
+            "tipo": d.get("tipo", d.get("type")),
+            "cuerpo": d.get("cuerpo"),
+            "sujeto": d.get("sujeto", d.get("subject")),
+            "relacion": d.get("relacion", d.get("relation")),
+            "objeto": d.get("objeto", d.get("object")),
+            "polaridad": d.get("polaridad", d.get("polarity")),
+            "enunciado": d.get("enunciado", d.get("statement")),
+            "depende_de": list(grafo[did]),
+            "depende_transitivamente_de": transitivas["alcanzadas"],
+            "dependencias_faltantes": transitivas["faltantes"],
+            "requerido_por": requeridos_por.get(did, []),
+            "es_raiz": not bool(grafo[did]),
+            "es_circular": did in nodos_circulares,
+            "gobierna": d.get("gobierna", d.get("governs")),
             "cota": d.get("cota"),
             "ubicacion": ref(d),
         }
 
     # -----------------------------------------------------------
-    # 5. GRAFO DIRECTO DE DEPENDENCIAS
-    # -----------------------------------------------------------
-
-    grafo: Dict[str, List[str]] = {
-        ident: list(nodo["depende_de"])
-        for ident, nodo in nodos.items()
-    }
-
-    # -----------------------------------------------------------
-    # 6. DEPENDENCIAS PRESENTES Y AUSENTES
-    # -----------------------------------------------------------
-
-    dependencias_presentes: Dict[str, List[str]] = {}
-    dependencias_ausentes: Dict[str, List[str]] = {}
-
-    referencias_no_resueltas: List[Dict[str, Any]] = []
-
-    for ident, deps in grafo.items():
-
-        presentes = []
-        ausentes = []
-
-        for dep in deps:
-            if dep in ids_presentes:
-                presentes.append(dep)
-            else:
-                ausentes.append(dep)
-
-                referencias_no_resueltas.append({
-                    "declaracion": ident,
-                    "dependencia": dep,
-                    "tipo_declaracion": nodos[ident]["tipo"],
-                    "ubicacion": nodos[ident]["ubicacion"],
-                    "razon": (
-                        "La dependencia declarada no existe "
-                        "en la instantánea recolectada."
-                    ),
-                })
-
-        dependencias_presentes[ident] = sorted(set(presentes))
-        dependencias_ausentes[ident] = sorted(set(ausentes))
-
-    # -----------------------------------------------------------
-    # 7. DECLARACIONES RAÍZ
-    # -----------------------------------------------------------
-
-    declaraciones_raiz = sorted(
-        ident
-        for ident, deps in grafo.items()
-        if not deps
-    )
-
-    # -----------------------------------------------------------
-    # 8. RESOLUCIÓN TRANSITIVA
-    # -----------------------------------------------------------
-
-    def resolver_cadena(
-        inicio: str,
-        camino: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
-
-        camino = list(camino or [])
-
-        if inicio in camino:
-            idx = camino.index(inicio)
-            ciclo = camino[idx:] + [inicio]
-
-            return {
-                "dependencias": [],
-                "ausentes": [],
-                "ciclos": [ciclo],
-            }
-
-        camino.append(inicio)
-
-        dependencias: Set[str] = set()
-        ausentes: Set[str] = set()
-        ciclos: List[List[str]] = []
-
-        for dep in grafo.get(inicio, []):
-
-            if dep not in ids_presentes:
-                ausentes.add(dep)
-                continue
-
-            dependencias.add(dep)
-
-            resultado = resolver_cadena(dep, camino)
-
-            dependencias.update(resultado["dependencias"])
-            ausentes.update(resultado["ausentes"])
-            ciclos.extend(resultado["ciclos"])
-
-        return {
-            "dependencias": sorted(dependencias),
-            "ausentes": sorted(ausentes),
-            "ciclos": ciclos,
-        }
-
-    dependencias_transitivas: Dict[str, List[str]] = {}
-    faltantes_transitivos: Dict[str, List[str]] = {}
-    ciclos_por_declaracion: Dict[str, List[List[str]]] = {}
-
-    for ident in nodos:
-
-        resultado = resolver_cadena(ident)
-
-        dependencias_transitivas[ident] = resultado["dependencias"]
-        faltantes_transitivos[ident] = resultado["ausentes"]
-        ciclos_por_declaracion[ident] = resultado["ciclos"]
-
-    # -----------------------------------------------------------
-    # 9. RELACIONES ESTRUCTURALES DECLARADAS
-    # -----------------------------------------------------------
-
-    relaciones: List[Dict[str, Any]] = []
-
-    for ident, nodo in nodos.items():
-
-        for dep in nodo["depende_de"]:
-            relaciones.append({
-                "origen": ident,
-                "tipo": "dependencia",
-                "destino": dep,
-                "presente": dep in ids_presentes,
-            })
-
-        for dominio in nodo["gobierna"]:
-            relaciones.append({
-                "origen": ident,
-                "tipo": "gobierna",
-                "destino": dominio,
-                "presente": True,
-            })
-
-        sujeto = nodo.get("sujeto")
-        relacion = nodo.get("relacion")
-        objeto = nodo.get("objeto")
-
-        if sujeto is not None or relacion is not None or objeto is not None:
-            relaciones.append({
-                "origen": ident,
-                "tipo": "proposicion",
-                "sujeto": sujeto,
-                "relacion": relacion,
-                "objeto": objeto,
-                "polaridad": nodo.get("polaridad"),
-            })
-
-    # -----------------------------------------------------------
-    # 10. MAPA DE UNIONES / RECOMBINACIONES
-    # -----------------------------------------------------------
+    # 15. CONTRADICCIONES REALES
     #
-    # SOLO se registra una unión cuando existe explícitamente
-    # en los datos recolectados.
-    #
-    # No se fabrican uniones por semejanza textual.
-    # No se presume que dos teoremas estén unidos solamente
-    # porque compartan una dependencia.
-    #
-
-    uniones: List[Dict[str, Any]] = []
-
-    for ident, nodo in nodos.items():
-
-        for campo in (
-            "une_con",
-            "union",
-            "uniones",
-            "recombina_con",
-            "recombinacion",
-            "recombinaciones",
-        ):
-            valores = nodo.get(campo)
-
-            if valores is None:
-                continue
-
-            if isinstance(valores, str):
-                valores = [valores]
-
-            if isinstance(valores, (list, tuple, set)):
-
-                for destino in valores:
-                    uniones.append({
-                        "origen": ident,
-                        "destino": destino,
-                        "tipo": campo,
-                        "presente": destino in ids_presentes,
-                    })
-
+    # Estas sí afectan coherencia.
     # -----------------------------------------------------------
-    # 11. POR TIPO
-    # -----------------------------------------------------------
-
-    cuerpos = sorted({
-        d.get("cuerpo")
-        for d in decls
-        if d.get("cuerpo") is not None
-    })
-
-    por_tipo = {
-        tipo: sum(
-            1
-            for d in decls
-            if d.get("tipo") == tipo
-        )
-        for tipo in TIPOS
-    }
-
-    # -----------------------------------------------------------
-    # 12. CONTRADICCIONES
-    # -----------------------------------------------------------
-
     choques = (
         contradiccion_directa(decls)
         + contradiccion_de_cota(decls)
     )
 
+    # -----------------------------------------------------------
+    # 16. COHERENCIA
+    #
+    # SOLO:
+    # - contradicciones
+    # - errores de recolección
+    #
+    # Las dependencias faltantes se reportan aparte.
+    # Las circularidades se reportan aparte.
+    # Ninguna de las dos altera coherente.
+    # -----------------------------------------------------------
     coherente = not (choques or errores)
 
     # -----------------------------------------------------------
-    # 13. DIAGNÓSTICO
+    # 17. DIAGNÓSTICO
     # -----------------------------------------------------------
-
     if (choques or errores) and DiagnosticoGlobal is not None:
         try:
             DiagnosticoGlobal.recibir_reporte(
@@ -2323,9 +2395,26 @@ def barrer(
             pass
 
     # -----------------------------------------------------------
-    # 14. IDS DEL DOMINIO K/O
+    # 18. RESUMEN POR TIPO
     # -----------------------------------------------------------
+    cuerpos = sorted({
+        d.get("cuerpo")
+        for d in decls
+        if d.get("cuerpo") is not None
+    })
 
+    por_tipo = {
+        t: sum(
+            1
+            for d in decls
+            if d.get("tipo", d.get("type")) == t
+        )
+        for t in TIPOS
+    }
+
+    # -----------------------------------------------------------
+    # 19. IDS K/O
+    # -----------------------------------------------------------
     ids_ko = (
         ids_dominio_k_o(declaraciones_externas)
         if coherente
@@ -2333,66 +2422,99 @@ def barrer(
     )
 
     # -----------------------------------------------------------
-    # 15. RESULTADO COMPLETO
+    # 20. LÍMITE AXIOMÁTICO ESTRUCTURAL
+    #
+    # NO se crean "anclas".
+    # NO se interpreta circularidad como fallo.
+    # Solo se informa de dependencias declaradas que no
+    # aparecen en la instantánea recolectada.
     # -----------------------------------------------------------
-
-    return {
-        "coherente": coherente,
-
-        "declaraciones": len(decls),
-
-        "indice": indice,
-
-        "nodos": nodos,
-
-        "grafo": grafo,
-
-        "relaciones": relaciones,
-
-        "uniones": uniones,
-
-        "dependencias_presentes": dependencias_presentes,
-
-        "dependencias_ausentes": dependencias_ausentes,
-
-        "dependencias_transitivas": dependencias_transitivas,
-
-        "faltantes_transitivos": faltantes_transitivos,
-
-        "referencias_no_resueltas": referencias_no_resueltas,
-
-        "declaraciones_raiz": declaraciones_raiz,
-
-        "ciclos_por_declaracion": ciclos_por_declaracion,
-
-        "ids_duplicados": sorted(set(ids_duplicados)),
-
-        "choques": choques,
-
-        "errores": errores,
-
-        "cuerpos": cuerpos,
-
-        "por_tipo": por_tipo,
-
-        "ids_dominio_k_o": ids_ko,
-
-        "traduccion_claves": traduccion,
-
+    limite = {
+        "premisas_faltantes": len(dependencias_faltantes),
+        "dependencias_no_satisfechas": len(dependencias_faltantes),
+        "dependencias_circulares": len(ciclos),
+        "detalle": dependencias_faltantes,
+        "ciclos": ciclos,
+        "alcance": {
+            "total_declaraciones": len(decls),
+            "dependencias_declaradas": len(dependencias),
+            "dependencias_resueltas": sum(
+                1
+                for x in dependencias
+                if x["estado"] == "RESUELTA"
+            ),
+            "dependencias_faltantes": len(
+                dependencias_faltantes
+            ),
+            "declaraciones_raiz": len(raices),
+            "circularidades_estructurales": len(ciclos),
+            "contradicciones": len(choques),
+        },
+        "nota": (
+            "El límite axiomático informa únicamente sobre "
+            "dependencias declaradas y su presencia en la "
+            "instantánea recolectada. Una declaración sin "
+            "dependencias es una raíz válida. La circularidad "
+            "es una propiedad estructural del grafo y no "
+            "constituye por sí misma una contradicción."
+        ),
     }
 
+    # -----------------------------------------------------------
+    # 21. RESULTADO
+    # -----------------------------------------------------------
+    return {
+        "coherente": coherente,
+        "choques": choques,
+        "errores": errores,
+        "declaraciones": len(decls),
+        "cuerpos": cuerpos,
+        "por_tipo": por_tipo,
+        "ids_dominio_k_o": ids_ko,
 
-def verificar_salida(salida: Dict) -> bool:
-    """Interpreta la salida de barrer mediante su campo coherente."""
-    return bool(salida.get("coherente", False))
+        "grafo": {
+            "nodos": nodos,
+            "aristas": dependencias,
+            "dependencias": grafo,
+            "requerido_por": requeridos_por,
+            "raices": raices,
+            "ciclos": ciclos,
+            "nodos_circulares": sorted(nodos_circulares),
+        },
 
+        "mapa_declaraciones": mapa_declaraciones,
 
-def verificar(
-    declaraciones_externas: Optional[Dict[str, List[Dict]]] = None,
-) -> Dict[str, Any]:
-    """Alias contractual de barrer. Sin segunda implementación."""
-    return barrer(declaraciones_externas)
+        "estructura": {
+            "uniones": uniones,
+            "recombinaciones": recombinaciones,
+            "dependencia_compartida": dict(dependencia_compartida),
+        },
 
+        "dependencias_faltantes": dependencias_faltantes,
+        "dependencias_transitivas": dependencias_transitivas,
+
+        "limite_axiomático": limite,
+
+        "diagnostico_estructural": {
+            "declaraciones_raiz": raices,
+            "dependencias_totales": len(dependencias),
+            "dependencias_resueltas": sum(
+                1
+                for x in dependencias
+                if x["estado"] == "RESUELTA"
+            ),
+            "dependencias_faltantes": len(
+                dependencias_faltantes
+            ),
+            "ciclos": len(ciclos),
+            "contradicciones": len(choques),
+            "errores_recoleccion": len(errores),
+        },
+    }
+
+# ===============================================================
+# FIN 8.4
+# ===============================================================
 # ===============================================================
 # FIN 8.4
 # ===============================================================# ===============================================================

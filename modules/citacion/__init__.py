@@ -1956,22 +1956,122 @@ def barrer(peticion: Any = None) -> Dict[str, Any]:
         ),
     }
 
+# ===============================================================
+# VERIFICAR — IDs DE CAPACIDADES POR MÓDULO + CUANTIFICACIÓN
+# ===============================================================
 
-def verificar(peticion: Any = None) -> Dict[str, Any]:
-    return barrer(peticion)
+def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
+    resultados: Dict[str, Any] = {}
+    total_ids = 0
+    total_callables = 0
+    total_faltantes = 0
 
+    catalogo = None
 
-def verificar_salida(salida: Any) -> bool:
-    if not isinstance(salida, dict):
-        return False
-    return (
-        "id" in salida
-        or "coherente" in salida
-        or "anuncios" in salida
-        or "declaraciones" in salida
-        or "citas" in salida
-        or "resuelto" in salida
-    )
+    if engine is not None:
+        for attr in ("modulos", "modules", "catalogo", "registry"):
+            catalogo = getattr(engine, attr, None)
+            if isinstance(catalogo, dict):
+                break
+
+    if not isinstance(catalogo, dict):
+        return {
+            "id": ID_MODULO if "ID_MODULO" in globals() else "DGCO",
+            "operacion": "verificar",
+            "coherente": False,
+            "estado": "DEGRADADO",
+            "total_modulos": 0,
+            "total_ids": 0,
+            "callables": 0,
+            "faltantes": 0,
+            "modulos": {},
+        }
+
+    for mid, meta in catalogo.items():
+
+        if isinstance(meta, dict) and isinstance(meta.get("contenedor"), dict):
+            cont = meta["contenedor"]
+        elif isinstance(meta, dict) and "capacidades" in meta:
+            cont = meta
+        else:
+            cont = getattr(meta, "CONTENEDOR", None)
+
+        mid_s = str(mid)
+
+        if not isinstance(cont, dict):
+            resultados[mid_s] = {
+                "id_modulo": mid_s,
+                "ids": [],
+                "n": 0,
+                "callables": 0,
+                "faltantes": 0,
+                "coherente": False,
+                "error": "sin CONTENEDOR auditable",
+            }
+            continue
+
+        id_modulo = str(cont.get("id") or mid_s)
+        capacidades = cont.get("capacidades")
+
+        if not isinstance(capacidades, dict):
+            resultados[mid_s] = {
+                "id_modulo": id_modulo,
+                "ids": [],
+                "n": 0,
+                "callables": 0,
+                "faltantes": 0,
+                "coherente": False,
+                "error": "sin capacidades",
+            }
+            continue
+
+        ids: List[str] = []
+        callables: List[str] = []
+        faltantes: List[str] = []
+
+        for nombre, ref in capacidades.items():
+            nombre_s = str(nombre)
+            ids.append(nombre_s)
+
+            if callable(ref):
+                callables.append(nombre_s)
+            else:
+                faltantes.append(nombre_s)
+
+        n = len(ids)
+        n_callables = len(callables)
+        n_faltantes = len(faltantes)
+
+        total_ids += n
+        total_callables += n_callables
+        total_faltantes += n_faltantes
+
+        resultados[mid_s] = {
+            "id_modulo": id_modulo,
+            "nombre": cont.get("nombre"),
+            "rol": cont.get("rol"),
+            "ids": ids,
+            "n": n,
+            "callables": callables,
+            "callables_n": n_callables,
+            "faltantes": faltantes,
+            "faltantes_n": n_faltantes,
+            "coherente": n_faltantes == 0 and n > 0,
+        }
+
+    coherente = total_faltantes == 0 and total_ids > 0
+
+    return {
+        "id": ID_MODULO if "ID_MODULO" in globals() else "DGCO",
+        "operacion": "verificar",
+        "estado": "OPERATIVO" if coherente else "DEGRADADO",
+        "coherente": coherente,
+        "total_modulos": len(resultados),
+        "total_ids": total_ids,
+        "callables": total_callables,
+        "faltantes": total_faltantes,
+        "modulos": resultados,
+    }
 
 # ===============================================================
 # SECCIÓN 35 — CAPACIDADES ARQUITECTÓNICAS

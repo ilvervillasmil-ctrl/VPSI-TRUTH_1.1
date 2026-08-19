@@ -817,7 +817,6 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 }
 
-
 # ===============================================================
 # SECCIÓN 17 — REGISTRO DE DECLARACIONES (proceso de ciclo)
 # ===============================================================
@@ -826,68 +825,166 @@ CONTENEDOR: Dict[str, Any] = {
 # No es verdad persistente del corpus AX.
 # No modifica conocimiento de otros módulos.
 #
+# Identidad documental:
+#     (modulo, id)
+#
+# El ID puede repetirse entre módulos.
+# La repetición dentro de un mismo módulo sí requiere resolución
+# contractual inequívoca.
+# ===============================================================
 
 _REGISTRO: List[Dict[str, Any]] = []
 
-#===============================================================
+
+# ===============================================================
 # SECCIÓN 18 — validar_declaracion
-#===============================================================
+# ===============================================================
 
 def _validar_declaracion(decl: Dict[str, Any]) -> List[str]:
     errores: List[str] = []
+
     if not isinstance(decl, dict):
         return ["declaracion debe ser dict"]
+
     tipo = decl.get("tipo")
-    if tipo is not None and tipo not in TIPOS_DECLARACION:
-        # tipos nuevos se admiten si son str no vacío (fractal)
-        if not (isinstance(tipo, str) and tipo.strip()):
-            errores.append("tipo de declaración inválido: {0}".format(tipo))
+    if not isinstance(tipo, str) or not tipo.strip():
+        errores.append("falta campo obligatorio: tipo")
+    elif tipo not in TIPOS_DECLARACION and not tipo.strip():
+        errores.append("tipo de declaración inválido: {0}".format(tipo))
+
     for campo in CAMPOS_OBLIGATORIOS:
-        if campo == "id" and decl.get("tipo") == "limite":
-            continue
-        # compat: fuente <- fuente_modulo
         if campo == "fuente":
-            if not decl.get("fuente") and not decl.get("fuente_modulo"):
-                errores.append("falta campo obligatorio: fuente")
+            if not isinstance(decl.get("fuente"), str) or not decl.get("fuente").strip():
+                if not isinstance(decl.get("fuente_modulo"), str) or not decl.get("fuente_modulo").strip():
+                    errores.append("falta campo obligatorio: fuente")
             continue
-        if decl.get(campo) in (None, ""):
+
+        if campo == "id":
+            if not isinstance(decl.get("id"), str) or not decl.get("id").strip():
+                errores.append("falta campo obligatorio: id")
+            continue
+
+        valor = decl.get(campo)
+        if valor is None or valor == "":
             errores.append("falta campo obligatorio: {0}".format(campo))
+
+    modulo = (
+        decl.get("modulo")
+        or decl.get("fuente_modulo")
+        or decl.get("fuente")
+    )
+
+    if not isinstance(modulo, str) or not modulo.strip():
+        errores.append("falta campo obligatorio: modulo")
+
     return errores
-    
-#===============================================================
-# SECCIÓN 19 normalizar_declaracion
-#===============================================================
+
+
+# ===============================================================
+# SECCIÓN 19 — normalizar_declaracion
+# ===============================================================
 
 def _normalizar_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
-    fuente = decl.get("fuente") or decl.get("fuente_modulo") or ""
+    fuente = str(
+        decl.get("fuente")
+        or decl.get("fuente_modulo")
+        or ""
+    ).strip()
+
+    modulo = str(
+        decl.get("modulo")
+        or decl.get("fuente_modulo")
+        or fuente
+        or ""
+    ).strip()
+
+    identificador = str(
+        decl.get("id")
+        or ""
+    ).strip()
+
     out: Dict[str, Any] = {
-        "id": decl.get("id"),
+        "id": identificador,
+        "modulo": modulo,
         "tipo": decl.get("tipo"),
         "fuente": fuente,
-        "fuente_modulo": fuente,  # compat lectura legada
+        "fuente_modulo": modulo,
         "enunciado": decl.get("enunciado") or "",
         "descripcion": decl.get("descripcion") or "",
         "evidencia_ref": decl.get("evidencia_ref") or "",
     }
+
     for c in CAMPOS_OPCIONALES:
-        if c in ("fuente_modulo",):
+        if c in ("fuente_modulo", "modulo"):
             continue
         if c in decl and decl[c] is not None:
             out[c] = decl[c]
+
     if "relaciones" not in out:
         out["relaciones"] = list(decl.get("relaciones") or [])
+
+    if "depende_de" not in out:
+        out["depende_de"] = list(decl.get("depende_de") or [])
+
     return out
 
 
 # ===============================================================
-# SECCIÓN 20 — RESOLUCIÓN / REGISTRO / CONSULTA BASE/ limpiar_ciclo
+# SECCIÓN 19.1 — clave documental
+# ===============================================================
+
+def _clave_declaracion(decl: Dict[str, Any]) -> Tuple[str, str]:
+    return (
+        str(decl.get("modulo") or decl.get("fuente_modulo") or "").strip(),
+        str(decl.get("id") or "").strip(),
+    )
+
+
+def _referencia_declaracion(decl: Dict[str, Any]) -> str:
+    modulo, identificador = _clave_declaracion(decl)
+    if modulo and identificador:
+        return "{0}:{1}".format(modulo, identificador)
+    return identificador or modulo
+
+
+def _clave_peticion(peticion: Any) -> Tuple[Optional[str], Optional[str]]:
+    if isinstance(peticion, dict):
+        modulo = peticion.get("modulo") or peticion.get("fuente_modulo")
+        identificador = peticion.get("id")
+        return (
+            str(modulo).strip() if modulo is not None and str(modulo).strip() else None,
+            str(identificador).strip() if identificador is not None and str(identificador).strip() else None,
+        )
+
+    if isinstance(peticion, str):
+        valor = peticion.strip()
+
+        if ":" in valor:
+            modulo, identificador = valor.split(":", 1)
+            modulo = modulo.strip()
+            identificador = identificador.strip()
+            if modulo and identificador:
+                return modulo, identificador
+
+        return None, valor
+
+    return None, None
+
+
+# ===============================================================
+# SECCIÓN 20 — RESOLUCIÓN / REGISTRO / CONSULTA BASE / limpiar_ciclo
 # ===============================================================
 
 def limpiar_ciclo() -> Dict[str, Any]:
     """Limpia el registro operativo del ciclo. No toca corpus externo."""
     n = len(_REGISTRO)
     _REGISTRO.clear()
-    return {"ok": True, "limpiadas": n, "id": _ID}
+    return {
+        "ok": True,
+        "limpiadas": n,
+        "id": _ID,
+    }
+
 
 # ===============================================================
 # SECCIÓN 21 — REGISTRAR
@@ -896,256 +993,525 @@ def limpiar_ciclo() -> Dict[str, Any]:
 def registrar(declaracion: Dict[str, Any]) -> Dict[str, Any]:
     """
     Incorpora una declaración pública al registro operativo.
-    No modifica el conocimiento de origen.
+
+    La identidad es (modulo, id).
+    Un mismo id puede existir en módulos diferentes.
+    Una declaración no puede sustituir silenciosamente a otra
+    del mismo módulo.
     """
     errores = _validar_declaracion(declaracion)
+
     if errores:
-        return {"ok": False, "errores": errores, "id": _ID}
+        return {
+            "ok": False,
+            "errores": errores,
+            "id": _ID,
+        }
+
     normalizada = _normalizar_declaracion(declaracion)
+    clave = _clave_declaracion(normalizada)
+
+    if not clave[0] or not clave[1]:
+        return {
+            "ok": False,
+            "errores": ["identidad documental incompleta: requiere modulo e id"],
+            "id": _ID,
+        }
+
+    existentes = [
+        d for d in _REGISTRO
+        if _clave_declaracion(d) == clave
+    ]
+
+    if existentes:
+        return {
+            "ok": False,
+            "errores": [
+                "declaracion duplicada dentro del mismo modulo: {0}".format(
+                    _referencia_declaracion(normalizada)
+                )
+            ],
+            "id": _ID,
+        }
+
     _REGISTRO.append(normalizada)
+
     return {
         "ok": True,
         "n": len(_REGISTRO),
         "declaracion": normalizada,
         "id": _ID,
+        "modulo": clave[0],
+        "clave": _referencia_declaracion(normalizada),
     }
+
 
 # ===============================================================
 # SECCIÓN 22 — RESOLVER
 # ===============================================================
 
-def resolver(id_decl: str) -> Dict[str, Any]:
+def resolver(
+    id_decl: Any,
+    modulo: Optional[str] = None,
+) -> Dict[str, Any]:
     """
-    Resuelve una declaración por id.
-    1) registro operativo
-    2) fuentes registradas del sistema (sin lista cerrada de módulos)
-    No inventa enunciados.
+    Resuelve una declaración mediante identidad documental.
+
+    Formas aceptadas:
+
+        resolver("AX:T1")
+        resolver("T1", modulo="AX")
+        resolver({"modulo": "AX", "id": "T1"})
+
+    Un ID sin módulo solamente puede resolverse si existe una única
+    declaración con ese ID en las fuentes disponibles.
+
+    Nunca selecciona arbitrariamente entre módulos.
+    No inventa declaraciones.
     """
-    if not id_decl or not str(id_decl).strip():
+
+    modulo_pet, id_pet = _clave_peticion(id_decl)
+
+    modulo_res = (
+        str(modulo).strip()
+        if modulo is not None and str(modulo).strip()
+        else modulo_pet
+    )
+
+    clave = id_pet
+
+    if not clave:
         return {
             "id": id_decl,
+            "modulo": modulo_res,
             "resuelto": False,
             "declaracion": None,
             "nota": "id vacío",
         }
-    clave = str(id_decl).strip()
 
-    for d in _REGISTRO:
-        if d.get("id") == clave and d.get("enunciado"):
-            return {
-                "id": clave,
-                "resuelto": True,
-                "declaracion": d,
-                "origen": "registro_ciclo",
-                "nota": "resuelto desde registro operativo de CIT",
-            }
+    candidatos = [
+        d for d in _REGISTRO
+        if d.get("id") == clave
+        and (
+            modulo_res is None
+            or str(d.get("modulo") or d.get("fuente_modulo") or "").strip()
+            == modulo_res
+        )
+        and d.get("enunciado")
+    ]
 
-    # Puente genérico a fuentes del paquete citacion (si existen)
+    if len(candidatos) == 1:
+        d = candidatos[0]
+        return {
+            "id": clave,
+            "modulo": d.get("modulo"),
+            "resuelto": True,
+            "declaracion": d,
+            "origen": "registro_ciclo",
+            "nota": "resuelto desde registro operativo de CIT",
+        }
+
+    if len(candidatos) > 1:
+        return {
+            "id": clave,
+            "modulo": modulo_res,
+            "resuelto": False,
+            "declaracion": None,
+            "ambiguo": True,
+            "candidatos": [
+                _referencia_declaracion(d)
+                for d in candidatos
+            ],
+            "nota": "id ambiguo: existen múltiples declaraciones resolubles",
+        }
+
+    # -----------------------------------------------------------
+    # Puente a fuentes del sistema
+    # -----------------------------------------------------------
     try:
         from modules.citacion.fuentes import ax as fuente_ax
 
-        r = fuente_ax.anunciar_id(
-            clave,
-            evidencia_ref="cit.resolver",
-            registrar=False,
-        )
-        if r.get("resuelto") and r.get("cita"):
+        if modulo_res:
+            r = fuente_ax.anunciar_id(
+                clave,
+                modulo=modulo_res,
+                evidencia_ref="cit.resolver",
+                registrar=False,
+            )
+        else:
+            r = fuente_ax.anunciar_id(
+                clave,
+                evidencia_ref="cit.resolver",
+                registrar=False,
+            )
+
+        if isinstance(r, dict) and r.get("resuelto") and r.get("cita"):
             c = r["cita"]
+
             decl = _normalizar_declaracion({
                 "id": clave,
+                "modulo": (
+                    c.get("modulo")
+                    or c.get("fuente_modulo")
+                    or modulo_res
+                    or c.get("fuente")
+                ),
                 "tipo": c.get("tipo") or "axioma",
-                "fuente": c.get("fuente_modulo") or "ax",
+                "fuente": c.get("fuente") or c.get("fuente_modulo") or "ax",
                 "enunciado": c.get("enunciado"),
                 "descripcion": c.get("descripcion"),
                 "evidencia_ref": c.get("evidencia_ref"),
+                "relaciones": c.get("relaciones") or [],
+                "depende_de": c.get("depende_de") or [],
             })
+
             return {
                 "id": clave,
+                "modulo": decl.get("modulo"),
                 "resuelto": True,
                 "declaracion": decl,
                 "origen": "fuente_sistema",
                 "nota": "resuelto desde fuente de declaraciones del sistema",
             }
+
+    except TypeError:
+        # Compatibilidad con contratos de fuentes antiguas que todavía
+        # no reciben modulo como argumento.
+        try:
+            from modules.citacion.fuentes import ax as fuente_ax
+
+            r = fuente_ax.anunciar_id(
+                clave,
+                evidencia_ref="cit.resolver",
+                registrar=False,
+            )
+
+            if isinstance(r, dict) and r.get("resuelto") and r.get("cita"):
+                c = r["cita"]
+                decl = _normalizar_declaracion({
+                    "id": clave,
+                    "modulo": (
+                        c.get("modulo")
+                        or c.get("fuente_modulo")
+                        or modulo_res
+                        or c.get("fuente")
+                    ),
+                    "tipo": c.get("tipo") or "axioma",
+                    "fuente": c.get("fuente") or c.get("fuente_modulo") or "ax",
+                    "enunciado": c.get("enunciado"),
+                    "descripcion": c.get("descripcion"),
+                    "evidencia_ref": c.get("evidencia_ref"),
+                    "relaciones": c.get("relaciones") or [],
+                    "depende_de": c.get("depende_de") or [],
+                })
+
+                if modulo_res and decl.get("modulo") != modulo_res:
+                    return {
+                        "id": clave,
+                        "modulo": modulo_res,
+                        "resuelto": False,
+                        "declaracion": None,
+                        "nota": (
+                            "la fuente resolvió el id, pero no confirmó "
+                            "el módulo solicitado"
+                        ),
+                    }
+
+                return {
+                    "id": clave,
+                    "modulo": decl.get("modulo"),
+                    "resuelto": True,
+                    "declaracion": decl,
+                    "origen": "fuente_sistema",
+                    "nota": "resuelto desde fuente de declaraciones del sistema",
+                }
+
+        except Exception:
+            pass
+
     except Exception:
         pass
 
     return {
         "id": clave,
+        "modulo": modulo_res,
         "resuelto": False,
         "declaracion": None,
-        "nota": "sin declaración resoluble en registro ni fuentes cargadas",
+        "nota": (
+            "sin declaración resoluble en registro ni fuentes cargadas"
+        ),
     }
+
+
 # ===============================================================
-# SECCIÓN 23 BUSCAR
+# SECCIÓN 24 — CITAR
 # ===============================================================
 
-def buscar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def citar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
-    Consulta sobre declaraciones del registro operativo.
-    Filtros: id, tipo, fuente, o_ref, texto (subcadena en enunciado).
-    """
-    pet = peticion if isinstance(peticion, dict) else {}
-    out = list(_REGISTRO)
+    Representación citable de declaraciones.
 
-    if pet.get("id"):
-        out = [d for d in out if d.get("id") == pet["id"]]
-    if pet.get("tipo"):
-        out = [d for d in out if d.get("tipo") == pet["tipo"]]
-    fuente = pet.get("fuente") or pet.get("modulo")
-    if fuente:
-        out = [
-            d for d in out
-            if d.get("fuente") == fuente or d.get("fuente_modulo") == fuente
-        ]
-    if pet.get("o_ref"):
-        out = [d for d in out if d.get("o_ref") == pet["o_ref"]]
-    if pet.get("texto"):
-        t = str(pet["texto"]).lower()
-        out = [
-            d for d in out
-            if t in str(d.get("enunciado") or "").lower()
-            or t in str(d.get("descripcion") or "").lower()
-        ]
+    La cita conserva:
+        modulo
+        id
+        tipo
+        fuente
+        enunciado
+        relaciones
+        depende_de
 
-    return {
-        "id": _ID,
-        "declaraciones": out,
-        "n": len(out),
-        "filtro": pet,
-        "nota": "solo exposición; sin recálculo; sin modificación",
-    }
-# ===============================================================
-# SECCIÓN 24 CITAR
-# ===============================================================
-
-def citar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """
-    Representación citable de declaraciones (compatibilidad de API).
-    Internamente = buscar + forma de cita.
+    CIT no modifica el contenido de la declaración.
     """
     pack = buscar(peticion)
-    citas = pack.get("declaraciones") or []
+    declaraciones = pack.get("declaraciones") or []
+
+    citas: List[Dict[str, Any]] = []
+
+    for d in declaraciones:
+        n = _normalizar_declaracion(d)
+        citas.append({
+            "modulo": n.get("modulo"),
+            "id": n.get("id"),
+            "clave": _referencia_declaracion(n),
+            "tipo": n.get("tipo"),
+            "fuente": n.get("fuente"),
+            "fuente_modulo": n.get("fuente_modulo"),
+            "enunciado": n.get("enunciado"),
+            "descripcion": n.get("descripcion"),
+            "evidencia_ref": n.get("evidencia_ref"),
+            "relaciones": list(n.get("relaciones") or []),
+            "depende_de": list(n.get("depende_de") or []),
+        })
+
     return {
         "id": _ID,
         "citas": citas,
         "n": len(citas),
-        "nota": "citas = representación de declaraciones; sin recálculo",
+        "nota": (
+            "Cita documental basada en módulo e ID; "
+            "sin recálculo ni modificación."
+        ),
     }
+
+
 # ===============================================================
-# SECCIÓN 25 RESOLVER ENUNCIADO
+# SECCIÓN 25 — RESOLVER ENUNCIADO
 # ===============================================================
 
-def resolver_enunciado(id_norma: str) -> Dict[str, Any]:
-    """Alias de resolución orientado a enunciado (modo consulta)."""
-    r = resolver(id_norma)
+def resolver_enunciado(
+    id_norma: str,
+    modulo: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Resolución de enunciado mediante módulo + ID."""
+    r = resolver(id_norma, modulo=modulo)
     d = r.get("declaracion") or {}
+
     return {
         "id": id_norma,
+        "modulo": r.get("modulo") or d.get("modulo"),
         "enunciado": d.get("enunciado") if r.get("resuelto") else None,
         "descripcion": d.get("descripcion") if r.get("resuelto") else None,
         "fuente": d.get("fuente") if r.get("resuelto") else None,
-        "fuente_modulo": d.get("fuente") if r.get("resuelto") else None,
+        "fuente_modulo": d.get("modulo") if r.get("resuelto") else None,
+        "depende_de": d.get("depende_de") if r.get("resuelto") else [],
         "resuelto": bool(r.get("resuelto")),
+        "ambiguo": bool(r.get("ambiguo")),
+        "candidatos": r.get("candidatos") or [],
         "nota": r.get("nota"),
     }
 
 
 # ===============================================================
-# SECCIÓN 26 RELACIONAR
+# SECCIÓN 26 — RELACIONAR
 # ===============================================================
 
 def relacionar(
     id_a: str,
     relacion: str,
     id_b: str,
+    modulo_a: Optional[str] = None,
+    modulo_b: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Documenta una relación entre dos declaraciones ya resolubles.
-    No altera el conocimiento de origen; solo el registro operativo.
+    Documenta una relación entre dos declaraciones resolubles.
+
+    La relación conserva la identidad completa de ambos extremos.
+    CIT registra la relación; no convierte la relación en verdad
+    axiomática ni altera las declaraciones originales.
     """
+
     if relacion not in RELACIONES:
         return {
             "ok": False,
-            "errores": ["relacion no admitida: {0}".format(relacion)],
+            "errores": [
+                "relacion no admitida: {0}".format(relacion)
+            ],
             "id": _ID,
         }
-    ra = resolver(id_a)
-    rb = resolver(id_b)
+
+    ra = resolver(id_a, modulo=modulo_a)
+    rb = resolver(id_b, modulo=modulo_b)
+
     if not ra.get("resuelto") or not rb.get("resuelto"):
         return {
             "ok": False,
-            "errores": ["ambas declaraciones deben ser resolubles"],
+            "errores": [
+                "ambas declaraciones deben ser resolubles"
+            ],
             "a": ra,
             "b": rb,
             "id": _ID,
         }
+
+    da = ra["declaracion"]
+    db = rb["declaracion"]
+
+    ref_a = _referencia_declaracion(da)
+    ref_b = _referencia_declaracion(db)
+
     enlace = {
-        "id": "REL-{0}-{1}-{2}".format(id_a, relacion, id_b),
+        "id": "REL-{0}-{1}-{2}".format(
+            ref_a,
+            relacion,
+            ref_b,
+        ),
+        "modulo": _NOMBRE,
         "tipo": "citacion",
         "fuente": _NOMBRE,
-        "enunciado": "{0} {1} {2}".format(id_a, relacion, id_b),
+        "enunciado": "{0} {1} {2}".format(
+            ref_a,
+            relacion,
+            ref_b,
+        ),
         "descripcion": "Relación documental registrada por CIT.",
         "relaciones": [
-            {"de": id_a, "relacion": relacion, "a": id_b},
+            {
+                "de": {
+                    "modulo": da.get("modulo"),
+                    "id": da.get("id"),
+                },
+                "relacion": relacion,
+                "a": {
+                    "modulo": db.get("modulo"),
+                    "id": db.get("id"),
+                },
+            }
         ],
-        "meta": {"a": id_a, "b": id_b, "relacion": relacion},
+        "meta": {
+            "a": ref_a,
+            "b": ref_b,
+            "modulo_a": da.get("modulo"),
+            "id_a": da.get("id"),
+            "modulo_b": db.get("modulo"),
+            "id_b": db.get("id"),
+            "relacion": relacion,
+        },
     }
+
     return registrar(enlace)
 
+
 # ===============================================================
-# SECCIÓN 27 CADENA
+# SECCIÓN 27 — CADENA
 # ===============================================================
 
-def cadena(ids: Optional[List[str]] = None) -> Dict[str, Any]:
+def cadena(
+    ids: Optional[List[Any]] = None,
+) -> Dict[str, Any]:
     """
-    Construye una cadena de fundamentación a partir de ids ordenados.
-    Cada eslabón debe ser resoluble. No inventa nodos.
+    Construye una cadena documental a partir de referencias ordenadas.
+
+    Cada referencia puede ser:
+        "AX:T1"
+        {"modulo": "AX", "id": "T1"}
+
+    No inventa nodos.
+    No determina verdad.
+    No interpreta compatibilidad.
     """
+
     secuencia = list(ids or [])
     eslabones: List[Dict[str, Any]] = []
-    faltantes: List[str] = []
-    for i in secuencia:
-        r = resolver(str(i))
+    faltantes: List[Any] = []
+    ambiguos: List[Dict[str, Any]] = []
+
+    for referencia in secuencia:
+        r = resolver(referencia)
+
         if r.get("resuelto"):
             eslabones.append(r["declaracion"])
+        elif r.get("ambiguo"):
+            ambiguos.append({
+                "referencia": referencia,
+                "candidatos": r.get("candidatos") or [],
+            })
         else:
-            faltantes.append(str(i))
+            faltantes.append(referencia)
+
+    completa = (
+        len(faltantes) == 0
+        and len(ambiguos) == 0
+        and len(eslabones) > 0
+    )
+
     return {
         "id": _ID,
         "cadena": eslabones,
         "n": len(eslabones),
         "faltantes": faltantes,
-        "completa": len(faltantes) == 0 and len(eslabones) > 0,
+        "ambiguos": ambiguos,
+        "completa": completa,
         "nota": (
-            "Cadena normativa documental. "
-            "Solo declaraciones resolubles; sin recálculo."
+            "Cadena documental basada en declaraciones resolubles "
+            "por módulo e ID; sin recálculo."
         ),
     }
+
+
 # ===============================================================
-# SECCIÓN 28 EXPLICAR
+# SECCIÓN 28 — EXPLICAR
 # ===============================================================
 
-def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def explicar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     """
-    Explicación documental: declaraciones del registro + cadena opcional.
-    Toda explicación proviene de declaraciones existentes.
+    Explicación documental.
+
+    Toda explicación procede de declaraciones existentes.
+    CIT no agrega premisas ni interpreta el contenido matemático.
     """
+
     pet = peticion if isinstance(peticion, dict) else {}
+
     ids = pet.get("ids") or pet.get("cadena") or []
-    if isinstance(ids, str):
+
+    if isinstance(ids, (str, dict)):
         ids = [ids]
-    pack_busca = buscar(pet)
-    pack_cadena = cadena(list(ids)) if ids else {
-        "cadena": pack_busca.get("declaraciones") or [],
-        "n": pack_busca.get("n", 0),
-        "faltantes": [],
-        "completa": (pack_busca.get("n") or 0) > 0,
-    }
+
+    if ids:
+        pack_cadena = cadena(list(ids))
+    else:
+        pack_busca = buscar(pet)
+
+        declaraciones = pack_busca.get("declaraciones") or []
+
+        pack_cadena = {
+            "cadena": declaraciones,
+            "n": len(declaraciones),
+            "faltantes": [],
+            "ambiguos": [],
+            "completa": len(declaraciones) > 0,
+        }
+
     return {
         "id": _ID,
         "explicacion": pack_cadena.get("cadena") or [],
         "n": pack_cadena.get("n", 0),
         "faltantes": pack_cadena.get("faltantes") or [],
+        "ambiguos": pack_cadena.get("ambiguos") or [],
         "completa": bool(pack_cadena.get("completa")),
         "nota": (
             "Explicación = declaraciones existentes. "
@@ -1155,406 +1521,92 @@ def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 29 ANRNCIO DE DECLARACIONES 
+# SECCIÓN 29 — ANUNCIO DE DECLARACIONES
 # ===============================================================
 
-
-
-
-def _anuncio_de_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
+def _anuncio_de_declaracion(
+    decl: Dict[str, Any],
+) -> Dict[str, Any]:
     errores = _validar_declaracion(decl)
+
     if errores:
-        return {"ok": False, "errores": errores, "anuncio": None}
+        return {
+            "ok": False,
+            "errores": errores,
+            "anuncio": None,
+        }
+
     c = _normalizar_declaracion(decl)
+
     return {
         "ok": True,
         "anuncio": {
-            "titulo": "[{0}] {1}".format(c.get("fuente"), c.get("id")),
+            "titulo": "[{0}:{1}]".format(
+                c.get("modulo"),
+                c.get("id"),
+            ),
+            "modulo": c.get("modulo"),
+            "id": c.get("id"),
+            "clave": _referencia_declaracion(c),
             "tipo": c.get("tipo"),
+            "fuente": c.get("fuente"),
             "enunciado": c.get("enunciado"),
             "descripcion": c.get("descripcion"),
             "evidencia_ref": c.get("evidencia_ref"),
             "o_ref": c.get("o_ref"),
             "contexto_ciclo": c.get("contexto_ciclo"),
             "relaciones": c.get("relaciones") or [],
+            "depende_de": c.get("depende_de") or [],
         },
     }
+
+
 # ===============================================================
-# SECCIÓN 30
+# SECCIÓN 30 — ANUNCIAR TODO
 # ===============================================================
 
-def anunciar_todo(filtro: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def anunciar_todo(
+    filtro: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     pack = buscar(filtro)
+
     anuncios: List[Dict[str, Any]] = []
+
     for d in pack.get("declaraciones") or []:
         r = _anuncio_de_declaracion(d)
+
         if r.get("ok") and r.get("anuncio"):
             anuncios.append(r["anuncio"])
+
     return {
         "id": _ID,
         "anuncios": anuncios,
         "n": len(anuncios),
         "filtro": filtro or {},
-        "nota": "capacidad total de anuncio sobre declaraciones resolubles",
-    }
-
-
-def _es_paquete_ciclo(obj: Any) -> bool:
-    if not isinstance(obj, dict):
-        return False
-    if "resultado" in obj and isinstance(obj.get("resultado"), dict):
-        return True
-    if "contexto_cx" in obj and "tipos_peticion" in obj:
-        return True
-    if obj.get("engine_version") and ("resultado" in obj or "peticion" in obj):
-        return True
-    return False
-
-
-def _es_declaracion_suelta(obj: Any) -> bool:
-    if not isinstance(obj, dict):
-        return False
-    if _es_paquete_ciclo(obj):
-        return False
-    return "tipo" in obj or "enunciado" in obj or "id" in obj
-
-
-def _evidencia_ref(paquete: Dict[str, Any]) -> str:
-    inv = paquete.get("invocador_id") or "ciclo"
-    ver = paquete.get("engine_version") or ""
-    res = paquete.get("resultado") or {}
-    seq = res.get("secuencia")
-    base = "ciclo:{0}:v{1}".format(inv, ver)
-    if seq is not None:
-        base = base + ":seq={0}".format(seq)
-    return base
-
-
-def _o_ref(paquete: Dict[str, Any]) -> Optional[str]:
-    res = paquete.get("resultado") or {}
-    cx = paquete.get("contexto_cx") or {}
-    reg = cx.get("registro") if isinstance(cx.get("registro"), dict) else {}
-    for src in (res, cx, reg, paquete.get("peticion") or {}):
-        if not isinstance(src, dict):
-            continue
-        for k in ("O_id", "o_id", "O_context", "contexto", "enunciado_O"):
-            v = src.get(k)
-            if v is not None and str(v).strip() and str(v).strip().lower() not in (
-                "undefined",
-                "indefinido",
-                "none",
-                "null",
-            ):
-                return str(v).strip()[:200]
-    return None
-
-
-def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Modo Engine: fundamentación documental del ciclo.
-    Lee solo el paquete. No calcula. No inventa factores.
-    Incorpora declaraciones desde fuentes del sistema si están disponibles.
-    Lista de fuentes: abierta (cualquier módulo presente o futuro vía fuentes/).
-    """
-    limpiar_ciclo()
-
-    res = paquete.get("resultado") if isinstance(paquete.get("resultado"), dict) else {}
-    cx = paquete.get("contexto_cx") if isinstance(paquete.get("contexto_cx"), dict) else {}
-    tipos = list(paquete.get("tipos_peticion") or cx.get("tipos_peticion") or [])
-    if not tipos:
-        tipos = ["dame_cadena_completa"]
-
-    evid = _evidencia_ref(paquete)
-    o_ref = _o_ref(paquete)
-    ctx_ciclo = str(res.get("estado") or cx.get("modo_entrada") or "ciclo")
-
-    errores: List[str] = []
-    n_fuentes = 0
-
-    def _ok_fuente(r: Any) -> None:
-        nonlocal n_fuentes
-        if isinstance(r, dict) and r.get("ok") is False:
-            errores.extend([str(e) for e in (r.get("errores") or [])])
-        else:
-            n_fuentes += 1
-
-    # Fuentes opcionales bajo modules/citacion/fuentes/ (fractal: añadir archivo,
-    # no modificar este INIT). Fallo de una fuente no detiene el resto.
-    try:
-        from modules.citacion.fuentes import cx as fuente_cx
-
-        if cx:
-            _ok_fuente(
-                fuente_cx.desde_resolver(
-                    cx,
-                    evidencia_ref=evid,
-                    contexto_ciclo=ctx_ciclo,
-                    registrar=True,
-                )
-            )
-        reg = cx.get("registro") if isinstance(cx.get("registro"), dict) else {}
-        estado_cx = reg.get("estado") or cx.get("estado")
-        if estado_cx in ("indefinido",) or res.get("estado") == "UNDEFINED":
-            _ok_fuente(
-                fuente_cx.anunciar_indefinido(
-                    motivo=str(
-                        res.get("razon")
-                        or "O/contexto no usable en el ciclo"
-                    ),
-                    evidencia_ref=evid,
-                    o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo,
-                    registrar=True,
-                )
-            )
-    except Exception as e:
-        errores.append("fuente cx: {0}: {1}".format(type(e).__name__, e))
-
-    try:
-        from modules.citacion.fuentes import ca as fuente_ca
-
-        factores = res.get("factores") if isinstance(res.get("factores"), dict) else {}
-        C, L, K = factores.get("C"), factores.get("L"), factores.get("K")
-        if C is not None or L is not None or K is not None:
-            _ok_fuente(
-                fuente_ca.anunciar_factores(
-                    C=C, L=L, K=K,
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo, registrar=True,
-                )
-            )
-        elif res.get("estado") in ("PARCIAL", "UNDEFINED"):
-            _ok_fuente(
-                fuente_ca.anunciar_sin_factores(
-                    motivo=str(res.get("razon") or "factores incompletos"),
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo, registrar=True,
-                )
-            )
-    except Exception as e:
-        errores.append("fuente ca: {0}: {1}".format(type(e).__name__, e))
-
-    try:
-        from modules.citacion.fuentes import fo as fuente_fo
-
-        tru_ri = res.get("tru_ri") or res.get("Tru_Ri")
-        tru_total = res.get("tru_total") or res.get("Tru_total")
-        if (
-            tru_ri is not None
-            and tru_total is not None
-            and str(tru_ri) not in ("UNDEFINED", "None")
-            and str(tru_total) not in ("UNDEFINED", "None")
-        ):
-            factores = res.get("factores") if isinstance(res.get("factores"), dict) else {}
-            _ok_fuente(
-                fuente_fo.anunciar_formula_aplicada(
-                    tru_ri=tru_ri, tru_total=tru_total,
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo,
-                    C=factores.get("C"), L=factores.get("L"), K=factores.get("K"),
-                    registrar=True,
-                )
-            )
-        elif "dame_normas" in tipos or "dame_cadena_completa" in tipos:
-            _ok_fuente(
-                fuente_fo.anunciar_expresion(
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo, registrar=True,
-                )
-            )
-    except Exception as e:
-        errores.append("fuente fo: {0}: {1}".format(type(e).__name__, e))
-
-    try:
-        from modules.citacion.fuentes import ct as fuente_ct
-
-        if res.get("alpha") is not None or res.get("beta") is not None:
-            _ok_fuente(
-                fuente_ct.anunciar_valores(
-                    alpha=res.get("alpha"), beta=res.get("beta"),
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo, registrar=True,
-                )
-            )
-        elif "dame_normas" in tipos or "dame_cadena_completa" in tipos:
-            _ok_fuente(
-                fuente_ct.anunciar_ancla(
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo, registrar=True,
-                )
-            )
-    except Exception as e:
-        errores.append("fuente ct: {0}: {1}".format(type(e).__name__, e))
-
-    try:
-        from modules.citacion.fuentes import ax as fuente_ax
-
-        ids: List[str] = []
-        val = res.get("valuacion") if isinstance(res.get("valuacion"), dict) else {}
-        for src in (val.get("ids"), cx.get("ids_cx_relevantes"), res.get("ids")):
-            if isinstance(src, list):
-                for i in src:
-                    s = str(i).strip()
-                    if s and s not in ids:
-                        ids.append(s)
-        if ids:
-            pack_ax = fuente_ax.anunciar_lista(
-                ids,
-                evidencia_ref=evid, o_ref=o_ref,
-                contexto_ciclo=ctx_ciclo, registrar=True,
-            )
-            n_fuentes += int(pack_ax.get("n") or 0)
-    except Exception as e:
-        errores.append("fuente ax: {0}: {1}".format(type(e).__name__, e))
-
-    try:
-        from modules.citacion.fuentes import mc as fuente_mc
-
-        if "permite_k" in cx:
-            _ok_fuente(
-                fuente_mc.anunciar_permite_k(
-                    permite_k=bool(cx.get("permite_k")),
-                    enunciado="permite_k={0} según contexto del ciclo.".format(
-                        cx.get("permite_k")
-                    ),
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo, registrar=True,
-                )
-            )
-        informe_mc = paquete.get("informe_mecanica") or res.get("informe_mecanica")
-        if isinstance(informe_mc, dict):
-            _ok_fuente(
-                fuente_mc.desde_informe_barrer(
-                    informe_mc,
-                    evidencia_ref=evid, o_ref=o_ref,
-                    contexto_ciclo=ctx_ciclo, registrar=True,
-                )
-            )
-    except Exception as e:
-        errores.append("fuente mc: {0}: {1}".format(type(e).__name__, e))
-
-    try:
-        from modules.citacion.fuentes import limite as fuente_lim
-
-        factores = res.get("factores") if isinstance(res.get("factores"), dict) else {}
-        tiene_factores = all(
-            factores.get(k) is not None
-            and str(factores.get(k)) not in ("UNDEFINED", "None", "")
-            for k in ("C", "L", "K")
-        )
-        permite_k = cx.get("permite_k")
-        reg = cx.get("registro") if isinstance(cx.get("registro"), dict) else {}
-        o_estado = reg.get("estado")
-        if res.get("estado") == "UNDEFINED":
-            o_estado = o_estado or "indefinido"
-
-        pack_lim = fuente_lim.anunciar_desde_ciclo(
-            evidencia_ref=evid, o_ref=o_ref, contexto_ciclo=ctx_ciclo,
-            permite_k=permite_k if isinstance(permite_k, bool) else None,
-            tiene_factores=tiene_factores, o_estado=o_estado, registrar=True,
-        )
-        if pack_lim.get("citas"):
-            n_fuentes += len(pack_lim.get("citas") or [])
-    except Exception as e:
-        errores.append("fuente limite: {0}: {1}".format(type(e).__name__, e))
-
-    # Auto-declaración del oficio CIT (fractal, no cálculo)
-    try:
-        from modules.citacion.esquema import plantilla
-
-        cita_self = plantilla(
-            id="CIT-CICLO",
-            tipo="citacion",
-            fuente_modulo=_NOMBRE,
-            enunciado=(
-                "CIT fundamentó el ciclo; estado_resultado={0}; "
-                "tipos_peticion={1}.".format(res.get("estado"), tipos)
-            ),
-            descripcion=(
-                "Declaración del oficio de fundamentación; "
-                "no calcula; documenta el cierre de anuncio."
-            ),
-            evidencia_ref=evid,
-            o_ref=o_ref,
-            contexto_ciclo=ctx_ciclo,
-            meta={"tipos_peticion": tipos, "estado": res.get("estado")},
-        )
-        registrar(cita_self)
-        n_fuentes += 1
-    except Exception as e:
-        errores.append("declaracion fractal: {0}: {1}".format(type(e).__name__, e))
-
-    anuncios_pack = anunciar_todo()
-    return {
-        "id": _ID,
-        "estado": "OK" if n_fuentes > 0 else "VACIO",
-        "ok": n_fuentes > 0,
-        "n_declaraciones": len(_REGISTRO),
-        "n_citas": len(_REGISTRO),
-        "n_anuncios": anuncios_pack.get("n", 0),
-        "anuncios": anuncios_pack.get("anuncios") or [],
-        "tipos_peticion": tipos,
-        "evidencia_ref": evid,
-        "o_ref": o_ref,
-        "errores": errores,
-        "engine_version": paquete.get("engine_version"),
         "nota": (
-            "CIT: autoridad universal de fundamentación sobre el paquete; "
-            "cero agencia sobre valores numéricos; sin recálculo; "
-            "sin modificación del conocimiento declarado."
+            "Capacidad total de anuncio sobre declaraciones resolubles; "
+            "cada declaración conserva módulo e ID."
         ),
     }
 
-
-def anunciar(arg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """
-    Entrada única — modo Engine y modo Consulta.
-
-    - paquete de ciclo → cadena documental completa
-    - declaración suelta → registro + anuncio de forma
-    - None → anunciar_todo() del registro actual
-    """
-    if arg is None:
-        return anunciar_todo()
-
-    if _es_paquete_ciclo(arg):
-        return _anunciar_paquete(arg)
-
-    if _es_declaracion_suelta(arg):
-        reg = registrar(arg)
-        if not reg.get("ok"):
-            return {
-                "ok": False,
-                "errores": reg.get("errores") or ["declaracion inválida"],
-                "anuncio": None,
-                "id": _ID,
-            }
-        return _anuncio_de_declaracion(reg.get("declaracion") or arg)
-
-    return {
-        "ok": False,
-        "estado": "ERROR_FORMA",
-        "errores": [
-            "anunciar: se esperaba paquete de ciclo o una declaración "
-            "con tipo/enunciado/id"
-        ],
-        "anuncio": None,
-        "id": _ID,
-    }
-
-
 # ===============================================================
-# SECCIÓN 31 INVENTARIO
+# SECCIÓN 31 — INVENTARIO
 # ===============================================================
-
-
-
-
-
-
-
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Inventario contractual de CIT.
+
+    Expone exclusivamente la infraestructura declarada por el módulo:
+    identidad, contrato, esquema, capacidades, tipos, relaciones y
+    campos obligatorios.
+
+    No ejecuta otras capacidades.
+    No consulta autoridades externas.
+    No modifica conocimiento.
+    """
+    capacidades = list(CONTENEDOR["capacidades"].keys()) if isinstance(CONTENEDOR.get("capacidades"), dict) else []
+
     return {
         "id": _ID,
         "nombre": _NOMBRE,
@@ -1568,525 +1620,1000 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "tipos_declaracion": list(TIPOS_DECLARACION),
         "relaciones": list(RELACIONES),
         "campos_obligatorios": list(CAMPOS_OBLIGATORIOS),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades": capacidades,
         "registro_n": len(_REGISTRO),
         "funcion": (
-            "Autoridad universal de fundamentación. "
-            "Resuelve, organiza, relaciona y cita cualquier declaración "
-            "pública del VPSI. No modifica conocimiento."
+            "Autoridad de fundamentación documental. "
+            "Resuelve, organiza, relaciona, explica y cita declaraciones "
+            "públicas identificadas por módulo e ID. "
+            "No modifica conocimiento de origen ni recalcula valores."
         ),
         "modos": ["engine", "consulta"],
         "requiere": [],
     }
 
-# ===============================================================
-# SECCIÓN 32 REPORTE
-# ===============================================================
 
+# ===============================================================
+# SECCIÓN 32 — REPORTE
+# ===============================================================
 
 def reporte(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Reporte operativo de CIT.
+
+    El reporte describe el estado observable del módulo y de su registro
+    operativo. No declara coherencia matemática del corpus ni sustituye
+    el diagnóstico de otro módulo.
+    """
+    errores: List[str] = []
+    advertencias: List[str] = []
+
+    if not isinstance(_REGISTRO, list):
+        errores.append("registro operativo inválido")
+
+    capacidades = CONTENEDOR.get("capacidades")
+    if not isinstance(capacidades, dict):
+        errores.append("contenedor de capacidades inválido")
+        capacidades_n = 0
+    else:
+        capacidades_n = len(capacidades)
+
+    if isinstance(_REGISTRO, list):
+        for i, decl in enumerate(_REGISTRO):
+            if not isinstance(decl, dict):
+                errores.append(
+                    "declaración inválida en registro operativo: índice {0}".format(i)
+                )
+                continue
+            errores.extend(
+                "registro[{0}]: {1}".format(i, e)
+                for e in _validar_declaracion(decl)
+            )
+
+    coherente = not errores
+
+    if not _REGISTRO:
+        advertencias.append("registro operativo vacío")
+
     return {
         "id": _ID,
         "nombre": _NOMBRE,
         "rol": _ROL,
         "version": _VERSION,
-        "estado": "OPERATIVO",
-        "coherente": True,
-        "registro_n": len(_REGISTRO),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "estado": "OPERATIVO" if coherente else "ERROR",
+        "coherente": coherente,
+        "errores": errores,
+        "advertencias": advertencias,
+        "registro_n": len(_REGISTRO) if isinstance(_REGISTRO, list) else 0,
+        "capacidades": (
+            list(capacidades.keys())
+            if isinstance(capacidades, dict)
+            else []
+        ),
+        "capacidades_n": capacidades_n,
         "nota": (
-            "CIT documenta y fundamenta. "
-            "No calcula. No altera declaraciones de origen."
+            "CIT documenta y fundamenta declaraciones existentes. "
+            "El reporte evalúa únicamente su estado operativo local; "
+            "no determina la coherencia del corpus ni modifica declaraciones."
         ),
     }
 
 
+# ===============================================================
+# SECCIÓN 33 — DIAGNÓSTICO
+# ===============================================================
+
 def diagnostico(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Diagnóstico propio y determinista de CIT.
+
+    Solo inspecciona invariantes internas de CIT:
+    - registro operativo;
+    - declaraciones registradas;
+    - capacidades declaradas;
+    - contrato básico.
+
+    No consulta ni suplanta AX, CX, CA, FO, CT, MC, límite u otros
+    módulos. Una declaración de otro módulo no se considera duplicada
+    simplemente por compartir ID: la identidad documental es
+    (fuente/módulo, ID).
+    """
+    problemas: List[Dict[str, Any]] = []
+    advertencias: List[Dict[str, Any]] = []
+    recomendaciones: List[str] = []
+
+    if not isinstance(_REGISTRO, list):
+        problemas.append({
+            "tipo": "registro_invalido",
+            "detalle": "El registro operativo no es una lista.",
+        })
+    else:
+        for i, decl in enumerate(_REGISTRO):
+            if not isinstance(decl, dict):
+                problemas.append({
+                    "tipo": "declaracion_invalida",
+                    "indice": i,
+                    "detalle": "La entrada no es un dict.",
+                })
+                continue
+
+            errores_decl = _validar_declaracion(decl)
+            for error in errores_decl:
+                problemas.append({
+                    "tipo": "declaracion_invalida",
+                    "indice": i,
+                    "id": decl.get("id"),
+                    "fuente": decl.get("fuente") or decl.get("fuente_modulo"),
+                    "detalle": error,
+                })
+
+    capacidades = CONTENEDOR.get("capacidades")
+    if not isinstance(capacidades, dict):
+        problemas.append({
+            "tipo": "capacidades_invalidas",
+            "detalle": "CONTENEDOR['capacidades'] debe ser un dict.",
+        })
+    else:
+        for nombre in capacidades.keys():
+            if not isinstance(nombre, str) or not nombre.strip():
+                problemas.append({
+                    "tipo": "capacidad_invalida",
+                    "detalle": "Existe una capacidad sin nombre válido.",
+                })
+
+    if not TIPOS_DECLARACION:
+        advertencias.append({
+            "tipo": "tipos_declaracion_vacios",
+            "detalle": "No existen tipos de declaración registrados.",
+        })
+
+    if not RELACIONES:
+        advertencias.append({
+            "tipo": "relaciones_vacias",
+            "detalle": "No existen relaciones documentales registradas.",
+        })
+
+    if not _REGISTRO:
+        advertencias.append({
+            "tipo": "registro_vacio",
+            "detalle": "No existen declaraciones en el registro operativo.",
+        })
+
+    if problemas:
+        recomendaciones.append(
+            "Corregir las inconsistencias internas del registro o del contrato de CIT."
+        )
+
+    if advertencias:
+        recomendaciones.append(
+            "Verificar si el estado del ciclo justifica la ausencia de declaraciones."
+        )
+
     return {
         "id": _ID,
         "nombre": _NOMBRE,
         "rol": _ROL,
-        "estado": "OPERATIVO",
-        "problemas": [],
-        "advertencias": [],
-        "recomendaciones": [],
-        "coherente": True,
-        "registro_n": len(_REGISTRO),
-        "nota": "Diagnóstico propio de CIT. No consulta autoridades ajenas.",
+        "estado": "OPERATIVO" if not problemas else "ERROR",
+        "problemas": problemas,
+        "advertencias": advertencias,
+        "recomendaciones": recomendaciones,
+        "coherente": not problemas,
+        "registro_n": len(_REGISTRO) if isinstance(_REGISTRO, list) else 0,
+        "capacidades": (
+            list(CONTENEDOR["capacidades"].keys())
+            if isinstance(CONTENEDOR.get("capacidades"), dict)
+            else []
+        ),
+        "nota": (
+            "Diagnóstico local de CIT. "
+            "No determina la verdad ni la coherencia de declaraciones "
+            "pertenecientes a otros módulos. "
+            "La identidad documental se determina por módulo/fuente + ID; "
+            "un mismo ID puede existir legítimamente en módulos diferentes."
+        ),
     }
 
 # ===============================================================
-# SECCIÓN 32 BARRER
+# SECCIÓN 34 — BARRER
 # ===============================================================
 
 def barrer(peticion: Any = None) -> Dict[str, Any]:
     """
-    Barrido estructural determinista del módulo CIT.
+    Auditoría estructural determinista de CIT.
 
-    PRINCIPIOS:
-    - No modifica conocimiento.
-    - Una declaración se identifica por (módulo, id).
-    - Un mismo id en módulos distintos NO es duplicado.
-    - Una dependencia se resuelve dentro de su módulo cuando éste está
-      explícitamente determinado.
-    - Una dependencia sin módulo puede resolverse contra el módulo de origen.
-    - Una dependencia no encontrada se registra como ausente; no se inventa.
-    - Las raíces sin depende_de son válidas.
-    - La existencia de una dependencia no constituye contradicción.
-    - Las relaciones se conservan como aristas estructurales.
+    Principios:
+    - CIT documenta; no calcula.
+    - CIT no modifica conocimiento de origen.
+    - CIT no sustituye a AX, MC, CX, CA, FO, TT ni Engine.
+    - Las declaraciones se identifican por (modulo, id).
+    - Un mismo id puede existir legítimamente en módulos diferentes.
+    - Un id repetido dentro del mismo módulo sí constituye duplicidad.
+    - Las dependencias se resuelven siempre dentro de su módulo cuando
+      la declaración proporciona módulo explícito.
+    - Una dependencia sin módulo puede resolverse contra el módulo
+      de origen de la declaración.
+    - No se inventan declaraciones ni dependencias.
+    - No se interpreta el contenido matemático de una declaración.
+    - No se convierte una ausencia documental en contradicción axiomática.
+    - El barrido inspecciona la infraestructura declarada por CIT.
     """
 
-    errores: List[str] = []
-    choques: List[str] = []
-
-    # -----------------------------------------------------------
-    # 1. Validación contractual existente
-    # -----------------------------------------------------------
-    for t in TIPOS_DECLARACION:
-        if not isinstance(t, str) or not t:
-            errores.append("tipo inválido en TIPOS_DECLARACION")
-
-    capacidades = CONTENEDOR.get("capacidades", {})
-    if not isinstance(capacidades, dict):
-        capacidades = {}
-
-    for cap in capacidades:
-        nombre = str(cap).lower()
-        if any(
-            x in nombre
-            for x in ("modificar", "alterar", "reescribir", "borrar_corpus")
-        ):
-            choques.append(
-                "capacidad incompatible con restricción única de CIT: {0}".format(cap)
-            )
-
-    # -----------------------------------------------------------
-    # 2. Determinar módulo de cada registro
-    # -----------------------------------------------------------
-    def _modulo_de(registro: Any) -> str:
-        if not isinstance(registro, dict):
-            return str(_ID)
-        for clave in (
-            "modulo",
-            "module",
-            "contenedor",
-            "cuerpo",
-            "namespace",
-        ):
-            valor = registro.get(clave)
-            if isinstance(valor, str) and valor.strip():
-                return valor.strip()
-        return str(_ID)
-
-    def _id_de(registro: Any) -> Optional[str]:
-        if not isinstance(registro, dict):
-            return None
-        for clave in ("id", "ID"):
-            valor = registro.get(clave)
-            if isinstance(valor, str) and valor.strip():
-                return valor.strip()
-        return None
-
-    def _deps_de(registro: Any) -> List[str]:
-        if not isinstance(registro, dict):
-            return []
-        valor = registro.get("depende_de")
-        if valor is None:
-            valor = registro.get("depends_on")
-        if valor is None:
-            return []
-        if isinstance(valor, str):
-            valor = [valor]
-        if not isinstance(valor, (list, tuple, set)):
-            return []
-        return sorted(
-            {
-                str(x).strip()
-                for x in valor
-                if str(x).strip()
-            }
-        )
-
-    # -----------------------------------------------------------
-    # 3. Construir índice contextual módulo -> id
-    # -----------------------------------------------------------
-    indice: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    errores: List[Dict[str, Any]] = []
+    advertencias: List[Dict[str, Any]] = []
+    dependencias: List[Dict[str, Any]] = []
     declaraciones: List[Dict[str, Any]] = []
-
-    if isinstance(_REGISTRO, (list, tuple)):
-        fuente = list(_REGISTRO)
-    elif isinstance(_REGISTRO, dict):
-        fuente = list(_REGISTRO.values())
-    else:
-        fuente = []
-
-    for registro in fuente:
-        if not isinstance(registro, dict):
-            errores.append("registro inválido en _REGISTRO")
-            continue
-
-        rid = _id_de(registro)
-        if rid is None:
-            errores.append("registro sin id")
-            continue
-
-        modulo = _modulo_de(registro)
-
-        indice.setdefault(modulo, {})
-
-        # -------------------------------------------------------
-        # ID repetido: solamente error dentro del mismo módulo
-        # -------------------------------------------------------
-        if rid in indice[modulo]:
-            existente = indice[modulo][rid]
-
-            if existente != registro:
-                errores.append(
-                    "id duplicado dentro del mismo módulo: {0}::{1}".format(
-                        modulo, rid
-                    )
-                )
-            continue
-
-        copia = dict(registro)
-        copia["_modulo"] = modulo
-        copia["_id"] = rid
-        indice[modulo][rid] = copia
-        declaraciones.append(copia)
+    capacidades: List[Dict[str, Any]] = []
+    modulos: List[Dict[str, Any]] = []
+    duplicados: List[Dict[str, Any]] = []
+    relaciones: List[Dict[str, Any]] = []
+    cadenas: List[Dict[str, Any]] = []
 
     # -----------------------------------------------------------
-    # 4. Índice global contextual
+    # 1. CONTRATO BASE DE CIT
     # -----------------------------------------------------------
-    nodos: Dict[str, Dict[str, Any]] = {}
 
-    for registro in declaraciones:
-        modulo = registro["_modulo"]
-        rid = registro["_id"]
-        clave = "{0}::{1}".format(modulo, rid)
+    contrato = {
+        "id": _ID,
+        "nombre": _NOMBRE,
+        "rol": _ROL,
+        "version": _VERSION,
+        "version_contrato": _VERSION_CONTRATO,
+        "esquema": _ESQUEMA,
+        "estabilidad": _ESTABILIDAD,
+        "compatible_desde": _COMPATIBLE_DESDE,
+        "api_engine": _API_ENGINE,
+    }
 
-        nodos[clave] = {
-            "clave": clave,
-            "modulo": modulo,
-            "id": rid,
-            "tipo": registro.get("tipo"),
-            "sujeto": registro.get("sujeto"),
-            "relacion": registro.get("relacion"),
-            "objeto": registro.get("objeto"),
-            "polaridad": registro.get("polaridad"),
-            "enunciado": registro.get("enunciado"),
-            "depende_de": _deps_de(registro),
-            "dependencias": [],
-            "dependencias_ausentes": [],
-            "raiz": len(_deps_de(registro)) == 0,
-        }
-
-    # -----------------------------------------------------------
-    # 5. Resolver dependencias
-    # -----------------------------------------------------------
-    aristas: List[Dict[str, Any]] = []
-    dependencias_ausentes: List[Dict[str, Any]] = []
-    dependencias_compartidas: Dict[str, List[str]] = {}
-
-    def _resolver_dependencia(
-        modulo_origen: str,
-        dependencia: str,
-    ) -> Optional[str]:
-
-        texto = str(dependencia).strip()
-
-        if not texto:
-            return None
-
-        # -------------------------------------------------------
-        # Forma explícita: MODULO::ID
-        # -------------------------------------------------------
-        if "::" in texto:
-            modulo_destino, id_destino = texto.split("::", 1)
-            modulo_destino = modulo_destino.strip()
-            id_destino = id_destino.strip()
-
-            if id_destino in indice.get(modulo_destino, {}):
-                return "{0}::{1}".format(
-                    modulo_destino,
-                    id_destino,
-                )
-
-            return None
-
-        # -------------------------------------------------------
-        # Primero: mismo módulo que el origen
-        # -------------------------------------------------------
-        if texto in indice.get(modulo_origen, {}):
-            return "{0}::{1}".format(
-                modulo_origen,
-                texto,
-            )
-
-        # -------------------------------------------------------
-        # Segundo: búsqueda determinista entre módulos.
-        # Solo se resuelve si existe UNA única coincidencia.
-        # -------------------------------------------------------
-        coincidencias = [
-            "{0}::{1}".format(modulo, texto)
-            for modulo in sorted(indice)
-            if texto in indice.get(modulo, {})
-        ]
-
-        if len(coincidencias) == 1:
-            return coincidencias[0]
-
-        # Cero o múltiples coincidencias ambiguas.
-        return None
-
-    for clave, nodo in nodos.items():
-        modulo = nodo["modulo"]
-
-        for dependencia in nodo["depende_de"]:
-            destino = _resolver_dependencia(
-                modulo,
-                dependencia,
-            )
-
-            if destino is None:
-                nodo["dependencias_ausentes"].append(dependencia)
-
-                dependencias_ausentes.append({
-                    "origen": clave,
-                    "modulo_origen": modulo,
-                    "id_origen": nodo["id"],
-                    "dependencia": dependencia,
-                    "estado": "NO_RESUELTA",
-                })
-
-                aristas.append({
-                    "desde": clave,
-                    "hacia": dependencia,
-                    "tipo": "depende_de",
-                    "estado": "ausente",
-                })
-
-                continue
-
-            nodo["dependencias"].append(destino)
-
-            aristas.append({
-                "desde": clave,
-                "hacia": destino,
-                "tipo": "depende_de",
-                "estado": "resuelta",
+    for campo in (
+        "id",
+        "nombre",
+        "rol",
+        "version",
+        "version_contrato",
+        "esquema",
+        "estabilidad",
+        "compatible_desde",
+        "api_engine",
+    ):
+        valor = contrato.get(campo)
+        if valor is None or str(valor).strip() == "":
+            errores.append({
+                "tipo": "campo_contrato_ausente",
+                "campo": campo,
+                "modulo": _NOMBRE,
             })
 
-            dependencias_compartidas.setdefault(
-                destino,
-                [],
-            ).append(clave)
+    # -----------------------------------------------------------
+    # 2. TIPOS
+    # -----------------------------------------------------------
+
+    tipos_validos: List[str] = []
+
+    for tipo in TIPOS_DECLARACION:
+        if not isinstance(tipo, str) or not tipo.strip():
+            errores.append({
+                "tipo": "tipo_declaracion_invalido",
+                "valor": tipo,
+            })
+        else:
+            tipos_validos.append(tipo.strip())
 
     # -----------------------------------------------------------
-    # 6. Normalización determinista
+    # 3. CAMPOS OBLIGATORIOS
     # -----------------------------------------------------------
-    for nodo in nodos.values():
-        nodo["dependencias"] = sorted(set(nodo["dependencias"]))
-        nodo["dependencias_ausentes"] = sorted(
-            set(nodo["dependencias_ausentes"])
+
+    campos_obligatorios: List[str] = []
+
+    for campo in CAMPOS_OBLIGATORIOS:
+        if not isinstance(campo, str) or not campo.strip():
+            errores.append({
+                "tipo": "campo_obligatorio_invalido",
+                "valor": campo,
+            })
+        else:
+            campos_obligatorios.append(campo.strip())
+
+    # -----------------------------------------------------------
+    # 4. RELACIONES
+    # -----------------------------------------------------------
+
+    relaciones_validas: List[str] = []
+
+    for relacion in RELACIONES:
+        if not isinstance(relacion, str) or not relacion.strip():
+            errores.append({
+                "tipo": "relacion_invalida",
+                "valor": relacion,
+            })
+        else:
+            relaciones_validas.append(relacion.strip())
+
+    # -----------------------------------------------------------
+    # 5. CAPACIDADES DECLARADAS POR CIT
+    # -----------------------------------------------------------
+
+    capacidades_contenedor = CONTENEDOR.get("capacidades")
+
+    if not isinstance(capacidades_contenedor, dict):
+        errores.append({
+            "tipo": "contenedor_capacidades_invalido",
+            "detalle": "CONTENEDOR['capacidades'] debe ser dict",
+        })
+        capacidades_contenedor = {}
+
+    for nombre, referencia in sorted(
+        capacidades_contenedor.items(),
+        key=lambda x: str(x[0]),
+    ):
+        if not isinstance(nombre, str) or not nombre.strip():
+            errores.append({
+                "tipo": "capacidad_sin_nombre",
+                "valor": nombre,
+            })
+            continue
+
+        capacidades.append({
+            "nombre": nombre,
+            "referencia": (
+                referencia.__name__
+                if callable(referencia)
+                and hasattr(referencia, "__name__")
+                else str(referencia)
+            ),
+            "callable": bool(callable(referencia)),
+        })
+
+        if not callable(referencia):
+            advertencias.append({
+                "tipo": "capacidad_no_callable",
+                "capacidad": nombre,
+                "referencia": str(referencia),
+            })
+
+    # -----------------------------------------------------------
+    # 6. REGISTRO OPERATIVO LOCAL
+    # -----------------------------------------------------------
+
+    registro_local = list(_REGISTRO)
+
+    # identidad documental:
+    # (fuente_modulo/fuente, id)
+    indice_local: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
+
+    for decl in registro_local:
+        if not isinstance(decl, dict):
+            errores.append({
+                "tipo": "registro_no_dict",
+                "valor": repr(decl),
+            })
+            continue
+
+        did = decl.get("id")
+        fuente = (
+            decl.get("fuente_modulo")
+            or decl.get("fuente")
+            or _NOMBRE
         )
 
-    for destino in list(dependencias_compartidas):
-        dependencias_compartidas[destino] = sorted(
-            set(dependencias_compartidas[destino])
+        if did is None or not str(did).strip():
+            errores.append({
+                "tipo": "declaracion_sin_id",
+                "fuente_modulo": str(fuente),
+            })
+            continue
+
+        did = str(did).strip()
+        fuente = str(fuente).strip()
+
+        clave = (fuente, did)
+
+        indice_local.setdefault(clave, []).append(decl)
+
+        errores_decl = _validar_declaracion(decl)
+
+        if errores_decl:
+            errores.append({
+                "tipo": "declaracion_invalida",
+                "modulo": fuente,
+                "id": did,
+                "errores": list(errores_decl),
+            })
+
+        declaraciones.append({
+            "modulo": fuente,
+            "id": did,
+            "tipo": decl.get("tipo"),
+            "enunciado": decl.get("enunciado"),
+            "descripcion": decl.get("descripcion"),
+            "evidencia_ref": decl.get("evidencia_ref"),
+            "relaciones": list(decl.get("relaciones") or []),
+        })
+
+    # -----------------------------------------------------------
+    # 7. DUPLICIDAD CORRECTA
+    #
+    # MISMO ID EN DISTINTO MÓDULO = LEGÍTIMO
+    # MISMO ID EN MISMO MÓDULO = DUPLICADO
+    # -----------------------------------------------------------
+
+    for (fuente, did), items in sorted(indice_local.items()):
+        if len(items) > 1:
+            duplicados.append({
+                "tipo": "id_duplicado_en_modulo",
+                "modulo": fuente,
+                "id": did,
+                "cantidad": len(items),
+            })
+
+    # -----------------------------------------------------------
+    # 8. RELACIONES DEL REGISTRO
+    # -----------------------------------------------------------
+
+    for decl in registro_local:
+        if not isinstance(decl, dict):
+            continue
+
+        fuente_a = (
+            decl.get("fuente_modulo")
+            or decl.get("fuente")
+            or _NOMBRE
         )
+        id_a = decl.get("id")
+
+        if id_a is None:
+            continue
+
+        for rel in decl.get("relaciones") or []:
+            if not isinstance(rel, dict):
+                advertencias.append({
+                    "tipo": "relacion_forma_invalida",
+                    "modulo": fuente_a,
+                    "id": id_a,
+                    "relacion": rel,
+                })
+                continue
+
+            id_b = rel.get("a") or rel.get("id_b") or rel.get("hacia")
+            tipo_rel = rel.get("relacion") or rel.get("tipo")
+
+            if not id_b:
+                advertencias.append({
+                    "tipo": "relacion_sin_destino",
+                    "modulo": fuente_a,
+                    "id": id_a,
+                })
+                continue
+
+            relaciones.append({
+                "desde": {
+                    "modulo": str(fuente_a),
+                    "id": str(id_a),
+                },
+                "relacion": tipo_rel,
+                "hacia": {
+                    "modulo": str(
+                        rel.get("fuente_modulo")
+                        or rel.get("fuente")
+                        or fuente_a
+                    ),
+                    "id": str(id_b),
+                },
+            })
+
+            if (
+                tipo_rel is not None
+                and str(tipo_rel) not in relaciones_validas
+            ):
+                advertencias.append({
+                    "tipo": "relacion_no_catalogada",
+                    "modulo": fuente_a,
+                    "id": id_a,
+                    "relacion": tipo_rel,
+                })
 
     # -----------------------------------------------------------
-    # 7. Dependencias transitivas
+    # 9. RESOLUCIÓN DE DEPENDENCIAS
+    #
+    # La dependencia siempre conserva su identidad de módulo.
     # -----------------------------------------------------------
-    def _transitivas(origen: str) -> Dict[str, Any]:
-        alcanzadas: List[str] = []
-        ciclos: List[List[str]] = []
-        camino: List[str] = []
-        visitados: Set[str] = set()
 
-        def dfs(actual: str) -> None:
-            if actual in camino:
-                inicio = camino.index(actual)
-                ciclos.append(
-                    camino[inicio:] + [actual]
+    for decl in registro_local:
+        if not isinstance(decl, dict):
+            continue
+
+        modulo = str(
+            decl.get("fuente_modulo")
+            or decl.get("fuente")
+            or _NOMBRE
+        ).strip()
+
+        did = decl.get("id")
+
+        if did is None:
+            continue
+
+        did = str(did).strip()
+
+        deps = decl.get("depende_de") or []
+
+        if not isinstance(deps, (list, tuple)):
+            advertencias.append({
+                "tipo": "depende_de_forma_invalida",
+                "modulo": modulo,
+                "id": did,
+                "valor": deps,
+            })
+            continue
+
+        for dep in deps:
+            dep_modulo = modulo
+            dep_id = None
+
+            if isinstance(dep, dict):
+                dep_id = (
+                    dep.get("id")
+                    or dep.get("id_decl")
+                    or dep.get("declaracion")
                 )
+                dep_modulo = str(
+                    dep.get("fuente_modulo")
+                    or dep.get("fuente")
+                    or modulo
+                ).strip()
+            else:
+                dep_id = str(dep).strip()
+
+            if not dep_id:
+                advertencias.append({
+                    "tipo": "dependencia_sin_id",
+                    "modulo": modulo,
+                    "id": did,
+                })
+                continue
+
+            clave_dep = (dep_modulo, str(dep_id))
+
+            encontrada = clave_dep in indice_local
+
+            dependencias.append({
+                "desde": {
+                    "modulo": modulo,
+                    "id": did,
+                },
+                "hacia": {
+                    "modulo": dep_modulo,
+                    "id": str(dep_id),
+                },
+                "estado": (
+                    "encontrada"
+                    if encontrada
+                    else "no_resuelta_en_registro"
+                ),
+            })
+
+    # -----------------------------------------------------------
+    # 10. CADENAS LOCALES
+    # -----------------------------------------------------------
+
+    grafo: Dict[Tuple[str, str], List[Tuple[str, str]]] = {}
+
+    for item in dependencias:
+        origen = (
+            item["desde"]["modulo"],
+            item["desde"]["id"],
+        )
+        destino = (
+            item["hacia"]["modulo"],
+            item["hacia"]["id"],
+        )
+
+        if item["estado"] == "encontrada":
+            grafo.setdefault(origen, []).append(destino)
+
+    def _cadena(
+        origen: Tuple[str, str],
+    ) -> Tuple[List[Tuple[str, str]], bool]:
+        visitados: Set[Tuple[str, str]] = set()
+        camino: List[Tuple[str, str]] = []
+        ciclo = False
+
+        def _dfs(nodo: Tuple[str, str]) -> None:
+            nonlocal ciclo
+
+            if nodo in camino:
+                ciclo = True
                 return
 
-            if actual in visitados:
+            if nodo in visitados:
                 return
 
-            visitados.add(actual)
-            camino.append(actual)
+            visitados.add(nodo)
+            camino.append(nodo)
 
-            nodo_actual = nodos.get(actual)
-
-            if nodo_actual is not None:
-                for destino in nodo_actual["dependencias"]:
-                    if destino not in alcanzadas:
-                        alcanzadas.append(destino)
-                    dfs(destino)
+            for destino in sorted(
+                grafo.get(nodo, []),
+                key=lambda x: (str(x[0]), str(x[1])),
+            ):
+                _dfs(destino)
 
             camino.pop()
 
-        dfs(origen)
+        _dfs(origen)
 
-        return {
-            "dependencias_transitivas": sorted(
-                set(x for x in alcanzadas if x != origen)
+        return sorted(visitados), ciclo
+
+    ciclos: List[List[Dict[str, str]]] = []
+
+    for origen in sorted(grafo.keys()):
+        alcanzables, hay_ciclo = _cadena(origen)
+
+        cadenas.append({
+            "origen": {
+                "modulo": origen[0],
+                "id": origen[1],
+            },
+            "alcanzables": [
+                {
+                    "modulo": modulo,
+                    "id": did,
+                }
+                for modulo, did in alcanzables
+                if (modulo, did) != origen
+            ],
+            "ciclo": hay_ciclo,
+        })
+
+        if hay_ciclo:
+            ciclos.append([
+                {
+                    "modulo": modulo,
+                    "id": did,
+                }
+                for modulo, did in alcanzables
+            ])
+
+    # -----------------------------------------------------------
+    # 11. INSPECCIÓN DE MÓDULOS DISPONIBLES
+    #
+    # Se utiliza la infraestructura de CONTENEDORES del sistema
+    # cuando está disponible. CIT no inventa módulos.
+    # -----------------------------------------------------------
+
+    try:
+        registro_engine = globals().get("REGISTRO_MODULOS")
+        if registro_engine is None:
+            registro_engine = globals().get("_REGISTRO_MODULOS")
+
+        contenedores = getattr(
+            registro_engine,
+            "contenedores",
+            {},
+        )
+
+        if isinstance(contenedores, dict):
+            for nombre, cont in sorted(
+                contenedores.items(),
+                key=lambda x: str(x[0]),
+            ):
+                meta = getattr(cont, "meta", {})
+                if not isinstance(meta, dict):
+                    meta = {}
+
+                modulo_info = {
+                    "nombre": str(
+                        getattr(cont, "nombre", None)
+                        or meta.get("nombre")
+                        or nombre
+                    ),
+                    "id": str(
+                        getattr(cont, "id", None)
+                        or meta.get("id")
+                        or ""
+                    ),
+                    "rol": str(
+                        getattr(cont, "rol", None)
+                        or meta.get("rol")
+                        or ""
+                    ),
+                    "version": str(
+                        getattr(cont, "version", None)
+                        or meta.get("version")
+                        or ""
+                    ),
+                    "ruta": str(
+                        getattr(cont, "ruta", "")
+                        or meta.get("ruta")
+                        or ""
+                    ),
+                    "requiere": list(
+                        getattr(cont, "requiere", None)
+                        or meta.get("requiere")
+                        or []
+                    ),
+                    "capacidades": sorted(
+                        list(
+                            getattr(cont, "capacidades", None)
+                            or meta.get("capacidades", {})
+                            or {}
+                        )
+                    ),
+                }
+
+                modulos.append(modulo_info)
+
+    except Exception as exc:
+        advertencias.append({
+            "tipo": "inventario_modulos_no_disponible",
+            "error": "{0}: {1}".format(
+                type(exc).__name__,
+                exc,
             ),
-            "ciclos": ciclos,
-        }
-
-    ciclos: List[List[str]] = []
-
-    for clave in sorted(nodos):
-        resultado = _transitivas(clave)
-
-        nodos[clave]["dependencias_transitivas"] = resultado[
-            "dependencias_transitivas"
-        ]
-
-        nodos[clave]["ciclos"] = resultado["ciclos"]
-
-        ciclos.extend(resultado["ciclos"])
+        })
 
     # -----------------------------------------------------------
-    # 8. Deduplicar ciclos
+    # 12. DEPENDENCIAS ENTRE MÓDULOS
     # -----------------------------------------------------------
-    ciclos_unicos: List[List[str]] = []
-    ciclos_vistos: Set[Tuple[str, ...]] = set()
 
-    for ciclo in ciclos:
-        if not ciclo:
-            continue
+    dependencias_modulo: List[Dict[str, Any]] = []
 
-        canonico = tuple(
-            sorted(set(ciclo))
-        )
+    for modulo in modulos:
+        nombre = modulo.get("nombre")
+        rol = modulo.get("rol")
+        for requerido in modulo.get("requiere") or []:
+            requerido = str(requerido).strip()
 
-        if canonico not in ciclos_vistos:
-            ciclos_vistos.add(canonico)
-            ciclos_unicos.append(ciclo)
+            destino = None
 
-    # -----------------------------------------------------------
-    # 9. Raíces
-    # -----------------------------------------------------------
-    raices = sorted(
-        clave
-        for clave, nodo in nodos.items()
-        if nodo["raiz"]
-    )
+            for candidato in modulos:
+                if (
+                    candidato.get("nombre") == requerido
+                    or candidato.get("id") == requerido
+                    or candidato.get("rol") == requerido
+                ):
+                    destino = candidato
+                    break
 
-    # -----------------------------------------------------------
-    # 10. Relaciones por tipo
-    # -----------------------------------------------------------
-    por_tipo: Dict[str, List[str]] = {}
-
-    for clave, nodo in nodos.items():
-        tipo = nodo.get("tipo")
-
-        if tipo is None:
-            tipo = "sin_tipo"
-
-        por_tipo.setdefault(
-            str(tipo),
-            [],
-        ).append(clave)
-
-    for tipo in por_tipo:
-        por_tipo[tipo] = sorted(
-            set(por_tipo[tipo])
-        )
+            dependencias_modulo.append({
+                "desde": {
+                    "modulo": nombre,
+                    "rol": rol,
+                },
+                "hacia": requerido,
+                "estado": (
+                    "encontrada"
+                    if destino is not None
+                    else "no_resuelta"
+                ),
+            })
 
     # -----------------------------------------------------------
-    # 11. Coherencia contractual propia del módulo
+    # 13. VALIDACIÓN DE CAPACIDADES CONTRACTUALES
     # -----------------------------------------------------------
-    coherente = not errores and not choques
 
-    # -----------------------------------------------------------
-    # 12. Grafo completo
-    # -----------------------------------------------------------
-    grafo = {
-        "nodos": nodos,
-        "aristas": aristas,
-        "raices": raices,
-        "ciclos": ciclos_unicos,
-        "dependencias_ausentes": dependencias_ausentes,
-        "dependencias_compartidas": {
-            k: sorted(set(v))
-            for k, v in sorted(
-                dependencias_compartidas.items()
-            )
-        },
-        "por_tipo": por_tipo,
-        "total_nodos": len(nodos),
-        "total_aristas": len(aristas),
-        "aristas_resueltas": sum(
-            1
-            for a in aristas
-            if a["estado"] == "resuelta"
-        ),
-        "aristas_ausentes": sum(
-            1
-            for a in aristas
-            if a["estado"] == "ausente"
-        ),
-        "total_raices": len(raices),
-        "total_ciclos": len(ciclos_unicos),
+    capacidades_requeridas = {
+        "anunciar",
+        "anunciar_todo",
+        "citar",
+        "registrar",
+        "resolver_enunciado",
+        "inventario",
+        "barrer",
+        "verificar",
+        "limpiar_ciclo",
     }
 
+    capacidades_presentes = set(
+        str(x.get("nombre"))
+        for x in capacidades
+    )
+
+    for capacidad in sorted(
+        capacidades_requeridas - capacidades_presentes
+    ):
+        errores.append({
+            "tipo": "capacidad_contractual_ausente",
+            "capacidad": capacidad,
+        })
+
     # -----------------------------------------------------------
-    # 13. Salida contractual
+    # 14. RESTRICCIONES NEGATIVAS DEL OFICIO CIT
     # -----------------------------------------------------------
+
+    prohibidas = (
+        "calcular_C",
+        "calcular_L",
+        "calcular_K",
+        "calcular_Tru",
+        "fijar_O",
+        "evaluar_verdad_personal",
+        "interpretar_estados_mentales",
+        "orquestar_modulos",
+        "aprobar_material_realidad",
+    )
+
+    nombres_capacidades = {
+        str(x.get("nombre")).lower()
+        for x in capacidades
+    }
+
+    for prohibida in prohibidas:
+        if prohibida.lower() in nombres_capacidades:
+            errores.append({
+                "tipo": "capacidad_prohibida",
+                "capacidad": prohibida,
+            })
+
+    # -----------------------------------------------------------
+    # 15. ESTADO ESTRUCTURAL
+    # -----------------------------------------------------------
+
+    coherente = not errores
+
+    estado = "OPERATIVO" if coherente else "INCONSISTENTE"
+
+    # -----------------------------------------------------------
+    # 16. SALIDA COMPLETA
+    # -----------------------------------------------------------
+
     return {
         "id": _ID,
         "nombre": _NOMBRE,
         "rol": _ROL,
         "version": _VERSION,
+        "version_contrato": _VERSION_CONTRATO,
+
+        "estado": estado,
         "coherente": coherente,
-        "choques": choques,
+
+        "contrato": contrato,
+
         "errores": errores,
-        "registro_n": len(declaraciones),
-        "capacidades": list(capacidades.keys()),
-        "grafo": grafo,
-        "declaraciones": nodos,
-        "dependencias": aristas,
-        "dependencias_ausentes": dependencias_ausentes,
-        "raices": raices,
-        "ciclos": ciclos_unicos,
+        "errores_n": len(errores),
+
+        "advertencias": advertencias,
+        "advertencias_n": len(advertencias),
+
+        "modulos": modulos,
+        "modulos_n": len(modulos),
+
+        "capacidades": capacidades,
+        "capacidades_n": len(capacidades),
+
+        "declaraciones": declaraciones,
+        "declaraciones_n": len(declaraciones),
+
+        "duplicados": duplicados,
+        "duplicados_n": len(duplicados),
+
+        "relaciones": relaciones,
+        "relaciones_n": len(relaciones),
+
+        "dependencias": dependencias,
+        "dependencias_n": len(dependencias),
+
+        "dependencias_modulo": dependencias_modulo,
+        "dependencias_modulo_n": len(dependencias_modulo),
+
+        "cadenas": cadenas,
+        "ciclos": ciclos,
+        "ciclos_n": len(ciclos),
+
+        "tipos_declaracion": tipos_validos,
+        "campos_obligatorios": campos_obligatorios,
+        "relaciones_validas": relaciones_validas,
+
+        "registro_n": len(registro_local),
+
+        "reglas": {
+            "identidad_declaracion": "(fuente_modulo, id)",
+            "duplicidad": (
+                "El mismo id en módulos diferentes es válido; "
+                "el mismo id repetido dentro del mismo módulo es duplicado."
+            ),
+            "dependencias": (
+                "Se resuelven por módulo + id; no se inventan nodos."
+            ),
+            "ciclos": (
+                "Un ciclo estructural se informa como ciclo; "
+                "no se convierte automáticamente en contradicción."
+            ),
+            "ausencia": (
+                "Una dependencia ausente se informa como no resuelta; "
+                "no se convierte en contradicción ni en premisa."
+            ),
+            "citacion": (
+                "CIT documenta declaraciones existentes y sus relaciones; "
+                "no recalcula su contenido."
+            ),
+        },
+
         "nota": (
-            "Barrido estructural determinista. La identidad de una "
-            "declaración es módulo::id. Un mismo id en módulos distintos "
-            "no constituye duplicación. Las dependencias se resuelven "
-            "contra el índice contextual; las no resueltas se registran "
-            "sin inventar premisas. Las raíces son declaraciones válidas "
-            "sin depende_de. La circularidad se registra estructuralmente "
-            "y no se clasifica por sí misma como contradicción."
+            "Barrer estructural de CIT. La identidad documental es "
+            "(modulo,id), por lo que la reutilización de un mismo ID "
+            "entre módulos no constituye duplicidad. El barrido inspecciona "
+            "contrato, capacidades, declaraciones, relaciones, dependencias "
+            "y cadenas sin modificar conocimiento de origen."
         ),
     }
 
 
-def verificar(peticion: Any = None) -> Dict[str, Any]:
-    return barrer(peticion)
-
-
 def verificar_salida(salida: Any) -> bool:
+    """
+    Verificación contractual de la salida producida por barrer.
+
+    No interpreta verdad matemática.
+    Solo verifica que la salida tenga la estructura mínima
+    producida por el barrido CIT.
+    """
     if not isinstance(salida, dict):
         return False
 
-    return (
-        "id" in salida
-        and "nombre" in salida
-        and "coherente" in salida
-        and "grafo" in salida
-        and isinstance(salida.get("grafo"), dict)
+    campos = (
+        "id",
+        "nombre",
+        "rol",
+        "version",
+        "estado",
+        "coherente",
+        "errores",
+        "advertencias",
+        "modulos",
+        "capacidades",
+        "declaraciones",
+        "duplicados",
+        "relaciones",
+        "dependencias",
+        "dependencias_modulo",
+        "cadenas",
+        "ciclos",
     )
 
+    if any(campo not in salida for campo in campos):
+        return False
+
+    if not isinstance(salida.get("coherente"), bool):
+        return False
+
+    for campo in campos:
+        if campo in (
+            "errores",
+            "advertencias",
+            "modulos",
+            "capacidades",
+            "declaraciones",
+            "duplicados",
+            "relaciones",
+            "dependencias",
+            "dependencias_modulo",
+            "cadenas",
+            "ciclos",
+        ):
+            if not isinstance(salida.get(campo), list):
+                return False
+
+    if salida.get("coherente") and salida.get("errores"):
+        return False
+
+    if not salida.get("coherente") and not salida.get("errores"):
+        return False
+
+    return True
+
+
+def verificar(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Alias contractual de barrer.
+    Una única implementación de auditoría.
+    """
+    return barrer(peticion)
+
+
 # ===============================================================
-# FIN SECCIÓN 32 BARRER
+# FIN SECCIÓN 34
 # ===============================================================
+
 # ===============================================================
-# ejecutar_total
+# 35 ejecutar_total
 # ===============================================================
 
 def ejecutar_total(
@@ -2157,7 +2684,7 @@ def ejecutar_total(
 
 
 # ===============================================================
-# inspeccionar
+# 36 inspeccionar
 # ===============================================================
 
 def inspeccionar(
@@ -2200,7 +2727,7 @@ def inspeccionar(
 
 
 # ===============================================================
-# registrar_inventario
+# 37 registrar_inventario
 # ===============================================================
 
 def registrar_inventario(
@@ -2219,7 +2746,7 @@ def registrar_inventario(
     }
 
 # ===============================================================
-# RESOLUCIÓN Y EXPORTACIONES
+# 38 RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
 
 _CAP_MAP = {

@@ -1957,7 +1957,7 @@ def barrer(peticion: Any = None) -> Dict[str, Any]:
     }
 
 # ===============================================================
-# VERIFICAR — IDs DE CAPACIDADES POR MÓDULO + CUANTIFICACIÓN
+# VERIFICAR — IDs + CALLABLE REAL POR MÓDULO
 # ===============================================================
 
 def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
@@ -2003,10 +2003,11 @@ def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
                 "id_modulo": mid_s,
                 "ids": [],
                 "n": 0,
-                "callables": 0,
-                "faltantes": 0,
+                "callables": [],
+                "callables_n": 0,
+                "faltantes": [],
+                "faltantes_n": 0,
                 "coherente": False,
-                "error": "sin CONTENEDOR auditable",
             }
             continue
 
@@ -2018,10 +2019,11 @@ def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
                 "id_modulo": id_modulo,
                 "ids": [],
                 "n": 0,
-                "callables": 0,
-                "faltantes": 0,
+                "callables": [],
+                "callables_n": 0,
+                "faltantes": [],
+                "faltantes_n": 0,
                 "coherente": False,
-                "error": "sin capacidades",
             }
             continue
 
@@ -2038,25 +2040,19 @@ def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
             else:
                 faltantes.append(nombre_s)
 
-        n = len(ids)
-        n_callables = len(callables)
-        n_faltantes = len(faltantes)
-
-        total_ids += n
-        total_callables += n_callables
-        total_faltantes += n_faltantes
+        total_ids += len(ids)
+        total_callables += len(callables)
+        total_faltantes += len(faltantes)
 
         resultados[mid_s] = {
             "id_modulo": id_modulo,
-            "nombre": cont.get("nombre"),
-            "rol": cont.get("rol"),
             "ids": ids,
-            "n": n,
+            "n": len(ids),
             "callables": callables,
-            "callables_n": n_callables,
+            "callables_n": len(callables),
             "faltantes": faltantes,
-            "faltantes_n": n_faltantes,
-            "coherente": n_faltantes == 0 and n > 0,
+            "faltantes_n": len(faltantes),
+            "coherente": len(faltantes) == 0 and len(ids) > 0,
         }
 
     coherente = total_faltantes == 0 and total_ids > 0
@@ -2072,7 +2068,6 @@ def verificar(engine: Any = None, **kwargs: Any) -> Dict[str, Any]:
         "faltantes": total_faltantes,
         "modulos": resultados,
     }
-
 # ===============================================================
 # SECCIÓN 35 — CAPACIDADES ARQUITECTÓNICAS
 # ===============================================================

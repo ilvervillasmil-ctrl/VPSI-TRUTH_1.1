@@ -2653,6 +2653,31 @@ def buscar_por_id(id_decl: str) -> Optional[Dict]:
 # FIN 8.5
 # ===============================================================# 8.6 — # ===============================================================
 # ===============================================================
+# 8.6 — VERIFICAR SALIDA
+# ===============================================================
+
+def verificar_salida(salida: Dict) -> bool:
+    """
+    Verifica determinísticamente la salida producida por barrer.
+
+    Contrato:
+    - recibe exclusivamente la salida de barrer
+    - no recolecta nuevamente
+    - no ejecuta barrer
+    - no ejecuta limite_axiomático
+    - no modifica la salida
+    - utiliza únicamente el campo contractual 'coherente'
+    """
+
+    if not isinstance(salida, dict):
+        return False
+
+    return salida.get("coherente") is True
+
+# ===============================================================
+# FIN 8.4.1
+# ===============================================================
+# ===============================================================
 # 8.6 — INVENTARIO
 # ===============================================================
 

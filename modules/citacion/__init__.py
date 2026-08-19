@@ -352,11 +352,11 @@ CONTENEDOR: Dict[str, Any] = {
         "inventariar": True,
 
         # --- PERMISOS DE ESCRITURA ---
-        "modificar": False,    # ← ELIMINADO (no permitido)
+        #"modificar": False,    # ← ELIMINADO (no permitido)
         "alterar": False,
-        "reescribir": False,   # ← ELIMINADO (no permitido)
+        #"reescribir": False,   # ← ELIMINADO (no permitido)
         "crear": True,
-        "eliminar": False,     # ← ELIMINADO (no permitido)
+        #"eliminar": False,     # ← ELIMINADO (no permitido)
         "actualizar": False,
 
         # --- PERMISOS DE PROCESAMIENTO ---

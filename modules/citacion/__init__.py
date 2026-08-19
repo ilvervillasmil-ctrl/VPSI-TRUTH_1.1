@@ -829,98 +829,203 @@ CONTENEDOR: Dict[str, Any] = {
 
 _REGISTRO: List[Dict[str, Any]] = []
 
-#===============================================================
+
+# ===============================================================
 # SECCIÓN 18 — validar_declaracion
-#===============================================================
+# ===============================================================
 
 def _validar_declaracion(decl: Dict[str, Any]) -> List[str]:
     errores: List[str] = []
+
     if not isinstance(decl, dict):
         return ["declaracion debe ser dict"]
+
     tipo = decl.get("tipo")
+
     if tipo is not None and tipo not in TIPOS_DECLARACION:
-        # tipos nuevos se admiten si son str no vacío (fractal)
         if not (isinstance(tipo, str) and tipo.strip()):
-            errores.append("tipo de declaración inválido: {0}".format(tipo))
+            errores.append(
+                "tipo de declaración inválido: {0}".format(tipo)
+            )
+
     for campo in CAMPOS_OBLIGATORIOS:
         if campo == "id" and decl.get("tipo") == "limite":
             continue
-        # compat: fuente <- fuente_modulo
+
         if campo == "fuente":
             if not decl.get("fuente") and not decl.get("fuente_modulo"):
                 errores.append("falta campo obligatorio: fuente")
             continue
-        if decl.get(campo) in (None, ""):
-            errores.append("falta campo obligatorio: {0}".format(campo))
-    return errores
-    
-#===============================================================
-# SECCIÓN 19 normalizar_declaracion
-#===============================================================
 
-def _normalizar_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
-    fuente = decl.get("fuente") or decl.get("fuente_modulo") or ""
+        if decl.get(campo) in (None, ""):
+            errores.append(
+                "falta campo obligatorio: {0}".format(campo)
+            )
+
+    # La repetición de id NO constituye error.
+    return errores
+
+
+# ===============================================================
+# SECCIÓN 19 — normalizar_declaracion
+# ===============================================================
+
+def _normalizar_declaracion(
+    decl: Dict[str, Any],
+) -> Dict[str, Any]:
+
+    fuente = (
+        decl.get("fuente")
+        or decl.get("fuente_modulo")
+        or ""
+    )
+
     out: Dict[str, Any] = {
         "id": decl.get("id"),
         "tipo": decl.get("tipo"),
         "fuente": fuente,
-        "fuente_modulo": fuente,  # compat lectura legada
+        "fuente_modulo": fuente,
         "enunciado": decl.get("enunciado") or "",
         "descripcion": decl.get("descripcion") or "",
         "evidencia_ref": decl.get("evidencia_ref") or "",
     }
+
     for c in CAMPOS_OPCIONALES:
         if c in ("fuente_modulo",):
             continue
         if c in decl and decl[c] is not None:
             out[c] = decl[c]
+
     if "relaciones" not in out:
         out["relaciones"] = list(decl.get("relaciones") or [])
+
     return out
 
 
 # ===============================================================
-# SECCIÓN 20 — RESOLUCIÓN / REGISTRO / CONSULTA BASE/ limpiar_ciclo
+# SECCIÓN 20 — RESOLUCIÓN / REGISTRO / CONSULTA BASE /
+#             limpiar_ciclo / clasificación de ids
 # ===============================================================
 
 def limpiar_ciclo() -> Dict[str, Any]:
     """Limpia el registro operativo del ciclo. No toca corpus externo."""
+
     n = len(_REGISTRO)
     _REGISTRO.clear()
-    return {"ok": True, "limpiadas": n, "id": _ID}
+
+    return {
+        "ok": True,
+        "limpiadas": n,
+        "id": _ID,
+    }
+
+
+def _clasificar_ids() -> Dict[str, Any]:
+    """
+    Clasificación documental de ids presentes en el registro.
+
+    Un id repetido NO constituye error contractual.
+    Las declaraciones se conservan como ocurrencias independientes.
+    """
+
+    grupos: Dict[str, List[Dict[str, Any]]] = {}
+
+    for d in _REGISTRO:
+        clave = str(d.get("id") or "")
+        grupos.setdefault(clave, []).append(d)
+
+    ids_unicos: List[str] = []
+    ids_repetidos: List[str] = []
+    ocurrencias_repetidas: Dict[str, int] = {}
+
+    for clave, declaraciones in grupos.items():
+        if len(declaraciones) == 1:
+            ids_unicos.append(clave)
+        else:
+            ids_repetidos.append(clave)
+            ocurrencias_repetidas[clave] = len(declaraciones)
+
+    return {
+        "ids_unicos": ids_unicos,
+        "ids_repetidos": ids_repetidos,
+        "ocurrencias_repetidas": ocurrencias_repetidas,
+        "n_ids_distintos": len(grupos),
+        "n_ocurrencias": len(_REGISTRO),
+        "hay_repetidos": bool(ids_repetidos),
+        "repetidos_son_error": False,
+    }
+
 
 # ===============================================================
 # SECCIÓN 21 — REGISTRAR
 # ===============================================================
 
-def registrar(declaracion: Dict[str, Any]) -> Dict[str, Any]:
+def registrar(
+    declaracion: Dict[str, Any],
+) -> Dict[str, Any]:
+
     """
     Incorpora una declaración pública al registro operativo.
+
     No modifica el conocimiento de origen.
+
+    Los ids repetidos son válidos y cada ocurrencia
+    se conserva como declaración documental.
     """
+
     errores = _validar_declaracion(declaracion)
+
     if errores:
-        return {"ok": False, "errores": errores, "id": _ID}
+        return {
+            "ok": False,
+            "errores": errores,
+            "id": _ID,
+        }
+
     normalizada = _normalizar_declaracion(declaracion)
     _REGISTRO.append(normalizada)
+
+    clasificacion = _clasificar_ids()
+    clave = str(normalizada.get("id"))
+    repetido = clave in clasificacion.get("ids_repetidos", [])
+
     return {
         "ok": True,
         "n": len(_REGISTRO),
         "declaracion": normalizada,
         "id": _ID,
+        "clasificacion_id": "repetido" if repetido else "unico",
+        "id_repetido": repetido,
+        "ids_repetidos": clasificacion.get("ids_repetidos", []),
+        "nota": (
+            "id repetido permitido; cada declaración se conserva "
+            "como ocurrencia documental."
+            if repetido
+            else
+            "declaración registrada como ocurrencia documental."
+        ),
     }
+
 
 # ===============================================================
 # SECCIÓN 22 — RESOLVER
 # ===============================================================
 
-def resolver(id_decl: str) -> Dict[str, Any]:
+def resolver(
+    id_decl: str,
+) -> Dict[str, Any]:
+
     """
     Resuelve una declaración por id.
+
     1) registro operativo
-    2) fuentes registradas del sistema (sin lista cerrada de módulos)
+    2) fuentes registradas del sistema
+
+    Los ids repetidos no son error.
+    Se conserva la multiplicidad documental.
     No inventa enunciados.
     """
+
     if not id_decl or not str(id_decl).strip():
         return {
             "id": id_decl,
@@ -928,19 +1033,35 @@ def resolver(id_decl: str) -> Dict[str, Any]:
             "declaracion": None,
             "nota": "id vacío",
         }
+
     clave = str(id_decl).strip()
+    coincidencias: List[Dict[str, Any]] = []
 
     for d in _REGISTRO:
         if d.get("id") == clave and d.get("enunciado"):
-            return {
-                "id": clave,
-                "resuelto": True,
-                "declaracion": d,
-                "origen": "registro_ciclo",
-                "nota": "resuelto desde registro operativo de CIT",
-            }
+            coincidencias.append(d)
 
-    # Puente genérico a fuentes del paquete citacion (si existen)
+    if coincidencias:
+        repetido = len(coincidencias) > 1
+
+        return {
+            "id": clave,
+            "resuelto": True,
+            "declaracion": coincidencias[0],
+            "ocurrencias": coincidencias,
+            "n_ocurrencias": len(coincidencias),
+            "id_repetido": repetido,
+            "clasificacion_id": "repetido" if repetido else "unico",
+            "origen": "registro_ciclo",
+            "nota": (
+                "id repetido; se conservan todas las ocurrencias "
+                "documentales del registro operativo."
+                if repetido
+                else
+                "resuelto desde registro operativo de CIT"
+            ),
+        }
+
     try:
         from modules.citacion.fuentes import ax as fuente_ax
 
@@ -949,8 +1070,10 @@ def resolver(id_decl: str) -> Dict[str, Any]:
             evidencia_ref="cit.resolver",
             registrar=False,
         )
+
         if r.get("resuelto") and r.get("cita"):
             c = r["cita"]
+
             decl = _normalizar_declaracion({
                 "id": clave,
                 "tipo": c.get("tipo") or "axioma",
@@ -959,13 +1082,22 @@ def resolver(id_decl: str) -> Dict[str, Any]:
                 "descripcion": c.get("descripcion"),
                 "evidencia_ref": c.get("evidencia_ref"),
             })
+
             return {
                 "id": clave,
                 "resuelto": True,
                 "declaracion": decl,
+                "ocurrencias": [decl],
+                "n_ocurrencias": 1,
+                "id_repetido": False,
+                "clasificacion_id": "fuente_sistema",
                 "origen": "fuente_sistema",
-                "nota": "resuelto desde fuente de declaraciones del sistema",
+                "nota": (
+                    "resuelto desde fuente de declaraciones "
+                    "del sistema"
+                ),
             }
+
     except Exception:
         pass
 
@@ -973,72 +1105,138 @@ def resolver(id_decl: str) -> Dict[str, Any]:
         "id": clave,
         "resuelto": False,
         "declaracion": None,
-        "nota": "sin declaración resoluble en registro ni fuentes cargadas",
+        "ocurrencias": [],
+        "n_ocurrencias": 0,
+        "id_repetido": False,
+        "clasificacion_id": "no_resuelto",
+        "nota": (
+            "sin declaración resoluble en registro "
+            "ni fuentes cargadas"
+        ),
     }
+
+
 # ===============================================================
-# SECCIÓN 23 BUSCAR
+# SECCIÓN 23 — BUSCAR
 # ===============================================================
 
-def buscar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def buscar(
+    peticion: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+
     """
     Consulta sobre declaraciones del registro operativo.
-    Filtros: id, tipo, fuente, o_ref, texto (subcadena en enunciado).
+
+    Filtros: id, tipo, fuente, modulo, o_ref, texto.
+
+    Un id repetido devuelve todas sus ocurrencias.
+    No se deduplican declaraciones.
     """
+
     pet = peticion if isinstance(peticion, dict) else {}
     out = list(_REGISTRO)
 
     if pet.get("id"):
         out = [d for d in out if d.get("id") == pet["id"]]
+
     if pet.get("tipo"):
         out = [d for d in out if d.get("tipo") == pet["tipo"]]
+
     fuente = pet.get("fuente") or pet.get("modulo")
+
     if fuente:
         out = [
             d for d in out
-            if d.get("fuente") == fuente or d.get("fuente_modulo") == fuente
+            if d.get("fuente") == fuente
+            or d.get("fuente_modulo") == fuente
         ]
+
     if pet.get("o_ref"):
         out = [d for d in out if d.get("o_ref") == pet["o_ref"]]
+
     if pet.get("texto"):
         t = str(pet["texto"]).lower()
+
         out = [
             d for d in out
             if t in str(d.get("enunciado") or "").lower()
             or t in str(d.get("descripcion") or "").lower()
         ]
 
+    grupos: Dict[str, int] = {}
+
+    for d in out:
+        clave = str(d.get("id"))
+        grupos[clave] = grupos.get(clave, 0) + 1
+
+    ids_repetidos = [
+        clave
+        for clave, cantidad in grupos.items()
+        if cantidad > 1
+    ]
+
     return {
         "id": _ID,
         "declaraciones": out,
         "n": len(out),
         "filtro": pet,
-        "nota": "solo exposición; sin recálculo; sin modificación",
+        "ids_repetidos": ids_repetidos,
+        "hay_repetidos": bool(ids_repetidos),
+        "nota": (
+            "solo exposición; sin recálculo; sin modificación; "
+            "las ocurrencias con id repetido se conservan y se exponen."
+        ),
     }
+
+
 # ===============================================================
-# SECCIÓN 24 CITAR
+# SECCIÓN 24 — CITAR
 # ===============================================================
 
-def citar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def citar(peticion: Optional[Dict[str, Any]] = None,) -> Dict[str, Any]:
+
     """
-    Representación citable de declaraciones (compatibilidad de API).
+    Representación citable de declaraciones.
+
     Internamente = buscar + forma de cita.
+
+    Los ids repetidos no se eliminan:
+    cada ocurrencia resoluble permanece citable.
     """
+
     pack = buscar(peticion)
-    citas = pack.get("declaraciones") or []
+    declaraciones = pack.get("declaraciones") or []
+    citas: List[Dict[str, Any]] = []
+
+    for d in declaraciones:
+        r = _anuncio_de_declaracion(d)
+
+        if r.get("ok") and r.get("anuncio"):
+            citas.append(r["anuncio"])
+
     return {
         "id": _ID,
         "citas": citas,
         "n": len(citas),
-        "nota": "citas = representación de declaraciones; sin recálculo",
+        "ids_repetidos": pack.get("ids_repetidos") or [],
+        "hay_repetidos": bool(pack.get("hay_repetidos")),
+        "nota": ("citas = representación de declaraciones; sin recálculo; "
+            "los ids repetidos se citan por ocurrencia."
+        ),
     }
+
+
 # ===============================================================
-# SECCIÓN 25 RESOLVER ENUNCIADO
+# SECCIÓN 25 — RESOLVER ENUNCIADO
 # ===============================================================
 
-def resolver_enunciado(id_norma: str) -> Dict[str, Any]:
+def resolver_enunciado(id_norma: str,) -> Dict[str, Any]:
+
     """Alias de resolución orientado a enunciado (modo consulta)."""
+
     r = resolver(id_norma)
     d = r.get("declaracion") or {}
+
     return {
         "id": id_norma,
         "enunciado": d.get("enunciado") if r.get("resuelto") else None,
@@ -1046,39 +1244,49 @@ def resolver_enunciado(id_norma: str) -> Dict[str, Any]:
         "fuente": d.get("fuente") if r.get("resuelto") else None,
         "fuente_modulo": d.get("fuente") if r.get("resuelto") else None,
         "resuelto": bool(r.get("resuelto")),
+        "id_repetido": bool(r.get("id_repetido")),
+        "n_ocurrencias": int(r.get("n_ocurrencias") or 0),
+        "ocurrencias": r.get("ocurrencias") or [],
         "nota": r.get("nota"),
     }
 
 
 # ===============================================================
-# SECCIÓN 26 RELACIONAR
+# SECCIÓN 26 — RELACIONAR
 # ===============================================================
 
-def relacionar(
-    id_a: str,
-    relacion: str,
-    id_b: str,
-) -> Dict[str, Any]:
+def relacionar(id_a: str, relacion: str, id_b: str) -> Dict[str, Any]:
+
     """
     Documenta una relación entre dos declaraciones ya resolubles.
-    No altera el conocimiento de origen; solo el registro operativo.
+
+    No altera el conocimiento de origen;
+    solo el registro operativo.
     """
+
     if relacion not in RELACIONES:
         return {
             "ok": False,
-            "errores": ["relacion no admitida: {0}".format(relacion)],
+            "errores": [
+                "relacion no admitida: {0}".format(relacion)
+            ],
             "id": _ID,
         }
+
     ra = resolver(id_a)
     rb = resolver(id_b)
+
     if not ra.get("resuelto") or not rb.get("resuelto"):
         return {
             "ok": False,
-            "errores": ["ambas declaraciones deben ser resolubles"],
+            "errores": [
+                "ambas declaraciones deben ser resolubles"
+            ],
             "a": ra,
             "b": rb,
             "id": _ID,
         }
+
     enlace = {
         "id": "REL-{0}-{1}-{2}".format(id_a, relacion, id_b),
         "tipo": "citacion",
@@ -1086,66 +1294,112 @@ def relacionar(
         "enunciado": "{0} {1} {2}".format(id_a, relacion, id_b),
         "descripcion": "Relación documental registrada por CIT.",
         "relaciones": [
-            {"de": id_a, "relacion": relacion, "a": id_b},
+            {
+                "de": id_a,
+                "relacion": relacion,
+                "a": id_b,
+            },
         ],
-        "meta": {"a": id_a, "b": id_b, "relacion": relacion},
+        "meta": {
+            "a": id_a,
+            "b": id_b,
+            "relacion": relacion,
+            "a_repetido": bool(ra.get("id_repetido")),
+            "b_repetido": bool(rb.get("id_repetido")),
+        },
     }
+
     return registrar(enlace)
 
 # ===============================================================
-# SECCIÓN 27 CADENA
+# SECCIÓN 27 — CADENA
 # ===============================================================
 
 def cadena(ids: Optional[List[str]] = None) -> Dict[str, Any]:
     """
-    Construye una cadena de fundamentación a partir de ids ordenados.
-    Cada eslabón debe ser resoluble. No inventa nodos.
+    Construye una cadena de fundamentación
+    a partir de ids ordenados.
+
+    Cada eslabón debe ser resoluble.
+    No inventa nodos.
+
+    Si un id está repetido, la cadena conserva
+    la resolución documental existente sin tratar
+    la repetición como error.
     """
+
     secuencia = list(ids or [])
+
     eslabones: List[Dict[str, Any]] = []
     faltantes: List[str] = []
+    repetidos: List[str] = []
+
     for i in secuencia:
         r = resolver(str(i))
+
         if r.get("resuelto"):
             eslabones.append(r["declaracion"])
+
+            if r.get("id_repetido"):
+                repetidos.append(str(i))
         else:
             faltantes.append(str(i))
+
     return {
         "id": _ID,
         "cadena": eslabones,
         "n": len(eslabones),
         "faltantes": faltantes,
+        "ids_repetidos": repetidos,
         "completa": len(faltantes) == 0 and len(eslabones) > 0,
         "nota": (
             "Cadena normativa documental. "
-            "Solo declaraciones resolubles; sin recálculo."
+            "Solo declaraciones resolubles; "
+            "sin recálculo; "
+            "los ids repetidos no constituyen error."
         ),
     }
+
+
 # ===============================================================
-# SECCIÓN 28 EXPLICAR
+# SECCIÓN 28 — EXPLICAR
 # ===============================================================
 
 def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
-    Explicación documental: declaraciones del registro + cadena opcional.
+    Explicación documental:
+    declaraciones del registro + cadena opcional.
+
     Toda explicación proviene de declaraciones existentes.
     """
+
     pet = peticion if isinstance(peticion, dict) else {}
+
     ids = pet.get("ids") or pet.get("cadena") or []
+
     if isinstance(ids, str):
         ids = [ids]
+
     pack_busca = buscar(pet)
-    pack_cadena = cadena(list(ids)) if ids else {
-        "cadena": pack_busca.get("declaraciones") or [],
-        "n": pack_busca.get("n", 0),
-        "faltantes": [],
-        "completa": (pack_busca.get("n") or 0) > 0,
-    }
+
+    pack_cadena = (
+        cadena(list(ids))
+        if ids
+        else {
+            "cadena": pack_busca.get("declaraciones") or [],
+            "n": pack_busca.get("n", 0),
+            "faltantes": [],
+            "ids_repetidos": pack_busca.get("ids_repetidos") or [],
+            "completa": pack_busca.get("n", 0) > 0,
+        }
+    )
+
     return {
         "id": _ID,
         "explicacion": pack_cadena.get("cadena") or [],
         "n": pack_cadena.get("n", 0),
         "faltantes": pack_cadena.get("faltantes") or [],
+        "ids_repetidos": pack_cadena.get("ids_repetidos") or [],
         "completa": bool(pack_cadena.get("completa")),
         "nota": (
             "Explicación = declaraciones existentes. "
@@ -1155,21 +1409,26 @@ def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 29 ANRNCIO DE DECLARACIONES 
+# SECCIÓN 29 — ANUNCIO DE DECLARACIONES
 # ===============================================================
-
-
-
 
 def _anuncio_de_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
     errores = _validar_declaracion(decl)
+
     if errores:
-        return {"ok": False, "errores": errores, "anuncio": None}
+        return {
+            "ok": False,
+            "errores": errores,
+            "anuncio": None,
+        }
+
     c = _normalizar_declaracion(decl)
+
     return {
         "ok": True,
         "anuncio": {
             "titulo": "[{0}] {1}".format(c.get("fuente"), c.get("id")),
+            "id": c.get("id"),
             "tipo": c.get("tipo"),
             "enunciado": c.get("enunciado"),
             "descripcion": c.get("descripcion"),
@@ -1179,6 +1438,7 @@ def _anuncio_de_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
             "relaciones": c.get("relaciones") or [],
         },
     }
+
 # ===============================================================
 # SECCIÓN 30
 # ===============================================================
@@ -1195,9 +1455,64 @@ def anunciar_todo(filtro: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "anuncios": anuncios,
         "n": len(anuncios),
         "filtro": filtro or {},
-        "nota": "capacidad total de anuncio sobre declaraciones resolubles",
+        "ids_repetidos": pack.get("ids_repetidos") or [],
+        "hay_repetidos": bool(pack.get("hay_repetidos")),
+        "nota": (
+            "capacidad total de anuncio sobre declaraciones resolubles; "
+            "los ids repetidos se anuncian por ocurrencia."
+        ),
     }
 
+
+def _es_paquete_ciclo(obj: Any) -> bool:
+    if not isinstance(obj, dict):
+        return False
+    if "resultado" in obj and isinstance(obj.get("resultado"), dict):
+        return True
+    if "contexto_cx" in obj and "tipos_peticion" in obj:
+        return True
+    if obj.get("engine_version") and ("resultado" in obj or "peticion" in obj):
+        return True
+    return False
+
+
+def _es_declaracion_suelta(obj: Any) -> bool:
+    if not isinstance(obj, dict):
+        return False
+    if _es_paquete_ciclo(obj):
+        return False
+    return "tipo" in obj or "enunciado" in obj or "id" in obj
+
+
+def _evidencia_ref(paquete: Dict[str, Any]) -> str:
+    inv = paquete.get("invocador_id") or "ciclo"
+    ver = paquete.get("engine_version") or ""
+    res = paquete.get("resultado") or {}
+    seq = res.get("secuencia")
+    base = "ciclo:{0}:v{1}".format(inv, ver)
+    if seq is not None:
+        base = base + ":seq={0}".format(seq)
+    return base
+
+
+def _o_ref(paquete: Dict[str, Any]) -> Optional[str]:
+    res = paquete.get("resultado") or {}
+    cx = paquete.get("contexto_cx") or {}
+    reg = cx.get("registro") if isinstance(cx.get("registro"), dict) else {}
+
+    for src in (res, cx, reg, paquete.get("peticion") or {}):
+        if not isinstance(src, dict):
+            continue
+        for k in ("O_id", "o_id", "O_context", "contexto", "enunciado_O"):
+            v = src.get(k)
+            if v is not None and str(v).strip() and str(v).strip().lower() not in (
+                "undefined", "indefinido", "none", "null"
+            ):
+                return str(v).strip()[:200]
+    return None
+# ===============================================================
+# SECCIÓN 31 — HELPERS DE PAQUETE / FORMA
+# ===============================================================
 
 def _es_paquete_ciclo(obj: Any) -> bool:
     if not isinstance(obj, dict):
@@ -1248,13 +1563,14 @@ def _o_ref(paquete: Dict[str, Any]) -> Optional[str]:
                 return str(v).strip()[:200]
     return None
 
+# ===============================================================
+# SECCIÓN 32 — ANUNCIAR PAQUETE (modo Engine)
+# ===============================================================
 
 def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
     """
     Modo Engine: fundamentación documental del ciclo.
     Lee solo el paquete. No calcula. No inventa factores.
-    Incorpora declaraciones desde fuentes del sistema si están disponibles.
-    Lista de fuentes: abierta (cualquier módulo presente o futuro vía fuentes/).
     """
     limpiar_ciclo()
 
@@ -1278,11 +1594,8 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
         else:
             n_fuentes += 1
 
-    # Fuentes opcionales bajo modules/citacion/fuentes/ (fractal: añadir archivo,
-    # no modificar este INIT). Fallo de una fuente no detiene el resto.
     try:
         from modules.citacion.fuentes import cx as fuente_cx
-
         if cx:
             _ok_fuente(
                 fuente_cx.desde_resolver(
@@ -1297,10 +1610,7 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
         if estado_cx in ("indefinido",) or res.get("estado") == "UNDEFINED":
             _ok_fuente(
                 fuente_cx.anunciar_indefinido(
-                    motivo=str(
-                        res.get("razon")
-                        or "O/contexto no usable en el ciclo"
-                    ),
+                    motivo=str(res.get("razon") or "O/contexto no usable en el ciclo"),
                     evidencia_ref=evid,
                     o_ref=o_ref,
                     contexto_ciclo=ctx_ciclo,
@@ -1312,7 +1622,6 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         from modules.citacion.fuentes import ca as fuente_ca
-
         factores = res.get("factores") if isinstance(res.get("factores"), dict) else {}
         C, L, K = factores.get("C"), factores.get("L"), factores.get("K")
         if C is not None or L is not None or K is not None:
@@ -1336,7 +1645,6 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         from modules.citacion.fuentes import fo as fuente_fo
-
         tru_ri = res.get("tru_ri") or res.get("Tru_Ri")
         tru_total = res.get("tru_total") or res.get("Tru_total")
         if (
@@ -1367,7 +1675,6 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         from modules.citacion.fuentes import ct as fuente_ct
-
         if res.get("alpha") is not None or res.get("beta") is not None:
             _ok_fuente(
                 fuente_ct.anunciar_valores(
@@ -1388,7 +1695,6 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         from modules.citacion.fuentes import ax as fuente_ax
-
         ids: List[str] = []
         val = res.get("valuacion") if isinstance(res.get("valuacion"), dict) else {}
         for src in (val.get("ids"), cx.get("ids_cx_relevantes"), res.get("ids")):
@@ -1409,7 +1715,6 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         from modules.citacion.fuentes import mc as fuente_mc
-
         if "permite_k" in cx:
             _ok_fuente(
                 fuente_mc.anunciar_permite_k(
@@ -1435,7 +1740,6 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         from modules.citacion.fuentes import limite as fuente_lim
-
         factores = res.get("factores") if isinstance(res.get("factores"), dict) else {}
         tiene_factores = all(
             factores.get(k) is not None
@@ -1447,7 +1751,6 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
         o_estado = reg.get("estado")
         if res.get("estado") == "UNDEFINED":
             o_estado = o_estado or "indefinido"
-
         pack_lim = fuente_lim.anunciar_desde_ciclo(
             evidencia_ref=evid, o_ref=o_ref, contexto_ciclo=ctx_ciclo,
             permite_k=permite_k if isinstance(permite_k, bool) else None,
@@ -1458,10 +1761,8 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         errores.append("fuente limite: {0}: {1}".format(type(e).__name__, e))
 
-    # Auto-declaración del oficio CIT (fractal, no cálculo)
     try:
         from modules.citacion.esquema import plantilla
-
         cita_self = plantilla(
             id="CIT-CICLO",
             tipo="citacion",
@@ -1485,6 +1786,8 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
         errores.append("declaracion fractal: {0}: {1}".format(type(e).__name__, e))
 
     anuncios_pack = anunciar_todo()
+    clasif = _clasificar_ids_registro()
+
     return {
         "id": _ID,
         "estado": "OK" if n_fuentes > 0 else "VACIO",
@@ -1493,6 +1796,7 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
         "n_citas": len(_REGISTRO),
         "n_anuncios": anuncios_pack.get("n", 0),
         "anuncios": anuncios_pack.get("anuncios") or [],
+        "clasificacion_ids": clasif,
         "tipos_peticion": tipos,
         "evidencia_ref": evid,
         "o_ref": o_ref,
@@ -1501,15 +1805,18 @@ def _anunciar_paquete(paquete: Dict[str, Any]) -> Dict[str, Any]:
         "nota": (
             "CIT: autoridad universal de fundamentación sobre el paquete; "
             "cero agencia sobre valores numéricos; sin recálculo; "
-            "sin modificación del conocimiento declarado."
+            "sin modificación del conocimiento declarado; "
+            "ids repetidos se clasifican, no se rechazan."
         ),
     }
 
+# ===============================================================
+# SECCIÓN 33 — ANUNCIAR (entrada única)
+# ===============================================================
 
 def anunciar(arg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Entrada única — modo Engine y modo Consulta.
-
     - paquete de ciclo → cadena documental completa
     - declaración suelta → registro + anuncio de forma
     - None → anunciar_todo() del registro actual
@@ -1542,12 +1849,12 @@ def anunciar(arg: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "id": _ID,
     }
 
-
 # ===============================================================
-# SECCIÓN 7 — REPORTING ESTÁNDAR
+# SECCIÓN 34 — REPORTING ESTÁNDAR
 # ===============================================================
 
 def inventario(peticion: Any = None) -> Dict[str, Any]:
+    clasif = _clasificar_ids_registro()
     return {
         "id": _ID,
         "nombre": _NOMBRE,
@@ -1563,17 +1870,19 @@ def inventario(peticion: Any = None) -> Dict[str, Any]:
         "campos_obligatorios": list(CAMPOS_OBLIGATORIOS),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "registro_n": len(_REGISTRO),
+        "clasificacion_ids": clasif,
         "funcion": (
             "Autoridad universal de fundamentación. "
             "Resuelve, organiza, relaciona y cita cualquier declaración "
             "pública del VPSI. No modifica conocimiento."
         ),
         "modos": ["engine", "consulta"],
-        "requiere": [],
+        "requiere": list(CONTENEDOR.get("requiere") or []),
     }
 
 
 def reporte(peticion: Any = None) -> Dict[str, Any]:
+    clasif = _clasificar_ids_registro()
     return {
         "id": _ID,
         "nombre": _NOMBRE,
@@ -1582,15 +1891,18 @@ def reporte(peticion: Any = None) -> Dict[str, Any]:
         "estado": "OPERATIVO",
         "coherente": True,
         "registro_n": len(_REGISTRO),
+        "ids_duplicados_n": clasif.get("total_duplicados", 0),
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "nota": (
             "CIT documenta y fundamenta. "
-            "No calcula. No altera declaraciones de origen."
+            "No calcula. No altera declaraciones de origen. "
+            "ID repetido no es error."
         ),
     }
 
 
 def diagnostico(peticion: Any = None) -> Dict[str, Any]:
+    clasif = _clasificar_ids_registro()
     return {
         "id": _ID,
         "nombre": _NOMBRE,
@@ -1601,7 +1913,11 @@ def diagnostico(peticion: Any = None) -> Dict[str, Any]:
         "recomendaciones": [],
         "coherente": True,
         "registro_n": len(_REGISTRO),
-        "nota": "Diagnóstico propio de CIT. No consulta autoridades ajenas.",
+        "ids_duplicados_n": clasif.get("total_duplicados", 0),
+        "nota": (
+            "Diagnóstico propio de CIT. "
+            "ID repetido se clasifica, no se reporta como problema."
+        ),
     }
 
 
@@ -1613,7 +1929,6 @@ def barrer(peticion: Any = None) -> Dict[str, Any]:
         if not isinstance(t, str) or not t:
             errores.append("tipo inválido en TIPOS_DECLARACION")
 
-    # Restricción única: ninguna capacidad puede modificar conocimiento
     for cap in CONTENEDOR["capacidades"]:
         nombre = str(cap).lower()
         if any(x in nombre for x in ("modificar", "alterar", "reescribir", "borrar_corpus")):
@@ -1621,6 +1936,7 @@ def barrer(peticion: Any = None) -> Dict[str, Any]:
                 "capacidad incompatible con restricción única de CIT: {0}".format(cap)
             )
 
+    clasif = _clasificar_ids_registro()
     coherente = not errores and not choques
     return {
         "id": _ID,
@@ -1631,10 +1947,12 @@ def barrer(peticion: Any = None) -> Dict[str, Any]:
         "choques": choques,
         "errores": errores,
         "registro_n": len(_REGISTRO),
+        "clasificacion_ids": clasif,
         "capacidades": list(CONTENEDOR["capacidades"].keys()),
         "nota": (
             "Centinela CIT: integridad del oficio de fundamentación. "
-            "Sin juicio de verdad numérica."
+            "Sin juicio de verdad numérica. "
+            "ID repetido no es choque."
         ),
     }
 
@@ -1656,7 +1974,7 @@ def verificar_salida(salida: Any) -> bool:
     )
 
 # ===============================================================
-# ejecutar_total
+# SECCIÓN 35 — CAPACIDADES ARQUITECTÓNICAS
 # ===============================================================
 
 def ejecutar_total(
@@ -1726,10 +2044,6 @@ def ejecutar_total(
     }
 
 
-# ===============================================================
-# inspeccionar
-# ===============================================================
-
 def inspeccionar(
     peticion: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
@@ -1749,6 +2063,7 @@ def inspeccionar(
     for n in metas_sin:
         errores.append("meta sin capacidad: {0}".format(n))
 
+    clasif = _clasificar_ids_registro()
     coherente = not errores
     return {
         "id": _ID,
@@ -1762,16 +2077,13 @@ def inspeccionar(
         "capacidades_meta": list(metas.keys()),
         "capacidades_resolubles": resolubles,
         "capacidades_no_resolubles": no_resolubles,
+        "clasificacion_ids": clasif,
         "errores": errores,
         "autoriza_engine": CONTENEDOR.get("autoriza_engine"),
         "reporting": CONTENEDOR.get("reporting"),
         "invariantes": CONTENEDOR.get("invariantes"),
     }
 
-
-# ===============================================================
-# registrar_inventario
-# ===============================================================
 
 def registrar_inventario(
     peticion: Optional[Dict[str, Any]] = None,
@@ -1789,21 +2101,16 @@ def registrar_inventario(
     }
 
 # ===============================================================
-# RESOLUCIÓN Y EXPORTACIONES
+# SECCIÓN 36 — RESOLUCIÓN Y EXPORTACIONES
 # ===============================================================
 
 _CAP_MAP = {
-    # --- CENTINELA ---
     "verificar": verificar,
     "barrer": barrer,
     "verificar_salida": verificar_salida,
-
-    # --- INVENTARIO Y REPORTING ---
     "inventario": inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
-
-    # --- OPERACIONES DE CITACIÓN ---
     "anunciar": anunciar,
     "anunciar_todo": anunciar_todo,
     "citar": citar,
@@ -1815,11 +2122,7 @@ _CAP_MAP = {
     "explicar": explicar,
     "relacionar": relacionar,
     "limpiar_ciclo": limpiar_ciclo,
-
-    # --- COMPATIBILIDAD ENGINE ---
     "evaluar": anunciar,
-
-    # --- CAPACIDADES ARQUITECTÓNICAS ---
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
@@ -1886,7 +2189,5 @@ __all__ = [
 ]
 
 # ===============================================================
-# FIN RESOLUCIÓN Y EXPORTACIONES
+# FIN DEL MÓDULO
 # ===============================================================
-
-

@@ -817,9 +817,8 @@ CONTENEDOR: Dict[str, Any] = {
     ],
 }
 
-
 # ===============================================================
-# SECCIÓN 17 — REGISTRO DE DECLARACIONES (proceso de ciclo)
+# SECCIÓN 3 — REGISTRO DE DECLARACIONES (proceso de ciclo)
 # ===============================================================
 #
 # Memoria operativa del ciclo / consulta.
@@ -829,9 +828,6 @@ CONTENEDOR: Dict[str, Any] = {
 
 _REGISTRO: List[Dict[str, Any]] = []
 
-#===============================================================
-# SECCIÓN 18 — validar_declaracion
-#===============================================================
 
 def _validar_declaracion(decl: Dict[str, Any]) -> List[str]:
     errores: List[str] = []
@@ -853,10 +849,7 @@ def _validar_declaracion(decl: Dict[str, Any]) -> List[str]:
         if decl.get(campo) in (None, ""):
             errores.append("falta campo obligatorio: {0}".format(campo))
     return errores
-    
-#===============================================================
-# SECCIÓN 19 normalizar_declaracion
-#===============================================================
+
 
 def _normalizar_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
     fuente = decl.get("fuente") or decl.get("fuente_modulo") or ""
@@ -880,7 +873,7 @@ def _normalizar_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 20 — RESOLUCIÓN / REGISTRO / CONSULTA BASE/ limpiar_ciclo
+# SECCIÓN 4 — RESOLUCIÓN / REGISTRO / CONSULTA BASE
 # ===============================================================
 
 def limpiar_ciclo() -> Dict[str, Any]:
@@ -889,9 +882,6 @@ def limpiar_ciclo() -> Dict[str, Any]:
     _REGISTRO.clear()
     return {"ok": True, "limpiadas": n, "id": _ID}
 
-# ===============================================================
-# SECCIÓN 21 — REGISTRAR
-# ===============================================================
 
 def registrar(declaracion: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -910,9 +900,6 @@ def registrar(declaracion: Dict[str, Any]) -> Dict[str, Any]:
         "id": _ID,
     }
 
-# ===============================================================
-# SECCIÓN 22 — RESOLVER
-# ===============================================================
 
 def resolver(id_decl: str) -> Dict[str, Any]:
     """
@@ -975,9 +962,7 @@ def resolver(id_decl: str) -> Dict[str, Any]:
         "declaracion": None,
         "nota": "sin declaración resoluble en registro ni fuentes cargadas",
     }
-# ===============================================================
-# SECCIÓN 23 BUSCAR
-# ===============================================================
+
 
 def buscar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -1014,9 +999,7 @@ def buscar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "filtro": pet,
         "nota": "solo exposición; sin recálculo; sin modificación",
     }
-# ===============================================================
-# SECCIÓN 24 CITAR
-# ===============================================================
+
 
 def citar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -1031,9 +1014,7 @@ def citar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "n": len(citas),
         "nota": "citas = representación de declaraciones; sin recálculo",
     }
-# ===============================================================
-# SECCIÓN 25 RESOLVER ENUNCIADO
-# ===============================================================
+
 
 def resolver_enunciado(id_norma: str) -> Dict[str, Any]:
     """Alias de resolución orientado a enunciado (modo consulta)."""
@@ -1051,7 +1032,7 @@ def resolver_enunciado(id_norma: str) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 26 RELACIONAR
+# SECCIÓN 5 — RELACIONES Y CADENA NORMATIVA
 # ===============================================================
 
 def relacionar(
@@ -1092,9 +1073,6 @@ def relacionar(
     }
     return registrar(enlace)
 
-# ===============================================================
-# SECCIÓN 27 CADENA
-# ===============================================================
 
 def cadena(ids: Optional[List[str]] = None) -> Dict[str, Any]:
     """
@@ -1121,9 +1099,7 @@ def cadena(ids: Optional[List[str]] = None) -> Dict[str, Any]:
             "Solo declaraciones resolubles; sin recálculo."
         ),
     }
-# ===============================================================
-# SECCIÓN 28 EXPLICAR
-# ===============================================================
+
 
 def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
@@ -1155,11 +1131,8 @@ def explicar(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
 
 # ===============================================================
-# SECCIÓN 29 ANRNCIO DE DECLARACIONES 
+# SECCIÓN 6 — ANUNCIO (forma + modo Engine)
 # ===============================================================
-
-
-
 
 def _anuncio_de_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
     errores = _validar_declaracion(decl)
@@ -1179,9 +1152,7 @@ def _anuncio_de_declaracion(decl: Dict[str, Any]) -> Dict[str, Any]:
             "relaciones": c.get("relaciones") or [],
         },
     }
-# ===============================================================
-# SECCIÓN 30
-# ===============================================================
+
 
 def anunciar_todo(filtro: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     pack = buscar(filtro)
@@ -1654,6 +1625,7 @@ def verificar_salida(salida: Any) -> bool:
         or "citas" in salida
         or "resuelto" in salida
     )
+
 
 # ===============================================================
 # ejecutar_total

@@ -36,9 +36,16 @@
 
 from __future__ import annotations
 
-from decimal import Decimal, ROUND_HALF_UP, getcontext
 from fractions import Fraction
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
+from decimal import Decimal, ROUND_HALF_UP, getcontext
+
+# ===============================================================
+# AUTORIDAD DE CONSTANTES (CT) — OBLIGATORIO
+# ===============================================================
+from modules.constante import ALPHA, BETA
+# ===============================================================
+
 
 getcontext().prec = 50
 

@@ -458,6 +458,7 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
         "validar_esquema": True,
         "acceso_archivos": True,
+        "evaluar_universal": True,
     },
 
     # ============================================================

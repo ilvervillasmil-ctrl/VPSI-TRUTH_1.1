@@ -403,9 +403,6 @@ class Contenedor:
         self.id: str = str(meta.get("id", ""))
         self.nombre: str = str(meta.get("nombre", ""))
         self.rol: str = str(meta.get("rol", ""))
-        self.state = SessionStateOmega(tau=tau) if SessionStateOmega else None
-
-
 
         # -------------------------------------------------------
         # Parte 10.2 VERSIONES Y PALABRAS CLAVE DEL CONTRATO

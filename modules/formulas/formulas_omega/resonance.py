@@ -1,7 +1,5 @@
 # ======================================================================
-#
 # RESONANCE — modules/formulas/formulas_omega/resonance.py
-#
 # ======================================================================
 #
 # RESPONSABILIDAD
@@ -29,14 +27,11 @@
 #
 # ======================================================================
 
-from __future__ import annotations
 
-import math
-from .constants import PHI
 # ===============================================================
-# AUTORIDAD DE CONSTANTES (CT) — OBLIGATORIO
+import math 
 # ===============================================================
-from modules.constante import ALPHA, BETA
+from .constants import PHI, NUM_LAYERS, GOLDEN_ANG_RAD
 # ===============================================================
 
 

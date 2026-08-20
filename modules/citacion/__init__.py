@@ -743,6 +743,17 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con inventario registrado",
             "acceso_archivos": ["acceso_archivos"],
         },
+        "evaluar_universal": {
+            "descripcion": (
+                "Evalúa las capacidades reales de este módulo "
+                "cuya firma se satisfaga con los hechos de entrada. "
+                "Engine entrega la entrada; este callable solo aplica lo local."
+           ),
+          "entrada": "hechos: dict",
+          "validar_esquema": ["*"],
+          "salida": "dict con hechos, traza, ejecutadas",
+          "acceso_archivos": ["*"],
+        },
     },
     # ============================================================
     # 14 REPORTING (OBLIGATORIO EN EL ESQUEMA)

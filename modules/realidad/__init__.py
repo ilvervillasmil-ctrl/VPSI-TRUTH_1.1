@@ -362,6 +362,7 @@ CONTENEDOR: Dict[str, Any] = {
         # --- CAPACIDADES ARQUITECTÓNICAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": "ejecutar_total",
         "inspeccionar": "inspeccionar",
+        "evaluar_universal": "evaluar_universal",
         "registrar_inventario": "registrar_inventario",
     },
     

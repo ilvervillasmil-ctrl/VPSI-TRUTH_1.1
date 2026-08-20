@@ -1,18 +1,109 @@
-"""
-Fórmula de la Verdad (VPSI v9.4).
-
-Definiciones canónicas:
-    Tru_Ri(D)    = C(D) * L(D) * K(D)
-    Tru_total(D) = (Tru_Ri(D) * ALPHA) + BETA
-
-Donde:
-    - ALPHA = 26/27 (fracción observable del cubo 3×3×3)
-    - BETA  = 1/27  (fracción interior irreducible del cubo 3×3×3)
-    - Tru_Ri: Contribución del observador (R_i).
-    - Tru_total: Verdad total, incluyendo el piso estructural β.
-
-Fuente: Teorema de la Verdad, VPSI v9.4 (Sección 2.14, Definición 2.14).
-"""
+# ======================================================================
+#
+# VPSI-TRUTH — modules/formulas/truth.py
+#
+# FÓRMULA DE LA VERDAD
+#
+# ======================================================================
+#
+# PROPÓSITO
+#
+# Este módulo define y expone las capacidades responsables de calcular
+# la Fórmula de la Verdad conforme a las definiciones canónicas de
+# VPSI-TRUTH.
+#
+#     tru_ri(C, L, K)
+#         Calcula Tru_Ri.
+#
+#     tru_total(C, L, K)
+#         Calcula Tru_total.
+#
+# Engine descubre y utiliza estas capacidades dentro de la evaluación
+# universal. Este módulo no necesita conocer qué módulo produce C, L, K
+# ni qué capacidad consumirá posteriormente sus resultados.
+#
+# ======================================================================
+#
+# DEFINICIONES CANÓNICAS — VPSI v9.4
+#
+#     Tru_Ri(D)    = C(D) × L(D) × K(D)
+#
+#     Tru_total(D) = (Tru_Ri(D) × ALPHA) + BETA
+#
+# ======================================================================
+#
+# FLUJO
+#
+#     C ─┐
+#     L ─┼──► tru_ri ───► Tru_Ri
+#     K ─┘                    │
+#                             ▼
+#                          × ALPHA
+#                             │
+#                             ▼
+#                          + BETA
+#                             │
+#                             ▼
+#                         Tru_total
+#
+# ======================================================================
+#
+# CONSTANTES — AUTORIDAD CT
+#
+#     ALPHA = 26/27
+#     BETA  =  1/27
+#
+# ALPHA y BETA no se definen ni redefinen aquí.
+# La única fuente autorizada es:
+#
+#     modules.constante
+#
+# Las fórmulas deben importar directamente dichas constantes y no
+# contener valores locales, copias ni sustituciones equivalentes.
+#
+# ======================================================================
+#
+# EVALUACIÓN UNIVERSAL
+#
+# Este módulo participa en la evaluación universal mediante sus
+# capacidades declaradas en el contrato.
+#
+# Engine entrega los hechos disponibles; las capacidades de este módulo
+# reciben las entradas que correspondan y producen los resultados
+# definidos por las fórmulas.
+#
+#     Engine
+#       │
+#       ▼
+#     evaluar_universal
+#       │
+#       ▼
+#     Calculator ──► C, L, K
+#                       │
+#                       ▼
+#                    Formulas
+#                       │
+#                 tru_ri / tru_total
+#                       │
+#                       ▼
+#                VERDAD CUANTIFICADA
+#
+# ======================================================================
+#
+# INTEGRIDAD MATEMÁTICA
+#
+# Las operaciones utilizan Fraction para conservar exactitud racional.
+# No se introducen límites, normalizaciones ni transformaciones ajenas
+# a las definiciones canónicas.
+#
+# ======================================================================
+#
+# FUENTE NORMATIVA
+#
+#     Teorema de la Verdad — VPSI v9.4
+#     Sección 2.14 — Definición 2.14
+#
+# ======================================================================
 
 from fractions import Fraction
 from modules.constante import ALPHA, BETA

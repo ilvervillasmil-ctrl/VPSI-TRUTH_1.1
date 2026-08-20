@@ -101,7 +101,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from core.centinela import Centinela, Veredicto
+# En core/engine.py (arranque)
+import importlib
+import pkgutil
+from pathlib import Path
 
+def _cargar_paquete_estricto(ruta_paquete: str) -> None:
+    mod = importlib.import_module(ruta_paquete)
+    path = Path(mod.__file__).parent
+    for _, name, _ in pkgutil.iter_modules([str(path)]):
+        if name.startswith("_"):
+            continue
+        importlib.import_module(f"{ruta_paquete}.{name}")
 
 # ===============================================================
 # Parte 2 CONSTANTES /el esquema de contrato requerido,

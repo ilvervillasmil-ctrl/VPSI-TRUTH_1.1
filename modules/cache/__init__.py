@@ -2296,7 +2296,7 @@ __all__ = [
     "registrar_inventario",
     "mapear_codigo",
     "clasificar_ids",
-    "evaluar_universal,
+    "evaluar_universal",
 ]
 
 # ===============================================================

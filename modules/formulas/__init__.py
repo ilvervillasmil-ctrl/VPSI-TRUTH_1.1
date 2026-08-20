@@ -321,6 +321,7 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total": True,
         "inspeccionar": True,
         "registrar_inventario": True,
+        "evaluar_universal": True,
     },
 
 

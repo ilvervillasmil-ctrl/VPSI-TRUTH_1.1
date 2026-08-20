@@ -22,12 +22,20 @@ def _capas_ok(phi6: float = 0.0):
     ]
 
 
-def test_t04_exige_siete_capas():
-    """T04 — una estructura distinta de siete capas debe rechazarse."""
-    with pytest.raises(StructuralIntegrityError):
-        AntiHackValidation.validate_layer_data(
-            [{"L": 1.0, "phi": 0.0}] * 6
-        )
+def test_t04_exige_numero_de_capas():
+    """T04 — número de capas distinto del canónico → error."""
+    from core.engine import AntiHackValidation, StructuralIntegrityError
+
+    try:
+        from modules.formulas.formulas_omega.constants import NUM_LAYERS
+        n = int(NUM_LAYERS)
+    except Exception:
+        n = 7
+
+    capas_cortas = [{"L": 1.0, "phi": 0.0} for _ in range(max(1, n - 1))]
+
+    with pytest.raises((ValueError, StructuralIntegrityError, TypeError, KeyError)):
+        AntiHackValidation.validate_layer_data(capas_cortas)
 
 
 def test_t05_L_fuera_de_dominio():

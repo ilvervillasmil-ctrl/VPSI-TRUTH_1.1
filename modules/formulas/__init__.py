@@ -63,11 +63,12 @@ import sys
 import math
 import ast
 import copy
+import inspect
 import threading
 import importlib.util
 
 # --- Tipos y estructuras ---
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 from collections import defaultdict
 
 # --- Números y precisión ---
@@ -485,8 +486,7 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
-
-                "listar_formulas": {
+        "listar_formulas": {
             "descripcion": (
                 "Lista todas las fórmulas descubiertas y registradas."
             ),

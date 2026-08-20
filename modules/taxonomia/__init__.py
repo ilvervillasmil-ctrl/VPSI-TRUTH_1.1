@@ -441,7 +441,7 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["*"],
         },
 
-                "verificar_salida": {
+        "verificar_salida": {
             "descripcion": (
                 "Forma mínima de una salida de TX."
             ),

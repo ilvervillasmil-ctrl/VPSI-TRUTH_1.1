@@ -91,8 +91,12 @@
 # ===============================================================
 
 from __future__ import annotations
+
+import importlib
 import importlib.util
 import inspect
+import math
+import pkgutil
 import re
 import sys
 import time
@@ -100,11 +104,9 @@ from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
 from core.centinela import Centinela, Veredicto
-# En core/engine.py (arranque)
-import importlib
-import pkgutil
-from pathlib import Path
+
 
 def _cargar_paquete_estricto(ruta_paquete: str) -> None:
     mod = importlib.import_module(ruta_paquete)
@@ -113,6 +115,10 @@ def _cargar_paquete_estricto(ruta_paquete: str) -> None:
         if name.startswith("_"):
             continue
         importlib.import_module(f"{ruta_paquete}.{name}")
+
+ALPHA_VPSI = 26.0 / 27.0
+BETA_VPSI = 1.0 / 27.0
+EPSILON = 1e-12
 
 # ===============================================================
 # Parte 2 CONSTANTES /el esquema de contrato requerido,
@@ -281,7 +287,88 @@ class CapasInvalidasError(AgenciaMatematicaError):
 
 class FormulaNoDisponibleError(AgenciaMatematicaError):
     """FO no expone la capacidad matemática requerida."""
+     pass
+
+class PurposeAlignmentError(Exception):
+    """Fricción distinta de cero en la capa L6 Propósito."""
     pass
+
+class StructuralIntegrityError(Exception):
+    """Violación de la invariancia estructural VPSI."""
+    pass
+
+class CircularityDetectedError(Exception):
+    """Referencias o retroalimentación circular en fórmulas."""
+    pass
+
+# ===============================================================
+# Parte 9.1 VALIDADOR ANTI-HACK
+# Encargado de la integridad matemática, verificación de fricción
+# y prevención de ciclos/manipulación.
+# ===============================================================
+
+class AntiHackValidation:
+    """Capa Anti-Hack para validación estricta de entradas y prevención de manipulación."""
+
+    @staticmethod
+    def is_finite_number(value: Any) -> bool:
+        return isinstance(value, (int, float)) and math.isfinite(value)
+
+    @classmethod
+    def detect_reference_cycle(cls, obj: Any, seen: Optional[set] = None, path: str = "root") -> None:
+        if seen is None:
+            seen = set()
+        if isinstance(obj, (dict, list, tuple, set)):
+            obj_id = id(obj)
+            if obj_id in seen:
+                raise CircularityDetectedError(f"Referencia circular detectada en {path}.")
+            seen.add(obj_id)
+            if isinstance(obj, dict):
+                for k, v in obj.items():
+                    cls.detect_reference_cycle(v, seen, f"{path}.{k}")
+            else:
+                for i, v in enumerate(obj):
+                    cls.detect_reference_cycle(v, seen, f"{path}[{i}]")
+            seen.remove(obj_id)
+
+    @classmethod
+    def validate_layer_data(cls, layers_data: List[Dict[str, Any]]) -> None:
+        cls.detect_reference_cycle(layers_data)
+        if not isinstance(layers_data, list) or len(layers_data) != 7:
+            raise ValueError("layers_data debe ser una lista de exactamente 7 capas.")
+
+        for i, layer in enumerate(layers_data):
+            if not isinstance(layer, dict) or "L" not in layer or "phi" not in layer:
+                raise KeyError(f"La capa L{i} debe incluir 'L' y 'phi'.")
+
+            L, phi = layer["L"], layer["phi"]
+            if not cls.is_finite_number(L) or not cls.is_finite_number(phi):
+                raise StructuralIntegrityError(f"Valores no finitos en L{i}: L={L}, phi={phi}.")
+            if not (0.0 <= L <= 1.0) or not (0.0 <= phi <= 1.0):
+                raise StructuralIntegrityError(f"Valores fuera del dominio [0,1] en L{i}.")
+
+        if layers_data[6]["phi"] != 0.0:
+            raise PurposeAlignmentError(
+                f"La capa L6 debe tener fricción phi = 0.0, obtenido {layers_data[6]['phi']}."
+            )
+
+    @classmethod
+    def assert_truth_formula(cls, C: float, L: float, K: float, truth_value: float) -> None:
+        # Fórmula: (C * L * K * ALPHA_VPSI) + BETA_VPSI
+        expected = (C * L * K * ALPHA_VPSI) + BETA_VPSI
+        if abs(truth_value - expected) > EPSILON:
+            raise StructuralIntegrityError(
+                f"Violación de fórmula de verdad: esperado {expected}, obtenido {truth_value}."
+            )
+        if not (BETA_VPSI - EPSILON <= truth_value <= 1.0 + EPSILON):
+            raise StructuralIntegrityError(
+                f"Valor de verdad fuera de límites [{BETA_VPSI}, 1.0]: {truth_value}."
+            )
+
+    @classmethod
+    def detect_formula_circularity(cls, c_omega: float, truth_value: float) -> None:
+        if abs(c_omega - truth_value) <= EPSILON and c_omega not in (0.0, 1.0):
+            raise CircularityDetectedError("Colapso circular detectado entre CΩ y Truth_total.")
 
 
 # ===============================================================
@@ -308,6 +395,9 @@ class Contenedor:
         self.meta = meta
         self.modulo = modulo
         self.ruta = ruta
+        self._layers = {}
+        self._memory_layer = None
+        self._L7_emergent = 1.0
 
         # -------------------------------------------------------
         # Parte 10.1 IDENTIDAD DE CADA MODULO EN EL CONTRATO
@@ -316,6 +406,9 @@ class Contenedor:
         self.id: str = str(meta.get("id", ""))
         self.nombre: str = str(meta.get("nombre", ""))
         self.rol: str = str(meta.get("rol", ""))
+        self.state = SessionStateOmega(tau=tau) if SessionStateOmega else None
+
+
 
         # -------------------------------------------------------
         # Parte 10.2 VERSIONES Y PALABRAS CLAVE DEL CONTRATO
@@ -520,6 +613,11 @@ class Engine:
         self.advertencias: List[str] = []
         self.fallos: List[Dict[str, Any]] = []
         self.resultados_evaluacion: List[Any] = []
+
+                     # Estado y capas del Teorema VPSI
+        self._layers: Dict[int, Dict[str, float]] = {}
+        self._memory_layer: Optional[Dict[str, Any]] = None
+        self._L7_emergent: float = 1.0
 
         # =======================================================
         # Parte 12.2 TRAZAS

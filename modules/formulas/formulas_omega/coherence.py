@@ -116,11 +116,12 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
+# Autoridad de constantes (CT)
+from modules.constante import ALPHA, BETA, C_MAX, R_FIN
+
+# Constantes locales de omega
 from .constants import (
-    ALPHA,
-    BETA,
     S_REF,
-    R_FIN,
     KAPPA,
     THETA_CUBE,
     ALPHA_OVER_S,
@@ -130,19 +131,20 @@ from .constants import (
     CODE_SATURATION,
     CODE_ENTROPY,
     PHI,
-    C_MAX,
     CODE_LOOP,
     LOOP_THRESHOLD,
     LOOP_WINDOW,
     LOOP_VARIANCE,
     T_PERIOD,
 )
+
+# Hermanos dentro de formulas_omega
 from .energy import LayerEnergy
 from .negentropy import NegentropyCalculator
 from .presence import PresenceLogic
 from .wonder import WonderLogic
 from .interaction import ExternalInteraction
-from .resonance import ResonanceLogic, obtener_backend
+from .resonance import ResonanceLogic
 from .metaconsciousness import MetaconsciousnessCalculator
 
 # ===============================================================

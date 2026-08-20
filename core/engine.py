@@ -651,6 +651,9 @@ class Engine:
         # Parte 12.6 ARRANQUE
         # =======================================================
 
+        self._paquetes_python_descubiertos = self._descubrir_paquetes_python(self.raiz)
+        self._modulos_descubiertos = self._descubrir_modulos()
+        self._cargar_y_validar()
         self._modulos_descubiertos = self._descubrir_modulos()
         self._cargar_y_validar()
         self._resolver_dependencias()
@@ -689,7 +692,7 @@ class Engine:
     # ===========================================================
     # Parte 12.9 EJECUCIÓN DEL PROPÓSITO FUNDAMENTAL
     # ===========================================================
-
+     
     def ejecutar_proposito(
         self,
         entrada: Any,
@@ -747,7 +750,39 @@ class Engine:
             "resultado": resultado,
         })
 
-       
+    # ===========================================================
+    # Parte 13 — RESOLUCIÓN DE NOMBRE PYTHON CANÓNICO
+    # ===========================================================
+
+    def _nombre_python_canonico(self, path_dir: Path) -> Optional[str]:
+        """
+        Convierte una ruta física perteneciente a la raíz de módulos
+        en su nombre Python canónico.
+
+        Ejemplo:
+
+            /.../modules/self
+                → modules.self
+
+            /.../modules/self/L4
+                → modules.self.L4
+        """
+
+        try:
+            relativa = path_dir.resolve().relative_to(self.raiz.resolve())
+        except ValueError:
+            return None
+
+        partes = (self.raiz.name,) + relativa.parts
+
+        if not partes:
+            return None
+
+        return ".".join(
+            parte for parte in partes
+            if parte and parte != "."
+        )
+        
     # ============================================================
     # ANTI-HACK / STRUCTURAL GUARD
     # ============================================================
@@ -1088,21 +1123,27 @@ class Engine:
 
     def _leer_contrato(self, path_dir: Path) -> Optional[Dict[str, Any]]:
         init_path = path_dir / "__init__.py"
-        nombre_mod = f"vpsi_dinamico_{path_dir.name}"
 
         try:
-            spec = importlib.util.spec_from_file_location(
-                nombre_mod,
-                init_path,
-                submodule_search_locations=[str(path_dir)]
-            )
+            nombre_python = self._nombre_python_canonico(path_dir)
 
-            if spec is None or spec.loader is None:
-                return None
+            if nombre_python:
+                mod = importlib.import_module(nombre_python)
+            else:
+                nombre_mod = f"vpsi_dinamico_{path_dir.name}"
 
-            mod = importlib.util.module_from_spec(spec)
-            sys.modules[nombre_mod] = mod
-            spec.loader.exec_module(mod)
+                spec = importlib.util.spec_from_file_location(
+                    nombre_mod,
+                    init_path,
+                    submodule_search_locations=[str(path_dir)]
+                )
+
+                if spec is None or spec.loader is None:
+                    return None
+
+                mod = importlib.util.module_from_spec(spec)
+                sys.modules[nombre_mod] = mod
+                spec.loader.exec_module(mod)
 
             meta = getattr(mod, "CONTENEDOR", None)
 
@@ -1121,7 +1162,8 @@ class Engine:
 
         except Exception as e:
             self.errores_arranque.append(
-                f"{path_dir.name}: error al cargar → {type(e).__name__}: {e}"
+                f"{path_dir.name}: error al cargar → "
+                f"{type(e).__name__}: {e}"
             )
             return None
 

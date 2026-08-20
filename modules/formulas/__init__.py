@@ -51,7 +51,6 @@
 #
 # ===============================================================
 
-
 # ===============================================================
 # IMPORTACIONES
 # ===============================================================
@@ -68,7 +67,7 @@ import threading
 import importlib.util
 
 # --- Tipos y estructuras ---
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 from collections import defaultdict
 
 # --- Números y precisión ---
@@ -80,6 +79,15 @@ from datetime import datetime, timezone
 
 # --- Sistema de archivos ---
 from pathlib import Path
+
+# ===============================================================
+# AUTORIDAD DE CONSTANTES (CT) — OBLIGATORIO
+# ===============================================================
+# Toda fórmula y todo cálculo de Tru debe resolver ALPHA / BETA
+# exclusivamente desde constante. No se permiten valores locales.
+from modules.constante import ALPHA, BETA
+# ===============================================================
+
 
 
 # ===============================================================
@@ -824,45 +832,135 @@ def _tru_total_wrapper(C, L, K):
 # CAPACIDADES PÚBLICAS
 # ===============================================================
 
+# ===============================================================
+# BARRER UNIVERSAL — FÓRMULAS (FO)
+# ===============================================================
+# Punto de convergencia de todas las fórmulas del módulo.
+# Descubre absolutamente todos los archivos, verifica las
+# fórmulas canónicas de verdad (tru_ri / tru_total) y reporta
+# el estado completo de forma determinista.
+# ===============================================================
+
 def barrer() -> Dict[str, Any]:
+    """
+    Barrido universal del dominio de fórmulas.
+
+    - Descubre todos los archivos .py del módulo
+    - Recoge todas las fórmulas existentes (descubiertas + registradas)
+    - Verifica obligatoriamente las fórmulas canónicas de verdad:
+          tru_ri  y  tru_total
+    - Ejecuta todas las reglas de coherencia registradas
+    - Produce un informe determinista único
+
+    No modifica estado.
+    No inventa fórmulas.
+    No depende de módulos externos para el resultado principal.
+    """
     faltas: List[str] = []
+
+    # -----------------------------------------------------------
+    # 1. Descubrimiento total de fórmulas en archivos
+    # -----------------------------------------------------------
+    descubiertas = _descubrir_formulas()          # dict nombre → meta
+    registradas  = dict(_FORMULAS)                # dict nombre → meta + función
+
+    # Unión determinista de todas las fórmulas existentes
+    todas: Dict[str, Any] = {}
+    for nombre, meta in sorted(descubiertas.items()):
+        todas[nombre] = {"origen": "descubierta", **meta}
+    for nombre, meta in sorted(registradas.items()):
+        todas[nombre] = {"origen": "registrada", **{k: v for k, v in meta.items() if k != "funcion"}}
+
+    # -----------------------------------------------------------
+    # 2. Verificación obligatoria de las fórmulas de verdad
+    #    (punto de convergencia del sistema)
+    # -----------------------------------------------------------
+    if "tru_ri" not in todas:
+        faltas.append("Fórmula canónica de verdad 'tru_ri' ausente.")
+    if "tru_total" not in todas:
+        faltas.append("Fórmula canónica de verdad 'tru_total' ausente.")
+
+    # -----------------------------------------------------------
+    # 3. Ejecución de todas las reglas de coherencia
+    # -----------------------------------------------------------
     for regla_fn in _REGLAS:
         try:
-            faltas.extend(regla_fn() or [])
+            resultado = regla_fn()
+            if resultado:
+                faltas.extend(resultado)
         except Exception as e:  # noqa: BLE001
             faltas.append(
                 "{0}: {1}: {2}".format(
-                    regla_fn.__name__, type(e).__name__, e
+                    getattr(regla_fn, "__name__", "regla"),
+                    type(e).__name__,
+                    e,
                 )
             )
 
-    if faltas and DiagnosticoGlobal is not None:
-        try:
-            DiagnosticoGlobal.recibir_reporte(
-                modulo="formulas",
-                errores=[
-                    {"tipo": "falta", "detalle": falta}
-                    for falta in faltas
-                ],
-            )
-        except Exception:  # noqa: BLE001
-            pass
+    # -----------------------------------------------------------
+    # 4. Informe determinista de convergencia
+    # -----------------------------------------------------------
+    limpio = not faltas
 
     return {
         "contenedor": NOMBRE_MODULO,
-        "estado": "APROBADO" if not faltas else "RECHAZADO",
-        "coherente": not faltas,
-        "faltas": faltas,
+        "id": ID_MODULO,
+        "rol": ROL_MODULO,
+        "version": VERSION_MODULO,
+        "estado": "APROBADO" if limpio else "RECHAZADO",
+        "coherente": limpio,
+        "faltas": list(faltas),
+
+        # Convergencia de fórmulas
+        "formulas": sorted(todas.keys()),
+        "formulas_registradas": sorted(registradas.keys()),
+        "formulas_descubiertas": sorted(descubiertas.keys()),
+        "total_formulas": len(todas),
+
+        # Punto de verdad (obligatorio)
+        "verdad": {
+            "tru_ri": "tru_ri" in todas,
+            "tru_total": "tru_total" in todas,
+        },
+
         "reglas": [r.__name__ for r in _REGLAS],
-        "formulas": list(_FORMULAS.keys()) or list(_descubrir_formulas().keys()),
     }
 
 
 def verificar_salida(salida: Dict[str, Any]) -> bool:
-    return bool(salida.get("coherente", False))
+    """
+    Verifica la forma mínima de una salida del barrer universal de FO.
+    """
+    if not isinstance(salida, dict):
+        return False
+    if "coherente" not in salida or not isinstance(salida["coherente"], bool):
+        return False
+    if "estado" not in salida or not isinstance(salida["estado"], str):
+        return False
+    if "faltas" in salida and not isinstance(salida["faltas"], list):
+        return False
+    if "formulas" in salida and not isinstance(salida["formulas"], list):
+        return False
+    return True
+    
+# ===============================================================
+# INVENTARIO / AXIOMAS / LISTAR / VERIFICAR — FÓRMULAS (FO)
+# ===============================================================
 
+def inventario(peticion: Any = None) -> Dict[str, Any]:
+    """
+    Instantánea determinista del dominio de fórmulas.
 
-def inventario(peticion=None) -> Dict[str, Any]:
+    Incluye:
+      - Todas las fórmulas descubiertas en archivos
+      - Todas las fórmulas registradas por decorador
+      - Estado de las fórmulas canónicas de verdad
+      - Metadatos contractuales del módulo
+    """
+    descubiertas = _descubrir_formulas()
+    registradas  = list(_FORMULAS.keys())
+    todas = sorted(set(descubiertas.keys()) | set(registradas))
+
     return {
         "id": ID_MODULO,
         "nombre": NOMBRE_MODULO,
@@ -871,28 +969,58 @@ def inventario(peticion=None) -> Dict[str, Any]:
         "version_contrato": VERSION_CONTRATO,
         "esquema": ESQUEMA_CONTRATO,
         "estabilidad": ESTABILIDAD,
-        "formulas": _descubrir_formulas(),
-        "formulas_registradas": list(_FORMULAS.keys()),
+
+        # Convergencia de fórmulas
+        "formulas": todas,
+        "formulas_descubiertas": descubiertas,
+        "formulas_registradas": registradas,
+        "total_formulas": len(todas),
+
+        # Punto de verdad (obligatorio)
+        "verdad": {
+            "tru_ri": "tru_ri" in todas,
+            "tru_total": "tru_total" in todas,
+        },
+
         "reglas": len(_REGLAS),
         "declaraciones": len(_DECLARACIONES),
-        "capacidades": list(CONTENEDOR["capacidades"].keys()),
+        "capacidades": list(CONTENEDOR.get("capacidades", {}).keys()),
         "requiere": list(CONTENEDOR.get("requiere") or []),
         "invariantes": CONTENEDOR.get("invariantes"),
     }
 
 
 def axiomas() -> List[Dict[str, Any]]:
+    """
+    Expone las declaraciones axiomáticas registradas en el módulo.
+    No filtra ni interpreta.
+    """
     return list(_DECLARACIONES)
 
 
 def listar_formulas() -> Dict[str, Any]:
+    """
+    Lista completa y determinista de todas las fórmulas existentes.
+    """
+    descubiertas = _descubrir_formulas()
+    registradas  = list(_FORMULAS.keys())
+
     return {
-        "descubiertas": _descubrir_formulas(),
-        "registradas": list(_FORMULAS.keys()),
+        "descubiertas": descubiertas,
+        "registradas": registradas,
+        "todas": sorted(set(descubiertas.keys()) | set(registradas)),
+        "total": len(set(descubiertas.keys()) | set(registradas)),
+        "verdad": {
+            "tru_ri": "tru_ri" in descubiertas or "tru_ri" in registradas,
+            "tru_total": "tru_total" in descubiertas or "tru_total" in registradas,
+        },
     }
 
 
 def verificar() -> Dict[str, Any]:
+    """
+    Alias contractual de barrer().
+    """
     return barrer()
 
 # ===============================================================

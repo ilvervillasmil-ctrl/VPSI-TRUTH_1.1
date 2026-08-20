@@ -540,6 +540,7 @@ CONTENEDOR: Dict[str, Any] = {
         "validar_esquema": ["*"],
         "salida": "dict con hechos, traza, ejecutadas",
         "acceso_archivos": ["*"],
+        },
 
     },
 

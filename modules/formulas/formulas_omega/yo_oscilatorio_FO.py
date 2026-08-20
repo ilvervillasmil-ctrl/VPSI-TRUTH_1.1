@@ -18,12 +18,50 @@
 #   - No decide el significado psicológico o epistemológico del resultado.
 #
 # ===============================================================
+# ESTRUCTURA DE CAPAS
+# ===============================================================
+#
+#   L0 — CAOS / ENTRADA EXTERNA
+#        No pertenece al conjunto de capas internas de L4.
+#        Puede actuar como entrada o forzamiento externo F_L0.
+#
+#   L1..L6 — SEIS CAPAS INTERNAS DEL SISTEMA
+#        Son las únicas capas que participan en la distribución
+#        energética interna del carril L4.
+#
+#        {L1, L2, L3, L4, L5, L6}
+#
+#        NUM_LAYERS = 6
+#
+#   L7 — EMERGENCIA
+#        No es una octava capa interna utilizada por L4.
+#        Representa la emergencia resultante de la integración del
+#        sistema completo y constituye una salida/resultante posterior.
+#        L7 NO entra en:
+#          - E_i
+#          - w_i
+#          - S
+#          - φ_Y
+#          - Π f_i
+#          - la distribución energética interna de L4.
+#
+#   Por tanto, para este módulo:
+#
+#        L0  → entrada / forzamiento externo
+#        L1..L6 → dinámica interna
+#        L7  → emergencia / resultado de integración
+#
+#   El carril de L4 no confunde las ocho posiciones conceptuales con
+#   ocho capas internas. Su espacio energético interno está compuesto
+#   exclusivamente por las seis capas L1..L6.
+#
+# ===============================================================
 # DEFINICIONES MATEMÁTICAS
 # ===============================================================
 #
 # Ecuación maestra de movimiento (Ecuación Diferencial Ordinaria):
 #
-#   d²θ_Y / dt² + φ_Y(t) · (dθ_Y / dt) + π² · (θ_Y(t) - θ_eq(t)) = F_Y(t)
+#   d²θ_Y / dt² + φ_Y(t) · (dθ_Y / dt) + π² · (θ_Y(t) − θ_eq(t)) = F_Y(t)
 #
 # Despejada (Aceleración):
 #
@@ -35,71 +73,358 @@
 #   θ̇(t + dt) = θ̇(t) + θ̈ · dt
 #   θ(t + dt) = θ(t) + θ̇(t + dt) · dt
 #
-# Energías operacionales y pesos emergentes (6 capas internas L1..L6):
+# ===============================================================
+# ENERGÍAS OPERACIONALES Y PESOS EMERGENTES
+# ===============================================================
+#
+# Las energías y pesos internos se calculan exclusivamente sobre
+# las seis capas internas L1..L6.
+#
+#   i ∈ {1,2,3,4,5,6}
 #
 #   E_i = L_i · (1 - φ_i) · ν_i
+#
 #   ν_i = Φ^(i/2)
-#   w_i = E_i / Σ_j E_j   (si Σ_j E_j = 0 → w_i = 1/6)
 #
-# Propiedades derivadas emergentes:
+#   w_i = E_i / Σ_j E_j
 #
-#   Entropía de pesos:
-#     S = -Σ_i w_i · ln(w_i)   (para w_i > 0)
+#   donde j ∈ {1,2,3,4,5,6}.
 #
-#   Amortiguamiento efectivo del Yo:
-#     φ_Y = Σ_i w_i · φ_i      (con φ_6 = 0)
-#     ζ_Y = φ_Y / (2π)         (amortiguamiento adimensional)
-#     ω_Y = π · √(1 - ζ_Y²)    (para ζ_Y < 1; 0 si ζ_Y ≥ 1)
+# Si:
 #
-# Geometría dinámica del atractor de equilibrio:
+#   Σ_j E_j = 0
+#
+# entonces:
+#
+#   w_i = 1/6
+#
+# para cada una de las seis capas internas.
+#
+# L0 no participa de esta normalización.
+# L7 no participa de esta normalización.
+#
+# ===============================================================
+# PROPIEDADES DERIVADAS EMERGENTES
+# ===============================================================
+#
+# Entropía de pesos:
+#
+#   S = -Σ_i w_i · ln(w_i)
+#
+#   para w_i > 0
+#
+#   i ∈ {1,2,3,4,5,6}
+#
+# Entropía máxima del espacio interno:
+#
+#   S_MAX = ln(6)
+#
+# Amortiguamiento efectivo del Yo:
+#
+#   φ_Y = Σ_i w_i · φ_i
+#
+#   con:
+#
+#   φ_6 = 0
+#
+#   L6 no introduce fricción propia en el amortiguamiento efectivo.
+#
+# Amortiguamiento adimensional:
+#
+#   ζ_Y = φ_Y / (2π)
+#
+# Frecuencia amortiguada:
+#
+#   ω_Y = π · √(1 - ζ_Y²)
+#
+#   para ζ_Y < 1.
+#
+#   Si ζ_Y ≥ 1:
+#
+#   ω_Y = 0
+#
+# ===============================================================
+# GEOMETRÍA DINÁMICA DEL ATRACTOR DE EQUILIBRIO
+# ===============================================================
+#
+# El atractor geométrico θ_cube constituye la referencia base.
+# El equilibrio del carril puede desplazarse dinámicamente según
+# el estado instantáneo de la integración interna.
 #
 #   θ_eq(t) = θ_cube + Δθ_coh(t) + Δθ_w(t)
-#   Δθ_coh  = β · ((C_Ω / α) - 1) · (π / 27)
-#   Δθ_w    = β · (w_alto - w_bajo) · (π / 54)
-#   con w_alto = (w_4 + w_5 + w_6) / 3,  w_bajo = (w_1 + w_2) / 2
 #
-# Componentes de la fuerza total F_Y(t):
+# Desplazamiento por coherencia:
+#
+#   Δθ_coh =
+#       β · ((C_Ω / α) - 1) · (π / 27)
+#
+# Desplazamiento por distribución energética:
+#
+#   w_alto = (w_4 + w_5 + w_6) / 3
+#
+#   w_bajo = (w_1 + w_2) / 2
+#
+#   Δθ_w =
+#       β · (w_alto - w_bajo) · (π / 54)
+#
+# Por tanto:
+#
+#   θ_eq =
+#       θ_cube
+#       + β · ((C_Ω / α) - 1) · (π / 27)
+#       + β · (w_alto - w_bajo) · (π / 54)
+#
+# Las variables w_i utilizadas aquí corresponden exclusivamente
+# a L1..L6.
+#
+# ===============================================================
+# COMPONENTES DE LA FUERZA TOTAL F_Y(t)
+# ===============================================================
 #
 #   F_Y = F_L0 + F_L5 + F_L6 + F_β + F_COH
 #
-#   F_L0  = scale_L0 · L0
-#   F_L5  = ρ · P_t · C_Ω + 0.5 · ΔC_Ω - β · (S / ln(6))
-#   F_L6  = w_6 · P
-#   F_β   = β · (1 - exp(-N / k))
+# Entrada / forzamiento externo procedente de L0:
+#
+#   F_L0 = scale_L0 · L0
+#
+# L0 no forma parte de las seis capas internas y no recibe w_0.
+#
+# Retroalimentación metaestructural:
+#
+#   F_L5 =
+#       ρ · P_t · C_Ω
+#       + 0.5 · ΔC_Ω
+#       - β · (S / ln(6))
+#
+# Dirección / propósito:
+#
+#   F_L6 = w_6 · P
+#
+# L6 sí pertenece a las seis capas internas y, por tanto, posee w_6,
+# pero su fricción propia permanece fijada por el invariante:
+#
+#   φ_6 = 0
+#
+# Fuerza asociada al margen β / novedad:
+#
+#   F_β = β · (1 - exp(-N / k))
+#
+# Retroalimentación dinámica de coherencia:
+#
 #   F_COH = C_Ω · ΔC_Ω
+#
+# La suma de estos términos produce:
+#
+#   F_Y(t)
+#
+# ===============================================================
+# RELACIÓN CON L7
+# ===============================================================
+#
+# L7 NO es una variable de entrada de este módulo.
+#
+# L7 representa la emergencia producida por la integración del sistema:
+#
+#   L0
+#    ↓
+#   L1..L6
+#    ↓
+#   integración dinámica
+#    ↓
+#   L7 — EMERGENCIA
+#
+# Por tanto, L7 no debe introducirse artificialmente como:
+#
+#   E_7
+#   w_7
+#   φ_7
+#   f_7
+#
+# dentro del carril L4.
+#
+# La emergencia L7 será tratada posteriormente como resultado de la
+# integración correspondiente, no como una capa interna adicional
+# del oscilador.
 #
 # ===============================================================
 # VARIABLES
 # ===============================================================
 #
-# θ_Y, θ̇_Y      posición y velocidad continua del carril    [rad], [rad/s]
-# L_i, φ_i     activaciones y fricción de las capas L1..L6 [0, 1]
-# L0           entrada externa/forzamiento                 [0, 1]
-# P            magnitud computable de dirección/propósito [0, 1]
-# C_Ω, ΔC_Ω    coherencia global y su tasa de variación    [0, α]
-# S            entropía de distribución energética        [0, ln(6)]
-# N, k         novedad y escala de sensibilidad            adimensional
-# dt           paso temporal de integración               [s]
-# α, β, Φ      constantes estructurales (constants.py)
+# θ_Y, θ̇_Y
+#   posición y velocidad continua del carril
+#   [rad], [rad/s]
+#
+# L_i
+#   activación de cada capa interna
+#   i ∈ {1,2,3,4,5,6}
+#   [0,1]
+#
+# φ_i
+#   fricción estructural de cada capa interna
+#   i ∈ {1,2,3,4,5,6}
+#   [0,1]
+#
+# φ_6
+#   fricción propia de L6
+#   fijada por invariante:
+#   φ_6 = 0
+#
+# L0
+#   entrada externa / caos / forzamiento
+#   [0,1]
+#
+# P
+#   magnitud computable de dirección / propósito de L6
+#   [0,1]
+#
+# C_Ω
+#   coherencia estructural global
+#   [0, α]
+#
+# ΔC_Ω
+#   variación temporal de C_Ω
+#
+# S
+#   entropía de la distribución energética interna
+#   [0, ln(6)]
+#
+# N
+#   magnitud de novedad
+#   adimensional
+#
+# k
+#   escala de sensibilidad de la función de novedad
+#   adimensional
+#
+# dt
+#   paso temporal de integración
+#   [s]
+#
+# α, β, Φ
+#   constantes estructurales obtenidas de los módulos canónicos
+#
+# L7
+#   resultado emergente posterior.
+#   No constituye una variable interna del carril L4.
 #
 # ===============================================================
 # DOMINIO Y RESTRICCIONES
 # ===============================================================
 #
-#   L_i, φ_i ∈ [0, 1]
-#   φ_6 = 0 (invariante: L6 no aporta fricción propia)
+#   L_i ∈ [0,1]
+#   φ_i ∈ [0,1]
+#
+#   i ∈ {1,2,3,4,5,6}
+#
+#   φ_6 = 0
+#
 #   dt > 0
+#
 #   C_Ω ∈ [0, α]
-#   Si Σ E_i == 0, w_i = 1/6 (evita división por cero)
+#
+#   Σ_i E_i ≥ 0
+#
+# Si:
+#
+#   Σ_i E_i == 0
+#
+# entonces:
+#
+#   w_i = 1/6
+#
+# para las seis capas internas.
+#
+# L0 queda fuera de la normalización energética.
+# L7 queda fuera de la normalización energética.
 #
 # ===============================================================
 # CASOS LÍMITE
 # ===============================================================
 #
-#   todas L_i = 0        → E_i = 0 → w_i = 1/6 → φ_Y = Σ(1/6·φ_i)
-#   ζ_Y ≥ 1              → régimen sobreamortiguado → ω_Y = 0
-#   ΔC_Ω = 0             → F_COH = 0 (fuerza de coherencia estática es nula)
-#   N = 0                → F_β = 0
+# Todas las capas internas desactivadas:
+#
+#   L1 = L2 = L3 = L4 = L5 = L6 = 0
+#
+# entonces:
+#
+#   E_i = 0
+#
+#   w_i = 1/6
+#
+# y:
+#
+#   φ_Y = Σ_i (1/6 · φ_i)
+#
+# con:
+#
+#   φ_6 = 0.
+#
+# Si:
+#
+#   ζ_Y ≥ 1
+#
+# entonces:
+#
+#   régimen crítico o sobreamortiguado
+#
+#   ω_Y = 0
+#
+# Si:
+#
+#   ΔC_Ω = 0
+#
+# entonces:
+#
+#   F_COH = 0
+#
+# Si:
+#
+#   N = 0
+#
+# entonces:
+#
+#   F_β = 0
+#
+# ===============================================================
+# CADENA CAUSAL DEL MÓDULO
+# ===============================================================
+#
+#   L0
+#    │
+#    └──────────────→ F_L0
+#                         │
+#   L1..L6               │
+#    │                   │
+#    ├→ E_i              │
+#    │    ↓              │
+#    ├→ w_i              │
+#    │    ↓              │
+#    ├→ S                │
+#    │    ↓              │
+#    ├→ φ_Y → ζ_Y → ω_Y │
+#    │                   │
+#    └→ θ_eq ────────────┤
+#                        ↓
+#                  F_L5 + F_L6
+#                  + F_β + F_COH
+#                        ↓
+#                       F_Y
+#                        ↓
+#              θ̈_Y = F_Y - φ_Yθ̇_Y
+#                    - π²(θ_Y-θ_eq)
+#                        ↓
+#                 θ̇_Y(t + dt)
+#                        ↓
+#                  θ_Y(t + dt)
+#                        ↓
+#                nuevo estado
+#                        ↓
+#                 siguiente ciclo
+#
+# El resultado integrado puede posteriormente participar en la
+# determinación de la emergencia L7, pero L7 no vuelve a entrar
+# como capa interna de este cálculo salvo que una arquitectura
+# posterior defina explícitamente dicho canal.
 #
 # ===============================================================
 from __future__ import annotations

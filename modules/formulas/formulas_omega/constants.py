@@ -1,6 +1,6 @@
 """
 Universal Coherence Framework v3.3 - Fundamental Constants
-Single Source of Truth for all constants across the framework. para EL VPSI
+Single Source of Truth for all constants across the framework.
 
 Author: Ilver Villasmil
 Framework: Villasmil-Omega

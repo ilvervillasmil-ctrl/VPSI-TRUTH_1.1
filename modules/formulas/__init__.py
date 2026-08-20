@@ -523,26 +523,56 @@ def registrar_formula(nombre: str, meta: Dict[str, Any]):
 
 def _descubrir_formulas() -> Dict[str, Dict[str, Any]]:
     registro: Dict[str, Dict[str, Any]] = {}
+    prefijo = f"{__package__}."
+    try:
+        importlib.invalidate_caches()
+    except Exception:
+        pass
+    modulos: Set[str] = set()
     for f in sorted(_DIR.glob("*.py")):
         if f.name.startswith("_") or f.name == "__init__.py":
             continue
-        clave = f"formulas_{f.stem}"
-        spec = importlib.util.spec_from_file_location(clave, f)
-        if spec is None or spec.loader is None:
-            continue
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[clave] = mod
+        modulos.add(f"{__package__}.{f.stem}")
+    try:
+        for info in pkgutil.walk_packages([str(_DIR)], prefix=prefijo):
+            if info.name.endswith(".__init__"):
+                continue
+            modulos.add(info.name)
+    except Exception:
+        pass
+    for nombre_modulo in sorted(modulos):
         try:
-            spec.loader.exec_module(mod)
+            mod = importlib.import_module(nombre_modulo)
         except Exception:
             continue
+        archivo = getattr(mod, "__file__", None)
+        archivo_nombre = Path(archivo).name if archivo else nombre_modulo
         meta = getattr(mod, "FORMULA", None)
         if isinstance(meta, dict) and "nombre" in meta:
-            registro[meta["nombre"]] = {
-                "archivo": f.name,
+            nombre = str(meta["nombre"])
+            funcion = getattr(mod, nombre, None)
+            registro[nombre] = {
+                "archivo": archivo_nombre,
+                "modulo": nombre_modulo,
                 "expresion": meta.get("expresion", "No definida"),
                 "fuente": meta.get("fuente", "Desconocida"),
+                "funcion": funcion,
             }
+        for nombre, objeto in vars(mod).items():
+            if nombre.startswith("_") or not callable(objeto):
+                continue
+            if getattr(objeto, "__module__", None) != nombre_modulo:
+                continue
+            meta_objeto = getattr(objeto, "FORMULA", None)
+            if isinstance(meta_objeto, dict):
+                nombre_formula = str(meta_objeto.get("nombre", nombre))
+                registro[nombre_formula] = {
+                    "archivo": archivo_nombre,
+                    "modulo": nombre_modulo,
+                    "expresion": meta_objeto.get("expresion", "No definida"),
+                    "fuente": meta_objeto.get("fuente", "Desconocida"),
+                    "funcion": objeto,
+                }
     return registro
 
 @regla

@@ -395,9 +395,7 @@ class Contenedor:
         self.meta = meta
         self.modulo = modulo
         self.ruta = ruta
-        self._layers = {}
-        self._memory_layer = None
-        self._L7_emergent = 1.0
+    
 
         # -------------------------------------------------------
         # Parte 10.1 IDENTIDAD DE CADA MODULO EN EL CONTRATO
@@ -594,6 +592,9 @@ class Engine:
         # =======================================================
         # Parte 12.1 CONFIGURACIÓN BÁSICA
         # =======================================================
+        self._layers = {}
+        self._memory_layer = None
+        self._L7_emergent = 1.0 
 
         self.raiz = Path(raiz_modulos).resolve()
         self.invocador_id = invocador_id

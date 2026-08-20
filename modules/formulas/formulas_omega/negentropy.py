@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import math
 
-from .constants import S_REF, CODE_ENTROPY, CODE_SATURATION
+from .constants import NUM_LAYERS
 class NegentropyCalculator:
     """
     Negentropy: N = 1 - S/S_max

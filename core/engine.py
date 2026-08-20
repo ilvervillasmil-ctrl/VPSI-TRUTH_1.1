@@ -201,7 +201,7 @@ BANDERAS_REPORTING = (
 
 CLAVES_META_CAPACIDAD = (
     "descripcion", "entrada", "validar_esquema",
-    "salida", "acceso_archivos", "evaluar_universal",
+    "salida", "acceso_archivos",
 )
 
 # ===============================================================

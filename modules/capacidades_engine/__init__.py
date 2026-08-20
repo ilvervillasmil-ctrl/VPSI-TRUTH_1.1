@@ -335,6 +335,7 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total": True,
         "inspeccionar": True,
         "registrar_inventario": True,
+        "evaluar_universal": True,
     },
 
     # ============================================================
@@ -369,6 +370,7 @@ CONTENEDOR: Dict[str, Any] = {
         "registrar_inventario": "registrar_inventario",
         "reporte": "reporte",
         "diagnostico": "diagnostico",
+        "evaluar_universal": "evaluar_universal",
     },
 
     # ============================================================
@@ -478,7 +480,7 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con estructura, capacidades y estado del modulo",
             "acceso_archivos": ["acceso_archivos"],
         },
-                "registrar_inventario": {
+        "registrar_inventario": {
             "descripcion": (
                 "Registra el inventario estructural de CE "
                 "como instantanea determinista. No altera evidencia."
@@ -489,9 +491,9 @@ CONTENEDOR: Dict[str, Any] = {
             "acceso_archivos": ["acceso_archivos"],
         },
         "reporte": {
-            "descripcion": (
-                "Reporte de estado de CE: coherencia del inventario "
-                "de skills, ids, archivos y capacidades declaradas."
+                 "descripcion": (
+                 "Reporte de estado de CE: coherencia del inventario "
+                 "de skills, ids, archivos y capacidades declaradas."
             ),
             "entrada": "ninguna",
             "validar_esquema": ["*"],
@@ -514,9 +516,23 @@ CONTENEDOR: Dict[str, Any] = {
             ),
             "acceso_archivos": ["*"],
         },
+        # ============================================================
+        # EVALUAR UNIVERSAL 
+        # ============================================================
+       "evaluar_universal": {
+            "descripcion": (
+                "Evalúa las capacidades reales de este módulo "
+                "cuya firma se satisfaga con los hechos de entrada. "
+                "Engine entrega la entrada; este callable solo aplica lo local."
+           ),
+          "entrada": "hechos: dict",
+          "validar_esquema": ["*"],
+          "salida": "dict con hechos, traza, ejecutadas",
+          "acceso_archivos": ["*"],
+         },
     },
 
-        # ============================================================
+    # ============================================================
     # 5.14 — REPORTING
     # ============================================================
     "reporting": {
@@ -555,6 +571,7 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total": True,
         "inspeccionar": True,
         "registrar_inventario": True,
+        "evaluar_universal": True,
     },
 
     # ============================================================
@@ -1742,6 +1759,143 @@ def registrar_inventario(
 # FIN PARTE 8
 # ===============================================================
 # ===============================================================
+# EVALUAR_UNIVERSAL
+# ===============================================================
+
+def evaluar_universal(
+    hechos: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Engine entrega hechos.
+    Este callable ejecuta las capacidades REALES de ESTE módulo
+    (CONTENEDOR['capacidades'] ya resuelto a callables).
+    Punto fijo local. No se llama a sí mismo. No toca otros módulos.
+    """
+    hechos_out: Dict[str, Any] = dict(hechos or {})
+    traza: List[Dict[str, Any]] = []
+    ejecutadas: set = set()
+
+    capacidades = CONTENEDOR.get("capacidades") or {}
+
+    while True:
+        nuevos = 0
+
+        for nombre, fn in capacidades.items():
+            if nombre == "evaluar_universal":
+                continue
+            if not callable(fn):
+                continue
+            if nombre in ejecutadas:
+                continue
+
+            try:
+                sig = inspect.signature(fn)
+            except (TypeError, ValueError):
+                continue
+
+            requeridos = []
+            opcionales = []
+            for pname, p in sig.parameters.items():
+                if p.kind not in (
+                    inspect.Parameter.POSITIONAL_ONLY,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    inspect.Parameter.KEYWORD_ONLY,
+                ):
+                    continue
+                if p.default is inspect.Parameter.empty:
+                    requeridos.append(pname)
+                else:
+                    opcionales.append(pname)
+
+            # --- resolución de argumentos (universal, sin nombres inventados) ---
+            argumentos: Dict[str, Any] = {}
+
+            if not requeridos:
+                # firma vacía o solo opcionales: usar opcionales presentes en hechos
+                for p in opcionales:
+                    if p in hechos_out:
+                        argumentos[p] = hechos_out[p]
+                try:
+                    salida = fn(**argumentos) if argumentos else fn()
+                except Exception as ex:
+                    ejecutadas.add(nombre)
+                    traza.append({
+                        "capacidad": nombre,
+                        "estado": "ERROR",
+                        "detalle": "{0}: {1}".format(type(ex).__name__, ex),
+                    })
+                    continue
+
+            elif all(r in hechos_out for r in requeridos):
+                # todos los requeridos existen como claves en hechos
+                for p in requeridos + opcionales:
+                    if p in hechos_out:
+                        argumentos[p] = hechos_out[p]
+                try:
+                    salida = fn(**argumentos)
+                except Exception as ex:
+                    ejecutadas.add(nombre)
+                    traza.append({
+                        "capacidad": nombre,
+                        "estado": "ERROR",
+                        "detalle": "{0}: {1}".format(type(ex).__name__, ex),
+                    })
+                    continue
+
+            elif len(requeridos) == 1:
+                # patrón real del repo: calcular(peticion), verificar(datos), etc.
+                # se entrega el dict de hechos completo en ese único parámetro
+                argumentos[requeridos[0]] = hechos_out
+                for p in opcionales:
+                    if p in hechos_out:
+                        argumentos[p] = hechos_out[p]
+                try:
+                    salida = fn(**argumentos)
+                except Exception as ex:
+                    ejecutadas.add(nombre)
+                    traza.append({
+                        "capacidad": nombre,
+                        "estado": "ERROR",
+                        "detalle": "{0}: {1}".format(type(ex).__name__, ex),
+                    })
+                    continue
+            else:
+                # varios requeridos ausentes: no aplicable aún
+                continue
+
+            ejecutadas.add(nombre)
+            publicados: List[str] = []
+
+            if isinstance(salida, dict):
+                for clave, valor in salida.items():
+                    if clave.startswith("_"):
+                        continue
+                    if clave not in hechos_out:
+                        hechos_out[clave] = valor
+                        publicados.append(clave)
+                        nuevos += 1
+
+            traza.append({
+                "capacidad": nombre,
+                "estado": "EXITO",
+                "argumentos": sorted(argumentos.keys()),
+                "publica": publicados,
+            })
+
+        if nuevos == 0:
+            break
+
+    return {
+        "hechos": hechos_out,
+        "traza": traza,
+        "ejecutadas": sorted(ejecutadas),
+    }
+
+# ===============================================================
+# FIN EVALUAR_UNIVERSAL
+# ===============================================================
+
+# ===============================================================
 # PARTE 9 — REPORTES Y DIAGNÓSTICO
 # ===============================================================
 
@@ -1898,6 +2052,7 @@ _CAP_MAP = {
     "registrar_inventario": registrar_inventario,
     "reporte": reporte,
     "diagnostico": diagnostico,
+    "evaluar_universal": evaluar_universal,
 }
 # ===============================================================
 # FIN 10.1
@@ -2010,6 +2165,7 @@ __all__ = [
     "reporte",
     "diagnostico",
     "ContratoInvalido",
+    "evaluar_universal",
 ]
 
 # ===============================================================

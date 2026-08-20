@@ -361,7 +361,7 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total": "ejecutar_total",
         "inspeccionar": "inspeccionar",
         "registrar_inventario": "registrar_inventario",
-        "evaluar_universal": "evaluar_univerlal",
+        "evaluar_universal": "evaluar_universal",
     },
 
     # ============================================================

@@ -13,7 +13,7 @@
   total_modulos: 19
   trazas_n: 55
   rutas_n: 0
-  timestamp: 2026-08-20T16:57:46.675668+00:00
+  timestamp: 2026-08-20T17:00:10.525471+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -31,7 +31,7 @@
     []
   trazas_n: 55
   rutas_n: 0
-  timestamp: 2026-08-20T16:57:46.675568+00:00
+  timestamp: 2026-08-20T17:00:10.525383+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -2046,7 +2046,7 @@
       total_unicos: 18
       total_duplicados: 0
       ids_duplicados:
-      actualizado: 2026-08-20T16:57:46.466131+00:00
+      actualizado: 2026-08-20T17:00:10.329035+00:00
     nota: CACHE no sabe lo que ocurrió. Solo sabe qué fue registrado y qué estructura encontró. Análisis semántico: módulo futuro.
 
 ══════════════════════════════════════════════════════════════════════
@@ -2407,32 +2407,32 @@
         archivo: __init__.py
         sha256: 39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e
         tamano: 166998
-        timestamp_mtime: 2026-08-20T16:57:40.986160+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: 3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34
         tamano: 6365
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-20T16:57:40.987160+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
     conteos_disponible: True
     escalas_ids_disponible: True
     historial_n: 0
@@ -2591,32 +2591,32 @@
         archivo: __init__.py
         sha256: 39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e
         tamano: 166998
-        timestamp_mtime: 2026-08-20T16:57:40.986160+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: 3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34
         tamano: 6365
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-20T16:57:40.987020+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-20T16:57:40.987160+00:00
+        timestamp_mtime: 2026-08-20T17:00:01.985018+00:00
     factores_api:
       • C
       • K
@@ -11561,7 +11561,7 @@
         estado: descubierto
         errores:
           []
-        representacion: {'resolver': <function resolver at 0x7fc529e06980>, 'evaluar': <function resolver at 0x7fc529e06980>, 'centinela': <function centinela at 0x7fc529e068e0>, 'barrer': <function barrer at 0x7fc529e06a20>
+        representacion: {'resolver': <function resolver at 0x7f0ac860a980>, 'evaluar': <function resolver at 0x7f0ac860a980>, 'centinela': <function centinela at 0x7f0ac860a8e0>, 'barrer': <function barrer at 0x7f0ac860aa20>
       [29]
         nombre: _Undefined
         origen: vpsi_dinamico_contexto
@@ -11635,7 +11635,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7fc529e06160>
+        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7f0ac860a160>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [34]
@@ -11652,7 +11652,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cargar_reglas at 0x7fc529e06660>
+        referencia: <function _cargar_reglas at 0x7f0ac860a660>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [35]
@@ -11669,7 +11669,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _centinela_archivo at 0x7fc529e065c0>
+        referencia: <function _centinela_archivo at 0x7f0ac860a5c0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [36]
@@ -11686,7 +11686,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cfg at 0x7fc529e05ee0>
+        referencia: <function _cfg at 0x7f0ac8609ee0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [37]
@@ -11703,7 +11703,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _conflicto_ligaduras at 0x7fc529e062a0>
+        referencia: <function _conflicto_ligaduras at 0x7f0ac860a2a0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [38]
@@ -11720,7 +11720,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _descubrir_inventario_total at 0x7fc529e06840>
+        referencia: <function _descubrir_inventario_total at 0x7f0ac860a840>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [39]
@@ -11737,7 +11737,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _detectar_choques_reglas at 0x7fc529e06700>
+        referencia: <function _detectar_choques_reglas at 0x7f0ac860a700>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [40]
@@ -11754,7 +11754,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _id_anclado at 0x7fc529e063e0>
+        referencia: <function _id_anclado at 0x7f0ac860a3e0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [41]
@@ -11771,7 +11771,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_registro at 0x7fc529e06200>
+        referencia: <function _normalizar_registro at 0x7f0ac860a200>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [42]
@@ -11788,7 +11788,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_tipos_peticion at 0x7fc529e060c0>
+        referencia: <function _normalizar_tipos_peticion at 0x7f0ac860a0c0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [43]
@@ -11805,7 +11805,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _permite_k at 0x7fc529e06340>
+        referencia: <function _permite_k at 0x7f0ac860a340>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [44]
@@ -11822,7 +11822,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _registro_vacio at 0x7fc529e05f80>
+        referencia: <function _registro_vacio at 0x7f0ac8609f80>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [45]
@@ -11839,7 +11839,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _resolver_capacidades at 0x7fc529e07100>
+        referencia: <function _resolver_capacidades at 0x7f0ac860b100>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [46]
@@ -11856,7 +11856,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _truthy_pedir at 0x7fc529e06020>
+        referencia: <function _truthy_pedir at 0x7f0ac860a020>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [47]
@@ -11873,7 +11873,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_clasificacion at 0x7fc529e06520>
+        referencia: <function _validar_clasificacion at 0x7f0ac860a520>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [48]
@@ -11890,7 +11890,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_contrato at 0x7fc529e067a0>
+        referencia: <function _validar_contrato at 0x7f0ac860a7a0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [49]
@@ -11907,7 +11907,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_regla_meta at 0x7fc529e06480>
+        referencia: <function _validar_regla_meta at 0x7f0ac860a480>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [50]
@@ -11924,7 +11924,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function axiomas at 0x7fc529e06de0>
+        referencia: <function axiomas at 0x7f0ac860ade0>
         ejecutable_directamente: True
       [51]
         nombre: barrer
@@ -11940,7 +11940,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function barrer at 0x7fc529e06a20>
+        referencia: <function barrer at 0x7f0ac860aa20>
         ejecutable_directamente: True
       [52]
         nombre: centinela
@@ -11956,7 +11956,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function centinela at 0x7fc529e068e0>
+        referencia: <function centinela at 0x7f0ac860a8e0>
         ejecutable_directamente: True
       [53]
         nombre: dataclass
@@ -11972,7 +11972,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function dataclass at 0x7fc529ef0b80>
+        referencia: <function dataclass at 0x7f0ac86dcb80>
         ejecutable_directamente: True
       [54]
         nombre: defaultdict
@@ -12016,7 +12016,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function diagnostico at 0x7fc529e07060>
+        referencia: <function diagnostico at 0x7f0ac860b060>
         ejecutable_directamente: True
       [57]
         nombre: ejecutar
@@ -12032,7 +12032,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function ejecutar at 0x7fc529e06d40>
+        referencia: <function ejecutar at 0x7f0ac860ad40>
         ejecutable_directamente: True
       [58]
         nombre: es_undefined
@@ -12048,7 +12048,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function es_undefined at 0x7fc529dac220>
+        referencia: <function es_undefined at 0x7f0ac85a8220>
         ejecutable_directamente: False
       [59]
         nombre: evaluar_universal
@@ -12064,7 +12064,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function evaluar_universal at 0x7fc529e06f20>
+        referencia: <function evaluar_universal at 0x7f0ac860af20>
         ejecutable_directamente: True
       [60]
         nombre: field
@@ -12080,7 +12080,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function field at 0x7fc52a0c3880>
+        referencia: <function field at 0x7f0ac88c3880>
         ejecutable_directamente: True
       [61]
         nombre: inventario
@@ -12096,7 +12096,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function inventario at 0x7fc529e06ca0>
+        referencia: <function inventario at 0x7f0ac860aca0>
         ejecutable_directamente: True
       [62]
         nombre: recibir_comentarios
@@ -12112,7 +12112,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function recibir_comentarios at 0x7fc529e06e80>
+        referencia: <function recibir_comentarios at 0x7f0ac860ae80>
         ejecutable_directamente: False
       [63]
         nombre: registrar_inventario
@@ -12128,7 +12128,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function registrar_inventario at 0x7fc529e06c00>
+        referencia: <function registrar_inventario at 0x7f0ac860ac00>
         ejecutable_directamente: True
       [64]
         nombre: reporte
@@ -12144,7 +12144,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function reporte at 0x7fc529e06fc0>
+        referencia: <function reporte at 0x7f0ac860afc0>
         ejecutable_directamente: True
       [65]
         nombre: resolver
@@ -12160,7 +12160,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function resolver at 0x7fc529e06980>
+        referencia: <function resolver at 0x7f0ac860a980>
         ejecutable_directamente: True
       [66]
         nombre: verificar
@@ -12176,7 +12176,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar at 0x7fc529e06ac0>
+        referencia: <function verificar at 0x7f0ac860aac0>
         ejecutable_directamente: True
       [67]
         nombre: verificar_salida
@@ -12192,7 +12192,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar_salida at 0x7fc529e06b60>
+        referencia: <function verificar_salida at 0x7f0ac860ab60>
         ejecutable_directamente: False
       [68]
         nombre: auto_auditoria
@@ -12313,7 +12313,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7fc529e06160>
+        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7f0ac860a160>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [1]
@@ -12330,7 +12330,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cargar_reglas at 0x7fc529e06660>
+        referencia: <function _cargar_reglas at 0x7f0ac860a660>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [2]
@@ -12347,7 +12347,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _centinela_archivo at 0x7fc529e065c0>
+        referencia: <function _centinela_archivo at 0x7f0ac860a5c0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [3]
@@ -12364,7 +12364,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cfg at 0x7fc529e05ee0>
+        referencia: <function _cfg at 0x7f0ac8609ee0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [4]
@@ -12381,7 +12381,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _conflicto_ligaduras at 0x7fc529e062a0>
+        referencia: <function _conflicto_ligaduras at 0x7f0ac860a2a0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [5]
@@ -12398,7 +12398,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _descubrir_inventario_total at 0x7fc529e06840>
+        referencia: <function _descubrir_inventario_total at 0x7f0ac860a840>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [6]
@@ -12415,7 +12415,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _detectar_choques_reglas at 0x7fc529e06700>
+        referencia: <function _detectar_choques_reglas at 0x7f0ac860a700>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [7]
@@ -12432,7 +12432,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _id_anclado at 0x7fc529e063e0>
+        referencia: <function _id_anclado at 0x7f0ac860a3e0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [8]
@@ -12449,7 +12449,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_registro at 0x7fc529e06200>
+        referencia: <function _normalizar_registro at 0x7f0ac860a200>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [9]
@@ -12466,7 +12466,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_tipos_peticion at 0x7fc529e060c0>
+        referencia: <function _normalizar_tipos_peticion at 0x7f0ac860a0c0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [10]
@@ -12483,7 +12483,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _permite_k at 0x7fc529e06340>
+        referencia: <function _permite_k at 0x7f0ac860a340>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [11]
@@ -12500,7 +12500,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _registro_vacio at 0x7fc529e05f80>
+        referencia: <function _registro_vacio at 0x7f0ac8609f80>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [12]
@@ -12517,7 +12517,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _resolver_capacidades at 0x7fc529e07100>
+        referencia: <function _resolver_capacidades at 0x7f0ac860b100>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [13]
@@ -12534,7 +12534,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _truthy_pedir at 0x7fc529e06020>
+        referencia: <function _truthy_pedir at 0x7f0ac860a020>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [14]
@@ -12551,7 +12551,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_clasificacion at 0x7fc529e06520>
+        referencia: <function _validar_clasificacion at 0x7f0ac860a520>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [15]
@@ -12568,7 +12568,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_contrato at 0x7fc529e067a0>
+        referencia: <function _validar_contrato at 0x7f0ac860a7a0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [16]
@@ -12585,7 +12585,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_regla_meta at 0x7fc529e06480>
+        referencia: <function _validar_regla_meta at 0x7f0ac860a480>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [17]
@@ -12602,7 +12602,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function axiomas at 0x7fc529e06de0>
+        referencia: <function axiomas at 0x7f0ac860ade0>
         ejecutable_directamente: True
       [18]
         nombre: barrer
@@ -12618,7 +12618,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function barrer at 0x7fc529e06a20>
+        referencia: <function barrer at 0x7f0ac860aa20>
         ejecutable_directamente: True
       [19]
         nombre: centinela
@@ -12634,7 +12634,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function centinela at 0x7fc529e068e0>
+        referencia: <function centinela at 0x7f0ac860a8e0>
         ejecutable_directamente: True
       [20]
         nombre: dataclass
@@ -12650,7 +12650,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function dataclass at 0x7fc529ef0b80>
+        referencia: <function dataclass at 0x7f0ac86dcb80>
         ejecutable_directamente: True
       [21]
         nombre: diagnostico
@@ -12666,7 +12666,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function diagnostico at 0x7fc529e07060>
+        referencia: <function diagnostico at 0x7f0ac860b060>
         ejecutable_directamente: True
       [22]
         nombre: ejecutar
@@ -12682,7 +12682,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function ejecutar at 0x7fc529e06d40>
+        referencia: <function ejecutar at 0x7f0ac860ad40>
         ejecutable_directamente: True
       [23]
         nombre: es_undefined
@@ -12698,7 +12698,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function es_undefined at 0x7fc529dac220>
+        referencia: <function es_undefined at 0x7f0ac85a8220>
         ejecutable_directamente: False
       [24]
         nombre: evaluar_universal
@@ -12714,7 +12714,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function evaluar_universal at 0x7fc529e06f20>
+        referencia: <function evaluar_universal at 0x7f0ac860af20>
         ejecutable_directamente: True
       [25]
         nombre: field
@@ -12730,7 +12730,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function field at 0x7fc52a0c3880>
+        referencia: <function field at 0x7f0ac88c3880>
         ejecutable_directamente: True
       [26]
         nombre: inventario
@@ -12746,7 +12746,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function inventario at 0x7fc529e06ca0>
+        referencia: <function inventario at 0x7f0ac860aca0>
         ejecutable_directamente: True
       [27]
         nombre: recibir_comentarios
@@ -12762,7 +12762,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function recibir_comentarios at 0x7fc529e06e80>
+        referencia: <function recibir_comentarios at 0x7f0ac860ae80>
         ejecutable_directamente: False
       [28]
         nombre: registrar_inventario
@@ -12778,7 +12778,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function registrar_inventario at 0x7fc529e06c00>
+        referencia: <function registrar_inventario at 0x7f0ac860ac00>
         ejecutable_directamente: True
       [29]
         nombre: reporte
@@ -12794,7 +12794,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function reporte at 0x7fc529e06fc0>
+        referencia: <function reporte at 0x7f0ac860afc0>
         ejecutable_directamente: True
       [30]
         nombre: resolver
@@ -12810,7 +12810,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function resolver at 0x7fc529e06980>
+        referencia: <function resolver at 0x7f0ac860a980>
         ejecutable_directamente: True
       [31]
         nombre: verificar
@@ -12826,7 +12826,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar at 0x7fc529e06ac0>
+        referencia: <function verificar at 0x7f0ac860aac0>
         ejecutable_directamente: True
       [32]
         nombre: verificar_salida
@@ -12842,7 +12842,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar_salida at 0x7fc529e06b60>
+        referencia: <function verificar_salida at 0x7f0ac860ab60>
         ejecutable_directamente: False
     clases:
       [0]
@@ -13290,7 +13290,7 @@
         estado: descubierto
         errores:
           []
-        representacion: {'resolver': <function resolver at 0x7fc529e06980>, 'evaluar': <function resolver at 0x7fc529e06980>, 'centinela': <function centinela at 0x7fc529e068e0>, 'barrer': <function barrer at 0x7fc529e06a20>
+        representacion: {'resolver': <function resolver at 0x7f0ac860a980>, 'evaluar': <function resolver at 0x7f0ac860a980>, 'centinela': <function centinela at 0x7f0ac860a8e0>, 'barrer': <function barrer at 0x7f0ac860aa20>
       [25]
         nombre: __all__
         origen: vpsi_dinamico_contexto
@@ -13474,7 +13474,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function axiomas at 0x7fc529e06de0>
+        referencia: <function axiomas at 0x7f0ac860ade0>
         ejecutable_directamente: True
       [1]
         nombre: barrer
@@ -13490,7 +13490,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function barrer at 0x7fc529e06a20>
+        referencia: <function barrer at 0x7f0ac860aa20>
         ejecutable_directamente: True
       [2]
         nombre: centinela
@@ -13506,7 +13506,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function centinela at 0x7fc529e068e0>
+        referencia: <function centinela at 0x7f0ac860a8e0>
         ejecutable_directamente: True
       [3]
         nombre: dataclass
@@ -13522,7 +13522,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function dataclass at 0x7fc529ef0b80>
+        referencia: <function dataclass at 0x7f0ac86dcb80>
         ejecutable_directamente: True
       [4]
         nombre: diagnostico
@@ -13538,7 +13538,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function diagnostico at 0x7fc529e07060>
+        referencia: <function diagnostico at 0x7f0ac860b060>
         ejecutable_directamente: True
       [5]
         nombre: ejecutar
@@ -13554,7 +13554,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function ejecutar at 0x7fc529e06d40>
+        referencia: <function ejecutar at 0x7f0ac860ad40>
         ejecutable_directamente: True
       [6]
         nombre: es_undefined
@@ -13570,7 +13570,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function es_undefined at 0x7fc529dac220>
+        referencia: <function es_undefined at 0x7f0ac85a8220>
         ejecutable_directamente: False
       [7]
         nombre: evaluar_universal
@@ -13586,7 +13586,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function evaluar_universal at 0x7fc529e06f20>
+        referencia: <function evaluar_universal at 0x7f0ac860af20>
         ejecutable_directamente: True
       [8]
         nombre: field
@@ -13602,7 +13602,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function field at 0x7fc52a0c3880>
+        referencia: <function field at 0x7f0ac88c3880>
         ejecutable_directamente: True
       [9]
         nombre: inventario
@@ -13618,7 +13618,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function inventario at 0x7fc529e06ca0>
+        referencia: <function inventario at 0x7f0ac860aca0>
         ejecutable_directamente: True
       [10]
         nombre: recibir_comentarios
@@ -13634,7 +13634,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function recibir_comentarios at 0x7fc529e06e80>
+        referencia: <function recibir_comentarios at 0x7f0ac860ae80>
         ejecutable_directamente: False
       [11]
         nombre: registrar_inventario
@@ -13650,7 +13650,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function registrar_inventario at 0x7fc529e06c00>
+        referencia: <function registrar_inventario at 0x7f0ac860ac00>
         ejecutable_directamente: True
       [12]
         nombre: reporte
@@ -13666,7 +13666,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function reporte at 0x7fc529e06fc0>
+        referencia: <function reporte at 0x7f0ac860afc0>
         ejecutable_directamente: True
       [13]
         nombre: resolver
@@ -13682,7 +13682,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function resolver at 0x7fc529e06980>
+        referencia: <function resolver at 0x7f0ac860a980>
         ejecutable_directamente: True
       [14]
         nombre: verificar
@@ -13698,7 +13698,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar at 0x7fc529e06ac0>
+        referencia: <function verificar at 0x7f0ac860aac0>
         ejecutable_directamente: True
       [15]
         nombre: verificar_salida
@@ -13714,7 +13714,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar_salida at 0x7fc529e06b60>
+        referencia: <function verificar_salida at 0x7f0ac860ab60>
         ejecutable_directamente: False
     total_componentes: 76
     total_ejecutables: 16
@@ -22546,389 +22546,389 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-20T16:57:46.113612+00:00
+    timestamp: 2026-08-20T17:00:09.990390+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.017591
+    duracion_s: 0.015053
   [1]
     id_traza: 2
-    timestamp: 2026-08-20T16:57:46.127230+00:00
+    timestamp: 2026-08-20T17:00:10.004350+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.013506
+    duracion_s: 0.013873
   [2]
     id_traza: 3
-    timestamp: 2026-08-20T16:57:46.141065+00:00
+    timestamp: 2026-08-20T17:00:10.018509+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.013707
+    duracion_s: 0.014067
   [3]
     id_traza: 4
-    timestamp: 2026-08-20T16:57:46.141185+00:00
+    timestamp: 2026-08-20T17:00:10.018599+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 3e-05
+    duracion_s: 2.3e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-20T16:57:46.141225+00:00
+    timestamp: 2026-08-20T17:00:10.018641+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 8e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-20T16:57:46.466254+00:00
+    timestamp: 2026-08-20T17:00:10.329135+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.324976
+    duracion_s: 0.310444
   [6]
     id_traza: 7
-    timestamp: 2026-08-20T16:57:46.467081+00:00
+    timestamp: 2026-08-20T17:00:10.329908+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000713
+    duracion_s: 0.000701
   [7]
     id_traza: 8
-    timestamp: 2026-08-20T16:57:46.467675+00:00
+    timestamp: 2026-08-20T17:00:10.330532+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000554
+    duracion_s: 0.000587
   [8]
     id_traza: 9
-    timestamp: 2026-08-20T16:57:46.468232+00:00
+    timestamp: 2026-08-20T17:00:10.331122+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000507
+    duracion_s: 0.000542
   [9]
     id_traza: 10
-    timestamp: 2026-08-20T16:57:46.469458+00:00
+    timestamp: 2026-08-20T17:00:10.332254+00:00
     modulo: capacidades_engine
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001194
+    duracion_s: 0.0011
   [10]
     id_traza: 11
-    timestamp: 2026-08-20T16:57:46.469776+00:00
+    timestamp: 2026-08-20T17:00:10.332590+00:00
     modulo: capacidades_engine
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00028
+    duracion_s: 0.000301
   [11]
     id_traza: 12
-    timestamp: 2026-08-20T16:57:46.470186+00:00
+    timestamp: 2026-08-20T17:00:10.333019+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000362
+    duracion_s: 0.000389
   [12]
     id_traza: 13
-    timestamp: 2026-08-20T16:57:46.472811+00:00
+    timestamp: 2026-08-20T17:00:10.335512+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.002592
+    duracion_s: 0.00246
   [13]
     id_traza: 14
-    timestamp: 2026-08-20T16:57:46.474348+00:00
+    timestamp: 2026-08-20T17:00:10.337019+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001474
+    duracion_s: 0.001471
   [14]
     id_traza: 15
-    timestamp: 2026-08-20T16:57:46.475902+00:00
+    timestamp: 2026-08-20T17:00:10.338541+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001495
+    duracion_s: 0.001479
   [15]
     id_traza: 16
-    timestamp: 2026-08-20T16:57:46.475950+00:00
+    timestamp: 2026-08-20T17:00:10.338585+00:00
     modulo: citacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 3e-06
   [16]
     id_traza: 17
-    timestamp: 2026-08-20T16:57:46.475980+00:00
+    timestamp: 2026-08-20T17:00:10.338614+00:00
     modulo: citacion
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 2e-06
+    duracion_s: 1e-06
   [17]
     id_traza: 18
-    timestamp: 2026-08-20T16:57:46.476005+00:00
+    timestamp: 2026-08-20T17:00:10.338641+00:00
     modulo: citacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 4e-06
   [18]
     id_traza: 19
-    timestamp: 2026-08-20T16:57:46.476567+00:00
+    timestamp: 2026-08-20T17:00:10.339253+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000537
+    duracion_s: 0.000586
   [19]
     id_traza: 20
-    timestamp: 2026-08-20T16:57:46.476716+00:00
+    timestamp: 2026-08-20T17:00:10.339438+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000107
+    duracion_s: 0.000144
   [20]
     id_traza: 21
-    timestamp: 2026-08-20T16:57:46.476829+00:00
+    timestamp: 2026-08-20T17:00:10.339568+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 8.4e-05
+    duracion_s: 9.4e-05
   [21]
     id_traza: 22
-    timestamp: 2026-08-20T16:57:46.493056+00:00
+    timestamp: 2026-08-20T17:00:10.354902+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.016195
+    duracion_s: 0.015301
   [22]
     id_traza: 23
-    timestamp: 2026-08-20T16:57:46.494319+00:00
+    timestamp: 2026-08-20T17:00:10.356116+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.001192
+    duracion_s: 0.001177
   [23]
     id_traza: 24
-    timestamp: 2026-08-20T16:57:46.497440+00:00
+    timestamp: 2026-08-20T17:00:10.359426+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.003026
+    duracion_s: 0.003266
   [24]
     id_traza: 25
-    timestamp: 2026-08-20T16:57:46.538147+00:00
+    timestamp: 2026-08-20T17:00:10.398467+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.040654
+    duracion_s: 0.038997
   [25]
     id_traza: 26
-    timestamp: 2026-08-20T16:57:46.573757+00:00
+    timestamp: 2026-08-20T17:00:10.430146+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.035512
+    duracion_s: 0.0316
   [26]
     id_traza: 27
-    timestamp: 2026-08-20T16:57:46.612449+00:00
+    timestamp: 2026-08-20T17:00:10.456717+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.03858
+    duracion_s: 0.026485
   [27]
     id_traza: 28
-    timestamp: 2026-08-20T16:57:46.612562+00:00
+    timestamp: 2026-08-20T17:00:10.456804+00:00
     modulo: diagnosticoD
     capacidad: reporte
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 3e-06
   [28]
     id_traza: 29
-    timestamp: 2026-08-20T16:57:46.612591+00:00
+    timestamp: 2026-08-20T17:00:10.456836+00:00
     modulo: diagnosticoD
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [29]
     id_traza: 30
-    timestamp: 2026-08-20T16:57:46.612615+00:00
+    timestamp: 2026-08-20T17:00:10.456862+00:00
     modulo: diagnosticoD
     capacidad: inventario
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 3e-06
   [30]
     id_traza: 31
-    timestamp: 2026-08-20T16:57:46.616383+00:00
+    timestamp: 2026-08-20T17:00:10.460592+00:00
     modulo: diccionario
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.003745
+    duracion_s: 0.003705
   [31]
     id_traza: 32
-    timestamp: 2026-08-20T16:57:46.616451+00:00
+    timestamp: 2026-08-20T17:00:10.460652+00:00
     modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1.8e-05
+    duracion_s: 1.6e-05
   [32]
     id_traza: 33
-    timestamp: 2026-08-20T16:57:46.616502+00:00
+    timestamp: 2026-08-20T17:00:10.460706+00:00
     modulo: diccionario
     capacidad: inventario
     estado: EXITO
     duracion_s: 1.6e-05
   [33]
     id_traza: 34
-    timestamp: 2026-08-20T16:57:46.617867+00:00
+    timestamp: 2026-08-20T17:00:10.462246+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001342
+    duracion_s: 0.001512
   [34]
     id_traza: 35
-    timestamp: 2026-08-20T16:57:46.618438+00:00
+    timestamp: 2026-08-20T17:00:10.462980+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000537
+    duracion_s: 0.000693
   [35]
     id_traza: 36
-    timestamp: 2026-08-20T16:57:46.618653+00:00
+    timestamp: 2026-08-20T17:00:10.463240+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000177
+    duracion_s: 0.000216
   [36]
     id_traza: 37
-    timestamp: 2026-08-20T16:57:46.618712+00:00
+    timestamp: 2026-08-20T17:00:10.463335+00:00
     modulo: interfaz
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2.5e-05
+    duracion_s: 5.4e-05
   [37]
     id_traza: 38
-    timestamp: 2026-08-20T16:57:46.622573+00:00
+    timestamp: 2026-08-20T17:00:10.467411+00:00
     modulo: realidad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.003836
+    duracion_s: 0.004033
   [38]
     id_traza: 39
-    timestamp: 2026-08-20T16:57:46.623174+00:00
+    timestamp: 2026-08-20T17:00:10.468064+00:00
     modulo: realidad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000564
+    duracion_s: 0.000612
   [39]
     id_traza: 40
-    timestamp: 2026-08-20T16:57:46.627359+00:00
+    timestamp: 2026-08-20T17:00:10.475971+00:00
     modulo: realidad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.004144
+    duracion_s: 0.007863
   [40]
     id_traza: 41
-    timestamp: 2026-08-20T16:57:46.636936+00:00
+    timestamp: 2026-08-20T17:00:10.486431+00:00
     modulo: self
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.009518
+    duracion_s: 0.010395
   [41]
     id_traza: 42
-    timestamp: 2026-08-20T16:57:46.644987+00:00
+    timestamp: 2026-08-20T17:00:10.495679+00:00
     modulo: self
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.007985
+    duracion_s: 0.009175
   [42]
     id_traza: 43
-    timestamp: 2026-08-20T16:57:46.645057+00:00
+    timestamp: 2026-08-20T17:00:10.495756+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
     duracion_s: 1.1e-05
   [43]
     id_traza: 44
-    timestamp: 2026-08-20T16:57:46.668881+00:00
+    timestamp: 2026-08-20T17:00:10.518708+00:00
     modulo: spartaco_seguridad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.023792
+    duracion_s: 0.022921
   [44]
     id_traza: 45
-    timestamp: 2026-08-20T16:57:46.669646+00:00
+    timestamp: 2026-08-20T17:00:10.519377+00:00
     modulo: spartaco_seguridad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.00071
+    duracion_s: 0.000625
   [45]
     id_traza: 46
-    timestamp: 2026-08-20T16:57:46.670256+00:00
+    timestamp: 2026-08-20T17:00:10.519966+00:00
     modulo: spartaco_seguridad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000561
+    duracion_s: 0.000548
   [46]
     id_traza: 47
-    timestamp: 2026-08-20T16:57:46.671468+00:00
+    timestamp: 2026-08-20T17:00:10.521048+00:00
     modulo: taxonomia
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001175
+    duracion_s: 0.001049
   [47]
     id_traza: 48
-    timestamp: 2026-08-20T16:57:46.671915+00:00
+    timestamp: 2026-08-20T17:00:10.521485+00:00
     modulo: taxonomia
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000411
+    duracion_s: 0.000402
   [48]
     id_traza: 49
-    timestamp: 2026-08-20T16:57:46.672156+00:00
+    timestamp: 2026-08-20T17:00:10.521734+00:00
     modulo: taxonomia
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000199
+    duracion_s: 0.000207
   [49]
     id_traza: 50
-    timestamp: 2026-08-20T16:57:46.673961+00:00
+    timestamp: 2026-08-20T17:00:10.523583+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001774
+    duracion_s: 0.001817
   [50]
     id_traza: 51
-    timestamp: 2026-08-20T16:57:46.674764+00:00
+    timestamp: 2026-08-20T17:00:10.524443+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000769
+    duracion_s: 0.000827
   [51]
     id_traza: 52
-    timestamp: 2026-08-20T16:57:46.675470+00:00
+    timestamp: 2026-08-20T17:00:10.525218+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000664
+    duracion_s: 0.000736
   [52]
     id_traza: 53
-    timestamp: 2026-08-20T16:57:46.675514+00:00
+    timestamp: 2026-08-20T17:00:10.525263+00:00
     modulo: verificacion
     capacidad: reporte
     estado: EXITO
     duracion_s: 8e-06
   [53]
     id_traza: 54
-    timestamp: 2026-08-20T16:57:46.675539+00:00
+    timestamp: 2026-08-20T17:00:10.525291+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1e-06
+    duracion_s: 2e-06
   [54]
     id_traza: 55
-    timestamp: 2026-08-20T16:57:46.675558+00:00
+    timestamp: 2026-08-20T17:00:10.525369+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2e-06
+    duracion_s: 5e-06
 
 ══════════════════════════════════════════════════════════════════════
   MAPA DE RUTA DE EJECUCIÓN

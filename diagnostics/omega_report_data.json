@@ -6,7 +6,7 @@
     "total_modulos": 19,
     "trazas_n": 55,
     "rutas_n": 0,
-    "timestamp": "2026-08-19T23:55:09.957579+00:00"
+    "timestamp": "2026-08-20T06:12:40.919426+00:00"
   },
   "reportes": [
     {
@@ -25,7 +25,7 @@
         "advertencias": [],
         "trazas_n": 55,
         "rutas_n": 0,
-        "timestamp": "2026-08-19T23:55:09.957524+00:00"
+        "timestamp": "2026-08-20T06:12:40.919339+00:00"
       }
     },
     {
@@ -36,7 +36,7 @@
         "id": "AX",
         "nombre": "axiomas",
         "rol": "AX",
-        "version": "9.6",
+        "version": "8.0",
         "version_contrato": "1.0",
         "esquema": "VPSI-CONTRACT-1.0",
         "estabilidad": "ESTABLE",
@@ -141,7 +141,8 @@
           "recuperar": true,
           "crear": true,
           "actualizar": false,
-          "alterar": false
+          "alterar": false,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -159,7 +160,8 @@
           "buscar_por_id",
           "limite_axiomático",
           "ejecutar_total",
-          "inspeccionar"
+          "inspeccionar",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -337,6 +339,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -360,7 +373,7 @@
           "id": "AX",
           "modulo": "axiomas",
           "rol": "AX",
-          "version": "9.6",
+          "version": "8.0",
           "version_contrato": "1.0",
           "esquema": "VPSI-CONTRACT-1.0",
           "estabilidad": "ESTABLE",
@@ -417,7 +430,8 @@
             "buscar_por_id",
             "limite_axiomático",
             "ejecutar_total",
-            "inspeccionar"
+            "inspeccionar",
+            "evaluar_universal"
           ],
           "capacidades_resueltas": [
             "verificar",
@@ -435,7 +449,8 @@
             "buscar_por_id",
             "limite_axiomático",
             "ejecutar_total",
-            "inspeccionar"
+            "inspeccionar",
+            "evaluar_universal"
           ],
           "capacidades_meta": [
             "verificar",
@@ -453,7 +468,8 @@
             "buscar_por_id",
             "limite_axiomático",
             "ejecutar_total",
-            "inspeccionar"
+            "inspeccionar",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -530,7 +546,8 @@
             "buscar_por_id": true,
             "limite_axiomático": true,
             "ejecutar_total": true,
-            "inspeccionar": true
+            "inspeccionar": true,
+            "evaluar_universal": true
           }
         },
         "diagnostico": {
@@ -760,7 +777,7 @@
           "id": "AX",
           "nombre": "axiomas",
           "rol": "AX",
-          "version": "9.6",
+          "version": "8.0",
           "version_contrato": "1.0",
           "esquema": "VPSI-CONTRACT-1.0",
           "estabilidad": "ESTABLE",
@@ -830,7 +847,8 @@
             "buscar_por_id",
             "limite_axiomático",
             "ejecutar_total",
-            "inspeccionar"
+            "inspeccionar",
+            "evaluar_universal"
           ],
           "capacidades_resueltas": [
             "verificar",
@@ -848,7 +866,8 @@
             "buscar_por_id",
             "limite_axiomático",
             "ejecutar_total",
-            "inspeccionar"
+            "inspeccionar",
+            "evaluar_universal"
           ],
           "capacidades_meta": [
             "verificar",
@@ -866,7 +885,8 @@
             "buscar_por_id",
             "limite_axiomático",
             "ejecutar_total",
-            "inspeccionar"
+            "inspeccionar",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -960,7 +980,8 @@
             "recuperar": true,
             "crear": true,
             "actualizar": false,
-            "alterar": false
+            "alterar": false,
+            "evaluar_universal": true
           },
           "reporting": {
             "estado": true,
@@ -980,7 +1001,8 @@
             "metricas": true,
             "diagnostico": true,
             "reporte": true,
-            "validar_esquema": true
+            "validar_esquema": true,
+            "evaluar_universal": true
           },
           "estados_validos": [
             "NO_INICIADO",
@@ -1625,6 +1647,7 @@
           "reporte": true,
           "validar_esquema": true,
           "acceso_archivos": true,
+          "evaluar_universal": true,
           "ejecutar_total": true,
           "inspeccionar": true,
           "registrar_inventario": true
@@ -1655,7 +1678,8 @@
           "inspeccionar",
           "registrar_inventario",
           "mapear_codigo",
-          "clasificar_ids"
+          "clasificar_ids",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -1943,6 +1967,17 @@
             "acceso_archivos": [
               "*"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -2018,7 +2053,8 @@
             "inspeccionar",
             "registrar_inventario",
             "mapear_codigo",
-            "clasificar_ids"
+            "clasificar_ids",
+            "evaluar_universal"
           ],
           "capacidades_meta": [
             "verificar",
@@ -2046,7 +2082,8 @@
             "inspeccionar",
             "registrar_inventario",
             "mapear_codigo",
-            "clasificar_ids"
+            "clasificar_ids",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -2197,7 +2234,8 @@
             "inspeccionar",
             "registrar_inventario",
             "mapear_codigo",
-            "clasificar_ids"
+            "clasificar_ids",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -2244,7 +2282,7 @@
             "total_unicos": 18,
             "total_duplicados": 0,
             "ids_duplicados": {},
-            "actualizado": "2026-08-19T23:55:09.838879+00:00"
+            "actualizado": "2026-08-20T06:12:40.720697+00:00"
           },
           "nota": "CACHE no sabe lo que ocurrió. Solo sabe qué fue registrado y qué estructura encontró. Análisis semántico: módulo futuro."
         }
@@ -2376,7 +2414,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "calcular",
@@ -2398,7 +2437,8 @@
           "verificar_calculo_de_C_L_K",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "calcular": {
@@ -2620,6 +2660,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -2670,39 +2721,39 @@
           "hashes": {
             "__init__.py": {
               "archivo": "__init__.py",
-              "sha256": "d44d03ebcde78733ea5530ab3a99466d15bda9952f0d9bd797e472178e5245fc",
-              "tamano": 161414,
-              "timestamp_mtime": "2026-08-19T23:55:03.709979+00:00"
+              "sha256": "39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e",
+              "tamano": 166998,
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34",
               "tamano": 6365,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             }
           },
           "conteos_disponible": true,
@@ -2730,7 +2781,8 @@
             "verificar_calculo_de_C_L_K",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "capacidades_callable": [
             "barrer",
@@ -2741,6 +2793,7 @@
             "calcular_factor",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "explicar_calculo",
             "historial",
             "inspeccionar",
@@ -2803,7 +2856,8 @@
             "acceso_archivos": true,
             "ejecutar_total": true,
             "inspeccionar": true,
-            "registrar_inventario": true
+            "registrar_inventario": true,
+            "evaluar_universal": true
           },
           "conocimiento_exportable": [
             "C",
@@ -2866,39 +2920,39 @@
           "hashes": {
             "__init__.py": {
               "archivo": "__init__.py",
-              "sha256": "d44d03ebcde78733ea5530ab3a99466d15bda9952f0d9bd797e472178e5245fc",
-              "tamano": 161414,
-              "timestamp_mtime": "2026-08-19T23:55:03.709979+00:00"
+              "sha256": "39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e",
+              "tamano": 166998,
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34",
               "tamano": 6365,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-19T23:55:03.710577+00:00"
+              "timestamp_mtime": "2026-08-20T06:12:35.216498+00:00"
             }
           },
           "factores_api": [
@@ -2946,6 +3000,7 @@
             "calcular_factor",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "explicar_calculo",
             "historial",
             "inspeccionar",
@@ -3108,7 +3163,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -3123,7 +3179,8 @@
           "inspeccionar",
           "registrar_inventario",
           "reporte",
-          "diagnostico"
+          "diagnostico",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -3268,6 +3325,17 @@
             "acceso_archivos": [
               "*"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -3325,7 +3393,8 @@
             "inspeccionar",
             "registrar_inventario",
             "reporte",
-            "diagnostico"
+            "diagnostico",
+            "evaluar_universal"
           ],
           "capacidades_meta": [
             "verificar",
@@ -3340,7 +3409,8 @@
             "inspeccionar",
             "registrar_inventario",
             "reporte",
-            "diagnostico"
+            "diagnostico",
+            "evaluar_universal"
           ],
           "autoridad": [
             "Mantener el inventario operativo de skills nativos del Engine",
@@ -3428,6 +3498,7 @@
             "barrer",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "ids",
             "inspeccionar",
             "inventario",
@@ -3443,6 +3514,7 @@
             "barrer",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "ids",
             "inspeccionar",
             "inventario",
@@ -3458,6 +3530,7 @@
             "barrer",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "ids",
             "inspeccionar",
             "inventario",
@@ -3469,9 +3542,9 @@
             "verificar",
             "verificar_salida"
           ],
-          "n_capacidades": 13,
-          "n_capacidades_meta": 13,
-          "n_capacidades_callable": 13,
+          "n_capacidades": 14,
+          "n_capacidades_meta": 14,
+          "n_capacidades_callable": 14,
           "funcion": "Capacidad estructural del Engine. Mantiene el inventario operativo de skills nativos. Cada archivo implementa uno o más skills. Engine es la única autoridad que los ejecuta. CE no calcula, no deposita, no decide, no selecciona."
         }
       }
@@ -3589,7 +3662,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -3604,7 +3678,8 @@
           "verificar_salida",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -3748,6 +3823,17 @@
             "salida": "dict con inventario registrado",
             "acceso_archivos": [
               "acceso_archivos"
+            ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
             ]
           }
         },
@@ -4440,7 +4526,8 @@
             "verificar_salida",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -9518,7 +9605,8 @@
             "verificar_salida",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -9668,7 +9756,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -9691,7 +9780,8 @@
           "evaluar",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -9924,6 +10014,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -9981,7 +10082,8 @@
             "evaluar",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "nota": "CIT documenta y fundamenta. No calcula. No altera declaraciones de origen."
         },
@@ -10077,7 +10179,8 @@
             "evaluar",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "registro_n": 0,
           "funcion": "Autoridad universal de fundamentación. Resuelve, organiza, relaciona y cita cualquier declaración pública del VPSI. No modifica conocimiento.",
@@ -10202,6 +10305,7 @@
           "ejecutar_total": true,
           "inspeccionar": true,
           "registrar_inventario": true,
+          "evaluar_universal": true,
           "validar_esquema": true,
           "acceso_archivos": true
         },
@@ -10212,6 +10316,7 @@
           "descubrir_constantes",
           "diagnostico",
           "ejecutar_total",
+          "evaluar_universal",
           "inspeccionar",
           "inventario",
           "listar_constantes",
@@ -10363,6 +10468,17 @@
             "acceso_archivos": [
               "*"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -10405,6 +10521,7 @@
             "descubrir_constantes",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "inspeccionar",
             "inventario",
             "listar_constantes",
@@ -10511,6 +10628,7 @@
             "descubrir_constantes",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "inspeccionar",
             "inventario",
             "listar_constantes",
@@ -10671,7 +10789,8 @@
           "conocimiento": true,
           "reporte": true,
           "validar_esquema": true,
-          "acceso_archivos": true
+          "acceso_archivos": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "resolver",
@@ -10686,7 +10805,8 @@
           "verificar_salida",
           "ejecutar",
           "ejecutar_total",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "resolver": {
@@ -10831,6 +10951,17 @@
             "acceso_archivos": [
               "*"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -10880,7 +11011,8 @@
             "verificar_salida",
             "ejecutar",
             "ejecutar_total",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -10973,7 +11105,8 @@
             "verificar_salida",
             "ejecutar",
             "ejecutar_total",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "capacidades_declaradas": [
             "resolver",
@@ -10988,7 +11121,8 @@
             "verificar_salida",
             "ejecutar",
             "ejecutar_total",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "capacidades_resueltas": [
             "resolver",
@@ -11003,7 +11137,8 @@
             "verificar_salida",
             "ejecutar",
             "ejecutar_total",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "reglas_internas": [
             "auto_auditoria",
@@ -11611,7 +11746,7 @@
               "tipo": "constante",
               "estado": "descubierto",
               "errores": [],
-              "representacion": "{'resolver': <function resolver at 0x7f0091bfade0>, 'evaluar': <function resolver at 0x7f0091bfade0>, 'centinela': <function centinela at 0x7f0091bfad40>, 'barrer': <function barrer at 0x7f0091bfae80>"
+              "representacion": "{'resolver': <function resolver at 0x7fa54cc6f2e0>, 'evaluar': <function resolver at 0x7fa54cc6f2e0>, 'centinela': <function centinela at 0x7fa54cc6f240>, 'barrer': <function barrer at 0x7fa54cc6f380>"
             },
             {
               "nombre": "_Undefined",
@@ -11685,7 +11820,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7f0091bfa5c0>",
+              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7fa54cc6eac0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11702,7 +11837,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cargar_reglas at 0x7f0091bfaac0>",
+              "referencia": "<function _cargar_reglas at 0x7fa54cc6efc0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11719,7 +11854,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _centinela_archivo at 0x7f0091bfaa20>",
+              "referencia": "<function _centinela_archivo at 0x7fa54cc6ef20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11736,7 +11871,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cfg at 0x7f0091bfa340>",
+              "referencia": "<function _cfg at 0x7fa54cc6e840>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11753,7 +11888,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _conflicto_ligaduras at 0x7f0091bfa700>",
+              "referencia": "<function _conflicto_ligaduras at 0x7fa54cc6ec00>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11770,7 +11905,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _descubrir_inventario_total at 0x7f0091bfaca0>",
+              "referencia": "<function _descubrir_inventario_total at 0x7fa54cc6f1a0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11787,7 +11922,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _detectar_choques_reglas at 0x7f0091bfab60>",
+              "referencia": "<function _detectar_choques_reglas at 0x7fa54cc6f060>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11804,7 +11939,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _id_anclado at 0x7f0091bfa840>",
+              "referencia": "<function _id_anclado at 0x7fa54cc6ed40>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11821,7 +11956,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_registro at 0x7f0091bfa660>",
+              "referencia": "<function _normalizar_registro at 0x7fa54cc6eb60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11838,7 +11973,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_tipos_peticion at 0x7f0091bfa520>",
+              "referencia": "<function _normalizar_tipos_peticion at 0x7fa54cc6ea20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11855,7 +11990,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _permite_k at 0x7f0091bfa7a0>",
+              "referencia": "<function _permite_k at 0x7fa54cc6eca0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11872,7 +12007,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _registro_vacio at 0x7f0091bfa3e0>",
+              "referencia": "<function _registro_vacio at 0x7fa54cc6e8e0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11889,7 +12024,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _resolver_capacidades at 0x7f0091bfb4c0>",
+              "referencia": "<function _resolver_capacidades at 0x7fa54cc6fa60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11906,7 +12041,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _truthy_pedir at 0x7f0091bfa480>",
+              "referencia": "<function _truthy_pedir at 0x7fa54cc6e980>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11923,7 +12058,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_clasificacion at 0x7f0091bfa980>",
+              "referencia": "<function _validar_clasificacion at 0x7fa54cc6ee80>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11940,7 +12075,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_contrato at 0x7f0091bfac00>",
+              "referencia": "<function _validar_contrato at 0x7fa54cc6f100>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11957,7 +12092,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_regla_meta at 0x7f0091bfa8e0>",
+              "referencia": "<function _validar_regla_meta at 0x7fa54cc6ede0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11974,7 +12109,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function axiomas at 0x7f0091bfb240>",
+              "referencia": "<function axiomas at 0x7fa54cc6f740>",
               "ejecutable_directamente": true
             },
             {
@@ -11990,7 +12125,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function barrer at 0x7f0091bfae80>",
+              "referencia": "<function barrer at 0x7fa54cc6f380>",
               "ejecutable_directamente": true
             },
             {
@@ -12006,7 +12141,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function centinela at 0x7f0091bfad40>",
+              "referencia": "<function centinela at 0x7fa54cc6f240>",
               "ejecutable_directamente": true
             },
             {
@@ -12022,7 +12157,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function dataclass at 0x7f0091ef2480>",
+              "referencia": "<function dataclass at 0x7fa54ceee480>",
               "ejecutable_directamente": true
             },
             {
@@ -12066,7 +12201,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function diagnostico at 0x7f0091bfb420>",
+              "referencia": "<function diagnostico at 0x7fa54cc6f9c0>",
               "ejecutable_directamente": true
             },
             {
@@ -12082,7 +12217,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function ejecutar at 0x7f0091bfb1a0>",
+              "referencia": "<function ejecutar at 0x7fa54cc6f6a0>",
               "ejecutable_directamente": true
             },
             {
@@ -12098,8 +12233,24 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function es_undefined at 0x7f0091dcf420>",
+              "referencia": "<function es_undefined at 0x7fa54cc28040>",
               "ejecutable_directamente": false
+            },
+            {
+              "nombre": "evaluar_universal",
+              "origen": "vpsi_dinamico_contexto",
+              "modulo": "contexto",
+              "archivo": "__init__.py",
+              "declarado": true,
+              "descubierto": true,
+              "callable": true,
+              "ejecutable": true,
+              "requiere_entrada": false,
+              "tipo": "funcion",
+              "estado": "descubierto",
+              "errores": [],
+              "referencia": "<function evaluar_universal at 0x7fa54cc6f880>",
+              "ejecutable_directamente": true
             },
             {
               "nombre": "field",
@@ -12114,7 +12265,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function field at 0x7f0091ef3ce0>",
+              "referencia": "<function field at 0x7fa54ceefd80>",
               "ejecutable_directamente": true
             },
             {
@@ -12130,7 +12281,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function inventario at 0x7f0091bfb100>",
+              "referencia": "<function inventario at 0x7fa54cc6f600>",
               "ejecutable_directamente": true
             },
             {
@@ -12146,7 +12297,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function recibir_comentarios at 0x7f0091bfb2e0>",
+              "referencia": "<function recibir_comentarios at 0x7fa54cc6f7e0>",
               "ejecutable_directamente": false
             },
             {
@@ -12162,7 +12313,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function registrar_inventario at 0x7f0091bfb060>",
+              "referencia": "<function registrar_inventario at 0x7fa54cc6f560>",
               "ejecutable_directamente": true
             },
             {
@@ -12178,7 +12329,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function reporte at 0x7f0091bfb380>",
+              "referencia": "<function reporte at 0x7fa54cc6f920>",
               "ejecutable_directamente": true
             },
             {
@@ -12194,7 +12345,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function resolver at 0x7f0091bfade0>",
+              "referencia": "<function resolver at 0x7fa54cc6f2e0>",
               "ejecutable_directamente": true
             },
             {
@@ -12210,7 +12361,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar at 0x7f0091bfaf20>",
+              "referencia": "<function verificar at 0x7fa54cc6f420>",
               "ejecutable_directamente": true
             },
             {
@@ -12226,7 +12377,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar_salida at 0x7f0091bfafc0>",
+              "referencia": "<function verificar_salida at 0x7fa54cc6f4c0>",
               "ejecutable_directamente": false
             },
             {
@@ -12348,7 +12499,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7f0091bfa5c0>",
+              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7fa54cc6eac0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12365,7 +12516,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cargar_reglas at 0x7f0091bfaac0>",
+              "referencia": "<function _cargar_reglas at 0x7fa54cc6efc0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12382,7 +12533,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _centinela_archivo at 0x7f0091bfaa20>",
+              "referencia": "<function _centinela_archivo at 0x7fa54cc6ef20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12399,7 +12550,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cfg at 0x7f0091bfa340>",
+              "referencia": "<function _cfg at 0x7fa54cc6e840>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12416,7 +12567,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _conflicto_ligaduras at 0x7f0091bfa700>",
+              "referencia": "<function _conflicto_ligaduras at 0x7fa54cc6ec00>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12433,7 +12584,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _descubrir_inventario_total at 0x7f0091bfaca0>",
+              "referencia": "<function _descubrir_inventario_total at 0x7fa54cc6f1a0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12450,7 +12601,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _detectar_choques_reglas at 0x7f0091bfab60>",
+              "referencia": "<function _detectar_choques_reglas at 0x7fa54cc6f060>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12467,7 +12618,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _id_anclado at 0x7f0091bfa840>",
+              "referencia": "<function _id_anclado at 0x7fa54cc6ed40>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12484,7 +12635,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_registro at 0x7f0091bfa660>",
+              "referencia": "<function _normalizar_registro at 0x7fa54cc6eb60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12501,7 +12652,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_tipos_peticion at 0x7f0091bfa520>",
+              "referencia": "<function _normalizar_tipos_peticion at 0x7fa54cc6ea20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12518,7 +12669,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _permite_k at 0x7f0091bfa7a0>",
+              "referencia": "<function _permite_k at 0x7fa54cc6eca0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12535,7 +12686,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _registro_vacio at 0x7f0091bfa3e0>",
+              "referencia": "<function _registro_vacio at 0x7fa54cc6e8e0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12552,7 +12703,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _resolver_capacidades at 0x7f0091bfb4c0>",
+              "referencia": "<function _resolver_capacidades at 0x7fa54cc6fa60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12569,7 +12720,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _truthy_pedir at 0x7f0091bfa480>",
+              "referencia": "<function _truthy_pedir at 0x7fa54cc6e980>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12586,7 +12737,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_clasificacion at 0x7f0091bfa980>",
+              "referencia": "<function _validar_clasificacion at 0x7fa54cc6ee80>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12603,7 +12754,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_contrato at 0x7f0091bfac00>",
+              "referencia": "<function _validar_contrato at 0x7fa54cc6f100>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12620,7 +12771,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_regla_meta at 0x7f0091bfa8e0>",
+              "referencia": "<function _validar_regla_meta at 0x7fa54cc6ede0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12637,7 +12788,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function axiomas at 0x7f0091bfb240>",
+              "referencia": "<function axiomas at 0x7fa54cc6f740>",
               "ejecutable_directamente": true
             },
             {
@@ -12653,7 +12804,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function barrer at 0x7f0091bfae80>",
+              "referencia": "<function barrer at 0x7fa54cc6f380>",
               "ejecutable_directamente": true
             },
             {
@@ -12669,7 +12820,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function centinela at 0x7f0091bfad40>",
+              "referencia": "<function centinela at 0x7fa54cc6f240>",
               "ejecutable_directamente": true
             },
             {
@@ -12685,7 +12836,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function dataclass at 0x7f0091ef2480>",
+              "referencia": "<function dataclass at 0x7fa54ceee480>",
               "ejecutable_directamente": true
             },
             {
@@ -12701,7 +12852,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function diagnostico at 0x7f0091bfb420>",
+              "referencia": "<function diagnostico at 0x7fa54cc6f9c0>",
               "ejecutable_directamente": true
             },
             {
@@ -12717,7 +12868,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function ejecutar at 0x7f0091bfb1a0>",
+              "referencia": "<function ejecutar at 0x7fa54cc6f6a0>",
               "ejecutable_directamente": true
             },
             {
@@ -12733,8 +12884,24 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function es_undefined at 0x7f0091dcf420>",
+              "referencia": "<function es_undefined at 0x7fa54cc28040>",
               "ejecutable_directamente": false
+            },
+            {
+              "nombre": "evaluar_universal",
+              "origen": "vpsi_dinamico_contexto",
+              "modulo": "contexto",
+              "archivo": "__init__.py",
+              "declarado": true,
+              "descubierto": true,
+              "callable": true,
+              "ejecutable": true,
+              "requiere_entrada": false,
+              "tipo": "funcion",
+              "estado": "descubierto",
+              "errores": [],
+              "referencia": "<function evaluar_universal at 0x7fa54cc6f880>",
+              "ejecutable_directamente": true
             },
             {
               "nombre": "field",
@@ -12749,7 +12916,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function field at 0x7f0091ef3ce0>",
+              "referencia": "<function field at 0x7fa54ceefd80>",
               "ejecutable_directamente": true
             },
             {
@@ -12765,7 +12932,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function inventario at 0x7f0091bfb100>",
+              "referencia": "<function inventario at 0x7fa54cc6f600>",
               "ejecutable_directamente": true
             },
             {
@@ -12781,7 +12948,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function recibir_comentarios at 0x7f0091bfb2e0>",
+              "referencia": "<function recibir_comentarios at 0x7fa54cc6f7e0>",
               "ejecutable_directamente": false
             },
             {
@@ -12797,7 +12964,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function registrar_inventario at 0x7f0091bfb060>",
+              "referencia": "<function registrar_inventario at 0x7fa54cc6f560>",
               "ejecutable_directamente": true
             },
             {
@@ -12813,7 +12980,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function reporte at 0x7f0091bfb380>",
+              "referencia": "<function reporte at 0x7fa54cc6f920>",
               "ejecutable_directamente": true
             },
             {
@@ -12829,7 +12996,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function resolver at 0x7f0091bfade0>",
+              "referencia": "<function resolver at 0x7fa54cc6f2e0>",
               "ejecutable_directamente": true
             },
             {
@@ -12845,7 +13012,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar at 0x7f0091bfaf20>",
+              "referencia": "<function verificar at 0x7fa54cc6f420>",
               "ejecutable_directamente": true
             },
             {
@@ -12861,7 +13028,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar_salida at 0x7f0091bfafc0>",
+              "referencia": "<function verificar_salida at 0x7fa54cc6f4c0>",
               "ejecutable_directamente": false
             }
           ],
@@ -13311,7 +13478,7 @@
               "tipo": "constante",
               "estado": "descubierto",
               "errores": [],
-              "representacion": "{'resolver': <function resolver at 0x7f0091bfade0>, 'evaluar': <function resolver at 0x7f0091bfade0>, 'centinela': <function centinela at 0x7f0091bfad40>, 'barrer': <function barrer at 0x7f0091bfae80>"
+              "representacion": "{'resolver': <function resolver at 0x7fa54cc6f2e0>, 'evaluar': <function resolver at 0x7fa54cc6f2e0>, 'centinela': <function centinela at 0x7fa54cc6f240>, 'barrer': <function barrer at 0x7fa54cc6f380>"
             },
             {
               "nombre": "__all__",
@@ -13497,7 +13664,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function axiomas at 0x7f0091bfb240>",
+              "referencia": "<function axiomas at 0x7fa54cc6f740>",
               "ejecutable_directamente": true
             },
             {
@@ -13513,7 +13680,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function barrer at 0x7f0091bfae80>",
+              "referencia": "<function barrer at 0x7fa54cc6f380>",
               "ejecutable_directamente": true
             },
             {
@@ -13529,7 +13696,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function centinela at 0x7f0091bfad40>",
+              "referencia": "<function centinela at 0x7fa54cc6f240>",
               "ejecutable_directamente": true
             },
             {
@@ -13545,7 +13712,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function dataclass at 0x7f0091ef2480>",
+              "referencia": "<function dataclass at 0x7fa54ceee480>",
               "ejecutable_directamente": true
             },
             {
@@ -13561,7 +13728,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function diagnostico at 0x7f0091bfb420>",
+              "referencia": "<function diagnostico at 0x7fa54cc6f9c0>",
               "ejecutable_directamente": true
             },
             {
@@ -13577,7 +13744,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function ejecutar at 0x7f0091bfb1a0>",
+              "referencia": "<function ejecutar at 0x7fa54cc6f6a0>",
               "ejecutable_directamente": true
             },
             {
@@ -13593,8 +13760,24 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function es_undefined at 0x7f0091dcf420>",
+              "referencia": "<function es_undefined at 0x7fa54cc28040>",
               "ejecutable_directamente": false
+            },
+            {
+              "nombre": "evaluar_universal",
+              "origen": "vpsi_dinamico_contexto",
+              "modulo": "contexto",
+              "archivo": "__init__.py",
+              "declarado": true,
+              "descubierto": true,
+              "callable": true,
+              "ejecutable": true,
+              "requiere_entrada": false,
+              "tipo": "funcion",
+              "estado": "descubierto",
+              "errores": [],
+              "referencia": "<function evaluar_universal at 0x7fa54cc6f880>",
+              "ejecutable_directamente": true
             },
             {
               "nombre": "field",
@@ -13609,7 +13792,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function field at 0x7f0091ef3ce0>",
+              "referencia": "<function field at 0x7fa54ceefd80>",
               "ejecutable_directamente": true
             },
             {
@@ -13625,7 +13808,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function inventario at 0x7f0091bfb100>",
+              "referencia": "<function inventario at 0x7fa54cc6f600>",
               "ejecutable_directamente": true
             },
             {
@@ -13641,7 +13824,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function recibir_comentarios at 0x7f0091bfb2e0>",
+              "referencia": "<function recibir_comentarios at 0x7fa54cc6f7e0>",
               "ejecutable_directamente": false
             },
             {
@@ -13657,7 +13840,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function registrar_inventario at 0x7f0091bfb060>",
+              "referencia": "<function registrar_inventario at 0x7fa54cc6f560>",
               "ejecutable_directamente": true
             },
             {
@@ -13673,7 +13856,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function reporte at 0x7f0091bfb380>",
+              "referencia": "<function reporte at 0x7fa54cc6f920>",
               "ejecutable_directamente": true
             },
             {
@@ -13689,7 +13872,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function resolver at 0x7f0091bfade0>",
+              "referencia": "<function resolver at 0x7fa54cc6f2e0>",
               "ejecutable_directamente": true
             },
             {
@@ -13705,7 +13888,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar at 0x7f0091bfaf20>",
+              "referencia": "<function verificar at 0x7fa54cc6f420>",
               "ejecutable_directamente": true
             },
             {
@@ -13721,12 +13904,12 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar_salida at 0x7f0091bfafc0>",
+              "referencia": "<function verificar_salida at 0x7fa54cc6f4c0>",
               "ejecutable_directamente": false
             }
           ],
-          "total_componentes": 75,
-          "total_ejecutables": 15
+          "total_componentes": 76,
+          "total_ejecutables": 16
         }
       }
     },
@@ -13834,6 +14017,7 @@
           "reporte": true,
           "validar_esquema": true,
           "acceso_archivos": true,
+          "evaluar_universal": true,
           "ejecutar_total": true,
           "inspeccionar": true,
           "registrar_inventario": true
@@ -13844,6 +14028,7 @@
           "diagnostico",
           "ejecutar_total",
           "evaluar",
+          "evaluar_universal",
           "inspeccionar",
           "inventario",
           "listar_mecanicas",
@@ -13984,6 +14169,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -14050,6 +14246,7 @@
             "diagnostico",
             "ejecutar_total",
             "evaluar",
+            "evaluar_universal",
             "inspeccionar",
             "inventario",
             "listar_mecanicas",
@@ -14255,6 +14452,7 @@
             "diagnostico",
             "ejecutar_total",
             "evaluar",
+            "evaluar_universal",
             "inspeccionar",
             "inventario",
             "listar_mecanicas",
@@ -14392,7 +14590,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "censo",
@@ -14405,7 +14604,8 @@
           "diagnostico",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "censo": {
@@ -14528,6 +14728,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -14565,7 +14776,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "nota": "DGCO observa por conteo; no invalida arranque por sí solo."
         },
@@ -14598,7 +14810,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "regla": "por módulo: faltantes==0 y total>0 → OPERATIVO; global = suma de conteos",
           "requiere": [
@@ -14744,7 +14957,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -14764,7 +14978,8 @@
           "inyectar_en_peticion",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -14964,6 +15179,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -15003,6 +15229,7 @@
             "definir",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "inspeccionar",
             "inventario",
             "inyectar_en_peticion",
@@ -15091,6 +15318,7 @@
             "definir",
             "diagnostico",
             "ejecutar_total",
+            "evaluar_universal",
             "inspeccionar",
             "inventario",
             "inyectar_en_peticion",
@@ -15189,22 +15417,22 @@
         "id": "FO",
         "nombre": "formulas",
         "rol": "FO",
-        "version": "1.1",
+        "version": "2.0",
         "version_contrato": "1.0",
         "esquema": "VPSI-CONTRACT-1.0",
         "estabilidad": "ESTABLE",
         "compatible_desde": "1.0",
         "api_engine": ">=1.0",
-        "descripcion": "Contenedor de fórmulas. Rol FO. Expone y ejecuta tru_ri y tru_total, y cualquier fórmula descubierta en los archivos del módulo. Sin límites artificiales sobre C, L, K.",
-        "funcion": "Ser la fuente oficial de las fórmulas de verdad: descubrir archivos del módulo, registrar fórmulas, evaluar tru_ri(C,L,K) y tru_total(C,L,K), validar coherencia.",
+        "descripcion": "Contenedor de fórmulas. Expone y ejecuta tru_ri y tru_total y cualquier fórmula descubierta en los archivos del módulo. ALPHA y BETA se resuelven exclusivamente desde modules.constante.",
+        "funcion": "Ser la fuente oficial de las fórmulas de verdad: descubrir archivos, registrar fórmulas, evaluar tru_ri(C,L,K) y tru_total(C,L,K), validar coherencia.",
         "no_hace": [
           "No calcula C, L, K (los recibe como entrada)",
-          "No clasifica entrada de usuario (eso es CX)",
+          "No clasifica entrada de usuario",
           "No orquesta el sistema (eso es Engine)",
           "No modifica otros módulos"
         ],
         "autoridad": [
-          "Ejecutar cualquier fórmula registrada o descubierta en el módulo",
+          "Ejecutar cualquier fórmula registrada o descubierta",
           "Calcular tru_ri y tru_total para cualquier C, L, K válidos",
           "Leer y ejecutar todos los archivos .py del módulo",
           "Reportar estado, inventario y diagnóstico propios"
@@ -15230,7 +15458,24 @@
           "listar_declaraciones"
         ],
         "requiere": [
-          "*"
+          "CE",
+          "AX",
+          "MC",
+          "SF",
+          "CA",
+          "CX",
+          "DI",
+          "RE",
+          "VX",
+          "TX",
+          "CH",
+          "CIT",
+          "DGCO",
+          "UI",
+          "CC",
+          "TT",
+          "SC",
+          "CT"
         ],
         "autoriza_engine": {
           "leer": true,
@@ -15270,7 +15515,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -15286,7 +15532,8 @@
           "listar_formulas",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -15301,29 +15548,29 @@
             ]
           },
           "barrer": {
-            "descripcion": "Ejecuta todas las reglas y reporta faltas de coherencia.",
+            "descripcion": "Barrido universal de todas las fórmulas del módulo.",
             "entrada": "*",
             "validar_esquema": [
               "*"
             ],
-            "salida": "dict con estado, coherente, faltas, reglas, formulas",
+            "salida": "dict con estado, coherente, faltas, formulas, verdad",
             "acceso_archivos": [
               "*"
             ]
           },
           "evaluar": {
-            "descripcion": "Alias de barrer. Evalúa coherencia del módulo.",
+            "descripcion": "Alias de barrer.",
             "entrada": "*",
             "validar_esquema": [
               "*"
             ],
-            "salida": "dict con estado, coherente, faltas, reglas, formulas",
+            "salida": "dict con estado, coherente, faltas, formulas",
             "acceso_archivos": [
               "*"
             ]
           },
           "verificar_salida": {
-            "descripcion": "Comprueba si una salida de barrer es coherente.",
+            "descripcion": "Comprueba forma mínima de una salida de barrer.",
             "entrada": "*",
             "validar_esquema": [
               "*"
@@ -15334,113 +15581,124 @@
             ]
           },
           "inventario": {
-            "descripcion": "Inventario de fórmulas descubiertas y registradas.",
+            "descripcion": "Inventario completo de fórmulas descubiertas y registradas.",
             "entrada": "*",
             "validar_esquema": [
               "*"
             ],
-            "salida": "dict con formulas, formulas_registradas, reglas, declaraciones",
+            "salida": "dict con formulas, verdad, reglas, declaraciones",
             "acceso_archivos": [
               "*"
             ]
           },
           "axiomas": {
-            "descripcion": "Declaraciones FO registradas (FO-1..FO-4).",
+            "descripcion": "Declaraciones FO-1 a FO-4.",
             "entrada": "*",
             "validar_esquema": [
               "*"
             ],
-            "salida": "list[dict] de declaraciones",
+            "salida": "list[dict]",
             "acceso_archivos": [
               "*"
             ]
           },
           "tru_ri": {
-            "descripcion": "Calcula Tru_Ri = C * L * K. Sin límites artificiales sobre los valores de C, L, K.",
-            "entrada": "*",
+            "descripcion": "Calcula Tru_Ri = C * L * K sin límites artificiales.",
+            "entrada": "C, L, K (Fraction)",
             "validar_esquema": [
               "*"
             ],
-            "salida": "resultado de C * L * K",
+            "salida": "Fraction",
             "acceso_archivos": [
               "*"
             ]
           },
           "tru_total": {
-            "descripcion": "Calcula Tru_total = (Tru_Ri * ALPHA) + BETA. Sin límites artificiales sobre C, L, K.",
-            "entrada": "*",
+            "descripcion": "Calcula Tru_total = (Tru_Ri * ALPHA) + BETA.",
+            "entrada": "C, L, K (Fraction)",
             "validar_esquema": [
               "*"
             ],
-            "salida": "resultado de (C*L*K)*ALPHA + BETA",
+            "salida": "Fraction",
             "acceso_archivos": [
               "*"
             ]
           },
           "reporte": {
-            "descripcion": "Reporte interno de estado del módulo FO.",
+            "descripcion": "Reporte de estado del módulo FO.",
             "entrada": "*",
             "validar_esquema": [
               "*"
             ],
-            "salida": "dict con estado, coherente, formulas, faltas, capacidades",
+            "salida": "dict con estado, coherente, formulas, faltas",
             "acceso_archivos": [
               "*"
             ]
           },
           "diagnostico": {
-            "descripcion": "Diagnóstico: qué falta, qué está mal en FO.",
+            "descripcion": "Diagnóstico de faltas y recomendaciones.",
             "entrada": "*",
             "validar_esquema": [
               "*"
             ],
-            "salida": "dict con estado, problemas, advertencias, recomendaciones",
+            "salida": "dict con problemas, advertencias, recomendaciones",
             "acceso_archivos": [
               "*"
             ]
           },
           "listar_formulas": {
-            "descripcion": "Lista todas las fórmulas descubiertas y registradas.",
+            "descripcion": "Lista todas las fórmulas existentes.",
             "entrada": "*",
             "validar_esquema": [
               "*"
             ],
-            "salida": "dict con descubiertas y registradas",
+            "salida": "dict con descubiertas, registradas, todas, verdad",
             "acceso_archivos": [
               "*"
             ]
           },
           "ejecutar_total": {
-            "descripcion": "Autoridad total de ENGINE sobre FO. Ejerce TODAS las unidades operativamente ejecutables del módulo conforme a su contrato e inventario. Todo es callable real. No inventa capacidades.",
+            "descripcion": "Autoridad total de Engine. Ejecuta todas las capacidades reales.",
             "entrada": "peticion opcional (dict)",
             "validar_esquema": [
               "*"
             ],
-            "salida": "dict con resultados de todas las unidades ejecutadas",
+            "salida": "dict con resultados de todas las unidades",
             "acceso_archivos": [
               "*"
             ]
           },
           "inspeccionar": {
-            "descripcion": "Capacidad meta de inspeccion estructural de FO. Expone constantes, capacidades, formulas y estado sin alterar el contrato ni calcular.",
+            "descripcion": "Inspección estructural sin calcular ni alterar.",
             "entrada": "peticion opcional (dict)",
             "validar_esquema": [
-              "acceso_archivos"
+              "*"
             ],
-            "salida": "dict con estructura, capacidades y estado del modulo",
+            "salida": "dict con estructura, capacidades y estado",
             "acceso_archivos": [
-              "acceso_archivos"
+              "*"
             ]
           },
           "registrar_inventario": {
-            "descripcion": "Registra el inventario estructural de FO como instantanea determinista. No altera evidencia.",
+            "descripcion": "Instantánea determinista del inventario.",
             "entrada": "peticion opcional (dict)",
             "validar_esquema": [
-              "acceso_archivos"
+              "*"
             ],
             "salida": "dict con inventario registrado",
             "acceso_archivos": [
-              "acceso_archivos"
+              "*"
+            ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa capacidades reales cuya firma se satisfaga con los hechos.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
             ]
           }
         },
@@ -15455,13 +15713,14 @@
           "el rol nunca cambia",
           "las capacidades declaradas son siempre callables tras la resolución",
           "este módulo no modifica el estado de otros módulos",
-          "tru_ri y tru_total no imponen límites artificiales sobre C, L, K"
+          "tru_ri y tru_total no imponen límites artificiales sobre C, L, K",
+          "ALPHA y BETA provienen exclusivamente de modules.constante"
         ],
         "reporte": {
           "id": "FO",
           "modulo": "formulas",
           "rol": "FO",
-          "version": "1.1",
+          "version": "2.0",
           "version_contrato": "1.0",
           "esquema": "VPSI-CONTRACT-1.0",
           "estabilidad": "ESTABLE",
@@ -15469,8 +15728,10 @@
           "coherente": true,
           "faltas": [],
           "formulas": [
+            "escala",
             "tru_ri",
-            "tru_total"
+            "tru_total",
+            "verdad"
           ],
           "reglas": [
             "_validar_piso_formulas",
@@ -15490,13 +15751,31 @@
             "listar_formulas",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
-            "*"
+            "CE",
+            "AX",
+            "MC",
+            "SF",
+            "CA",
+            "CX",
+            "DI",
+            "RE",
+            "VX",
+            "TX",
+            "CH",
+            "CIT",
+            "DGCO",
+            "UI",
+            "CC",
+            "TT",
+            "SC",
+            "CT"
           ],
           "autoridad": [
-            "Ejecutar cualquier fórmula registrada o descubierta en el módulo",
+            "Ejecutar cualquier fórmula registrada o descubierta",
             "Calcular tru_ri y tru_total para cualquier C, L, K válidos",
             "Leer y ejecutar todos los archivos .py del módulo",
             "Reportar estado, inventario y diagnóstico propios"
@@ -15520,12 +15799,7 @@
             "verificar_coherencia",
             "listar_formulas",
             "listar_declaraciones"
-          ],
-          "operaciones_arquitectonicas": {
-            "ejecutar_total": true,
-            "inspeccionar": true,
-            "registrar_inventario": true
-          }
+          ]
         },
         "diagnostico": {
           "id": "FO",
@@ -15536,17 +15810,23 @@
           "recomendaciones": [],
           "coherente": true,
           "faltas_n": 0,
-          "formulas_n": 2
+          "formulas_n": 4
         },
         "inventario": {
           "id": "FO",
           "nombre": "formulas",
           "rol": "FO",
-          "version": "1.1",
+          "version": "2.0",
           "version_contrato": "1.0",
           "esquema": "VPSI-CONTRACT-1.0",
           "estabilidad": "ESTABLE",
-          "formulas": {
+          "formulas": [
+            "escala",
+            "tru_ri",
+            "tru_total",
+            "verdad"
+          ],
+          "formulas_descubiertas": {
             "escala": {
               "archivo": "f_escala.py",
               "expresion": "display(v) = fraccion(v) = decimal(v)",
@@ -15562,6 +15842,11 @@
             "tru_ri",
             "tru_total"
           ],
+          "total_formulas": 4,
+          "verdad": {
+            "tru_ri": true,
+            "tru_total": true
+          },
           "reglas": 2,
           "declaraciones": 4,
           "capacidades": [
@@ -15578,17 +15863,36 @@
             "listar_formulas",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
-            "*"
+            "CE",
+            "AX",
+            "MC",
+            "SF",
+            "CA",
+            "CX",
+            "DI",
+            "RE",
+            "VX",
+            "TX",
+            "CH",
+            "CIT",
+            "DGCO",
+            "UI",
+            "CC",
+            "TT",
+            "SC",
+            "CT"
           ],
           "invariantes": [
             "el id del módulo nunca cambia",
             "el rol nunca cambia",
             "las capacidades declaradas son siempre callables tras la resolución",
             "este módulo no modifica el estado de otros módulos",
-            "tru_ri y tru_total no imponen límites artificiales sobre C, L, K"
+            "tru_ri y tru_total no imponen límites artificiales sobre C, L, K",
+            "ALPHA y BETA provienen exclusivamente de modules.constante"
           ]
         }
       }
@@ -15704,7 +16008,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -15716,7 +16021,8 @@
           "inventario_paquetes",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -15828,6 +16134,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -15889,7 +16206,8 @@
             "inventario_paquetes",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "estados_operacion": [
             "PROPUESTO",
@@ -16007,7 +16325,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -16019,6 +16338,7 @@
           "registrar_resultado_dominio",
           "ejecutar_total",
           "inspeccionar",
+          "evaluar_universal",
           "registrar_inventario"
         ],
         "capacidades_meta": {
@@ -16131,6 +16451,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -16169,6 +16500,7 @@
             "registrar_resultado_dominio",
             "ejecutar_total",
             "inspeccionar",
+            "evaluar_universal",
             "registrar_inventario"
           ],
           "requiere": [
@@ -16251,6 +16583,7 @@
             "registrar_resultado_dominio",
             "ejecutar_total",
             "inspeccionar",
+            "evaluar_universal",
             "registrar_inventario"
           ],
           "requiere": [
@@ -16455,7 +16788,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -16471,7 +16805,8 @@
           "diagnostico",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -16627,6 +16962,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -16680,7 +17026,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -16742,6 +17089,7 @@
             "ejecutar_total",
             "elegir",
             "estado_self",
+            "evaluar_universal",
             "inspeccionar",
             "inventario",
             "oscilar",
@@ -16892,7 +17240,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -16904,7 +17253,8 @@
           "catalogo",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -17016,6 +17366,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -17054,7 +17415,8 @@
             "catalogo",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -17121,7 +17483,8 @@
             "catalogo",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -17309,7 +17672,8 @@
           "diagnostico",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "requiere": [
           "CE",
@@ -17367,6 +17731,7 @@
           "reporte": true,
           "validar_esquema": true,
           "acceso_archivos": true,
+          "evaluar_universal": true,
           "ejecutar_total": true,
           "inspeccionar": true,
           "registrar_inventario": true
@@ -17382,7 +17747,8 @@
           "diagnostico",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -17505,6 +17871,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -17544,7 +17921,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -17631,7 +18009,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -17895,7 +18274,8 @@
           "acceso_archivos": true,
           "ejecutar_total": true,
           "inspeccionar": true,
-          "registrar_inventario": true
+          "registrar_inventario": true,
+          "evaluar_universal": true
         },
         "capacidades": [
           "verificar",
@@ -17909,7 +18289,8 @@
           "diagnostico",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -18043,6 +18424,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -18091,7 +18483,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "requiere": [
             "CE",
@@ -18172,7 +18565,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "catalogo": {
             "modulo": "tru_totales",
@@ -18414,6 +18808,7 @@
           "reporte": true,
           "validar_esquema": true,
           "acceso_archivos": true,
+          "evaluar_universal": true,
           "ejecutar_total": true,
           "inspeccionar": true,
           "registrar_inventario": true
@@ -18428,7 +18823,8 @@
           "diagnostico",
           "ejecutar_total",
           "inspeccionar",
-          "registrar_inventario"
+          "registrar_inventario",
+          "evaluar_universal"
         ],
         "capacidades_meta": {
           "verificar": {
@@ -18540,6 +18936,17 @@
             "acceso_archivos": [
               "acceso_archivos"
             ]
+          },
+          "evaluar_universal": {
+            "descripcion": "Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.",
+            "entrada": "hechos: dict",
+            "validar_esquema": [
+              "*"
+            ],
+            "salida": "dict con hechos, traza, ejecutadas",
+            "acceso_archivos": [
+              "*"
+            ]
           }
         },
         "estados_validos": [
@@ -18584,7 +18991,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "jurisdiccion": [
             "codigo",
@@ -18655,7 +19063,8 @@
             "diagnostico",
             "ejecutar_total",
             "inspeccionar",
-            "registrar_inventario"
+            "registrar_inventario",
+            "evaluar_universal"
           ],
           "funcion": "Autoridad de verificación estructural. Determina si una estructura satisface o viola reglas formales. Solo produce evidencia. No interpreta, no corrige, no ejecuta.",
           "jurisdiccion": [
@@ -18953,43 +19362,24 @@
             "CT"
           ],
           "formulas": [
-            "AX",
-            "CA",
-            "CC",
             "CE",
+            "AX",
+            "MC",
+            "SF",
+            "CA",
+            "CX",
+            "DI",
+            "RE",
+            "VX",
+            "TX",
             "CH",
             "CIT",
-            "CT",
-            "CX",
             "DGCO",
-            "DI",
-            "FO",
-            "MC",
-            "RE",
-            "SC",
-            "SF",
-            "TT",
-            "TX",
             "UI",
-            "VX",
-            "axiomas",
-            "cache",
-            "calculator",
-            "capacidades_engine",
-            "catalogo_citaciones",
-            "citacion",
-            "constante",
-            "contexto",
-            "correlacion_mecanica",
-            "diagnosticoD",
-            "diccionario",
-            "interfaz",
-            "realidad",
-            "self",
-            "spartaco_seguridad",
-            "taxonomia",
-            "tru_totales",
-            "verificacion"
+            "CC",
+            "TT",
+            "SC",
+            "CT"
           ],
           "interfaz": [
             "CE",
@@ -19266,6 +19656,12 @@
             "modulo": "axiomas"
           },
           {
+            "id": "axiomas.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "axiomas"
+          },
+          {
             "id": "CH",
             "nombre": "cache",
             "rol": "CH",
@@ -19428,6 +19824,12 @@
             "modulo": "cache"
           },
           {
+            "id": "cache.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "cache"
+          },
+          {
             "id": "CA",
             "nombre": "calculator",
             "rol": "CA",
@@ -19554,6 +19956,12 @@
             "modulo": "calculator"
           },
           {
+            "id": "calculator.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "calculator"
+          },
+          {
             "id": "CE",
             "nombre": "capacidades_engine",
             "rol": "CE",
@@ -19638,6 +20046,12 @@
             "modulo": "capacidades_engine"
           },
           {
+            "id": "capacidades_engine.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "capacidades_engine"
+          },
+          {
             "id": "CC",
             "nombre": "catalogo_citaciones",
             "rol": "CC",
@@ -19718,6 +20132,12 @@
           {
             "id": "catalogo_citaciones.registrar_inventario",
             "nombre": "registrar_inventario",
+            "tipo": "capacidad",
+            "modulo": "catalogo_citaciones"
+          },
+          {
+            "id": "catalogo_citaciones.evaluar_universal",
+            "nombre": "evaluar_universal",
             "tipo": "capacidad",
             "modulo": "catalogo_citaciones"
           },
@@ -19854,6 +20274,12 @@
             "modulo": "citacion"
           },
           {
+            "id": "citacion.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "citacion"
+          },
+          {
             "id": "CT",
             "nombre": "constante",
             "rol": "CT",
@@ -19892,6 +20318,12 @@
           {
             "id": "constante.ejecutar_total",
             "nombre": "ejecutar_total",
+            "tipo": "capacidad",
+            "modulo": "constante"
+          },
+          {
+            "id": "constante.evaluar_universal",
+            "nombre": "evaluar_universal",
             "tipo": "capacidad",
             "modulo": "constante"
           },
@@ -20022,6 +20454,12 @@
             "modulo": "contexto"
           },
           {
+            "id": "contexto.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "contexto"
+          },
+          {
             "id": "MC",
             "nombre": "correlacion_mecanica",
             "rol": "MC",
@@ -20054,6 +20492,12 @@
           {
             "id": "correlacion_mecanica.evaluar",
             "nombre": "evaluar",
+            "tipo": "capacidad",
+            "modulo": "correlacion_mecanica"
+          },
+          {
+            "id": "correlacion_mecanica.evaluar_universal",
+            "nombre": "evaluar_universal",
             "tipo": "capacidad",
             "modulo": "correlacion_mecanica"
           },
@@ -20172,6 +20616,12 @@
             "modulo": "diagnosticoD"
           },
           {
+            "id": "diagnosticoD.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "diagnosticoD"
+          },
+          {
             "id": "DI",
             "nombre": "diccionario",
             "rol": "DI",
@@ -20286,6 +20736,12 @@
             "modulo": "diccionario"
           },
           {
+            "id": "diccionario.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "diccionario"
+          },
+          {
             "id": "FO",
             "nombre": "formulas",
             "rol": "FO",
@@ -20376,6 +20832,12 @@
             "modulo": "formulas"
           },
           {
+            "id": "formulas.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "formulas"
+          },
+          {
             "id": "UI",
             "nombre": "interfaz",
             "rol": "UI",
@@ -20442,6 +20904,12 @@
             "modulo": "interfaz"
           },
           {
+            "id": "interfaz.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "interfaz"
+          },
+          {
             "id": "RE",
             "nombre": "realidad",
             "rol": "RE",
@@ -20498,6 +20966,12 @@
           {
             "id": "realidad.inspeccionar",
             "nombre": "inspeccionar",
+            "tipo": "capacidad",
+            "modulo": "realidad"
+          },
+          {
+            "id": "realidad.evaluar_universal",
+            "nombre": "evaluar_universal",
             "tipo": "capacidad",
             "modulo": "realidad"
           },
@@ -20598,6 +21072,12 @@
             "modulo": "self"
           },
           {
+            "id": "self.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "self"
+          },
+          {
             "id": "SC",
             "nombre": "spartaco_seguridad",
             "rol": "SC",
@@ -20660,6 +21140,12 @@
           {
             "id": "spartaco_seguridad.registrar_inventario",
             "nombre": "registrar_inventario",
+            "tipo": "capacidad",
+            "modulo": "spartaco_seguridad"
+          },
+          {
+            "id": "spartaco_seguridad.evaluar_universal",
+            "nombre": "evaluar_universal",
             "tipo": "capacidad",
             "modulo": "spartaco_seguridad"
           },
@@ -20732,6 +21218,12 @@
           {
             "id": "taxonomia.registrar_inventario",
             "nombre": "registrar_inventario",
+            "tipo": "capacidad",
+            "modulo": "taxonomia"
+          },
+          {
+            "id": "taxonomia.evaluar_universal",
+            "nombre": "evaluar_universal",
             "tipo": "capacidad",
             "modulo": "taxonomia"
           },
@@ -20814,6 +21306,12 @@
             "modulo": "tru_totales"
           },
           {
+            "id": "tru_totales.evaluar_universal",
+            "nombre": "evaluar_universal",
+            "tipo": "capacidad",
+            "modulo": "tru_totales"
+          },
+          {
             "id": "VX",
             "nombre": "verificacion",
             "rol": "VX",
@@ -20876,6 +21374,12 @@
           {
             "id": "verificacion.registrar_inventario",
             "nombre": "registrar_inventario",
+            "tipo": "capacidad",
+            "modulo": "verificacion"
+          },
+          {
+            "id": "verificacion.evaluar_universal",
+            "nombre": "evaluar_universal",
             "tipo": "capacidad",
             "modulo": "verificacion"
           }
@@ -21049,6 +21553,11 @@
           {
             "from": "axiomas",
             "to": "axiomas.inspeccionar",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "axiomas",
+            "to": "axiomas.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -21272,6 +21781,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "cache",
+            "to": "cache.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "calculator",
             "to": "CT",
             "tipo": "requiere"
@@ -21462,6 +21976,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "calculator",
+            "to": "calculator.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "capacidades_engine",
             "to": "AX",
             "tipo": "requiere"
@@ -21612,6 +22131,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "capacidades_engine",
+            "to": "capacidades_engine.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "catalogo_citaciones",
             "to": "CE",
             "tipo": "requiere"
@@ -21759,6 +22283,11 @@
           {
             "from": "catalogo_citaciones",
             "to": "catalogo_citaciones.registrar_inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "catalogo_citaciones",
+            "to": "catalogo_citaciones.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -21962,6 +22491,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "citacion",
+            "to": "citacion.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "constante",
             "to": "CE",
             "tipo": "requiere"
@@ -22079,6 +22613,11 @@
           {
             "from": "constante",
             "to": "constante.ejecutar_total",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "constante",
+            "to": "constante.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -22272,6 +22811,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "contexto",
+            "to": "contexto.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "correlacion_mecanica",
             "to": "CE",
             "tipo": "requiere"
@@ -22388,6 +22932,11 @@
           },
           {
             "from": "correlacion_mecanica",
+            "to": "correlacion_mecanica.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "correlacion_mecanica",
             "to": "correlacion_mecanica.inspeccionar",
             "tipo": "declara_capacidad"
           },
@@ -22479,6 +23028,11 @@
           {
             "from": "diagnosticoD",
             "to": "diagnosticoD.registrar_inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "diagnosticoD",
+            "to": "diagnosticoD.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -22662,8 +23216,98 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "diccionario",
+            "to": "diccionario.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "formulas",
-            "to": "*",
+            "to": "CE",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "AX",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "MC",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "SF",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "CA",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "CX",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "DI",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "RE",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "VX",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "TX",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "CH",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "CIT",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "DGCO",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "UI",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "CC",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "TT",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "SC",
+            "tipo": "requiere"
+          },
+          {
+            "from": "formulas",
+            "to": "CT",
             "tipo": "requiere"
           },
           {
@@ -22734,6 +23378,11 @@
           {
             "from": "formulas",
             "to": "formulas.registrar_inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "formulas",
+            "to": "formulas.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -22877,6 +23526,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "interfaz",
+            "to": "interfaz.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "realidad",
             "to": "CE",
             "tipo": "requiere"
@@ -23009,6 +23663,11 @@
           {
             "from": "realidad",
             "to": "realidad.inspeccionar",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "realidad",
+            "to": "realidad.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -23177,6 +23836,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "self",
+            "to": "self.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "spartaco_seguridad",
             "to": "CE",
             "tipo": "requiere"
@@ -23314,6 +23978,11 @@
           {
             "from": "spartaco_seguridad",
             "to": "spartaco_seguridad.registrar_inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "spartaco_seguridad",
+            "to": "spartaco_seguridad.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -23459,6 +24128,11 @@
           {
             "from": "taxonomia",
             "to": "taxonomia.registrar_inventario",
+            "tipo": "declara_capacidad"
+          },
+          {
+            "from": "taxonomia",
+            "to": "taxonomia.evaluar_universal",
             "tipo": "declara_capacidad"
           },
           {
@@ -23612,6 +24286,11 @@
             "tipo": "declara_capacidad"
           },
           {
+            "from": "tru_totales",
+            "to": "tru_totales.evaluar_universal",
+            "tipo": "declara_capacidad"
+          },
+          {
             "from": "verificacion",
             "to": "CE",
             "tipo": "requiere"
@@ -23750,6 +24429,11 @@
             "from": "verificacion",
             "to": "verificacion.registrar_inventario",
             "tipo": "declara_capacidad"
+          },
+          {
+            "from": "verificacion",
+            "to": "verificacion.evaluar_universal",
+            "tipo": "declara_capacidad"
           }
         ]
       }
@@ -23761,135 +24445,135 @@
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-19T23:55:09.663366+00:00",
+          "timestamp": "2026-08-20T06:12:40.388047+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.008881
+          "duracion_s": 0.014913
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-19T23:55:09.671774+00:00",
+          "timestamp": "2026-08-20T06:12:40.401892+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.008351
+          "duracion_s": 0.013768
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-19T23:55:09.680270+00:00",
+          "timestamp": "2026-08-20T06:12:40.415680+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.008436
+          "duracion_s": 0.013708
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-19T23:55:09.680323+00:00",
+          "timestamp": "2026-08-20T06:12:40.415763+00:00",
           "modulo": "cache",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 1.3e-05
+          "duracion_s": 2.4e-05
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-19T23:55:09.680350+00:00",
+          "timestamp": "2026-08-20T06:12:40.415807+00:00",
           "modulo": "cache",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 5e-06
+          "duracion_s": 9e-06
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-19T23:55:09.838944+00:00",
+          "timestamp": "2026-08-20T06:12:40.720795+00:00",
           "modulo": "cache",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.158565
+          "duracion_s": 0.30494
         },
         {
           "id_traza": 7,
-          "timestamp": "2026-08-19T23:55:09.839381+00:00",
+          "timestamp": "2026-08-20T06:12:40.721556+00:00",
           "modulo": "calculator",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000393
+          "duracion_s": 0.000694
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-19T23:55:09.839677+00:00",
+          "timestamp": "2026-08-20T06:12:40.722139+00:00",
           "modulo": "calculator",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000272
+          "duracion_s": 0.000546
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-19T23:55:09.839989+00:00",
+          "timestamp": "2026-08-20T06:12:40.722747+00:00",
           "modulo": "calculator",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000284
+          "duracion_s": 0.000563
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-19T23:55:09.840648+00:00",
+          "timestamp": "2026-08-20T06:12:40.723847+00:00",
           "modulo": "capacidades_engine",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000641
+          "duracion_s": 0.00106
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-19T23:55:09.840806+00:00",
+          "timestamp": "2026-08-20T06:12:40.724134+00:00",
           "modulo": "capacidades_engine",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000133
+          "duracion_s": 0.000252
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-19T23:55:09.841048+00:00",
+          "timestamp": "2026-08-20T06:12:40.724614+00:00",
           "modulo": "capacidades_engine",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000217
+          "duracion_s": 0.000441
         },
         {
           "id_traza": 13,
-          "timestamp": "2026-08-19T23:55:09.842481+00:00",
+          "timestamp": "2026-08-20T06:12:40.726967+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001412
+          "duracion_s": 0.002319
         },
         {
           "id_traza": 14,
-          "timestamp": "2026-08-19T23:55:09.843394+00:00",
+          "timestamp": "2026-08-20T06:12:40.728738+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000879
+          "duracion_s": 0.001732
         },
         {
           "id_traza": 15,
-          "timestamp": "2026-08-19T23:55:09.844267+00:00",
+          "timestamp": "2026-08-20T06:12:40.730431+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000841
+          "duracion_s": 0.001625
         },
         {
           "id_traza": 16,
-          "timestamp": "2026-08-19T23:55:09.844296+00:00",
+          "timestamp": "2026-08-20T06:12:40.730480+00:00",
           "modulo": "citacion",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 2e-06
+          "duracion_s": 4e-06
         },
         {
           "id_traza": 17,
-          "timestamp": "2026-08-19T23:55:09.844313+00:00",
+          "timestamp": "2026-08-20T06:12:40.730509+00:00",
           "modulo": "citacion",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -23897,95 +24581,95 @@
         },
         {
           "id_traza": 18,
-          "timestamp": "2026-08-19T23:55:09.844329+00:00",
+          "timestamp": "2026-08-20T06:12:40.730538+00:00",
           "modulo": "citacion",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 2e-06
+          "duracion_s": 5e-06
         },
         {
           "id_traza": 19,
-          "timestamp": "2026-08-19T23:55:09.844787+00:00",
+          "timestamp": "2026-08-20T06:12:40.731787+00:00",
           "modulo": "constante",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000444
+          "duracion_s": 0.001223
         },
         {
           "id_traza": 20,
-          "timestamp": "2026-08-19T23:55:09.844874+00:00",
+          "timestamp": "2026-08-20T06:12:40.731947+00:00",
           "modulo": "constante",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 6.5e-05
+          "duracion_s": 0.000118
         },
         {
           "id_traza": 21,
-          "timestamp": "2026-08-19T23:55:09.844937+00:00",
+          "timestamp": "2026-08-20T06:12:40.732079+00:00",
           "modulo": "constante",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 4.5e-05
+          "duracion_s": 9.8e-05
         },
         {
           "id_traza": 22,
-          "timestamp": "2026-08-19T23:55:09.854127+00:00",
+          "timestamp": "2026-08-20T06:12:40.747428+00:00",
           "modulo": "contexto",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.009171
+          "duracion_s": 0.015315
         },
         {
           "id_traza": 23,
-          "timestamp": "2026-08-19T23:55:09.854846+00:00",
+          "timestamp": "2026-08-20T06:12:40.748707+00:00",
           "modulo": "contexto",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000684
+          "duracion_s": 0.00123
         },
         {
           "id_traza": 24,
-          "timestamp": "2026-08-19T23:55:09.856699+00:00",
+          "timestamp": "2026-08-20T06:12:40.751988+00:00",
           "modulo": "contexto",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001795
+          "duracion_s": 0.003236
         },
         {
           "id_traza": 25,
-          "timestamp": "2026-08-19T23:55:09.880326+00:00",
+          "timestamp": "2026-08-20T06:12:40.790278+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.023598
+          "duracion_s": 0.038248
         },
         {
           "id_traza": 26,
-          "timestamp": "2026-08-19T23:55:09.896722+00:00",
+          "timestamp": "2026-08-20T06:12:40.822930+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.01635
+          "duracion_s": 0.032575
         },
         {
           "id_traza": 27,
-          "timestamp": "2026-08-19T23:55:09.913917+00:00",
+          "timestamp": "2026-08-20T06:12:40.851987+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.017146
+          "duracion_s": 0.028969
         },
         {
           "id_traza": 28,
-          "timestamp": "2026-08-19T23:55:09.913965+00:00",
+          "timestamp": "2026-08-20T06:12:40.852065+00:00",
           "modulo": "diagnosticoD",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 2e-06
+          "duracion_s": 4e-06
         },
         {
           "id_traza": 29,
-          "timestamp": "2026-08-19T23:55:09.913982+00:00",
+          "timestamp": "2026-08-20T06:12:40.852097+00:00",
           "modulo": "diagnosticoD",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -23993,199 +24677,199 @@
         },
         {
           "id_traza": 30,
-          "timestamp": "2026-08-19T23:55:09.913996+00:00",
+          "timestamp": "2026-08-20T06:12:40.852122+00:00",
           "modulo": "diagnosticoD",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 2e-06
+          "duracion_s": 3e-06
         },
         {
           "id_traza": 31,
-          "timestamp": "2026-08-19T23:55:09.915951+00:00",
+          "timestamp": "2026-08-20T06:12:40.855925+00:00",
           "modulo": "diccionario",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001942
+          "duracion_s": 0.00378
         },
         {
           "id_traza": 32,
-          "timestamp": "2026-08-19T23:55:09.915991+00:00",
+          "timestamp": "2026-08-20T06:12:40.855982+00:00",
           "modulo": "diccionario",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 1.1e-05
+          "duracion_s": 1.6e-05
         },
         {
           "id_traza": 33,
-          "timestamp": "2026-08-19T23:55:09.916023+00:00",
+          "timestamp": "2026-08-20T06:12:40.856034+00:00",
           "modulo": "diccionario",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 1e-05
+          "duracion_s": 1.7e-05
         },
         {
           "id_traza": 34,
-          "timestamp": "2026-08-19T23:55:09.916660+00:00",
+          "timestamp": "2026-08-20T06:12:40.857547+00:00",
           "modulo": "formulas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000622
+          "duracion_s": 0.001486
         },
         {
           "id_traza": 35,
-          "timestamp": "2026-08-19T23:55:09.916889+00:00",
+          "timestamp": "2026-08-20T06:12:40.858322+00:00",
           "modulo": "formulas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000205
+          "duracion_s": 0.000738
         },
         {
           "id_traza": 36,
-          "timestamp": "2026-08-19T23:55:09.917007+00:00",
+          "timestamp": "2026-08-20T06:12:40.858611+00:00",
           "modulo": "formulas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 9.2e-05
+          "duracion_s": 0.000246
         },
         {
           "id_traza": 37,
-          "timestamp": "2026-08-19T23:55:09.917042+00:00",
+          "timestamp": "2026-08-20T06:12:40.858676+00:00",
           "modulo": "interfaz",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 1.5e-05
+          "duracion_s": 2.6e-05
         },
         {
           "id_traza": 38,
-          "timestamp": "2026-08-19T23:55:09.919128+00:00",
+          "timestamp": "2026-08-20T06:12:40.862754+00:00",
           "modulo": "realidad",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.00207
+          "duracion_s": 0.004048
         },
         {
           "id_traza": 39,
-          "timestamp": "2026-08-19T23:55:09.919496+00:00",
+          "timestamp": "2026-08-20T06:12:40.863499+00:00",
           "modulo": "realidad",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000337
+          "duracion_s": 0.000709
         },
         {
           "id_traza": 40,
-          "timestamp": "2026-08-19T23:55:09.929396+00:00",
+          "timestamp": "2026-08-20T06:12:40.868016+00:00",
           "modulo": "realidad",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.00987
+          "duracion_s": 0.004473
         },
         {
           "id_traza": 41,
-          "timestamp": "2026-08-19T23:55:09.935080+00:00",
+          "timestamp": "2026-08-20T06:12:40.878637+00:00",
           "modulo": "self",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.005642
+          "duracion_s": 0.010569
         },
         {
           "id_traza": 42,
-          "timestamp": "2026-08-19T23:55:09.940079+00:00",
+          "timestamp": "2026-08-20T06:12:40.888817+00:00",
           "modulo": "self",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.004957
+          "duracion_s": 0.010121
         },
         {
           "id_traza": 43,
-          "timestamp": "2026-08-19T23:55:09.940123+00:00",
+          "timestamp": "2026-08-20T06:12:40.888894+00:00",
           "modulo": "self",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 6e-06
+          "duracion_s": 1.4e-05
         },
         {
           "id_traza": 44,
-          "timestamp": "2026-08-19T23:55:09.953539+00:00",
+          "timestamp": "2026-08-20T06:12:40.911960+00:00",
           "modulo": "spartaco_seguridad",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.0134
+          "duracion_s": 0.023028
         },
         {
           "id_traza": 45,
-          "timestamp": "2026-08-19T23:55:09.954049+00:00",
+          "timestamp": "2026-08-20T06:12:40.912709+00:00",
           "modulo": "spartaco_seguridad",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000484
+          "duracion_s": 0.000705
         },
         {
           "id_traza": 46,
-          "timestamp": "2026-08-19T23:55:09.954419+00:00",
+          "timestamp": "2026-08-20T06:12:40.913400+00:00",
           "modulo": "spartaco_seguridad",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000336
+          "duracion_s": 0.000645
         },
         {
           "id_traza": 47,
-          "timestamp": "2026-08-19T23:55:09.955040+00:00",
+          "timestamp": "2026-08-20T06:12:40.914721+00:00",
           "modulo": "taxonomia",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000598
+          "duracion_s": 0.001279
         },
         {
           "id_traza": 48,
-          "timestamp": "2026-08-19T23:55:09.955201+00:00",
+          "timestamp": "2026-08-20T06:12:40.914995+00:00",
           "modulo": "taxonomia",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000135
+          "duracion_s": 0.000238
         },
         {
           "id_traza": 49,
-          "timestamp": "2026-08-19T23:55:09.955328+00:00",
+          "timestamp": "2026-08-20T06:12:40.915305+00:00",
           "modulo": "taxonomia",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000104
+          "duracion_s": 0.000269
         },
         {
           "id_traza": 50,
-          "timestamp": "2026-08-19T23:55:09.956153+00:00",
+          "timestamp": "2026-08-20T06:12:40.917418+00:00",
           "modulo": "tru_totales",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000807
+          "duracion_s": 0.002077
         },
         {
           "id_traza": 51,
-          "timestamp": "2026-08-19T23:55:09.956541+00:00",
+          "timestamp": "2026-08-20T06:12:40.918376+00:00",
           "modulo": "tru_totales",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000364
+          "duracion_s": 0.000915
         },
         {
           "id_traza": 52,
-          "timestamp": "2026-08-19T23:55:09.956907+00:00",
+          "timestamp": "2026-08-20T06:12:40.919225+00:00",
           "modulo": "tru_totales",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000341
+          "duracion_s": 0.000808
         },
         {
           "id_traza": 53,
-          "timestamp": "2026-08-19T23:55:09.956935+00:00",
+          "timestamp": "2026-08-20T06:12:40.919273+00:00",
           "modulo": "verificacion",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 5e-06
+          "duracion_s": 7e-06
         },
         {
           "id_traza": 54,
-          "timestamp": "2026-08-19T23:55:09.956951+00:00",
+          "timestamp": "2026-08-20T06:12:40.919303+00:00",
           "modulo": "verificacion",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -24193,11 +24877,11 @@
         },
         {
           "id_traza": 55,
-          "timestamp": "2026-08-19T23:55:09.957514+00:00",
+          "timestamp": "2026-08-20T06:12:40.919329+00:00",
           "modulo": "verificacion",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 4e-06
+          "duracion_s": 3e-06
         }
       ]
     },

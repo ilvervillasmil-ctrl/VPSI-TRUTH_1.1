@@ -13,7 +13,7 @@
   total_modulos: 19
   trazas_n: 55
   rutas_n: 0
-  timestamp: 2026-08-19T23:55:09.957579+00:00
+  timestamp: 2026-08-20T06:12:40.919426+00:00
 
 ══════════════════════════════════════════════════════════════════════
   INFORMACIÓN DEL RUN
@@ -31,7 +31,7 @@
     []
   trazas_n: 55
   rutas_n: 0
-  timestamp: 2026-08-19T23:55:09.957524+00:00
+  timestamp: 2026-08-20T06:12:40.919339+00:00
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO AX/axiomas
@@ -39,7 +39,7 @@
   id: AX
   nombre: axiomas
   rol: AX
-  version: 9.6
+  version: 8.0
   version_contrato: 1.0
   esquema: VPSI-CONTRACT-1.0
   estabilidad: ESTABLE
@@ -140,6 +140,7 @@
     crear: True
     actualizar: False
     alterar: False
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -157,6 +158,7 @@
     • limite_axiomático
     • ejecutar_total
     • inspeccionar
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia interna del módulo.
@@ -286,6 +288,14 @@
       salida: dict con estructura, capacidades y estado del módulo
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -305,7 +315,7 @@
     id: AX
     modulo: axiomas
     rol: AX
-    version: 9.6
+    version: 8.0
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
@@ -361,6 +371,7 @@
       • limite_axiomático
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
     capacidades_resueltas:
       • verificar
       • barrer
@@ -378,6 +389,7 @@
       • limite_axiomático
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
     capacidades_meta:
       • verificar
       • barrer
@@ -395,6 +407,7 @@
       • limite_axiomático
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -466,6 +479,7 @@
       limite_axiomático: True
       ejecutar_total: True
       inspeccionar: True
+      evaluar_universal: True
   diagnostico:
     id: AX
     modulo: axiomas
@@ -650,7 +664,7 @@
     id: AX
     nombre: axiomas
     rol: AX
-    version: 9.6
+    version: 8.0
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
@@ -718,6 +732,7 @@
       • limite_axiomático
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
     capacidades_resueltas:
       • verificar
       • barrer
@@ -735,6 +750,7 @@
       • limite_axiomático
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
     capacidades_meta:
       • verificar
       • barrer
@@ -752,6 +768,7 @@
       • limite_axiomático
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -841,6 +858,7 @@
       crear: True
       actualizar: False
       alterar: False
+      evaluar_universal: True
     reporting:
       estado: True
       salud: True
@@ -860,6 +878,7 @@
       diagnostico: True
       reporte: True
       validar_esquema: True
+      evaluar_universal: True
     estados_validos:
       • NO_INICIADO
       • OPERATIVO
@@ -1487,6 +1506,7 @@
     reporte: True
     validar_esquema: True
     acceso_archivos: True
+    evaluar_universal: True
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
@@ -1517,6 +1537,7 @@
     • registrar_inventario
     • mapear_codigo
     • clasificar_ids
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Integridad formal del registro.
@@ -1726,6 +1747,14 @@
       salida: dict con ids_por_modulo, ids_unicos, ids_duplicados, id_a_modulos
       acceso_archivos:
         • *
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -1800,6 +1829,7 @@
       • registrar_inventario
       • mapear_codigo
       • clasificar_ids
+      • evaluar_universal
     capacidades_meta:
       • verificar
       • barrer
@@ -1827,6 +1857,7 @@
       • registrar_inventario
       • mapear_codigo
       • clasificar_ids
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -1971,6 +2002,7 @@
       • registrar_inventario
       • mapear_codigo
       • clasificar_ids
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -2014,7 +2046,7 @@
       total_unicos: 18
       total_duplicados: 0
       ids_duplicados:
-      actualizado: 2026-08-19T23:55:09.838879+00:00
+      actualizado: 2026-08-20T06:12:40.720697+00:00
     nota: CACHE no sabe lo que ocurrió. Solo sabe qué fue registrado y qué estructura encontró. Análisis semántico: módulo futuro.
 
 ══════════════════════════════════════════════════════════════════════
@@ -2137,6 +2169,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • calcular
     • calcular_C
@@ -2158,6 +2191,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     calcular:
       descripcion: Pipeline completo. C/L/K son objetos unicos con fraccion+decimal (ej display: 7/9 = 0.778).
@@ -2319,6 +2353,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -2363,34 +2405,34 @@
     hashes:
       __init__.py:
         archivo: __init__.py
-        sha256: d44d03ebcde78733ea5530ab3a99466d15bda9952f0d9bd797e472178e5245fc
-        tamano: 161414
-        timestamp_mtime: 2026-08-19T23:55:03.709979+00:00
+        sha256: 39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e
+        tamano: 166998
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: 3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34
         tamano: 6365
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
     conteos_disponible: True
     escalas_ids_disponible: True
     historial_n: 0
@@ -2417,6 +2459,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     capacidades_callable:
       • barrer
       • calcular
@@ -2426,6 +2469,7 @@
       • calcular_factor
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • explicar_calculo
       • historial
       • inspeccionar
@@ -2486,6 +2530,7 @@
       ejecutar_total: True
       inspeccionar: True
       registrar_inventario: True
+      evaluar_universal: True
     conocimiento_exportable:
       • C
       • L
@@ -2544,34 +2589,34 @@
     hashes:
       __init__.py:
         archivo: __init__.py
-        sha256: d44d03ebcde78733ea5530ab3a99466d15bda9952f0d9bd797e472178e5245fc
-        tamano: 161414
-        timestamp_mtime: 2026-08-19T23:55:03.709979+00:00
+        sha256: 39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e
+        tamano: 166998
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       coherencia.py:
         archivo: coherencia.py
         sha256: 3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34
         tamano: 6365
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       conteos.py:
         archivo: conteos.py
         sha256: 19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330
         tamano: 20987
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       correlacion_k.py:
         archivo: correlacion_k.py
         sha256: b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab
         tamano: 5546
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       escalas_ids.py:
         archivo: escalas_ids.py
         sha256: 1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128
         tamano: 2895
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
       logica.py:
         archivo: logica.py
         sha256: 39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1
         tamano: 4803
-        timestamp_mtime: 2026-08-19T23:55:03.710577+00:00
+        timestamp_mtime: 2026-08-20T06:12:35.216498+00:00
     factores_api:
       • C
       • K
@@ -2615,6 +2660,7 @@
       • calcular_factor
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • explicar_calculo
       • historial
       • inspeccionar
@@ -2766,6 +2812,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -2780,6 +2827,7 @@
     • registrar_inventario
     • reporte
     • diagnostico
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. ¿El inventario operativo de skills de CE es coherente?
@@ -2885,6 +2933,14 @@
       salida: dict con estado, problemas, advertencias, recomendaciones, coherente, ids, archivos
       acceso_archivos:
         • *
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -2940,6 +2996,7 @@
       • registrar_inventario
       • reporte
       • diagnostico
+      • evaluar_universal
     capacidades_meta:
       • verificar
       • barrer
@@ -2954,6 +3011,7 @@
       • registrar_inventario
       • reporte
       • diagnostico
+      • evaluar_universal
     autoridad:
       • Mantener el inventario operativo de skills nativos del Engine
       • Descubrir y validar forma mínima de cada skill
@@ -3036,6 +3094,7 @@
       • barrer
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • ids
       • inspeccionar
       • inventario
@@ -3050,6 +3109,7 @@
       • barrer
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • ids
       • inspeccionar
       • inventario
@@ -3064,6 +3124,7 @@
       • barrer
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • ids
       • inspeccionar
       • inventario
@@ -3074,9 +3135,9 @@
       • skills
       • verificar
       • verificar_salida
-    n_capacidades: 13
-    n_capacidades_meta: 13
-    n_capacidades_callable: 13
+    n_capacidades: 14
+    n_capacidades_meta: 14
+    n_capacidades_callable: 14
     funcion: Capacidad estructural del Engine. Mantiene el inventario operativo de skills nativos. Cada archivo implementa uno o más skills. Engine es la única autoridad que los ejecuta. CE no calcula, no deposita, no decide, no selecciona.
 
 ══════════════════════════════════════════════════════════════════════
@@ -3186,6 +3247,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -3200,6 +3262,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia del glosario.
@@ -3305,6 +3368,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -3885,6 +3956,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -9585,6 +9657,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -9723,6 +9796,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -9745,6 +9819,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Centinela del oficio de fundamentación.
@@ -9914,6 +9989,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -9968,6 +10051,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     nota: CIT documenta y fundamenta. No calcula. No altera declaraciones de origen.
   diagnostico:
     id: CIT
@@ -10061,6 +10145,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     registro_n: 0
     funcion: Autoridad universal de fundamentación. Resuelve, organiza, relaciona y cita cualquier declaración pública del VPSI. No modifica conocimiento.
     modos:
@@ -10175,6 +10260,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
     validar_esquema: True
     acceso_archivos: True
   capacidades:
@@ -10184,6 +10270,7 @@
     • descubrir_constantes
     • diagnostico
     • ejecutar_total
+    • evaluar_universal
     • inspeccionar
     • inventario
     • listar_constantes
@@ -10296,6 +10383,14 @@
       salida: dict con id, operacion, registrado, inventario y nota
       acceso_archivos:
         • *
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -10333,6 +10428,7 @@
       • descubrir_constantes
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • inspeccionar
       • inventario
       • listar_constantes
@@ -10432,6 +10528,7 @@
       • descubrir_constantes
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • inspeccionar
       • inventario
       • listar_constantes
@@ -10581,6 +10678,7 @@
     reporte: True
     validar_esquema: True
     acceso_archivos: True
+    evaluar_universal: True
   capacidades:
     • resolver
     • evaluar
@@ -10595,6 +10693,7 @@
     • ejecutar
     • ejecutar_total
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     resolver:
       descripcion: Garantiza el marco O clasificado a partir de la petición.
@@ -10700,6 +10799,14 @@
       salida: dict con archivos, componentes, funciones, clases, constantes, reglas, capacidades y unidades ejecutables
       acceso_archivos:
         • *
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -10746,6 +10853,7 @@
       • ejecutar
       • ejecutar_total
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -10835,6 +10943,7 @@
       • ejecutar
       • ejecutar_total
       • registrar_inventario
+      • evaluar_universal
     capacidades_declaradas:
       • resolver
       • evaluar
@@ -10849,6 +10958,7 @@
       • ejecutar
       • ejecutar_total
       • registrar_inventario
+      • evaluar_universal
     capacidades_resueltas:
       • resolver
       • evaluar
@@ -10863,6 +10973,7 @@
       • ejecutar
       • ejecutar_total
       • registrar_inventario
+      • evaluar_universal
     reglas_internas:
       • auto_auditoria
       • declaracion_O
@@ -11450,7 +11561,7 @@
         estado: descubierto
         errores:
           []
-        representacion: {'resolver': <function resolver at 0x7f0091bfade0>, 'evaluar': <function resolver at 0x7f0091bfade0>, 'centinela': <function centinela at 0x7f0091bfad40>, 'barrer': <function barrer at 0x7f0091bfae80>
+        representacion: {'resolver': <function resolver at 0x7fa54cc6f2e0>, 'evaluar': <function resolver at 0x7fa54cc6f2e0>, 'centinela': <function centinela at 0x7fa54cc6f240>, 'barrer': <function barrer at 0x7fa54cc6f380>
       [29]
         nombre: _Undefined
         origen: vpsi_dinamico_contexto
@@ -11524,7 +11635,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7f0091bfa5c0>
+        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7fa54cc6eac0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [34]
@@ -11541,7 +11652,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cargar_reglas at 0x7f0091bfaac0>
+        referencia: <function _cargar_reglas at 0x7fa54cc6efc0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [35]
@@ -11558,7 +11669,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _centinela_archivo at 0x7f0091bfaa20>
+        referencia: <function _centinela_archivo at 0x7fa54cc6ef20>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [36]
@@ -11575,7 +11686,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cfg at 0x7f0091bfa340>
+        referencia: <function _cfg at 0x7fa54cc6e840>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [37]
@@ -11592,7 +11703,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _conflicto_ligaduras at 0x7f0091bfa700>
+        referencia: <function _conflicto_ligaduras at 0x7fa54cc6ec00>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [38]
@@ -11609,7 +11720,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _descubrir_inventario_total at 0x7f0091bfaca0>
+        referencia: <function _descubrir_inventario_total at 0x7fa54cc6f1a0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [39]
@@ -11626,7 +11737,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _detectar_choques_reglas at 0x7f0091bfab60>
+        referencia: <function _detectar_choques_reglas at 0x7fa54cc6f060>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [40]
@@ -11643,7 +11754,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _id_anclado at 0x7f0091bfa840>
+        referencia: <function _id_anclado at 0x7fa54cc6ed40>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [41]
@@ -11660,7 +11771,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_registro at 0x7f0091bfa660>
+        referencia: <function _normalizar_registro at 0x7fa54cc6eb60>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [42]
@@ -11677,7 +11788,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_tipos_peticion at 0x7f0091bfa520>
+        referencia: <function _normalizar_tipos_peticion at 0x7fa54cc6ea20>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [43]
@@ -11694,7 +11805,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _permite_k at 0x7f0091bfa7a0>
+        referencia: <function _permite_k at 0x7fa54cc6eca0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [44]
@@ -11711,7 +11822,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _registro_vacio at 0x7f0091bfa3e0>
+        referencia: <function _registro_vacio at 0x7fa54cc6e8e0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [45]
@@ -11728,7 +11839,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _resolver_capacidades at 0x7f0091bfb4c0>
+        referencia: <function _resolver_capacidades at 0x7fa54cc6fa60>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [46]
@@ -11745,7 +11856,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _truthy_pedir at 0x7f0091bfa480>
+        referencia: <function _truthy_pedir at 0x7fa54cc6e980>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [47]
@@ -11762,7 +11873,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_clasificacion at 0x7f0091bfa980>
+        referencia: <function _validar_clasificacion at 0x7fa54cc6ee80>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [48]
@@ -11779,7 +11890,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_contrato at 0x7f0091bfac00>
+        referencia: <function _validar_contrato at 0x7fa54cc6f100>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [49]
@@ -11796,7 +11907,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_regla_meta at 0x7f0091bfa8e0>
+        referencia: <function _validar_regla_meta at 0x7fa54cc6ede0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [50]
@@ -11813,7 +11924,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function axiomas at 0x7f0091bfb240>
+        referencia: <function axiomas at 0x7fa54cc6f740>
         ejecutable_directamente: True
       [51]
         nombre: barrer
@@ -11829,7 +11940,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function barrer at 0x7f0091bfae80>
+        referencia: <function barrer at 0x7fa54cc6f380>
         ejecutable_directamente: True
       [52]
         nombre: centinela
@@ -11845,7 +11956,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function centinela at 0x7f0091bfad40>
+        referencia: <function centinela at 0x7fa54cc6f240>
         ejecutable_directamente: True
       [53]
         nombre: dataclass
@@ -11861,7 +11972,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function dataclass at 0x7f0091ef2480>
+        referencia: <function dataclass at 0x7fa54ceee480>
         ejecutable_directamente: True
       [54]
         nombre: defaultdict
@@ -11905,7 +12016,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function diagnostico at 0x7f0091bfb420>
+        referencia: <function diagnostico at 0x7fa54cc6f9c0>
         ejecutable_directamente: True
       [57]
         nombre: ejecutar
@@ -11921,7 +12032,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function ejecutar at 0x7f0091bfb1a0>
+        referencia: <function ejecutar at 0x7fa54cc6f6a0>
         ejecutable_directamente: True
       [58]
         nombre: es_undefined
@@ -11937,9 +12048,25 @@
         estado: descubierto
         errores:
           []
-        referencia: <function es_undefined at 0x7f0091dcf420>
+        referencia: <function es_undefined at 0x7fa54cc28040>
         ejecutable_directamente: False
       [59]
+        nombre: evaluar_universal
+        origen: vpsi_dinamico_contexto
+        modulo: contexto
+        archivo: __init__.py
+        declarado: True
+        descubierto: True
+        callable: True
+        ejecutable: True
+        requiere_entrada: False
+        tipo: funcion
+        estado: descubierto
+        errores:
+          []
+        referencia: <function evaluar_universal at 0x7fa54cc6f880>
+        ejecutable_directamente: True
+      [60]
         nombre: field
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -11953,9 +12080,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function field at 0x7f0091ef3ce0>
+        referencia: <function field at 0x7fa54ceefd80>
         ejecutable_directamente: True
-      [60]
+      [61]
         nombre: inventario
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -11969,9 +12096,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function inventario at 0x7f0091bfb100>
+        referencia: <function inventario at 0x7fa54cc6f600>
         ejecutable_directamente: True
-      [61]
+      [62]
         nombre: recibir_comentarios
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -11985,9 +12112,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function recibir_comentarios at 0x7f0091bfb2e0>
+        referencia: <function recibir_comentarios at 0x7fa54cc6f7e0>
         ejecutable_directamente: False
-      [62]
+      [63]
         nombre: registrar_inventario
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12001,9 +12128,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function registrar_inventario at 0x7f0091bfb060>
+        referencia: <function registrar_inventario at 0x7fa54cc6f560>
         ejecutable_directamente: True
-      [63]
+      [64]
         nombre: reporte
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12017,9 +12144,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function reporte at 0x7f0091bfb380>
+        referencia: <function reporte at 0x7fa54cc6f920>
         ejecutable_directamente: True
-      [64]
+      [65]
         nombre: resolver
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12033,9 +12160,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function resolver at 0x7f0091bfade0>
+        referencia: <function resolver at 0x7fa54cc6f2e0>
         ejecutable_directamente: True
-      [65]
+      [66]
         nombre: verificar
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12049,9 +12176,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar at 0x7f0091bfaf20>
+        referencia: <function verificar at 0x7fa54cc6f420>
         ejecutable_directamente: True
-      [66]
+      [67]
         nombre: verificar_salida
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12065,9 +12192,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar_salida at 0x7f0091bfafc0>
+        referencia: <function verificar_salida at 0x7fa54cc6f4c0>
         ejecutable_directamente: False
-      [67]
+      [68]
         nombre: auto_auditoria
         tipo: regla
         origen: auto_auditoria.py
@@ -12080,7 +12207,7 @@
         estado: descubierto
         errores:
           []
-      [68]
+      [69]
         nombre: declaracion_O
         tipo: validador
         origen: declaracion_O.py
@@ -12093,7 +12220,7 @@
         estado: descubierto
         errores:
           []
-      [69]
+      [70]
         nombre: entendimiento_fractal
         tipo: validador
         origen: entendimiento_fractal.py
@@ -12106,7 +12233,7 @@
         estado: descubierto
         errores:
           []
-      [70]
+      [71]
         nombre: entrada_natural
         tipo: validador
         origen: entrada_natural.py
@@ -12119,7 +12246,7 @@
         estado: descubierto
         errores:
           []
-      [71]
+      [72]
         nombre: marco_desde_repositorio
         tipo: validador
         origen: marco_desde_repositorio.py
@@ -12132,7 +12259,7 @@
         estado: descubierto
         errores:
           []
-      [72]
+      [73]
         nombre: nucleo_sm_CX
         tipo: validador
         origen: nucleo_sm_CX.py
@@ -12145,7 +12272,7 @@
         estado: descubierto
         errores:
           []
-      [73]
+      [74]
         nombre: peticion_anuncio
         tipo: validador
         origen: peticion_anuncio.py
@@ -12158,7 +12285,7 @@
         estado: descubierto
         errores:
           []
-      [74]
+      [75]
         nombre: secuencia_conversacion
         tipo: validador
         origen: secuencia_conversacion.py
@@ -12186,7 +12313,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7f0091bfa5c0>
+        referencia: <function _asegurar_invariante_pedir_anuncio at 0x7fa54cc6eac0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [1]
@@ -12203,7 +12330,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cargar_reglas at 0x7f0091bfaac0>
+        referencia: <function _cargar_reglas at 0x7fa54cc6efc0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [2]
@@ -12220,7 +12347,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _centinela_archivo at 0x7f0091bfaa20>
+        referencia: <function _centinela_archivo at 0x7fa54cc6ef20>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [3]
@@ -12237,7 +12364,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _cfg at 0x7f0091bfa340>
+        referencia: <function _cfg at 0x7fa54cc6e840>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [4]
@@ -12254,7 +12381,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _conflicto_ligaduras at 0x7f0091bfa700>
+        referencia: <function _conflicto_ligaduras at 0x7fa54cc6ec00>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [5]
@@ -12271,7 +12398,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _descubrir_inventario_total at 0x7f0091bfaca0>
+        referencia: <function _descubrir_inventario_total at 0x7fa54cc6f1a0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [6]
@@ -12288,7 +12415,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _detectar_choques_reglas at 0x7f0091bfab60>
+        referencia: <function _detectar_choques_reglas at 0x7fa54cc6f060>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [7]
@@ -12305,7 +12432,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _id_anclado at 0x7f0091bfa840>
+        referencia: <function _id_anclado at 0x7fa54cc6ed40>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [8]
@@ -12322,7 +12449,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_registro at 0x7f0091bfa660>
+        referencia: <function _normalizar_registro at 0x7fa54cc6eb60>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [9]
@@ -12339,7 +12466,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _normalizar_tipos_peticion at 0x7f0091bfa520>
+        referencia: <function _normalizar_tipos_peticion at 0x7fa54cc6ea20>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [10]
@@ -12356,7 +12483,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _permite_k at 0x7f0091bfa7a0>
+        referencia: <function _permite_k at 0x7fa54cc6eca0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [11]
@@ -12373,7 +12500,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _registro_vacio at 0x7f0091bfa3e0>
+        referencia: <function _registro_vacio at 0x7fa54cc6e8e0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [12]
@@ -12390,7 +12517,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _resolver_capacidades at 0x7f0091bfb4c0>
+        referencia: <function _resolver_capacidades at 0x7fa54cc6fa60>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [13]
@@ -12407,7 +12534,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _truthy_pedir at 0x7f0091bfa480>
+        referencia: <function _truthy_pedir at 0x7fa54cc6e980>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [14]
@@ -12424,7 +12551,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_clasificacion at 0x7f0091bfa980>
+        referencia: <function _validar_clasificacion at 0x7fa54cc6ee80>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [15]
@@ -12441,7 +12568,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_contrato at 0x7f0091bfac00>
+        referencia: <function _validar_contrato at 0x7fa54cc6f100>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [16]
@@ -12458,7 +12585,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function _validar_regla_meta at 0x7f0091bfa8e0>
+        referencia: <function _validar_regla_meta at 0x7fa54cc6ede0>
         ejecutable_directamente: False
         participa_en_ejecucion: True
       [17]
@@ -12475,7 +12602,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function axiomas at 0x7f0091bfb240>
+        referencia: <function axiomas at 0x7fa54cc6f740>
         ejecutable_directamente: True
       [18]
         nombre: barrer
@@ -12491,7 +12618,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function barrer at 0x7f0091bfae80>
+        referencia: <function barrer at 0x7fa54cc6f380>
         ejecutable_directamente: True
       [19]
         nombre: centinela
@@ -12507,7 +12634,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function centinela at 0x7f0091bfad40>
+        referencia: <function centinela at 0x7fa54cc6f240>
         ejecutable_directamente: True
       [20]
         nombre: dataclass
@@ -12523,7 +12650,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function dataclass at 0x7f0091ef2480>
+        referencia: <function dataclass at 0x7fa54ceee480>
         ejecutable_directamente: True
       [21]
         nombre: diagnostico
@@ -12539,7 +12666,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function diagnostico at 0x7f0091bfb420>
+        referencia: <function diagnostico at 0x7fa54cc6f9c0>
         ejecutable_directamente: True
       [22]
         nombre: ejecutar
@@ -12555,7 +12682,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function ejecutar at 0x7f0091bfb1a0>
+        referencia: <function ejecutar at 0x7fa54cc6f6a0>
         ejecutable_directamente: True
       [23]
         nombre: es_undefined
@@ -12571,9 +12698,25 @@
         estado: descubierto
         errores:
           []
-        referencia: <function es_undefined at 0x7f0091dcf420>
+        referencia: <function es_undefined at 0x7fa54cc28040>
         ejecutable_directamente: False
       [24]
+        nombre: evaluar_universal
+        origen: vpsi_dinamico_contexto
+        modulo: contexto
+        archivo: __init__.py
+        declarado: True
+        descubierto: True
+        callable: True
+        ejecutable: True
+        requiere_entrada: False
+        tipo: funcion
+        estado: descubierto
+        errores:
+          []
+        referencia: <function evaluar_universal at 0x7fa54cc6f880>
+        ejecutable_directamente: True
+      [25]
         nombre: field
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12587,9 +12730,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function field at 0x7f0091ef3ce0>
+        referencia: <function field at 0x7fa54ceefd80>
         ejecutable_directamente: True
-      [25]
+      [26]
         nombre: inventario
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12603,9 +12746,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function inventario at 0x7f0091bfb100>
+        referencia: <function inventario at 0x7fa54cc6f600>
         ejecutable_directamente: True
-      [26]
+      [27]
         nombre: recibir_comentarios
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12619,9 +12762,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function recibir_comentarios at 0x7f0091bfb2e0>
+        referencia: <function recibir_comentarios at 0x7fa54cc6f7e0>
         ejecutable_directamente: False
-      [27]
+      [28]
         nombre: registrar_inventario
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12635,9 +12778,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function registrar_inventario at 0x7f0091bfb060>
+        referencia: <function registrar_inventario at 0x7fa54cc6f560>
         ejecutable_directamente: True
-      [28]
+      [29]
         nombre: reporte
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12651,9 +12794,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function reporte at 0x7f0091bfb380>
+        referencia: <function reporte at 0x7fa54cc6f920>
         ejecutable_directamente: True
-      [29]
+      [30]
         nombre: resolver
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12667,9 +12810,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function resolver at 0x7f0091bfade0>
+        referencia: <function resolver at 0x7fa54cc6f2e0>
         ejecutable_directamente: True
-      [30]
+      [31]
         nombre: verificar
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12683,9 +12826,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar at 0x7f0091bfaf20>
+        referencia: <function verificar at 0x7fa54cc6f420>
         ejecutable_directamente: True
-      [31]
+      [32]
         nombre: verificar_salida
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -12699,7 +12842,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar_salida at 0x7f0091bfafc0>
+        referencia: <function verificar_salida at 0x7fa54cc6f4c0>
         ejecutable_directamente: False
     clases:
       [0]
@@ -13147,7 +13290,7 @@
         estado: descubierto
         errores:
           []
-        representacion: {'resolver': <function resolver at 0x7f0091bfade0>, 'evaluar': <function resolver at 0x7f0091bfade0>, 'centinela': <function centinela at 0x7f0091bfad40>, 'barrer': <function barrer at 0x7f0091bfae80>
+        representacion: {'resolver': <function resolver at 0x7fa54cc6f2e0>, 'evaluar': <function resolver at 0x7fa54cc6f2e0>, 'centinela': <function centinela at 0x7fa54cc6f240>, 'barrer': <function barrer at 0x7fa54cc6f380>
       [25]
         nombre: __all__
         origen: vpsi_dinamico_contexto
@@ -13331,7 +13474,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function axiomas at 0x7f0091bfb240>
+        referencia: <function axiomas at 0x7fa54cc6f740>
         ejecutable_directamente: True
       [1]
         nombre: barrer
@@ -13347,7 +13490,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function barrer at 0x7f0091bfae80>
+        referencia: <function barrer at 0x7fa54cc6f380>
         ejecutable_directamente: True
       [2]
         nombre: centinela
@@ -13363,7 +13506,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function centinela at 0x7f0091bfad40>
+        referencia: <function centinela at 0x7fa54cc6f240>
         ejecutable_directamente: True
       [3]
         nombre: dataclass
@@ -13379,7 +13522,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function dataclass at 0x7f0091ef2480>
+        referencia: <function dataclass at 0x7fa54ceee480>
         ejecutable_directamente: True
       [4]
         nombre: diagnostico
@@ -13395,7 +13538,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function diagnostico at 0x7f0091bfb420>
+        referencia: <function diagnostico at 0x7fa54cc6f9c0>
         ejecutable_directamente: True
       [5]
         nombre: ejecutar
@@ -13411,7 +13554,7 @@
         estado: descubierto
         errores:
           []
-        referencia: <function ejecutar at 0x7f0091bfb1a0>
+        referencia: <function ejecutar at 0x7fa54cc6f6a0>
         ejecutable_directamente: True
       [6]
         nombre: es_undefined
@@ -13427,9 +13570,25 @@
         estado: descubierto
         errores:
           []
-        referencia: <function es_undefined at 0x7f0091dcf420>
+        referencia: <function es_undefined at 0x7fa54cc28040>
         ejecutable_directamente: False
       [7]
+        nombre: evaluar_universal
+        origen: vpsi_dinamico_contexto
+        modulo: contexto
+        archivo: __init__.py
+        declarado: True
+        descubierto: True
+        callable: True
+        ejecutable: True
+        requiere_entrada: False
+        tipo: funcion
+        estado: descubierto
+        errores:
+          []
+        referencia: <function evaluar_universal at 0x7fa54cc6f880>
+        ejecutable_directamente: True
+      [8]
         nombre: field
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13443,9 +13602,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function field at 0x7f0091ef3ce0>
+        referencia: <function field at 0x7fa54ceefd80>
         ejecutable_directamente: True
-      [8]
+      [9]
         nombre: inventario
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13459,9 +13618,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function inventario at 0x7f0091bfb100>
+        referencia: <function inventario at 0x7fa54cc6f600>
         ejecutable_directamente: True
-      [9]
+      [10]
         nombre: recibir_comentarios
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13475,9 +13634,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function recibir_comentarios at 0x7f0091bfb2e0>
+        referencia: <function recibir_comentarios at 0x7fa54cc6f7e0>
         ejecutable_directamente: False
-      [10]
+      [11]
         nombre: registrar_inventario
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13491,9 +13650,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function registrar_inventario at 0x7f0091bfb060>
+        referencia: <function registrar_inventario at 0x7fa54cc6f560>
         ejecutable_directamente: True
-      [11]
+      [12]
         nombre: reporte
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13507,9 +13666,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function reporte at 0x7f0091bfb380>
+        referencia: <function reporte at 0x7fa54cc6f920>
         ejecutable_directamente: True
-      [12]
+      [13]
         nombre: resolver
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13523,9 +13682,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function resolver at 0x7f0091bfade0>
+        referencia: <function resolver at 0x7fa54cc6f2e0>
         ejecutable_directamente: True
-      [13]
+      [14]
         nombre: verificar
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13539,9 +13698,9 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar at 0x7f0091bfaf20>
+        referencia: <function verificar at 0x7fa54cc6f420>
         ejecutable_directamente: True
-      [14]
+      [15]
         nombre: verificar_salida
         origen: vpsi_dinamico_contexto
         modulo: contexto
@@ -13555,10 +13714,10 @@
         estado: descubierto
         errores:
           []
-        referencia: <function verificar_salida at 0x7f0091bfafc0>
+        referencia: <function verificar_salida at 0x7fa54cc6f4c0>
         ejecutable_directamente: False
-    total_componentes: 75
-    total_ejecutables: 15
+    total_componentes: 76
+    total_ejecutables: 16
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO MC/correlacion_mecanica
@@ -13657,6 +13816,7 @@
     reporte: True
     validar_esquema: True
     acceso_archivos: True
+    evaluar_universal: True
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
@@ -13666,6 +13826,7 @@
     • diagnostico
     • ejecutar_total
     • evaluar
+    • evaluar_universal
     • inspeccionar
     • inventario
     • listar_mecanicas
@@ -13770,6 +13931,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -13832,6 +14001,7 @@
       • diagnostico
       • ejecutar_total
       • evaluar
+      • evaluar_universal
       • inspeccionar
       • inventario
       • listar_mecanicas
@@ -14013,6 +14183,7 @@
       • diagnostico
       • ejecutar_total
       • evaluar
+      • evaluar_universal
       • inspeccionar
       • inventario
       • listar_mecanicas
@@ -14139,6 +14310,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • censo
     • verificar
@@ -14151,6 +14323,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     censo:
       descripcion: Censo global por conteo de capacidades.
@@ -14240,6 +14413,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -14274,6 +14455,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     nota: DGCO observa por conteo; no invalida arranque por sí solo.
   diagnostico:
     id: DGCO
@@ -14307,6 +14489,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     regla: por módulo: faltantes==0 y total>0 → OPERATIVO; global = suma de conteos
     requiere:
       • *
@@ -14441,6 +14624,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -14460,6 +14644,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia del diccionario.
@@ -14605,6 +14790,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -14640,6 +14833,7 @@
       • definir
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • inspeccionar
       • inventario
       • inyectar_en_peticion
@@ -14721,6 +14915,7 @@
       • definir
       • diagnostico
       • ejecutar_total
+      • evaluar_universal
       • inspeccionar
       • inventario
       • inyectar_en_peticion
@@ -14809,21 +15004,21 @@
   id: FO
   nombre: formulas
   rol: FO
-  version: 1.1
+  version: 2.0
   version_contrato: 1.0
   esquema: VPSI-CONTRACT-1.0
   estabilidad: ESTABLE
   compatible_desde: 1.0
   api_engine: >=1.0
-  descripcion: Contenedor de fórmulas. Rol FO. Expone y ejecuta tru_ri y tru_total, y cualquier fórmula descubierta en los archivos del módulo. Sin límites artificiales sobre C, L, K.
-  funcion: Ser la fuente oficial de las fórmulas de verdad: descubrir archivos del módulo, registrar fórmulas, evaluar tru_ri(C,L,K) y tru_total(C,L,K), validar coherencia.
+  descripcion: Contenedor de fórmulas. Expone y ejecuta tru_ri y tru_total y cualquier fórmula descubierta en los archivos del módulo. ALPHA y BETA se resuelven exclusivamente desde modules.constante.
+  funcion: Ser la fuente oficial de las fórmulas de verdad: descubrir archivos, registrar fórmulas, evaluar tru_ri(C,L,K) y tru_total(C,L,K), validar coherencia.
   no_hace:
     • No calcula C, L, K (los recibe como entrada)
-    • No clasifica entrada de usuario (eso es CX)
+    • No clasifica entrada de usuario
     • No orquesta el sistema (eso es Engine)
     • No modifica otros módulos
   autoridad:
-    • Ejecutar cualquier fórmula registrada o descubierta en el módulo
+    • Ejecutar cualquier fórmula registrada o descubierta
     • Calcular tru_ri y tru_total para cualquier C, L, K válidos
     • Leer y ejecutar todos los archivos .py del módulo
     • Reportar estado, inventario y diagnóstico propios
@@ -14846,7 +15041,24 @@
     • listar_formulas
     • listar_declaraciones
   requiere:
-    • *
+    • CE
+    • AX
+    • MC
+    • SF
+    • CA
+    • CX
+    • DI
+    • RE
+    • VX
+    • TX
+    • CH
+    • CIT
+    • DGCO
+    • UI
+    • CC
+    • TT
+    • SC
+    • CT
   autoriza_engine:
     leer: True
     ejecutar: True
@@ -14886,6 +15098,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -14901,6 +15114,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia de fórmulas.
@@ -14911,23 +15125,23 @@
       acceso_archivos:
         • *
     barrer:
-      descripcion: Ejecuta todas las reglas y reporta faltas de coherencia.
+      descripcion: Barrido universal de todas las fórmulas del módulo.
       entrada: *
       validar_esquema:
         • *
-      salida: dict con estado, coherente, faltas, reglas, formulas
+      salida: dict con estado, coherente, faltas, formulas, verdad
       acceso_archivos:
         • *
     evaluar:
-      descripcion: Alias de barrer. Evalúa coherencia del módulo.
+      descripcion: Alias de barrer.
       entrada: *
       validar_esquema:
         • *
-      salida: dict con estado, coherente, faltas, reglas, formulas
+      salida: dict con estado, coherente, faltas, formulas
       acceso_archivos:
         • *
     verificar_salida:
-      descripcion: Comprueba si una salida de barrer es coherente.
+      descripcion: Comprueba forma mínima de una salida de barrer.
       entrada: *
       validar_esquema:
         • *
@@ -14935,85 +15149,93 @@
       acceso_archivos:
         • *
     inventario:
-      descripcion: Inventario de fórmulas descubiertas y registradas.
+      descripcion: Inventario completo de fórmulas descubiertas y registradas.
       entrada: *
       validar_esquema:
         • *
-      salida: dict con formulas, formulas_registradas, reglas, declaraciones
+      salida: dict con formulas, verdad, reglas, declaraciones
       acceso_archivos:
         • *
     axiomas:
-      descripcion: Declaraciones FO registradas (FO-1..FO-4).
+      descripcion: Declaraciones FO-1 a FO-4.
       entrada: *
       validar_esquema:
         • *
-      salida: list[dict] de declaraciones
+      salida: list[dict]
       acceso_archivos:
         • *
     tru_ri:
-      descripcion: Calcula Tru_Ri = C * L * K. Sin límites artificiales sobre los valores de C, L, K.
-      entrada: *
+      descripcion: Calcula Tru_Ri = C * L * K sin límites artificiales.
+      entrada: C, L, K (Fraction)
       validar_esquema:
         • *
-      salida: resultado de C * L * K
+      salida: Fraction
       acceso_archivos:
         • *
     tru_total:
-      descripcion: Calcula Tru_total = (Tru_Ri * ALPHA) + BETA. Sin límites artificiales sobre C, L, K.
-      entrada: *
+      descripcion: Calcula Tru_total = (Tru_Ri * ALPHA) + BETA.
+      entrada: C, L, K (Fraction)
       validar_esquema:
         • *
-      salida: resultado de (C*L*K)*ALPHA + BETA
+      salida: Fraction
       acceso_archivos:
         • *
     reporte:
-      descripcion: Reporte interno de estado del módulo FO.
+      descripcion: Reporte de estado del módulo FO.
       entrada: *
       validar_esquema:
         • *
-      salida: dict con estado, coherente, formulas, faltas, capacidades
+      salida: dict con estado, coherente, formulas, faltas
       acceso_archivos:
         • *
     diagnostico:
-      descripcion: Diagnóstico: qué falta, qué está mal en FO.
+      descripcion: Diagnóstico de faltas y recomendaciones.
       entrada: *
       validar_esquema:
         • *
-      salida: dict con estado, problemas, advertencias, recomendaciones
+      salida: dict con problemas, advertencias, recomendaciones
       acceso_archivos:
         • *
     listar_formulas:
-      descripcion: Lista todas las fórmulas descubiertas y registradas.
+      descripcion: Lista todas las fórmulas existentes.
       entrada: *
       validar_esquema:
         • *
-      salida: dict con descubiertas y registradas
+      salida: dict con descubiertas, registradas, todas, verdad
       acceso_archivos:
         • *
     ejecutar_total:
-      descripcion: Autoridad total de ENGINE sobre FO. Ejerce TODAS las unidades operativamente ejecutables del módulo conforme a su contrato e inventario. Todo es callable real. No inventa capacidades.
+      descripcion: Autoridad total de Engine. Ejecuta todas las capacidades reales.
       entrada: peticion opcional (dict)
       validar_esquema:
         • *
-      salida: dict con resultados de todas las unidades ejecutadas
+      salida: dict con resultados de todas las unidades
       acceso_archivos:
         • *
     inspeccionar:
-      descripcion: Capacidad meta de inspeccion estructural de FO. Expone constantes, capacidades, formulas y estado sin alterar el contrato ni calcular.
+      descripcion: Inspección estructural sin calcular ni alterar.
       entrada: peticion opcional (dict)
       validar_esquema:
-        • acceso_archivos
-      salida: dict con estructura, capacidades y estado del modulo
+        • *
+      salida: dict con estructura, capacidades y estado
       acceso_archivos:
-        • acceso_archivos
+        • *
     registrar_inventario:
-      descripcion: Registra el inventario estructural de FO como instantanea determinista. No altera evidencia.
+      descripcion: Instantánea determinista del inventario.
       entrada: peticion opcional (dict)
       validar_esquema:
-        • acceso_archivos
+        • *
       salida: dict con inventario registrado
       acceso_archivos:
-        • acceso_archivos
+        • *
+    evaluar_universal:
+      descripcion: Evalúa capacidades reales cuya firma se satisfaga con los hechos.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -15025,11 +15247,12 @@
     • las capacidades declaradas son siempre callables tras la resolución
     • este módulo no modifica el estado de otros módulos
     • tru_ri y tru_total no imponen límites artificiales sobre C, L, K
+    • ALPHA y BETA provienen exclusivamente de modules.constante
   reporte:
     id: FO
     modulo: formulas
     rol: FO
-    version: 1.1
+    version: 2.0
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
@@ -15038,8 +15261,10 @@
     faltas:
       []
     formulas:
+      • escala
       • tru_ri
       • tru_total
+      • verdad
     reglas:
       • _validar_piso_formulas
       • _validar_formulas_canonicas
@@ -15058,10 +15283,28 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
-      • *
+      • CE
+      • AX
+      • MC
+      • SF
+      • CA
+      • CX
+      • DI
+      • RE
+      • VX
+      • TX
+      • CH
+      • CIT
+      • DGCO
+      • UI
+      • CC
+      • TT
+      • SC
+      • CT
     autoridad:
-      • Ejecutar cualquier fórmula registrada o descubierta en el módulo
+      • Ejecutar cualquier fórmula registrada o descubierta
       • Calcular tru_ri y tru_total para cualquier C, L, K válidos
       • Leer y ejecutar todos los archivos .py del módulo
       • Reportar estado, inventario y diagnóstico propios
@@ -15083,10 +15326,6 @@
       • verificar_coherencia
       • listar_formulas
       • listar_declaraciones
-    operaciones_arquitectonicas:
-      ejecutar_total: True
-      inspeccionar: True
-      registrar_inventario: True
   diagnostico:
     id: FO
     modulo: formulas
@@ -15099,16 +15338,21 @@
       []
     coherente: True
     faltas_n: 0
-    formulas_n: 2
+    formulas_n: 4
   inventario:
     id: FO
     nombre: formulas
     rol: FO
-    version: 1.1
+    version: 2.0
     version_contrato: 1.0
     esquema: VPSI-CONTRACT-1.0
     estabilidad: ESTABLE
     formulas:
+      • escala
+      • tru_ri
+      • tru_total
+      • verdad
+    formulas_descubiertas:
       escala:
         archivo: f_escala.py
         expresion: display(v) = fraccion(v) = decimal(v)
@@ -15120,6 +15364,10 @@
     formulas_registradas:
       • tru_ri
       • tru_total
+    total_formulas: 4
+    verdad:
+      tru_ri: True
+      tru_total: True
     reglas: 2
     declaraciones: 4
     capacidades:
@@ -15137,14 +15385,33 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
-      • *
+      • CE
+      • AX
+      • MC
+      • SF
+      • CA
+      • CX
+      • DI
+      • RE
+      • VX
+      • TX
+      • CH
+      • CIT
+      • DGCO
+      • UI
+      • CC
+      • TT
+      • SC
+      • CT
     invariantes:
       • el id del módulo nunca cambia
       • el rol nunca cambia
       • las capacidades declaradas son siempre callables tras la resolución
       • este módulo no modifica el estado de otros módulos
       • tru_ri y tru_total no imponen límites artificiales sobre C, L, K
+      • ALPHA y BETA provienen exclusivamente de modules.constante
 
 ══════════════════════════════════════════════════════════════════════
   MÓDULO UI/interfaz
@@ -15251,6 +15518,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -15262,6 +15530,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia interna del módulo.
@@ -15343,6 +15612,14 @@
         • acceso_archivos
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -15398,6 +15675,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     estados_operacion:
       • PROPUESTO
       • PARCIAL
@@ -15505,6 +15783,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -15515,6 +15794,7 @@
     • registrar_resultado_dominio
     • ejecutar_total
     • inspeccionar
+    • evaluar_universal
     • registrar_inventario
   capacidades_meta:
     verificar:
@@ -15597,6 +15877,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -15631,6 +15919,7 @@
       • registrar_resultado_dominio
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
       • registrar_inventario
     requiere:
       • CE
@@ -15705,6 +15994,7 @@
       • registrar_resultado_dominio
       • ejecutar_total
       • inspeccionar
+      • evaluar_universal
       • registrar_inventario
     requiere:
       • CE
@@ -15890,6 +16180,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -15905,6 +16196,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia interna de SF.
@@ -16018,6 +16310,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -16069,6 +16369,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -16126,6 +16427,7 @@
       • ejecutar_total
       • elegir
       • estado_self
+      • evaluar_universal
       • inspeccionar
       • inventario
       • oscilar
@@ -16263,6 +16565,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -16274,6 +16577,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Garantiza la coherencia del catálogo sincronizado.
@@ -16355,6 +16659,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -16390,6 +16702,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -16456,6 +16769,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -16621,6 +16935,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   requiere:
     • CE
     • AX
@@ -16676,6 +16991,7 @@
     reporte: True
     validar_esquema: True
     acceso_archivos: True
+    evaluar_universal: True
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
@@ -16691,6 +17007,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Coherencia interna de TX (alias de barrer).
@@ -16780,6 +17097,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -16816,6 +17141,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -16898,6 +17224,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -17117,6 +17444,7 @@
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
+    evaluar_universal: True
   capacidades:
     • verificar
     • barrer
@@ -17130,6 +17458,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Alias de barrer. Verifica coherencia del catálogo.
@@ -17227,6 +17556,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -17272,6 +17609,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     requiere:
       • CE
       • AX
@@ -17349,6 +17687,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     catalogo:
       modulo: tru_totales
       version: 2.0
@@ -17562,6 +17901,7 @@
     reporte: True
     validar_esquema: True
     acceso_archivos: True
+    evaluar_universal: True
     ejecutar_total: True
     inspeccionar: True
     registrar_inventario: True
@@ -17576,6 +17916,7 @@
     • ejecutar_total
     • inspeccionar
     • registrar_inventario
+    • evaluar_universal
   capacidades_meta:
     verificar:
       descripcion: Verifica una estructura contra reglas formales. Produce evidencia. No interpreta ni corrige.
@@ -17657,6 +17998,14 @@
       salida: dict con inventario registrado
       acceso_archivos:
         • acceso_archivos
+    evaluar_universal:
+      descripcion: Evalúa las capacidades reales de este módulo cuya firma se satisfaga con los hechos de entrada. Engine entrega la entrada; este callable solo aplica lo local.
+      entrada: hechos: dict
+      validar_esquema:
+        • *
+      salida: dict con hechos, traza, ejecutadas
+      acceso_archivos:
+        • *
   estados_validos:
     • NO_INICIADO
     • OPERATIVO
@@ -17698,6 +18047,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     jurisdiccion:
       • codigo
       • contratos
@@ -17766,6 +18116,7 @@
       • ejecutar_total
       • inspeccionar
       • registrar_inventario
+      • evaluar_universal
     funcion: Autoridad de verificación estructural. Determina si una estructura satisface o viola reglas formales. Solo produce evidencia. No interpreta, no corrige, no ejecuta.
     jurisdiccion:
       • codigo
@@ -18044,43 +18395,24 @@
       • SC
       • CT
     formulas:
-      • AX
-      • CA
-      • CC
       • CE
+      • AX
+      • MC
+      • SF
+      • CA
+      • CX
+      • DI
+      • RE
+      • VX
+      • TX
       • CH
       • CIT
-      • CT
-      • CX
       • DGCO
-      • DI
-      • FO
-      • MC
-      • RE
-      • SC
-      • SF
-      • TT
-      • TX
       • UI
-      • VX
-      • axiomas
-      • cache
-      • calculator
-      • capacidades_engine
-      • catalogo_citaciones
-      • citacion
-      • constante
-      • contexto
-      • correlacion_mecanica
-      • diagnosticoD
-      • diccionario
-      • interfaz
-      • realidad
-      • self
-      • spartaco_seguridad
-      • taxonomia
-      • tru_totales
-      • verificacion
+      • CC
+      • TT
+      • SC
+      • CT
     interfaz:
       • CE
       • AX
@@ -18328,1348 +18660,1443 @@
       tipo: capacidad
       modulo: axiomas
     [17]
+      id: axiomas.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: axiomas
+    [18]
       id: CH
       nombre: cache
       rol: CH
       tipo: modulo
-    [18]
+    [19]
       id: cache.verificar
       nombre: verificar
       tipo: capacidad
       modulo: cache
-    [19]
+    [20]
       id: cache.barrer
       nombre: barrer
       tipo: capacidad
       modulo: cache
-    [20]
+    [21]
       id: cache.depositar
       nombre: depositar
       tipo: capacidad
       modulo: cache
-    [21]
+    [22]
       id: cache.leer
       nombre: leer
       tipo: capacidad
       modulo: cache
-    [22]
+    [23]
       id: cache.leer_eventos
       nombre: leer_eventos
       tipo: capacidad
       modulo: cache
-    [23]
+    [24]
       id: cache.leer_por_ciclo
       nombre: leer_por_ciclo
       tipo: capacidad
       modulo: cache
-    [24]
+    [25]
       id: cache.leer_por_modulo
       nombre: leer_por_modulo
       tipo: capacidad
       modulo: cache
-    [25]
+    [26]
       id: cache.leer_por_tipo
       nombre: leer_por_tipo
       tipo: capacidad
       modulo: cache
-    [26]
+    [27]
       id: cache.leer_por_categoria
       nombre: leer_por_categoria
       tipo: capacidad
       modulo: cache
-    [27]
+    [28]
       id: cache.leer_por_capacidad
       nombre: leer_por_capacidad
       tipo: capacidad
       modulo: cache
-    [28]
+    [29]
       id: cache.leer_por_origen
       nombre: leer_por_origen
       tipo: capacidad
       modulo: cache
-    [29]
+    [30]
       id: cache.leer_por_destino
       nombre: leer_por_destino
       tipo: capacidad
       modulo: cache
-    [30]
+    [31]
       id: cache.leer_por_estado
       nombre: leer_por_estado
       tipo: capacidad
       modulo: cache
-    [31]
+    [32]
       id: cache.leer_por_seq
       nombre: leer_por_seq
       tipo: capacidad
       modulo: cache
-    [32]
+    [33]
       id: cache.leer_por_timestamp
       nombre: leer_por_timestamp
       tipo: capacidad
       modulo: cache
-    [33]
+    [34]
       id: cache.categorias
       nombre: categorias
       tipo: capacidad
       modulo: cache
-    [34]
+    [35]
       id: cache.inventario
       nombre: inventario
       tipo: capacidad
       modulo: cache
-    [35]
+    [36]
       id: cache.reporte
       nombre: reporte
       tipo: capacidad
       modulo: cache
-    [36]
+    [37]
       id: cache.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: cache
-    [37]
+    [38]
       id: cache.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: cache
-    [38]
+    [39]
       id: cache.backend_para_centinela
       nombre: backend_para_centinela
       tipo: capacidad
       modulo: cache
-    [39]
+    [40]
       id: cache.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: cache
-    [40]
+    [41]
       id: cache.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: cache
-    [41]
+    [42]
       id: cache.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: cache
-    [42]
+    [43]
       id: cache.mapear_codigo
       nombre: mapear_codigo
       tipo: capacidad
       modulo: cache
-    [43]
+    [44]
       id: cache.clasificar_ids
       nombre: clasificar_ids
       tipo: capacidad
       modulo: cache
-    [44]
+    [45]
+      id: cache.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: cache
+    [46]
       id: CA
       nombre: calculator
       rol: CA
       tipo: modulo
-    [45]
+    [47]
       id: calculator.calcular
       nombre: calcular
       tipo: capacidad
       modulo: calculator
-    [46]
+    [48]
       id: calculator.calcular_C
       nombre: calcular_C
       tipo: capacidad
       modulo: calculator
-    [47]
+    [49]
       id: calculator.calcular_L
       nombre: calcular_L
       tipo: capacidad
       modulo: calculator
-    [48]
+    [50]
       id: calculator.calcular_K
       nombre: calcular_K
       tipo: capacidad
       modulo: calculator
-    [49]
+    [51]
       id: calculator.calcular_factor
       nombre: calcular_factor
       tipo: capacidad
       modulo: calculator
-    [50]
+    [52]
       id: calculator.representar
       nombre: representar
       tipo: capacidad
       modulo: calculator
-    [51]
+    [53]
       id: calculator.validar_evidencia
       nombre: validar_evidencia
       tipo: capacidad
       modulo: calculator
-    [52]
+    [54]
       id: calculator.explicar_calculo
       nombre: explicar_calculo
       tipo: capacidad
       modulo: calculator
-    [53]
+    [55]
       id: calculator.verificar
       nombre: verificar
       tipo: capacidad
       modulo: calculator
-    [54]
+    [56]
       id: calculator.barrer
       nombre: barrer
       tipo: capacidad
       modulo: calculator
-    [55]
+    [57]
       id: calculator.inventario
       nombre: inventario
       tipo: capacidad
       modulo: calculator
-    [56]
+    [58]
       id: calculator.reporte
       nombre: reporte
       tipo: capacidad
       modulo: calculator
-    [57]
+    [59]
       id: calculator.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: calculator
-    [58]
+    [60]
       id: calculator.leer_ids_escala
       nombre: leer_ids_escala
       tipo: capacidad
       modulo: calculator
-    [59]
+    [61]
       id: calculator.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: calculator
-    [60]
+    [62]
       id: calculator.historial
       nombre: historial
       tipo: capacidad
       modulo: calculator
-    [61]
+    [63]
       id: calculator.verificar_calculo_de_C_L_K
       nombre: verificar_calculo_de_C_L_K
       tipo: capacidad
       modulo: calculator
-    [62]
+    [64]
       id: calculator.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: calculator
-    [63]
+    [65]
       id: calculator.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: calculator
-    [64]
+    [66]
       id: calculator.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: calculator
-    [65]
+    [67]
+      id: calculator.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: calculator
+    [68]
       id: CE
       nombre: capacidades_engine
       rol: CE
       tipo: modulo
-    [66]
+    [69]
       id: capacidades_engine.verificar
       nombre: verificar
       tipo: capacidad
       modulo: capacidades_engine
-    [67]
+    [70]
       id: capacidades_engine.barrer
       nombre: barrer
       tipo: capacidad
       modulo: capacidades_engine
-    [68]
+    [71]
       id: capacidades_engine.inventario
       nombre: inventario
       tipo: capacidad
       modulo: capacidades_engine
-    [69]
+    [72]
       id: capacidades_engine.skills
       nombre: skills
       tipo: capacidad
       modulo: capacidades_engine
-    [70]
+    [73]
       id: capacidades_engine.ids
       nombre: ids
       tipo: capacidad
       modulo: capacidades_engine
-    [71]
+    [74]
       id: capacidades_engine.por_id
       nombre: por_id
       tipo: capacidad
       modulo: capacidades_engine
-    [72]
+    [75]
       id: capacidades_engine.listar_archivos
       nombre: listar_archivos
       tipo: capacidad
       modulo: capacidades_engine
-    [73]
+    [76]
       id: capacidades_engine.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: capacidades_engine
-    [74]
+    [77]
       id: capacidades_engine.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: capacidades_engine
-    [75]
+    [78]
       id: capacidades_engine.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: capacidades_engine
-    [76]
+    [79]
       id: capacidades_engine.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: capacidades_engine
-    [77]
+    [80]
       id: capacidades_engine.reporte
       nombre: reporte
       tipo: capacidad
       modulo: capacidades_engine
-    [78]
+    [81]
       id: capacidades_engine.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: capacidades_engine
-    [79]
+    [82]
+      id: capacidades_engine.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: capacidades_engine
+    [83]
       id: CC
       nombre: catalogo_citaciones
       rol: CC
       tipo: modulo
-    [80]
+    [84]
       id: catalogo_citaciones.verificar
       nombre: verificar
       tipo: capacidad
       modulo: catalogo_citaciones
-    [81]
+    [85]
       id: catalogo_citaciones.barrer
       nombre: barrer
       tipo: capacidad
       modulo: catalogo_citaciones
-    [82]
+    [86]
       id: catalogo_citaciones.inventario
       nombre: inventario
       tipo: capacidad
       modulo: catalogo_citaciones
-    [83]
+    [87]
       id: catalogo_citaciones.categorias
       nombre: categorias
       tipo: capacidad
       modulo: catalogo_citaciones
-    [84]
+    [88]
       id: catalogo_citaciones.por_id
       nombre: por_id
       tipo: capacidad
       modulo: catalogo_citaciones
-    [85]
+    [89]
       id: catalogo_citaciones.ids
       nombre: ids
       tipo: capacidad
       modulo: catalogo_citaciones
-    [86]
+    [90]
       id: catalogo_citaciones.esquema
       nombre: esquema
       tipo: capacidad
       modulo: catalogo_citaciones
-    [87]
+    [91]
       id: catalogo_citaciones.reporte
       nombre: reporte
       tipo: capacidad
       modulo: catalogo_citaciones
-    [88]
+    [92]
       id: catalogo_citaciones.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: catalogo_citaciones
-    [89]
+    [93]
       id: catalogo_citaciones.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: catalogo_citaciones
-    [90]
+    [94]
       id: catalogo_citaciones.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: catalogo_citaciones
-    [91]
+    [95]
       id: catalogo_citaciones.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: catalogo_citaciones
-    [92]
+    [96]
       id: catalogo_citaciones.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: catalogo_citaciones
-    [93]
+    [97]
+      id: catalogo_citaciones.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: catalogo_citaciones
+    [98]
       id: CIT
       nombre: citacion
       rol: CIT
       tipo: modulo
-    [94]
+    [99]
       id: citacion.verificar
       nombre: verificar
       tipo: capacidad
       modulo: citacion
-    [95]
+    [100]
       id: citacion.barrer
       nombre: barrer
       tipo: capacidad
       modulo: citacion
-    [96]
+    [101]
       id: citacion.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: citacion
-    [97]
+    [102]
       id: citacion.inventario
       nombre: inventario
       tipo: capacidad
       modulo: citacion
-    [98]
+    [103]
       id: citacion.reporte
       nombre: reporte
       tipo: capacidad
       modulo: citacion
-    [99]
+    [104]
       id: citacion.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: citacion
-    [100]
+    [105]
       id: citacion.anunciar
       nombre: anunciar
       tipo: capacidad
       modulo: citacion
-    [101]
+    [106]
       id: citacion.anunciar_todo
       nombre: anunciar_todo
       tipo: capacidad
       modulo: citacion
-    [102]
+    [107]
       id: citacion.citar
       nombre: citar
       tipo: capacidad
       modulo: citacion
-    [103]
+    [108]
       id: citacion.registrar
       nombre: registrar
       tipo: capacidad
       modulo: citacion
-    [104]
+    [109]
       id: citacion.resolver
       nombre: resolver
       tipo: capacidad
       modulo: citacion
-    [105]
+    [110]
       id: citacion.resolver_enunciado
       nombre: resolver_enunciado
       tipo: capacidad
       modulo: citacion
-    [106]
+    [111]
       id: citacion.buscar
       nombre: buscar
       tipo: capacidad
       modulo: citacion
-    [107]
+    [112]
       id: citacion.cadena
       nombre: cadena
       tipo: capacidad
       modulo: citacion
-    [108]
+    [113]
       id: citacion.explicar
       nombre: explicar
       tipo: capacidad
       modulo: citacion
-    [109]
+    [114]
       id: citacion.relacionar
       nombre: relacionar
       tipo: capacidad
       modulo: citacion
-    [110]
+    [115]
       id: citacion.limpiar_ciclo
       nombre: limpiar_ciclo
       tipo: capacidad
       modulo: citacion
-    [111]
+    [116]
       id: citacion.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: citacion
-    [112]
+    [117]
       id: citacion.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: citacion
-    [113]
+    [118]
       id: citacion.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: citacion
-    [114]
+    [119]
       id: citacion.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: citacion
-    [115]
+    [120]
+      id: citacion.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: citacion
+    [121]
       id: CT
       nombre: constante
       rol: CT
       tipo: modulo
-    [116]
+    [122]
       id: constante.alpha
       nombre: alpha
       tipo: capacidad
       modulo: constante
-    [117]
+    [123]
       id: constante.beta
       nombre: beta
       tipo: capacidad
       modulo: constante
-    [118]
+    [124]
       id: constante.buscar_constante
       nombre: buscar_constante
       tipo: capacidad
       modulo: constante
-    [119]
+    [125]
       id: constante.descubrir_constantes
       nombre: descubrir_constantes
       tipo: capacidad
       modulo: constante
-    [120]
+    [126]
       id: constante.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: constante
-    [121]
+    [127]
       id: constante.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: constante
-    [122]
+    [128]
+      id: constante.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: constante
+    [129]
       id: constante.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: constante
-    [123]
+    [130]
       id: constante.inventario
       nombre: inventario
       tipo: capacidad
       modulo: constante
-    [124]
+    [131]
       id: constante.listar_constantes
       nombre: listar_constantes
       tipo: capacidad
       modulo: constante
-    [125]
+    [132]
       id: constante.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: constante
-    [126]
+    [133]
       id: constante.reporte
       nombre: reporte
       tipo: capacidad
       modulo: constante
-    [127]
+    [134]
       id: constante.verificar
       nombre: verificar
       tipo: capacidad
       modulo: constante
-    [128]
+    [135]
       id: constante.verificar_constantes
       nombre: verificar_constantes
       tipo: capacidad
       modulo: constante
-    [129]
+    [136]
       id: CX
       nombre: contexto
       rol: CX
       tipo: modulo
-    [130]
+    [137]
       id: contexto.resolver
       nombre: resolver
       tipo: capacidad
       modulo: contexto
-    [131]
+    [138]
       id: contexto.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: contexto
-    [132]
+    [139]
       id: contexto.centinela
       nombre: centinela
       tipo: capacidad
       modulo: contexto
-    [133]
+    [140]
       id: contexto.verificar
       nombre: verificar
       tipo: capacidad
       modulo: contexto
-    [134]
+    [141]
       id: contexto.barrer
       nombre: barrer
       tipo: capacidad
       modulo: contexto
-    [135]
+    [142]
       id: contexto.inventario
       nombre: inventario
       tipo: capacidad
       modulo: contexto
-    [136]
+    [143]
       id: contexto.reporte
       nombre: reporte
       tipo: capacidad
       modulo: contexto
-    [137]
+    [144]
       id: contexto.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: contexto
-    [138]
+    [145]
       id: contexto.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: contexto
-    [139]
+    [146]
       id: contexto.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: contexto
-    [140]
+    [147]
       id: contexto.ejecutar
       nombre: ejecutar
       tipo: capacidad
       modulo: contexto
-    [141]
+    [148]
       id: contexto.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: contexto
-    [142]
+    [149]
       id: contexto.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: contexto
-    [143]
+    [150]
+      id: contexto.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: contexto
+    [151]
       id: MC
       nombre: correlacion_mecanica
       rol: MC
       tipo: modulo
-    [144]
+    [152]
       id: correlacion_mecanica.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [145]
+    [153]
       id: correlacion_mecanica.barrer
       nombre: barrer
       tipo: capacidad
       modulo: correlacion_mecanica
-    [146]
+    [154]
       id: correlacion_mecanica.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: correlacion_mecanica
-    [147]
+    [155]
       id: correlacion_mecanica.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: correlacion_mecanica
-    [148]
+    [156]
       id: correlacion_mecanica.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [149]
+    [157]
+      id: correlacion_mecanica.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: correlacion_mecanica
+    [158]
       id: correlacion_mecanica.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [150]
+    [159]
       id: correlacion_mecanica.inventario
       nombre: inventario
       tipo: capacidad
       modulo: correlacion_mecanica
-    [151]
+    [160]
       id: correlacion_mecanica.listar_mecanicas
       nombre: listar_mecanicas
       tipo: capacidad
       modulo: correlacion_mecanica
-    [152]
+    [161]
       id: correlacion_mecanica.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: correlacion_mecanica
-    [153]
+    [162]
       id: correlacion_mecanica.reporte
       nombre: reporte
       tipo: capacidad
       modulo: correlacion_mecanica
-    [154]
+    [163]
       id: correlacion_mecanica.verificar
       nombre: verificar
       tipo: capacidad
       modulo: correlacion_mecanica
-    [155]
+    [164]
       id: correlacion_mecanica.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: correlacion_mecanica
-    [156]
+    [165]
       id: DGCO
       nombre: diagnosticoD
       rol: DGCO
       tipo: modulo
-    [157]
+    [166]
       id: diagnosticoD.censo
       nombre: censo
       tipo: capacidad
       modulo: diagnosticoD
-    [158]
+    [167]
       id: diagnosticoD.verificar
       nombre: verificar
       tipo: capacidad
       modulo: diagnosticoD
-    [159]
+    [168]
       id: diagnosticoD.barrer
       nombre: barrer
       tipo: capacidad
       modulo: diagnosticoD
-    [160]
+    [169]
       id: diagnosticoD.presentar
       nombre: presentar
       tipo: capacidad
       modulo: diagnosticoD
-    [161]
+    [170]
       id: diagnosticoD.reportar
       nombre: reportar
       tipo: capacidad
       modulo: diagnosticoD
-    [162]
+    [171]
       id: diagnosticoD.inventario
       nombre: inventario
       tipo: capacidad
       modulo: diagnosticoD
-    [163]
+    [172]
       id: diagnosticoD.reporte
       nombre: reporte
       tipo: capacidad
       modulo: diagnosticoD
-    [164]
+    [173]
       id: diagnosticoD.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: diagnosticoD
-    [165]
+    [174]
       id: diagnosticoD.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: diagnosticoD
-    [166]
+    [175]
       id: diagnosticoD.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: diagnosticoD
-    [167]
+    [176]
       id: diagnosticoD.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: diagnosticoD
-    [168]
+    [177]
+      id: diagnosticoD.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: diagnosticoD
+    [178]
       id: DI
       nombre: diccionario
       rol: DI
       tipo: modulo
-    [169]
+    [179]
       id: diccionario.verificar
       nombre: verificar
       tipo: capacidad
       modulo: diccionario
-    [170]
+    [180]
       id: diccionario.barrer
       nombre: barrer
       tipo: capacidad
       modulo: diccionario
-    [171]
+    [181]
       id: diccionario.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: diccionario
-    [172]
+    [182]
       id: diccionario.inventario
       nombre: inventario
       tipo: capacidad
       modulo: diccionario
-    [173]
+    [183]
       id: diccionario.reporte
       nombre: reporte
       tipo: capacidad
       modulo: diccionario
-    [174]
+    [184]
       id: diccionario.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: diccionario
-    [175]
+    [185]
       id: diccionario.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: diccionario
-    [176]
+    [186]
       id: diccionario.resolver
       nombre: resolver
       tipo: capacidad
       modulo: diccionario
-    [177]
+    [187]
       id: diccionario.listar
       nombre: listar
       tipo: capacidad
       modulo: diccionario
-    [178]
+    [188]
       id: diccionario.cargar
       nombre: cargar
       tipo: capacidad
       modulo: diccionario
-    [179]
+    [189]
       id: diccionario.cargar_todos
       nombre: cargar_todos
       tipo: capacidad
       modulo: diccionario
-    [180]
+    [190]
       id: diccionario.definir
       nombre: definir
       tipo: capacidad
       modulo: diccionario
-    [181]
+    [191]
       id: diccionario.significado
       nombre: significado
       tipo: capacidad
       modulo: diccionario
-    [182]
+    [192]
       id: diccionario.palabras
       nombre: palabras
       tipo: capacidad
       modulo: diccionario
-    [183]
+    [193]
       id: diccionario.inyectar_en_peticion
       nombre: inyectar_en_peticion
       tipo: capacidad
       modulo: diccionario
-    [184]
+    [194]
       id: diccionario.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: diccionario
-    [185]
+    [195]
       id: diccionario.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: diccionario
-    [186]
+    [196]
       id: diccionario.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: diccionario
-    [187]
+    [197]
+      id: diccionario.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: diccionario
+    [198]
       id: FO
       nombre: formulas
       rol: FO
       tipo: modulo
-    [188]
+    [199]
       id: formulas.verificar
       nombre: verificar
       tipo: capacidad
       modulo: formulas
-    [189]
+    [200]
       id: formulas.barrer
       nombre: barrer
       tipo: capacidad
       modulo: formulas
-    [190]
+    [201]
       id: formulas.evaluar
       nombre: evaluar
       tipo: capacidad
       modulo: formulas
-    [191]
+    [202]
       id: formulas.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: formulas
-    [192]
+    [203]
       id: formulas.inventario
       nombre: inventario
       tipo: capacidad
       modulo: formulas
-    [193]
+    [204]
       id: formulas.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: formulas
-    [194]
+    [205]
       id: formulas.tru_ri
       nombre: tru_ri
       tipo: capacidad
       modulo: formulas
-    [195]
+    [206]
       id: formulas.tru_total
       nombre: tru_total
       tipo: capacidad
       modulo: formulas
-    [196]
+    [207]
       id: formulas.reporte
       nombre: reporte
       tipo: capacidad
       modulo: formulas
-    [197]
+    [208]
       id: formulas.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: formulas
-    [198]
+    [209]
       id: formulas.listar_formulas
       nombre: listar_formulas
       tipo: capacidad
       modulo: formulas
-    [199]
+    [210]
       id: formulas.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: formulas
-    [200]
+    [211]
       id: formulas.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: formulas
-    [201]
+    [212]
       id: formulas.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: formulas
-    [202]
+    [213]
+      id: formulas.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: formulas
+    [214]
       id: UI
       nombre: interfaz
       rol: UI
       tipo: modulo
-    [203]
+    [215]
       id: interfaz.verificar
       nombre: verificar
       tipo: capacidad
       modulo: interfaz
-    [204]
+    [216]
       id: interfaz.barrer
       nombre: barrer
       tipo: capacidad
       modulo: interfaz
-    [205]
+    [217]
       id: interfaz.componer
       nombre: componer
       tipo: capacidad
       modulo: interfaz
-    [206]
+    [218]
       id: interfaz.observar
       nombre: observar
       tipo: capacidad
       modulo: interfaz
-    [207]
+    [219]
       id: interfaz.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: interfaz
-    [208]
+    [220]
       id: interfaz.inventario
       nombre: inventario
       tipo: capacidad
       modulo: interfaz
-    [209]
+    [221]
       id: interfaz.inventario_paquetes
       nombre: inventario_paquetes
       tipo: capacidad
       modulo: interfaz
-    [210]
+    [222]
       id: interfaz.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: interfaz
-    [211]
+    [223]
       id: interfaz.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: interfaz
-    [212]
+    [224]
       id: interfaz.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: interfaz
-    [213]
+    [225]
+      id: interfaz.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: interfaz
+    [226]
       id: RE
       nombre: realidad
       rol: RE
       tipo: modulo
-    [214]
+    [227]
       id: realidad.verificar
       nombre: verificar
       tipo: capacidad
       modulo: realidad
-    [215]
+    [228]
       id: realidad.barrer
       nombre: barrer
       tipo: capacidad
       modulo: realidad
-    [216]
+    [229]
       id: realidad.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: realidad
-    [217]
+    [230]
       id: realidad.inventario
       nombre: inventario
       tipo: capacidad
       modulo: realidad
-    [218]
+    [231]
       id: realidad.reporte
       nombre: reporte
       tipo: capacidad
       modulo: realidad
-    [219]
+    [232]
       id: realidad.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: realidad
-    [220]
+    [233]
       id: realidad.registrar_resultado_dominio
       nombre: registrar_resultado_dominio
       tipo: capacidad
       modulo: realidad
-    [221]
+    [234]
       id: realidad.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: realidad
-    [222]
+    [235]
       id: realidad.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: realidad
-    [223]
+    [236]
+      id: realidad.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: realidad
+    [237]
       id: realidad.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: realidad
-    [224]
+    [238]
       id: SF
       nombre: self
       rol: SF
       tipo: modulo
-    [225]
+    [239]
       id: self.verificar
       nombre: verificar
       tipo: capacidad
       modulo: self
-    [226]
+    [240]
       id: self.barrer
       nombre: barrer
       tipo: capacidad
       modulo: self
-    [227]
+    [241]
       id: self.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: self
-    [228]
+    [242]
       id: self.yo_funcional
       nombre: yo_funcional
       tipo: capacidad
       modulo: self
-    [229]
+    [243]
       id: self.oscilar
       nombre: oscilar
       tipo: capacidad
       modulo: self
-    [230]
+    [244]
       id: self.desde_donde
       nombre: desde_donde
       tipo: capacidad
       modulo: self
-    [231]
+    [245]
       id: self.estado_self
       nombre: estado_self
       tipo: capacidad
       modulo: self
-    [232]
+    [246]
       id: self.elegir
       nombre: elegir
       tipo: capacidad
       modulo: self
-    [233]
+    [247]
       id: self.inventario
       nombre: inventario
       tipo: capacidad
       modulo: self
-    [234]
+    [248]
       id: self.reporte
       nombre: reporte
       tipo: capacidad
       modulo: self
-    [235]
+    [249]
       id: self.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: self
-    [236]
+    [250]
       id: self.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: self
-    [237]
+    [251]
       id: self.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: self
-    [238]
+    [252]
       id: self.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: self
-    [239]
+    [253]
+      id: self.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: self
+    [254]
       id: SC
       nombre: spartaco_seguridad
       rol: SC
       tipo: modulo
-    [240]
+    [255]
       id: spartaco_seguridad.verificar
       nombre: verificar
       tipo: capacidad
       modulo: spartaco_seguridad
-    [241]
+    [256]
       id: spartaco_seguridad.barrer
       nombre: barrer
       tipo: capacidad
       modulo: spartaco_seguridad
-    [242]
+    [257]
       id: spartaco_seguridad.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: spartaco_seguridad
-    [243]
+    [258]
       id: spartaco_seguridad.inventario
       nombre: inventario
       tipo: capacidad
       modulo: spartaco_seguridad
-    [244]
+    [259]
       id: spartaco_seguridad.reporte
       nombre: reporte
       tipo: capacidad
       modulo: spartaco_seguridad
-    [245]
+    [260]
       id: spartaco_seguridad.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: spartaco_seguridad
-    [246]
+    [261]
       id: spartaco_seguridad.catalogo
       nombre: catalogo
       tipo: capacidad
       modulo: spartaco_seguridad
-    [247]
+    [262]
       id: spartaco_seguridad.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: spartaco_seguridad
-    [248]
+    [263]
       id: spartaco_seguridad.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: spartaco_seguridad
-    [249]
+    [264]
       id: spartaco_seguridad.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: spartaco_seguridad
-    [250]
+    [265]
+      id: spartaco_seguridad.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: spartaco_seguridad
+    [266]
       id: TX
       nombre: taxonomia
       rol: TX
       tipo: modulo
-    [251]
+    [267]
       id: taxonomia.verificar
       nombre: verificar
       tipo: capacidad
       modulo: taxonomia
-    [252]
+    [268]
       id: taxonomia.barrer
       nombre: barrer
       tipo: capacidad
       modulo: taxonomia
-    [253]
+    [269]
       id: taxonomia.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: taxonomia
-    [254]
+    [270]
       id: taxonomia.aplicar
       nombre: aplicar
       tipo: capacidad
       modulo: taxonomia
-    [255]
+    [271]
       id: taxonomia.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: taxonomia
-    [256]
+    [272]
       id: taxonomia.inventario
       nombre: inventario
       tipo: capacidad
       modulo: taxonomia
-    [257]
+    [273]
       id: taxonomia.reporte
       nombre: reporte
       tipo: capacidad
       modulo: taxonomia
-    [258]
+    [274]
       id: taxonomia.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: taxonomia
-    [259]
+    [275]
       id: taxonomia.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: taxonomia
-    [260]
+    [276]
       id: taxonomia.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: taxonomia
-    [261]
+    [277]
       id: taxonomia.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: taxonomia
-    [262]
+    [278]
+      id: taxonomia.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: taxonomia
+    [279]
       id: TT
       nombre: tru_totales
       rol: TT
       tipo: modulo
-    [263]
+    [280]
       id: tru_totales.verificar
       nombre: verificar
       tipo: capacidad
       modulo: tru_totales
-    [264]
+    [281]
       id: tru_totales.barrer
       nombre: barrer
       tipo: capacidad
       modulo: tru_totales
-    [265]
+    [282]
       id: tru_totales.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: tru_totales
-    [266]
+    [283]
       id: tru_totales.categorias
       nombre: categorias
       tipo: capacidad
       modulo: tru_totales
-    [267]
+    [284]
       id: tru_totales.capacidades
       nombre: capacidades
       tipo: capacidad
       modulo: tru_totales
-    [268]
+    [285]
       id: tru_totales.resolver_pedido
       nombre: resolver_pedido
       tipo: capacidad
       modulo: tru_totales
-    [269]
+    [286]
       id: tru_totales.inventario
       nombre: inventario
       tipo: capacidad
       modulo: tru_totales
-    [270]
+    [287]
       id: tru_totales.reporte
       nombre: reporte
       tipo: capacidad
       modulo: tru_totales
-    [271]
+    [288]
       id: tru_totales.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: tru_totales
-    [272]
+    [289]
       id: tru_totales.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: tru_totales
-    [273]
+    [290]
       id: tru_totales.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: tru_totales
-    [274]
+    [291]
       id: tru_totales.registrar_inventario
       nombre: registrar_inventario
       tipo: capacidad
       modulo: tru_totales
-    [275]
+    [292]
+      id: tru_totales.evaluar_universal
+      nombre: evaluar_universal
+      tipo: capacidad
+      modulo: tru_totales
+    [293]
       id: VX
       nombre: verificacion
       rol: VX
       tipo: modulo
-    [276]
+    [294]
       id: verificacion.verificar
       nombre: verificar
       tipo: capacidad
       modulo: verificacion
-    [277]
+    [295]
       id: verificacion.barrer
       nombre: barrer
       tipo: capacidad
       modulo: verificacion
-    [278]
+    [296]
       id: verificacion.verificar_salida
       nombre: verificar_salida
       tipo: capacidad
       modulo: verificacion
-    [279]
+    [297]
       id: verificacion.axiomas
       nombre: axiomas
       tipo: capacidad
       modulo: verificacion
-    [280]
+    [298]
       id: verificacion.inventario
       nombre: inventario
       tipo: capacidad
       modulo: verificacion
-    [281]
+    [299]
       id: verificacion.reporte
       nombre: reporte
       tipo: capacidad
       modulo: verificacion
-    [282]
+    [300]
       id: verificacion.diagnostico
       nombre: diagnostico
       tipo: capacidad
       modulo: verificacion
-    [283]
+    [301]
       id: verificacion.ejecutar_total
       nombre: ejecutar_total
       tipo: capacidad
       modulo: verificacion
-    [284]
+    [302]
       id: verificacion.inspeccionar
       nombre: inspeccionar
       tipo: capacidad
       modulo: verificacion
-    [285]
+    [303]
       id: verificacion.registrar_inventario
       nombre: registrar_inventario
+      tipo: capacidad
+      modulo: verificacion
+    [304]
+      id: verificacion.evaluar_universal
+      nombre: evaluar_universal
       tipo: capacidad
       modulo: verificacion
   aristas:
@@ -19810,2164 +20237,2308 @@
       to: axiomas.inspeccionar
       tipo: declara_capacidad
     [34]
-      from: cache
-      to: CE
-      tipo: requiere
+      from: axiomas
+      to: axiomas.evaluar_universal
+      tipo: declara_capacidad
     [35]
       from: cache
-      to: AX
+      to: CE
       tipo: requiere
     [36]
       from: cache
-      to: FO
+      to: AX
       tipo: requiere
     [37]
       from: cache
-      to: MC
+      to: FO
       tipo: requiere
     [38]
       from: cache
-      to: SF
+      to: MC
       tipo: requiere
     [39]
       from: cache
-      to: CA
+      to: SF
       tipo: requiere
     [40]
       from: cache
-      to: CX
+      to: CA
       tipo: requiere
     [41]
       from: cache
-      to: DI
+      to: CX
       tipo: requiere
     [42]
       from: cache
-      to: RE
+      to: DI
       tipo: requiere
     [43]
       from: cache
-      to: VX
+      to: RE
       tipo: requiere
     [44]
       from: cache
-      to: TX
+      to: VX
       tipo: requiere
     [45]
       from: cache
-      to: CIT
+      to: TX
       tipo: requiere
     [46]
       from: cache
-      to: DGCO
+      to: CIT
       tipo: requiere
     [47]
       from: cache
-      to: UI
+      to: DGCO
       tipo: requiere
     [48]
       from: cache
-      to: CC
+      to: UI
       tipo: requiere
     [49]
       from: cache
-      to: TT
+      to: CC
       tipo: requiere
     [50]
       from: cache
-      to: SC
+      to: TT
       tipo: requiere
     [51]
       from: cache
-      to: CT
+      to: SC
       tipo: requiere
     [52]
       from: cache
-      to: cache.verificar
-      tipo: declara_capacidad
+      to: CT
+      tipo: requiere
     [53]
       from: cache
-      to: cache.barrer
+      to: cache.verificar
       tipo: declara_capacidad
     [54]
       from: cache
-      to: cache.depositar
+      to: cache.barrer
       tipo: declara_capacidad
     [55]
       from: cache
-      to: cache.leer
+      to: cache.depositar
       tipo: declara_capacidad
     [56]
       from: cache
-      to: cache.leer_eventos
+      to: cache.leer
       tipo: declara_capacidad
     [57]
       from: cache
-      to: cache.leer_por_ciclo
+      to: cache.leer_eventos
       tipo: declara_capacidad
     [58]
       from: cache
-      to: cache.leer_por_modulo
+      to: cache.leer_por_ciclo
       tipo: declara_capacidad
     [59]
       from: cache
-      to: cache.leer_por_tipo
+      to: cache.leer_por_modulo
       tipo: declara_capacidad
     [60]
       from: cache
-      to: cache.leer_por_categoria
+      to: cache.leer_por_tipo
       tipo: declara_capacidad
     [61]
       from: cache
-      to: cache.leer_por_capacidad
+      to: cache.leer_por_categoria
       tipo: declara_capacidad
     [62]
       from: cache
-      to: cache.leer_por_origen
+      to: cache.leer_por_capacidad
       tipo: declara_capacidad
     [63]
       from: cache
-      to: cache.leer_por_destino
+      to: cache.leer_por_origen
       tipo: declara_capacidad
     [64]
       from: cache
-      to: cache.leer_por_estado
+      to: cache.leer_por_destino
       tipo: declara_capacidad
     [65]
       from: cache
-      to: cache.leer_por_seq
+      to: cache.leer_por_estado
       tipo: declara_capacidad
     [66]
       from: cache
-      to: cache.leer_por_timestamp
+      to: cache.leer_por_seq
       tipo: declara_capacidad
     [67]
       from: cache
-      to: cache.categorias
+      to: cache.leer_por_timestamp
       tipo: declara_capacidad
     [68]
       from: cache
-      to: cache.inventario
+      to: cache.categorias
       tipo: declara_capacidad
     [69]
       from: cache
-      to: cache.reporte
+      to: cache.inventario
       tipo: declara_capacidad
     [70]
       from: cache
-      to: cache.diagnostico
+      to: cache.reporte
       tipo: declara_capacidad
     [71]
       from: cache
-      to: cache.verificar_salida
+      to: cache.diagnostico
       tipo: declara_capacidad
     [72]
       from: cache
-      to: cache.backend_para_centinela
+      to: cache.verificar_salida
       tipo: declara_capacidad
     [73]
       from: cache
-      to: cache.ejecutar_total
+      to: cache.backend_para_centinela
       tipo: declara_capacidad
     [74]
       from: cache
-      to: cache.inspeccionar
+      to: cache.ejecutar_total
       tipo: declara_capacidad
     [75]
       from: cache
-      to: cache.registrar_inventario
+      to: cache.inspeccionar
       tipo: declara_capacidad
     [76]
       from: cache
-      to: cache.mapear_codigo
+      to: cache.registrar_inventario
       tipo: declara_capacidad
     [77]
       from: cache
-      to: cache.clasificar_ids
+      to: cache.mapear_codigo
       tipo: declara_capacidad
     [78]
-      from: calculator
-      to: CT
-      tipo: requiere
+      from: cache
+      to: cache.clasificar_ids
+      tipo: declara_capacidad
     [79]
-      from: calculator
-      to: AX
-      tipo: requiere
+      from: cache
+      to: cache.evaluar_universal
+      tipo: declara_capacidad
     [80]
       from: calculator
-      to: FO
+      to: CT
       tipo: requiere
     [81]
       from: calculator
-      to: MC
+      to: AX
       tipo: requiere
     [82]
       from: calculator
-      to: SF
+      to: FO
       tipo: requiere
     [83]
       from: calculator
-      to: CA
+      to: MC
       tipo: requiere
     [84]
       from: calculator
-      to: CX
+      to: SF
       tipo: requiere
     [85]
       from: calculator
-      to: DI
+      to: CA
       tipo: requiere
     [86]
       from: calculator
-      to: RE
+      to: CX
       tipo: requiere
     [87]
       from: calculator
-      to: VX
+      to: DI
       tipo: requiere
     [88]
       from: calculator
-      to: TX
+      to: RE
       tipo: requiere
     [89]
       from: calculator
-      to: CH
+      to: VX
       tipo: requiere
     [90]
       from: calculator
-      to: CIT
+      to: TX
       tipo: requiere
     [91]
       from: calculator
-      to: DGCO
+      to: CH
       tipo: requiere
     [92]
       from: calculator
-      to: UI
+      to: CIT
       tipo: requiere
     [93]
       from: calculator
-      to: CC
+      to: DGCO
       tipo: requiere
     [94]
       from: calculator
-      to: TT
+      to: UI
       tipo: requiere
     [95]
       from: calculator
-      to: SC
+      to: CC
       tipo: requiere
     [96]
       from: calculator
-      to: calculator.calcular
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [97]
       from: calculator
-      to: calculator.calcular_C
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [98]
       from: calculator
-      to: calculator.calcular_L
+      to: calculator.calcular
       tipo: declara_capacidad
     [99]
       from: calculator
-      to: calculator.calcular_K
+      to: calculator.calcular_C
       tipo: declara_capacidad
     [100]
       from: calculator
-      to: calculator.calcular_factor
+      to: calculator.calcular_L
       tipo: declara_capacidad
     [101]
       from: calculator
-      to: calculator.representar
+      to: calculator.calcular_K
       tipo: declara_capacidad
     [102]
       from: calculator
-      to: calculator.validar_evidencia
+      to: calculator.calcular_factor
       tipo: declara_capacidad
     [103]
       from: calculator
-      to: calculator.explicar_calculo
+      to: calculator.representar
       tipo: declara_capacidad
     [104]
       from: calculator
-      to: calculator.verificar
+      to: calculator.validar_evidencia
       tipo: declara_capacidad
     [105]
       from: calculator
-      to: calculator.barrer
+      to: calculator.explicar_calculo
       tipo: declara_capacidad
     [106]
       from: calculator
-      to: calculator.inventario
+      to: calculator.verificar
       tipo: declara_capacidad
     [107]
       from: calculator
-      to: calculator.reporte
+      to: calculator.barrer
       tipo: declara_capacidad
     [108]
       from: calculator
-      to: calculator.diagnostico
+      to: calculator.inventario
       tipo: declara_capacidad
     [109]
       from: calculator
-      to: calculator.leer_ids_escala
+      to: calculator.reporte
       tipo: declara_capacidad
     [110]
       from: calculator
-      to: calculator.verificar_salida
+      to: calculator.diagnostico
       tipo: declara_capacidad
     [111]
       from: calculator
-      to: calculator.historial
+      to: calculator.leer_ids_escala
       tipo: declara_capacidad
     [112]
       from: calculator
-      to: calculator.verificar_calculo_de_C_L_K
+      to: calculator.verificar_salida
       tipo: declara_capacidad
     [113]
       from: calculator
-      to: calculator.ejecutar_total
+      to: calculator.historial
       tipo: declara_capacidad
     [114]
       from: calculator
-      to: calculator.inspeccionar
+      to: calculator.verificar_calculo_de_C_L_K
       tipo: declara_capacidad
     [115]
       from: calculator
-      to: calculator.registrar_inventario
+      to: calculator.ejecutar_total
       tipo: declara_capacidad
     [116]
-      from: capacidades_engine
-      to: AX
-      tipo: requiere
+      from: calculator
+      to: calculator.inspeccionar
+      tipo: declara_capacidad
     [117]
-      from: capacidades_engine
-      to: FO
-      tipo: requiere
+      from: calculator
+      to: calculator.registrar_inventario
+      tipo: declara_capacidad
     [118]
-      from: capacidades_engine
-      to: MC
-      tipo: requiere
+      from: calculator
+      to: calculator.evaluar_universal
+      tipo: declara_capacidad
     [119]
       from: capacidades_engine
-      to: SF
+      to: AX
       tipo: requiere
     [120]
       from: capacidades_engine
-      to: CA
+      to: FO
       tipo: requiere
     [121]
       from: capacidades_engine
-      to: CX
+      to: MC
       tipo: requiere
     [122]
       from: capacidades_engine
-      to: DI
+      to: SF
       tipo: requiere
     [123]
       from: capacidades_engine
-      to: RE
+      to: CA
       tipo: requiere
     [124]
       from: capacidades_engine
-      to: VX
+      to: CX
       tipo: requiere
     [125]
       from: capacidades_engine
-      to: TX
+      to: DI
       tipo: requiere
     [126]
       from: capacidades_engine
-      to: CH
+      to: RE
       tipo: requiere
     [127]
       from: capacidades_engine
-      to: CIT
+      to: VX
       tipo: requiere
     [128]
       from: capacidades_engine
-      to: DGCO
+      to: TX
       tipo: requiere
     [129]
       from: capacidades_engine
-      to: UI
+      to: CH
       tipo: requiere
     [130]
       from: capacidades_engine
-      to: CC
+      to: CIT
       tipo: requiere
     [131]
       from: capacidades_engine
-      to: TT
+      to: DGCO
       tipo: requiere
     [132]
       from: capacidades_engine
-      to: SC
+      to: UI
       tipo: requiere
     [133]
       from: capacidades_engine
-      to: capacidades_engine.verificar
-      tipo: declara_capacidad
+      to: CC
+      tipo: requiere
     [134]
       from: capacidades_engine
-      to: capacidades_engine.barrer
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [135]
       from: capacidades_engine
-      to: capacidades_engine.inventario
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [136]
       from: capacidades_engine
-      to: capacidades_engine.skills
+      to: capacidades_engine.verificar
       tipo: declara_capacidad
     [137]
       from: capacidades_engine
-      to: capacidades_engine.ids
+      to: capacidades_engine.barrer
       tipo: declara_capacidad
     [138]
       from: capacidades_engine
-      to: capacidades_engine.por_id
+      to: capacidades_engine.inventario
       tipo: declara_capacidad
     [139]
       from: capacidades_engine
-      to: capacidades_engine.listar_archivos
+      to: capacidades_engine.skills
       tipo: declara_capacidad
     [140]
       from: capacidades_engine
-      to: capacidades_engine.verificar_salida
+      to: capacidades_engine.ids
       tipo: declara_capacidad
     [141]
       from: capacidades_engine
-      to: capacidades_engine.ejecutar_total
+      to: capacidades_engine.por_id
       tipo: declara_capacidad
     [142]
       from: capacidades_engine
-      to: capacidades_engine.inspeccionar
+      to: capacidades_engine.listar_archivos
       tipo: declara_capacidad
     [143]
       from: capacidades_engine
-      to: capacidades_engine.registrar_inventario
+      to: capacidades_engine.verificar_salida
       tipo: declara_capacidad
     [144]
       from: capacidades_engine
-      to: capacidades_engine.reporte
+      to: capacidades_engine.ejecutar_total
       tipo: declara_capacidad
     [145]
       from: capacidades_engine
-      to: capacidades_engine.diagnostico
+      to: capacidades_engine.inspeccionar
       tipo: declara_capacidad
     [146]
-      from: catalogo_citaciones
-      to: CE
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.registrar_inventario
+      tipo: declara_capacidad
     [147]
-      from: catalogo_citaciones
-      to: AX
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.reporte
+      tipo: declara_capacidad
     [148]
-      from: catalogo_citaciones
-      to: FO
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.diagnostico
+      tipo: declara_capacidad
     [149]
-      from: catalogo_citaciones
-      to: MC
-      tipo: requiere
+      from: capacidades_engine
+      to: capacidades_engine.evaluar_universal
+      tipo: declara_capacidad
     [150]
       from: catalogo_citaciones
-      to: SF
+      to: CE
       tipo: requiere
     [151]
       from: catalogo_citaciones
-      to: CA
+      to: AX
       tipo: requiere
     [152]
       from: catalogo_citaciones
-      to: CX
+      to: FO
       tipo: requiere
     [153]
       from: catalogo_citaciones
-      to: DI
+      to: MC
       tipo: requiere
     [154]
       from: catalogo_citaciones
-      to: RE
+      to: SF
       tipo: requiere
     [155]
       from: catalogo_citaciones
-      to: VX
+      to: CA
       tipo: requiere
     [156]
       from: catalogo_citaciones
-      to: TX
+      to: CX
       tipo: requiere
     [157]
       from: catalogo_citaciones
-      to: CH
+      to: DI
       tipo: requiere
     [158]
       from: catalogo_citaciones
-      to: CIT
+      to: RE
       tipo: requiere
     [159]
       from: catalogo_citaciones
-      to: DGCO
+      to: VX
       tipo: requiere
     [160]
       from: catalogo_citaciones
-      to: UI
+      to: TX
       tipo: requiere
     [161]
       from: catalogo_citaciones
-      to: TT
+      to: CH
       tipo: requiere
     [162]
       from: catalogo_citaciones
-      to: SC
+      to: CIT
       tipo: requiere
     [163]
       from: catalogo_citaciones
-      to: catalogo_citaciones.verificar
-      tipo: declara_capacidad
+      to: DGCO
+      tipo: requiere
     [164]
       from: catalogo_citaciones
-      to: catalogo_citaciones.barrer
-      tipo: declara_capacidad
+      to: UI
+      tipo: requiere
     [165]
       from: catalogo_citaciones
-      to: catalogo_citaciones.inventario
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [166]
       from: catalogo_citaciones
-      to: catalogo_citaciones.categorias
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [167]
       from: catalogo_citaciones
-      to: catalogo_citaciones.por_id
+      to: catalogo_citaciones.verificar
       tipo: declara_capacidad
     [168]
       from: catalogo_citaciones
-      to: catalogo_citaciones.ids
+      to: catalogo_citaciones.barrer
       tipo: declara_capacidad
     [169]
       from: catalogo_citaciones
-      to: catalogo_citaciones.esquema
+      to: catalogo_citaciones.inventario
       tipo: declara_capacidad
     [170]
       from: catalogo_citaciones
-      to: catalogo_citaciones.reporte
+      to: catalogo_citaciones.categorias
       tipo: declara_capacidad
     [171]
       from: catalogo_citaciones
-      to: catalogo_citaciones.diagnostico
+      to: catalogo_citaciones.por_id
       tipo: declara_capacidad
     [172]
       from: catalogo_citaciones
-      to: catalogo_citaciones.verificar_salida
+      to: catalogo_citaciones.ids
       tipo: declara_capacidad
     [173]
       from: catalogo_citaciones
-      to: catalogo_citaciones.ejecutar_total
+      to: catalogo_citaciones.esquema
       tipo: declara_capacidad
     [174]
       from: catalogo_citaciones
-      to: catalogo_citaciones.inspeccionar
+      to: catalogo_citaciones.reporte
       tipo: declara_capacidad
     [175]
       from: catalogo_citaciones
-      to: catalogo_citaciones.registrar_inventario
+      to: catalogo_citaciones.diagnostico
       tipo: declara_capacidad
     [176]
-      from: citacion
-      to: CE
-      tipo: requiere
+      from: catalogo_citaciones
+      to: catalogo_citaciones.verificar_salida
+      tipo: declara_capacidad
     [177]
-      from: citacion
-      to: AX
-      tipo: requiere
+      from: catalogo_citaciones
+      to: catalogo_citaciones.ejecutar_total
+      tipo: declara_capacidad
     [178]
-      from: citacion
-      to: FO
-      tipo: requiere
+      from: catalogo_citaciones
+      to: catalogo_citaciones.inspeccionar
+      tipo: declara_capacidad
     [179]
-      from: citacion
-      to: MC
-      tipo: requiere
+      from: catalogo_citaciones
+      to: catalogo_citaciones.registrar_inventario
+      tipo: declara_capacidad
     [180]
-      from: citacion
-      to: SF
-      tipo: requiere
+      from: catalogo_citaciones
+      to: catalogo_citaciones.evaluar_universal
+      tipo: declara_capacidad
     [181]
       from: citacion
-      to: CA
+      to: CE
       tipo: requiere
     [182]
       from: citacion
-      to: CX
+      to: AX
       tipo: requiere
     [183]
       from: citacion
-      to: DI
+      to: FO
       tipo: requiere
     [184]
       from: citacion
-      to: RE
+      to: MC
       tipo: requiere
     [185]
       from: citacion
-      to: VX
+      to: SF
       tipo: requiere
     [186]
       from: citacion
-      to: TX
+      to: CA
       tipo: requiere
     [187]
       from: citacion
-      to: CH
+      to: CX
       tipo: requiere
     [188]
       from: citacion
-      to: CIT
+      to: DI
       tipo: requiere
     [189]
       from: citacion
-      to: DGCO
+      to: RE
       tipo: requiere
     [190]
       from: citacion
-      to: UI
+      to: VX
       tipo: requiere
     [191]
       from: citacion
-      to: CC
+      to: TX
       tipo: requiere
     [192]
       from: citacion
-      to: TT
+      to: CH
       tipo: requiere
     [193]
       from: citacion
-      to: SC
+      to: CIT
       tipo: requiere
     [194]
       from: citacion
-      to: CT
+      to: DGCO
       tipo: requiere
     [195]
       from: citacion
-      to: citacion.verificar
-      tipo: declara_capacidad
+      to: UI
+      tipo: requiere
     [196]
       from: citacion
-      to: citacion.barrer
-      tipo: declara_capacidad
+      to: CC
+      tipo: requiere
     [197]
       from: citacion
-      to: citacion.verificar_salida
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [198]
       from: citacion
-      to: citacion.inventario
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [199]
       from: citacion
-      to: citacion.reporte
-      tipo: declara_capacidad
+      to: CT
+      tipo: requiere
     [200]
       from: citacion
-      to: citacion.diagnostico
+      to: citacion.verificar
       tipo: declara_capacidad
     [201]
       from: citacion
-      to: citacion.anunciar
+      to: citacion.barrer
       tipo: declara_capacidad
     [202]
       from: citacion
-      to: citacion.anunciar_todo
+      to: citacion.verificar_salida
       tipo: declara_capacidad
     [203]
       from: citacion
-      to: citacion.citar
+      to: citacion.inventario
       tipo: declara_capacidad
     [204]
       from: citacion
-      to: citacion.registrar
+      to: citacion.reporte
       tipo: declara_capacidad
     [205]
       from: citacion
-      to: citacion.resolver
+      to: citacion.diagnostico
       tipo: declara_capacidad
     [206]
       from: citacion
-      to: citacion.resolver_enunciado
+      to: citacion.anunciar
       tipo: declara_capacidad
     [207]
       from: citacion
-      to: citacion.buscar
+      to: citacion.anunciar_todo
       tipo: declara_capacidad
     [208]
       from: citacion
-      to: citacion.cadena
+      to: citacion.citar
       tipo: declara_capacidad
     [209]
       from: citacion
-      to: citacion.explicar
+      to: citacion.registrar
       tipo: declara_capacidad
     [210]
       from: citacion
-      to: citacion.relacionar
+      to: citacion.resolver
       tipo: declara_capacidad
     [211]
       from: citacion
-      to: citacion.limpiar_ciclo
+      to: citacion.resolver_enunciado
       tipo: declara_capacidad
     [212]
       from: citacion
-      to: citacion.evaluar
+      to: citacion.buscar
       tipo: declara_capacidad
     [213]
       from: citacion
-      to: citacion.ejecutar_total
+      to: citacion.cadena
       tipo: declara_capacidad
     [214]
       from: citacion
-      to: citacion.inspeccionar
+      to: citacion.explicar
       tipo: declara_capacidad
     [215]
       from: citacion
-      to: citacion.registrar_inventario
+      to: citacion.relacionar
       tipo: declara_capacidad
     [216]
-      from: constante
-      to: CE
-      tipo: requiere
+      from: citacion
+      to: citacion.limpiar_ciclo
+      tipo: declara_capacidad
     [217]
-      from: constante
-      to: AX
-      tipo: requiere
+      from: citacion
+      to: citacion.evaluar
+      tipo: declara_capacidad
     [218]
-      from: constante
-      to: FO
-      tipo: requiere
+      from: citacion
+      to: citacion.ejecutar_total
+      tipo: declara_capacidad
     [219]
-      from: constante
-      to: MC
-      tipo: requiere
+      from: citacion
+      to: citacion.inspeccionar
+      tipo: declara_capacidad
     [220]
-      from: constante
-      to: SF
-      tipo: requiere
+      from: citacion
+      to: citacion.registrar_inventario
+      tipo: declara_capacidad
     [221]
-      from: constante
-      to: CA
-      tipo: requiere
+      from: citacion
+      to: citacion.evaluar_universal
+      tipo: declara_capacidad
     [222]
       from: constante
-      to: CX
+      to: CE
       tipo: requiere
     [223]
       from: constante
-      to: DI
+      to: AX
       tipo: requiere
     [224]
       from: constante
-      to: RE
+      to: FO
       tipo: requiere
     [225]
       from: constante
-      to: VX
+      to: MC
       tipo: requiere
     [226]
       from: constante
-      to: TX
+      to: SF
       tipo: requiere
     [227]
       from: constante
-      to: CH
+      to: CA
       tipo: requiere
     [228]
       from: constante
-      to: CIT
+      to: CX
       tipo: requiere
     [229]
       from: constante
-      to: DGCO
+      to: DI
       tipo: requiere
     [230]
       from: constante
-      to: UI
+      to: RE
       tipo: requiere
     [231]
       from: constante
-      to: CC
+      to: VX
       tipo: requiere
     [232]
       from: constante
-      to: TT
+      to: TX
       tipo: requiere
     [233]
       from: constante
-      to: SC
+      to: CH
       tipo: requiere
     [234]
       from: constante
-      to: constante.alpha
-      tipo: declara_capacidad
+      to: CIT
+      tipo: requiere
     [235]
       from: constante
-      to: constante.beta
-      tipo: declara_capacidad
+      to: DGCO
+      tipo: requiere
     [236]
       from: constante
-      to: constante.buscar_constante
-      tipo: declara_capacidad
+      to: UI
+      tipo: requiere
     [237]
       from: constante
-      to: constante.descubrir_constantes
-      tipo: declara_capacidad
+      to: CC
+      tipo: requiere
     [238]
       from: constante
-      to: constante.diagnostico
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [239]
       from: constante
-      to: constante.ejecutar_total
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [240]
       from: constante
-      to: constante.inspeccionar
+      to: constante.alpha
       tipo: declara_capacidad
     [241]
       from: constante
-      to: constante.inventario
+      to: constante.beta
       tipo: declara_capacidad
     [242]
       from: constante
-      to: constante.listar_constantes
+      to: constante.buscar_constante
       tipo: declara_capacidad
     [243]
       from: constante
-      to: constante.registrar_inventario
+      to: constante.descubrir_constantes
       tipo: declara_capacidad
     [244]
       from: constante
-      to: constante.reporte
+      to: constante.diagnostico
       tipo: declara_capacidad
     [245]
       from: constante
-      to: constante.verificar
+      to: constante.ejecutar_total
       tipo: declara_capacidad
     [246]
       from: constante
-      to: constante.verificar_constantes
+      to: constante.evaluar_universal
       tipo: declara_capacidad
     [247]
-      from: contexto
-      to: CE
-      tipo: requiere
+      from: constante
+      to: constante.inspeccionar
+      tipo: declara_capacidad
     [248]
-      from: contexto
-      to: AX
-      tipo: requiere
+      from: constante
+      to: constante.inventario
+      tipo: declara_capacidad
     [249]
-      from: contexto
-      to: FO
-      tipo: requiere
+      from: constante
+      to: constante.listar_constantes
+      tipo: declara_capacidad
     [250]
-      from: contexto
-      to: MC
-      tipo: requiere
+      from: constante
+      to: constante.registrar_inventario
+      tipo: declara_capacidad
     [251]
-      from: contexto
-      to: SF
-      tipo: requiere
+      from: constante
+      to: constante.reporte
+      tipo: declara_capacidad
     [252]
-      from: contexto
-      to: CA
-      tipo: requiere
+      from: constante
+      to: constante.verificar
+      tipo: declara_capacidad
     [253]
-      from: contexto
-      to: DI
-      tipo: requiere
+      from: constante
+      to: constante.verificar_constantes
+      tipo: declara_capacidad
     [254]
       from: contexto
-      to: RE
+      to: CE
       tipo: requiere
     [255]
       from: contexto
-      to: VX
+      to: AX
       tipo: requiere
     [256]
       from: contexto
-      to: TX
+      to: FO
       tipo: requiere
     [257]
       from: contexto
-      to: CH
+      to: MC
       tipo: requiere
     [258]
       from: contexto
-      to: CIT
+      to: SF
       tipo: requiere
     [259]
       from: contexto
-      to: DGCO
+      to: CA
       tipo: requiere
     [260]
       from: contexto
-      to: UI
+      to: DI
       tipo: requiere
     [261]
       from: contexto
-      to: CC
+      to: RE
       tipo: requiere
     [262]
       from: contexto
-      to: TT
+      to: VX
       tipo: requiere
     [263]
       from: contexto
-      to: SC
+      to: TX
       tipo: requiere
     [264]
       from: contexto
-      to: CT
+      to: CH
       tipo: requiere
     [265]
       from: contexto
-      to: contexto.resolver
-      tipo: declara_capacidad
+      to: CIT
+      tipo: requiere
     [266]
       from: contexto
-      to: contexto.evaluar
-      tipo: declara_capacidad
+      to: DGCO
+      tipo: requiere
     [267]
       from: contexto
-      to: contexto.centinela
-      tipo: declara_capacidad
+      to: UI
+      tipo: requiere
     [268]
       from: contexto
-      to: contexto.verificar
-      tipo: declara_capacidad
+      to: CC
+      tipo: requiere
     [269]
       from: contexto
-      to: contexto.barrer
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [270]
       from: contexto
-      to: contexto.inventario
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [271]
       from: contexto
-      to: contexto.reporte
-      tipo: declara_capacidad
+      to: CT
+      tipo: requiere
     [272]
       from: contexto
-      to: contexto.diagnostico
+      to: contexto.resolver
       tipo: declara_capacidad
     [273]
       from: contexto
-      to: contexto.axiomas
+      to: contexto.evaluar
       tipo: declara_capacidad
     [274]
       from: contexto
-      to: contexto.verificar_salida
+      to: contexto.centinela
       tipo: declara_capacidad
     [275]
       from: contexto
-      to: contexto.ejecutar
+      to: contexto.verificar
       tipo: declara_capacidad
     [276]
       from: contexto
-      to: contexto.ejecutar_total
+      to: contexto.barrer
       tipo: declara_capacidad
     [277]
       from: contexto
-      to: contexto.registrar_inventario
+      to: contexto.inventario
       tipo: declara_capacidad
     [278]
-      from: correlacion_mecanica
-      to: CE
-      tipo: requiere
+      from: contexto
+      to: contexto.reporte
+      tipo: declara_capacidad
     [279]
-      from: correlacion_mecanica
-      to: AX
-      tipo: requiere
+      from: contexto
+      to: contexto.diagnostico
+      tipo: declara_capacidad
     [280]
-      from: correlacion_mecanica
-      to: FO
-      tipo: requiere
+      from: contexto
+      to: contexto.axiomas
+      tipo: declara_capacidad
     [281]
-      from: correlacion_mecanica
-      to: SF
-      tipo: requiere
+      from: contexto
+      to: contexto.verificar_salida
+      tipo: declara_capacidad
     [282]
-      from: correlacion_mecanica
-      to: CA
-      tipo: requiere
+      from: contexto
+      to: contexto.ejecutar
+      tipo: declara_capacidad
     [283]
-      from: correlacion_mecanica
-      to: CX
-      tipo: requiere
+      from: contexto
+      to: contexto.ejecutar_total
+      tipo: declara_capacidad
     [284]
-      from: correlacion_mecanica
-      to: DI
-      tipo: requiere
+      from: contexto
+      to: contexto.registrar_inventario
+      tipo: declara_capacidad
     [285]
-      from: correlacion_mecanica
-      to: RE
-      tipo: requiere
+      from: contexto
+      to: contexto.evaluar_universal
+      tipo: declara_capacidad
     [286]
       from: correlacion_mecanica
-      to: VX
+      to: CE
       tipo: requiere
     [287]
       from: correlacion_mecanica
-      to: TX
+      to: AX
       tipo: requiere
     [288]
       from: correlacion_mecanica
-      to: CH
+      to: FO
       tipo: requiere
     [289]
       from: correlacion_mecanica
-      to: CIT
+      to: SF
       tipo: requiere
     [290]
       from: correlacion_mecanica
-      to: DGCO
+      to: CA
       tipo: requiere
     [291]
       from: correlacion_mecanica
-      to: UI
+      to: CX
       tipo: requiere
     [292]
       from: correlacion_mecanica
-      to: CC
+      to: DI
       tipo: requiere
     [293]
       from: correlacion_mecanica
-      to: TT
+      to: RE
       tipo: requiere
     [294]
       from: correlacion_mecanica
-      to: SC
+      to: VX
       tipo: requiere
     [295]
       from: correlacion_mecanica
-      to: CT
+      to: TX
       tipo: requiere
     [296]
       from: correlacion_mecanica
-      to: correlacion_mecanica.axiomas
-      tipo: declara_capacidad
+      to: CH
+      tipo: requiere
     [297]
       from: correlacion_mecanica
-      to: correlacion_mecanica.barrer
-      tipo: declara_capacidad
+      to: CIT
+      tipo: requiere
     [298]
       from: correlacion_mecanica
-      to: correlacion_mecanica.diagnostico
-      tipo: declara_capacidad
+      to: DGCO
+      tipo: requiere
     [299]
       from: correlacion_mecanica
-      to: correlacion_mecanica.ejecutar_total
-      tipo: declara_capacidad
+      to: UI
+      tipo: requiere
     [300]
       from: correlacion_mecanica
-      to: correlacion_mecanica.evaluar
-      tipo: declara_capacidad
+      to: CC
+      tipo: requiere
     [301]
       from: correlacion_mecanica
-      to: correlacion_mecanica.inspeccionar
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [302]
       from: correlacion_mecanica
-      to: correlacion_mecanica.inventario
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [303]
       from: correlacion_mecanica
-      to: correlacion_mecanica.listar_mecanicas
-      tipo: declara_capacidad
+      to: CT
+      tipo: requiere
     [304]
       from: correlacion_mecanica
-      to: correlacion_mecanica.registrar_inventario
+      to: correlacion_mecanica.axiomas
       tipo: declara_capacidad
     [305]
       from: correlacion_mecanica
-      to: correlacion_mecanica.reporte
+      to: correlacion_mecanica.barrer
       tipo: declara_capacidad
     [306]
       from: correlacion_mecanica
-      to: correlacion_mecanica.verificar
+      to: correlacion_mecanica.diagnostico
       tipo: declara_capacidad
     [307]
       from: correlacion_mecanica
-      to: correlacion_mecanica.verificar_salida
+      to: correlacion_mecanica.ejecutar_total
       tipo: declara_capacidad
     [308]
-      from: diagnosticoD
-      to: *
-      tipo: requiere
+      from: correlacion_mecanica
+      to: correlacion_mecanica.evaluar
+      tipo: declara_capacidad
     [309]
-      from: diagnosticoD
-      to: diagnosticoD.censo
+      from: correlacion_mecanica
+      to: correlacion_mecanica.evaluar_universal
       tipo: declara_capacidad
     [310]
-      from: diagnosticoD
-      to: diagnosticoD.verificar
+      from: correlacion_mecanica
+      to: correlacion_mecanica.inspeccionar
       tipo: declara_capacidad
     [311]
-      from: diagnosticoD
-      to: diagnosticoD.barrer
+      from: correlacion_mecanica
+      to: correlacion_mecanica.inventario
       tipo: declara_capacidad
     [312]
-      from: diagnosticoD
-      to: diagnosticoD.presentar
+      from: correlacion_mecanica
+      to: correlacion_mecanica.listar_mecanicas
       tipo: declara_capacidad
     [313]
-      from: diagnosticoD
-      to: diagnosticoD.reportar
+      from: correlacion_mecanica
+      to: correlacion_mecanica.registrar_inventario
       tipo: declara_capacidad
     [314]
-      from: diagnosticoD
-      to: diagnosticoD.inventario
+      from: correlacion_mecanica
+      to: correlacion_mecanica.reporte
       tipo: declara_capacidad
     [315]
-      from: diagnosticoD
-      to: diagnosticoD.reporte
+      from: correlacion_mecanica
+      to: correlacion_mecanica.verificar
       tipo: declara_capacidad
     [316]
-      from: diagnosticoD
-      to: diagnosticoD.diagnostico
+      from: correlacion_mecanica
+      to: correlacion_mecanica.verificar_salida
       tipo: declara_capacidad
     [317]
       from: diagnosticoD
-      to: diagnosticoD.ejecutar_total
-      tipo: declara_capacidad
+      to: *
+      tipo: requiere
     [318]
       from: diagnosticoD
-      to: diagnosticoD.inspeccionar
+      to: diagnosticoD.censo
       tipo: declara_capacidad
     [319]
       from: diagnosticoD
-      to: diagnosticoD.registrar_inventario
+      to: diagnosticoD.verificar
       tipo: declara_capacidad
     [320]
-      from: diccionario
-      to: CE
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.barrer
+      tipo: declara_capacidad
     [321]
-      from: diccionario
-      to: AX
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.presentar
+      tipo: declara_capacidad
     [322]
-      from: diccionario
-      to: FO
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.reportar
+      tipo: declara_capacidad
     [323]
-      from: diccionario
-      to: MC
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.inventario
+      tipo: declara_capacidad
     [324]
-      from: diccionario
-      to: SF
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.reporte
+      tipo: declara_capacidad
     [325]
-      from: diccionario
-      to: CA
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.diagnostico
+      tipo: declara_capacidad
     [326]
-      from: diccionario
-      to: CX
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.ejecutar_total
+      tipo: declara_capacidad
     [327]
-      from: diccionario
-      to: RE
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.inspeccionar
+      tipo: declara_capacidad
     [328]
-      from: diccionario
-      to: VX
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.registrar_inventario
+      tipo: declara_capacidad
     [329]
-      from: diccionario
-      to: TX
-      tipo: requiere
+      from: diagnosticoD
+      to: diagnosticoD.evaluar_universal
+      tipo: declara_capacidad
     [330]
       from: diccionario
-      to: CH
+      to: CE
       tipo: requiere
     [331]
       from: diccionario
-      to: CIT
+      to: AX
       tipo: requiere
     [332]
       from: diccionario
-      to: DGCO
+      to: FO
       tipo: requiere
     [333]
       from: diccionario
-      to: UI
+      to: MC
       tipo: requiere
     [334]
       from: diccionario
-      to: CC
+      to: SF
       tipo: requiere
     [335]
       from: diccionario
-      to: TT
+      to: CA
       tipo: requiere
     [336]
       from: diccionario
-      to: SC
+      to: CX
       tipo: requiere
     [337]
       from: diccionario
-      to: CT
+      to: RE
       tipo: requiere
     [338]
       from: diccionario
-      to: diccionario.verificar
-      tipo: declara_capacidad
+      to: VX
+      tipo: requiere
     [339]
       from: diccionario
-      to: diccionario.barrer
-      tipo: declara_capacidad
+      to: TX
+      tipo: requiere
     [340]
       from: diccionario
-      to: diccionario.verificar_salida
-      tipo: declara_capacidad
+      to: CH
+      tipo: requiere
     [341]
       from: diccionario
-      to: diccionario.inventario
-      tipo: declara_capacidad
+      to: CIT
+      tipo: requiere
     [342]
       from: diccionario
-      to: diccionario.reporte
-      tipo: declara_capacidad
+      to: DGCO
+      tipo: requiere
     [343]
       from: diccionario
-      to: diccionario.diagnostico
-      tipo: declara_capacidad
+      to: UI
+      tipo: requiere
     [344]
       from: diccionario
-      to: diccionario.axiomas
-      tipo: declara_capacidad
+      to: CC
+      tipo: requiere
     [345]
       from: diccionario
-      to: diccionario.resolver
-      tipo: declara_capacidad
+      to: TT
+      tipo: requiere
     [346]
       from: diccionario
-      to: diccionario.listar
-      tipo: declara_capacidad
+      to: SC
+      tipo: requiere
     [347]
       from: diccionario
-      to: diccionario.cargar
-      tipo: declara_capacidad
+      to: CT
+      tipo: requiere
     [348]
       from: diccionario
-      to: diccionario.cargar_todos
+      to: diccionario.verificar
       tipo: declara_capacidad
     [349]
       from: diccionario
-      to: diccionario.definir
+      to: diccionario.barrer
       tipo: declara_capacidad
     [350]
       from: diccionario
-      to: diccionario.significado
+      to: diccionario.verificar_salida
       tipo: declara_capacidad
     [351]
       from: diccionario
-      to: diccionario.palabras
+      to: diccionario.inventario
       tipo: declara_capacidad
     [352]
       from: diccionario
-      to: diccionario.inyectar_en_peticion
+      to: diccionario.reporte
       tipo: declara_capacidad
     [353]
       from: diccionario
-      to: diccionario.ejecutar_total
+      to: diccionario.diagnostico
       tipo: declara_capacidad
     [354]
       from: diccionario
-      to: diccionario.inspeccionar
+      to: diccionario.axiomas
       tipo: declara_capacidad
     [355]
       from: diccionario
-      to: diccionario.registrar_inventario
+      to: diccionario.resolver
       tipo: declara_capacidad
     [356]
-      from: formulas
-      to: *
-      tipo: requiere
+      from: diccionario
+      to: diccionario.listar
+      tipo: declara_capacidad
     [357]
-      from: formulas
-      to: formulas.verificar
+      from: diccionario
+      to: diccionario.cargar
       tipo: declara_capacidad
     [358]
-      from: formulas
-      to: formulas.barrer
+      from: diccionario
+      to: diccionario.cargar_todos
       tipo: declara_capacidad
     [359]
-      from: formulas
-      to: formulas.evaluar
+      from: diccionario
+      to: diccionario.definir
       tipo: declara_capacidad
     [360]
-      from: formulas
-      to: formulas.verificar_salida
+      from: diccionario
+      to: diccionario.significado
       tipo: declara_capacidad
     [361]
-      from: formulas
-      to: formulas.inventario
+      from: diccionario
+      to: diccionario.palabras
       tipo: declara_capacidad
     [362]
-      from: formulas
-      to: formulas.axiomas
+      from: diccionario
+      to: diccionario.inyectar_en_peticion
       tipo: declara_capacidad
     [363]
-      from: formulas
-      to: formulas.tru_ri
+      from: diccionario
+      to: diccionario.ejecutar_total
       tipo: declara_capacidad
     [364]
-      from: formulas
-      to: formulas.tru_total
+      from: diccionario
+      to: diccionario.inspeccionar
       tipo: declara_capacidad
     [365]
-      from: formulas
-      to: formulas.reporte
+      from: diccionario
+      to: diccionario.registrar_inventario
       tipo: declara_capacidad
     [366]
-      from: formulas
-      to: formulas.diagnostico
+      from: diccionario
+      to: diccionario.evaluar_universal
       tipo: declara_capacidad
     [367]
       from: formulas
+      to: CE
+      tipo: requiere
+    [368]
+      from: formulas
+      to: AX
+      tipo: requiere
+    [369]
+      from: formulas
+      to: MC
+      tipo: requiere
+    [370]
+      from: formulas
+      to: SF
+      tipo: requiere
+    [371]
+      from: formulas
+      to: CA
+      tipo: requiere
+    [372]
+      from: formulas
+      to: CX
+      tipo: requiere
+    [373]
+      from: formulas
+      to: DI
+      tipo: requiere
+    [374]
+      from: formulas
+      to: RE
+      tipo: requiere
+    [375]
+      from: formulas
+      to: VX
+      tipo: requiere
+    [376]
+      from: formulas
+      to: TX
+      tipo: requiere
+    [377]
+      from: formulas
+      to: CH
+      tipo: requiere
+    [378]
+      from: formulas
+      to: CIT
+      tipo: requiere
+    [379]
+      from: formulas
+      to: DGCO
+      tipo: requiere
+    [380]
+      from: formulas
+      to: UI
+      tipo: requiere
+    [381]
+      from: formulas
+      to: CC
+      tipo: requiere
+    [382]
+      from: formulas
+      to: TT
+      tipo: requiere
+    [383]
+      from: formulas
+      to: SC
+      tipo: requiere
+    [384]
+      from: formulas
+      to: CT
+      tipo: requiere
+    [385]
+      from: formulas
+      to: formulas.verificar
+      tipo: declara_capacidad
+    [386]
+      from: formulas
+      to: formulas.barrer
+      tipo: declara_capacidad
+    [387]
+      from: formulas
+      to: formulas.evaluar
+      tipo: declara_capacidad
+    [388]
+      from: formulas
+      to: formulas.verificar_salida
+      tipo: declara_capacidad
+    [389]
+      from: formulas
+      to: formulas.inventario
+      tipo: declara_capacidad
+    [390]
+      from: formulas
+      to: formulas.axiomas
+      tipo: declara_capacidad
+    [391]
+      from: formulas
+      to: formulas.tru_ri
+      tipo: declara_capacidad
+    [392]
+      from: formulas
+      to: formulas.tru_total
+      tipo: declara_capacidad
+    [393]
+      from: formulas
+      to: formulas.reporte
+      tipo: declara_capacidad
+    [394]
+      from: formulas
+      to: formulas.diagnostico
+      tipo: declara_capacidad
+    [395]
+      from: formulas
       to: formulas.listar_formulas
       tipo: declara_capacidad
-    [368]
+    [396]
       from: formulas
       to: formulas.ejecutar_total
       tipo: declara_capacidad
-    [369]
+    [397]
       from: formulas
       to: formulas.inspeccionar
       tipo: declara_capacidad
-    [370]
+    [398]
       from: formulas
       to: formulas.registrar_inventario
       tipo: declara_capacidad
-    [371]
+    [399]
+      from: formulas
+      to: formulas.evaluar_universal
+      tipo: declara_capacidad
+    [400]
       from: interfaz
       to: CE
       tipo: requiere
-    [372]
+    [401]
       from: interfaz
       to: AX
       tipo: requiere
-    [373]
+    [402]
       from: interfaz
       to: FO
       tipo: requiere
-    [374]
+    [403]
       from: interfaz
       to: MC
       tipo: requiere
-    [375]
+    [404]
       from: interfaz
       to: SF
       tipo: requiere
-    [376]
+    [405]
       from: interfaz
       to: CA
       tipo: requiere
-    [377]
+    [406]
       from: interfaz
       to: CX
       tipo: requiere
-    [378]
+    [407]
       from: interfaz
       to: DI
       tipo: requiere
-    [379]
+    [408]
       from: interfaz
       to: RE
       tipo: requiere
-    [380]
+    [409]
       from: interfaz
       to: VX
       tipo: requiere
-    [381]
+    [410]
       from: interfaz
       to: TX
       tipo: requiere
-    [382]
+    [411]
       from: interfaz
       to: CH
       tipo: requiere
-    [383]
+    [412]
       from: interfaz
       to: CIT
       tipo: requiere
-    [384]
+    [413]
       from: interfaz
       to: DGCO
       tipo: requiere
-    [385]
+    [414]
       from: interfaz
       to: CC
       tipo: requiere
-    [386]
+    [415]
       from: interfaz
       to: TT
       tipo: requiere
-    [387]
+    [416]
       from: interfaz
       to: SC
       tipo: requiere
-    [388]
+    [417]
       from: interfaz
       to: CT
       tipo: requiere
-    [389]
+    [418]
       from: interfaz
       to: interfaz.verificar
       tipo: declara_capacidad
-    [390]
+    [419]
       from: interfaz
       to: interfaz.barrer
       tipo: declara_capacidad
-    [391]
+    [420]
       from: interfaz
       to: interfaz.componer
       tipo: declara_capacidad
-    [392]
+    [421]
       from: interfaz
       to: interfaz.observar
       tipo: declara_capacidad
-    [393]
+    [422]
       from: interfaz
       to: interfaz.axiomas
       tipo: declara_capacidad
-    [394]
+    [423]
       from: interfaz
       to: interfaz.inventario
       tipo: declara_capacidad
-    [395]
+    [424]
       from: interfaz
       to: interfaz.inventario_paquetes
       tipo: declara_capacidad
-    [396]
+    [425]
       from: interfaz
       to: interfaz.ejecutar_total
       tipo: declara_capacidad
-    [397]
+    [426]
       from: interfaz
       to: interfaz.inspeccionar
       tipo: declara_capacidad
-    [398]
+    [427]
       from: interfaz
       to: interfaz.registrar_inventario
       tipo: declara_capacidad
-    [399]
+    [428]
+      from: interfaz
+      to: interfaz.evaluar_universal
+      tipo: declara_capacidad
+    [429]
       from: realidad
       to: CE
       tipo: requiere
-    [400]
+    [430]
       from: realidad
       to: AX
       tipo: requiere
-    [401]
+    [431]
       from: realidad
       to: FO
       tipo: requiere
-    [402]
+    [432]
       from: realidad
       to: MC
       tipo: requiere
-    [403]
+    [433]
       from: realidad
       to: SF
       tipo: requiere
-    [404]
+    [434]
       from: realidad
       to: CA
       tipo: requiere
-    [405]
+    [435]
       from: realidad
       to: CX
       tipo: requiere
-    [406]
+    [436]
       from: realidad
       to: DI
       tipo: requiere
-    [407]
+    [437]
       from: realidad
       to: VX
       tipo: requiere
-    [408]
+    [438]
       from: realidad
       to: TX
       tipo: requiere
-    [409]
+    [439]
       from: realidad
       to: CH
       tipo: requiere
-    [410]
+    [440]
       from: realidad
       to: CIT
       tipo: requiere
-    [411]
+    [441]
       from: realidad
       to: DGCO
       tipo: requiere
-    [412]
+    [442]
       from: realidad
       to: UI
       tipo: requiere
-    [413]
+    [443]
       from: realidad
       to: CC
       tipo: requiere
-    [414]
+    [444]
       from: realidad
       to: TT
       tipo: requiere
-    [415]
+    [445]
       from: realidad
       to: SC
       tipo: requiere
-    [416]
+    [446]
       from: realidad
       to: CT
       tipo: requiere
-    [417]
+    [447]
       from: realidad
       to: realidad.verificar
       tipo: declara_capacidad
-    [418]
+    [448]
       from: realidad
       to: realidad.barrer
       tipo: declara_capacidad
-    [419]
+    [449]
       from: realidad
       to: realidad.verificar_salida
       tipo: declara_capacidad
-    [420]
+    [450]
       from: realidad
       to: realidad.inventario
       tipo: declara_capacidad
-    [421]
+    [451]
       from: realidad
       to: realidad.reporte
       tipo: declara_capacidad
-    [422]
+    [452]
       from: realidad
       to: realidad.diagnostico
       tipo: declara_capacidad
-    [423]
+    [453]
       from: realidad
       to: realidad.registrar_resultado_dominio
       tipo: declara_capacidad
-    [424]
+    [454]
       from: realidad
       to: realidad.ejecutar_total
       tipo: declara_capacidad
-    [425]
+    [455]
       from: realidad
       to: realidad.inspeccionar
       tipo: declara_capacidad
-    [426]
+    [456]
+      from: realidad
+      to: realidad.evaluar_universal
+      tipo: declara_capacidad
+    [457]
       from: realidad
       to: realidad.registrar_inventario
       tipo: declara_capacidad
-    [427]
+    [458]
       from: self
       to: CE
       tipo: requiere
-    [428]
+    [459]
       from: self
       to: AX
       tipo: requiere
-    [429]
+    [460]
       from: self
       to: FO
       tipo: requiere
-    [430]
+    [461]
       from: self
       to: MC
       tipo: requiere
-    [431]
+    [462]
       from: self
       to: CA
       tipo: requiere
-    [432]
+    [463]
       from: self
       to: CX
       tipo: requiere
-    [433]
+    [464]
       from: self
       to: DI
       tipo: requiere
-    [434]
+    [465]
       from: self
       to: RE
       tipo: requiere
-    [435]
+    [466]
       from: self
       to: VX
       tipo: requiere
-    [436]
+    [467]
       from: self
       to: TX
       tipo: requiere
-    [437]
+    [468]
       from: self
       to: CH
       tipo: requiere
-    [438]
+    [469]
       from: self
       to: CIT
       tipo: requiere
-    [439]
+    [470]
       from: self
       to: DGCO
       tipo: requiere
-    [440]
+    [471]
       from: self
       to: UI
       tipo: requiere
-    [441]
+    [472]
       from: self
       to: CC
       tipo: requiere
-    [442]
+    [473]
       from: self
       to: TT
       tipo: requiere
-    [443]
+    [474]
       from: self
       to: SC
       tipo: requiere
-    [444]
+    [475]
       from: self
       to: CT
       tipo: requiere
-    [445]
+    [476]
       from: self
       to: self.verificar
       tipo: declara_capacidad
-    [446]
+    [477]
       from: self
       to: self.barrer
       tipo: declara_capacidad
-    [447]
+    [478]
       from: self
       to: self.verificar_salida
       tipo: declara_capacidad
-    [448]
+    [479]
       from: self
       to: self.yo_funcional
       tipo: declara_capacidad
-    [449]
+    [480]
       from: self
       to: self.oscilar
       tipo: declara_capacidad
-    [450]
+    [481]
       from: self
       to: self.desde_donde
       tipo: declara_capacidad
-    [451]
+    [482]
       from: self
       to: self.estado_self
       tipo: declara_capacidad
-    [452]
+    [483]
       from: self
       to: self.elegir
       tipo: declara_capacidad
-    [453]
+    [484]
       from: self
       to: self.inventario
       tipo: declara_capacidad
-    [454]
+    [485]
       from: self
       to: self.reporte
       tipo: declara_capacidad
-    [455]
+    [486]
       from: self
       to: self.diagnostico
       tipo: declara_capacidad
-    [456]
+    [487]
       from: self
       to: self.ejecutar_total
       tipo: declara_capacidad
-    [457]
+    [488]
       from: self
       to: self.inspeccionar
       tipo: declara_capacidad
-    [458]
+    [489]
       from: self
       to: self.registrar_inventario
       tipo: declara_capacidad
-    [459]
+    [490]
+      from: self
+      to: self.evaluar_universal
+      tipo: declara_capacidad
+    [491]
       from: spartaco_seguridad
       to: CE
       tipo: requiere
-    [460]
+    [492]
       from: spartaco_seguridad
       to: AX
       tipo: requiere
-    [461]
+    [493]
       from: spartaco_seguridad
       to: FO
       tipo: requiere
-    [462]
+    [494]
       from: spartaco_seguridad
       to: MC
       tipo: requiere
-    [463]
+    [495]
       from: spartaco_seguridad
       to: SF
       tipo: requiere
-    [464]
+    [496]
       from: spartaco_seguridad
       to: CA
       tipo: requiere
-    [465]
+    [497]
       from: spartaco_seguridad
       to: CX
       tipo: requiere
-    [466]
+    [498]
       from: spartaco_seguridad
       to: DI
       tipo: requiere
-    [467]
+    [499]
       from: spartaco_seguridad
       to: RE
       tipo: requiere
-    [468]
+    [500]
       from: spartaco_seguridad
       to: VX
       tipo: requiere
-    [469]
+    [501]
       from: spartaco_seguridad
       to: TX
       tipo: requiere
-    [470]
+    [502]
       from: spartaco_seguridad
       to: CH
       tipo: requiere
-    [471]
+    [503]
       from: spartaco_seguridad
       to: CIT
       tipo: requiere
-    [472]
+    [504]
       from: spartaco_seguridad
       to: DGCO
       tipo: requiere
-    [473]
+    [505]
       from: spartaco_seguridad
       to: UI
       tipo: requiere
-    [474]
+    [506]
       from: spartaco_seguridad
       to: CC
       tipo: requiere
-    [475]
+    [507]
       from: spartaco_seguridad
       to: TT
       tipo: requiere
-    [476]
+    [508]
       from: spartaco_seguridad
       to: CT
       tipo: requiere
-    [477]
+    [509]
       from: spartaco_seguridad
       to: spartaco_seguridad.verificar
       tipo: declara_capacidad
-    [478]
+    [510]
       from: spartaco_seguridad
       to: spartaco_seguridad.barrer
       tipo: declara_capacidad
-    [479]
+    [511]
       from: spartaco_seguridad
       to: spartaco_seguridad.verificar_salida
       tipo: declara_capacidad
-    [480]
+    [512]
       from: spartaco_seguridad
       to: spartaco_seguridad.inventario
       tipo: declara_capacidad
-    [481]
+    [513]
       from: spartaco_seguridad
       to: spartaco_seguridad.reporte
       tipo: declara_capacidad
-    [482]
+    [514]
       from: spartaco_seguridad
       to: spartaco_seguridad.diagnostico
       tipo: declara_capacidad
-    [483]
+    [515]
       from: spartaco_seguridad
       to: spartaco_seguridad.catalogo
       tipo: declara_capacidad
-    [484]
+    [516]
       from: spartaco_seguridad
       to: spartaco_seguridad.ejecutar_total
       tipo: declara_capacidad
-    [485]
+    [517]
       from: spartaco_seguridad
       to: spartaco_seguridad.inspeccionar
       tipo: declara_capacidad
-    [486]
+    [518]
       from: spartaco_seguridad
       to: spartaco_seguridad.registrar_inventario
       tipo: declara_capacidad
-    [487]
+    [519]
+      from: spartaco_seguridad
+      to: spartaco_seguridad.evaluar_universal
+      tipo: declara_capacidad
+    [520]
       from: taxonomia
       to: CE
       tipo: requiere
-    [488]
+    [521]
       from: taxonomia
       to: AX
       tipo: requiere
-    [489]
+    [522]
       from: taxonomia
       to: FO
       tipo: requiere
-    [490]
+    [523]
       from: taxonomia
       to: MC
       tipo: requiere
-    [491]
+    [524]
       from: taxonomia
       to: SF
       tipo: requiere
-    [492]
+    [525]
       from: taxonomia
       to: CA
       tipo: requiere
-    [493]
+    [526]
       from: taxonomia
       to: CX
       tipo: requiere
-    [494]
+    [527]
       from: taxonomia
       to: DI
       tipo: requiere
-    [495]
+    [528]
       from: taxonomia
       to: RE
       tipo: requiere
-    [496]
+    [529]
       from: taxonomia
       to: VX
       tipo: requiere
-    [497]
+    [530]
       from: taxonomia
       to: CH
       tipo: requiere
-    [498]
+    [531]
       from: taxonomia
       to: CIT
       tipo: requiere
-    [499]
+    [532]
       from: taxonomia
       to: DGCO
       tipo: requiere
-    [500]
+    [533]
       from: taxonomia
       to: UI
       tipo: requiere
-    [501]
+    [534]
       from: taxonomia
       to: CC
       tipo: requiere
-    [502]
+    [535]
       from: taxonomia
       to: TT
       tipo: requiere
-    [503]
+    [536]
       from: taxonomia
       to: SC
       tipo: requiere
-    [504]
+    [537]
       from: taxonomia
       to: CT
       tipo: requiere
-    [505]
+    [538]
       from: taxonomia
       to: taxonomia.verificar
       tipo: declara_capacidad
-    [506]
+    [539]
       from: taxonomia
       to: taxonomia.barrer
       tipo: declara_capacidad
-    [507]
+    [540]
       from: taxonomia
       to: taxonomia.verificar_salida
       tipo: declara_capacidad
-    [508]
+    [541]
       from: taxonomia
       to: taxonomia.aplicar
       tipo: declara_capacidad
-    [509]
+    [542]
       from: taxonomia
       to: taxonomia.axiomas
       tipo: declara_capacidad
-    [510]
+    [543]
       from: taxonomia
       to: taxonomia.inventario
       tipo: declara_capacidad
-    [511]
+    [544]
       from: taxonomia
       to: taxonomia.reporte
       tipo: declara_capacidad
-    [512]
+    [545]
       from: taxonomia
       to: taxonomia.diagnostico
       tipo: declara_capacidad
-    [513]
+    [546]
       from: taxonomia
       to: taxonomia.ejecutar_total
       tipo: declara_capacidad
-    [514]
+    [547]
       from: taxonomia
       to: taxonomia.inspeccionar
       tipo: declara_capacidad
-    [515]
+    [548]
       from: taxonomia
       to: taxonomia.registrar_inventario
       tipo: declara_capacidad
-    [516]
+    [549]
+      from: taxonomia
+      to: taxonomia.evaluar_universal
+      tipo: declara_capacidad
+    [550]
       from: tru_totales
       to: CE
       tipo: requiere
-    [517]
+    [551]
       from: tru_totales
       to: AX
       tipo: requiere
-    [518]
+    [552]
       from: tru_totales
       to: FO
       tipo: requiere
-    [519]
+    [553]
       from: tru_totales
       to: MC
       tipo: requiere
-    [520]
+    [554]
       from: tru_totales
       to: SF
       tipo: requiere
-    [521]
+    [555]
       from: tru_totales
       to: CA
       tipo: requiere
-    [522]
+    [556]
       from: tru_totales
       to: CX
       tipo: requiere
-    [523]
+    [557]
       from: tru_totales
       to: DI
       tipo: requiere
-    [524]
+    [558]
       from: tru_totales
       to: RE
       tipo: requiere
-    [525]
+    [559]
       from: tru_totales
       to: VX
       tipo: requiere
-    [526]
+    [560]
       from: tru_totales
       to: TX
       tipo: requiere
-    [527]
+    [561]
       from: tru_totales
       to: CH
       tipo: requiere
-    [528]
+    [562]
       from: tru_totales
       to: CIT
       tipo: requiere
-    [529]
+    [563]
       from: tru_totales
       to: DGCO
       tipo: requiere
-    [530]
+    [564]
       from: tru_totales
       to: UI
       tipo: requiere
-    [531]
+    [565]
       from: tru_totales
       to: CC
       tipo: requiere
-    [532]
+    [566]
       from: tru_totales
       to: SC
       tipo: requiere
-    [533]
+    [567]
       from: tru_totales
       to: CT
       tipo: requiere
-    [534]
+    [568]
       from: tru_totales
       to: tru_totales.verificar
       tipo: declara_capacidad
-    [535]
+    [569]
       from: tru_totales
       to: tru_totales.barrer
       tipo: declara_capacidad
-    [536]
+    [570]
       from: tru_totales
       to: tru_totales.verificar_salida
       tipo: declara_capacidad
-    [537]
+    [571]
       from: tru_totales
       to: tru_totales.categorias
       tipo: declara_capacidad
-    [538]
+    [572]
       from: tru_totales
       to: tru_totales.capacidades
       tipo: declara_capacidad
-    [539]
+    [573]
       from: tru_totales
       to: tru_totales.resolver_pedido
       tipo: declara_capacidad
-    [540]
+    [574]
       from: tru_totales
       to: tru_totales.inventario
       tipo: declara_capacidad
-    [541]
+    [575]
       from: tru_totales
       to: tru_totales.reporte
       tipo: declara_capacidad
-    [542]
+    [576]
       from: tru_totales
       to: tru_totales.diagnostico
       tipo: declara_capacidad
-    [543]
+    [577]
       from: tru_totales
       to: tru_totales.ejecutar_total
       tipo: declara_capacidad
-    [544]
+    [578]
       from: tru_totales
       to: tru_totales.inspeccionar
       tipo: declara_capacidad
-    [545]
+    [579]
       from: tru_totales
       to: tru_totales.registrar_inventario
       tipo: declara_capacidad
-    [546]
+    [580]
+      from: tru_totales
+      to: tru_totales.evaluar_universal
+      tipo: declara_capacidad
+    [581]
       from: verificacion
       to: CE
       tipo: requiere
-    [547]
+    [582]
       from: verificacion
       to: AX
       tipo: requiere
-    [548]
+    [583]
       from: verificacion
       to: FO
       tipo: requiere
-    [549]
+    [584]
       from: verificacion
       to: MC
       tipo: requiere
-    [550]
+    [585]
       from: verificacion
       to: SF
       tipo: requiere
-    [551]
+    [586]
       from: verificacion
       to: CA
       tipo: requiere
-    [552]
+    [587]
       from: verificacion
       to: CX
       tipo: requiere
-    [553]
+    [588]
       from: verificacion
       to: DI
       tipo: requiere
-    [554]
+    [589]
       from: verificacion
       to: RE
       tipo: requiere
-    [555]
+    [590]
       from: verificacion
       to: TX
       tipo: requiere
-    [556]
+    [591]
       from: verificacion
       to: CH
       tipo: requiere
-    [557]
+    [592]
       from: verificacion
       to: CIT
       tipo: requiere
-    [558]
+    [593]
       from: verificacion
       to: DGCO
       tipo: requiere
-    [559]
+    [594]
       from: verificacion
       to: UI
       tipo: requiere
-    [560]
+    [595]
       from: verificacion
       to: CC
       tipo: requiere
-    [561]
+    [596]
       from: verificacion
       to: TT
       tipo: requiere
-    [562]
+    [597]
       from: verificacion
       to: SC
       tipo: requiere
-    [563]
+    [598]
       from: verificacion
       to: CT
       tipo: requiere
-    [564]
+    [599]
       from: verificacion
       to: verificacion.verificar
       tipo: declara_capacidad
-    [565]
+    [600]
       from: verificacion
       to: verificacion.barrer
       tipo: declara_capacidad
-    [566]
+    [601]
       from: verificacion
       to: verificacion.verificar_salida
       tipo: declara_capacidad
-    [567]
+    [602]
       from: verificacion
       to: verificacion.axiomas
       tipo: declara_capacidad
-    [568]
+    [603]
       from: verificacion
       to: verificacion.inventario
       tipo: declara_capacidad
-    [569]
+    [604]
       from: verificacion
       to: verificacion.reporte
       tipo: declara_capacidad
-    [570]
+    [605]
       from: verificacion
       to: verificacion.diagnostico
       tipo: declara_capacidad
-    [571]
+    [606]
       from: verificacion
       to: verificacion.ejecutar_total
       tipo: declara_capacidad
-    [572]
+    [607]
       from: verificacion
       to: verificacion.inspeccionar
       tipo: declara_capacidad
-    [573]
+    [608]
       from: verificacion
       to: verificacion.registrar_inventario
+      tipo: declara_capacidad
+    [609]
+      from: verificacion
+      to: verificacion.evaluar_universal
       tipo: declara_capacidad
 
 ══════════════════════════════════════════════════════════════════════
@@ -21975,389 +22546,389 @@
 ══════════════════════════════════════════════════════════════════════
   [0]
     id_traza: 1
-    timestamp: 2026-08-19T23:55:09.663366+00:00
+    timestamp: 2026-08-20T06:12:40.388047+00:00
     modulo: axiomas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.008881
+    duracion_s: 0.014913
   [1]
     id_traza: 2
-    timestamp: 2026-08-19T23:55:09.671774+00:00
+    timestamp: 2026-08-20T06:12:40.401892+00:00
     modulo: axiomas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.008351
+    duracion_s: 0.013768
   [2]
     id_traza: 3
-    timestamp: 2026-08-19T23:55:09.680270+00:00
+    timestamp: 2026-08-20T06:12:40.415680+00:00
     modulo: axiomas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.008436
+    duracion_s: 0.013708
   [3]
     id_traza: 4
-    timestamp: 2026-08-19T23:55:09.680323+00:00
+    timestamp: 2026-08-20T06:12:40.415763+00:00
     modulo: cache
     capacidad: reporte
     estado: EXITO
-    duracion_s: 1.3e-05
+    duracion_s: 2.4e-05
   [4]
     id_traza: 5
-    timestamp: 2026-08-19T23:55:09.680350+00:00
+    timestamp: 2026-08-20T06:12:40.415807+00:00
     modulo: cache
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 9e-06
   [5]
     id_traza: 6
-    timestamp: 2026-08-19T23:55:09.838944+00:00
+    timestamp: 2026-08-20T06:12:40.720795+00:00
     modulo: cache
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.158565
+    duracion_s: 0.30494
   [6]
     id_traza: 7
-    timestamp: 2026-08-19T23:55:09.839381+00:00
+    timestamp: 2026-08-20T06:12:40.721556+00:00
     modulo: calculator
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000393
+    duracion_s: 0.000694
   [7]
     id_traza: 8
-    timestamp: 2026-08-19T23:55:09.839677+00:00
+    timestamp: 2026-08-20T06:12:40.722139+00:00
     modulo: calculator
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000272
+    duracion_s: 0.000546
   [8]
     id_traza: 9
-    timestamp: 2026-08-19T23:55:09.839989+00:00
+    timestamp: 2026-08-20T06:12:40.722747+00:00
     modulo: calculator
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000284
+    duracion_s: 0.000563
   [9]
     id_traza: 10
-    timestamp: 2026-08-19T23:55:09.840648+00:00
+    timestamp: 2026-08-20T06:12:40.723847+00:00
     modulo: capacidades_engine
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000641
+    duracion_s: 0.00106
   [10]
     id_traza: 11
-    timestamp: 2026-08-19T23:55:09.840806+00:00
+    timestamp: 2026-08-20T06:12:40.724134+00:00
     modulo: capacidades_engine
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000133
+    duracion_s: 0.000252
   [11]
     id_traza: 12
-    timestamp: 2026-08-19T23:55:09.841048+00:00
+    timestamp: 2026-08-20T06:12:40.724614+00:00
     modulo: capacidades_engine
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000217
+    duracion_s: 0.000441
   [12]
     id_traza: 13
-    timestamp: 2026-08-19T23:55:09.842481+00:00
+    timestamp: 2026-08-20T06:12:40.726967+00:00
     modulo: catalogo_citaciones
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001412
+    duracion_s: 0.002319
   [13]
     id_traza: 14
-    timestamp: 2026-08-19T23:55:09.843394+00:00
+    timestamp: 2026-08-20T06:12:40.728738+00:00
     modulo: catalogo_citaciones
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000879
+    duracion_s: 0.001732
   [14]
     id_traza: 15
-    timestamp: 2026-08-19T23:55:09.844267+00:00
+    timestamp: 2026-08-20T06:12:40.730431+00:00
     modulo: catalogo_citaciones
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000841
+    duracion_s: 0.001625
   [15]
     id_traza: 16
-    timestamp: 2026-08-19T23:55:09.844296+00:00
+    timestamp: 2026-08-20T06:12:40.730480+00:00
     modulo: citacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 2e-06
+    duracion_s: 4e-06
   [16]
     id_traza: 17
-    timestamp: 2026-08-19T23:55:09.844313+00:00
+    timestamp: 2026-08-20T06:12:40.730509+00:00
     modulo: citacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [17]
     id_traza: 18
-    timestamp: 2026-08-19T23:55:09.844329+00:00
+    timestamp: 2026-08-20T06:12:40.730538+00:00
     modulo: citacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2e-06
+    duracion_s: 5e-06
   [18]
     id_traza: 19
-    timestamp: 2026-08-19T23:55:09.844787+00:00
+    timestamp: 2026-08-20T06:12:40.731787+00:00
     modulo: constante
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000444
+    duracion_s: 0.001223
   [19]
     id_traza: 20
-    timestamp: 2026-08-19T23:55:09.844874+00:00
+    timestamp: 2026-08-20T06:12:40.731947+00:00
     modulo: constante
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 6.5e-05
+    duracion_s: 0.000118
   [20]
     id_traza: 21
-    timestamp: 2026-08-19T23:55:09.844937+00:00
+    timestamp: 2026-08-20T06:12:40.732079+00:00
     modulo: constante
     capacidad: inventario
     estado: EXITO
-    duracion_s: 4.5e-05
+    duracion_s: 9.8e-05
   [21]
     id_traza: 22
-    timestamp: 2026-08-19T23:55:09.854127+00:00
+    timestamp: 2026-08-20T06:12:40.747428+00:00
     modulo: contexto
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.009171
+    duracion_s: 0.015315
   [22]
     id_traza: 23
-    timestamp: 2026-08-19T23:55:09.854846+00:00
+    timestamp: 2026-08-20T06:12:40.748707+00:00
     modulo: contexto
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000684
+    duracion_s: 0.00123
   [23]
     id_traza: 24
-    timestamp: 2026-08-19T23:55:09.856699+00:00
+    timestamp: 2026-08-20T06:12:40.751988+00:00
     modulo: contexto
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.001795
+    duracion_s: 0.003236
   [24]
     id_traza: 25
-    timestamp: 2026-08-19T23:55:09.880326+00:00
+    timestamp: 2026-08-20T06:12:40.790278+00:00
     modulo: correlacion_mecanica
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.023598
+    duracion_s: 0.038248
   [25]
     id_traza: 26
-    timestamp: 2026-08-19T23:55:09.896722+00:00
+    timestamp: 2026-08-20T06:12:40.822930+00:00
     modulo: correlacion_mecanica
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.01635
+    duracion_s: 0.032575
   [26]
     id_traza: 27
-    timestamp: 2026-08-19T23:55:09.913917+00:00
+    timestamp: 2026-08-20T06:12:40.851987+00:00
     modulo: correlacion_mecanica
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.017146
+    duracion_s: 0.028969
   [27]
     id_traza: 28
-    timestamp: 2026-08-19T23:55:09.913965+00:00
+    timestamp: 2026-08-20T06:12:40.852065+00:00
     modulo: diagnosticoD
     capacidad: reporte
     estado: EXITO
-    duracion_s: 2e-06
+    duracion_s: 4e-06
   [28]
     id_traza: 29
-    timestamp: 2026-08-19T23:55:09.913982+00:00
+    timestamp: 2026-08-20T06:12:40.852097+00:00
     modulo: diagnosticoD
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [29]
     id_traza: 30
-    timestamp: 2026-08-19T23:55:09.913996+00:00
+    timestamp: 2026-08-20T06:12:40.852122+00:00
     modulo: diagnosticoD
     capacidad: inventario
     estado: EXITO
-    duracion_s: 2e-06
+    duracion_s: 3e-06
   [30]
     id_traza: 31
-    timestamp: 2026-08-19T23:55:09.915951+00:00
+    timestamp: 2026-08-20T06:12:40.855925+00:00
     modulo: diccionario
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.001942
+    duracion_s: 0.00378
   [31]
     id_traza: 32
-    timestamp: 2026-08-19T23:55:09.915991+00:00
+    timestamp: 2026-08-20T06:12:40.855982+00:00
     modulo: diccionario
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 1.1e-05
+    duracion_s: 1.6e-05
   [32]
     id_traza: 33
-    timestamp: 2026-08-19T23:55:09.916023+00:00
+    timestamp: 2026-08-20T06:12:40.856034+00:00
     modulo: diccionario
     capacidad: inventario
     estado: EXITO
-    duracion_s: 1e-05
+    duracion_s: 1.7e-05
   [33]
     id_traza: 34
-    timestamp: 2026-08-19T23:55:09.916660+00:00
+    timestamp: 2026-08-20T06:12:40.857547+00:00
     modulo: formulas
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000622
+    duracion_s: 0.001486
   [34]
     id_traza: 35
-    timestamp: 2026-08-19T23:55:09.916889+00:00
+    timestamp: 2026-08-20T06:12:40.858322+00:00
     modulo: formulas
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000205
+    duracion_s: 0.000738
   [35]
     id_traza: 36
-    timestamp: 2026-08-19T23:55:09.917007+00:00
+    timestamp: 2026-08-20T06:12:40.858611+00:00
     modulo: formulas
     capacidad: inventario
     estado: EXITO
-    duracion_s: 9.2e-05
+    duracion_s: 0.000246
   [36]
     id_traza: 37
-    timestamp: 2026-08-19T23:55:09.917042+00:00
+    timestamp: 2026-08-20T06:12:40.858676+00:00
     modulo: interfaz
     capacidad: inventario
     estado: EXITO
-    duracion_s: 1.5e-05
+    duracion_s: 2.6e-05
   [37]
     id_traza: 38
-    timestamp: 2026-08-19T23:55:09.919128+00:00
+    timestamp: 2026-08-20T06:12:40.862754+00:00
     modulo: realidad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.00207
+    duracion_s: 0.004048
   [38]
     id_traza: 39
-    timestamp: 2026-08-19T23:55:09.919496+00:00
+    timestamp: 2026-08-20T06:12:40.863499+00:00
     modulo: realidad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000337
+    duracion_s: 0.000709
   [39]
     id_traza: 40
-    timestamp: 2026-08-19T23:55:09.929396+00:00
+    timestamp: 2026-08-20T06:12:40.868016+00:00
     modulo: realidad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.00987
+    duracion_s: 0.004473
   [40]
     id_traza: 41
-    timestamp: 2026-08-19T23:55:09.935080+00:00
+    timestamp: 2026-08-20T06:12:40.878637+00:00
     modulo: self
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.005642
+    duracion_s: 0.010569
   [41]
     id_traza: 42
-    timestamp: 2026-08-19T23:55:09.940079+00:00
+    timestamp: 2026-08-20T06:12:40.888817+00:00
     modulo: self
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.004957
+    duracion_s: 0.010121
   [42]
     id_traza: 43
-    timestamp: 2026-08-19T23:55:09.940123+00:00
+    timestamp: 2026-08-20T06:12:40.888894+00:00
     modulo: self
     capacidad: inventario
     estado: EXITO
-    duracion_s: 6e-06
+    duracion_s: 1.4e-05
   [43]
     id_traza: 44
-    timestamp: 2026-08-19T23:55:09.953539+00:00
+    timestamp: 2026-08-20T06:12:40.911960+00:00
     modulo: spartaco_seguridad
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.0134
+    duracion_s: 0.023028
   [44]
     id_traza: 45
-    timestamp: 2026-08-19T23:55:09.954049+00:00
+    timestamp: 2026-08-20T06:12:40.912709+00:00
     modulo: spartaco_seguridad
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000484
+    duracion_s: 0.000705
   [45]
     id_traza: 46
-    timestamp: 2026-08-19T23:55:09.954419+00:00
+    timestamp: 2026-08-20T06:12:40.913400+00:00
     modulo: spartaco_seguridad
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000336
+    duracion_s: 0.000645
   [46]
     id_traza: 47
-    timestamp: 2026-08-19T23:55:09.955040+00:00
+    timestamp: 2026-08-20T06:12:40.914721+00:00
     modulo: taxonomia
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000598
+    duracion_s: 0.001279
   [47]
     id_traza: 48
-    timestamp: 2026-08-19T23:55:09.955201+00:00
+    timestamp: 2026-08-20T06:12:40.914995+00:00
     modulo: taxonomia
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000135
+    duracion_s: 0.000238
   [48]
     id_traza: 49
-    timestamp: 2026-08-19T23:55:09.955328+00:00
+    timestamp: 2026-08-20T06:12:40.915305+00:00
     modulo: taxonomia
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000104
+    duracion_s: 0.000269
   [49]
     id_traza: 50
-    timestamp: 2026-08-19T23:55:09.956153+00:00
+    timestamp: 2026-08-20T06:12:40.917418+00:00
     modulo: tru_totales
     capacidad: reporte
     estado: EXITO
-    duracion_s: 0.000807
+    duracion_s: 0.002077
   [50]
     id_traza: 51
-    timestamp: 2026-08-19T23:55:09.956541+00:00
+    timestamp: 2026-08-20T06:12:40.918376+00:00
     modulo: tru_totales
     capacidad: diagnostico
     estado: EXITO
-    duracion_s: 0.000364
+    duracion_s: 0.000915
   [51]
     id_traza: 52
-    timestamp: 2026-08-19T23:55:09.956907+00:00
+    timestamp: 2026-08-20T06:12:40.919225+00:00
     modulo: tru_totales
     capacidad: inventario
     estado: EXITO
-    duracion_s: 0.000341
+    duracion_s: 0.000808
   [52]
     id_traza: 53
-    timestamp: 2026-08-19T23:55:09.956935+00:00
+    timestamp: 2026-08-20T06:12:40.919273+00:00
     modulo: verificacion
     capacidad: reporte
     estado: EXITO
-    duracion_s: 5e-06
+    duracion_s: 7e-06
   [53]
     id_traza: 54
-    timestamp: 2026-08-19T23:55:09.956951+00:00
+    timestamp: 2026-08-20T06:12:40.919303+00:00
     modulo: verificacion
     capacidad: diagnostico
     estado: EXITO
     duracion_s: 1e-06
   [54]
     id_traza: 55
-    timestamp: 2026-08-19T23:55:09.957514+00:00
+    timestamp: 2026-08-20T06:12:40.919329+00:00
     modulo: verificacion
     capacidad: inventario
     estado: EXITO
-    duracion_s: 4e-06
+    duracion_s: 3e-06
 
 ══════════════════════════════════════════════════════════════════════
   MAPA DE RUTA DE EJECUCIÓN

@@ -577,6 +577,14 @@ class Engine:
 
     VERSION = VERSION_ENGINE
 
+# ===============================================================
+# Parte 12 ENGINE AQUI SE DEFINEN LAS DECLARACIONES
+# ===============================================================
+
+class Engine:
+
+    VERSION = VERSION_ENGINE
+
     # ===========================================================
     # DECLARACIÓN PROPÓSITO FUNDAMENTAL (MANDATO INVARIABLE)
     # ===========================================================
@@ -651,9 +659,6 @@ class Engine:
         # Parte 12.6 ARRANQUE
         # =======================================================
 
-        self._paquetes_python_descubiertos = self._descubrir_paquetes_python(self.raiz)
-        self._modulos_descubiertos = self._descubrir_modulos()
-        self._cargar_y_validar()
         self._modulos_descubiertos = self._descubrir_modulos()
         self._cargar_y_validar()
         self._resolver_dependencias()
@@ -672,18 +677,12 @@ class Engine:
             self.estado = ESTADO_OPERATIVO
 
     # ===========================================================
-    # Parte 12.8 DESCUBRIMIENTO DE MÓDULOS CONTRACTUALES
+    # Parte 12.8 DESCUBRIMIENTO
     # ===========================================================
 
     def _descubrir_modulos(self) -> List[Path]:
-        if not self.raiz.is_dir():
-            return []
-
-        return [
-            p
-            for p in sorted(self.raiz.iterdir())
-            if p.is_dir() and (p / "__init__.py").is_file()
-        ]
+        if not self.raiz.is_dir(): return []
+        return [p for p in sorted(self.raiz.iterdir()) if p.is_dir() and (p / "__init__.py").is_file()]
 
     # ===========================================================
     # Métodos de validación de Propósito
@@ -695,28 +694,10 @@ class Engine:
             "proposito": self.proposito,
             "clave": self.clave_proposito
         }
-
-    # ===========================================================
-    # Parte 12.8.1 DESCUBRIMIENTO DE PAQUETES PYTHON
-    # ===========================================================
-
-    def _descubrir_paquetes_python(self, raiz: Path) -> List[Path]:
-        paquetes: List[Path] = []
-
-        if not raiz.is_dir():
-            return paquetes
-
-        for init_path in sorted(raiz.rglob("__init__.py")):
-            paquete_dir = init_path.parent
-
-            if paquete_dir not in paquetes:
-                paquetes.append(paquete_dir)
-
-        return paquetes
     # ===========================================================
     # Parte 12.9 EJECUCIÓN DEL PROPÓSITO FUNDAMENTAL
     # ===========================================================
-     
+
     def ejecutar_proposito(
         self,
         entrada: Any,
@@ -773,39 +754,6 @@ class Engine:
             "capacidad": capacidad,
             "resultado": resultado,
         })
-
-    # ===========================================================
-    # Parte 13 — RESOLUCIÓN DE NOMBRE PYTHON CANÓNICO
-    # ===========================================================
-
-    def _nombre_python_canonico(self, path_dir: Path) -> Optional[str]:
-        """
-        Convierte una ruta física perteneciente a la raíz de módulos
-        en su nombre Python canónico.
-
-        Ejemplo:
-
-            /.../modules/self
-                → modules.self
-
-            /.../modules/self/L4
-                → modules.self.L4
-        """
-
-        try:
-            relativa = path_dir.resolve().relative_to(self.raiz.resolve())
-        except ValueError:
-            return None
-
-        partes = (self.raiz.name,) + relativa.parts
-
-        if not partes:
-            return None
-
-        return ".".join(
-            parte for parte in partes
-            if parte and parte != "."
-        )
         
     # ============================================================
     # ANTI-HACK / STRUCTURAL GUARD

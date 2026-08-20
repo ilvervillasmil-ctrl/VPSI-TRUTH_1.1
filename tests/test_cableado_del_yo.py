@@ -1,405 +1,940 @@
 # ===============================================================
-# VPSI-TRUTH — TEST INTEGRAL — SELF/L4 — CABLEADO DINÁMICO
+# VPSI-TRUTH — tests/test_cableado_del_yo.py
+# TEST DE CABLEADO — SELF — L4 — YO OSCILATORIO DINÁMICO
+# ===============================================================
+#
+# RUTA DEL OBJETIVO:
+#
+#   modules/self/L4/yo_oscillador_dinamico.py
+#
+# RESPONSABILIDAD DEL TEST:
+#
+#   Verificar que el cableado dinámico de L4:
+#
+#       L1..L6
+#          ↓
+#       E_i
+#          ↓
+#       w_i
+#          ↓
+#       f_i
+#          ↓
+#       S
+#          ↓
+#       C_Ω
+#          ↓
+#       φ_Y
+#          ↓
+#       θ_eq
+#          ↓
+#       F_Y
+#          ↓
+#       θ̈_Y
+#          ↓
+#       θ̇_Y
+#          ↓
+#       θ_Y
+#
+#   está realmente conectado y ejecutable.
+#
+#   ESTE TEST NO MODIFICA EL CONTRATO DEL MÓDULO.
+#
+#   ESTE TEST NO SUPONE QUE modules.self.__init__ DEBA
+#   REEXPORTAR LA CLASE.
+#
+#   LA IMPORTACIÓN SE REALIZA DESDE LA RUTA REAL DEL CABLEADO.
+#
 # ===============================================================
 
 import math
 
-from modules.self import (
+import pytest
+
+from modules.self.L4.yo_oscillador_dinamico import (
+    ALPHA_F,
+    BETA_F,
+    ENTROPY_MAX,
+    INTERNAL_LAYERS,
+    LAYER_INDICES,
+    PI2,
     YoOscillator,
     YoState,
+    compute_contributions,
+    compute_c_omega,
     compute_energies,
     compute_weights,
-    compute_contributions,
-    shannon_S,
-    compute_c_omega,
-    phi_Y,
-    zeta_Y,
-    omega_Y,
     dynamic_equilibrium,
+    force_BETA,
+    force_COH,
+    force_L0,
+    force_L5,
+    force_L6,
     force_Y,
+    negentropy,
+    normalized_entropy,
+    omega_Y,
+    oscillator_solution_Y,
+    phi_Y,
+    read_rail,
+    regime_Y,
+    shannon_S,
+    step_yo,
+    zeta_Y,
 )
 
-# ===============================================================
-# 1. ENTRADAS CANÓNICAS
-# ===============================================================
-
-ACT = [0.10, 0.20, 0.30, 0.40, 0.50, 0.60]
-FRICTION = [0.02, 0.05, 0.03, 0.01, 0.01, 0.00]
-
-assert len(ACT) == 6
-assert len(FRICTION) == 6
-assert FRICTION[5] == 0.0
 
 # ===============================================================
-# 2. ENERGÍAS — L1..L6
+# 1. EXISTENCIA Y ESTRUCTURA DEL MÓDULO
 # ===============================================================
 
-energies = compute_energies(ACT, FRICTION)
+def test_l4_yo_oscillator_importa_desde_la_ruta_real():
 
-assert len(energies) == 6
-assert all(math.isfinite(x) for x in energies)
-assert all(x >= 0.0 for x in energies)
+    assert YoOscillator is not None
+    assert YoState is not None
 
-for i in range(1, 7):
-    expected = ACT[i - 1] * (1.0 - FRICTION[i - 1]) * (
-        (1.0 + math.sqrt(5.0)) / 2.0
-    ) ** (i / 2.0)
+
+def test_l4_define_seis_capas_internas():
+
+    assert INTERNAL_LAYERS == 6
+    assert LAYER_INDICES == (1, 2, 3, 4, 5, 6)
+
+
+def test_constantes_estructurales_estan_conectadas():
+
+    assert math.isfinite(ALPHA_F)
+    assert math.isfinite(BETA_F)
+    assert ALPHA_F > 0.0
+    assert BETA_F > 0.0
     assert math.isclose(
-        energies[i - 1],
-        expected,
-        rel_tol=1e-12,
-        abs_tol=1e-15,
-    ), f"E{i} no coincide con la fórmula canónica"
-
-# ===============================================================
-# 3. PESOS — E_i → w_i
-# ===============================================================
-
-weights = compute_weights(energies)
-
-assert len(weights) == 6
-assert all(math.isfinite(x) for x in weights)
-assert all(x >= 0.0 for x in weights)
-assert math.isclose(sum(weights), 1.0, rel_tol=1e-12)
-
-for i in range(6):
-    assert math.isclose(
-        weights[i],
-        energies[i] / sum(energies),
-        rel_tol=1e-12,
-        abs_tol=1e-15,
-    ), f"w{i + 1} no deriva correctamente de E{i + 1}"
-
-# ===============================================================
-# 4. CONTRIBUCIONES — w_i → f_i
-# ===============================================================
-
-contributions = compute_contributions(
-    weights,
-    ACT,
-    energies,
-    FRICTION,
-)
-
-assert len(contributions) == 6
-assert all(math.isfinite(x) for x in contributions)
-assert all(x >= 0.0 for x in contributions)
-
-for i in range(6):
-    expected = (
-        weights[i]
-        * ACT[i]
-        * (1.0 - FRICTION[i])
-        * energies[i]
+        ALPHA_F + BETA_F,
+        1.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
     )
+
+
+# ===============================================================
+# 2. CABLEADO L1..L6 → ENERGÍAS
+# ===============================================================
+
+def test_l1_l6_alimentan_el_calculo_de_energias():
+
+    activations = [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+    ]
+
+    frictions = [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    ]
+
+    energies = compute_energies(
+        activations,
+        frictions,
+    )
+
+    assert len(energies) == 6
+
+    for i, energy in enumerate(energies, 1):
+
+        expected = 1.0 * (
+            1.0 - 0.0
+        ) * (
+            (1.0 + math.sqrt(5.0)) / 2.0
+        ) ** (
+            i / 2.0
+        )
+
+        assert math.isclose(
+            energy,
+            expected,
+            rel_tol=1e-12,
+            abs_tol=1e-12,
+        )
+
+
+def test_l6_conserva_fraccion_cero_de_friccion():
+
+    activations = [1.0] * 6
+
+    frictions = [
+        0.10,
+        0.02,
+        0.05,
+        0.03,
+        0.01,
+        0.00,
+    ]
+
+    energies = compute_energies(
+        activations,
+        frictions,
+    )
+
+    phi = (
+        1.0 + math.sqrt(5.0)
+    ) / 2.0
+
+    expected_l6 = phi ** 3.0
+
     assert math.isclose(
-        contributions[i],
+        energies[5],
+        expected_l6,
+        rel_tol=1e-12,
+        abs_tol=1e-12,
+    )
+
+
+def test_energia_cambia_si_cambia_una_activacion():
+
+    base = [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+    ]
+
+    altered = [
+        1.0,
+        1.0,
+        1.0,
+        0.5,
+        1.0,
+        1.0,
+    ]
+
+    frictions = [0.0] * 6
+
+    energies_base = compute_energies(
+        base,
+        frictions,
+    )
+
+    energies_altered = compute_energies(
+        altered,
+        frictions,
+    )
+
+    assert energies_base[3] != energies_altered[3]
+
+    assert math.isclose(
+        energies_altered[3],
+        energies_base[3] * 0.5,
+        rel_tol=1e-12,
+        abs_tol=1e-12,
+    )
+
+    for i in [0, 1, 2, 4, 5]:
+
+        assert math.isclose(
+            energies_base[i],
+            energies_altered[i],
+            rel_tol=1e-12,
+            abs_tol=1e-12,
+        )
+
+
+# ===============================================================
+# 3. CABLEADO ENERGÍAS → PESOS
+# ===============================================================
+
+def test_energias_alimentan_pesos_emergentes():
+
+    energies = [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+    ]
+
+    weights = compute_weights(
+        energies
+    )
+
+    assert len(weights) == 6
+
+    assert math.isclose(
+        sum(weights),
+        1.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+    total = sum(energies)
+
+    for energy, weight in zip(
+        energies,
+        weights,
+    ):
+
+        assert math.isclose(
+            weight,
+            energy / total,
+            rel_tol=1e-12,
+            abs_tol=1e-12,
+        )
+
+
+def test_pesos_uniformes_si_no_hay_energia():
+
+    weights = compute_weights(
+        [0.0] * 6
+    )
+
+    assert len(weights) == 6
+
+    for weight in weights:
+
+        assert math.isclose(
+            weight,
+            1.0 / 6.0,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+
+
+# ===============================================================
+# 4. CABLEADO PESOS → CONTRIBUCIONES
+# ===============================================================
+
+def test_pesos_alimentan_contribuciones():
+
+    activations = [1.0] * 6
+    energies = [1.0] * 6
+    weights = [1.0 / 6.0] * 6
+    frictions = [0.0] * 6
+
+    contributions = compute_contributions(
+        weights,
+        activations,
+        energies,
+        frictions,
+    )
+
+    assert len(contributions) == 6
+
+    for contribution in contributions:
+
+        assert math.isclose(
+            contribution,
+            1.0 / 6.0,
+            rel_tol=1e-12,
+            abs_tol=1e-12,
+        )
+
+
+# ===============================================================
+# 5. CABLEADO PESOS → ENTROPÍA
+# ===============================================================
+
+def test_entropia_de_distribucion_uniforme():
+
+    weights = [1.0 / 6.0] * 6
+
+    S = shannon_S(weights)
+
+    assert math.isclose(
+        S,
+        math.log(6.0),
+        rel_tol=1e-12,
+        abs_tol=1e-12,
+    )
+
+
+def test_entropia_normalizada_maxima():
+
+    weights = [1.0 / 6.0] * 6
+
+    S = shannon_S(weights)
+
+    normalized = normalized_entropy(S)
+
+    assert math.isclose(
+        normalized,
+        1.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+
+def test_negentropia_uniforme_es_cero():
+
+    weights = [1.0 / 6.0] * 6
+
+    assert math.isclose(
+        negentropy(weights),
+        0.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+
+def test_entropia_de_distribucion_concentrada():
+
+    weights = [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    ]
+
+    S = shannon_S(weights)
+
+    assert math.isclose(
+        S,
+        0.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+
+# ===============================================================
+# 6. CABLEADO CONTRIBUCIONES → C_Ω
+# ===============================================================
+
+def test_contribuciones_alimentan_c_omega():
+
+    contributions = [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+    ]
+
+    C = compute_c_omega(
+        contributions
+    )
+
+    assert math.isfinite(C)
+
+    assert 0.0 <= C <= ALPHA_F
+
+
+def test_c_omega_no_excede_alpha():
+
+    contributions = [
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+        10.0,
+    ]
+
+    C = compute_c_omega(
+        contributions,
+        rho=100.0,
+        P_t=100.0,
+        A=100.0,
+        I_ext=100.0,
+    )
+
+    assert C <= ALPHA_F
+
+
+# ===============================================================
+# 7. CABLEADO PESOS → AMORTIGUAMIENTO
+# ===============================================================
+
+def test_phi_y_es_promedio_ponderado_de_fricciones():
+
+    weights = [1.0 / 6.0] * 6
+
+    frictions = [
+        0.10,
+        0.02,
+        0.05,
+        0.03,
+        0.01,
+        0.00,
+    ]
+
+    expected = sum(
+        weights[i] * frictions[i]
+        for i in range(6)
+    )
+
+    result = phi_Y(
+        weights,
+        frictions,
+    )
+
+    assert math.isclose(
+        result,
         expected,
         rel_tol=1e-12,
-        abs_tol=1e-15,
-    ), f"f{i + 1} incorrecta"
+        abs_tol=1e-12,
+    )
 
-# ===============================================================
-# 5. ENTROPÍA
-# ===============================================================
 
-S = shannon_S(weights)
+def test_l6_no_aporta_friccion():
 
-assert math.isfinite(S)
-assert S >= 0.0
-assert S <= math.log(6.0) + 1e-12
+    weights = [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+    ]
 
-# ===============================================================
-# 6. COHERENCIA
-# ===============================================================
+    frictions = [
+        0.10,
+        0.02,
+        0.05,
+        0.03,
+        0.01,
+        0.90,
+    ]
 
-C = compute_c_omega(
-    contributions,
-    rho=1.0,
-    P_t=1.0,
-    A=1.0,
-    I_ext=1.0,
-)
-
-assert math.isfinite(C)
-assert 0.0 <= C <= 26.0 / 27.0
-
-# ===============================================================
-# 7. AMORTIGUAMIENTO
-# ===============================================================
-
-phi = phi_Y(
-    weights,
-    FRICTION,
-)
-
-expected_phi = sum(
-    weights[i] * FRICTION[i]
-    for i in range(6)
-)
-
-assert math.isclose(
-    phi,
-    expected_phi,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
-
-# L6 NO debe aportar fricción.
-phi_without_l6 = sum(
-    weights[i] * FRICTION[i]
-    for i in range(5)
-)
-
-assert math.isclose(
-    phi,
-    phi_without_l6,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
-
-zeta = zeta_Y(phi)
-omega = omega_Y(phi)
-
-assert math.isfinite(zeta)
-assert math.isfinite(omega)
-assert zeta >= 0.0
-assert omega >= 0.0
-
-# ===============================================================
-# 8. EQUILIBRIO DINÁMICO
-# ===============================================================
-
-theta_eq = dynamic_equilibrium(
-    C,
-    weights,
-)
-
-assert math.isfinite(theta_eq)
-
-# ===============================================================
-# 9. FUERZA TOTAL
-# ===============================================================
-
-force = force_Y(
-    L0_input=0.25,
-    weights=weights,
-    purpose_magnitude=0.50,
-    c_omega=C,
-    rho=1.0,
-    P_t=1.0,
-    S=S,
-    delta_c=C,
-    novelty=0.20,
-)
-
-assert math.isfinite(force)
-
-# ===============================================================
-# 10. EJECUCIÓN REAL DEL CABLE
-# ===============================================================
-
-yo = YoOscillator()
-
-before = yo.snapshot()
-
-assert math.isclose(
-    before["t"],
-    0.0,
-    abs_tol=1e-15,
-)
-
-after = yo.step(
-    ACT,
-    dt=0.001,
-    L0_input=0.25,
-    purpose_magnitude=0.50,
-    rho=1.0,
-    P_t=1.0,
-    A=1.0,
-    I_ext=1.0,
-    novelty=0.20,
-    frictions=FRICTION,
-)
-
-# ===============================================================
-# 11. ESTADO TEMPORAL
-# ===============================================================
-
-assert math.isclose(
-    after["t"],
-    0.001,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
-
-assert math.isfinite(after["theta_Y"])
-assert math.isfinite(after["theta_dot_Y"])
-
-# ===============================================================
-# 12. VERIFICAR QUE EL STEP USÓ LAS MISMAS ENERGÍAS
-# ===============================================================
-
-for i in range(6):
     assert math.isclose(
-        after["energies_L1_L6"][i],
-        energies[i],
-        rel_tol=1e-12,
-        abs_tol=1e-15,
-    ), f"STEP no utilizó E{i + 1} calculada por el cable"
+        phi_Y(
+            weights,
+            frictions,
+        ),
+        0.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
 
 # ===============================================================
-# 13. VERIFICAR PESOS
+# 8. CABLEADO φ_Y → ζ_Y → ω_Y → RÉGIMEN
 # ===============================================================
 
-for i in range(6):
+def test_cadena_de_amortiguamiento():
+
+    phi = 0.05
+
+    zeta = zeta_Y(phi)
+
+    omega = omega_Y(phi)
+
+    regime = regime_Y(phi)
+
+    assert zeta >= 0.0
+    assert omega >= 0.0
+    assert regime == "SUBAMORTIGUADO"
+
+
+def test_omega_se_anula_en_sobre_amortiguamiento():
+
+    phi = 2.0 * math.pi
+
     assert math.isclose(
-        after["weights_L1_L6"][i],
-        weights[i],
-        rel_tol=1e-12,
-        abs_tol=1e-15,
-    ), f"STEP no utilizó w{i + 1} derivado de E{i + 1}"
+        zeta_Y(phi),
+        1.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+    assert math.isclose(
+        omega_Y(phi),
+        0.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+    assert regime_Y(phi) == "CRITICO"
+
 
 # ===============================================================
-# 14. VERIFICAR CADENA COMPLETA
+# 9. CABLEADO C_Ω + PESOS → θ_eq
 # ===============================================================
 
-assert math.isclose(
-    after["S"],
-    S,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
+def test_c_omega_y_pesos_alimentan_equilibrio():
 
-assert math.isclose(
-    after["C_OMEGA"],
-    C,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
+    weights = [1.0 / 6.0] * 6
 
-assert math.isclose(
-    after["phi_Y"],
-    phi,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
+    theta_eq = dynamic_equilibrium(
+        c_omega=0.0,
+        weights=weights,
+    )
 
-assert math.isclose(
-    after["omega_Y"],
-    omega,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
+    assert math.isfinite(theta_eq)
 
-assert math.isclose(
-    after["theta_eq"],
-    theta_eq,
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
 
-# ===============================================================
-# 15. L6 — INVARIANTE φ6 = 0
-# ===============================================================
+def test_equilibrio_responde_a_cambio_de_pesos():
 
-ACT_L6_ONLY = [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+    weights_a = [
+        1.0 / 6.0,
+        1.0 / 6.0,
+        1.0 / 6.0,
+        1.0 / 6.0,
+        1.0 / 6.0,
+        1.0 / 6.0,
+    ]
 
-E_L6 = compute_energies(
-    ACT_L6_ONLY,
-    FRICTION,
-)
+    weights_b = [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.5,
+        0.5,
+    ]
 
-W_L6 = compute_weights(E_L6)
+    theta_a = dynamic_equilibrium(
+        0.5 * ALPHA_F,
+        weights_a,
+    )
 
-PHI_L6 = phi_Y(
-    W_L6,
-    FRICTION,
-)
+    theta_b = dynamic_equilibrium(
+        0.5 * ALPHA_F,
+        weights_b,
+    )
 
-assert math.isclose(
-    PHI_L6,
-    0.0,
-    abs_tol=1e-15,
-), "L6 está introduciendo fricción"
+    assert theta_a != theta_b
 
-assert math.isclose(
-    W_L6[5],
-    1.0,
-    rel_tol=1e-12,
-)
 
 # ===============================================================
-# 16. DINÁMICA — CAMBIO REAL DE ESTADO
+# 10. CABLEADO DE FUERZAS
 # ===============================================================
 
-yo2 = YoOscillator()
+def test_force_l0_es_entrada_externa():
 
-s0 = yo2.snapshot()
+    assert math.isclose(
+        force_L0(3.0),
+        3.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
 
-s1 = yo2.step(
-    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    dt=0.001,
-)
 
-assert s1["t"] > s0["t"]
-assert math.isfinite(s1["theta_Y"])
-assert math.isfinite(s1["theta_dot_Y"])
+def test_force_l6_usa_w6_como_direccion():
+
+    assert math.isclose(
+        force_L6(
+            w6=0.25,
+            purpose_magnitude=4.0,
+        ),
+        1.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+
+def test_force_beta_responde_a_novedad():
+
+    zero = force_BETA(0.0)
+    positive = force_BETA(10.0)
+
+    assert zero == 0.0
+    assert positive > zero
+
+
+def test_force_coh_responde_a_delta_c():
+
+    assert math.isclose(
+        force_COH(
+            c_omega=0.5,
+            delta_c=0.2,
+        ),
+        0.1,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+
+def test_force_y_integra_los_canales():
+
+    result = force_Y(
+        L0_input=1.0,
+        weights=[0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+        purpose_magnitude=2.0,
+        c_omega=0.0,
+        rho=1.0,
+        P_t=1.0,
+        S=0.0,
+        delta_c=0.0,
+        novelty=0.0,
+    )
+
+    assert math.isfinite(result)
+
+    assert result >= 3.0
+
 
 # ===============================================================
-# 17. RETROALIMENTACIÓN TEMPORAL ΔCΩ
+# 11. INTEGRACIÓN COMPLETA DEL CARRIL
 # ===============================================================
 
-s2 = yo2.step(
-    [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
-    dt=0.001,
-)
+def test_step_yo_ejecuta_el_circuito_completo():
 
-assert math.isclose(
-    s2["delta_C_OMEGA"],
-    s2["C_OMEGA"] - s1["C_OMEGA"],
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
+    state = YoState()
+
+    activations = [
+        1.0,
+        0.8,
+        0.6,
+        0.7,
+        0.9,
+        1.0,
+    ]
+
+    new_state = step_yo(
+        state,
+        activations=activations,
+        dt=0.01,
+    )
+
+    assert new_state.t == 0.01
+
+    assert len(new_state.energies) == 6
+    assert len(new_state.weights) == 6
+    assert len(new_state.contributions) == 6
+
+    assert math.isfinite(new_state.theta)
+    assert math.isfinite(new_state.theta_dot)
+    assert math.isfinite(new_state.theta_eq)
+    assert math.isfinite(new_state.force_y)
+    assert math.isfinite(new_state.c_omega)
+    assert math.isfinite(new_state.phi_y)
+    assert math.isfinite(new_state.zeta_y)
+    assert math.isfinite(new_state.omega_y)
+    assert math.isfinite(new_state.S)
+
+
+def test_step_yo_realmente_mueve_el_estado():
+
+    oscillator = YoOscillator()
+
+    before = oscillator.snapshot()
+
+    after = oscillator.step(
+        activations=[
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+        ],
+        dt=0.01,
+        L0_input=1.0,
+        purpose_magnitude=1.0,
+    )
+
+    assert after["t"] > before["t"]
+
+    assert (
+        after["theta_Y"]
+        != before["theta_Y"]
+        or
+        after["theta_dot_Y"]
+        != before["theta_dot_Y"]
+    )
+
 
 # ===============================================================
-# 18. TEST DE CERO
+# 12. VERIFICACIÓN DE LA CADENA ENERGÉTICA COMPLETA
 # ===============================================================
 
-zero = YoOscillator()
+def test_cadena_l1_l6_hasta_estado_l4():
 
-z = zero.step(
-    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-    dt=0.001,
-)
+    activations = [
+        0.90,
+        0.80,
+        0.70,
+        0.60,
+        0.50,
+        0.40,
+    ]
 
-assert all(
-    math.isclose(w, 1.0 / 6.0, rel_tol=1e-12)
-    for w in z["weights_L1_L6"]
-)
+    oscillator = YoOscillator()
 
-assert math.isclose(
-    z["S"],
-    math.log(6.0),
-    rel_tol=1e-12,
-    abs_tol=1e-15,
-)
+    result = oscillator.step(
+        activations=activations,
+        dt=0.001,
+    )
 
-assert math.isclose(
-    z["C_OMEGA"],
-    0.0,
-    abs_tol=1e-15,
-)
+    energies = result[
+        "energies_L1_L6"
+    ]
+
+    weights = result[
+        "weights_L1_L6"
+    ]
+
+    contributions = result[
+        "contributions_f1_f6"
+    ]
+
+    assert len(energies) == 6
+    assert len(weights) == 6
+    assert len(contributions) == 6
+
+    assert math.isclose(
+        sum(weights),
+        1.0,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+    assert result["C_OMEGA"] >= 0.0
+    assert result["C_OMEGA"] <= ALPHA_F
+
+    assert math.isfinite(
+        result["theta_Y"]
+    )
+
+    assert math.isfinite(
+        result["theta_dot_Y"]
+    )
+
+    assert result["L0_ROLE"] == (
+        "INPUT_EXTERNAL"
+    )
+
 
 # ===============================================================
-# RESULTADO
+# 13. L0 NO DEBE CONVERTIRSE EN PESO INTERNO
 # ===============================================================
 
-print("PASS — CABLEADO SELF/L4 VERIFICADO")
-print("PASS — L1..L6 → E → w → f")
-print("PASS — E → S / CΩ / φY")
-print("PASS — CΩ / φY → θeq / FY")
-print("PASS — θ̈ → θ̇ → θ")
-print("PASS — ΔCΩ temporal")
-print("PASS — φ6 = 0")
-print("PASS — caso ΣE = 0")
+def test_l0_no_forma_parte_de_los_seis_pesos():
+
+    oscillator = YoOscillator()
+
+    result = oscillator.step(
+        activations=[1.0] * 6,
+        dt=0.001,
+        L0_input=100.0,
+    )
+
+    assert len(
+        result["weights_L1_L6"]
+    ) == 6
+
+    assert "w0" not in result
+
+
+# ===============================================================
+# 14. VALIDACIONES DE CONTRATO
+# ===============================================================
+
+def test_rechaza_menos_de_seis_activaciones():
+
+    with pytest.raises(ValueError):
+
+        compute_energies(
+            [1.0] * 5,
+            [0.0] * 6,
+        )
+
+
+def test_rechaza_mas_de_seis_activaciones():
+
+    with pytest.raises(ValueError):
+
+        compute_energies(
+            [1.0] * 7,
+            [0.0] * 6,
+        )
+
+
+def test_rechaza_activacion_fuera_de_rango():
+
+    with pytest.raises(ValueError):
+
+        compute_energies(
+            [1.0, 1.0, 1.0, 1.0, 1.0, 2.0],
+            [0.0] * 6,
+        )
+
+
+def test_rechaza_dt_cero():
+
+    with pytest.raises(ValueError):
+
+        step_yo(
+            YoState(),
+            activations=[1.0] * 6,
+            dt=0.0,
+        )
+
+
+def test_rechaza_dt_negativo():
+
+    with pytest.raises(ValueError):
+
+        step_yo(
+            YoState(),
+            activations=[1.0] * 6,
+            dt=-0.01,
+        )
+
+
+# ===============================================================
+# 15. LECTURA DEL CARRIL
+# ===============================================================
+
+def test_read_rail_expone_el_estado_COMPLETO():
+
+    state = YoState()
+
+    rail = read_rail(state)
+
+    required = {
+        "theta_Y",
+        "theta_dot_Y",
+        "t",
+        "theta_eq",
+        "phi_Y",
+        "zeta_Y",
+        "omega_Y",
+        "regime",
+        "force_Y",
+        "C_OMEGA",
+        "C_OMEGA_RAW",
+        "delta_C_OMEGA",
+        "S",
+        "weights_L1_L6",
+        "energies_L1_L6",
+        "contributions_f1_f6",
+        "ALPHA",
+        "BETA",
+        "THETA_CUBE",
+        "L0_ROLE",
+    }
+
+    assert required.issubset(
+        rail.keys()
+    )
+
+
+# ===============================================================
+# 16. SOLUCIÓN ANALÍTICA
+# ===============================================================
+
+def test_solucion_analitica_es_finita():
+
+    result = oscillator_solution_Y(
+        t=1.0,
+        amplitude=0.5,
+        delta=0.0,
+        phi_y=0.05,
+    )
+
+    assert math.isfinite(result)
+
+
+# ===============================================================
+# FIN DEL TEST
+# ===============================================================

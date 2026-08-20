@@ -6,7 +6,7 @@
     "total_modulos": 19,
     "trazas_n": 55,
     "rutas_n": 0,
-    "timestamp": "2026-08-20T06:33:30.733302+00:00"
+    "timestamp": "2026-08-20T06:51:10.440278+00:00"
   },
   "reportes": [
     {
@@ -25,7 +25,7 @@
         "advertencias": [],
         "trazas_n": 55,
         "rutas_n": 0,
-        "timestamp": "2026-08-20T06:33:30.733217+00:00"
+        "timestamp": "2026-08-20T06:51:10.440194+00:00"
       }
     },
     {
@@ -2282,7 +2282,7 @@
             "total_unicos": 18,
             "total_duplicados": 0,
             "ids_duplicados": {},
-            "actualizado": "2026-08-20T06:33:30.545396+00:00"
+            "actualizado": "2026-08-20T06:51:10.258413+00:00"
           },
           "nota": "CACHE no sabe lo que ocurrió. Solo sabe qué fue registrado y qué estructura encontró. Análisis semántico: módulo futuro."
         }
@@ -2723,37 +2723,37 @@
               "archivo": "__init__.py",
               "sha256": "39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e",
               "tamano": 166998,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34",
               "tamano": 6365,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             }
           },
           "conteos_disponible": true,
@@ -2922,37 +2922,37 @@
               "archivo": "__init__.py",
               "sha256": "39c403d502cb9f5d3785c4860e832654016d3ca22647fc1cb23fdc4dd9b0c41e",
               "tamano": 166998,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "coherencia.py": {
               "archivo": "coherencia.py",
               "sha256": "3eba01b69ffd993205a3e7963d1ecfb564246dee8d737d7a1506f74247edcf34",
               "tamano": 6365,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "conteos.py": {
               "archivo": "conteos.py",
               "sha256": "19c30b65365863ef671d9e03aba20e9096b97033681120c4c9ca49dadf352330",
               "tamano": 20987,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "correlacion_k.py": {
               "archivo": "correlacion_k.py",
               "sha256": "b1cc60d3cc07db792ad4978ff6b14f810d406a62aeae6f552b1795d6695200ab",
               "tamano": 5546,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "escalas_ids.py": {
               "archivo": "escalas_ids.py",
               "sha256": "1db219e396c1a9c1cbfdf29ff92842b2b151907c07c6043a70c46349661ba128",
               "tamano": 2895,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             },
             "logica.py": {
               "archivo": "logica.py",
               "sha256": "39b805c383a02e670d4fd1158e0c95b8e2e41c2d451c8ca377f497c802c236f1",
               "tamano": 4803,
-              "timestamp_mtime": "2026-08-20T06:33:22.981959+00:00"
+              "timestamp_mtime": "2026-08-20T06:51:05.530763+00:00"
             }
           },
           "factores_api": [
@@ -11746,7 +11746,7 @@
               "tipo": "constante",
               "estado": "descubierto",
               "errores": [],
-              "representacion": "{'resolver': <function resolver at 0x7f356f1c32e0>, 'evaluar': <function resolver at 0x7f356f1c32e0>, 'centinela': <function centinela at 0x7f356f1c3240>, 'barrer': <function barrer at 0x7f356f1c3380>"
+              "representacion": "{'resolver': <function resolver at 0x7f60fa6032e0>, 'evaluar': <function resolver at 0x7f60fa6032e0>, 'centinela': <function centinela at 0x7f60fa603240>, 'barrer': <function barrer at 0x7f60fa603380>"
             },
             {
               "nombre": "_Undefined",
@@ -11820,7 +11820,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7f356f1c2ac0>",
+              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7f60fa602ac0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11837,7 +11837,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cargar_reglas at 0x7f356f1c2fc0>",
+              "referencia": "<function _cargar_reglas at 0x7f60fa602fc0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11854,7 +11854,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _centinela_archivo at 0x7f356f1c2f20>",
+              "referencia": "<function _centinela_archivo at 0x7f60fa602f20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11871,7 +11871,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cfg at 0x7f356f1c2840>",
+              "referencia": "<function _cfg at 0x7f60fa602840>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11888,7 +11888,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _conflicto_ligaduras at 0x7f356f1c2c00>",
+              "referencia": "<function _conflicto_ligaduras at 0x7f60fa602c00>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11905,7 +11905,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _descubrir_inventario_total at 0x7f356f1c31a0>",
+              "referencia": "<function _descubrir_inventario_total at 0x7f60fa6031a0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11922,7 +11922,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _detectar_choques_reglas at 0x7f356f1c3060>",
+              "referencia": "<function _detectar_choques_reglas at 0x7f60fa603060>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11939,7 +11939,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _id_anclado at 0x7f356f1c2d40>",
+              "referencia": "<function _id_anclado at 0x7f60fa602d40>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11956,7 +11956,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_registro at 0x7f356f1c2b60>",
+              "referencia": "<function _normalizar_registro at 0x7f60fa602b60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11973,7 +11973,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_tipos_peticion at 0x7f356f1c2a20>",
+              "referencia": "<function _normalizar_tipos_peticion at 0x7f60fa602a20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -11990,7 +11990,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _permite_k at 0x7f356f1c2ca0>",
+              "referencia": "<function _permite_k at 0x7f60fa602ca0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12007,7 +12007,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _registro_vacio at 0x7f356f1c28e0>",
+              "referencia": "<function _registro_vacio at 0x7f60fa6028e0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12024,7 +12024,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _resolver_capacidades at 0x7f356f1c3a60>",
+              "referencia": "<function _resolver_capacidades at 0x7f60fa603a60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12041,7 +12041,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _truthy_pedir at 0x7f356f1c2980>",
+              "referencia": "<function _truthy_pedir at 0x7f60fa602980>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12058,7 +12058,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_clasificacion at 0x7f356f1c2e80>",
+              "referencia": "<function _validar_clasificacion at 0x7f60fa602e80>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12075,7 +12075,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_contrato at 0x7f356f1c3100>",
+              "referencia": "<function _validar_contrato at 0x7f60fa603100>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12092,7 +12092,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_regla_meta at 0x7f356f1c2de0>",
+              "referencia": "<function _validar_regla_meta at 0x7f60fa602de0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12109,7 +12109,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function axiomas at 0x7f356f1c3740>",
+              "referencia": "<function axiomas at 0x7f60fa603740>",
               "ejecutable_directamente": true
             },
             {
@@ -12125,7 +12125,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function barrer at 0x7f356f1c3380>",
+              "referencia": "<function barrer at 0x7f60fa603380>",
               "ejecutable_directamente": true
             },
             {
@@ -12141,7 +12141,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function centinela at 0x7f356f1c3240>",
+              "referencia": "<function centinela at 0x7f60fa603240>",
               "ejecutable_directamente": true
             },
             {
@@ -12157,7 +12157,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function dataclass at 0x7f356f4c2480>",
+              "referencia": "<function dataclass at 0x7f60fa8f2480>",
               "ejecutable_directamente": true
             },
             {
@@ -12201,7 +12201,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function diagnostico at 0x7f356f1c39c0>",
+              "referencia": "<function diagnostico at 0x7f60fa6039c0>",
               "ejecutable_directamente": true
             },
             {
@@ -12217,7 +12217,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function ejecutar at 0x7f356f1c36a0>",
+              "referencia": "<function ejecutar at 0x7f60fa6036a0>",
               "ejecutable_directamente": true
             },
             {
@@ -12233,7 +12233,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function es_undefined at 0x7f356f17c040>",
+              "referencia": "<function es_undefined at 0x7f60fa5bc040>",
               "ejecutable_directamente": false
             },
             {
@@ -12249,7 +12249,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function evaluar_universal at 0x7f356f1c3880>",
+              "referencia": "<function evaluar_universal at 0x7f60fa603880>",
               "ejecutable_directamente": true
             },
             {
@@ -12265,7 +12265,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function field at 0x7f356f4c3d80>",
+              "referencia": "<function field at 0x7f60fa8f3d80>",
               "ejecutable_directamente": true
             },
             {
@@ -12281,7 +12281,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function inventario at 0x7f356f1c3600>",
+              "referencia": "<function inventario at 0x7f60fa603600>",
               "ejecutable_directamente": true
             },
             {
@@ -12297,7 +12297,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function recibir_comentarios at 0x7f356f1c37e0>",
+              "referencia": "<function recibir_comentarios at 0x7f60fa6037e0>",
               "ejecutable_directamente": false
             },
             {
@@ -12313,7 +12313,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function registrar_inventario at 0x7f356f1c3560>",
+              "referencia": "<function registrar_inventario at 0x7f60fa603560>",
               "ejecutable_directamente": true
             },
             {
@@ -12329,7 +12329,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function reporte at 0x7f356f1c3920>",
+              "referencia": "<function reporte at 0x7f60fa603920>",
               "ejecutable_directamente": true
             },
             {
@@ -12345,7 +12345,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function resolver at 0x7f356f1c32e0>",
+              "referencia": "<function resolver at 0x7f60fa6032e0>",
               "ejecutable_directamente": true
             },
             {
@@ -12361,7 +12361,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar at 0x7f356f1c3420>",
+              "referencia": "<function verificar at 0x7f60fa603420>",
               "ejecutable_directamente": true
             },
             {
@@ -12377,7 +12377,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar_salida at 0x7f356f1c34c0>",
+              "referencia": "<function verificar_salida at 0x7f60fa6034c0>",
               "ejecutable_directamente": false
             },
             {
@@ -12499,7 +12499,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7f356f1c2ac0>",
+              "referencia": "<function _asegurar_invariante_pedir_anuncio at 0x7f60fa602ac0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12516,7 +12516,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cargar_reglas at 0x7f356f1c2fc0>",
+              "referencia": "<function _cargar_reglas at 0x7f60fa602fc0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12533,7 +12533,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _centinela_archivo at 0x7f356f1c2f20>",
+              "referencia": "<function _centinela_archivo at 0x7f60fa602f20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12550,7 +12550,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _cfg at 0x7f356f1c2840>",
+              "referencia": "<function _cfg at 0x7f60fa602840>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12567,7 +12567,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _conflicto_ligaduras at 0x7f356f1c2c00>",
+              "referencia": "<function _conflicto_ligaduras at 0x7f60fa602c00>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12584,7 +12584,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _descubrir_inventario_total at 0x7f356f1c31a0>",
+              "referencia": "<function _descubrir_inventario_total at 0x7f60fa6031a0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12601,7 +12601,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _detectar_choques_reglas at 0x7f356f1c3060>",
+              "referencia": "<function _detectar_choques_reglas at 0x7f60fa603060>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12618,7 +12618,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _id_anclado at 0x7f356f1c2d40>",
+              "referencia": "<function _id_anclado at 0x7f60fa602d40>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12635,7 +12635,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_registro at 0x7f356f1c2b60>",
+              "referencia": "<function _normalizar_registro at 0x7f60fa602b60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12652,7 +12652,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _normalizar_tipos_peticion at 0x7f356f1c2a20>",
+              "referencia": "<function _normalizar_tipos_peticion at 0x7f60fa602a20>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12669,7 +12669,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _permite_k at 0x7f356f1c2ca0>",
+              "referencia": "<function _permite_k at 0x7f60fa602ca0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12686,7 +12686,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _registro_vacio at 0x7f356f1c28e0>",
+              "referencia": "<function _registro_vacio at 0x7f60fa6028e0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12703,7 +12703,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _resolver_capacidades at 0x7f356f1c3a60>",
+              "referencia": "<function _resolver_capacidades at 0x7f60fa603a60>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12720,7 +12720,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _truthy_pedir at 0x7f356f1c2980>",
+              "referencia": "<function _truthy_pedir at 0x7f60fa602980>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12737,7 +12737,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_clasificacion at 0x7f356f1c2e80>",
+              "referencia": "<function _validar_clasificacion at 0x7f60fa602e80>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12754,7 +12754,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_contrato at 0x7f356f1c3100>",
+              "referencia": "<function _validar_contrato at 0x7f60fa603100>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12771,7 +12771,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function _validar_regla_meta at 0x7f356f1c2de0>",
+              "referencia": "<function _validar_regla_meta at 0x7f60fa602de0>",
               "ejecutable_directamente": false,
               "participa_en_ejecucion": true
             },
@@ -12788,7 +12788,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function axiomas at 0x7f356f1c3740>",
+              "referencia": "<function axiomas at 0x7f60fa603740>",
               "ejecutable_directamente": true
             },
             {
@@ -12804,7 +12804,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function barrer at 0x7f356f1c3380>",
+              "referencia": "<function barrer at 0x7f60fa603380>",
               "ejecutable_directamente": true
             },
             {
@@ -12820,7 +12820,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function centinela at 0x7f356f1c3240>",
+              "referencia": "<function centinela at 0x7f60fa603240>",
               "ejecutable_directamente": true
             },
             {
@@ -12836,7 +12836,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function dataclass at 0x7f356f4c2480>",
+              "referencia": "<function dataclass at 0x7f60fa8f2480>",
               "ejecutable_directamente": true
             },
             {
@@ -12852,7 +12852,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function diagnostico at 0x7f356f1c39c0>",
+              "referencia": "<function diagnostico at 0x7f60fa6039c0>",
               "ejecutable_directamente": true
             },
             {
@@ -12868,7 +12868,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function ejecutar at 0x7f356f1c36a0>",
+              "referencia": "<function ejecutar at 0x7f60fa6036a0>",
               "ejecutable_directamente": true
             },
             {
@@ -12884,7 +12884,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function es_undefined at 0x7f356f17c040>",
+              "referencia": "<function es_undefined at 0x7f60fa5bc040>",
               "ejecutable_directamente": false
             },
             {
@@ -12900,7 +12900,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function evaluar_universal at 0x7f356f1c3880>",
+              "referencia": "<function evaluar_universal at 0x7f60fa603880>",
               "ejecutable_directamente": true
             },
             {
@@ -12916,7 +12916,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function field at 0x7f356f4c3d80>",
+              "referencia": "<function field at 0x7f60fa8f3d80>",
               "ejecutable_directamente": true
             },
             {
@@ -12932,7 +12932,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function inventario at 0x7f356f1c3600>",
+              "referencia": "<function inventario at 0x7f60fa603600>",
               "ejecutable_directamente": true
             },
             {
@@ -12948,7 +12948,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function recibir_comentarios at 0x7f356f1c37e0>",
+              "referencia": "<function recibir_comentarios at 0x7f60fa6037e0>",
               "ejecutable_directamente": false
             },
             {
@@ -12964,7 +12964,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function registrar_inventario at 0x7f356f1c3560>",
+              "referencia": "<function registrar_inventario at 0x7f60fa603560>",
               "ejecutable_directamente": true
             },
             {
@@ -12980,7 +12980,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function reporte at 0x7f356f1c3920>",
+              "referencia": "<function reporte at 0x7f60fa603920>",
               "ejecutable_directamente": true
             },
             {
@@ -12996,7 +12996,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function resolver at 0x7f356f1c32e0>",
+              "referencia": "<function resolver at 0x7f60fa6032e0>",
               "ejecutable_directamente": true
             },
             {
@@ -13012,7 +13012,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar at 0x7f356f1c3420>",
+              "referencia": "<function verificar at 0x7f60fa603420>",
               "ejecutable_directamente": true
             },
             {
@@ -13028,7 +13028,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar_salida at 0x7f356f1c34c0>",
+              "referencia": "<function verificar_salida at 0x7f60fa6034c0>",
               "ejecutable_directamente": false
             }
           ],
@@ -13478,7 +13478,7 @@
               "tipo": "constante",
               "estado": "descubierto",
               "errores": [],
-              "representacion": "{'resolver': <function resolver at 0x7f356f1c32e0>, 'evaluar': <function resolver at 0x7f356f1c32e0>, 'centinela': <function centinela at 0x7f356f1c3240>, 'barrer': <function barrer at 0x7f356f1c3380>"
+              "representacion": "{'resolver': <function resolver at 0x7f60fa6032e0>, 'evaluar': <function resolver at 0x7f60fa6032e0>, 'centinela': <function centinela at 0x7f60fa603240>, 'barrer': <function barrer at 0x7f60fa603380>"
             },
             {
               "nombre": "__all__",
@@ -13664,7 +13664,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function axiomas at 0x7f356f1c3740>",
+              "referencia": "<function axiomas at 0x7f60fa603740>",
               "ejecutable_directamente": true
             },
             {
@@ -13680,7 +13680,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function barrer at 0x7f356f1c3380>",
+              "referencia": "<function barrer at 0x7f60fa603380>",
               "ejecutable_directamente": true
             },
             {
@@ -13696,7 +13696,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function centinela at 0x7f356f1c3240>",
+              "referencia": "<function centinela at 0x7f60fa603240>",
               "ejecutable_directamente": true
             },
             {
@@ -13712,7 +13712,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function dataclass at 0x7f356f4c2480>",
+              "referencia": "<function dataclass at 0x7f60fa8f2480>",
               "ejecutable_directamente": true
             },
             {
@@ -13728,7 +13728,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function diagnostico at 0x7f356f1c39c0>",
+              "referencia": "<function diagnostico at 0x7f60fa6039c0>",
               "ejecutable_directamente": true
             },
             {
@@ -13744,7 +13744,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function ejecutar at 0x7f356f1c36a0>",
+              "referencia": "<function ejecutar at 0x7f60fa6036a0>",
               "ejecutable_directamente": true
             },
             {
@@ -13760,7 +13760,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function es_undefined at 0x7f356f17c040>",
+              "referencia": "<function es_undefined at 0x7f60fa5bc040>",
               "ejecutable_directamente": false
             },
             {
@@ -13776,7 +13776,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function evaluar_universal at 0x7f356f1c3880>",
+              "referencia": "<function evaluar_universal at 0x7f60fa603880>",
               "ejecutable_directamente": true
             },
             {
@@ -13792,7 +13792,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function field at 0x7f356f4c3d80>",
+              "referencia": "<function field at 0x7f60fa8f3d80>",
               "ejecutable_directamente": true
             },
             {
@@ -13808,7 +13808,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function inventario at 0x7f356f1c3600>",
+              "referencia": "<function inventario at 0x7f60fa603600>",
               "ejecutable_directamente": true
             },
             {
@@ -13824,7 +13824,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function recibir_comentarios at 0x7f356f1c37e0>",
+              "referencia": "<function recibir_comentarios at 0x7f60fa6037e0>",
               "ejecutable_directamente": false
             },
             {
@@ -13840,7 +13840,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function registrar_inventario at 0x7f356f1c3560>",
+              "referencia": "<function registrar_inventario at 0x7f60fa603560>",
               "ejecutable_directamente": true
             },
             {
@@ -13856,7 +13856,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function reporte at 0x7f356f1c3920>",
+              "referencia": "<function reporte at 0x7f60fa603920>",
               "ejecutable_directamente": true
             },
             {
@@ -13872,7 +13872,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function resolver at 0x7f356f1c32e0>",
+              "referencia": "<function resolver at 0x7f60fa6032e0>",
               "ejecutable_directamente": true
             },
             {
@@ -13888,7 +13888,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar at 0x7f356f1c3420>",
+              "referencia": "<function verificar at 0x7f60fa603420>",
               "ejecutable_directamente": true
             },
             {
@@ -13904,7 +13904,7 @@
               "tipo": "funcion",
               "estado": "descubierto",
               "errores": [],
-              "referencia": "<function verificar_salida at 0x7f356f1c34c0>",
+              "referencia": "<function verificar_salida at 0x7f60fa6034c0>",
               "ejecutable_directamente": false
             }
           ],
@@ -24445,39 +24445,39 @@
       "contenido": [
         {
           "id_traza": 1,
-          "timestamp": "2026-08-20T06:33:30.227846+00:00",
+          "timestamp": "2026-08-20T06:51:09.930869+00:00",
           "modulo": "axiomas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.014543
+          "duracion_s": 0.014466
         },
         {
           "id_traza": 2,
-          "timestamp": "2026-08-20T06:33:30.241756+00:00",
+          "timestamp": "2026-08-20T06:51:09.944531+00:00",
           "modulo": "axiomas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.01384
+          "duracion_s": 0.01357
         },
         {
           "id_traza": 3,
-          "timestamp": "2026-08-20T06:33:30.255299+00:00",
+          "timestamp": "2026-08-20T06:51:09.958273+00:00",
           "modulo": "axiomas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.013473
+          "duracion_s": 0.01366
         },
         {
           "id_traza": 4,
-          "timestamp": "2026-08-20T06:33:30.255372+00:00",
+          "timestamp": "2026-08-20T06:51:09.958362+00:00",
           "modulo": "cache",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 2.3e-05
+          "duracion_s": 2.4e-05
         },
         {
           "id_traza": 5,
-          "timestamp": "2026-08-20T06:33:30.255414+00:00",
+          "timestamp": "2026-08-20T06:51:09.958406+00:00",
           "modulo": "cache",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -24485,87 +24485,87 @@
         },
         {
           "id_traza": 6,
-          "timestamp": "2026-08-20T06:33:30.545489+00:00",
+          "timestamp": "2026-08-20T06:51:10.258512+00:00",
           "modulo": "cache",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.29003
+          "duracion_s": 0.300055
         },
         {
           "id_traza": 7,
-          "timestamp": "2026-08-20T06:33:30.546241+00:00",
+          "timestamp": "2026-08-20T06:51:10.259291+00:00",
           "modulo": "calculator",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000667
+          "duracion_s": 0.000707
         },
         {
           "id_traza": 8,
-          "timestamp": "2026-08-20T06:33:30.546863+00:00",
+          "timestamp": "2026-08-20T06:51:10.259895+00:00",
           "modulo": "calculator",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000584
+          "duracion_s": 0.00056
         },
         {
           "id_traza": 9,
-          "timestamp": "2026-08-20T06:33:30.547577+00:00",
+          "timestamp": "2026-08-20T06:51:10.260528+00:00",
           "modulo": "calculator",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000637
+          "duracion_s": 0.000562
         },
         {
           "id_traza": 10,
-          "timestamp": "2026-08-20T06:33:30.548707+00:00",
+          "timestamp": "2026-08-20T06:51:10.261647+00:00",
           "modulo": "capacidades_engine",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001083
+          "duracion_s": 0.001084
         },
         {
           "id_traza": 11,
-          "timestamp": "2026-08-20T06:33:30.548994+00:00",
+          "timestamp": "2026-08-20T06:51:10.261986+00:00",
           "modulo": "capacidades_engine",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000253
+          "duracion_s": 0.000302
         },
         {
           "id_traza": 12,
-          "timestamp": "2026-08-20T06:33:30.549424+00:00",
+          "timestamp": "2026-08-20T06:51:10.262438+00:00",
           "modulo": "capacidades_engine",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.00039
+          "duracion_s": 0.000397
         },
         {
           "id_traza": 13,
-          "timestamp": "2026-08-20T06:33:30.551875+00:00",
+          "timestamp": "2026-08-20T06:51:10.264848+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.002419
+          "duracion_s": 0.002376
         },
         {
           "id_traza": 14,
-          "timestamp": "2026-08-20T06:33:30.553353+00:00",
+          "timestamp": "2026-08-20T06:51:10.266382+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001441
+          "duracion_s": 0.001497
         },
         {
           "id_traza": 15,
-          "timestamp": "2026-08-20T06:33:30.554874+00:00",
+          "timestamp": "2026-08-20T06:51:10.267867+00:00",
           "modulo": "catalogo_citaciones",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.001477
+          "duracion_s": 0.001439
         },
         {
           "id_traza": 16,
-          "timestamp": "2026-08-20T06:33:30.554919+00:00",
+          "timestamp": "2026-08-20T06:51:10.267912+00:00",
           "modulo": "citacion",
           "capacidad": "reporte",
           "estado": "EXITO",
@@ -24573,15 +24573,15 @@
         },
         {
           "id_traza": 17,
-          "timestamp": "2026-08-20T06:33:30.554949+00:00",
+          "timestamp": "2026-08-20T06:51:10.267960+00:00",
           "modulo": "citacion",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 1e-06
+          "duracion_s": 2e-06
         },
         {
           "id_traza": 18,
-          "timestamp": "2026-08-20T06:33:30.554977+00:00",
+          "timestamp": "2026-08-20T06:51:10.267992+00:00",
           "modulo": "citacion",
           "capacidad": "inventario",
           "estado": "EXITO",
@@ -24589,87 +24589,87 @@
         },
         {
           "id_traza": 19,
-          "timestamp": "2026-08-20T06:33:30.555656+00:00",
+          "timestamp": "2026-08-20T06:51:10.268576+00:00",
           "modulo": "constante",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.000651
+          "duracion_s": 0.000555
         },
         {
           "id_traza": 20,
-          "timestamp": "2026-08-20T06:33:30.555817+00:00",
+          "timestamp": "2026-08-20T06:51:10.268732+00:00",
           "modulo": "constante",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000121
+          "duracion_s": 0.000116
         },
         {
           "id_traza": 21,
-          "timestamp": "2026-08-20T06:33:30.555951+00:00",
+          "timestamp": "2026-08-20T06:51:10.268863+00:00",
           "modulo": "constante",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 9.8e-05
+          "duracion_s": 9.6e-05
         },
         {
           "id_traza": 22,
-          "timestamp": "2026-08-20T06:33:30.571463+00:00",
+          "timestamp": "2026-08-20T06:51:10.284146+00:00",
           "modulo": "contexto",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.015481
+          "duracion_s": 0.015251
         },
         {
           "id_traza": 23,
-          "timestamp": "2026-08-20T06:33:30.572724+00:00",
+          "timestamp": "2026-08-20T06:51:10.285380+00:00",
           "modulo": "contexto",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.001223
+          "duracion_s": 0.001196
         },
         {
           "id_traza": 24,
-          "timestamp": "2026-08-20T06:33:30.575955+00:00",
+          "timestamp": "2026-08-20T06:51:10.288660+00:00",
           "modulo": "contexto",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.003188
+          "duracion_s": 0.003238
         },
         {
           "id_traza": 25,
-          "timestamp": "2026-08-20T06:33:30.613933+00:00",
+          "timestamp": "2026-08-20T06:51:10.324624+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.037938
+          "duracion_s": 0.035923
         },
         {
           "id_traza": 26,
-          "timestamp": "2026-08-20T06:33:30.643844+00:00",
+          "timestamp": "2026-08-20T06:51:10.353400+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.029862
+          "duracion_s": 0.028709
         },
         {
           "id_traza": 27,
-          "timestamp": "2026-08-20T06:33:30.671531+00:00",
+          "timestamp": "2026-08-20T06:51:10.379059+00:00",
           "modulo": "correlacion_mecanica",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.027627
+          "duracion_s": 0.025574
         },
         {
           "id_traza": 28,
-          "timestamp": "2026-08-20T06:33:30.671624+00:00",
+          "timestamp": "2026-08-20T06:51:10.379135+00:00",
           "modulo": "diagnosticoD",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 3e-06
+          "duracion_s": 4e-06
         },
         {
           "id_traza": 29,
-          "timestamp": "2026-08-20T06:33:30.671657+00:00",
+          "timestamp": "2026-08-20T06:51:10.379167+00:00",
           "modulo": "diagnosticoD",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -24677,7 +24677,7 @@
         },
         {
           "id_traza": 30,
-          "timestamp": "2026-08-20T06:33:30.671682+00:00",
+          "timestamp": "2026-08-20T06:51:10.379194+00:00",
           "modulo": "diagnosticoD",
           "capacidad": "inventario",
           "estado": "EXITO",
@@ -24685,15 +24685,15 @@
         },
         {
           "id_traza": 31,
-          "timestamp": "2026-08-20T06:33:30.675123+00:00",
+          "timestamp": "2026-08-20T06:51:10.382679+00:00",
           "modulo": "diccionario",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.003419
+          "duracion_s": 0.003463
         },
         {
           "id_traza": 32,
-          "timestamp": "2026-08-20T06:33:30.675175+00:00",
+          "timestamp": "2026-08-20T06:51:10.382734+00:00",
           "modulo": "diccionario",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -24701,7 +24701,7 @@
         },
         {
           "id_traza": 33,
-          "timestamp": "2026-08-20T06:33:30.675225+00:00",
+          "timestamp": "2026-08-20T06:51:10.382786+00:00",
           "modulo": "diccionario",
           "capacidad": "inventario",
           "estado": "EXITO",
@@ -24709,79 +24709,79 @@
         },
         {
           "id_traza": 34,
-          "timestamp": "2026-08-20T06:33:30.676723+00:00",
+          "timestamp": "2026-08-20T06:51:10.384199+00:00",
           "modulo": "formulas",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001472
+          "duracion_s": 0.001387
         },
         {
           "id_traza": 35,
-          "timestamp": "2026-08-20T06:33:30.677377+00:00",
+          "timestamp": "2026-08-20T06:51:10.384846+00:00",
           "modulo": "formulas",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000621
+          "duracion_s": 0.000611
         },
         {
           "id_traza": 36,
-          "timestamp": "2026-08-20T06:33:30.677652+00:00",
+          "timestamp": "2026-08-20T06:51:10.385152+00:00",
           "modulo": "formulas",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000236
+          "duracion_s": 0.000267
         },
         {
           "id_traza": 37,
-          "timestamp": "2026-08-20T06:33:30.677714+00:00",
+          "timestamp": "2026-08-20T06:51:10.385217+00:00",
           "modulo": "interfaz",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 2.5e-05
+          "duracion_s": 2.6e-05
         },
         {
           "id_traza": 38,
-          "timestamp": "2026-08-20T06:33:30.681547+00:00",
+          "timestamp": "2026-08-20T06:51:10.388958+00:00",
           "modulo": "realidad",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.003804
+          "duracion_s": 0.003685
         },
         {
           "id_traza": 39,
-          "timestamp": "2026-08-20T06:33:30.682190+00:00",
+          "timestamp": "2026-08-20T06:51:10.389592+00:00",
           "modulo": "realidad",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000583
+          "duracion_s": 0.000589
         },
         {
           "id_traza": 40,
-          "timestamp": "2026-08-20T06:33:30.686286+00:00",
+          "timestamp": "2026-08-20T06:51:10.394098+00:00",
           "modulo": "realidad",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.004055
+          "duracion_s": 0.004466
         },
         {
           "id_traza": 41,
-          "timestamp": "2026-08-20T06:33:30.695987+00:00",
+          "timestamp": "2026-08-20T06:51:10.403779+00:00",
           "modulo": "self",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.009651
+          "duracion_s": 0.009628
         },
         {
           "id_traza": 42,
-          "timestamp": "2026-08-20T06:33:30.704920+00:00",
+          "timestamp": "2026-08-20T06:51:10.412626+00:00",
           "modulo": "self",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.008886
+          "duracion_s": 0.008802
         },
         {
           "id_traza": 43,
-          "timestamp": "2026-08-20T06:33:30.704974+00:00",
+          "timestamp": "2026-08-20T06:51:10.412678+00:00",
           "modulo": "self",
           "capacidad": "inventario",
           "estado": "EXITO",
@@ -24789,87 +24789,87 @@
         },
         {
           "id_traza": 44,
-          "timestamp": "2026-08-20T06:33:30.726460+00:00",
+          "timestamp": "2026-08-20T06:51:10.433654+00:00",
           "modulo": "spartaco_seguridad",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.021456
+          "duracion_s": 0.020949
         },
         {
           "id_traza": 45,
-          "timestamp": "2026-08-20T06:33:30.727141+00:00",
+          "timestamp": "2026-08-20T06:51:10.434312+00:00",
           "modulo": "spartaco_seguridad",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000638
+          "duracion_s": 0.00062
         },
         {
           "id_traza": 46,
-          "timestamp": "2026-08-20T06:33:30.727784+00:00",
+          "timestamp": "2026-08-20T06:51:10.434899+00:00",
           "modulo": "spartaco_seguridad",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000602
+          "duracion_s": 0.000544
         },
         {
           "id_traza": 47,
-          "timestamp": "2026-08-20T06:33:30.729038+00:00",
+          "timestamp": "2026-08-20T06:51:10.436112+00:00",
           "modulo": "taxonomia",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001219
+          "duracion_s": 0.001179
         },
         {
           "id_traza": 48,
-          "timestamp": "2026-08-20T06:33:30.729307+00:00",
+          "timestamp": "2026-08-20T06:51:10.436373+00:00",
           "modulo": "taxonomia",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000234
+          "duracion_s": 0.000226
         },
         {
           "id_traza": 49,
-          "timestamp": "2026-08-20T06:33:30.729581+00:00",
+          "timestamp": "2026-08-20T06:51:10.436612+00:00",
           "modulo": "taxonomia",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000234
+          "duracion_s": 0.0002
         },
         {
           "id_traza": 50,
-          "timestamp": "2026-08-20T06:33:30.731425+00:00",
+          "timestamp": "2026-08-20T06:51:10.438445+00:00",
           "modulo": "tru_totales",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 0.001811
+          "duracion_s": 0.001803
         },
         {
           "id_traza": 51,
-          "timestamp": "2026-08-20T06:33:30.732312+00:00",
+          "timestamp": "2026-08-20T06:51:10.439293+00:00",
           "modulo": "tru_totales",
           "capacidad": "diagnostico",
           "estado": "EXITO",
-          "duracion_s": 0.000855
+          "duracion_s": 0.000815
         },
         {
           "id_traza": 52,
-          "timestamp": "2026-08-20T06:33:30.733111+00:00",
+          "timestamp": "2026-08-20T06:51:10.440088+00:00",
           "modulo": "tru_totales",
           "capacidad": "inventario",
           "estado": "EXITO",
-          "duracion_s": 0.000761
+          "duracion_s": 0.000756
         },
         {
           "id_traza": 53,
-          "timestamp": "2026-08-20T06:33:30.733155+00:00",
+          "timestamp": "2026-08-20T06:51:10.440131+00:00",
           "modulo": "verificacion",
           "capacidad": "reporte",
           "estado": "EXITO",
-          "duracion_s": 8e-06
+          "duracion_s": 7e-06
         },
         {
           "id_traza": 54,
-          "timestamp": "2026-08-20T06:33:30.733183+00:00",
+          "timestamp": "2026-08-20T06:51:10.440159+00:00",
           "modulo": "verificacion",
           "capacidad": "diagnostico",
           "estado": "EXITO",
@@ -24877,7 +24877,7 @@
         },
         {
           "id_traza": 55,
-          "timestamp": "2026-08-20T06:33:30.733207+00:00",
+          "timestamp": "2026-08-20T06:51:10.440184+00:00",
           "modulo": "verificacion",
           "capacidad": "inventario",
           "estado": "EXITO",

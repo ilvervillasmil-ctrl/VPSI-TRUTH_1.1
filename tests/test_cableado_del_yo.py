@@ -5,7 +5,7 @@
 #
 # RUTA DEL OBJETIVO:
 #
-#   modules/self/L4/yo_oscillador_dinamico.py
+#   modules/self/L4/yo_oscilador_dinamico.py
 #
 # RESPONSABILIDAD DEL TEST:
 #
@@ -47,10 +47,11 @@
 # ===============================================================
 
 import math
+from pathlib import Path
 
 import pytest
 
-from modules.self.L4.yo_oscillador_dinamico import (
+from modules.self.L4.yo_oscilador_dinamico import (
     ALPHA_F,
     BETA_F,
     ENTROPY_MAX,
@@ -91,6 +92,17 @@ def test_l4_yo_oscillator_importa_desde_la_ruta_real():
 
     assert YoOscillator is not None
     assert YoState is not None
+
+
+def test_l4_modulo_cargado_es_el_archivo_contractual_real():
+
+    modulo = Path(__file__).resolve().parents[1] / "modules" / "self" / "L4" / "yo_oscilador_dinamico.py"
+
+    assert modulo.is_file(), f"No existe el módulo contractual: {modulo}"
+
+    import modules.self.L4.yo_oscilador_dinamico as l4
+
+    assert Path(l4.__file__).resolve() == modulo.resolve()
 
 
 def test_l4_define_seis_capas_internas():
@@ -243,6 +255,36 @@ def test_energia_cambia_si_cambia_una_activacion():
             rel_tol=1e-12,
             abs_tol=1e-12,
         )
+
+
+@pytest.mark.parametrize("layer", range(6))
+def test_cada_activacion_alimenta_su_propia_energia(layer):
+
+    base = [1.0] * 6
+    altered = [1.0] * 6
+    altered[layer] = 0.25
+
+    frictions = [0.0] * 6
+
+    energies_base = compute_energies(base, frictions)
+    energies_altered = compute_energies(altered, frictions)
+
+    for index in range(6):
+
+        if index == layer:
+            assert math.isclose(
+                energies_altered[index],
+                energies_base[index] * 0.25,
+                rel_tol=1e-12,
+                abs_tol=1e-12,
+            )
+        else:
+            assert math.isclose(
+                energies_altered[index],
+                energies_base[index],
+                rel_tol=1e-12,
+                abs_tol=1e-12,
+            )
 
 
 # ===============================================================
@@ -672,6 +714,176 @@ def test_force_y_integra_los_canales():
     assert result >= 3.0
 
 
+def test_step_yo_ejecuta_realmente_todas_las_etapas_del_cableado(monkeypatch):
+
+    calls = []
+
+    energies = [1.0] * 6
+    weights = [1.0 / 6.0] * 6
+    contributions = [1.0 / 6.0] * 6
+
+    def wrapped_energies(*args, **kwargs):
+        calls.append("energies")
+        return energies
+
+    def wrapped_weights(*args, **kwargs):
+        calls.append("weights")
+        return weights
+
+    def wrapped_contributions(*args, **kwargs):
+        calls.append("contributions")
+        return contributions
+
+    def wrapped_entropy(*args, **kwargs):
+        calls.append("entropy")
+        return 0.5
+
+    def wrapped_c_omega(*args, **kwargs):
+        calls.append("c_omega")
+        return 0.25
+
+    def wrapped_phi(*args, **kwargs):
+        calls.append("phi")
+        return 0.05
+
+    def wrapped_zeta(*args, **kwargs):
+        calls.append("zeta")
+        return 0.01
+
+    def wrapped_omega(*args, **kwargs):
+        calls.append("omega")
+        return 1.0
+
+    def wrapped_regime(*args, **kwargs):
+        calls.append("regime")
+        return "SUBAMORTIGUADO"
+
+    def wrapped_equilibrium(*args, **kwargs):
+        calls.append("equilibrium")
+        return 0.2
+
+    def wrapped_force(*args, **kwargs):
+        calls.append("force")
+        return 1.0
+
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.compute_energies", wrapped_energies)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.compute_weights", wrapped_weights)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.compute_contributions", wrapped_contributions)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.shannon_S", wrapped_entropy)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.compute_c_omega", wrapped_c_omega)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.phi_Y", wrapped_phi)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.zeta_Y", wrapped_zeta)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.omega_Y", wrapped_omega)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.regime_Y", wrapped_regime)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.dynamic_equilibrium", wrapped_equilibrium)
+    monkeypatch.setattr("modules.self.L4.yo_oscilador_dinamico.force_Y", wrapped_force)
+
+    result = step_yo(
+        YoState(),
+        activations=[1.0] * 6,
+        dt=0.01,
+    )
+
+    assert result.t == 0.01
+
+    assert calls == [
+        "energies",
+        "weights",
+        "contributions",
+        "entropy",
+        "c_omega",
+        "phi",
+        "zeta",
+        "omega",
+        "regime",
+        "equilibrium",
+        "force",
+    ]
+
+
+def test_integracion_numerica_respeta_la_ecuacion_maestra():
+
+    state = YoState(
+        theta=0.4,
+        theta_dot=0.2,
+        t=3.0,
+        c_omega=0.1,
+    )
+
+    activations = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4]
+    dt = 0.01
+
+    result = step_yo(
+        state,
+        activations=activations,
+        dt=dt,
+        L0_input=0.3,
+        purpose_magnitude=0.2,
+        novelty=0.1,
+    )
+
+    expected_acceleration = (
+        result.force_y
+        - result.phi_y * state.theta_dot
+        - PI2 * (state.theta - result.theta_eq)
+    )
+
+    expected_theta_dot = (
+        state.theta_dot
+        + expected_acceleration * dt
+    )
+
+    expected_theta = (
+        state.theta
+        + expected_theta_dot * dt
+    )
+
+    assert math.isclose(
+        result.theta_dot,
+        expected_theta_dot,
+        rel_tol=1e-12,
+        abs_tol=1e-12,
+    )
+
+    assert math.isclose(
+        result.theta,
+        expected_theta,
+        rel_tol=1e-12,
+        abs_tol=1e-12,
+    )
+
+    assert math.isclose(
+        result.t,
+        state.t + dt,
+        rel_tol=0.0,
+        abs_tol=1e-12,
+    )
+
+
+def test_l0_modifica_la_fuerza_sin_entrar_en_las_seis_capas():
+
+    activations = [1.0] * 6
+
+    a = YoOscillator().step(
+        activations=activations,
+        dt=0.001,
+        L0_input=0.0,
+    )
+
+    b = YoOscillator().step(
+        activations=activations,
+        dt=0.001,
+        L0_input=10.0,
+    )
+
+    assert a["energies_L1_L6"] == b["energies_L1_L6"]
+    assert a["weights_L1_L6"] == b["weights_L1_L6"]
+    assert a["contributions_f1_f6"] == b["contributions_f1_f6"]
+    assert "w0" not in a
+    assert "w0" not in b
+    assert a["force_Y"] != b["force_Y"]
+
+
 # ===============================================================
 # 11. INTEGRACIÓN COMPLETA DEL CARRIL
 # ===============================================================
@@ -933,6 +1145,39 @@ def test_solucion_analitica_es_finita():
     )
 
     assert math.isfinite(result)
+
+
+def test_modulo_l4_expone_la_api_publica_del_cableado():
+
+    import modules.self.L4.yo_oscilador_dinamico as l4
+
+    expected = {
+        "compute_energies",
+        "compute_weights",
+        "compute_contributions",
+        "shannon_S",
+        "normalized_entropy",
+        "negentropy",
+        "compute_c_omega",
+        "phi_Y",
+        "zeta_Y",
+        "omega_Y",
+        "regime_Y",
+        "dynamic_equilibrium",
+        "force_L0",
+        "force_L5",
+        "force_L6",
+        "force_BETA",
+        "force_COH",
+        "force_Y",
+        "YoState",
+        "step_yo",
+        "oscillator_solution_Y",
+        "read_rail",
+        "YoOscillator",
+    }
+
+    assert expected.issubset(set(l4.__all__))
 
 
 # ===============================================================

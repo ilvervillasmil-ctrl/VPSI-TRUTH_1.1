@@ -750,11 +750,7 @@ class Engine:
             "resultado": resultado,
         })
 
-        return resultado
-
-       if HAS_LAYERS:
-            self._init_layers_silent()
-
+       
     # ============================================================
     # ANTI-HACK / STRUCTURAL GUARD
     # ============================================================

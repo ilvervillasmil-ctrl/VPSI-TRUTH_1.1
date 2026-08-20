@@ -3246,6 +3246,7 @@ __all__ = [
     "inspeccionar",
     "ContratoInvalido",
     "CAPACIDADES_RESUELTAS",
+    "evaluar_universal",
 ]
 
 # ===============================================================

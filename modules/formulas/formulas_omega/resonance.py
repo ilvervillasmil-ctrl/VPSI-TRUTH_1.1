@@ -32,11 +32,11 @@
 from __future__ import annotations
 
 import math
-
+from .constants import PHI
 # ===============================================================
 # AUTORIDAD DE CONSTANTES (CT) — OBLIGATORIO
 # ===============================================================
-from modules.constante import ALPHA, BETA, PHI
+from modules.constante import ALPHA, BETA
 # ===============================================================
 
 

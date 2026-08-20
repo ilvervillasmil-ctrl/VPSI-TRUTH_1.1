@@ -171,6 +171,7 @@ PERMISOS_AUTORIZA_ENGINE = (
     "recuperar", "sincronizar",
     "monitorear", "acceso_archivos", "ejecutar_total", 
     "inspeccionar", "registrar_inventario",
+    "evaluar_universal",
 )
 
 
@@ -189,7 +190,7 @@ BANDERAS_REPORTING = (
     "contrato", "conocimiento",
     "metricas", "diagnostico",
     "reporte", "acceso_archivos",
-    "validar_esquema",
+    "validar_esquema", "evaluar_universal"
 )
 
 # ===============================================================
@@ -200,7 +201,7 @@ BANDERAS_REPORTING = (
 
 CLAVES_META_CAPACIDAD = (
     "descripcion", "entrada", "validar_esquema",
-    "salida", "acceso_archivos",
+    "salida", "acceso_archivos", "evaluar_universal",
 )
 
 # ===============================================================

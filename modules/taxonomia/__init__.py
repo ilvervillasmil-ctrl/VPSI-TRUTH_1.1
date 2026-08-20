@@ -1421,7 +1421,8 @@ _CAP_MAP = {
     "ejecutar_total": ejecutar_total,
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
-    "evaluar_universal": evaluar_universal",
+    "evaluar_universal": evaluar_universal,
+    
 }
 
 # ===============================================================

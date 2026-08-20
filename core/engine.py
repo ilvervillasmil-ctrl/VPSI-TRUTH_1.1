@@ -286,7 +286,7 @@ class CapasInvalidasError(AgenciaMatematicaError):
 
 class FormulaNoDisponibleError(AgenciaMatematicaError):
     """FO no expone la capacidad matemática requerida."""
-     pass
+    pass
 
 class PurposeAlignmentError(Exception):
     """Fricción distinta de cero en la capa L6 Propósito."""

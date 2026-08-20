@@ -51,6 +51,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
+from modules.constante import ALPHA, BETA
+import modules.self.L4  # fuerza la carga estricta del subpaquete L4
 # ===============================================================
 # PARTE 1 — PRINCIPIOS, BANDERAS Y ESPECIFICACIONES PRECISAS
 # ===============================================================

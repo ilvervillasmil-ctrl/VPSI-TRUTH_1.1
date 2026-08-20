@@ -118,7 +118,13 @@ import math
 # SEMILLA (única autoridad)
 # ===============================================================
 from modules.constante import ALPHA, BETA
-from modules.formulas.formulas_omega.constants import C_MAX, R_FIN (
+
+# ===============================================================
+# DERIVADAS (formulas_omega.constants)
+# ===============================================================
+from modules.formulas.formulas_omega.constants import (
+    C_MAX,
+    R_FIN,
     S_REF,
     KAPPA,
     THETA_CUBE,

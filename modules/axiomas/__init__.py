@@ -639,6 +639,8 @@ CONTENEDOR: Dict[str, Any] = {
     # ============================================================
     "estados_validos": list(ESTADOS_VALIDOS),
     "invariantes": list(INVARIANTES),
+    },
+
 }
     
 # ===============================================================

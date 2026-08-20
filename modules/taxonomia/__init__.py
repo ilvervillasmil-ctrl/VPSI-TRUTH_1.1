@@ -294,7 +294,7 @@ CONTENEDOR: Dict[str, Any] = {
         # --- PERMISOS AGREGADOS (OBLIGATORIOS) ---
         "validar_esquema": True,          # ← AGREGADO
         "acceso_archivos": True,          # ← AGREGADO
-        "avaluar_universal": True,
+        "evaluar_universal": True,   
 
         # --- BANDERAS NUEVAS (OBLIGATORIAS ENGINE) ---
         "ejecutar_total": True,           # ← AGREGADO
@@ -324,6 +324,8 @@ CONTENEDOR: Dict[str, Any] = {
         "ejecutar_total",
         "inspeccionar",
         "registrar_inventario",
+        "evaluar_universal",            
+
     ],
 
     # ============================================================

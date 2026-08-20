@@ -1,4 +1,4 @@
-# ===============================================================
+===============================================================
 # VPSI-TRUTH — core/engine.py DIRECTOR ARQUITECTO SIMBIOSIS MECANICA
 # ===============================================================
 #
@@ -577,14 +577,6 @@ class Engine:
 
     VERSION = VERSION_ENGINE
 
-# ===============================================================
-# Parte 12 ENGINE AQUI SE DEFINEN LAS DECLARACIONES
-# ===============================================================
-
-class Engine:
-
-    VERSION = VERSION_ENGINE
-
     # ===========================================================
     # DECLARACIÓN PROPÓSITO FUNDAMENTAL (MANDATO INVARIABLE)
     # ===========================================================
@@ -754,7 +746,8 @@ class Engine:
             "capacidad": capacidad,
             "resultado": resultado,
         })
-        
+
+       
     # ============================================================
     # ANTI-HACK / STRUCTURAL GUARD
     # ============================================================
@@ -1095,27 +1088,21 @@ class Engine:
 
     def _leer_contrato(self, path_dir: Path) -> Optional[Dict[str, Any]]:
         init_path = path_dir / "__init__.py"
+        nombre_mod = f"vpsi_dinamico_{path_dir.name}"
 
         try:
-            nombre_python = self._nombre_python_canonico(path_dir)
+            spec = importlib.util.spec_from_file_location(
+                nombre_mod,
+                init_path,
+                submodule_search_locations=[str(path_dir)]
+            )
 
-            if nombre_python:
-                mod = importlib.import_module(nombre_python)
-            else:
-                nombre_mod = f"vpsi_dinamico_{path_dir.name}"
+            if spec is None or spec.loader is None:
+                return None
 
-                spec = importlib.util.spec_from_file_location(
-                    nombre_mod,
-                    init_path,
-                    submodule_search_locations=[str(path_dir)]
-                )
-
-                if spec is None or spec.loader is None:
-                    return None
-
-                mod = importlib.util.module_from_spec(spec)
-                sys.modules[nombre_mod] = mod
-                spec.loader.exec_module(mod)
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules[nombre_mod] = mod
+            spec.loader.exec_module(mod)
 
             meta = getattr(mod, "CONTENEDOR", None)
 
@@ -1134,8 +1121,7 @@ class Engine:
 
         except Exception as e:
             self.errores_arranque.append(
-                f"{path_dir.name}: error al cargar → "
-                f"{type(e).__name__}: {e}"
+                f"{path_dir.name}: error al cargar → {type(e).__name__}: {e}"
             )
             return None
 

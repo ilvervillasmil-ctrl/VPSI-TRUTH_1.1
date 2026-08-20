@@ -1,5 +1,5 @@
 # ===============================================================
-# modules/formulas/formulas_omega/yo_oscilatorio_FO.py
+# modules/formulas/formulas_omega/yo_oscilatorio_dinamico_FO.py
 # ===============================================================
 #
 # VPSI-TRUTH — L4 — YO OSCILATORIO DINÁMICO

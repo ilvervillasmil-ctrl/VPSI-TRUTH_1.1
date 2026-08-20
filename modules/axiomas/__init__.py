@@ -631,7 +631,7 @@ CONTENEDOR: Dict[str, Any] = {
         "reporte": True,
         "validar_esquema": True,
         "evaluar_universal": True,
-    },
+    
 
     # ============================================================
     # 5.14 — ESTADOS VÁLIDOS E INVARIANTES
@@ -639,6 +639,7 @@ CONTENEDOR: Dict[str, Any] = {
     "estados_validos": list(ESTADOS_VALIDOS),
     "invariantes": list(INVARIANTES),
 }
+    
 # ===============================================================
 # PARTE 6 — FUNCIONES PRIVADAS
 # ===============================================================

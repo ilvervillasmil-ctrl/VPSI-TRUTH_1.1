@@ -672,13 +672,55 @@ class Engine:
             self.estado = ESTADO_OPERATIVO
 
     # ===========================================================
-    # Parte 12.8 DESCUBRIMIENTO
+    # Parte 12.8 DESCUBRIMIENTO RECURSIVO
     # ===========================================================
 
     def _descubrir_modulos(self) -> List[Path]:
-        if not self.raiz.is_dir(): return []
-        return [p for p in sorted(self.raiz.iterdir()) if p.is_dir() and (p / "__init__.py").is_file()]
+        if not self.raiz.is_dir():
+            return []
 
+        encontrados: List[Path] = []
+
+        for path_dir in sorted(self.raiz.rglob("*")):
+            if not path_dir.is_dir():
+                continue
+
+            if not (path_dir / "__init__.py").is_file():
+                continue
+
+            encontrados.append(path_dir)
+
+        return encontrados
+
+    # ===========================================================
+    # Parte 12.8.1 DESCUBRIMIENTO DE PAQUETES PYTHON
+    # ===========================================================
+
+    def _descubrir_paquetes_python(self, raiz: Path) -> List[str]:
+        paquetes: List[str] = []
+
+        if not raiz.is_dir():
+            return paquetes
+
+        for init_path in sorted(raiz.rglob("__init__.py")):
+            paquete_dir = init_path.parent
+
+            try:
+                relativo = paquete_dir.relative_to(raiz)
+            except ValueError:
+                continue
+
+            partes = relativo.parts
+
+            if not partes:
+                continue
+
+            nombre_paquete = ".".join(partes)
+
+            if nombre_paquete not in paquetes:
+                paquetes.append(nombre_paquete)
+
+        return paquetes
     # ===========================================================
     # Métodos de validación de Propósito
     # ===========================================================

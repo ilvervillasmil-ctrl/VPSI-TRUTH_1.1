@@ -88,7 +88,7 @@ from fractions import Fraction
 from datetime import datetime, timezone
 
 from modules.constante import ALPHA, BETA
-
+import modules.formulas.formulas_omega  # fuerza la carga estricta del subpaquete
 # ===============================================================
 # 2. CONSTANTES DE IDENTIDAD
 # ===============================================================

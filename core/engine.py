@@ -87,12 +87,11 @@
 #
 # ===============================================================
 # ===============================================================
-# Parte 1 — IMPORTACIONES Y CONFIGURACIÓN DEL SISTEMA
+# Parte 1 IMPORTACIONES
 # ===============================================================
 
 from __future__ import annotations
 
-# --- Librerías Estándar de Python ---
 import importlib
 import importlib.util
 import inspect
@@ -104,39 +103,20 @@ import time
 from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-# --- Tipado Estático y Contratos (typing) ---
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Protocol,
-    Tuple,
-    Union,
-    runtime_checkable,
-)
-
-# --- Componentes Core VPSI-TRUTH ---
 from core.centinela import Centinela, Veredicto
 
-# --- Módulos Fórmulas VPSI-TRUTH ---
+# --- Igual que el otro repo (rutas VPSI) ---
 from modules.formulas.formulas_omega.coherence import (
     CoherenceEngine as FormulaEngine,
     SessionStateOmega,
 )
 from modules.formulas.formulas_omega.constants import ALPHA, BETA, PHI, S_REF
 
-
-# ===============================================================
-# CONSTANTES GLOBALES DE PROCESAMIENTO
-# ===============================================================
-
-ALPHA_VPSI: float = float(ALPHA)
-BETA_VPSI: float = float(BETA)
-EPSILON: float = 1e-12
-
+ALPHA_VPSI = float(ALPHA)
+BETA_VPSI = float(BETA)
+EPSILON = 1e-12
 
 
 # ===============================================================
@@ -390,9 +370,6 @@ class AntiHackValidation:
             raise CircularityDetectedError("Colapso circular detectado entre CΩ y Truth_total.")
 
 
-
-    
-
 # ===============================================================
 # ROLES
 # ===============================================================
@@ -406,56 +383,14 @@ OBLIGATORIOS: Tuple[str, ...] = ("CT", "AX", "FO", "MC", "SF")
 # Parte 10 CONTENEDOR LIBRERIAS Y CONTRATO Y ESPECIDICACIONES 
 # ===============================================================
 
-class ContenedorAdaptador:
+class Contenedor:
     """
-    Refuerzo no invasivo: Envuelve CUALQUIER módulo existente (diccionario u objeto)
-    sin modificar su estructura interna original.
+    Materialización de un CONTENEDOR.
+
+    El Engine no completa ni inventa campos del contrato.
     """
-    __slots__ = ("_origen", "nombre", "capacidades")
 
-    def __init__(self, modulo_original: Any) -> None:
-        self._origen = modulo_original
-
-        # 1. Extrae el nombre sin importar cómo esté guardado
-        if isinstance(modulo_original, dict):
-            self.nombre = str(modulo_original.get("nombre", "MODULO_ANONIMO"))
-            caps = modulo_original.get("capacidades", {})
-        else:
-            self.nombre = getattr(modulo_original, "nombre", "MODULO_ANONIMO")
-            caps = getattr(modulo_original, "capacidades", {})
-
-        # 2. Normaliza el mapa de capacidades
-        self.capacidades = caps if isinstance(caps, dict) else {}
-
-    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
-        """Busca la capacidad tanto en el diccionario como en los métodos del objeto."""
-        # A) Búsqueda en el diccionario de capacidades
-        if nombre_capacidad in self.capacidades:
-            return self.capacidades[nombre_capacidad]
-
-        # B) Búsqueda por si el módulo es un objeto con métodos directos
-        if hasattr(self._origen, nombre_capacidad):
-            attr = getattr(self._origen, nombre_capacidad)
-            if callable(attr):
-                return attr
-
-        # C) Búsqueda por si es un diccionario con funciones directas
-        if isinstance(self._origen, dict) and callable(self._origen.get(nombre_capacidad)):
-            return self._origen[nombre_capacidad]
-
-        return None
-
-    def __getitem__(self, key: str) -> Any:
-        """Mantiene compatibilidad hacia atrás si el Engine legacy accede como diccionario modulo['clave']."""
-        if isinstance(self._origen, dict):
-            return self._origen[key]
-        return getattr(self._origen, key)
-
-    def __contains__(self, key: str) -> bool:
-        if isinstance(self._origen, dict):
-            return key in self._origen
-        return hasattr(self._origen, key)
-
+    def __init__(self, meta: Dict[str, Any], modulo: Any, ruta: Path) -> None:
         self.meta = meta
         self.modulo = modulo
         self.ruta = ruta
@@ -465,10 +400,6 @@ class ContenedorAdaptador:
         # Parte 10.1 IDENTIDAD DE CADA MODULO EN EL CONTRATO
         # -------------------------------------------------------
 
-        self._dict = modulo_dict
-        self.nombre: str = str(modulo_dict.get("nombre", "MODULO_ANONIMO"))
-        caps = modulo_dict.get("capacidades", {})
-        self.capacidades: Dict[str, Callable[..., Any]] = caps if isinstance(caps, dict) else {}
         self.id: str = str(meta.get("id", ""))
         self.nombre: str = str(meta.get("nombre", ""))
         self.rol: str = str(meta.get("rol", ""))
@@ -638,99 +569,9 @@ class RegistroModulos:
         """Número total de Contenedores registrados."""
         return len(self.contenedores)
         
-# =====================================================================
-# 1. PROTOCOLOS CONTRACTUALES Y HELPERS (FUERA Y ARRIBA DE ENGINE)
-# =====================================================================
-
-@runtime_checkable
-class ContenedorContrato(Protocol):
-    """Contrato formal que todo contenedor (SF, FO, CT, etc.) debe cumplir."""
-    nombre: str
-    capacidades: Dict[str, Callable[..., Any]]
-
-    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
-        ...
-
-
-class EngineContrato(Protocol):
-    estado: str
-    contenedores: Dict[str, Any]
-
-    def _exigir_operativo(self) -> None:
-        ...
-
-
-class Contenedor:
-    """
-    Contenedor Contractual Unificado.
-    Soporta la carga por diccionario o por argumentos nombrados,
-    ofreciendo compatibilidad total con la línea 1312 y los 20+ módulos.
-    """
-
-    __slots__ = ("_dict", "nombre", "capacidades")
-
-    def __init__(
-        self,
-        modulo_dict: Optional[Dict[str, Any]] = None,
-        nombre: Optional[str] = None,
-        capacidades: Optional[Dict[str, Callable[..., Any]]] = None,
-        **kwargs: Any,
-    ) -> None:
-        # 1. Identificar el diccionario base
-        if isinstance(modulo_dict, dict):
-            self._dict = modulo_dict
-        elif "modulo" in kwargs and isinstance(kwargs["modulo"], dict):
-            self._dict = kwargs["modulo"]
-        else:
-            self._dict = {}
-
-        # 2. Asignar el nombre (venga del dict, parámetro directo o kwargs)
-        self.nombre = str(
-            nombre
-            or self._dict.get("nombre")
-            or kwargs.get("nombre")
-            or "MODULO_ANONIMO"
-        )
-
-        # 3. Asignar capacidades
-        caps = (
-            capacidades
-            or self._dict.get("capacidades")
-            or kwargs.get("capacidades")
-            or {}
-        )
-        self.capacidades = caps if isinstance(caps, dict) else {}
-
-    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
-        """Extrae la capacidad si existe en el diccionario."""
-        return self.capacidades.get(nombre_capacidad)
-
-    def __getitem__(self, key: str) -> Any:
-        """Acceso tipo diccionario modulo['clave'] para compatibilidad legacy."""
-        if key == "nombre":
-            return self.nombre
-        if key == "capacidades":
-            return self.capacidades
-        return self._dict[key]
-
-    def __contains__(self, key: str) -> bool:
-        if key in ("nombre", "capacidades"):
-            return True
-        return key in self._dict
-
-    def get(self, key: str, default: Any = None) -> Any:
-        try:
-            return self[key]
-        except KeyError:
-            return default
-
-
-# Aliasing transparente por si alguna otra prueba requiere el nombre wrapper
-ContenedorWrapper = Contenedor
-
-# =====================================================================
-# Parte 12 — ENGINE (DECLARACIONES Y CLASE UNIFICADA)
-# =====================================================================
+# ===============================================================
+# Parte 12 ENGINE AQUI SE DEFINEN LAS DECLARACIONES
+# ===============================================================
 
 class Engine:
 
@@ -742,29 +583,8 @@ class Engine:
     
     PROPOSITO_FUNDAMENTAL = "Calcular la verdad de cualquier descripcion"
     CLAVE_PROPOSITO = "evaluar_universal"
-
-    # ===========================================================
-    # CONSTRUCTOR UNIFICADO (MEZCLA ROBUSTA DE PARÁMETROS)
-    # ===========================================================
     
-    def __init__(
-        self,
-        raiz_modulos: Optional[Union[str, Path]] = None,
-        invocador_id: str = "core",
-        strict: bool = True,
-        estado: str = "OPERATIVO",
-        contenedores: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        # Atributos de ruta y contexto del Engine original
-        self.raiz_modulos = Path(raiz_modulos) if raiz_modulos else None
-        self.invocador_id = invocador_id
-        self.strict = strict
-        
-        # Atributos de estado y contenedores contractuales
-        self.estado: str = estado
-        self.contenedores: Dict[str, Any] = contenedores or {}
-
-
+    def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
         # =======================================================
         # Parte 12.1 CONFIGURACIÓN BÁSICA
         # =======================================================
@@ -2619,306 +2439,87 @@ class Engine:
 
         return salida
 
-# ===========================================================
-# Parte 29 — AGENCIA MATEMÁTICA INTERNA
-# ===========================================================
-#
-# SEPARACIÓN SEMÁNTICA OBLIGATORIA:
-#
-#   FÓRMULA 1 — COHERENCIA DEL CARRIL
-#       SF → FO.evaluar_coherencia → C_Ω
-#
-#   FÓRMULA 2 — VERDAD
-#       CA/Conteos + CT → FO.evaluar_verdad → Tru
-#
-# C_Ω ≠ C
-# C_Ω NO alimenta Tru.
-# Tru NO consume capas L0..L6.
-#
-# Engine:
-#   - dirige
-#   - resuelve
-#   - entrega paquetes
-#   - no calcula
-#   - no escribe ALPHA, BETA, C, L, K ni Tru
-#
-# ===========================================================
-
-
-
-
-    # -----------------------------------------------------------------
-    # VALIDACIONES Y CONTROLES DE ESTADO CONTRACTUAL
-    # -----------------------------------------------------------------
+    # ===========================================================
+    # Parte 29 — AGENCIA MATEMÁTICA INTERNA + EVALUAR_UNIVERSAL
+    # ===========================================================
+    #
+    # Adaptación de OmegaEngine (compute_coherence / apply_vpsi_truth)
+    # al modelo contractual VPSI.
+    #
+    # Reglas:
+    #   - Capas → Self (SF)
+    #   - Cálculo → Formulas (FO)
+    #   - Engine no escribe ALPHA, BETA ni Tru
+    #   - evaluar_universal se ejerce en TODOS los módulos que la declaren
+    #
+    # ===========================================================
 
     def _exigir_operativo(self) -> None:
-        """Exige estrictamente que el Engine se encuentre en estado OPERATIVO."""
-        estado_actual = getattr(self, "estado", getattr(self, "ESTADO", "INOPERATIVO"))
-        if estado_actual != "OPERATIVO":
-            raise RuntimeError(
-                f"[Engine Error] Operación rechazada: El Engine no se encuentra OPERATIVO (Estado actual: {estado_actual})."
+        if self.estado != ESTADO_OPERATIVO:
+            raise AgenciaMatematicaError(
+                "Engine no operativo (estado={0})".format(self.estado)
             )
 
-    def _resolver_modulo(self, nombre_modulo: str) -> ContenedorContrato:
-        """Resuelve un contenedor registrado de forma segura y tipada."""
-        if hasattr(self, "obtener_contenedor") and callable(getattr(self, "obtener_contenedor")):
-            mod = self.obtener_contenedor(nombre_modulo)
-        elif isinstance(self.contenedores, dict) and nombre_modulo in self.contenedores:
-            mod = self.contenedores[nombre_modulo]
-        else:
-            raise LookupError(f"[Engine Error] Módulo contractual no registrado: '{nombre_modulo}'.")
+    def _exigir_contenedor(self, clave: str, etiqueta: str) -> Contenedor:
+        cont = self.registro.primero(clave)
+        if cont is None:
+            raise AgenciaMatematicaError(
+                "{0} ausente en el registro".format(etiqueta)
+            )
+        return cont
 
-        if isinstance(mod, dict):
-            return ContenedorWrapper(mod)
-        if hasattr(mod, "fn") and hasattr(mod, "capacidades"):
-            return mod  # type: ignore
-        
-        raise TypeError(f"[Engine Error] El módulo '{nombre_modulo}' no implementa el protocolo de contenedor válido.")
+    def _exigir_capacidad(self, cont: Contenedor, nombre: str) -> None:
+        if not callable(cont.fn(nombre)):
+            raise FormulaNoDisponibleError(
+                "{0} no declara capacidad callable '{1}'".format(
+                    cont.nombre, nombre
+                )
+            )
 
-    def _exigir_contenedor(self, nombre_modulo: str, etiqueta: str = "") -> ContenedorContrato:
-        """Valida y retorna el contenedor requerido bajo demanda."""
-        try:
-            return self._resolver_modulo(nombre_modulo)
-        except Exception as exc:
-            raise RuntimeError(f"[Engine Error] Contenedor requerido '{etiqueta or nombre_modulo}' no disponible: {exc}") from exc
+    def _resultado_exito(self, salida: Dict[str, Any], contexto: str) -> Any:
+        if not isinstance(salida, dict):
+            raise AgenciaMatematicaError(
+                "{0}: salida no es dict".format(contexto)
+            )
+        if salida.get("estado") != "EXITO":
+            raise AgenciaMatematicaError(
+                "{0}: {1}".format(
+                    contexto,
+                    salida.get("error") or "ejecución no exitosa",
+                )
+            )
+        return salida.get("resultado")
 
-    def _exigir_capacidad(self, contenedor: ContenedorContrato, capacidad: str) -> None:
-        """Verifica de forma explícita que una capacidad exista y sea invocable."""
-        fn = contenedor.fn(capacidad)
-        if not callable(fn):
-            raise AttributeError(f"[Engine Error] El módulo '{contenedor.nombre}' no declara la capacidad invocable '{capacidad}'.")
-
-    def ejecutar_capacidad(
-        self,
-        nombre_modulo: str,
-        capacidad: str,
-        *args: Any,
-        **kwargs: Any,
-    ) -> Dict[str, Any]:
-        """Ejecuta de manera segura y controlada una capacidad de un módulo contractual."""
-        try:
-            mod = self._resolver_modulo(nombre_modulo)
-        except Exception as exc:
-            return {"estado": "ERROR", "error": str(exc)}
-
-        fn = mod.fn(capacidad)
-        if not callable(fn):
-            return {"estado": "ERROR", "error": f"Capacidad '{capacidad}' no encontrada o no es invocable en {nombre_modulo}."}
-
-        try:
-            # Resolución inteligente de firma basada en introspección limpia
-            if len(args) == 1 and isinstance(args[0], dict) and not kwargs:
-                sig = inspect.signature(fn)
-                try:
-                    sig.bind(**args[0])
-                    res = fn(**args[0])
-                except TypeError:
-                    res = fn(args[0])
-            else:
-                res = fn(*args, **kwargs)
-
-            return {"estado": "EXITO", "resultado": res}
-        except Exception as exc:
-            return {"estado": "ERROR", "error": f"Excepción interna en {nombre_modulo}.{capacidad}: {type(exc).__name__}: {exc}"}
-
-    def _resultado_exito(self, respuesta: Dict[str, Any], operacion: str) -> Any:
-        """Filtra y extrae el resultado de una ejecución exitosa, o lanza error de contrato."""
-        if not isinstance(respuesta, dict) or respuesta.get("estado") != "EXITO":
-            err = respuesta.get("error", "Error desconocido en paquete de datos") if isinstance(respuesta, dict) else "Respuesta no estructurada"
-            raise RuntimeError(f"[Falla Contractual] Operación '{operacion}' falló: {err}")
-        return respuesta.get("resultado")
-
-    @staticmethod
-    def _ejecutar_flexible(func: Callable[..., Any], *candidatos_args: Any) -> Any:
-        """Ejecuta un callable probando diferentes firmas de entrada de manera tolerante."""
-        ultima_excepcion = None
-        for arg in candidatos_args:
-            try:
-                if arg is None:
-                    return func()
-                elif isinstance(arg, dict):
-                    try:
-                        return func(**arg)
-                    except TypeError:
-                        return func(arg)
-                else:
-                    return func(arg)
-            except TypeError as exc:
-                ultima_excepcion = exc
-                continue
-            except Exception as exc:
-                raise exc
-        if ultima_excepcion:
-            try:
-                return func()
-            except Exception:
-                raise ultima_excepcion
-        return func()
-
-    # -----------------------------------------------------------------
-    # CAPACIDAD ENGINE — CICLO DE COHERENCIA
-    # -----------------------------------------------------------------
-
-    def evaluar_coherencia(
-        self,
-        peticion: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Ejecuta el ciclo contractual de coherencia: SF → ENGINE → FO → CoherenceEngine.
-        Cumple estrictamente con la separación semántica (C_Ω no alimenta Tru).
-        """
-        peticion = dict(peticion) if isinstance(peticion, dict) else {}
-
-        resultado: Dict[str, Any] = {
-            "operacion": "evaluar_coherencia",
-            "estado": "NO_INICIADO",
-            "coherente": False,
-            "sf": None,
-            "fo": None,
-            "coherencia": None,
-            "errores": [],
-        }
-
-        # 1. RESOLVER SF
-        try:
-            sf = self._resolver_modulo("SF")
-        except Exception as exc:
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append(f"SF: resolución falló: {type(exc).__name__}: {exc}")
-            return resultado
-
-        resultado["sf"] = {"nombre": sf.nombre, "capacidades": list(sf.capacidades.keys())}
-
-        # 2. OBTENER PERSPECTIVAS DEL SELF
-        perspectivas = None
-        for nombre in ("yo_funcional", "desde_donde", "estado_self", "capas"):
-            ref = sf.fn(nombre)
-            if callable(ref):
-                try:
-                    perspectivas = self._ejecutar_flexible(ref, peticion)
-                    if perspectivas is not None:
-                        break
-                except Exception:
-                    continue
-
-        if perspectivas is None:
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append("SF: no fue posible obtener una perspectiva contractual válida.")
-            return resultado
-
-        # 3. RESOLVER CAPAS DESDE LA PETICIÓN / SF
-        capas = peticion.get("capas")
-        if capas is None and isinstance(perspectivas, dict):
-            capas = perspectivas.get("perspectivas") or perspectivas.get("capas")
-        elif capas is None and isinstance(perspectivas, (list, tuple)):
-            capas = perspectivas
-
-        if capas is None:
-            capas = peticion.get("activations")
-
-        if capas is None:
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append("SF: no se obtuvo el vector contractual de capas para FO.")
-            return resultado
-
-        if not isinstance(capas, (list, tuple)):
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append("SF: las capas deben resolverse obligatoriamente como list o tuple.")
-            return resultado
-
-        # 4. RESOLVER FO
-        try:
-            fo = self._resolver_modulo("FO")
-        except Exception as exc:
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append(f"FO: resolución falló: {type(exc).__name__}: {exc}")
-            return resultado
-
-        resultado["fo"] = {"nombre": fo.nombre, "capacidades": list(fo.capacidades.keys())}
-        
-        ref_fo = fo.fn("evaluar_coherencia")
-        if not callable(ref_fo):
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append("FO: la capacidad contractual 'evaluar_coherencia' no es invocable.")
-            return resultado
-
-        # 5. ENGINE ENTREGA LOS HECHOS A FO
-        kwargs: Dict[str, Any] = {}
-        if "frictions" in peticion:
-            kwargs["frictions"] = peticion["frictions"]
-
-        for clave in (
-            "rho", "delta_t", "tau", "novelty", "sensitivity",
-            "external_coherences", "integration", "quality",
-            "complexity", "uncertainty", "externos", "meta"
-        ):
-            if clave in peticion:
-                kwargs[clave] = peticion[clave]
-
-        try:
-            coherencia = ref_fo(capas, **kwargs)
-        except Exception as exc:
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append(f"FO.evaluar_coherencia arrojó excepción: {type(exc).__name__}: {exc}")
-            return resultado
-
-        # 6. VALIDAR SALIDA DE FO
-        if not isinstance(coherencia, dict):
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append("FO.evaluar_coherencia no produjo un diccionario estructurado.")
-            return resultado
-
-        resultado["coherencia"] = coherencia
-        requeridos = ("c_omega", "c_beta", "c_alpha", "c_total", "energies")
-        faltantes = [clave for clave in requeridos if clave not in coherencia]
-
-        if faltantes:
-            resultado["estado"] = "DEGRADADO"
-            resultado["errores"].append("FO: salida de coherencia incompleta, faltan claves: " + ", ".join(faltantes))
-            return resultado
-
-        # 7. RESULTADO CONTRACTUAL FINAL
-        resultado["estado"] = "OPERATIVO"
-        resultado["coherente"] = True
-        resultado["capas"] = list(capas)
-        resultado["c_omega"] = coherencia["c_omega"]
-        resultado["c_beta"] = coherencia["c_beta"]
-        resultado["c_alpha"] = coherencia["c_alpha"]
-        resultado["c_total"] = coherencia["c_total"]
-        resultado["energies"] = coherencia["energies"]
-        resultado["diagnostico"] = coherencia.get("diagnostico", coherencia.get("diagnostic_name"))
-
-        return resultado
-
-    # -----------------------------------------------------------------
-    # CAPAS — SELF (SF)
-    # -----------------------------------------------------------------
+    # -----------------------------------------------------------
+    # CAPAS (Self)
+    # -----------------------------------------------------------
 
     def obtener_capas_self(self) -> Any:
-        """Obtiene las capas directamente desde Self (SF) validando el estado del Engine."""
+        """
+        Capas desde SF.
+        Equivalente a layers_data del OmegaEngine original.
+        """
         self._exigir_operativo()
         sf = self._exigir_contenedor("SF", "Self (SF)")
 
-        capacidad = None
         if callable(sf.fn("capas")):
             capacidad = "capas"
         elif callable(sf.fn("estado_self")):
             capacidad = "estado_self"
-
-        if not capacidad:
-            raise AttributeError("SF no declara 'capas' ni 'estado_self' como capacidades válidas.")
+        else:
+            raise FormulaNoDisponibleError(
+                "SF no declara 'capas' ni 'estado_self'"
+            )
 
         salida = self.ejecutar_capacidad("SF", capacidad)
-        capas = self._resultado_exito(salida, f"SF.{capacidad}")
-
+        capas = self._resultado_exito(salida, "SF.{0}".format(capacidad))
         if capas is None:
-            raise ValueError("SF devolvió un conjunto de capas vacío (None).")
-
+            raise CapasInvalidasError("SF devolvió capas vacías")
         return capas
 
-    # -----------------------------------------------------------------
-    # FÓRMULA 1 — COHERENCIA DEL CARRIL
-    # -----------------------------------------------------------------
+    # -----------------------------------------------------------
+    # COHERENCIA (FO)
+    # -----------------------------------------------------------
 
     def calcular_coherencia(
         self,
@@ -2926,7 +2527,10 @@ class Engine:
         externos: Optional[Dict[str, Any]] = None,
         meta: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """Ejecuta exclusivamente la Fórmula 1 — C_Ω mediante transporte limpio."""
+        """
+        Equivalente contractual de OmegaEngine.compute_coherence.
+        Capas → SF | Cálculo → FO.evaluar_coherencia
+        """
         self._exigir_operativo()
         fo = self._exigir_contenedor("FO", "Formulas (FO)")
         self._exigir_capacidad(fo, "evaluar_coherencia")
@@ -2934,13 +2538,154 @@ class Engine:
         if capas is None:
             capas = self.obtener_capas_self()
 
-        params = {
+        salida = self.ejecutar_capacidad(
+            "FO",
+            "evaluar_coherencia",
+            {
+                "capas": capas,
+                "externos": dict(externos or {}),
+                "meta": dict(meta or {}),
+            },
+        )
+        resultado = self._resultado_exito(salida, "FO.evaluar_coherencia")
+
+        return {
+            "estado": "EXITO",
+            "operacion": "calcular_coherencia",
+            "modulo": fo.nombre,
+            "capacidad": "evaluar_coherencia",
             "capas": capas,
-            "externos": dict(externos or {}),
-            "meta": dict(meta or {}),
+            "resultado": resultado,
         }
 
-        salida = self.ejecutar_capacidad("FO", "evaluar_coherencia", params)
+    # -----------------------------------------------------------
+    # VERDAD (FO)
+    # -----------------------------------------------------------
+
+    def aplicar_verdad(
+        self,
+        payload: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Equivalente contractual de OmegaEngine.apply_vpsi_truth.
+        Engine no escribe la fórmula: FO.tru_total o propósito.
+        """
+        self._exigir_operativo()
+        fo = self._exigir_contenedor("FO", "Formulas (FO)")
+        data = dict(payload or {})
+
+        if callable(fo.fn("tru_total")):
+            salida = self.ejecutar_capacidad("FO", "tru_total", data)
+            resultado = self._resultado_exito(salida, "FO.tru_total")
+            return {
+                "estado": "EXITO",
+                "operacion": "aplicar_verdad",
+                "modulo": fo.nombre,
+                "capacidad": "tru_total",
+                "resultado": resultado,
+            }
+
+        resultado = self.ejecutar_proposito(data)
+        return {
+            "estado": "EXITO",
+            "operacion": "aplicar_verdad",
+            "modulo": "PROPOSITO",
+            "capacidad": self.clave_proposito,
+            "resultado": resultado,
+        }
+
+    # -----------------------------------------------------------
+    # CICLO OMEGA
+    # -----------------------------------------------------------
+
+    def ciclo_omega(
+        self,
+        capas: Optional[Any] = None,
+        externos: Optional[Dict[str, Any]] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Pipeline activo:
+          SF (capas) → FO (coherencia) → FO (verdad)
+        """
+        self._exigir_operativo()
+
+        if capas is None:
+            capas = self.obtener_capas_self()
+
+        bloque_coh = self.calcular_coherencia(
+            capas=capas,
+            externos=externos,
+            meta=meta,
+        )
+        if bloque_coh.get("estado") != "EXITO":
+            return bloque_coh
+
+        res_coh = bloque_coh.get("resultado")
+
+        bloque_truth = self.aplicar_verdad(
+            {
+                "coherencia": res_coh,
+                "capas": capas,
+                "externos": dict(externos or {}),
+                "meta": dict(meta or {}),
+            }
+        )
+
+        return {
+            "estado": "EXITO",
+            "operacion": "ciclo_omega",
+            "capas": capas,
+            "coherencia": res_coh,
+            "verdad": bloque_truth.get("resultado"),
+            "detalle_coherencia": {
+                "modulo": bloque_coh.get("modulo"),
+                "capacidad": bloque_coh.get("capacidad"),
+            },
+            "detalle_verdad": {
+                "modulo": bloque_truth.get("modulo"),
+                "capacidad": bloque_truth.get("capacidad"),
+            },
+        }
+
+    # -----------------------------------------------------------
+    # EVALUAR_UNIVERSAL — TODOS LOS MÓDULOS
+    # -----------------------------------------------------------
+
+
+    # =========================================================================
+    # FÓRMULA 1 — COHERENCIA DEL CARRIL (C_Ω)
+    # =========================================================================
+   
+    def calcular_coherencia(
+        self,
+        capas: Optional[Any] = None,
+        externos: Optional[Dict[str, Any]] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Equivalente contractual de OmegaEngine.compute_coherence.
+        Capas → SF | Cálculo → FO.evaluar_coherencia (Fórmula 1 - C_Ω)
+        
+        Entrada: Activaciones L0..L6 desde el módulo Self (SF).
+        Salida: Escalar c_omega.
+        """
+        self._exigir_operativo()
+        fo = self._exigir_contenedor("FO", "Formulas (FO)")
+        self._exigir_capacidad(fo, "evaluar_coherencia")
+
+        if capas is None:
+            capas = self.obtener_capas_self()
+
+        salida = self.ejecutar_capacidad(
+            "FO",
+            "evaluar_coherencia",
+            {
+                "capas": capas,
+                "externos": dict(externos or {}),
+                "meta": dict(meta or {}),
+            },
+        )
         c_omega = self._resultado_exito(salida, "FO.evaluar_coherencia")
 
         return {
@@ -2953,53 +2698,140 @@ class Engine:
             "c_omega": c_omega,
         }
 
-    # -----------------------------------------------------------------
-    # CICLO OMEGA — COHERENCIA
-    # -----------------------------------------------------------------
+    # =========================================================================
+    # FÓRMULA 2 — EVALUACIÓN DE VERDAD (TRU)
+    # =========================================================================
+    def calcular_verdad(
+        self,
+        C: Any,
+        L: Any,
+        K: Any,
+        alpha: Optional[Any] = None,
+        beta: Optional[Any] = None,
+        externos: Optional[Dict[str, Any]] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Capacidad contractual para la Fórmula 2 — Verdad (Tru).
+        Factores de Dominio (CA/Conteos) → FO.evaluar_verdad
+        
+        Entrada: C, L, K (Fraction / factores de dominio).
+        Salida: Tru_Ri y Tru_total.
+        
+        Aislamiento: No consume ni conoce las capas L0..L6 del módulo SF.
+        """
+        self._exigir_operativo()
+        fo = self._exigir_contenedor("FO", "Formulas (FO)")
+        self._exigir_capacidad(fo, "evaluar_verdad")
 
-    def ciclo_omega(
+        salida = self.ejecutar_capacidad(
+            "FO",
+            "evaluar_verdad",
+            {
+                "C": C,
+                "L": L,
+                "K": K,
+                "alpha": alpha,
+                "beta": beta,
+                "externos": dict(externos or {}),
+                "meta": dict(meta or {}),
+            },
+        )
+        resultado_tru = self._resultado_exito(salida, "FO.evaluar_verdad")
+
+        return {
+            "estado": "EXITO",
+            "formula": "FORMULA_2_TRU",
+            "operacion": "calcular_verdad",
+            "modulo": fo.nombre,
+            "capacidad": "evaluar_verdad",
+            "factores": {"C": C, "L": L, "K": K},
+            "resultado": resultado_tru,
+        }
+
+
+    def ciclo_omega_universal(
         self,
         capas: Optional[Any] = None,
         externos: Optional[Dict[str, Any]] = None,
         meta: Optional[Dict[str, Any]] = None,
+        peticion_universal: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """Ejecuta el ciclo contractual integral del carril utilizando la Fórmula 1."""
-        self._exigir_operativo()
-
-        # Desempaquetado inteligente si se pasa una petición estructurada en el argumento capas
-        capas_input = capas
-        if isinstance(capas, dict) and "capas" in capas:
-            peticion_dict = capas
-            capas_input = peticion_dict.get("capas")
-            externos = externos or peticion_dict.get("externos")
-            meta = meta or peticion_dict.get("meta")
-
-        if capas_input is None:
-            capas_input = self.obtener_capas_self()
-
-        bloque_coherencia = self.calcular_coherencia(
-            capas=capas_input,
+        """
+        Ciclo completo:
+          1. ciclo_omega (SF + FO)
+          2. evaluar_universal en todos los módulos que la declaran
+        """
+        omega = self.ciclo_omega(
+            capas=capas,
             externos=externos,
             meta=meta,
         )
-
-        if bloque_coherencia.get("estado") != "EXITO":
-            return bloque_coherencia
-
-        resultado = bloque_coherencia.get("c_omega")
+        universal = self.evaluar_universal_todos(
+            peticion=peticion_universal,
+        )
 
         return {
-            "estado": "EXITO",
-            "operacion": "ciclo_omega",
-            "formula": "FORMULA_1_C_OMEGA",
-            "capas": capas_input,
-            "coherencia": resultado,
-            "detalle_coherencia": {
-                "modulo": bloque_coherencia.get("modulo"),
-                "capacidad": bloque_coherencia.get("capacidad"),
-            },
+            "estado": (
+                "EXITO"
+                if omega.get("estado") == "EXITO"
+                and universal.get("estado") in ("EXITO", "PARCIAL")
+                else "ERROR"
+            ),
+            "operacion": "ciclo_omega_universal",
+            "omega": omega,
+            "evaluar_universal": universal,
         }
+ 
+    # ===========================================================
+    # Parte 29 CONSOLIDACIÓN
+    # ===========================================================
 
+    def consolidar_reportes(self) -> Dict[str, Any]:
+
+        for nombre, cont in self.registro.contenedores.items():
+
+            if "reporte" in cont.capacidades:
+
+                r = self.ejecutar_capacidad(
+                    nombre,
+                    "reporte"
+                )
+
+                self._reportes_modulos[nombre] = (
+                    r.get("resultado")
+                    if r.get("estado") == "EXITO"
+                    else {
+                        "error": r.get("error"),
+                        "estado": "NO ENTREGADO POR MODULO"
+                    }
+                )
+
+            if "diagnostico" in cont.capacidades:
+
+                d = self.ejecutar_capacidad(
+                    nombre,
+                    "diagnostico"
+                )
+
+                if d.get("estado") == "EXITO":
+                    self._diagnosticos[nombre] = d.get("resultado")
+
+            if "inventario" in cont.capacidades:
+
+                inv = self.ejecutar_capacidad(
+                    nombre,
+                    "inventario"
+                )
+
+                if inv.get("estado") == "EXITO":
+                    self._inventarios[nombre] = inv.get("resultado")
+
+        return {
+            "reportes": self._reportes_modulos,
+            "diagnosticos": self._diagnosticos,
+            "inventarios": self._inventarios
+        }
 
     # ===========================================================
     # Parte 30 PAQUETE OMEGA

@@ -2723,6 +2723,164 @@ class Engine:
         )
 
         return resultado
+    # ===============================================================
+    # CAPAS — SELF (SF)
+    # ===============================================================
+
+    def obtener_capas_self(self) -> Any:
+        """
+        Obtiene las capas directamente desde Self (SF).
+
+        El Engine no fabrica las capas.
+        SF es el proveedor contractual de las capas.
+        """
+
+        self._exigir_operativo()
+
+        sf = self._exigir_contenedor("SF", "Self (SF)")
+
+        if callable(sf.fn("capas")):
+            capacidad = "capas"
+        elif callable(sf.fn("estado_self")):
+            capacidad = "estado_self"
+        else:
+            raise FormulaNoDisponibleError(
+                "SF no declara 'capas' ni 'estado_self'"
+            )
+
+        salida = self.ejecutar_capacidad(
+            "SF",
+            capacidad,
+        )
+
+        capas = self._resultado_exito(
+            salida,
+            "SF.{0}".format(capacidad),
+        )
+
+        if capas is None:
+            raise CapasInvalidasError(
+                "SF devolvió capas vacías"
+            )
+
+        return capas
+
+
+    # ===============================================================
+    # FÓRMULA 1 — COHERENCIA DEL CARRIL
+    # ===============================================================
+
+    def calcular_coherencia(
+        self,
+        capas: Optional[Any] = None,
+        externos: Optional[Dict[str, Any]] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Ejecuta exclusivamente la Fórmula 1 — C_Ω.
+
+        Flujo:
+
+            SF → Engine → FO.evaluar_coherencia
+
+        El Engine transporta las capas y parámetros.
+        FO ejecuta la matemática de coherencia.
+
+        Este método NO calcula verdad.
+        Este método NO calcula Tru_Ri.
+        Este método NO calcula Tru_total.
+        """
+
+        self._exigir_operativo()
+
+        fo = self._exigir_contenedor(
+            "FO",
+            "Formulas (FO)",
+        )
+
+        self._exigir_capacidad(
+            fo,
+            "evaluar_coherencia",
+        )
+
+        if capas is None:
+            capas = self.obtener_capas_self()
+
+        salida = self.ejecutar_capacidad(
+            "FO",
+            "evaluar_coherencia",
+            {
+                "capas": capas,
+                "externos": dict(externos or {}),
+                "meta": dict(meta or {}),
+            },
+        )
+
+        c_omega = self._resultado_exito(
+            salida,
+            "FO.evaluar_coherencia",
+        )
+
+        return {
+            "estado": "EXITO",
+            "formula": "FORMULA_1_C_OMEGA",
+            "operacion": "calcular_coherencia",
+            "modulo": fo.nombre,
+            "capacidad": "evaluar_coherencia",
+            "capas": capas,
+            "c_omega": c_omega,
+        }
+
+
+    # ===============================================================
+    # CICLO OMEGA — COHERENCIA
+    # ===============================================================
+
+    def ciclo_omega(
+        self,
+        capas: Optional[Any] = None,
+        externos: Optional[Dict[str, Any]] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Ejecuta el ciclo contractual del carril:
+
+            SF → ENGINE → FO
+
+        El ciclo utiliza la Fórmula 1 de coherencia.
+
+        No reconstruye ninguna fórmula.
+        No calcula C_Ω dentro del Engine.
+        No confunde C_Ω con TRU.
+        """
+
+        self._exigir_operativo()
+
+        if capas is None:
+            capas = self.obtener_capas_self()
+
+        bloque_coherencia = self.calcular_coherencia(
+            capas=capas,
+            externos=externos,
+            meta=meta,
+        )
+
+        if bloque_coherencia.get("estado") != "EXITO":
+            return bloque_coherencia
+
+        resultado = bloque_coherencia.get("c_omega")
+
+        return {
+            "estado": "EXITO",
+            "operacion": "ciclo_omega",
+            "formula": "FORMULA_1_C_OMEGA",
+            "capas": capas,
+            "coherencia": resultado,
+            "detalle_coherencia": {
+                "modulo": bloque_coherencia.get("modulo"),
+                "capacidad": bloque_coherencia.get("capacidad"),
+            },
+        }
     
     # ===========================================================
     # Parte 29 CONSOLIDACIÓN

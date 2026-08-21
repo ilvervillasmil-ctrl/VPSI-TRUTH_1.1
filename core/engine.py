@@ -576,9 +576,46 @@ class RegistroModulos:
         """Número total de Contenedores registrados."""
         return len(self.contenedores)
         
-# ===============================================================
-# Parte 12 ENGINE AQUI SE DEFINEN LAS DECLARACIONES
-# ===============================================================
+# =====================================================================
+# 1. PROTOCOLOS CONTRACTUALES Y HELPERS (FUERA Y ARRIBA DE ENGINE)
+# =====================================================================
+
+@runtime_checkable
+class ContenedorContrato(Protocol):
+    """Contrato formal que todo contenedor (SF, FO, CT, etc.) debe cumplir."""
+    nombre: str
+    capacidades: Dict[str, Callable[..., Any]]
+
+    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
+        ...
+
+
+class EngineContrato(Protocol):
+    estado: str
+    contenedores: Dict[str, Any]
+
+    def _exigir_operativo(self) -> None:
+        ...
+
+
+class ContenedorWrapper:
+    """Envuelve diccionarios de módulos para garantizar interfaz orientada a objetos."""
+
+    __slots__ = ("_dict", "nombre", "capacidades")
+
+    def __init__(self, modulo_dict: Dict[str, Any]) -> None:
+        self._dict = modulo_dict
+        self.nombre: str = str(modulo_dict.get("nombre", "MODULO_ANONIMO"))
+        caps = modulo_dict.get("capacidades", {})
+        self.capacidades: Dict[str, Callable[..., Any]] = caps if isinstance(caps, dict) else {}
+
+    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
+        return self.capacidades.get(nombre_capacidad)
+
+
+# =====================================================================
+# Parte 12 — ENGINE (DECLARACIONES Y CLASE UNIFICADA)
+# =====================================================================
 
 class Engine:
 
@@ -590,16 +627,28 @@ class Engine:
     
     PROPOSITO_FUNDAMENTAL = "Calcular la verdad de cualquier descripcion"
     CLAVE_PROPOSITO = "evaluar_universal"
+
+    # ===========================================================
+    # CONSTRUCTOR UNIFICADO (MEZCLA ROBUSTA DE PARÁMETROS)
+    # ===========================================================
     
-    def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
-   
     def __init__(
         self,
+        raiz_modulos: Optional[Union[str, Path]] = None,
+        invocador_id: str = "core",
+        strict: bool = True,
         estado: str = "OPERATIVO",
         contenedores: Optional[Dict[str, Any]] = None,
     ) -> None:
+        # Atributos de ruta y contexto del Engine original
+        self.raiz_modulos = Path(raiz_modulos) if raiz_modulos else None
+        self.invocador_id = invocador_id
+        self.strict = strict
+        
+        # Atributos de estado y contenedores contractuales
         self.estado: str = estado
         self.contenedores: Dict[str, Any] = contenedores or {}
+
 
         # =======================================================
         # Parte 12.1 CONFIGURACIÓN BÁSICA

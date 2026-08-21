@@ -2440,349 +2440,394 @@ class Engine:
         return salida
 
     # ===========================================================
-    # Parte 29 — AGENCIA MATEMÁTICA INTERNA + EVALUAR_UNIVERSAL
-    # ===========================================================
-    #
-    # Adaptación de OmegaEngine (compute_coherence / apply_vpsi_truth)
-    # al modelo contractual VPSI.
-    #
-    # Reglas:
-    #   - Capas → Self (SF)
-    #   - Cálculo → Formulas (FO)
-    #   - Engine no escribe ALPHA, BETA ni Tru
-    #   - evaluar_universal se ejerce en TODOS los módulos que la declaren
-    #
-    # ===========================================================
+# Parte 29 — AGENCIA MATEMÁTICA INTERNA
+# ===========================================================
+#
+# SEPARACIÓN SEMÁNTICA OBLIGATORIA:
+#
+#   FÓRMULA 1 — COHERENCIA DEL CARRIL
+#       SF → FO.evaluar_coherencia → C_Ω
+#
+#   FÓRMULA 2 — VERDAD
+#       CA/Conteos + CT → FO.evaluar_verdad → Tru
+#
+# C_Ω ≠ C
+# C_Ω NO alimenta Tru.
+# Tru NO consume capas L0..L6.
+#
+# Engine:
+#   - dirige
+#   - resuelve
+#   - entrega paquetes
+#   - no calcula
+#   - no escribe ALPHA, BETA, C, L, K ni Tru
+#
+# ===========================================================
 
-    def _exigir_operativo(self) -> None:
-        if self.estado != ESTADO_OPERATIVO:
-            raise AgenciaMatematicaError(
-                "Engine no operativo (estado={0})".format(self.estado)
-            )
-
-    def _exigir_contenedor(self, clave: str, etiqueta: str) -> Contenedor:
-        cont = self.registro.primero(clave)
-        if cont is None:
-            raise AgenciaMatematicaError(
-                "{0} ausente en el registro".format(etiqueta)
-            )
-        return cont
-
-    def _exigir_capacidad(self, cont: Contenedor, nombre: str) -> None:
-        if not callable(cont.fn(nombre)):
-            raise FormulaNoDisponibleError(
-                "{0} no declara capacidad callable '{1}'".format(
-                    cont.nombre, nombre
-                )
-            )
-
-    def _resultado_exito(self, salida: Dict[str, Any], contexto: str) -> Any:
-        if not isinstance(salida, dict):
-            raise AgenciaMatematicaError(
-                "{0}: salida no es dict".format(contexto)
-            )
-        if salida.get("estado") != "EXITO":
-            raise AgenciaMatematicaError(
-                "{0}: {1}".format(
-                    contexto,
-                    salida.get("error") or "ejecución no exitosa",
-                )
-            )
-        return salida.get("resultado")
-
-    # -----------------------------------------------------------
-    # CAPAS (Self)
-    # -----------------------------------------------------------
-
-    def obtener_capas_self(self) -> Any:
-        """
-        Capas desde SF.
-        Equivalente a layers_data del OmegaEngine original.
-        """
-        self._exigir_operativo()
-        sf = self._exigir_contenedor("SF", "Self (SF)")
-
-        if callable(sf.fn("capas")):
-            capacidad = "capas"
-        elif callable(sf.fn("estado_self")):
-            capacidad = "estado_self"
-        else:
-            raise FormulaNoDisponibleError(
-                "SF no declara 'capas' ni 'estado_self'"
-            )
-
-        salida = self.ejecutar_capacidad("SF", capacidad)
-        capas = self._resultado_exito(salida, "SF.{0}".format(capacidad))
-        if capas is None:
-            raise CapasInvalidasError("SF devolvió capas vacías")
-        return capas
-
-    # -----------------------------------------------------------
-    # COHERENCIA (FO)
-    # -----------------------------------------------------------
-
-    def calcular_coherencia(
-        self,
-        capas: Optional[Any] = None,
-        externos: Optional[Dict[str, Any]] = None,
-        meta: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Equivalente contractual de OmegaEngine.compute_coherence.
-        Capas → SF | Cálculo → FO.evaluar_coherencia
-        """
-        self._exigir_operativo()
-        fo = self._exigir_contenedor("FO", "Formulas (FO)")
-        self._exigir_capacidad(fo, "evaluar_coherencia")
-
-        if capas is None:
-            capas = self.obtener_capas_self()
-
-        salida = self.ejecutar_capacidad(
-            "FO",
-            "evaluar_coherencia",
-            {
-                "capas": capas,
-                "externos": dict(externos or {}),
-                "meta": dict(meta or {}),
-            },
+def _exigir_operativo(self) -> None:
+    if self.estado != ESTADO_OPERATIVO:
+        raise AgenciaMatematicaError(
+            "Engine no operativo (estado={0})".format(self.estado)
         )
-        resultado = self._resultado_exito(salida, "FO.evaluar_coherencia")
 
-        return {
-            "estado": "EXITO",
-            "operacion": "calcular_coherencia",
-            "modulo": fo.nombre,
-            "capacidad": "evaluar_coherencia",
+
+def _exigir_contenedor(self, clave: str, etiqueta: str) -> Contenedor:
+    cont = self.registro.primero(clave)
+    if cont is None:
+        raise AgenciaMatematicaError(
+            "{0} ausente en el registro".format(etiqueta)
+        )
+    return cont
+
+
+def _exigir_capacidad(self, cont: Contenedor, nombre: str) -> None:
+    if not callable(cont.fn(nombre)):
+        raise FormulaNoDisponibleError(
+            "{0} no declara capacidad callable '{1}'".format(
+                cont.nombre,
+                nombre,
+            )
+        )
+
+
+def _resultado_exito(self, salida: Dict[str, Any], contexto: str) -> Any:
+    if not isinstance(salida, dict):
+        raise AgenciaMatematicaError(
+            "{0}: salida no es dict".format(contexto)
+        )
+
+    if salida.get("estado") != "EXITO":
+        raise AgenciaMatematicaError(
+            "{0}: {1}".format(
+                contexto,
+                salida.get("error") or "ejecución no exitosa",
+            )
+        )
+
+    return salida.get("resultado")
+
+
+# ===========================================================
+# SELF — CAPAS
+# ===========================================================
+
+def obtener_capas_self(self) -> Any:
+    """
+    Fuente exclusiva de las capas L0..L6 para C_Ω.
+    """
+
+    self._exigir_operativo()
+
+    sf = self._exigir_contenedor(
+        "SF",
+        "Self (SF)",
+    )
+
+    if callable(sf.fn("capas")):
+        capacidad = "capas"
+    elif callable(sf.fn("estado_self")):
+        capacidad = "estado_self"
+    else:
+        raise FormulaNoDisponibleError(
+            "SF no declara 'capas' ni 'estado_self'"
+        )
+
+    salida = self.ejecutar_capacidad(
+        "SF",
+        capacidad,
+    )
+
+    capas = self._resultado_exito(
+        salida,
+        "SF.{0}".format(capacidad),
+    )
+
+    if capas is None:
+        raise CapasInvalidasError(
+            "SF devolvió capas vacías"
+        )
+
+    return capas
+
+
+# ===========================================================
+# FÓRMULA 1 — COHERENCIA DEL CARRIL C_Ω
+# ===========================================================
+
+def calcular_coherencia(
+    self,
+    capas: Optional[Any] = None,
+    externos: Optional[Dict[str, Any]] = None,
+    meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Calcula exclusivamente C_Ω.
+
+    Entrada:
+        capas L0..L6 desde SF.
+
+    Cálculo:
+        FO.evaluar_coherencia.
+
+    Salida:
+        C_Ω.
+
+    PROHIBICIÓN SEMÁNTICA:
+        C_Ω no es C.
+        C_Ω no se utiliza como factor C de Tru.
+    """
+
+    self._exigir_operativo()
+
+    fo = self._exigir_contenedor(
+        "FO",
+        "Formulas (FO)",
+    )
+
+    self._exigir_capacidad(
+        fo,
+        "evaluar_coherencia",
+    )
+
+    if capas is None:
+        capas = self.obtener_capas_self()
+
+    salida = self.ejecutar_capacidad(
+        "FO",
+        "evaluar_coherencia",
+        {
             "capas": capas,
-            "resultado": resultado,
-        }
+            "externos": dict(externos or {}),
+            "meta": dict(meta or {}),
+        },
+    )
 
-    # -----------------------------------------------------------
-    # VERDAD (FO)
-    # -----------------------------------------------------------
+    c_omega = self._resultado_exito(
+        salida,
+        "FO.evaluar_coherencia",
+    )
 
-    def aplicar_verdad(
-        self,
-        payload: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Equivalente contractual de OmegaEngine.apply_vpsi_truth.
-        Engine no escribe la fórmula: FO.tru_total o propósito.
-        """
-        self._exigir_operativo()
-        fo = self._exigir_contenedor("FO", "Formulas (FO)")
-        data = dict(payload or {})
+    return {
+        "estado": "EXITO",
+        "formula": "FORMULA_1_C_OMEGA",
+        "operacion": "calcular_coherencia",
+        "modulo": fo.nombre,
+        "capacidad": "evaluar_coherencia",
+        "capas": capas,
+        "c_omega": c_omega,
+    }
 
-        if callable(fo.fn("tru_total")):
-            salida = self.ejecutar_capacidad("FO", "tru_total", data)
-            resultado = self._resultado_exito(salida, "FO.tru_total")
-            return {
-                "estado": "EXITO",
-                "operacion": "aplicar_verdad",
-                "modulo": fo.nombre,
-                "capacidad": "tru_total",
-                "resultado": resultado,
-            }
 
-        resultado = self.ejecutar_proposito(data)
-        return {
-            "estado": "EXITO",
-            "operacion": "aplicar_verdad",
-            "modulo": "PROPOSITO",
-            "capacidad": self.clave_proposito,
-            "resultado": resultado,
-        }
+# ===========================================================
+# FÓRMULA 2 — VERDAD TRU
+# ===========================================================
 
-    # -----------------------------------------------------------
-    # CICLO OMEGA
-    # -----------------------------------------------------------
+def calcular_verdad(
+    self,
+    C: Any,
+    L: Any,
+    K: Any,
+    alpha: Optional[Any] = None,
+    beta: Optional[Any] = None,
+    externos: Optional[Dict[str, Any]] = None,
+    meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Calcula exclusivamente Tru.
 
-    def ciclo_omega(
-        self,
-        capas: Optional[Any] = None,
-        externos: Optional[Dict[str, Any]] = None,
-        meta: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Pipeline activo:
-          SF (capas) → FO (coherencia) → FO (verdad)
-        """
-        self._exigir_operativo()
+    Entrada:
+        C, L, K = factores de dominio.
+        alpha, beta = constantes contractuales cuando correspondan.
 
-        if capas is None:
-            capas = self.obtener_capas_self()
+    Fuente:
+        CA/Conteos + CT.
 
-        bloque_coh = self.calcular_coherencia(
-            capas=capas,
+    Cálculo:
+        FO.evaluar_verdad.
+
+    Aislamiento:
+        No recibe C_Ω.
+        No recibe capas.
+        No interpreta SF.
+    """
+
+    self._exigir_operativo()
+
+    fo = self._exigir_contenedor(
+        "FO",
+        "Formulas (FO)",
+    )
+
+    self._exigir_capacidad(
+        fo,
+        "evaluar_verdad",
+    )
+
+    salida = self.ejecutar_capacidad(
+        "FO",
+        "evaluar_verdad",
+        {
+            "C": C,
+            "L": L,
+            "K": K,
+            "alpha": alpha,
+            "beta": beta,
+            "externos": dict(externos or {}),
+            "meta": dict(meta or {}),
+        },
+    )
+
+    resultado_tru = self._resultado_exito(
+        salida,
+        "FO.evaluar_verdad",
+    )
+
+    return {
+        "estado": "EXITO",
+        "formula": "FORMULA_2_TRU",
+        "operacion": "calcular_verdad",
+        "modulo": fo.nombre,
+        "capacidad": "evaluar_verdad",
+        "factores": {
+            "C": C,
+            "L": L,
+            "K": K,
+        },
+        "constantes": {
+            "alpha": alpha,
+            "beta": beta,
+        },
+        "resultado": resultado_tru,
+    }
+
+
+# ===========================================================
+# CICLO SEPARADO — COHERENCIA
+# ===========================================================
+
+def ciclo_coherencia(
+    self,
+    capas: Optional[Any] = None,
+    externos: Optional[Dict[str, Any]] = None,
+    meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Ejecuta exclusivamente la Fórmula 1.
+
+        SF → FO → C_Ω
+    """
+
+    return self.calcular_coherencia(
+        capas=capas,
+        externos=externos,
+        meta=meta,
+    )
+
+
+# ===========================================================
+# CICLO SEPARADO — VERDAD
+# ===========================================================
+
+def ciclo_verdad(
+    self,
+    C: Any,
+    L: Any,
+    K: Any,
+    alpha: Optional[Any] = None,
+    beta: Optional[Any] = None,
+    externos: Optional[Dict[str, Any]] = None,
+    meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Ejecuta exclusivamente la Fórmula 2.
+
+        CA/Conteos + CT → FO → Tru
+    """
+
+    return self.calcular_verdad(
+        C=C,
+        L=L,
+        K=K,
+        alpha=alpha,
+        beta=beta,
+        externos=externos,
+        meta=meta,
+    )
+
+
+# ===========================================================
+# CICLO COMPUESTO — DOS PRODUCTOS DISTINTOS
+# ===========================================================
+
+def ciclo_omega(
+    self,
+    capas: Optional[Any] = None,
+    C: Any = None,
+    L: Any = None,
+    K: Any = None,
+    alpha: Optional[Any] = None,
+    beta: Optional[Any] = None,
+    externos: Optional[Dict[str, Any]] = None,
+    meta: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Ejecuta ambos cálculos sin fusionar sus semánticas.
+
+        RAMA A:
+            SF → FO → C_Ω
+
+        RAMA B:
+            CA/Conteos + CT → FO → Tru
+
+    IMPORTANTE:
+        El resultado C_Ω nunca se inserta como C.
+    """
+
+    self._exigir_operativo()
+
+    bloque_coherencia = self.ciclo_coherencia(
+        capas=capas,
+        externos=externos,
+        meta=meta,
+    )
+
+    bloque_verdad = None
+
+    if C is not None and L is not None and K is not None:
+        bloque_verdad = self.ciclo_verdad(
+            C=C,
+            L=L,
+            K=K,
+            alpha=alpha,
+            beta=beta,
             externos=externos,
             meta=meta,
         )
-        if bloque_coh.get("estado") != "EXITO":
-            return bloque_coh
 
-        res_coh = bloque_coh.get("resultado")
-
-        bloque_truth = self.aplicar_verdad(
-            {
-                "coherencia": res_coh,
-                "capas": capas,
-                "externos": dict(externos or {}),
-                "meta": dict(meta or {}),
-            }
-        )
-
-        return {
-            "estado": "EXITO",
-            "operacion": "ciclo_omega",
-            "capas": capas,
-            "coherencia": res_coh,
-            "verdad": bloque_truth.get("resultado"),
-            "detalle_coherencia": {
-                "modulo": bloque_coh.get("modulo"),
-                "capacidad": bloque_coh.get("capacidad"),
-            },
-            "detalle_verdad": {
-                "modulo": bloque_truth.get("modulo"),
-                "capacidad": bloque_truth.get("capacidad"),
-            },
-        }
-
-    # -----------------------------------------------------------
-    # EVALUAR_UNIVERSAL — TODOS LOS MÓDULOS
-    # -----------------------------------------------------------
-
-
-    # =========================================================================
-    # FÓRMULA 1 — COHERENCIA DEL CARRIL (C_Ω)
-    # =========================================================================
-   
-    def calcular_coherencia(
-        self,
-        capas: Optional[Any] = None,
-        externos: Optional[Dict[str, Any]] = None,
-        meta: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Equivalente contractual de OmegaEngine.compute_coherence.
-        Capas → SF | Cálculo → FO.evaluar_coherencia (Fórmula 1 - C_Ω)
-        
-        Entrada: Activaciones L0..L6 desde el módulo Self (SF).
-        Salida: Escalar c_omega.
-        """
-        self._exigir_operativo()
-        fo = self._exigir_contenedor("FO", "Formulas (FO)")
-        self._exigir_capacidad(fo, "evaluar_coherencia")
-
-        if capas is None:
-            capas = self.obtener_capas_self()
-
-        salida = self.ejecutar_capacidad(
-            "FO",
-            "evaluar_coherencia",
-            {
-                "capas": capas,
-                "externos": dict(externos or {}),
-                "meta": dict(meta or {}),
-            },
-        )
-        c_omega = self._resultado_exito(salida, "FO.evaluar_coherencia")
-
-        return {
-            "estado": "EXITO",
+    return {
+        "estado": (
+            "EXITO"
+            if bloque_coherencia.get("estado") == "EXITO"
+            and (
+                bloque_verdad is None
+                or bloque_verdad.get("estado") == "EXITO"
+            )
+            else "ERROR"
+        ),
+        "operacion": "ciclo_omega",
+        "coherencia": {
             "formula": "FORMULA_1_C_OMEGA",
-            "operacion": "calcular_coherencia",
-            "modulo": fo.nombre,
-            "capacidad": "evaluar_coherencia",
-            "capas": capas,
-            "c_omega": c_omega,
-        }
-
-    # =========================================================================
-    # FÓRMULA 2 — EVALUACIÓN DE VERDAD (TRU)
-    # =========================================================================
-    def calcular_verdad(
-        self,
-        C: Any,
-        L: Any,
-        K: Any,
-        alpha: Optional[Any] = None,
-        beta: Optional[Any] = None,
-        externos: Optional[Dict[str, Any]] = None,
-        meta: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Capacidad contractual para la Fórmula 2 — Verdad (Tru).
-        Factores de Dominio (CA/Conteos) → FO.evaluar_verdad
-        
-        Entrada: C, L, K (Fraction / factores de dominio).
-        Salida: Tru_Ri y Tru_total.
-        
-        Aislamiento: No consume ni conoce las capas L0..L6 del módulo SF.
-        """
-        self._exigir_operativo()
-        fo = self._exigir_contenedor("FO", "Formulas (FO)")
-        self._exigir_capacidad(fo, "evaluar_verdad")
-
-        salida = self.ejecutar_capacidad(
-            "FO",
-            "evaluar_verdad",
+            "resultado": bloque_coherencia.get("c_omega"),
+        },
+        "verdad": (
             {
-                "C": C,
-                "L": L,
-                "K": K,
-                "alpha": alpha,
-                "beta": beta,
-                "externos": dict(externos or {}),
-                "meta": dict(meta or {}),
-            },
-        )
-        resultado_tru = self._resultado_exito(salida, "FO.evaluar_verdad")
-
-        return {
-            "estado": "EXITO",
-            "formula": "FORMULA_2_TRU",
-            "operacion": "calcular_verdad",
-            "modulo": fo.nombre,
-            "capacidad": "evaluar_verdad",
-            "factores": {"C": C, "L": L, "K": K},
-            "resultado": resultado_tru,
-        }
-
-
-    def ciclo_omega_universal(
-        self,
-        capas: Optional[Any] = None,
-        externos: Optional[Dict[str, Any]] = None,
-        meta: Optional[Dict[str, Any]] = None,
-        peticion_universal: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Ciclo completo:
-          1. ciclo_omega (SF + FO)
-          2. evaluar_universal en todos los módulos que la declaran
-        """
-        omega = self.ciclo_omega(
-            capas=capas,
-            externos=externos,
-            meta=meta,
-        )
-        universal = self.evaluar_universal_todos(
-            peticion=peticion_universal,
-        )
-
-        return {
-            "estado": (
-                "EXITO"
-                if omega.get("estado") == "EXITO"
-                and universal.get("estado") in ("EXITO", "PARCIAL")
-                else "ERROR"
-            ),
-            "operacion": "ciclo_omega_universal",
-            "omega": omega,
-            "evaluar_universal": universal,
-        }
- 
+                "formula": "FORMULA_2_TRU",
+                "resultado": bloque_verdad.get("resultado"),
+            }
+            if bloque_verdad is not None
+            else None
+        ),
+    }
     # ===========================================================
     # Parte 29 CONSOLIDACIÓN
     # ===========================================================

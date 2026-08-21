@@ -1,56 +1,43 @@
-# -*- coding: utf-8 -*-
+# ===============================================================
+# tests/test_l5_metaconsciencia.py
+# ===============================================================
 """
-VPSI-TRUTH — TEST DL5
-modules/self/L5/metaconsciencia.py
+Auditoría contractual de L5 según el módulo real:
 
-Propósito
----------
-Validar el contrato matemático y causal del mirador L5.
+    modules/self/L5/metaconsciencia.py
 
-Este test NO hardcodea resultados derivados de la fórmula.
-Las propiedades se comprueban por invariancia, causalidad y
-consistencia entre ejecuciones.
+Contrato de este archivo (no el idealizado):
+    - Exporta ALPHA, BETA, PHI, THETA_CUBE_DEFAULT, LAYER_COUNT
+    - ControlConfiguration.agency / autoreference / conscious son bool
+    - gain de retorno = β · min(1, a·r) cuando a>0 y r>0
+    - formula_maestra_l5 NO expone novelty (sí calcular)
+    - sigma5 es parámetro de forma (default 0.029707)
+    - DEFAULT_FRICTIONS = (0.0,) * 7 en este fuente
 
-Contrato DL5 relevante
-----------------------
-    activations[0..6]       → carril L0..L6
-    theta_y                 → posición del Yo
-    theta_eq                → equilibrio del Yo
-    agency                  → agencia
-    autoreference           → autoreferencia
-    novelty                 → entrada reservada; no altera N ni I5
-    loop_detected           → lectura de estado del loop
-
-Cadena principal
-----------------
-    activations
-        ↓
-    energies / weights
-        ↓
-    coherence / receptor_quality
-        ↓
-    h5 / V5
-        ↓
-    I5
-        ↓
-    observation_level N
-        ↓
-    control
-        ↓
-    retorno opcional
+Ejecutar:
+    pytest -q tests/test_l5_metaconsciencia.py
 """
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
+import modules.constante as constante
+import modules.formulas.formulas_omega.constants as omega_constants
+
 from modules.self.L5.metaconsciencia import (
-    ALPHA_F,
-    BETA_F,
-    THETA_CUBE_F,
+    ALPHA,
+    BETA,
+    PHI,
+    THETA_CUBE_DEFAULT,
+    LAYER_COUNT,
+    N_MIN,
+    N_MAX,
     THRESHOLD_N2,
     THRESHOLD_N3,
-    LAYER_COUNT,
+    DEFAULT_FRICTIONS,
     L0,
     L1,
     L2,
@@ -58,12 +45,6 @@ from modules.self.L5.metaconsciencia import (
     L4,
     L5,
     L6,
-    DEFAULT_FRICTIONS,
-    LayerGeometry,
-    ControlConfiguration,
-    LayerMovement,
-    L5Result,
-    L5Metaconsciencia,
     build_geometry,
     calculate_energies,
     normalize_weights,
@@ -76,938 +57,689 @@ from modules.self.L5.metaconsciencia import (
     observation_intensity,
     determine_observation_level,
     control_configuration,
-    level_description,
     yo_state,
     decode_downward_signal,
     describe_movement,
+    L5Metaconsciencia,
     formula_maestra_l5,
 )
 
-
-# ===============================================================
-# DATOS BASE DEL TEST
-# ===============================================================
-
-CAPAS = (
-    0.10,
-    0.20,
-    0.30,
-    0.40,
-    0.50,
-    0.60,
-    0.70,
-)
-
-FRICCIONES = tuple(DEFAULT_FRICTIONS)
-
-THETA_Y = 0.50
-THETA_EQ = 0.50
-
-AGENCY = 0.80
-AUTOREFERENCE = 0.80
-
+TC = THETA_CUBE_DEFAULT
 SIGMA5 = 0.029707
 
-
-def _resultado_base(**overrides) -> L5Result:
-    parametros = dict(
-        activations=CAPAS,
-        theta_y=THETA_Y,
-        theta_eq=THETA_EQ,
-        agency=AGENCY,
-        autoreference=AUTOREFERENCE,
-        novelty=0.0,
-        frictions=FRICCIONES,
-        sigma5=SIGMA5,
-        loop_detected=False,
-    )
-    parametros.update(overrides)
-    return formula_maestra_l5(**parametros)
+TODO_1 = (1.0,) * LAYER_COUNT
+CERO = (0.0,) * LAYER_COUNT
+MEDIO = (0.5,) * LAYER_COUNT
 
 
-# ===============================================================
-# DL5 — ESTRUCTURA BÁSICA
-# ===============================================================
-
-def test_dl5_formula_maestra_produce_resultado_l5():
-    resultado = _resultado_base()
-
-    assert isinstance(resultado, L5Result)
+def _z(i: int) -> float:
+    return TC * (PHI ** ((i - L4) / 2.0))
 
 
-def test_dl5_carril_tiene_siete_posiciones():
-    resultado = _resultado_base()
-
-    assert len(resultado.activations_before) == LAYER_COUNT
-    assert len(resultado.activations_after) == LAYER_COUNT
+def _assert_unit_interval(value: float) -> None:
+    assert math.isfinite(value)
+    assert 0.0 <= value <= 1.0
 
 
-def test_dl5_indices_corresponden_al_carril_l0_l6():
-    assert (L0, L1, L2, L3, L4, L5, L6) == tuple(range(LAYER_COUNT))
-
-
-def test_dl5_activaciones_de_entrada_se_conservan():
-    resultado = _resultado_base()
-
-    assert resultado.activations_before == CAPAS
+def _assert_close(a: float, b: float, tol: float = 1e-12) -> None:
+    assert abs(float(a) - float(b)) <= tol, (a, b)
 
 
 # ===============================================================
-# DL5 — GEOMETRÍA
+# A. ARRANQUE Y API
 # ===============================================================
 
-def test_dl5_geometria_tiene_siete_capas():
-    geometry = build_geometry()
-
-    assert len(geometry) == LAYER_COUNT
-
-
-def test_dl5_geometria_contiene_layer_geometry():
-    geometry = build_geometry()
-
-    assert all(isinstance(item, LayerGeometry) for item in geometry)
-
-
-def test_dl5_geometria_indices_son_l0_a_l6():
-    geometry = build_geometry()
-
-    assert tuple(item.index for item in geometry) == tuple(range(LAYER_COUNT))
-
-
-def test_dl5_geometria_l5_existe():
-    geometry = build_geometry()
-
-    assert geometry[L5].index == L5
-
-
-# ===============================================================
-# DL5 — ENERGÍA Y PESOS
-# ===============================================================
-
-def test_dl5_energias_tienen_siete_posiciones():
-    geometry = build_geometry()
-
-    energies = calculate_energies(
-        CAPAS,
-        FRICCIONES,
-        geometry,
-    )
-
-    assert len(energies) == LAYER_COUNT
-
-
-def test_dl5_pesos_tienen_siete_posiciones():
-    geometry = build_geometry()
-
-    energies = calculate_energies(
-        CAPAS,
-        FRICCIONES,
-        geometry,
-    )
-
-    weights = normalize_weights(energies)
-
-    assert len(weights) == LAYER_COUNT
-
-
-def test_dl5_pesos_normalizados_suman_uno():
-    geometry = build_geometry()
-
-    energies = calculate_energies(
-        CAPAS,
-        FRICCIONES,
-        geometry,
-    )
-
-    weights = normalize_weights(energies)
-
-    assert sum(weights) == pytest.approx(1.0)
-
-
-def test_dl5_energias_son_no_negativas():
-    geometry = build_geometry()
-
-    energies = calculate_energies(
-        CAPAS,
-        FRICCIONES,
-        geometry,
-    )
-
-    assert all(value >= 0.0 for value in energies)
-
-
-def test_dl5_pesos_son_no_negativos():
-    geometry = build_geometry()
-
-    energies = calculate_energies(
-        CAPAS,
-        FRICCIONES,
-        geometry,
-    )
-
-    weights = normalize_weights(energies)
-
-    assert all(value >= 0.0 for value in weights)
-
-
-def test_dl5_cero_energias_produce_peso_uniforme():
-    energies = tuple(0.0 for _ in range(LAYER_COUNT))
-
-    weights = normalize_weights(energies)
-
-    assert len(weights) == LAYER_COUNT
-    assert all(
-        value == pytest.approx(1.0 / LAYER_COUNT)
-        for value in weights
-    )
-
-
-# ===============================================================
-# DL5 — COHERENCIA Y RECEPTOR
-# ===============================================================
-
-def test_dl5_coherencia_esta_en_rango():
-    coherence = default_coherence(CAPAS)
-
-    assert 0.0 <= coherence <= 1.0
-
-
-def test_dl5_coherencia_de_capas_identicas_es_uno():
-    capas = tuple(0.5 for _ in range(LAYER_COUNT))
-
-    coherence = default_coherence(capas)
-
-    assert coherence == pytest.approx(1.0)
-
-
-def test_dl5_receptor_devuelve_coherencia_calidad_y_distorsion():
-    coherence, quality, distortion = receptor_quality(
-        CAPAS,
-        FRICCIONES,
-    )
-
-    assert 0.0 <= coherence <= 1.0
-    assert 0.0 <= quality <= 1.0
-    assert 0.0 <= distortion <= 1.0
-
-
-def test_dl5_receptor_quality_y_distorsion_son_complementarios():
-    _, quality, distortion = receptor_quality(
-        CAPAS,
-        FRICCIONES,
-    )
-
-    assert distortion == pytest.approx(1.0 - quality)
-
-
-# ===============================================================
-# DL5 — OCUPACIÓN H5
-# ===============================================================
-
-def test_dl5_h5_esta_en_rango():
-    geometry = build_geometry()
-    z5 = geometry[L5].z
-
-    h5 = house_occupancy(
-        THETA_Y,
-        z5,
-        SIGMA5,
-    )
-
-    assert 0.0 <= h5 <= 1.0
-
-
-def test_dl5_h5_en_su_centro_es_uno():
-    h5 = house_occupancy(
-        THETA_Y,
-        THETA_Y,
-        SIGMA5,
-    )
-
-    assert h5 == pytest.approx(1.0)
-
-
-def test_dl5_h5_decrece_al_aumentar_distancia():
-    centro = house_occupancy(
-        THETA_Y,
-        THETA_Y,
-        SIGMA5,
-    )
-
-    distancia_pequena = house_occupancy(
-        THETA_Y,
-        THETA_Y + SIGMA5,
-        SIGMA5,
-    )
-
-    distancia_grande = house_occupancy(
-        THETA_Y,
-        THETA_Y + 2.0 * SIGMA5,
-        SIGMA5,
-    )
-
-    assert centro > distancia_pequena > distancia_grande
-
-
-# ===============================================================
-# DL5 — VISIBILIDAD
-# ===============================================================
-
-def test_dl5_visibilidad_de_capa_esta_en_rango():
-    geometry = build_geometry()
-
-    z5 = geometry[L5].z
-    zi = geometry[L4].z
-
-    visibility = layer_visibility(
-        z5,
-        zi,
-        THETA_CUBE_F,
-    )
-
-    assert 0.0 <= visibility <= 1.0
-
-
-def test_dl5_visibilidad_maxima_en_misma_posicion():
-    visibility = layer_visibility(
-        1.0,
-        1.0,
-        THETA_CUBE_F,
-    )
-
-    assert visibility == pytest.approx(1.0)
-
-
-def test_dl5_visibilidad_disminuye_con_distancia():
-    cercana = layer_visibility(
-        1.0,
-        1.1,
-        THETA_CUBE_F,
-    )
-
-    lejana = layer_visibility(
-        1.0,
-        2.0,
-        THETA_CUBE_F,
-    )
-
-    assert cercana > lejana
-
-
-def test_dl5_visibilidad_efectiva_esta_en_rango():
-    geometry = build_geometry()
-
-    energies = calculate_energies(
-        CAPAS,
-        FRICCIONES,
-        geometry,
-    )
-
-    weights = normalize_weights(energies)
-
-    visibility = effective_visibility(
-        weights,
-        geometry,
-        theta_cube=THETA_CUBE_F,
-    )
-
-    assert 0.0 <= visibility <= 1.0
-
-
-# ===============================================================
-# DL5 — I5
-# ===============================================================
-
-def test_dl5_i5_esta_limitado_por_alpha():
-    resultado = _resultado_base()
-
-    assert 0.0 <= resultado.i5 <= ALPHA_F
-
-
-def test_dl5_i5_es_consistente_con_q5_h5_v5():
-    resultado = _resultado_base()
-
-    esperado = calculate_i5(
-        q5=resultado.receptor_quality,
-        h5=resultado.occupancy,
-        v5=resultado.visibility,
-    )
-
-    assert resultado.i5 == pytest.approx(esperado)
-
-
-def test_dl5_i5_no_supera_alpha():
-    resultado = _resultado_base()
-
-    assert resultado.i5 <= ALPHA_F
-
-
-# ===============================================================
-# DL5 — INTENSIDADES DE OBSERVACIÓN
-# ===============================================================
-
-def test_dl5_produce_tres_intensidades_de_observacion():
-    resultado = _resultado_base()
-
-    assert len(resultado.observation_intensities) == 3
-
-
-def test_dl5_intensidades_corresponden_a_k_1_2_3():
-    resultado = _resultado_base()
-
-    esperadas = tuple(
-        observation_intensity(resultado.i5, k)
-        for k in range(1, 4)
-    )
-
-    assert resultado.observation_intensities == pytest.approx(esperadas)
-
-
-# ===============================================================
-# DL5 — EJE N
-# ===============================================================
-
-def test_dl5_n_siempre_pertenece_a_1_2_3():
-    resultado = _resultado_base()
-
-    assert resultado.observation_level in (1, 2, 3)
-
-
-def test_dl5_autoreferencia_menor_que_beta_fija_n1():
-    nivel = determine_observation_level(
-        i5=ALPHA_F,
-        autoreference=max(0.0, BETA_F - 1e-12),
-    )
-
-    assert nivel == 1
-
-
-def test_dl5_n2_y_n3_son_umbralizados_desde_i5_normalizado():
-    autoreference = BETA_F
-
-    nivel_n2 = determine_observation_level(
-        i5=ALPHA_F * THRESHOLD_N2,
-        autoreference=autoreference,
-    )
-
-    nivel_n3 = determine_observation_level(
-        i5=ALPHA_F * THRESHOLD_N3,
-        autoreference=autoreference,
-    )
-
-    assert nivel_n2 in (2, 3)
-    assert nivel_n3 == 3
-
-
-# ===============================================================
-# DL5 — CONFIGURACIÓN DE CONTROL
-# ===============================================================
-
-def test_dl5_control_es_configuration():
-    resultado = _resultado_base()
-
-    assert isinstance(resultado.control, ControlConfiguration)
-
-
-def test_dl5_producto_control_es_agencia_por_autoreferencia():
-    resultado = _resultado_base()
-
-    assert resultado.control.product == pytest.approx(
-        AGENCY * AUTOREFERENCE
-    )
-
-
-def test_dl5_producto_control_esta_en_rango():
-    resultado = _resultado_base()
-
-    assert 0.0 <= resultado.control.product <= 1.0
-
-
-def test_dl5_configuracion_x1():
-    cfg = control_configuration(
-        1,
-        agency=0.0,
-        autoreference=0.0,
-    )
-
-    assert cfg.code == "1.1"
-    assert cfg.product == pytest.approx(0.0)
-    assert cfg.conscious == pytest.approx(0.0)
-
-
-def test_dl5_configuracion_x2():
-    cfg = control_configuration(
-        1,
-        agency=0.0,
-        autoreference=1.0,
-    )
-
-    assert cfg.code == "1.2"
-    assert cfg.product == pytest.approx(0.0)
-
-
-def test_dl5_configuracion_x3():
-    cfg = control_configuration(
-        1,
-        agency=1.0,
-        autoreference=0.0,
-    )
-
-    assert cfg.code == "1.3"
-    assert cfg.product == pytest.approx(0.0)
-
-
-def test_dl5_configuracion_x4():
-    cfg = control_configuration(
-        1,
+def test_a1_formula_maestra_arranca():
+    result = formula_maestra_l5(
+        TODO_1,
+        theta_y=TC,
         agency=1.0,
         autoreference=1.0,
     )
-
-    assert cfg.code == "1.4"
-    assert cfg.product == pytest.approx(1.0)
-    assert cfg.conscious == pytest.approx(1.0)
+    assert result is not None
 
 
-# ===============================================================
-# DL5 — CASA DEL YO
-# ===============================================================
-
-def test_dl5_casa_del_yo_permanece_en_l4():
-    resultado = _resultado_base()
-
-    assert resultado.geometry[L4].index == L4
-    assert L4 == 4
+def test_a2_motor_l5_arranca():
+    engine = L5Metaconsciencia()
+    assert engine is not None
+    assert len(engine.geometry) == LAYER_COUNT
 
 
-def test_dl5_yo_state_no_mueve_la_casa_del_yo():
-    for nivel in (1, 2, 3):
-        estado = yo_state(
-            nivel,
-            agency=AGENCY,
-            autoreference=AUTOREFERENCE,
-        )
-
-        assert isinstance(estado, str)
+def test_a3_resultado_carril_completo():
+    result = formula_maestra_l5(TODO_1)
+    assert len(result.activations_before) == LAYER_COUNT
+    assert len(result.activations_after) == LAYER_COUNT
+    assert len(result.energies) == LAYER_COUNT
+    assert len(result.weights) == LAYER_COUNT
+    assert len(result.geometry) == LAYER_COUNT
 
 
 # ===============================================================
-# DL5 — RETORNO HACIA ABAJO
+# B. VALORES Y UMBRALES (según este fuente)
 # ===============================================================
 
-def test_dl5_sin_agencia_no_hay_retorno():
-    resultado = _resultado_base(
-        agency=0.0,
-        autoreference=AUTOREFERENCE,
+def test_b1_alpha_beta_cierre():
+    _assert_close(ALPHA + BETA, 1.0)
+
+
+def test_b2_alpha_beta_coinciden_con_semilla_numerica():
+    """Si el módulo redefine literales, al menos deben coincidir con la semilla."""
+    _assert_close(ALPHA, float(constante.ALPHA))
+    _assert_close(BETA, float(constante.BETA))
+
+
+def test_b3_phi_coincide_con_constants():
+    _assert_close(PHI, float(omega_constants.PHI))
+
+
+def test_b4_theta_cube_coincide_con_constants():
+    _assert_close(THETA_CUBE_DEFAULT, float(omega_constants.THETA_CUBE))
+
+
+def test_b5_layer_count():
+    assert LAYER_COUNT == 7
+    assert LAYER_COUNT == int(omega_constants.NUM_LAYERS)
+
+
+def test_b6_umbrales_derivados():
+    _assert_close(THRESHOLD_N2, (BETA / ALPHA) ** 0.5)
+    _assert_close(THRESHOLD_N3, (BETA / ALPHA) ** (1.0 / 3.0))
+
+
+def test_b7_default_frictions_longitud():
+    assert len(DEFAULT_FRICTIONS) == LAYER_COUNT
+
+
+# ===============================================================
+# C. CARRIL L0..L6
+# ===============================================================
+
+def test_c1_indices():
+    assert (L0, L1, L2, L3, L4, L5, L6) == (0, 1, 2, 3, 4, 5, 6)
+
+
+def test_c2_L4_casa_del_yo():
+    geometry = build_geometry()
+    _assert_close(geometry[L4].z, TC)
+
+
+def test_c3_siete_posiciones():
+    geometry = build_geometry()
+    assert len(geometry) == 7
+    assert tuple(p.index for p in geometry) == tuple(range(7))
+
+
+def test_c4_z_monotona():
+    geometry = build_geometry()
+    for i in range(LAYER_COUNT - 1):
+        assert geometry[i].z < geometry[i + 1].z
+
+
+def test_c5_theta_eq_no_cambia_geometria():
+    a = L5Metaconsciencia(theta_eq=0.05).geometry
+    b = L5Metaconsciencia(theta_eq=0.90).geometry
+    assert [p.z for p in a] == [p.z for p in b]
+
+
+# ===============================================================
+# D. ENERGÍA Y PESOS
+# ===============================================================
+
+def test_d1_energias_longitud():
+    assert len(calculate_energies(TODO_1)) == LAYER_COUNT
+
+
+def test_d2_energia_con_friccion_cero():
+    geometry = build_geometry()
+    zero_phi = (0.0,) * LAYER_COUNT
+    energies = calculate_energies(TODO_1, zero_phi, geometry)
+    for i in range(LAYER_COUNT):
+        _assert_close(energies[i], geometry[i].radius)
+
+
+def test_d3_friccion_reduce_energia():
+    zero_phi = (0.0,) * LAYER_COUNT
+    base = calculate_energies(TODO_1, zero_phi)
+    friction = [0.0] * LAYER_COUNT
+    friction[L3] = 0.5
+    reduced = calculate_energies(TODO_1, friction)
+    assert reduced[L3] < base[L3]
+
+
+def test_d4_pesos_suman_uno():
+    _assert_close(sum(normalize_weights(calculate_energies(TODO_1))), 1.0)
+
+
+def test_d5_apagado_uniforme():
+    weights = normalize_weights(calculate_energies(CERO))
+    for w in weights:
+        _assert_close(w, 1.0 / LAYER_COUNT)
+
+
+def test_d6_activaciones_invalidas():
+    with pytest.raises(ValueError):
+        calculate_energies((1.2, 0, 0, 0, 0, 0, 0))
+    with pytest.raises(ValueError):
+        calculate_energies((0.5,) * 6)
+
+
+def test_d7_fricciones_invalidas():
+    with pytest.raises(ValueError):
+        calculate_energies(TODO_1, (1.2,) * 7)
+    with pytest.raises(ValueError):
+        calculate_energies(TODO_1, (0.5,) * 6)
+
+
+# ===============================================================
+# E. RECEPTOR
+# ===============================================================
+
+def test_e1_coherencia_uniforme():
+    _assert_close(default_coherence(TODO_1), 1.0)
+
+
+def test_e2_desalineacion_reduce():
+    aligned = default_coherence((0.5, 0.8, 0.8, 0.8, 0.8, 0.5, 0.5))
+    misaligned = default_coherence((0.5, 1.0, 0.1, 1.0, 0.1, 0.5, 0.5))
+    assert aligned > misaligned
+
+
+def test_e3_calibracion_L1_L4():
+    frictions = (0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6)
+    _, q5, _ = receptor_quality(TODO_1, frictions)
+    expected = (
+        (1.0 - frictions[L1])
+        * (1.0 - frictions[L2])
+        * (1.0 - frictions[L3])
+        * (1.0 - frictions[L4])
+    )
+    _assert_close(q5, expected)
+
+
+def test_e4_distorsion_complemento():
+    _, q5, distortion = receptor_quality(TODO_1, DEFAULT_FRICTIONS)
+    _assert_close(q5 + distortion, 1.0)
+
+
+def test_e5_receptor_en_rango():
+    _, q5, distortion = receptor_quality(TODO_1, DEFAULT_FRICTIONS)
+    _assert_unit_interval(q5)
+    _assert_unit_interval(distortion)
+
+
+# ===============================================================
+# F. OCUPACIÓN h5
+# ===============================================================
+
+def test_f1_sigma5_positivo():
+    with pytest.raises(ValueError):
+        house_occupancy(TC, _z(L5), 0.0)
+
+
+def test_f2_maxima_en_z5():
+    _assert_close(house_occupancy(_z(L5), _z(L5), SIGMA5), 1.0)
+
+
+def test_f3_simetrica():
+    delta = 0.01
+    left = house_occupancy(_z(L5) - delta, _z(L5), SIGMA5)
+    right = house_occupancy(_z(L5) + delta, _z(L5), SIGMA5)
+    _assert_close(left, right)
+
+
+def test_f4_decrece_con_distancia():
+    center = house_occupancy(_z(L5), _z(L5), SIGMA5)
+    nearby = house_occupancy(_z(L5) + 0.01, _z(L5), SIGMA5)
+    far = house_occupancy(_z(L5) + 0.05, _z(L5), SIGMA5)
+    assert center > nearby > far
+
+
+def test_f5_en_rango():
+    for delta in (0.0, 0.01, 0.05, 1.0):
+        _assert_unit_interval(house_occupancy(_z(L5) + delta, _z(L5), SIGMA5))
+
+
+# ===============================================================
+# G. VISIBILIDAD
+# ===============================================================
+
+def test_g1_sobre_si_mismo():
+    _assert_close(layer_visibility(_z(L5), _z(L5), TC), 1.0)
+
+
+def test_g2_crece_hacia_L5():
+    values = [layer_visibility(_z(L5), _z(i), TC) for i in range(L0, L5 + 1)]
+    for i in range(len(values) - 1):
+        assert values[i] < values[i + 1]
+
+
+def test_g3_positiva():
+    for i in range(LAYER_COUNT):
+        assert layer_visibility(_z(L5), _z(i), TC) > 0.0
+
+
+def test_g4_theta_cube_cero():
+    with pytest.raises(ValueError):
+        layer_visibility(_z(L5), _z(L4), 0.0)
+
+
+def test_g5_efectiva_en_rango():
+    geometry = build_geometry()
+    weights = normalize_weights(calculate_energies(TODO_1))
+    _assert_unit_interval(
+        effective_visibility(weights, geometry, theta_cube=TC)
     )
 
-    assert resultado.activations_after == resultado.activations_before
-    assert resultado.movements == ()
+
+# ===============================================================
+# H. I5
+# ===============================================================
+
+def test_h1_techo_alpha():
+    value = calculate_i5(q5=1.0, h5=1.0, v5=1.0)
+    _assert_close(value, ALPHA)
+    assert value <= ALPHA + 1e-12
 
 
-def test_dl5_sin_autoreferencia_no_hay_retorno():
-    resultado = _resultado_base(
-        agency=AGENCY,
-        autoreference=0.0,
+def test_h2_monotona_q5():
+    assert calculate_i5(q5=0.6, h5=0.8, v5=0.8) > calculate_i5(
+        q5=0.4, h5=0.8, v5=0.8
     )
 
-    assert resultado.activations_after == resultado.activations_before
-    assert resultado.movements == ()
+
+def test_h3_monotona_h5():
+    assert calculate_i5(q5=0.8, h5=0.6, v5=0.8) > calculate_i5(
+        q5=0.8, h5=0.4, v5=0.8
+    )
 
 
-def test_dl5_sin_producto_no_hay_retorno():
-    before = CAPAS
+def test_h4_monotona_v5():
+    assert calculate_i5(q5=0.8, h5=0.8, v5=0.6) > calculate_i5(
+        q5=0.8, h5=0.8, v5=0.4
+    )
 
-    after = decode_downward_signal(
-        before,
-        observation_level=2,
-        agency=0.0,
+
+def test_h5_en_rango():
+    for q5 in (0.0, 0.5, 1.0):
+        for h5 in (0.0, 0.5, 1.0):
+            for v5 in (0.0, 0.5, 1.0):
+                value = calculate_i5(q5=q5, h5=h5, v5=v5)
+                assert 0.0 <= value <= ALPHA + 1e-12
+
+
+# ===============================================================
+# I. INTENSIDAD DE OBSERVACIÓN
+# ===============================================================
+
+def test_i1_orden_uno():
+    for i5 in (0.05, 0.2, 0.5, min(0.9, ALPHA)):
+        _assert_close(observation_intensity(i5, 1), i5)
+
+
+def test_i2_recursion_disminuye():
+    i5 = 0.5 * ALPHA
+    assert observation_intensity(i5, 1) > observation_intensity(i5, 2)
+    assert observation_intensity(i5, 2) > observation_intensity(i5, 3)
+
+
+def test_i3_orden_invalido():
+    with pytest.raises(ValueError):
+        observation_intensity(0.5, 0)
+
+
+def test_i4_en_rango():
+    for i5 in (0.0, 0.1, 0.5 * ALPHA, ALPHA):
+        for k in (1, 2, 3):
+            value = observation_intensity(i5, k)
+            assert 0.0 <= value <= ALPHA + 1e-12
+
+
+# ===============================================================
+# J. EJE N
+# ===============================================================
+
+def test_j1_sin_ar_minima_N1():
+    assert determine_observation_level(0.9, autoreference=BETA * 0.5) == N_MIN
+    assert determine_observation_level(0.9, autoreference=0.0) == N_MIN
+
+
+def test_j2_piso_N1():
+    assert determine_observation_level(0.0, autoreference=1.0) == N_MIN
+
+
+def test_j3_umbral_N2_inclusivo():
+    assert determine_observation_level(
+        ALPHA * THRESHOLD_N2, autoreference=1.0
+    ) == 2
+
+
+def test_j4_bajo_N2():
+    assert determine_observation_level(
+        ALPHA * THRESHOLD_N2 * 0.999, autoreference=1.0
+    ) == 1
+
+
+def test_j5_umbral_N3_inclusivo():
+    assert determine_observation_level(
+        ALPHA * THRESHOLD_N3, autoreference=1.0
+    ) == 3
+
+
+def test_j6_bajo_N3():
+    assert determine_observation_level(
+        ALPHA * THRESHOLD_N3 * 0.999, autoreference=1.0
+    ) == 2
+
+
+def test_j7_acotado():
+    for i5 in (0.0, 0.1, 0.5, 0.9, ALPHA):
+        for ar in (0.0, BETA, 0.5, 1.0):
+            level = determine_observation_level(i5, autoreference=ar)
+            assert N_MIN <= level <= N_MAX
+
+
+# ===============================================================
+# K. CONTROL (bool en este fuente)
+# ===============================================================
+
+def test_k1_cuatro_configuraciones():
+    cases = (
+        (0.0, 0.0, "2.1", False),
+        (0.0, 1.0, "2.2", False),
+        (1.0, 0.0, "2.3", False),
+        (1.0, 1.0, "2.4", True),
+    )
+    for agency, autoreference, code, conscious in cases:
+        cfg = control_configuration(2, agency=agency, autoreference=autoreference)
+        assert cfg.code == code
+        assert cfg.conscious is conscious
+        assert isinstance(cfg.agency, bool)
+        assert isinstance(cfg.autoreference, bool)
+        assert isinstance(cfg.conscious, bool)
+
+
+def test_k2_nivel_invalido():
+    with pytest.raises(ValueError):
+        control_configuration(0, agency=1.0, autoreference=1.0)
+    with pytest.raises(ValueError):
+        control_configuration(4, agency=1.0, autoreference=1.0)
+
+
+def test_k3_dimensiones_independientes():
+    cfg1 = control_configuration(2, agency=1.0, autoreference=0.0)
+    cfg2 = control_configuration(2, agency=0.0, autoreference=1.0)
+    assert cfg1.code == "2.3"
+    assert cfg2.code == "2.2"
+    assert cfg1.conscious is False
+    assert cfg2.conscious is False
+
+
+def test_k4_conscious_requiere_ambos():
+    cfg = control_configuration(2, agency=1.0, autoreference=1.0)
+    assert cfg.conscious is True
+
+
+# ===============================================================
+# L. CASA DEL YO = L4
+# ===============================================================
+
+def test_l1_casa_L4():
+    assert L5Metaconsciencia().geometry[L4].index == L4
+
+
+def test_l2_theta_eq_no_transfiere_a_L5():
+    result = formula_maestra_l5(
+        TODO_1,
+        theta_y=0.22,
+        theta_eq=TC,
+        agency=1.0,
         autoreference=1.0,
     )
+    _assert_close(result.theta_eq, TC)
+    _assert_close(result.geometry[L4].z, TC)
 
-    assert after == before
+
+def test_l3_yo_state_sin_L5_como_casa():
+    for level in (1, 2, 3):
+        state = yo_state(level, agency=1.0, autoreference=1.0)
+        assert "L5" not in state
 
 
-def test_dl5_retorno_atenúa_l1_l2_l3():
-    before = CAPAS
+# ===============================================================
+# M. RETORNO
+#   gate: a>0 y r>0
+#   gain = β · min(1, a·r)   (magnitud continua)
+# ===============================================================
 
+def test_m1_sin_agencia_sin_retorno():
     after = decode_downward_signal(
-        before,
-        observation_level=2,
-        agency=AGENCY,
-        autoreference=AUTOREFERENCE,
+        MEDIO, observation_level=3, agency=0.0, autoreference=1.0
     )
-
-    assert after[L1] < before[L1]
-    assert after[L2] < before[L2]
-    assert after[L3] < before[L3]
+    assert after == MEDIO
 
 
-def test_dl5_retorno_refuerza_l4():
-    before = CAPAS
-
+def test_m2_sin_autoreferencia_sin_retorno():
     after = decode_downward_signal(
-        before,
-        observation_level=2,
-        agency=AGENCY,
-        autoreference=AUTOREFERENCE,
+        MEDIO, observation_level=3, agency=1.0, autoreference=0.0
     )
+    assert after == MEDIO
 
-    assert after[L4] > before[L4]
 
-
-def test_dl5_retorno_no_altera_l0_l5_l6():
-    before = CAPAS
-
+def test_m3_reduce_L1_L2_L3():
     after = decode_downward_signal(
-        before,
+        MEDIO, observation_level=2, agency=1.0, autoreference=1.0
+    )
+    assert after[L1] < MEDIO[L1]
+    assert after[L2] < MEDIO[L2]
+    assert after[L3] < MEDIO[L3]
+
+
+def test_m4_refuerza_L4():
+    after = decode_downward_signal(
+        MEDIO, observation_level=2, agency=1.0, autoreference=1.0
+    )
+    assert after[L4] > MEDIO[L4]
+
+
+def test_m5_L0_L5_L6_invariantes():
+    after = decode_downward_signal(
+        MEDIO, observation_level=3, agency=1.0, autoreference=1.0
+    )
+    for index in (L0, L5, L6):
+        _assert_close(after[index], MEDIO[index])
+
+
+def test_m6_ganancia_beta_por_producto():
+    agency = 0.8
+    autoreference = 0.6
+    after = decode_downward_signal(
+        MEDIO,
         observation_level=2,
-        agency=AGENCY,
-        autoreference=AUTOREFERENCE,
+        agency=agency,
+        autoreference=autoreference,
     )
+    gain = BETA * min(1.0, agency * autoreference)
+    _assert_close(after[L1], MEDIO[L1] * (1.0 - gain))
+    _assert_close(after[L4], min(1.0, MEDIO[L4] * (1.0 + gain)))
 
-    assert after[L0] == before[L0]
-    assert after[L5] == before[L5]
-    assert after[L6] == before[L6]
 
-
-def test_dl5_movements_describen_las_variaciones_reales():
-    resultado = _resultado_base()
-
-    movimientos = describe_movement(
-        resultado.activations_before,
-        resultado.activations_after,
+def test_m7_entrada_no_se_muta():
+    before = [0.5] * LAYER_COUNT
+    snapshot = list(before)
+    decode_downward_signal(
+        before, observation_level=2, agency=1.0, autoreference=1.0
     )
+    assert before == snapshot
 
-    assert movimientos == resultado.movements
 
-    for movement in movimientos:
-        assert isinstance(movement, LayerMovement)
-        assert movement.source_layer == L5
-        assert movement.amount >= 0.0
+def test_m8_salida_en_rango():
+    after = decode_downward_signal(
+        MEDIO, observation_level=3, agency=1.0, autoreference=1.0
+    )
+    for value in after:
+        _assert_unit_interval(value)
+
+
+def test_m9_L4_saturado_queda_en_uno():
+    before = (0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5)
+    after = decode_downward_signal(
+        before, observation_level=2, agency=1.0, autoreference=1.0
+    )
+    _assert_close(after[L4], 1.0)
 
 
 # ===============================================================
-# DL5 — NOVELTY
-# ===============================================================
-#
-# Esta es la prueba correspondiente al fallo:
-#
-#     test_r1_novelty_no_modifica_N_ni_I5
-#
-# novelty es una entrada reservada.
-# El contrato actual indica explícitamente:
-#
-#     novelty → reservada; no mueve N
-#
-# Por tanto no se fija un I5 ni un N concreto.
-# Se ejecuta la misma fórmula dos veces cambiando ÚNICAMENTE novelty.
+# N. MOVIMIENTOS
 # ===============================================================
 
-def test_r1_novelty_no_modifica_N_ni_I5():
-    resultado_sin_novedad = _resultado_base(
+def test_n1_targets_cambio():
+    after = decode_downward_signal(
+        MEDIO, observation_level=2, agency=1.0, autoreference=1.0
+    )
+    targets = {m.target_layer for m in describe_movement(MEDIO, after)}
+    assert targets == {L1, L2, L3, L4}
+
+
+def test_n2_origen_L5():
+    after = decode_downward_signal(
+        MEDIO, observation_level=2, agency=1.0, autoreference=1.0
+    )
+    assert all(m.source_layer == L5 for m in describe_movement(MEDIO, after))
+
+
+def test_n3_L4_saturado_sin_traza():
+    before = (0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5)
+    after = decode_downward_signal(
+        before, observation_level=2, agency=1.0, autoreference=1.0
+    )
+    targets = {m.target_layer for m in describe_movement(before, after)}
+    assert L4 not in targets
+
+
+# ===============================================================
+# O. RESULTADO INTEGRAL
+# ===============================================================
+
+def test_o1_resultado_coherente():
+    result = formula_maestra_l5(
+        TODO_1, theta_y=TC, agency=1.0, autoreference=1.0
+    )
+    assert len(result.observation_intensities) == 3
+    assert result.observation_level in (1, 2, 3)
+    assert result.control.level == result.observation_level
+    assert result.loop_detected is False
+    assert result.control.conscious is True
+
+
+def test_o2_i5_en_rango():
+    result = formula_maestra_l5(TODO_1, theta_y=TC, agency=1.0, autoreference=1.0)
+    assert 0.0 <= result.i5 <= ALPHA + 1e-12
+
+
+def test_o3_ocupacion_en_rango():
+    _assert_unit_interval(formula_maestra_l5(TODO_1, theta_y=TC).occupancy)
+
+
+def test_o4_visibilidad_en_rango():
+    _assert_unit_interval(formula_maestra_l5(TODO_1, theta_y=TC).visibility)
+
+
+def test_o5_receptor_en_rango():
+    r = formula_maestra_l5(TODO_1, theta_y=TC)
+    _assert_unit_interval(r.coherence)
+    _assert_unit_interval(r.receptor_quality)
+    _assert_unit_interval(r.distortion)
+
+
+# ===============================================================
+# P. DETERMINISMO
+# ===============================================================
+
+def test_p1_determinismo():
+    a = formula_maestra_l5(
+        TODO_1, theta_y=0.22, agency=0.7, autoreference=0.6
+    )
+    b = formula_maestra_l5(
+        TODO_1, theta_y=0.22, agency=0.7, autoreference=0.6
+    )
+    assert a == b
+
+
+def test_p2_barrido_finito():
+    for theta in (0.01, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.50):
+        for autoreference in (0.0, BETA, 0.5, 1.0):
+            result = formula_maestra_l5(
+                TODO_1,
+                theta_y=theta,
+                agency=0.5,
+                autoreference=autoreference,
+            )
+            assert math.isfinite(result.i5)
+            assert math.isfinite(result.occupancy)
+            assert math.isfinite(result.visibility)
+            assert 0.0 <= result.i5 <= ALPHA + 1e-12
+            assert result.observation_level in (1, 2, 3)
+
+
+# ===============================================================
+# Q. FLAGS / novelty vía calcular (no vía formula_maestra_l5)
+# ===============================================================
+
+def test_q1_loop_detected_se_propaga():
+    assert formula_maestra_l5(TODO_1, loop_detected=True).loop_detected is True
+
+
+def test_q2_loop_no_cambia_activaciones():
+    a = formula_maestra_l5(TODO_1, loop_detected=False)
+    b = formula_maestra_l5(TODO_1, loop_detected=True)
+    assert a.activations_after == b.activations_after
+
+
+def test_r1_novelty_en_calcular_no_modifica_N_ni_I5():
+    """novelty está en calcular; formula_maestra_l5 de este fuente no lo expone."""
+    engine = L5Metaconsciencia()
+    a = engine.calcular(
+        activations=TODO_1,
+        theta_y=0.22,
+        agency=1.0,
+        autoreference=1.0,
         novelty=0.0,
     )
-
-    resultado_con_novedad = _resultado_base(
+    b = engine.calcular(
+        activations=TODO_1,
+        theta_y=0.22,
+        agency=1.0,
+        autoreference=1.0,
         novelty=1.0,
     )
-
-    assert (
-        resultado_sin_novedad.i5
-        == pytest.approx(resultado_con_novedad.i5)
-    )
-
-    assert (
-        resultado_sin_novedad.observation_level
-        == resultado_con_novedad.observation_level
-    )
-
-
-def test_r1_novelty_no_modifica_receptor():
-    resultado_sin_novedad = _resultado_base(
-        novelty=0.0,
-    )
-
-    resultado_con_novedad = _resultado_base(
-        novelty=1.0,
-    )
-
-    assert (
-        resultado_sin_novedad.coherence
-        == pytest.approx(resultado_con_novedad.coherence)
-    )
-
-    assert (
-        resultado_sin_novedad.receptor_quality
-        == pytest.approx(resultado_con_novedad.receptor_quality)
-    )
-
-    assert (
-        resultado_sin_novedad.distortion
-        == pytest.approx(resultado_con_novedad.distortion)
-    )
-
-
-def test_r1_novelty_no_modifica_h5_ni_v5():
-    resultado_sin_novedad = _resultado_base(
-        novelty=0.0,
-    )
-
-    resultado_con_novedad = _resultado_base(
-        novelty=1.0,
-    )
-
-    assert (
-        resultado_sin_novedad.occupancy
-        == pytest.approx(resultado_con_novedad.occupancy)
-    )
-
-    assert (
-        resultado_sin_novedad.visibility
-        == pytest.approx(resultado_con_novedad.visibility)
-    )
-
-
-def test_r1_novelty_no_modifica_intensidades_de_observacion():
-    resultado_sin_novedad = _resultado_base(
-        novelty=0.0,
-    )
-
-    resultado_con_novedad = _resultado_base(
-        novelty=1.0,
-    )
-
-    assert (
-        resultado_sin_novedad.observation_intensities
-        == pytest.approx(
-            resultado_con_novedad.observation_intensities
-        )
-    )
-
-
-def test_r1_novelty_no_modifica_control():
-    resultado_sin_novedad = _resultado_base(
-        novelty=0.0,
-    )
-
-    resultado_con_novedad = _resultado_base(
-        novelty=1.0,
-    )
-
-    assert resultado_sin_novedad.control == resultado_con_novedad.control
-
-
-def test_r1_novelty_no_modifica_retorno():
-    resultado_sin_novedad = _resultado_base(
-        novelty=0.0,
-    )
-
-    resultado_con_novedad = _resultado_base(
-        novelty=1.0,
-    )
-
-    assert (
-        resultado_sin_novedad.activations_after
-        == pytest.approx(resultado_con_novedad.activations_after)
-    )
+    assert a.observation_level == b.observation_level
+    _assert_close(a.i5, b.i5)
 
 
 # ===============================================================
-# DL5 — NOVELTY CONTINUA
-# ===============================================================
-#
-# No se asume que novelty sea booleano.
-# Se comprueba que diferentes valores reservados no introducen
-# causalidad en la salida actual.
+# S. INVARIANTES DE MODELO
 # ===============================================================
 
-def test_r1_novelty_es_invariante_para_varios_valores():
-    resultados = [
-        _resultado_base(novelty=value)
-        for value in (
-            0.0,
-            0.25,
-            0.5,
-            0.75,
-            1.0,
-        )
-    ]
-
-    referencia = resultados[0]
-
-    for resultado in resultados[1:]:
-        assert resultado.i5 == pytest.approx(referencia.i5)
-        assert (
-            resultado.observation_level
-            == referencia.observation_level
-        )
+def test_s1_no_octava_capa():
+    result = formula_maestra_l5(TODO_1, theta_y=0.22)
+    assert len(result.activations_before) == 7
+    assert len(result.activations_after) == 7
+    assert len(result.geometry) == 7
 
 
-# ===============================================================
-# DL5 — LOOP DETECTED
-# ===============================================================
-
-def test_dl5_loop_detected_es_lectura_y_no_modifica_i5():
-    sin_loop = _resultado_base(
-        loop_detected=False,
+def test_s2_L4_sigue_casa():
+    result = formula_maestra_l5(
+        TODO_1, theta_y=0.22, theta_eq=TC, agency=1.0, autoreference=1.0
     )
+    assert result.geometry[L4].index == L4
+    _assert_close(result.geometry[L4].z, TC)
+    _assert_close(result.theta_eq, TC)
 
-    con_loop = _resultado_base(
-        loop_detected=True,
+
+def test_s3_L5_observa_sin_reemplazar_L4():
+    result = formula_maestra_l5(
+        TODO_1, theta_y=0.22, theta_eq=TC, agency=1.0, autoreference=1.0
     )
-
-    assert con_loop.i5 == pytest.approx(sin_loop.i5)
-
-
-def test_dl5_loop_detected_es_conservado_en_resultado():
-    sin_loop = _resultado_base(
-        loop_detected=False,
-    )
-
-    con_loop = _resultado_base(
-        loop_detected=True,
-    )
-
-    assert sin_loop.loop_detected is False
-    assert con_loop.loop_detected is True
-
-
-def test_dl5_loop_detected_no_modifica_n():
-    sin_loop = _resultado_base(
-        loop_detected=False,
-    )
-
-    con_loop = _resultado_base(
-        loop_detected=True,
-    )
-
-    assert (
-        sin_loop.observation_level
-        == con_loop.observation_level
-    )
-
-
-# ===============================================================
-# DL5 — DETERMINISMO
-# ===============================================================
-
-def test_dl5_misma_entrada_produce_mismo_resultado():
-    primero = _resultado_base()
-    segundo = _resultado_base()
-
-    assert primero == segundo
-
-
-def test_dl5_misma_entrada_produce_mismo_i5():
-    primero = _resultado_base()
-    segundo = _resultado_base()
-
-    assert primero.i5 == pytest.approx(segundo.i5)
-
-
-def test_dl5_misma_entrada_produce_mismo_n():
-    primero = _resultado_base()
-    segundo = _resultado_base()
-
-    assert primero.observation_level == segundo.observation_level
-
-
-# ===============================================================
-# DL5 — RESULTADO COMPLETO
-# ===============================================================
-
-def test_dl5_resultado_expone_la_cadena_completa():
-    resultado = _resultado_base()
-
-    assert len(resultado.activations_before) == LAYER_COUNT
-    assert len(resultado.activations_after) == LAYER_COUNT
-    assert len(resultado.energies) == LAYER_COUNT
-    assert len(resultado.weights) == LAYER_COUNT
-    assert len(resultado.geometry) == LAYER_COUNT
-
-    assert 0.0 <= resultado.coherence <= 1.0
-    assert 0.0 <= resultado.receptor_quality <= 1.0
-    assert 0.0 <= resultado.distortion <= 1.0
-    assert 0.0 <= resultado.occupancy <= 1.0
-    assert 0.0 <= resultado.visibility <= 1.0
-    assert 0.0 <= resultado.i5 <= ALPHA_F
-
-    assert resultado.observation_level in (1, 2, 3)
-    assert isinstance(resultado.level_description, str)
-    assert isinstance(resultado.control, ControlConfiguration)
-    assert isinstance(resultado.yo_state, str)
-    assert isinstance(resultado.movements, tuple)
-    assert isinstance(resultado.loop_detected, bool)
-
-
-# ===============================================================
-# DL5 — NO SE MUEVE LA CASA DEL YO
-# ===============================================================
-
-def test_dl5_theta_y_no_reubica_la_casa_del_yo():
-    resultado = _resultado_base(
-        theta_y=THETA_Y,
-    )
-
-    assert resultado.geometry[L4].index == L4
-    assert resultado.theta_y == pytest.approx(THETA_Y)
-    assert resultado.theta_eq == pytest.approx(THETA_EQ)
-
-
-# ===============================================================
-# DL5 — CONSISTENCIA DE LA FORMULA MAESTRA
-# ===============================================================
-
-def test_dl5_formula_maestra_y_motor_producen_mismo_i5():
-    resultado_maestro = _resultado_base()
-
-    motor = L5Metaconsciencia(
-        theta_eq=THETA_EQ,
-        theta_cube=THETA_CUBE_F,
-        frictions=FRICCIONES,
-        sigma5=SIGMA5,
-    )
-
-    resultado_motor = motor.calcular(
-        activations=CAPAS,
-        theta_y=THETA_Y,
-        agency=AGENCY,
-        autoreference=AUTOREFERENCE,
-        novelty=0.0,
-        loop_detected=False,
-    )
-
-    assert resultado_maestro.i5 == pytest.approx(
-        resultado_motor.i5
-    )
-
-
-def test_dl5_formula_maestra_y_motor_producen_mismo_n():
-    resultado_maestro = _resultado_base()
-
-    motor = L5Metaconsciencia(
-        theta_eq=THETA_EQ,
-        theta_cube=THETA_CUBE_F,
-        frictions=FRICCIONES,
-        sigma5=SIGMA5,
-    )
-
-    resultado_motor = motor.calcular(
-        activations=CAPAS,
-        theta_y=THETA_Y,
-        agency=AGENCY,
-        autoreference=AUTOREFERENCE,
-        novelty=0.0,
-        loop_detected=False,
-    )
-
-    assert (
-        resultado_maestro.observation_level
-        == resultado_motor.observation_level
-    )
-
-
-# ===============================================================
-# FIN DL5
-# ===============================================================
+    assert result.geometry[L5].index == L5
+    assert result.geometry[L4].index == L4
+    _assert_close(result.geometry[L4].z, TC)

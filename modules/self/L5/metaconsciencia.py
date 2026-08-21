@@ -439,30 +439,6 @@
 #   del modelo operativo y pueden sustituirse por las capacidades
 #   contractuales del repositorio.
 
-
-from __future__ import annotations
-
-from dataclasses import dataclass
-from math import exp, pi
-from typing import (
-    Callable,
-    List,
-    Optional,
-    Sequence,
-    Tuple,
-)
-
-# ---------------------------------------------------------------
-# ÚNICA FUENTE ESTRUCTURAL
-# ---------------------------------------------------------------
-#
-# α y β proceden exclusivamente de modules.constante.
-# Φ, θ_cube, LAYER_FRICTION y NUM_LAYERS proceden exclusivamente
-# de formulas_omega.constants.
-#
-# No se vuelven a definir en este módulo.
-# ---------------------------------------------------------------
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -476,6 +452,8 @@ from modules.formulas.formulas_omega.constants import (
     THETA_CUBE,
     LAYER_FRICTION,
     NUM_LAYERS,
+)
+
 # ===========================================================
 # CONSTANTES LOCALES (derivadas de la semilla; no redefinidas)
 # ===========================================================

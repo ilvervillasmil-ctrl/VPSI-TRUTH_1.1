@@ -406,14 +406,56 @@ OBLIGATORIOS: Tuple[str, ...] = ("CT", "AX", "FO", "MC", "SF")
 # Parte 10 CONTENEDOR LIBRERIAS Y CONTRATO Y ESPECIDICACIONES 
 # ===============================================================
 
-class Contenedor:
+class ContenedorAdaptador:
     """
-    Materialización de un CONTENEDOR.
-
-    El Engine no completa ni inventa campos del contrato.
+    Refuerzo no invasivo: Envuelve CUALQUIER módulo existente (diccionario u objeto)
+    sin modificar su estructura interna original.
     """
+    __slots__ = ("_origen", "nombre", "capacidades")
 
-    def __init__(self, meta: Dict[str, Any], modulo: Any, ruta: Path) -> None:
+    def __init__(self, modulo_original: Any) -> None:
+        self._origen = modulo_original
+
+        # 1. Extrae el nombre sin importar cómo esté guardado
+        if isinstance(modulo_original, dict):
+            self.nombre = str(modulo_original.get("nombre", "MODULO_ANONIMO"))
+            caps = modulo_original.get("capacidades", {})
+        else:
+            self.nombre = getattr(modulo_original, "nombre", "MODULO_ANONIMO")
+            caps = getattr(modulo_original, "capacidades", {})
+
+        # 2. Normaliza el mapa de capacidades
+        self.capacidades = caps if isinstance(caps, dict) else {}
+
+    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
+        """Busca la capacidad tanto en el diccionario como en los métodos del objeto."""
+        # A) Búsqueda en el diccionario de capacidades
+        if nombre_capacidad in self.capacidades:
+            return self.capacidades[nombre_capacidad]
+
+        # B) Búsqueda por si el módulo es un objeto con métodos directos
+        if hasattr(self._origen, nombre_capacidad):
+            attr = getattr(self._origen, nombre_capacidad)
+            if callable(attr):
+                return attr
+
+        # C) Búsqueda por si es un diccionario con funciones directas
+        if isinstance(self._origen, dict) and callable(self._origen.get(nombre_capacidad)):
+            return self._origen[nombre_capacidad]
+
+        return None
+
+    def __getitem__(self, key: str) -> Any:
+        """Mantiene compatibilidad hacia atrás si el Engine legacy accede como diccionario modulo['clave']."""
+        if isinstance(self._origen, dict):
+            return self._origen[key]
+        return getattr(self._origen, key)
+
+    def __contains__(self, key: str) -> bool:
+        if isinstance(self._origen, dict):
+            return key in self._origen
+        return hasattr(self._origen, key)
+
         self.meta = meta
         self.modulo = modulo
         self.ruta = ruta

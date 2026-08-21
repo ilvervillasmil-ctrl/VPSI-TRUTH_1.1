@@ -732,15 +732,65 @@ def verificar() -> Dict[str, Any]:
 
 def evaluar_coherencia(capas, frictions=None, **kwargs):
     """
-    Capacidad contractual del módulo formulas.
-    Delega en formulas_omega.coherence.CoherenceEngine.
+    Capacidad contractual FO.
+    Normaliza capas a secuencia L0..L6 y delega en CoherenceEngine.
     """
-    result = CoherenceEngine.full_analysis(
-        activations=capas,
-        frictions=frictions,
-        **kwargs
+    from modules.formulas.formulas_omega.coherence import CoherenceEngine
+
+    activations = _normalizar_capas_l0_l6(capas)
+    frictions_n = _normalizar_fricciones(frictions, len(activations))
+
+    return CoherenceEngine.full_analysis(
+        activations=activations,
+        frictions=frictions_n,
+        **kwargs,
     )
-    return result  # o el bloque que Engine espera (c_omega + detalle)
+
+
+def _normalizar_capas_l0_l6(capas):
+    # Ya es secuencia de floats
+    if isinstance(capas, (list, tuple)) and capas and isinstance(capas[0], (int, float)):
+        return list(map(float, capas))
+
+    # Lista de dicts {"L": ..., "phi": ...}  (formato layers/export)
+    if isinstance(capas, (list, tuple)) and capas and isinstance(capas[0], dict):
+        return [float(c.get("L", 0.0)) for c in capas]
+
+    # Dict con claves int 0..6
+    if isinstance(capas, dict) and all(isinstance(k, int) for k in capas.keys()):
+        n = max(capas.keys()) + 1
+        return [float(capas.get(i, 0.0)) for i in range(n)]
+
+    # Dict con claves "L0".."L6" o "L1".."L6"
+    if isinstance(capas, dict):
+        out = []
+        for i in range(7):
+            key = f"L{i}"
+            if key in capas:
+                v = capas[key]
+                out.append(float(v["L"] if isinstance(v, dict) else v))
+            else:
+                out.append(0.0 if i == 0 else 0.0)
+        # si solo venían L1..L6, L0 queda 0 (o 1.0 si quieres substrato siempre on)
+        if "L0" not in capas and any(f"L{i}" in capas for i in range(1, 7)):
+            out[0] = 1.0  # L0 caos presente por defecto, coherente con ChaosLayer
+        return out
+
+    raise TypeError(
+        f"capas debe ser secuencia L0..L6 o exports de capa; recibido {type(capas).__name__}"
+    )
+
+
+def _normalizar_fricciones(frictions, n):
+    if frictions is None:
+        return None
+    if isinstance(frictions, (list, tuple)) and frictions and isinstance(frictions[0], (int, float)):
+        return list(map(float, frictions))
+    if isinstance(frictions, (list, tuple)) and frictions and isinstance(frictions[0], dict):
+        return [float(c.get("phi", 0.0)) for c in frictions]
+    if isinstance(frictions, dict) and all(isinstance(k, int) for k in frictions.keys()):
+        return [float(frictions.get(i, 0.0)) for i in range(n)]
+    return frictions
 # ---------------------------------------------------------------
 # 7.4 inventario
 # ---------------------------------------------------------------

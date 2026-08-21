@@ -369,6 +369,56 @@ class AntiHackValidation:
         if abs(c_omega - truth_value) <= EPSILON and c_omega not in (0.0, 1.0):
             raise CircularityDetectedError("Colapso circular detectado entre CΩ y Truth_total.")
 
+# =====================================================================
+# PROTOCOLOS CONTRACTUALES (Tipado Fuerte y Estático)
+# =====================================================================
+
+@runtime_checkable
+class ContenedorContrato(Protocol):
+    """Contrato formal que todo contenedor (SF, FO, CT, etc.) debe cumplir."""
+    nombre: str
+    capacidades: Dict[str, Callable[..., Any]]
+
+    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
+        ...
+
+
+class EngineContrato(Protocol):
+    estado: str
+    contenedores: Dict[str, Any]
+
+    def _exigir_operativo(self) -> None:
+        ...
+
+
+# =====================================================================
+# CLASE AUXILIAR DE ENVOLTURA ROBUSTA
+# =====================================================================
+
+class ContenedorWrapper:
+    """Envuelve diccionarios de módulos para garantizar interfaz orientada a objetos."""
+
+    __slots__ = ("_dict", "nombre", "capacidades")
+
+    def __init__(self, modulo_dict: Dict[str, Any]) -> None:
+        
+
+    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
+        return self.capacidades.get(nombre_capacidad)
+
+
+# =====================================================================
+# IMPLEMENTACIÓN CORE DE ENGINE
+# =====================================================================
+
+class Engine:
+    """
+    Engine de Orquestación Contractual de Nivel de Producción.
+    Garantiza aislamiento semántico estricto entre Capas (SF), Coherencia (FO / C_Ω)
+    y Verdad (Tru), operando únicamente como director y transportista.
+    """
+
+    
 
 # ===============================================================
 # ROLES
@@ -400,6 +450,10 @@ class Contenedor:
         # Parte 10.1 IDENTIDAD DE CADA MODULO EN EL CONTRATO
         # -------------------------------------------------------
 
+        self._dict = modulo_dict
+        self.nombre: str = str(modulo_dict.get("nombre", "MODULO_ANONIMO"))
+        caps = modulo_dict.get("capacidades", {})
+        self.capacidades: Dict[str, Callable[..., Any]] = caps if isinstance(caps, dict) else {}
         self.id: str = str(meta.get("id", ""))
         self.nombre: str = str(meta.get("nombre", ""))
         self.rol: str = str(meta.get("rol", ""))
@@ -585,6 +639,15 @@ class Engine:
     CLAVE_PROPOSITO = "evaluar_universal"
     
     def __init__(self, raiz_modulos: str | Path, invocador_id: str = "core", strict: bool = True) -> None:
+   
+    def __init__(
+        self,
+        estado: str = "OPERATIVO",
+        contenedores: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        self.estado: str = estado
+        self.contenedores: Dict[str, Any] = contenedores or {}
+
         # =======================================================
         # Parte 12.1 CONFIGURACIÓN BÁSICA
         # =======================================================
@@ -2464,34 +2527,134 @@ class Engine:
 #
 # ===========================================================
 
-    # ===============================================================
+
+
+
+    # -----------------------------------------------------------------
+    # VALIDACIONES Y CONTROLES DE ESTADO CONTRACTUAL
+    # -----------------------------------------------------------------
+
+    def _exigir_operativo(self) -> None:
+        """Exige estrictamente que el Engine se encuentre en estado OPERATIVO."""
+        estado_actual = getattr(self, "estado", getattr(self, "ESTADO", "INOPERATIVO"))
+        if estado_actual != "OPERATIVO":
+            raise RuntimeError(
+                f"[Engine Error] Operación rechazada: El Engine no se encuentra OPERATIVO (Estado actual: {estado_actual})."
+            )
+
+    def _resolver_modulo(self, nombre_modulo: str) -> ContenedorContrato:
+        """Resuelve un contenedor registrado de forma segura y tipada."""
+        if hasattr(self, "obtener_contenedor") and callable(getattr(self, "obtener_contenedor")):
+            mod = self.obtener_contenedor(nombre_modulo)
+        elif isinstance(self.contenedores, dict) and nombre_modulo in self.contenedores:
+            mod = self.contenedores[nombre_modulo]
+        else:
+            raise LookupError(f"[Engine Error] Módulo contractual no registrado: '{nombre_modulo}'.")
+
+        if isinstance(mod, dict):
+            return ContenedorWrapper(mod)
+        if hasattr(mod, "fn") and hasattr(mod, "capacidades"):
+            return mod  # type: ignore
+        
+        raise TypeError(f"[Engine Error] El módulo '{nombre_modulo}' no implementa el protocolo de contenedor válido.")
+
+    def _exigir_contenedor(self, nombre_modulo: str, etiqueta: str = "") -> ContenedorContrato:
+        """Valida y retorna el contenedor requerido bajo demanda."""
+        try:
+            return self._resolver_modulo(nombre_modulo)
+        except Exception as exc:
+            raise RuntimeError(f"[Engine Error] Contenedor requerido '{etiqueta or nombre_modulo}' no disponible: {exc}") from exc
+
+    def _exigir_capacidad(self, contenedor: ContenedorContrato, capacidad: str) -> None:
+        """Verifica de forma explícita que una capacidad exista y sea invocable."""
+        fn = contenedor.fn(capacidad)
+        if not callable(fn):
+            raise AttributeError(f"[Engine Error] El módulo '{contenedor.nombre}' no declara la capacidad invocable '{capacidad}'.")
+
+    def ejecutar_capacidad(
+        self,
+        nombre_modulo: str,
+        capacidad: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """Ejecuta de manera segura y controlada una capacidad de un módulo contractual."""
+        try:
+            mod = self._resolver_modulo(nombre_modulo)
+        except Exception as exc:
+            return {"estado": "ERROR", "error": str(exc)}
+
+        fn = mod.fn(capacidad)
+        if not callable(fn):
+            return {"estado": "ERROR", "error": f"Capacidad '{capacidad}' no encontrada o no es invocable en {nombre_modulo}."}
+
+        try:
+            # Resolución inteligente de firma basada en introspección limpia
+            if len(args) == 1 and isinstance(args[0], dict) and not kwargs:
+                sig = inspect.signature(fn)
+                try:
+                    sig.bind(**args[0])
+                    res = fn(**args[0])
+                except TypeError:
+                    res = fn(args[0])
+            else:
+                res = fn(*args, **kwargs)
+
+            return {"estado": "EXITO", "resultado": res}
+        except Exception as exc:
+            return {"estado": "ERROR", "error": f"Excepción interna en {nombre_modulo}.{capacidad}: {type(exc).__name__}: {exc}"}
+
+    def _resultado_exito(self, respuesta: Dict[str, Any], operacion: str) -> Any:
+        """Filtra y extrae el resultado de una ejecución exitosa, o lanza error de contrato."""
+        if not isinstance(respuesta, dict) or respuesta.get("estado") != "EXITO":
+            err = respuesta.get("error", "Error desconocido en paquete de datos") if isinstance(respuesta, dict) else "Respuesta no estructurada"
+            raise RuntimeError(f"[Falla Contractual] Operación '{operacion}' falló: {err}")
+        return respuesta.get("resultado")
+
+    @staticmethod
+    def _ejecutar_flexible(func: Callable[..., Any], *candidatos_args: Any) -> Any:
+        """Ejecuta un callable probando diferentes firmas de entrada de manera tolerante."""
+        ultima_excepcion = None
+        for arg in candidatos_args:
+            try:
+                if arg is None:
+                    return func()
+                elif isinstance(arg, dict):
+                    try:
+                        return func(**arg)
+                    except TypeError:
+                        return func(arg)
+                else:
+                    return func(arg)
+            except TypeError as exc:
+                ultima_excepcion = exc
+                continue
+            except Exception as exc:
+                raise exc
+        if ultima_excepcion:
+            try:
+                return func()
+            except Exception:
+                raise ultima_excepcion
+        return func()
+
+    # -----------------------------------------------------------------
     # CAPACIDAD ENGINE — CICLO DE COHERENCIA
-    # ===============================================================
+    # -----------------------------------------------------------------
 
     def evaluar_coherencia(
         self,
         peticion: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Ejecuta el ciclo contractual de coherencia:
-
-            SF → ENGINE → FO → CoherenceEngine
-
-        SF aporta las perspectivas/capas.
-        ENGINE resuelve y transporta los hechos.
-        FO ejecuta evaluar_coherencia().
-        FO delega el cálculo en CoherenceEngine.full_analysis().
-
-        ENGINE no calcula C_Ω, C_β, C_α ni C_total.
-        ENGINE no calcula Tru_Ri ni Tru_total.
-        ENGINE no inventa capacidades.
+        Ejecuta el ciclo contractual de coherencia: SF → ENGINE → FO → CoherenceEngine.
+        Cumple estrictamente con la separación semántica (C_Ω no alimenta Tru).
         """
-
         peticion = dict(peticion) if isinstance(peticion, dict) else {}
 
         resultado: Dict[str, Any] = {
             "operacion": "evaluar_coherencia",
-            "estado": ESTADO_NO_INICIADO,
+            "estado": "NO_INICIADO",
             "coherente": False,
             "sf": None,
             "fo": None,
@@ -2499,217 +2662,106 @@ class Engine:
             "errores": [],
         }
 
-        # -----------------------------------------------------------
         # 1. RESOLVER SF
-        # -----------------------------------------------------------
-
         try:
             sf = self._resolver_modulo("SF")
         except Exception as exc:
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                f"SF: resolución falló: {type(exc).__name__}: {exc}"
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append(f"SF: resolución falló: {type(exc).__name__}: {exc}")
             return resultado
 
-        if not isinstance(sf, dict):
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "SF: la resolución no produjo un CONTENEDOR válido."
-            )
-            return resultado
+        resultado["sf"] = {"nombre": sf.nombre, "capacidades": list(sf.capacidades.keys())}
 
-        resultado["sf"] = sf
-
-        capacidades_sf = sf.get("capacidades")
-
-        if not isinstance(capacidades_sf, dict):
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "SF: CONTENEDOR['capacidades'] no es dict."
-            )
-            return resultado
-
-        # -----------------------------------------------------------
         # 2. OBTENER PERSPECTIVAS DEL SELF
-        # -----------------------------------------------------------
-
         perspectivas = None
-
-        for nombre in (
-            "yo_funcional",
-            "desde_donde",
-            "estado_self",
-        ):
-            referencia = capacidades_sf.get(nombre)
-
-            if callable(referencia):
+        for nombre in ("yo_funcional", "desde_donde", "estado_self", "capas"):
+            ref = sf.fn(nombre)
+            if callable(ref):
                 try:
-                    perspectivas = referencia()
-                    break
-                except TypeError:
-                    try:
-                        perspectivas = referencia(peticion)
+                    perspectivas = self._ejecutar_flexible(ref, peticion)
+                    if perspectivas is not None:
                         break
-                    except Exception:
-                        continue
                 except Exception:
                     continue
 
         if perspectivas is None:
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "SF: no fue posible obtener una perspectiva contractual."
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append("SF: no fue posible obtener una perspectiva contractual válida.")
             return resultado
 
-        # -----------------------------------------------------------
         # 3. RESOLVER CAPAS DESDE LA PETICIÓN / SF
-        # -----------------------------------------------------------
-
         capas = peticion.get("capas")
-
         if capas is None and isinstance(perspectivas, dict):
-            capas = perspectivas.get("perspectivas")
-
-        if capas is None and isinstance(perspectivas, dict):
-            capas = perspectivas.get("capas")
+            capas = perspectivas.get("perspectivas") or perspectivas.get("capas")
+        elif capas is None and isinstance(perspectivas, (list, tuple)):
+            capas = perspectivas
 
         if capas is None:
             capas = peticion.get("activations")
 
         if capas is None:
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "SF: no se obtuvo el vector contractual de capas para FO."
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append("SF: no se obtuvo el vector contractual de capas para FO.")
             return resultado
 
         if not isinstance(capas, (list, tuple)):
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "SF: las capas deben resolverse como list/tuple."
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append("SF: las capas deben resolverse obligatoriamente como list o tuple.")
             return resultado
 
-        # -----------------------------------------------------------
         # 4. RESOLVER FO
-        # -----------------------------------------------------------
-
         try:
             fo = self._resolver_modulo("FO")
         except Exception as exc:
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                f"FO: resolución falló: {type(exc).__name__}: {exc}"
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append(f"FO: resolución falló: {type(exc).__name__}: {exc}")
             return resultado
 
-        if not isinstance(fo, dict):
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "FO: la resolución no produjo un CONTENEDOR válido."
-            )
+        resultado["fo"] = {"nombre": fo.nombre, "capacidades": list(fo.capacidades.keys())}
+        
+        ref_fo = fo.fn("evaluar_coherencia")
+        if not callable(ref_fo):
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append("FO: la capacidad contractual 'evaluar_coherencia' no es invocable.")
             return resultado
 
-        resultado["fo"] = fo
-
-        capacidades_fo = fo.get("capacidades")
-
-        if not isinstance(capacidades_fo, dict):
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "FO: CONTENEDOR['capacidades'] no es dict."
-            )
-            return resultado
-
-        referencia_fo = capacidades_fo.get("evaluar_coherencia")
-
-        if not callable(referencia_fo):
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "FO: la capacidad contractual 'evaluar_coherencia' "
-                "no es callable."
-            )
-            return resultado
-
-        # -----------------------------------------------------------
         # 5. ENGINE ENTREGA LOS HECHOS A FO
-        # -----------------------------------------------------------
-
-        kwargs = {}
-
+        kwargs: Dict[str, Any] = {}
         if "frictions" in peticion:
             kwargs["frictions"] = peticion["frictions"]
 
         for clave in (
-            "rho",
-            "delta_t",
-            "tau",
-            "novelty",
-            "sensitivity",
-            "external_coherences",
-            "integration",
-            "quality",
-            "complexity",
-            "uncertainty",
+            "rho", "delta_t", "tau", "novelty", "sensitivity",
+            "external_coherences", "integration", "quality",
+            "complexity", "uncertainty", "externos", "meta"
         ):
             if clave in peticion:
                 kwargs[clave] = peticion[clave]
 
         try:
-            coherencia = referencia_fo(
-                capas,
-                **kwargs,
-            )
+            coherencia = ref_fo(capas, **kwargs)
         except Exception as exc:
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                f"FO.evaluar_coherencia: "
-                f"{type(exc).__name__}: {exc}"
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append(f"FO.evaluar_coherencia arrojó excepción: {type(exc).__name__}: {exc}")
             return resultado
 
-        # -----------------------------------------------------------
         # 6. VALIDAR SALIDA DE FO
-        # -----------------------------------------------------------
-
         if not isinstance(coherencia, dict):
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "FO.evaluar_coherencia no produjo dict."
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append("FO.evaluar_coherencia no produjo un diccionario estructurado.")
             return resultado
 
         resultado["coherencia"] = coherencia
-
-        requeridos = (
-            "c_omega",
-            "c_beta",
-            "c_alpha",
-            "c_total",
-            "energies",
-        )
-
-        faltantes = [
-            clave
-            for clave in requeridos
-            if clave not in coherencia
-        ]
+        requeridos = ("c_omega", "c_beta", "c_alpha", "c_total", "energies")
+        faltantes = [clave for clave in requeridos if clave not in coherencia]
 
         if faltantes:
-            resultado["estado"] = ESTADO_DEGRADADO
-            resultado["errores"].append(
-                "FO: salida de coherencia incompleta: "
-                + ", ".join(faltantes)
-            )
+            resultado["estado"] = "DEGRADADO"
+            resultado["errores"].append("FO: salida de coherencia incompleta, faltan claves: " + ", ".join(faltantes))
             return resultado
 
-        # -----------------------------------------------------------
-        # 7. RESULTADO CONTRACTUAL
-        # -----------------------------------------------------------
-
-        resultado["estado"] = ESTADO_OPERATIVO
+        # 7. RESULTADO CONTRACTUAL FINAL
+        resultado["estado"] = "OPERATIVO"
         resultado["coherente"] = True
         resultado["capas"] = list(capas)
         resultado["c_omega"] = coherencia["c_omega"]
@@ -2717,58 +2769,39 @@ class Engine:
         resultado["c_alpha"] = coherencia["c_alpha"]
         resultado["c_total"] = coherencia["c_total"]
         resultado["energies"] = coherencia["energies"]
-        resultado["diagnostico"] = coherencia.get(
-            "diagnostico",
-            coherencia.get("diagnostic_name"),
-        )
+        resultado["diagnostico"] = coherencia.get("diagnostico", coherencia.get("diagnostic_name"))
 
         return resultado
-    # ===============================================================
+
+    # -----------------------------------------------------------------
     # CAPAS — SELF (SF)
-    # ===============================================================
+    # -----------------------------------------------------------------
 
     def obtener_capas_self(self) -> Any:
-        """
-        Obtiene las capas directamente desde Self (SF).
-
-        El Engine no fabrica las capas.
-        SF es el proveedor contractual de las capas.
-        """
-
+        """Obtiene las capas directamente desde Self (SF) validando el estado del Engine."""
         self._exigir_operativo()
-
         sf = self._exigir_contenedor("SF", "Self (SF)")
 
+        capacidad = None
         if callable(sf.fn("capas")):
             capacidad = "capas"
         elif callable(sf.fn("estado_self")):
             capacidad = "estado_self"
-        else:
-            raise FormulaNoDisponibleError(
-                "SF no declara 'capas' ni 'estado_self'"
-            )
 
-        salida = self.ejecutar_capacidad(
-            "SF",
-            capacidad,
-        )
+        if not capacidad:
+            raise AttributeError("SF no declara 'capas' ni 'estado_self' como capacidades válidas.")
 
-        capas = self._resultado_exito(
-            salida,
-            "SF.{0}".format(capacidad),
-        )
+        salida = self.ejecutar_capacidad("SF", capacidad)
+        capas = self._resultado_exito(salida, f"SF.{capacidad}")
 
         if capas is None:
-            raise CapasInvalidasError(
-                "SF devolvió capas vacías"
-            )
+            raise ValueError("SF devolvió un conjunto de capas vacío (None).")
 
         return capas
 
-
-    # ===============================================================
+    # -----------------------------------------------------------------
     # FÓRMULA 1 — COHERENCIA DEL CARRIL
-    # ===============================================================
+    # -----------------------------------------------------------------
 
     def calcular_coherencia(
         self,
@@ -2776,50 +2809,22 @@ class Engine:
         externos: Optional[Dict[str, Any]] = None,
         meta: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """
-        Ejecuta exclusivamente la Fórmula 1 — C_Ω.
-
-        Flujo:
-
-            SF → Engine → FO.evaluar_coherencia
-
-        El Engine transporta las capas y parámetros.
-        FO ejecuta la matemática de coherencia.
-
-        Este método NO calcula verdad.
-        Este método NO calcula Tru_Ri.
-        Este método NO calcula Tru_total.
-        """
-
+        """Ejecuta exclusivamente la Fórmula 1 — C_Ω mediante transporte limpio."""
         self._exigir_operativo()
-
-        fo = self._exigir_contenedor(
-            "FO",
-            "Formulas (FO)",
-        )
-
-        self._exigir_capacidad(
-            fo,
-            "evaluar_coherencia",
-        )
+        fo = self._exigir_contenedor("FO", "Formulas (FO)")
+        self._exigir_capacidad(fo, "evaluar_coherencia")
 
         if capas is None:
             capas = self.obtener_capas_self()
 
-        salida = self.ejecutar_capacidad(
-            "FO",
-            "evaluar_coherencia",
-            {
-                "capas": capas,
-                "externos": dict(externos or {}),
-                "meta": dict(meta or {}),
-            },
-        )
+        params = {
+            "capas": capas,
+            "externos": dict(externos or {}),
+            "meta": dict(meta or {}),
+        }
 
-        c_omega = self._resultado_exito(
-            salida,
-            "FO.evaluar_coherencia",
-        )
+        salida = self.ejecutar_capacidad("FO", "evaluar_coherencia", params)
+        c_omega = self._resultado_exito(salida, "FO.evaluar_coherencia")
 
         return {
             "estado": "EXITO",
@@ -2831,10 +2836,9 @@ class Engine:
             "c_omega": c_omega,
         }
 
-
-    # ===============================================================
+    # -----------------------------------------------------------------
     # CICLO OMEGA — COHERENCIA
-    # ===============================================================
+    # -----------------------------------------------------------------
 
     def ciclo_omega(
         self,
@@ -2842,25 +2846,22 @@ class Engine:
         externos: Optional[Dict[str, Any]] = None,
         meta: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """
-        Ejecuta el ciclo contractual del carril:
-
-            SF → ENGINE → FO
-
-        El ciclo utiliza la Fórmula 1 de coherencia.
-
-        No reconstruye ninguna fórmula.
-        No calcula C_Ω dentro del Engine.
-        No confunde C_Ω con TRU.
-        """
-
+        """Ejecuta el ciclo contractual integral del carril utilizando la Fórmula 1."""
         self._exigir_operativo()
 
-        if capas is None:
-            capas = self.obtener_capas_self()
+        # Desempaquetado inteligente si se pasa una petición estructurada en el argumento capas
+        capas_input = capas
+        if isinstance(capas, dict) and "capas" in capas:
+            peticion_dict = capas
+            capas_input = peticion_dict.get("capas")
+            externos = externos or peticion_dict.get("externos")
+            meta = meta or peticion_dict.get("meta")
+
+        if capas_input is None:
+            capas_input = self.obtener_capas_self()
 
         bloque_coherencia = self.calcular_coherencia(
-            capas=capas,
+            capas=capas_input,
             externos=externos,
             meta=meta,
         )
@@ -2874,63 +2875,14 @@ class Engine:
             "estado": "EXITO",
             "operacion": "ciclo_omega",
             "formula": "FORMULA_1_C_OMEGA",
-            "capas": capas,
+            "capas": capas_input,
             "coherencia": resultado,
             "detalle_coherencia": {
                 "modulo": bloque_coherencia.get("modulo"),
                 "capacidad": bloque_coherencia.get("capacidad"),
             },
         }
-    
-    # ===========================================================
-    # Parte 29 CONSOLIDACIÓN
-    # ===========================================================
 
-    def consolidar_reportes(self) -> Dict[str, Any]:
-
-        for nombre, cont in self.registro.contenedores.items():
-
-            if "reporte" in cont.capacidades:
-
-                r = self.ejecutar_capacidad(
-                    nombre,
-                    "reporte"
-                )
-
-                self._reportes_modulos[nombre] = (
-                    r.get("resultado")
-                    if r.get("estado") == "EXITO"
-                    else {
-                        "error": r.get("error"),
-                        "estado": "NO ENTREGADO POR MODULO"
-                    }
-                )
-
-            if "diagnostico" in cont.capacidades:
-
-                d = self.ejecutar_capacidad(
-                    nombre,
-                    "diagnostico"
-                )
-
-                if d.get("estado") == "EXITO":
-                    self._diagnosticos[nombre] = d.get("resultado")
-
-            if "inventario" in cont.capacidades:
-
-                inv = self.ejecutar_capacidad(
-                    nombre,
-                    "inventario"
-                )
-
-                if inv.get("estado") == "EXITO":
-                    self._inventarios[nombre] = inv.get("resultado")
-
-        return {
-            "reportes": self._reportes_modulos,
-            "diagnosticos": self._diagnosticos,
-            "inventarios": self._inventarios
-        }
 
     # ===========================================================
     # Parte 30 PAQUETE OMEGA

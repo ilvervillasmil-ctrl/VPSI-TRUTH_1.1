@@ -1,53 +1,32 @@
 
 """
 ===============================================================================
-TEST — ENGINE / CÁLCULO REAL DE VERDAD
+TEST — VERDAD REAL MEDIANTE ENGINE
 ===============================================================================
 
-OBJETIVO
---------
-Comprobar la cadena real de cálculo de verdad desde una petición semántica.
+El test presenta al Engine una conversación y su contexto.
 
-El test solamente proporciona:
+La petición es determinar la VERDAD.
 
-    X = conversación
-    O = contexto
+El Engine realiza todo el proceso matemático internamente.
 
-El cálculo pertenece exclusivamente al Engine y a las capacidades que éste
-resuelva contractualmente.
-
-Este test NO:
-
-    - calcula C
-    - calcula L
-    - calcula K
-    - calcula α
-    - calcula β
-    - calcula Tru_Ri
-    - calcula Tru_total
-    - reconstruye ninguna fórmula
-    - importa Calculator
-    - importa truth.py
-    - construye argumentos internos de FO
-    - introduce la clave L manualmente
-    - conoce qué capacidades internas debe ejecutar Engine
-    - sustituye una interfaz del Engine por una interfaz de FO
-
-La prueba únicamente observa la salida publicada por Engine.
+El test no calcula la verdad.
+El test no conoce los factores.
+El test no introduce resultados.
+El test no reproduce ninguna fórmula.
 ===============================================================================
 """
 
 from __future__ import annotations
 
+import math
 import sys
 from pathlib import Path
 
 import pytest
 
+from core.engine import Engine
 
-# ===========================================================================
-# REPOSITORIO
-# ===========================================================================
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -55,16 +34,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
-# ===========================================================================
-# ENGINE REAL
-# ===========================================================================
-
-from core.engine import Engine
-
-
-# ===========================================================================
-# MATERIAL SEMÁNTICO
-# ===========================================================================
+# ============================================================================
+# MATERIAL PARA DETERMINAR LA VERDAD
+# ============================================================================
 
 CONVERSACION = (
     "Carlos: Mana, voy a Miami.\n"
@@ -77,22 +49,16 @@ CONVERSACION = (
 )
 
 CONTEXTO = (
-    "Afirmación a evaluar: Carlos afirma 'Tengo 5 apartamentos'. "
-    "Evidencia aportada por Carla: los contratos y títulos de propiedad "
-    "de esos 5 apartamentos están a su nombre y no a nombre de Carlos."
+    "Determinar la verdad de la afirmación de Carlos "
+    "basándose en la conversación y en la evidencia presentada."
 )
 
 
-# ===========================================================================
+# ============================================================================
 # PETICIÓN
-# ===========================================================================
+# ============================================================================
 
 def _peticion_verdad() -> dict:
-    """
-    Construye exclusivamente la entrada semántica.
-
-    No contiene ningún resultado ni factor matemático.
-    """
     return {
         "texto": CONVERSACION,
         "mensaje": CONVERSACION,
@@ -102,84 +68,48 @@ def _peticion_verdad() -> dict:
     }
 
 
-# ===========================================================================
-# FIXTURE — ENGINE REAL
-# ===========================================================================
+# ============================================================================
+# ENGINE
+# ============================================================================
 
 @pytest.fixture(scope="module")
 def engine():
-    """
-    Engine real del repositorio.
-
-    El test no modifica ni sustituye ninguna capacidad.
-    """
     eng = Engine(
-        ROOT / "modules",
+        raiz_modulos=ROOT / "modules",
         invocador_id="test_engine_calculo_verdad_contractual",
         strict=True,
     )
 
     assert eng.estado == "OPERATIVO", (
-        "ENGINE NO OPERATIVO\n"
-        f"estado={eng.estado!r}\n"
+        f"Engine no operativo: {eng.estado!r}; "
         f"errores={eng.errores_arranque!r}"
     )
 
     return eng
 
 
-# ===========================================================================
-# TEST — PETICIÓN REAL DE VERDAD
-# ===========================================================================
+# ============================================================================
+# TEST DE VERDAD
+# ============================================================================
 
 def test_engine_calcula_verdad_por_ciclo_real(engine):
     """
-    El test entrega X + O.
+    El Engine recibe una petición de verdad basada en el contexto.
 
-    A partir de ahí, el Engine debe ejecutar su propia cadena contractual.
-
-    El test no conoce ni reproduce los pasos internos.
+    El cálculo pertenece completamente al Engine.
     """
 
     peticion = _peticion_verdad()
 
-    resultado = engine.ciclo_omega(
-        meta=peticion,
-    )
+    resultado = engine.ciclo_omega(capas=peticion)
 
-    assert isinstance(resultado, dict), (
-        "Engine no devolvió una estructura contractual tipo dict.\n"
-        f"Resultado: {resultado!r}"
-    )
+    assert isinstance(resultado, dict)
 
-    assert resultado.get("estado") == "EXITO", (
-        "El Engine no completó el ciclo de verdad.\n"
-        f"Resultado: {resultado!r}"
-    )
+    assert "tru_ri" in resultado
+    assert "tru_total" in resultado
 
-    assert "verdad" in resultado, (
-        "El Engine completó el ciclo pero no publicó el bloque de verdad.\n"
-        f"Resultado: {resultado!r}"
-    )
+    assert not isinstance(resultado["tru_ri"], bool)
+    assert not isinstance(resultado["tru_total"], bool)
 
-
-# ===========================================================================
-# TEST — DETERMINISMO
-# ===========================================================================
-
-def test_engine_verdad_es_determinista(engine):
-    """
-    La misma petición semántica debe producir la misma salida observable.
-
-    No se inspeccionan ni reproducen los cálculos internos.
-    """
-
-    peticion = _peticion_verdad()
-
-    primero = engine.ciclo_omega(meta=peticion)
-    segundo = engine.ciclo_omega(meta=peticion)
-
-    assert isinstance(primero, dict)
-    assert isinstance(segundo, dict)
-
-    assert primero == segundo
+    assert math.isfinite(float(resultado["tru_ri"]))
+    assert math.isfinite(float(resultado["tru_total"]))

@@ -112,39 +112,28 @@
 # ===============================================================
 from __future__ import annotations
 
-import math
-
 # ===============================================================
 # SEMILLA (única autoridad)
 # ===============================================================
 from modules.constante import ALPHA, BETA
 
-# ===============================================================
-# DERIVADAS (formulas_omega.constants)
-# ===============================================================
-from modules.formulas.formulas_omega.constants import (
-    C_MAX,
-    R_FIN,
-    S_REF,
-    KAPPA,
-    THETA_CUBE,
-    ALPHA_OVER_S,
-    NUM_LAYERS,
-    LAYER_FRICTION,
-    CODE_INTEGRATED,
-    CODE_SATURATION,
-    CODE_ENTROPY,
-    PHI,
-    CODE_LOOP,
-    LOOP_THRESHOLD,
-    LOOP_WINDOW,
-    LOOP_VARIANCE,
-    T_PERIOD,
-)
 
 # ===============================================================
 # MÓDULOS HERMANOS (formulas_omega)
 # ===============================================================
+
+_E0_REF = LayerEnergy.frequency(0)
+
+import math
+from modules.formulas.formulas_omega.constants import (
+    ALPHA, BETA, S_REF, R_FIN, KAPPA, THETA_CUBE,
+    ALPHA_OVER_S, NUM_LAYERS, LAYER_FRICTION,
+    CODE_INTEGRATED, CODE_SATURATION, CODE_ENTROPY,
+    # NEW v3.2
+    PHI, C_MAX, CODE_LOOP,
+    LOOP_THRESHOLD, LOOP_WINDOW, LOOP_VARIANCE,
+    T_PERIOD,
+)
 from .energy import LayerEnergy
 from .negentropy import NegentropyCalculator
 from .presence import PresenceLogic
@@ -152,7 +141,6 @@ from .wonder import WonderLogic
 from .interaction import ExternalInteraction
 from .resonance import ResonanceLogic
 from .metaconsciousness import MetaconsciousnessCalculator
-
 
 _E0_REF = LayerEnergy.frequency(0)
 

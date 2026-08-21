@@ -1,45 +1,252 @@
-"""
-VPSI-TRUTH — L5 METACONSCIENCIA
-FÓRMULA MAESTRA / MIRADOR
+# ===============================================================
+# modules/self/L5/metaconsciencia.py
+# ===============================================================
+#
+# VPSI-TRUTH — L5 — METACONSCIENCIA / MIRADOR
+#
+# RESPONSABILIDAD
+# ---------------
+# Implementar exclusivamente la matemática del mirador L5:
+#
+#   receptor L1..L4 → ocupación h5 → visibilidad V5 → señal I5
+#   → eje de observación N1|N2|N3 → configuración x.1..x.4
+#   → retorno opcional L5 → L4 → L3 → L2 → L1
+#
+# L5 no es una octava capa física del carril.
+# L5 es el mirador que observa el carril L0..L6.
+# La casa del Yo permanece en L4 en todos los casos.
+#
+# ===============================================================
+# SEPARACIÓN ESTRUCTURAL
+# ===============================================================
+#
+# L0..L6
+#   Capas funcionales del sistema (carril de siete posiciones).
+#   L0 entrada/caos, L1 cuerpo, L2 ego, L3 mente,
+#   L4 Yo (casa), L5 consciencia (mirador), L6 alma/propósito.
+#
+# L4
+#   Casa del Yo. θ_Y vive en L4.
+#   Este módulo NO mueve la casa del Yo a L5.
+#
+# L5
+#   Mirador / campo de observación.
+#   No se crea ni “crece” la consciencia: está presente;
+#   lo que cambia es el nivel de observación N y el control.
+#
+# N1..N3
+#   Eje de observación DENTRO de L5 (no son capas nuevas):
+#     N1  consciencia descriptiva
+#     N2  metaconsciencia (aparece el testigo)
+#     N3  ultra-metaconsciencia (se observa nacer la estructura)
+#
+# Configuraciones de control (dentro de cada N):
+#     x.1  sin agencia + sin autoreferencia
+#     x.2  sin agencia + con autoreferencia
+#     x.3  con agencia + sin autoreferencia
+#     x.4  con agencia + con autoreferencia
+#
+# Condición funcional de consciencia (dentro del nivel):
+#     agencia × autoreferencia
+#
+# ===============================================================
+# SEMILLA Y DERIVADAS (no se redefinen aquí)
+# ===============================================================
+#
+#   α, β     ← modules.constante
+#   Φ, θ_cube, LAYER_FRICTION, NUM_LAYERS, …
+#            ← modules.formulas.formulas_omega.constants
+#   E_i, ν_i ← LayerEnergy (formulas_omega.energy)
+#
+#   α = 26/27
+#   β =  1/27
+#   α + β = 1
+#
+# Umbrales del eje N (derivados de β/α, propios de L5):
+#
+#   THRESHOLD_N2 = (β/α)^(1/2)
+#   THRESHOLD_N3 = (β/α)^(1/3)
+#
+# Origen:
+#   I5^(k) = α · (I5/α)^k  ≥ β
+#   ⇒ (I5/α)^k ≥ β/α = 1/26
+#
+# ===============================================================
+# CADENA CAUSAL DEL MIRADOR
+# ===============================================================
+#
+#   activaciones L0..L6
+#           │
+#           ├→ E_i = L_i·(1−φ_i)·ν_i
+#           ├→ w_i = E_i / Σ E_j
+#           │
+#           ├→ receptor L1..L4
+#           │     coh4 = coherencia(L1..L4)
+#           │     calibration = Π_{i=1..4} (1−φ_i)
+#           │     q5 = coh4 · calibration
+#           │     dist = 1 − q5
+#           │
+#           ├→ h5 = ocupación del mirador
+#           │     h5 = exp( −(θ_Y − z5)² / (2·σ5²) )
+#           │
+#           ├→ V5 = visibilidad efectiva sobre L0..L4
+#           │     v_i = 1 / (1 + |z5−z_i|/θ_cube)
+#           │     V5  = Σ_{i=0..4} v_i·w_i / Σ_{i=0..4} w_i
+#           │
+#           ├→ I5 = α · q5 · h5 · V5
+#           │     (techo estructural α; no se busca I5 = 1)
+#           │
+#           ├→ N = nivel de observación
+#           │     AR < β            → N1
+#           │     I5/α ≥ THR_N3     → N3
+#           │     I5/α ≥ THR_N2     → N2
+#           │     si no             → N1
+#           │
+#           ├→ configuración x.1..x.4  (agencia, autoreferencia)
+#           │
+#           └→ retorno opcional (solo si conscious)
+#                 L5 → L4 → L3 → L2 → L1
+#                 gain = β · min(1, agencia·autoreferencia)
+#                 L1..L3 se atenúan; L4 se refuerza
+#
+# ===============================================================
+# FÓRMULAS
+# ===============================================================
+#
+# Energía (carril completo L0..L6):
+#
+#   ν_i = Φ^(i/2)
+#   E_i = L_i · (1 − φ_i) · ν_i
+#   w_i = E_i / Σ_j E_j          (si Σ=0 → 1/7)
+#
+# Receptor:
+#
+#   q5 = coh4 · Π_{i=1}^{4} (1 − φ_i)
+#   dist = 1 − q5
+#
+# Ocupación del mirador:
+#
+#   h5 = exp( −(θ_Y − z5)² / (2·σ5²) )     σ5 > 0
+#
+# Visibilidad de capa i desde L5:
+#
+#   v_i = 1 / (1 + |z5 − z_i| / θ_cube)
+#
+# Señal recibida:
+#
+#   I5 = α · q5 · h5 · V5
+#
+# Intensidad de observación de orden k:
+#
+#   I5^(k) = α · (I5/α)^k
+#
+# ===============================================================
+# VARIABLES
+# ===============================================================
+#
+# Entrada
+#   activations[0..6]   L0..L6 ∈ [0,1]
+#   frictions[0..6]     φ_i ∈ [0,1]
+#   theta_y             posición del carril del Yo (L4) [rad]
+#   theta_eq            equilibrio de referencia del Yo [rad]
+#   agency              agencia ∈ [0,1]
+#   autoreference       autoreferencia ∈ [0,1]
+#   novelty             novedad (reservada; no mueve N)
+#   loop_detected       bandera de loop del carril (lectura)
+#   sigma5              ancho del mirador (> 0)
+#
+# Derivadas
+#   E_i, w_i            energía y pesos del carril
+#   coh4, q5, dist      calidad del receptor L1..L4
+#   h5                  ocupación de L5
+#   V5                  visibilidad efectiva
+#   I5                  señal del mirador
+#   N                   nivel de observación ∈ {1,2,3}
+#   control             configuración x.1..x.4
+#   yo_state            etiqueta semántica (casa sigue en L4)
+#   activations_after   carril tras retorno (si conscious)
+#   movements           trazas del retorno hacia abajo
+#
+# ===============================================================
+# MECANISMOS PARAMETRIZABLES (no axiomas del capítulo)
+# ===============================================================
+#
+#   coherence_fn   → puede ser LayerCoherence del repo
+#   frequency_fn   → puede ser LayerEnergy.frequency / resonance
+#   h5, v_i        → formas operativas; σ5 y θ_cube explícitos
+#
+# No se presentan como definiciones canónicas del libro.
+# Son el motor de cálculo sustituible por capacidades contractuales.
+#
+# ===============================================================
+# LO QUE ESTE ARCHIVO NO HACE
+# ===============================================================
+#
+#   - no declara CONTENEDOR
+#   - no habla con Engine
+#   - no redefine α, β, Φ, θ_cube
+#   - no convierte L5 en capa física adicional del DE de L4
+#   - no mueve la casa del Yo de L4 a L5
+#   - no calcula el carril oscilatorio θ̈_Y (eso es L4 FO)
+#   - no calcula L7 / emergencia
+#   - no implementa casas discretas del mapa θ_Y → estación
+#   - no usa emotion / desire / fear como variables
+#
+# ===============================================================
+# RELACIÓN CON L4 (YO OSCILATORIO)
+# ===============================================================
+#
+#   L4 produce / expone:  θ_Y, θ̇_Y, θ_eq, φ_Y, C_Ω, …
+#   L5 consume:           θ_Y (ocupación h5), activaciones, fricciones
+#   L5 no integra el DE del carril; solo observa y, si conscious,
+#   devuelve un vector de activaciones modulado hacia abajo.
+#
+# ===============================================================
+# RELACIÓN CON formulas_omega.metaconsciousness
+# ===============================================================
+#
+#   FO MetaconsciousnessCalculator:
+#       MC = R_FIN · Π_{i=3..6} [L_i·(1−φ_i)]
+#
+#   Este L5:
+#       mirador I5, eje N, configuraciones de control, retorno
+#
+#   Son operadores distintos. Pueden coexistir.
+#   No sustituirse el uno al otro.
+#
+# ===============================================================
 
-Arquitectura:
-    L0..L6 = capas funcionales del sistema.
-    L4     = casa del Yo.
-    L5     = mirador / consciencia; no es una octava capa.
-    N1..N3 = niveles de observación de L5.
+# Importante:
+    # Las funciones de medición h5, v_i y coherencia son parametrizables.
+    # No se presentan como axiomas del capítulo. Son mecanismos de cálculo
+    # del modelo operativo y pueden sustituirse por las capacidades
+    # contractuales del repositorio.
 
-Fuente estructural:
-    - Campo de consciencia: beta = 1/27.
-    - La consciencia está presente en las capas; no se crea ni crece.
-    - L1 cuerpo, L2 ego, L3 mente, L4 Yo, L5 consciencia, L6 alma.
-    - La señal se recibe en L5 y se decodifica hacia abajo:
-      L5 -> L4 -> L3 -> L2 -> L1.
-    - N1: consciencia descriptiva.
-    - N2: metaconsciencia; aparece el testigo.
-    - N3: ultra-metaconsciencia; se observa el nacimiento de la
-      estructura y se disuelve la circularidad.
-    - Dentro de cada nivel existen cuatro configuraciones:
-        agencia / sin agencia
-        autoreferencia / sin autoreferencia.
-    - Los estados 1.4, 2.4 y 3.4 son los más integrados.
-    - La condición funcional de consciencia es:
-        agencia × autoreferencia
-      aplicada dentro de cada nivel.
-
-Importante:
-    Las funciones de medición h5, v_i y coherencia son parametrizables.
-    No se presentan como axiomas del capítulo. Son mecanismos de cálculo
-    del modelo operativo y pueden sustituirse por las capacidades
-    contractuales del repositorio.
-"""
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from math import exp, log, pi, sqrt
-from typing import Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+)
 
+# ---------------------------------------------------------------
+# ÚNICA FUENTE ESTRUCTURAL
+# ---------------------------------------------------------------
+from modules.constante import ALPHA, BETA
 
+from modules.formulas.formulas_omega.constants import (
+    PHI,
+    THETA_CUBE,
+    LAYER_FRICTION,
+    NUM_LAYERS,
+)
 # ===========================================================
 # 1. CONSTANTES ESTRUCTURALES
 # ===========================================================

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # tests/test_engine_calculo_verdad_contractual.py
 # ===============================================================
 # TEST — FÓRMULA 2 — VERDAD CONTRACTUAL
@@ -5,27 +6,40 @@
 #
 # OBJETIVO
 # --------
-# Verificar que Engine.evaluar() recibe una conversación y un contexto
-# semántico y produce el resultado de verdad mediante su cadena real.
+# Verificar la cadena real:
 #
-# EL TEST NO:
-#   - calcula C
-#   - calcula L
-#   - calcula K
-#   - calcula α
-#   - calcula β
-#   - calcula Tru_Ri
-#   - calcula Tru_total
-#   - importa Calculator
-#   - importa truth.py
-#   - reproduce ninguna fórmula
+#     SF
+#      ↓
+#   capas L0..L6
+#      ↓
+#   Engine.calcular_coherencia()
+#      ↓
+#   FO.evaluar_coherencia()
+#      ↓
+#   Engine.aplicar_verdad()
+#      ↓
+#   FO.tru_total
+#      ↓
+#   verdad cuantificada
 #
-# TODO cálculo pertenece al Engine y a las capacidades contractuales
-# que éste resuelva.
+# El test NO calcula:
+#   C
+#   L
+#   K
+#   α
+#   β
+#   Tru_Ri
+#   Tru_total
+#
+# El test únicamente entrega una situación semántica como contexto
+# auxiliar y deja que el Engine ejecute su cadena contractual real.
+#
+# No se hardcodea ningún resultado matemático.
 # ===============================================================
 
 from __future__ import annotations
 
+import math
 import sys
 from pathlib import Path
 
@@ -71,21 +85,21 @@ CONTEXTO_A = (
 
 
 # ===============================================================
-# PETICIÓN SEMÁNTICA
+# PETICIÓN / CONTEXTO SEMÁNTICO
 # ===============================================================
 
-def _peticion(conversacion: str, contexto: str) -> dict:
+def _contexto_verdad() -> dict:
     """
-    Construye exclusivamente la entrada semántica.
+    Contexto semántico auxiliar.
 
-    No contiene factores matemáticos ni resultados esperados.
+    No contiene C, L, K ni ningún resultado matemático.
     """
     return {
-        "texto": conversacion,
-        "mensaje": conversacion,
-        "contexto": contexto,
-        "O_context": contexto,
-        "enunciado_O": contexto,
+        "texto": CONVERSACION_A,
+        "mensaje": CONVERSACION_A,
+        "contexto": CONTEXTO_A,
+        "O_context": CONTEXTO_A,
+        "enunciado_O": CONTEXTO_A,
     }
 
 
@@ -98,7 +112,7 @@ def engine():
     """
     Engine real del repositorio.
 
-    Se utiliza únicamente el contrato actual de Engine.__init__().
+    Se utiliza exclusivamente la firma actual del constructor.
     """
     eng = Engine(
         ROOT / "modules",
@@ -119,50 +133,79 @@ def engine():
 # TEST — VERDAD REAL
 # ===============================================================
 
-def test_engine_evaluar_verdad_real(engine):
+def test_engine_calcula_verdad_por_ciclo_real(engine):
     """
-    El Engine debe realizar el cálculo completo.
+    El Engine debe ejecutar su cadena contractual real.
 
-    El test no conoce de antemano el resultado.
+    El test no proporciona C, L ni K.
 
-    Flujo esperado:
-
-        conversación + contexto
-                    ↓
-                 Engine
-                    ↓
-             resolución real
-                    ↓
-              Tru_Ri / Tru_total
+    El Engine debe:
+        1. obtener las capas de SF;
+        2. calcular CΩ mediante FO;
+        3. pasar el resultado a la pared de verdad;
+        4. ejecutar FO.tru_total;
+        5. devolver la verdad resultante.
     """
-    peticion = _peticion(
-        CONVERSACION_A,
-        CONTEXTO_A,
+
+    contexto = _contexto_verdad()
+
+    capas = engine.obtener_capas_self()
+
+    assert capas is not None, (
+        "SF no proporcionó las capas necesarias para el ciclo."
     )
 
-    resultado = engine.evaluar(peticion)
+    resultado = engine.ciclo_omega(
+        capas=capas,
+        meta=contexto,
+    )
 
     assert isinstance(resultado, dict), (
-        "Engine.evaluar() debe devolver un dict.\n"
+        "Engine.ciclo_omega() debe devolver un dict.\n"
         f"Resultado recibido: {resultado!r}"
     )
 
-    assert "tru_ri" in resultado, (
-        "Engine no publicó 'tru_ri'.\n"
-        f"Resultado recibido: {resultado!r}"
+    assert resultado.get("estado") == "EXITO", (
+        "El ciclo de verdad no terminó correctamente.\n"
+        f"Resultado: {resultado!r}"
     )
 
-    assert "tru_total" in resultado, (
-        "Engine no publicó 'tru_total'.\n"
-        f"Resultado recibido: {resultado!r}"
+    assert resultado.get("operacion") == "ciclo_omega"
+
+    assert "coherencia" in resultado, (
+        "El ciclo no publicó la coherencia producida por FO."
+    )
+
+    assert "verdad" in resultado, (
+        "El ciclo no publicó el resultado de verdad."
+    )
+
+    coherencia = resultado["coherencia"]
+    verdad = resultado["verdad"]
+
+    assert isinstance(coherencia, (int, float))
+    assert not isinstance(coherencia, bool)
+    assert math.isfinite(float(coherencia))
+
+    assert isinstance(verdad, (int, float))
+    assert not isinstance(verdad, bool)
+    assert math.isfinite(float(verdad))
+
+    assert 0.0 <= float(coherencia) <= 1.0
+    assert 0.0 <= float(verdad) <= 1.0
+
+    assert resultado["detalle_coherencia"]["capacidad"] == (
+        "evaluar_coherencia"
+    )
+
+    assert resultado["detalle_verdad"]["capacidad"] in (
+        "tru_total",
+        engine.clave_proposito,
     )
 
     print("\n===============================================================")
-    print("RESULTADO REAL PRODUCIDO POR ENGINE")
+    print("RESULTADO REAL DEL ENGINE")
     print("===============================================================")
-    print(f"tru_ri    = {resultado['tru_ri']!r}")
-    print(f"tru_total = {resultado['tru_total']!r}")
+    print(f"coherencia = {coherencia!r}")
+    print(f"verdad     = {verdad!r}")
     print("===============================================================")
-
-    # No se compara contra ningún valor calculado por el test.
-    # El Engine es la única autoridad del cálculo.

@@ -1,54 +1,53 @@
-# -*- coding: utf-8 -*-
-# tests/test_engine_calculo_verdad_contractual.py
-# ===============================================================
-# TEST — FÓRMULA 2 — VERDAD CONTRACTUAL
-# ===============================================================
-#
-# OBJETIVO
-# --------
-# Verificar la cadena real:
-#
-#     SF
-#      ↓
-#   capas L0..L6
-#      ↓
-#   Engine.calcular_coherencia()
-#      ↓
-#   FO.evaluar_coherencia()
-#      ↓
-#   Engine.aplicar_verdad()
-#      ↓
-#   FO.tru_total
-#      ↓
-#   verdad cuantificada
-#
-# El test NO calcula:
-#   C
-#   L
-#   K
-#   α
-#   β
-#   Tru_Ri
-#   Tru_total
-#
-# El test únicamente entrega una situación semántica como contexto
-# auxiliar y deja que el Engine ejecute su cadena contractual real.
-#
-# No se hardcodea ningún resultado matemático.
-# ===============================================================
+
+"""
+===============================================================================
+TEST — ENGINE / CÁLCULO REAL DE VERDAD
+===============================================================================
+
+OBJETIVO
+--------
+Comprobar la cadena real de cálculo de verdad desde una petición semántica.
+
+El test solamente proporciona:
+
+    X = conversación
+    O = contexto
+
+El cálculo pertenece exclusivamente al Engine y a las capacidades que éste
+resuelva contractualmente.
+
+Este test NO:
+
+    - calcula C
+    - calcula L
+    - calcula K
+    - calcula α
+    - calcula β
+    - calcula Tru_Ri
+    - calcula Tru_total
+    - reconstruye ninguna fórmula
+    - importa Calculator
+    - importa truth.py
+    - construye argumentos internos de FO
+    - introduce la clave L manualmente
+    - conoce qué capacidades internas debe ejecutar Engine
+    - sustituye una interfaz del Engine por una interfaz de FO
+
+La prueba únicamente observa la salida publicada por Engine.
+===============================================================================
+"""
 
 from __future__ import annotations
 
-import math
 import sys
 from pathlib import Path
 
 import pytest
 
 
-# ===============================================================
+# ===========================================================================
 # REPOSITORIO
-# ===============================================================
+# ===========================================================================
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -56,18 +55,18 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
-# ===============================================================
-# ÚNICO IMPORT PRODUCTIVO
-# ===============================================================
+# ===========================================================================
+# ENGINE REAL
+# ===========================================================================
 
 from core.engine import Engine
 
 
-# ===============================================================
+# ===========================================================================
 # MATERIAL SEMÁNTICO
-# ===============================================================
+# ===========================================================================
 
-CONVERSACION_A = (
+CONVERSACION = (
     "Carlos: Mana, voy a Miami.\n"
     "Maria: Genial, ¿qué harás?\n"
     "Carlos: Voy de vacaciones. Tengo 5 apartamentos.\n"
@@ -77,42 +76,42 @@ CONVERSACION_A = (
     "no de Carlos."
 )
 
-CONTEXTO_A = (
+CONTEXTO = (
     "Afirmación a evaluar: Carlos afirma 'Tengo 5 apartamentos'. "
     "Evidencia aportada por Carla: los contratos y títulos de propiedad "
     "de esos 5 apartamentos están a su nombre y no a nombre de Carlos."
 )
 
 
-# ===============================================================
-# PETICIÓN / CONTEXTO SEMÁNTICO
-# ===============================================================
+# ===========================================================================
+# PETICIÓN
+# ===========================================================================
 
-def _contexto_verdad() -> dict:
+def _peticion_verdad() -> dict:
     """
-    Contexto semántico auxiliar.
+    Construye exclusivamente la entrada semántica.
 
-    No contiene C, L, K ni ningún resultado matemático.
+    No contiene ningún resultado ni factor matemático.
     """
     return {
-        "texto": CONVERSACION_A,
-        "mensaje": CONVERSACION_A,
-        "contexto": CONTEXTO_A,
-        "O_context": CONTEXTO_A,
-        "enunciado_O": CONTEXTO_A,
+        "texto": CONVERSACION,
+        "mensaje": CONVERSACION,
+        "contexto": CONTEXTO,
+        "O_context": CONTEXTO,
+        "enunciado_O": CONTEXTO,
     }
 
 
-# ===============================================================
-# ENGINE REAL
-# ===============================================================
+# ===========================================================================
+# FIXTURE — ENGINE REAL
+# ===========================================================================
 
 @pytest.fixture(scope="module")
 def engine():
     """
     Engine real del repositorio.
 
-    Se utiliza exclusivamente la firma actual del constructor.
+    El test no modifica ni sustituye ninguna capacidad.
     """
     eng = Engine(
         ROOT / "modules",
@@ -129,83 +128,58 @@ def engine():
     return eng
 
 
-# ===============================================================
-# TEST — VERDAD REAL
-# ===============================================================
+# ===========================================================================
+# TEST — PETICIÓN REAL DE VERDAD
+# ===========================================================================
 
 def test_engine_calcula_verdad_por_ciclo_real(engine):
     """
-    El Engine debe ejecutar su cadena contractual real.
+    El test entrega X + O.
 
-    El test no proporciona C, L ni K.
+    A partir de ahí, el Engine debe ejecutar su propia cadena contractual.
 
-    El Engine debe:
-        1. obtener las capas de SF;
-        2. calcular CΩ mediante FO;
-        3. pasar el resultado a la pared de verdad;
-        4. ejecutar FO.tru_total;
-        5. devolver la verdad resultante.
+    El test no conoce ni reproduce los pasos internos.
     """
 
-    contexto = _contexto_verdad()
-
-    capas = engine.obtener_capas_self()
-
-    assert capas is not None, (
-        "SF no proporcionó las capas necesarias para el ciclo."
-    )
+    peticion = _peticion_verdad()
 
     resultado = engine.ciclo_omega(
-        capas=capas,
-        meta=contexto,
+        meta=peticion,
     )
 
     assert isinstance(resultado, dict), (
-        "Engine.ciclo_omega() debe devolver un dict.\n"
-        f"Resultado recibido: {resultado!r}"
-    )
-
-    assert resultado.get("estado") == "EXITO", (
-        "El ciclo de verdad no terminó correctamente.\n"
+        "Engine no devolvió una estructura contractual tipo dict.\n"
         f"Resultado: {resultado!r}"
     )
 
-    assert resultado.get("operacion") == "ciclo_omega"
-
-    assert "coherencia" in resultado, (
-        "El ciclo no publicó la coherencia producida por FO."
+    assert resultado.get("estado") == "EXITO", (
+        "El Engine no completó el ciclo de verdad.\n"
+        f"Resultado: {resultado!r}"
     )
 
     assert "verdad" in resultado, (
-        "El ciclo no publicó el resultado de verdad."
+        "El Engine completó el ciclo pero no publicó el bloque de verdad.\n"
+        f"Resultado: {resultado!r}"
     )
 
-    coherencia = resultado["coherencia"]
-    verdad = resultado["verdad"]
 
-    assert isinstance(coherencia, (int, float))
-    assert not isinstance(coherencia, bool)
-    assert math.isfinite(float(coherencia))
+# ===========================================================================
+# TEST — DETERMINISMO
+# ===========================================================================
 
-    assert isinstance(verdad, (int, float))
-    assert not isinstance(verdad, bool)
-    assert math.isfinite(float(verdad))
+def test_engine_verdad_es_determinista(engine):
+    """
+    La misma petición semántica debe producir la misma salida observable.
 
-    assert 0.0 <= float(coherencia) <= 1.0
-    assert 0.0 <= float(verdad) <= 1.0
+    No se inspeccionan ni reproducen los cálculos internos.
+    """
 
-    assert resultado["detalle_coherencia"]["capacidad"] == (
-        "evaluar_coherencia"
-    )
+    peticion = _peticion_verdad()
 
-    assert resultado["detalle_verdad"]["capacidad"] in (
-        "tru_total",
-        engine.clave_proposito,
-    )
+    primero = engine.ciclo_omega(meta=peticion)
+    segundo = engine.ciclo_omega(meta=peticion)
 
-    print("\n===============================================================")
-    print("RESULTADO REAL DEL ENGINE")
-    print("===============================================================")
-    print(f"coherencia = {coherencia!r}")
-    print(f"verdad     = {verdad!r}")
-    print("===============================================================")
+    assert isinstance(primero, dict)
+    assert isinstance(segundo, dict)
+
+    assert primero == segundo

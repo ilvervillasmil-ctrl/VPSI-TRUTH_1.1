@@ -369,54 +369,7 @@ class AntiHackValidation:
         if abs(c_omega - truth_value) <= EPSILON and c_omega not in (0.0, 1.0):
             raise CircularityDetectedError("Colapso circular detectado entre CΩ y Truth_total.")
 
-# =====================================================================
-# PROTOCOLOS CONTRACTUALES (Tipado Fuerte y Estático)
-# =====================================================================
 
-@runtime_checkable
-class ContenedorContrato(Protocol):
-    """Contrato formal que todo contenedor (SF, FO, CT, etc.) debe cumplir."""
-    nombre: str
-    capacidades: Dict[str, Callable[..., Any]]
-
-    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
-        ...
-
-
-class EngineContrato(Protocol):
-    estado: str
-    contenedores: Dict[str, Any]
-
-    def _exigir_operativo(self) -> None:
-        ...
-
-
-# =====================================================================
-# CLASE AUXILIAR DE ENVOLTURA ROBUSTA
-# =====================================================================
-
-class ContenedorWrapper:
-    """Envuelve diccionarios de módulos para garantizar interfaz orientada a objetos."""
-
-    __slots__ = ("_dict", "nombre", "capacidades")
-
-    def __init__(self, modulo_dict: Dict[str, Any]) -> None:
-        
-
-    def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
-        return self.capacidades.get(nombre_capacidad)
-
-
-# =====================================================================
-# IMPLEMENTACIÓN CORE DE ENGINE
-# =====================================================================
-
-class Engine:
-    """
-    Engine de Orquestación Contractual de Nivel de Producción.
-    Garantiza aislamiento semántico estricto entre Capas (SF), Coherencia (FO / C_Ω)
-    y Verdad (Tru), operando únicamente como director y transportista.
-    """
 
     
 

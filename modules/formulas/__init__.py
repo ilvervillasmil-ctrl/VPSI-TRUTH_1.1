@@ -730,67 +730,116 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
 def verificar() -> Dict[str, Any]:
     return barrer()
 
-def evaluar_coherencia(capas, frictions=None, **kwargs):
+# modules/formulas/formulas_omega/evaluar.py
+
+from typing import Any, Dict, List, Optional, Union
+
+
+def evaluar_coherencia(
+    capas: Optional[Union[List[Any], Dict[str, Any]]] = None,
+    frictions: Optional[Union[List[Any], Dict[int, Any]]] = None,
+    L: Optional[Union[List[Any], Dict[str, Any]]] = None,
+    raw_analysis: bool = False,
+    **kwargs: Any
+) -> Union[float, Dict[str, Any]]:
     """
-    Capacidad contractual FO.
-    Normaliza capas a secuencia L0..L6 y delega en CoherenceEngine.
+    Capacidad contractual FO — Coherencia del carril.
+
+    Soporta la recepción de activaciones y fricciones en múltiples formatos 
+    (listas de floats, diccionarios por capa L0..L6, diccionarios de exports),
+    y resuelve alias de firma para garantizar compatibilidad con la AgenciaMatematica.
+
+    Parámetros
+    ----------
+    capas / L : sequence | dict | None
+        Activaciones L0..L6 (floats) o lista de exports {"L", "phi"}.
+        Acepta 'L' como alias directo de 'capas'.
+    frictions : sequence | dict | None
+        Fricciones por capa φ_i. Si es None, se utiliza el valor canónico del Engine.
+    raw_analysis : bool (default: False)
+        Si es True, devuelve el diccionario estructurado con el análisis completo.
+        Si es False, devuelve únicamente el escalar float (c_omega).
+    **kwargs :
+        Parámetros reenviados a CoherenceEngine.full_analysis (rho, delta_t, etc.).
+
+    Retorno
+    ------
+    float | dict
+        c_omega escalar o diccionario completo de métricas.
     """
     from modules.formulas.formulas_omega.coherence import CoherenceEngine
 
-    activations = _normalizar_capas_l0_l6(capas)
-    frictions_n = _normalizar_fricciones(frictions, len(activations))
+    # 1. Resolución flexible de alias (acepta 'L' o 'capas')
+    input_layers = capas if capas is not None else L
+    if input_layers is None:
+        raise ValueError("Debe proporcionar 'capas' o 'L' para evaluar la coherencia.")
 
-    return CoherenceEngine.full_analysis(
+    # 2. Normalización de estructuras de datos
+    activations = _as_activations_l0_l6(input_layers)
+    frictions_n = _as_frictions(frictions, len(activations))
+
+    # 3. Ejecución del motor de coherencia
+    analisis = CoherenceEngine.full_analysis(
         activations=activations,
         frictions=frictions_n,
         **kwargs,
     )
 
+    # 4. Control de interfaz de salida
+    if raw_analysis:
+        return analisis
 
-def _normalizar_capas_l0_l6(capas):
-    # Ya es secuencia de floats
-    if isinstance(capas, (list, tuple)) and capas and isinstance(capas[0], (int, float)):
-        return list(map(float, capas))
+    return float(analisis.get("c_omega", 0.0))
 
-    # Lista de dicts {"L": ..., "phi": ...}  (formato layers/export)
-    if isinstance(capas, (list, tuple)) and capas and isinstance(capas[0], dict):
-        return [float(c.get("L", 0.0)) for c in capas]
 
-    # Dict con claves int 0..6
-    if isinstance(capas, dict) and all(isinstance(k, int) for k in capas.keys()):
-        n = max(capas.keys()) + 1
-        return [float(capas.get(i, 0.0)) for i in range(n)]
+def _as_activations_l0_l6(capas: Union[List[Any], Dict[str, Any]]) -> List[float]:
+    """Normaliza secuencias o diccionarios a una lista canónica de floats L0..L6."""
+    if isinstance(capas, (list, tuple)) and capas:
+        if isinstance(capas[0], (int, float)):
+            return [float(x) for x in capas]
+        if isinstance(capas[0], dict):
+            # Formato de exports de capa: [{"L": 0.5, "phi": 0.1}, ...]
+            return [float(c.get("L", 0.0)) for c in capas]
 
-    # Dict con claves "L0".."L6" o "L1".."L6"
     if isinstance(capas, dict):
+        # Caso 1: Claves numéricas enteras (0..6)
+        if capas and all(isinstance(k, int) for k in capas.keys()):
+            n = max(capas.keys()) + 1
+            return [float(capas.get(i, 0.0)) for i in range(n)]
+        
+        # Caso 2: Claves de texto ("L0".."L6")
         out = []
         for i in range(7):
             key = f"L{i}"
-            if key in capas:
-                v = capas[key]
-                out.append(float(v["L"] if isinstance(v, dict) else v))
-            else:
-                out.append(0.0 if i == 0 else 0.0)
-        # si solo venían L1..L6, L0 queda 0 (o 1.0 si quieres substrato siempre on)
-        if "L0" not in capas and any(f"L{i}" in capas for i in range(1, 7)):
-            out[0] = 1.0  # L0 caos presente por defecto, coherente con ChaosLayer
+            if key not in capas:
+                out.append(1.0 if i == 0 else 0.0)
+                continue
+            v = capas[key]
+            out.append(float(v["L"] if isinstance(v, dict) else v))
         return out
 
     raise TypeError(
-        f"capas debe ser secuencia L0..L6 o exports de capa; recibido {type(capas).__name__}"
+        f"capas/L debe ser una secuencia L0..L6 o dict de exports; "
+        f"recibido {type(capas).__name__}"
     )
 
 
-def _normalizar_fricciones(frictions, n):
+def _as_frictions(
+    frictions: Optional[Union[List[Any], Dict[int, Any]]], 
+    n: int
+) -> Optional[List[float]]:
+    """Normaliza las fricciones pasadas como entrada a una lista de floats."""
     if frictions is None:
         return None
-    if isinstance(frictions, (list, tuple)) and frictions and isinstance(frictions[0], (int, float)):
-        return list(map(float, frictions))
-    if isinstance(frictions, (list, tuple)) and frictions and isinstance(frictions[0], dict):
-        return [float(c.get("phi", 0.0)) for c in frictions]
+    if isinstance(frictions, (list, tuple)) and frictions:
+        if isinstance(frictions[0], (int, float)):
+            return [float(x) for x in frictions]
+        if isinstance(frictions[0], dict):
+            return [float(c.get("phi", 0.0)) for c in frictions]
     if isinstance(frictions, dict) and all(isinstance(k, int) for k in frictions.keys()):
         return [float(frictions.get(i, 0.0)) for i in range(n)]
-    return frictions
+    return list(frictions) if isinstance(frictions, (list, tuple)) else None
+
 # ---------------------------------------------------------------
 # 7.4 inventario
 # ---------------------------------------------------------------

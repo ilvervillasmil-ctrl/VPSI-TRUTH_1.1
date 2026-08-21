@@ -82,6 +82,7 @@ import threading
 import importlib.util
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
+from modules.formulas.formulas_omega.coherence import CoherenceEngine
 from collections import defaultdict
 from decimal import Decimal, getcontext
 from fractions import Fraction

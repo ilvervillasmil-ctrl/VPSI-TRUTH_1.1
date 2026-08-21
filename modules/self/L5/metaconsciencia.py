@@ -58,10 +58,6 @@
 #            ← modules.formulas.formulas_omega.constants
 #   E_i, ν_i ← LayerEnergy (formulas_omega.energy)
 #
-#   α = 26/27
-#   β =  1/27
-#   α + β = 1
-#
 # Umbrales del eje N (derivados de β/α, propios de L5):
 #
 #   THRESHOLD_N2 = (β/α)^(1/2)
@@ -69,7 +65,7 @@
 #
 # Origen:
 #   I5^(k) = α · (I5/α)^k  ≥ β
-#   ⇒ (I5/α)^k ≥ β/α = 1/26
+#   ⇒ (I5/α)^k ≥ β/α
 #
 # ===============================================================
 # CADENA CAUSAL DEL MIRADOR
@@ -217,19 +213,18 @@
 # ===============================================================
 
 # Importante:
-    # Las funciones de medición h5, v_i y coherencia son parametrizables.
-    # No se presentan como axiomas del capítulo. Son mecanismos de cálculo
-    # del modelo operativo y pueden sustituirse por las capacidades
-    # contractuales del repositorio.
+#   Las funciones de medición h5, v_i y coherencia son parametrizables.
+#   No se presentan como axiomas del capítulo. Son mecanismos de cálculo
+#   del modelo operativo y pueden sustituirse por las capacidades
+#   contractuales del repositorio.
 
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import exp, log, pi, sqrt
+from math import exp, pi
 from typing import (
     Callable,
-    Dict,
     List,
     Optional,
     Sequence,
@@ -239,43 +234,59 @@ from typing import (
 # ---------------------------------------------------------------
 # ÚNICA FUENTE ESTRUCTURAL
 # ---------------------------------------------------------------
-from modules.constante import ALPHA, BETA
+#
+# α y β proceden exclusivamente de modules.constante.
+# Φ, θ_cube, LAYER_FRICTION y NUM_LAYERS proceden exclusivamente
+# de formulas_omega.constants.
+#
+# No se vuelven a definir en este módulo.
+# ---------------------------------------------------------------
+
+from modules.constante import ALPHA as ALPHA_F, BETA as BETA_F
 
 from modules.formulas.formulas_omega.constants import (
-    PHI,
-    THETA_CUBE,
+    PHI as PHI_F,
+    THETA_CUBE as THETA_CUBE_F,
     LAYER_FRICTION,
     NUM_LAYERS,
 )
+
+
 # ===========================================================
 # 1. CONSTANTES ESTRUCTURALES
 # ===========================================================
 
-ALPHA: float = 26.0 / 27.0
-BETA: float = 1.0 / 27.0
-LAYER_COUNT: int = 7
+ALPHA = float(ALPHA_F)
+BETA = float(BETA_F)
+
+LAYER_COUNT: int = int(NUM_LAYERS)
 N_MIN: int = 1
 N_MAX: int = 3
 
-L0, L1, L2, L3, L4, L5, L6 = range(7)
+L0, L1, L2, L3, L4, L5, L6 = range(LAYER_COUNT)
 
-# El umbral se deriva de I5^(k) >= beta:
-# (I5 / alpha)^k >= beta / alpha = 1/26.
+# El umbral se deriva exclusivamente de β/α.
+#
+# I5^(k) = α · (I5/α)^k >= β
+#
+# ⇒ (I5/α)^k >= β/α
+#
+# No existe un valor literal independiente para los umbrales.
 THRESHOLD_N2: float = (BETA / ALPHA) ** (1.0 / 2.0)
 THRESHOLD_N3: float = (BETA / ALPHA) ** (1.0 / 3.0)
 
-# El ángulo no crea una capa nueva: solo pertenece a la geometría
-# cuando el repositorio lo provea.
+# El ángulo pertenece a la geometría operativa del mirador.
+# No constituye una semilla estructural adicional.
 GOLDEN_ANGLE_DEG: float = 137.507764
 GOLDEN_ANGLE_RAD: float = GOLDEN_ANGLE_DEG * pi / 180.0
 
-# Valor de referencia del carril. Puede sustituirse por constants.py.
-PHI: float = (1.0 + sqrt(5.0)) / 2.0
-THETA_CUBE_DEFAULT: float = 0.19365830044432666
+# Valor de referencia del carril procedente de constants.
+THETA_CUBE_DEFAULT: float = float(THETA_CUBE_F)
 
-# Fricciones: por defecto no se inventan fricciones nuevas.
-# El consumidor debe proporcionar las del carril real.
-DEFAULT_FRICTIONS: Tuple[float, ...] = (0.0,) * LAYER_COUNT
+# Fricciones canónicas procedentes del stack estructural.
+DEFAULT_FRICTIONS: Tuple[float, ...] = tuple(
+    float(value) for value in LAYER_FRICTION
+)
 
 
 # ===========================================================
@@ -288,19 +299,33 @@ def _clamp01(value: float) -> float:
 
 def _validate_layers(values: Sequence[float]) -> Tuple[float, ...]:
     if len(values) != LAYER_COUNT:
-        raise ValueError(f"Se requieren exactamente {LAYER_COUNT} capas: L0..L6.")
+        raise ValueError(
+            f"Se requieren exactamente {LAYER_COUNT} capas: L0..L6."
+        )
+
     result = tuple(float(v) for v in values)
+
     if any(v < 0.0 or v > 1.0 for v in result):
-        raise ValueError("Cada activación L0..L6 debe pertenecer a [0,1].")
+        raise ValueError(
+            "Cada activación L0..L6 debe pertenecer a [0,1]."
+        )
+
     return result
 
 
 def _validate_friction(values: Sequence[float]) -> Tuple[float, ...]:
     if len(values) != LAYER_COUNT:
-        raise ValueError(f"Se requieren exactamente {LAYER_COUNT} fricciones: L0..L6.")
+        raise ValueError(
+            f"Se requieren exactamente {LAYER_COUNT} fricciones: L0..L6."
+        )
+
     result = tuple(float(v) for v in values)
+
     if any(v < 0.0 or v > 1.0 for v in result):
-        raise ValueError("Cada fricción debe pertenecer a [0,1].")
+        raise ValueError(
+            "Cada fricción debe pertenecer a [0,1]."
+        )
+
     return result
 
 
@@ -328,14 +353,28 @@ def build_geometry(
     frequency_fn debe ser esa capacidad contractual. No se redefine
     aquí una segunda geometría cuando exista la capacidad real.
     """
-    fn = frequency_fn or (lambda i: PHI ** (i / 2.0))
+
+    fn = frequency_fn or (
+        lambda i: PHI ** (i / 2.0)
+    )
+
     geometry: List[LayerGeometry] = []
 
     for i in range(LAYER_COUNT):
         radius = float(fn(i))
         phase = i * GOLDEN_ANGLE_RAD
-        z = theta_cube * (PHI ** ((i - L4) / 2.0))
-        geometry.append(LayerGeometry(i, radius, phase, z))
+        z = theta_cube * (
+            PHI ** ((i - L4) / 2.0)
+        )
+
+        geometry.append(
+            LayerGeometry(
+                i,
+                radius,
+                phase,
+                z,
+            )
+        )
 
     return tuple(geometry)
 
@@ -355,24 +394,39 @@ def calculate_energies(
     Esta forma conserva el carril de siete capas. La geometría se usa
     para obtener nu_i/radio; no se elimina L0.
     """
+
     layers = _validate_layers(activations)
     friction = _validate_friction(frictions)
     geom = tuple(geometry or build_geometry())
 
     if len(geom) != LAYER_COUNT:
-        raise ValueError("La geometría debe contener L0..L6.")
+        raise ValueError(
+            "La geometría debe contener L0..L6."
+        )
 
     return tuple(
-        layers[i] * (1.0 - friction[i]) * geom[i].radius
+        layers[i]
+        * (1.0 - friction[i])
+        * geom[i].radius
         for i in range(LAYER_COUNT)
     )
 
 
-def normalize_weights(energies: Sequence[float]) -> Tuple[float, ...]:
+def normalize_weights(
+    energies: Sequence[float],
+) -> Tuple[float, ...]:
     total = sum(float(e) for e in energies)
+
     if total <= 0.0:
-        return tuple(1.0 / LAYER_COUNT for _ in energies)
-    return tuple(float(e) / total for e in energies)
+        return tuple(
+            1.0 / LAYER_COUNT
+            for _ in energies
+        )
+
+    return tuple(
+        float(e) / total
+        for e in energies
+    )
 
 
 # ===========================================================
@@ -389,26 +443,47 @@ def default_coherence(
     puede ser sustituida por layer_coherence.calculate_layer_coherence
     mediante coherence_fn.
     """
-    values = _validate_layers(activations)[L1:L4 + 1]
+
+    values = _validate_layers(
+        activations
+    )[L1:L4 + 1]
+
     if not values:
         return 0.0
 
     pairs = []
+
     for a, b in zip(values, values[1:]):
-        denominator = max(abs(a), abs(b))
+        denominator = max(
+            abs(a),
+            abs(b),
+        )
+
         if denominator == 0.0:
             pairs.append(1.0)
         else:
-            pairs.append(_clamp01(1.0 - abs(a - b) / denominator))
+            pairs.append(
+                _clamp01(
+                    1.0
+                    - abs(a - b) / denominator
+                )
+            )
 
-    return sum(pairs) / len(pairs) if pairs else 1.0
+    return (
+        sum(pairs) / len(pairs)
+        if pairs
+        else 1.0
+    )
 
 
 def receptor_quality(
     activations: Sequence[float],
     frictions: Sequence[float],
     *,
-    coherence_fn: Callable[[Sequence[float]], float] = default_coherence,
+    coherence_fn: Callable[
+        [Sequence[float]],
+        float,
+    ] = default_coherence,
 ) -> Tuple[float, float, float]:
     """
     Arquitectura del receptor L1..L4.
@@ -418,17 +493,34 @@ def receptor_quality(
     q5 = coh4 * calibration.
     dist = 1 - q5.
     """
+
     layers = _validate_layers(activations)
     friction = _validate_friction(frictions)
 
-    coh4 = _clamp01(float(coherence_fn(layers)))
-    calibration = 1.0
-    for i in range(L1, L4 + 1):
-        calibration *= 1.0 - friction[i]
+    coh4 = _clamp01(
+        float(
+            coherence_fn(layers)
+        )
+    )
 
-    q5 = _clamp01(coh4 * calibration)
+    calibration = 1.0
+
+    for i in range(L1, L4 + 1):
+        calibration *= (
+            1.0 - friction[i]
+        )
+
+    q5 = _clamp01(
+        coh4 * calibration
+    )
+
     distortion = 1.0 - q5
-    return coh4, q5, distortion
+
+    return (
+        coh4,
+        q5,
+        distortion,
+    )
 
 
 # ===========================================================
@@ -446,10 +538,27 @@ def house_occupancy(
     Hipótesis operativa: el capítulo habla de casa/mirador, pero no
     fija una gaussiana. Por eso sigma5 permanece explícito.
     """
+
     if sigma5 <= 0.0:
-        raise ValueError("sigma5 debe ser > 0.")
-    delta = float(theta_y) - float(z5)
-    return exp(-(delta * delta) / (2.0 * sigma5 * sigma5))
+        raise ValueError(
+            "sigma5 debe ser > 0."
+        )
+
+    delta = (
+        float(theta_y)
+        - float(z5)
+    )
+
+    return exp(
+        -(
+            delta * delta
+        )
+        / (
+            2.0
+            * sigma5
+            * sigma5
+        )
+    )
 
 
 def layer_visibility(
@@ -462,10 +571,20 @@ def layer_visibility(
 
     Hipótesis operativa parametrizable.
     """
-    scale = abs(float(theta_cube))
+
+    scale = abs(
+        float(theta_cube)
+    )
+
     if scale <= 0.0:
-        raise ValueError("theta_cube debe ser distinto de cero.")
-    return 1.0 / (1.0 + abs(z5 - zi) / scale)
+        raise ValueError(
+            "theta_cube debe ser distinto de cero."
+        )
+
+    return 1.0 / (
+        1.0
+        + abs(z5 - zi) / scale
+    )
 
 
 def effective_visibility(
@@ -477,16 +596,36 @@ def effective_visibility(
     """
     Campo de visión efectivo de L5 sobre las capas inferiores L0..L4.
     """
-    denominator = sum(weights[i] for i in range(L0, L4 + 1))
+
+    denominator = sum(
+        weights[i]
+        for i in range(
+            L0,
+            L4 + 1,
+        )
+    )
+
     if denominator <= 0.0:
         return 0.0
 
     z5 = geometry[L5].z
+
     numerator = sum(
-        layer_visibility(z5, geometry[i].z, theta_cube) * weights[i]
-        for i in range(L0, L4 + 1)
+        layer_visibility(
+            z5,
+            geometry[i].z,
+            theta_cube,
+        )
+        * weights[i]
+        for i in range(
+            L0,
+            L4 + 1,
+        )
     )
-    return _clamp01(numerator / denominator)
+
+    return _clamp01(
+        numerator / denominator
+    )
 
 
 # ===========================================================
@@ -504,21 +643,41 @@ def calculate_i5(
 
     El techo estructural es alpha; la señal nunca necesita llegar a 1.
     """
-    return _clamp01(ALPHA * _clamp01(q5) * _clamp01(h5) * _clamp01(v5))
+
+    return _clamp01(
+        ALPHA
+        * _clamp01(q5)
+        * _clamp01(h5)
+        * _clamp01(v5)
+    )
 
 
 # ===========================================================
 # 8. OBSERVACIÓN RECURSIVA: EJE N
 # ===========================================================
 
-def observation_intensity(i5: float, k: int) -> float:
+def observation_intensity(
+    i5: float,
+    k: int,
+) -> float:
     """
     I5^(k) = alpha * (I5/alpha)^k.
     """
+
     if k < 1:
-        raise ValueError("El orden de observación debe ser >= 1.")
-    normalized = _clamp01(i5 / ALPHA if ALPHA else 0.0)
-    return ALPHA * (normalized ** k)
+        raise ValueError(
+            "El orden de observación debe ser >= 1."
+        )
+
+    normalized = _clamp01(
+        i5 / ALPHA
+        if ALPHA
+        else 0.0
+    )
+
+    return ALPHA * (
+        normalized ** k
+    )
 
 
 def determine_observation_level(
@@ -532,17 +691,24 @@ def determine_observation_level(
     N1 es el piso del eje de observación.
     AR < beta => N1: sin autoreferencia mínima no existe el estado meta.
     """
-    ar = _clamp01(autoreference)
+
+    ar = _clamp01(
+        autoreference
+    )
 
     if ar < BETA:
         return N_MIN
 
-    normalized = _clamp01(i5 / ALPHA)
+    normalized = _clamp01(
+        i5 / ALPHA
+    )
 
     if normalized >= THRESHOLD_N3:
         return 3
+
     if normalized >= THRESHOLD_N2:
         return 2
+
     return 1
 
 
@@ -577,13 +743,33 @@ def control_configuration(
     La condición agency × autoreference identifica el estado consciente
     dentro del nivel. Esto no mueve el Yo entre capas.
     """
-    if observation_level not in (1, 2, 3):
-        raise ValueError("observation_level debe ser 1, 2 o 3.")
 
-    a = _clamp01(agency) > 0.0
-    ar = _clamp01(autoreference) > 0.0
+    if observation_level not in (
+        1,
+        2,
+        3,
+    ):
+        raise ValueError(
+            "observation_level debe ser 1, 2 o 3."
+        )
 
-    suffix = {(False, False): 1, (False, True): 2, (True, False): 3, (True, True): 4}[(a, ar)]
+    a = (
+        _clamp01(agency)
+        > 0.0
+    )
+
+    ar = (
+        _clamp01(autoreference)
+        > 0.0
+    )
+
+    suffix = {
+        (False, False): 1,
+        (False, True): 2,
+        (True, False): 3,
+        (True, True): 4,
+    }[(a, ar)]
+
     names = {
         1: "reacción pura",
         2: "observa pero no actúa",
@@ -597,7 +783,10 @@ def control_configuration(
         autoreference=ar,
         code=f"{observation_level}.{suffix}",
         name=names[suffix],
-        conscious=(a and ar),
+        conscious=(
+            a
+            and ar
+        ),
     )
 
 
@@ -605,11 +794,22 @@ def control_configuration(
 # 10. ESTADO SEMÁNTICO DEL YO
 # ===========================================================
 
-def level_description(observation_level: int) -> str:
+def level_description(
+    observation_level: int,
+) -> str:
     return {
-        1: "Consciencia descriptiva: actúa dentro del proceso y no lo ve.",
-        2: "Meta-consciencia: se observa describiendo; aparece el testigo.",
-        3: "Ultra-meta-consciencia: ve nacer la estructura y disuelve la circularidad.",
+        1: (
+            "Consciencia descriptiva: "
+            "actúa dentro del proceso y no lo ve."
+        ),
+        2: (
+            "Meta-consciencia: "
+            "se observa describiendo; aparece el testigo."
+        ),
+        3: (
+            "Ultra-meta-consciencia: "
+            "ve nacer la estructura y disuelve la circularidad."
+        ),
     }[observation_level]
 
 
@@ -625,19 +825,25 @@ def yo_state(
     El resultado semántico cambia por N y por la configuración de control,
     no por una transferencia L4 -> L5.
     """
+
     cfg = control_configuration(
         observation_level,
         agency=agency,
         autoreference=autoreference,
     )
 
-    if cfg.conscious and observation_level >= 2:
+    if (
+        cfg.conscious
+        and observation_level >= 2
+    ):
         return "YO_METACONSCIENTE"
 
     if cfg.conscious:
         return "YO_CONSCIENTE"
 
-    return f"YO_EN_CONFIGURACION_{cfg.code}"
+    return (
+        f"YO_EN_CONFIGURACION_{cfg.code}"
+    )
 
 
 # ===========================================================
@@ -671,7 +877,12 @@ def decode_downward_signal(
     autoreferencia y agencia. El mecanismo de D puede reemplazarse por
     el detector contractual del repositorio.
     """
-    layers = list(_validate_layers(activations))
+
+    layers = list(
+        _validate_layers(
+            activations
+        )
+    )
 
     # En el modelo base, la consciencia por sí sola no altera el carril.
     # Solo un estado con agencia + autoreferencia produce retorno activo.
@@ -686,12 +897,29 @@ def decode_downward_signal(
 
     # D_real completo requiere una medición temporal de identificación.
     # Aquí se utiliza beta como ganancia máxima estructural del retorno.
-    gain = beta * min(1.0, _clamp01(agency) * _clamp01(autoreference))
+    gain = (
+        beta
+        * min(
+            1.0,
+            _clamp01(agency)
+            * _clamp01(autoreference),
+        )
+    )
 
-    for i in (L1, L2, L3):
-        layers[i] = _clamp01(layers[i] * (1.0 - gain))
+    for i in (
+        L1,
+        L2,
+        L3,
+    ):
+        layers[i] = _clamp01(
+            layers[i]
+            * (1.0 - gain)
+        )
 
-    layers[L4] = _clamp01(layers[L4] * (1.0 + gain))
+    layers[L4] = _clamp01(
+        layers[L4]
+        * (1.0 + gain)
+    )
 
     return tuple(layers)
 
@@ -702,7 +930,12 @@ def describe_movement(
 ) -> Tuple[LayerMovement, ...]:
     changes: List[LayerMovement] = []
 
-    for i, (a, b) in enumerate(zip(before, after)):
+    for i, (a, b) in enumerate(
+        zip(
+            before,
+            after,
+        )
+    ):
         if abs(b - a) < 1e-15:
             continue
 
@@ -717,7 +950,9 @@ def describe_movement(
                 target_layer=i,
                 amount=abs(b - a),
                 direction=direction,
-                reason="retorno de la observación al carril",
+                reason=(
+                    "retorno de la observación al carril"
+                ),
             )
         )
 
@@ -770,19 +1005,42 @@ class L5Metaconsciencia:
         theta_eq: float = THETA_CUBE_DEFAULT,
         theta_cube: float = THETA_CUBE_DEFAULT,
         frictions: Sequence[float] = DEFAULT_FRICTIONS,
-        frequency_fn: Optional[Callable[[int], float]] = None,
-        coherence_fn: Callable[[Sequence[float]], float] = default_coherence,
+        frequency_fn: Optional[
+            Callable[[int], float]
+        ] = None,
+        coherence_fn: Callable[
+            [Sequence[float]],
+            float,
+        ] = default_coherence,
         sigma5: float = 0.029707,
     ) -> None:
-        self.theta_eq = float(theta_eq)
-        self.theta_cube = float(theta_cube)
-        self.frictions = _validate_friction(frictions)
+
+        self.theta_eq = float(
+            theta_eq
+        )
+
+        self.theta_cube = float(
+            theta_cube
+        )
+
+        self.frictions = (
+            _validate_friction(
+                frictions
+            )
+        )
+
         self.geometry = build_geometry(
             theta_cube=self.theta_cube,
             frequency_fn=frequency_fn,
         )
-        self.coherence_fn = coherence_fn
-        self.sigma5 = float(sigma5)
+
+        self.coherence_fn = (
+            coherence_fn
+        )
+
+        self.sigma5 = float(
+            sigma5
+        )
 
     def calcular(
         self,
@@ -809,24 +1067,43 @@ class L5Metaconsciencia:
         10. retorno L5 -> L4 -> L3 -> L2 -> L1
         11. salida completa
         """
-        before = _validate_layers(activations)
-        y = self.theta_eq if theta_y is None else float(theta_y)
+
+        before = _validate_layers(
+            activations
+        )
+
+        y = (
+            self.theta_eq
+            if theta_y is None
+            else float(theta_y)
+        )
 
         energies = calculate_energies(
             before,
             self.frictions,
             self.geometry,
         )
-        weights = normalize_weights(energies)
 
-        coh4, q5, distortion = receptor_quality(
-            before,
-            self.frictions,
-            coherence_fn=self.coherence_fn,
+        weights = normalize_weights(
+            energies
+        )
+
+        coh4, q5, distortion = (
+            receptor_quality(
+                before,
+                self.frictions,
+                coherence_fn=self.coherence_fn,
+            )
         )
 
         z5 = self.geometry[L5].z
-        h5 = house_occupancy(y, z5, self.sigma5)
+
+        h5 = house_occupancy(
+            y,
+            z5,
+            self.sigma5,
+        )
+
         v5 = effective_visibility(
             weights,
             self.geometry,
@@ -857,11 +1134,20 @@ class L5Metaconsciencia:
             autoreference=autoreference,
         )
 
-        movements = describe_movement(before, after)
+        movements = describe_movement(
+            before,
+            after,
+        )
 
         intensities = tuple(
-            observation_intensity(i5, k)
-            for k in range(1, N_MAX + 1)
+            observation_intensity(
+                i5,
+                k,
+            )
+            for k in range(
+                1,
+                N_MAX + 1,
+            )
         )
 
         # novelty se conserva como entrada del modelo para la futura
@@ -892,7 +1178,9 @@ class L5Metaconsciencia:
             movements=movements,
             theta_y=y,
             theta_eq=self.theta_eq,
-            loop_detected=bool(loop_detected),
+            loop_detected=bool(
+                loop_detected
+            ),
         )
 
 
@@ -908,10 +1196,14 @@ def formula_maestra_l5(
     agency: float = 0.0,
     autoreference: float = 0.0,
     frictions: Sequence[float] = DEFAULT_FRICTIONS,
-    coherence_fn: Callable[[Sequence[float]], float] = default_coherence,
+    coherence_fn: Callable[
+        [Sequence[float]],
+        float,
+    ] = default_coherence,
     sigma5: float = 0.029707,
     loop_detected: bool = False,
 ) -> L5Result:
+
     engine = L5Metaconsciencia(
         theta_eq=theta_eq,
         theta_cube=THETA_CUBE_DEFAULT,
@@ -919,6 +1211,7 @@ def formula_maestra_l5(
         coherence_fn=coherence_fn,
         sigma5=sigma5,
     )
+
     return engine.calcular(
         activations=activations,
         theta_y=theta_y,
@@ -933,7 +1226,16 @@ def formula_maestra_l5(
 # ===========================================================
 
 if __name__ == "__main__":
-    estado = (1.0, 0.8, 0.7, 0.8, 0.9, 0.7, 0.8)
+
+    estado = (
+        1.0,
+        0.8,
+        0.7,
+        0.8,
+        0.9,
+        0.7,
+        0.8,
+    )
 
     resultado = formula_maestra_l5(
         estado,
@@ -945,21 +1247,70 @@ if __name__ == "__main__":
     print("=" * 64)
     print("VPSI-TRUTH — FÓRMULA MAESTRA L5")
     print("=" * 64)
-    print(f"Casa del Yo              : L4")
-    print(f"Mirador                  : L5")
-    print(f"Nivel de observación N   : {resultado.observation_level}")
-    print(f"Configuración            : {resultado.control.code}")
-    print(f"Estado del Yo            : {resultado.yo_state}")
-    print(f"Coherencia receptor      : {resultado.coherence:.12f}")
-    print(f"Calidad receptor q5      : {resultado.receptor_quality:.12f}")
-    print(f"Distorsión               : {resultado.distortion:.12f}")
-    print(f"Ocupación h5             : {resultado.occupancy:.12f}")
-    print(f"Visibilidad V5           : {resultado.visibility:.12f}")
-    print(f"Señal I5                 : {resultado.i5:.12f}")
-    print(f"Umbral N2                : {THRESHOLD_N2:.12f}")
-    print(f"Umbral N3                : {THRESHOLD_N3:.12f}")
-    print(f"Descripción              : {resultado.level_description}")
-    print("Activaciones antes      :", resultado.activations_before)
-    print("Activaciones después    :", resultado.activations_after)
-    print("Movimientos             :", len(resultado.movements))
+    print(
+        f"Casa del Yo              : L4"
+    )
+    print(
+        f"Mirador                  : L5"
+    )
+    print(
+        f"Nivel de observación N   : "
+        f"{resultado.observation_level}"
+    )
+    print(
+        f"Configuración            : "
+        f"{resultado.control.code}"
+    )
+    print(
+        f"Estado del Yo            : "
+        f"{resultado.yo_state}"
+    )
+    print(
+        f"Coherencia receptor      : "
+        f"{resultado.coherence:.12f}"
+    )
+    print(
+        f"Calidad receptor q5      : "
+        f"{resultado.receptor_quality:.12f}"
+    )
+    print(
+        f"Distorsión               : "
+        f"{resultado.distortion:.12f}"
+    )
+    print(
+        f"Ocupación h5             : "
+        f"{resultado.occupancy:.12f}"
+    )
+    print(
+        f"Visibilidad V5           : "
+        f"{resultado.visibility:.12f}"
+    )
+    print(
+        f"Señal I5                 : "
+        f"{resultado.i5:.12f}"
+    )
+    print(
+        f"Umbral N2                : "
+        f"{THRESHOLD_N2:.12f}"
+    )
+    print(
+        f"Umbral N3                : "
+        f"{THRESHOLD_N3:.12f}"
+    )
+    print(
+        f"Descripción              : "
+        f"{resultado.level_description}"
+    )
+    print(
+        "Activaciones antes      :",
+        resultado.activations_before,
+    )
+    print(
+        "Activaciones después    :",
+        resultado.activations_after,
+    )
+    print(
+        "Movimientos             :",
+        len(resultado.movements),
+    )
     print("=" * 64)

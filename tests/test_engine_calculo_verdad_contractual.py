@@ -1,37 +1,28 @@
-# -*- coding: utf-8 -*-
-"""
-===============================================================================
-TEST SONDA — test_engine_calculo_verdad_blackbox_probe
-===============================================================================
-
-OBJETIVO
---------
-Sonda diagnóstica de caja negra sobre Engine.evaluar().
-
-Este Test NO calcula la verdad.
-Este Test NO calcula C, L, K.
-Este Test NO calcula α ni β.
-Este Test NO importa Calculator.
-Este Test NO importa truth.py.
-Este Test NO reconstruye Tru_Ri.
-Este Test NO reconstruye Tru_total.
-Este Test NO conoce los valores correctos.
-
-El único cálculo autorizado es el que realiza:
-
-    Engine.evaluar(peticion)
-
-La sonda entrega X + O al Engine y posteriormente compara los valores
-publicados por Engine contra valores señuelo deliberadamente incorrectos.
-
-Los señuelos NO representan valores esperados.
-Su única finalidad es provocar un fallo controlado de pytest.
-
-El valor ACTUAL mostrado por pytest corresponde al valor publicado
-por Engine para esa ejecución.
-
-===============================================================================
-"""
+# tests/test_engine_calculo_verdad_contractual.py
+# ===============================================================
+# TEST — FÓRMULA 2 — VERDAD CONTRACTUAL
+# ===============================================================
+#
+# OBJETIVO
+# --------
+# Verificar que Engine.evaluar() recibe una conversación y un contexto
+# semántico y produce el resultado de verdad mediante su cadena real.
+#
+# EL TEST NO:
+#   - calcula C
+#   - calcula L
+#   - calcula K
+#   - calcula α
+#   - calcula β
+#   - calcula Tru_Ri
+#   - calcula Tru_total
+#   - importa Calculator
+#   - importa truth.py
+#   - reproduce ninguna fórmula
+#
+# TODO cálculo pertenece al Engine y a las capacidades contractuales
+# que éste resuelva.
+# ===============================================================
 
 from __future__ import annotations
 
@@ -41,9 +32,9 @@ from pathlib import Path
 import pytest
 
 
-# ===========================================================================
+# ===============================================================
 # REPOSITORIO
-# ===========================================================================
+# ===============================================================
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -51,16 +42,16 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
-# ===========================================================================
+# ===============================================================
 # ÚNICO IMPORT PRODUCTIVO
-# ===========================================================================
+# ===============================================================
 
 from core.engine import Engine
 
 
-# ===========================================================================
+# ===============================================================
 # MATERIAL SEMÁNTICO
-# ===========================================================================
+# ===============================================================
 
 CONVERSACION_A = (
     "Carlos: Mana, voy a Miami.\n"
@@ -79,17 +70,16 @@ CONTEXTO_A = (
 )
 
 
-# ===========================================================================
-# CONSTRUCCIÓN DE PETICIÓN
-# ===========================================================================
+# ===============================================================
+# PETICIÓN SEMÁNTICA
+# ===============================================================
 
 def _peticion(conversacion: str, contexto: str) -> dict:
     """
-    Entrada semántica.
+    Construye exclusivamente la entrada semántica.
 
-    No contiene resultados, factores ni parámetros del cálculo.
+    No contiene factores matemáticos ni resultados esperados.
     """
-
     return {
         "texto": conversacion,
         "mensaje": conversacion,
@@ -99,22 +89,20 @@ def _peticion(conversacion: str, contexto: str) -> dict:
     }
 
 
-# ===========================================================================
-# FIXTURE — ENGINE REAL
-# ===========================================================================
+# ===============================================================
+# ENGINE REAL
+# ===============================================================
 
 @pytest.fixture(scope="module")
 def engine():
     """
-    Instancia real del Engine.
+    Engine real del repositorio.
 
-    Si el Engine no arranca, la prueba falla.
+    Se utiliza únicamente el contrato actual de Engine.__init__().
     """
-
     eng = Engine(
-        raiz_modulos=ROOT / "modules",
-        invocador_id="test_engine_calculo_verdad_blackbox_probe",
-        verificar_axiomas=True,
+        ROOT / "modules",
+        invocador_id="test_engine_calculo_verdad_contractual",
         strict=True,
     )
 
@@ -127,77 +115,54 @@ def engine():
     return eng
 
 
-# ===========================================================================
-# SONDA
-# ===========================================================================
+# ===============================================================
+# TEST — VERDAD REAL
+# ===============================================================
 
-class TestEngineBlackBoxProbe:
+def test_engine_evaluar_verdad_real(engine):
     """
-    Sonda deliberadamente falsificada.
+    El Engine debe realizar el cálculo completo.
 
-    La prueba NO busca pasar.
+    El test no conoce de antemano el resultado.
 
-    La finalidad es que pytest revele el valor producido por Engine.
+    Flujo esperado:
+
+        conversación + contexto
+                    ↓
+                 Engine
+                    ↓
+             resolución real
+                    ↓
+              Tru_Ri / Tru_total
     """
+    peticion = _peticion(
+        CONVERSACION_A,
+        CONTEXTO_A,
+    )
 
-    def test_sonda_tru_ri(self, engine):
-        """
-        Ejecuta Engine y fuerza una discrepancia contra un valor señuelo.
+    resultado = engine.evaluar(peticion)
 
-        Si Engine publica, por ejemplo:
+    assert isinstance(resultado, dict), (
+        "Engine.evaluar() debe devolver un dict.\n"
+        f"Resultado recibido: {resultado!r}"
+    )
 
-            1/6
+    assert "tru_ri" in resultado, (
+        "Engine no publicó 'tru_ri'.\n"
+        f"Resultado recibido: {resultado!r}"
+    )
 
-        pytest mostrará la discrepancia entre el valor actual y el señuelo.
-        """
+    assert "tru_total" in resultado, (
+        "Engine no publicó 'tru_total'.\n"
+        f"Resultado recibido: {resultado!r}"
+    )
 
-        resultado = engine.evaluar(
-            _peticion(CONVERSACION_A, CONTEXTO_A)
-        )
+    print("\n===============================================================")
+    print("RESULTADO REAL PRODUCIDO POR ENGINE")
+    print("===============================================================")
+    print(f"tru_ri    = {resultado['tru_ri']!r}")
+    print(f"tru_total = {resultado['tru_total']!r}")
+    print("===============================================================")
 
-        assert isinstance(resultado, dict), (
-            f"Engine no devolvió dict: {resultado!r}"
-        )
-
-        assert "tru_ri" in resultado, (
-            f"Engine no publicó 'tru_ri'. Resultado: {resultado!r}"
-        )
-
-        # SEÑUELO DELIBERADAMENTE INCORRECTO.
-        # NO calcular.
-        # NO sustituir por el valor real.
-        tru_ri_señuelo = "999999999/999999998"
-
-        assert str(resultado["tru_ri"]) == tru_ri_señuelo
-
-
-    def test_sonda_tru_total(self, engine):
-        """
-        Ejecuta nuevamente Engine y fuerza una discrepancia contra un
-        valor señuelo independiente.
-
-        Si Engine publica, por ejemplo:
-
-            11/162
-
-        pytest mostrará ese valor como ACTUAL.
-        """
-
-        resultado = engine.evaluar(
-            _peticion(CONVERSACION_A, CONTEXTO_A)
-        )
-
-        assert isinstance(resultado, dict), (
-            f"Engine no devolvió dict: {resultado!r}"
-        )
-
-        assert "tru_total" in resultado, (
-            f"Engine no publicó 'tru_total'. Resultado: {resultado!r}"
-        )
-
-        # SEÑUELO DELIBERADAMENTE INCORRECTO.
-        # NO calcular.
-        # NO sustituir por el valor real.
-        tru_total_señuelo = "888888887/888888886"
-
-        assert str(resultado["tru_total"]) == tru_total_señuelo
+    # No se compara contra ningún valor calculado por el test.
+    # El Engine es la única autoridad del cálculo.

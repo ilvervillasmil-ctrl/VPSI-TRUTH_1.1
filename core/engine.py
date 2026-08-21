@@ -2521,7 +2521,7 @@ class Engine:
     # COHERENCIA (FO)
     # -----------------------------------------------------------
 
-        def calcular_coherencia(
+    def calcular_coherencia(
         self,
         capas: Optional[Any] = None,
         externos: Optional[Dict[str, Any]] = None,

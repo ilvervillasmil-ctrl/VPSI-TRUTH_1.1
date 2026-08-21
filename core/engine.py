@@ -87,11 +87,12 @@
 #
 # ===============================================================
 # ===============================================================
-# Parte 1 IMPORTACIONES
+# Parte 1 — IMPORTACIONES Y CONFIGURACIÓN DEL SISTEMA
 # ===============================================================
 
 from __future__ import annotations
 
+# --- Librerías Estándar de Python ---
 import importlib
 import importlib.util
 import inspect
@@ -103,20 +104,39 @@ import time
 from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 
+# --- Tipado Estático y Contratos (typing) ---
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Protocol,
+    Tuple,
+    Union,
+    runtime_checkable,
+)
+
+# --- Componentes Core VPSI-TRUTH ---
 from core.centinela import Centinela, Veredicto
 
-# --- Igual que el otro repo (rutas VPSI) ---
+# --- Módulos Fórmulas VPSI-TRUTH ---
 from modules.formulas.formulas_omega.coherence import (
     CoherenceEngine as FormulaEngine,
     SessionStateOmega,
 )
 from modules.formulas.formulas_omega.constants import ALPHA, BETA, PHI, S_REF
 
-ALPHA_VPSI = float(ALPHA)
-BETA_VPSI = float(BETA)
-EPSILON = 1e-12
+
+# ===============================================================
+# CONSTANTES GLOBALES DE PROCESAMIENTO
+# ===============================================================
+
+ALPHA_VPSI: float = float(ALPHA)
+BETA_VPSI: float = float(BETA)
+EPSILON: float = 1e-12
+
 
 
 # ===============================================================

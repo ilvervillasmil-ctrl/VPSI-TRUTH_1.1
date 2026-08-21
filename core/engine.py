@@ -2652,83 +2652,103 @@ class Engine:
     # EVALUAR_UNIVERSAL — TODOS LOS MÓDULOS
     # -----------------------------------------------------------
 
-    def evaluar_universal_todos(
+
+    # =========================================================================
+    # FÓRMULA 1 — COHERENCIA DEL CARRIL (C_Ω)
+    # =========================================================================
+   
+    def calcular_coherencia(
         self,
-        peticion: Optional[Dict[str, Any]] = None,
+        capas: Optional[Any] = None,
+        externos: Optional[Dict[str, Any]] = None,
+        meta: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Ejecuta la capacidad 'evaluar_universal' en todos los módulos
-        que la declaran como callable.
-
-        No inventa la capacidad: solo la ejerce donde el contrato la expone.
+        Equivalente contractual de OmegaEngine.compute_coherence.
+        Capas → SF | Cálculo → FO.evaluar_coherencia (Fórmula 1 - C_Ω)
+        
+        Entrada: Activaciones L0..L6 desde el módulo Self (SF).
+        Salida: Escalar c_omega.
         """
         self._exigir_operativo()
+        fo = self._exigir_contenedor("FO", "Formulas (FO)")
+        self._exigir_capacidad(fo, "evaluar_coherencia")
 
-        payload = dict(peticion or {})
-        resultados: Dict[str, Any] = {}
-        ejecutados: List[str] = []
-        omitidos: List[str] = []
-        errores: List[Dict[str, str]] = []
+        if capas is None:
+            capas = self.obtener_capas_self()
 
-        for nombre in sorted(self.registro.contenedores.keys()):
-            cont = self.registro.contenedores[nombre]
-
-            if not callable(cont.fn("evaluar_universal")):
-                omitidos.append(nombre)
-                continue
-
-            if cont.autoriza_engine.get("ejecutar") is not True:
-                omitidos.append(nombre)
-                errores.append(
-                    {
-                        "modulo": nombre,
-                        "error": "contrato no autoriza ejecutar",
-                    }
-                )
-                continue
-
-            salida = self.ejecutar_capacidad(
-                nombre,
-                "evaluar_universal",
-                payload,
-            )
-
-            if salida.get("estado") == "EXITO":
-                ejecutados.append(nombre)
-                resultados[nombre] = {
-                    "estado": "EXITO",
-                    "rol": cont.rol,
-                    "id": cont.id,
-                    "resultado": salida.get("resultado"),
-                }
-            else:
-                errores.append(
-                    {
-                        "modulo": nombre,
-                        "error": str(
-                            salida.get("error") or salida.get("estado")
-                        ),
-                    }
-                )
-                resultados[nombre] = {
-                    "estado": salida.get("estado"),
-                    "rol": cont.rol,
-                    "id": cont.id,
-                    "error": salida.get("error"),
-                }
+        salida = self.ejecutar_capacidad(
+            "FO",
+            "evaluar_coherencia",
+            {
+                "capas": capas,
+                "externos": dict(externos or {}),
+                "meta": dict(meta or {}),
+            },
+        )
+        c_omega = self._resultado_exito(salida, "FO.evaluar_coherencia")
 
         return {
-            "estado": "EXITO" if not errores else "PARCIAL",
-            "operacion": "evaluar_universal_todos",
-            "total_modulos": self.registro.total(),
-            "ejecutados_n": len(ejecutados),
-            "omitidos_n": len(omitidos),
-            "errores_n": len(errores),
-            "ejecutados": ejecutados,
-            "omitidos": omitidos,
-            "errores": errores,
-            "resultados": resultados,
+            "estado": "EXITO",
+            "formula": "FORMULA_1_C_OMEGA",
+            "operacion": "calcular_coherencia",
+            "modulo": fo.nombre,
+            "capacidad": "evaluar_coherencia",
+            "capas": capas,
+            "c_omega": c_omega,
         }
+
+    # =========================================================================
+    # FÓRMULA 2 — EVALUACIÓN DE VERDAD (TRU)
+    # =========================================================================
+    def calcular_verdad(
+        self,
+        C: Any,
+        L: Any,
+        K: Any,
+        alpha: Optional[Any] = None,
+        beta: Optional[Any] = None,
+        externos: Optional[Dict[str, Any]] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Capacidad contractual para la Fórmula 2 — Verdad (Tru).
+        Factores de Dominio (CA/Conteos) → FO.evaluar_verdad
+        
+        Entrada: C, L, K (Fraction / factores de dominio).
+        Salida: Tru_Ri y Tru_total.
+        
+        Aislamiento: No consume ni conoce las capas L0..L6 del módulo SF.
+        """
+        self._exigir_operativo()
+        fo = self._exigir_contenedor("FO", "Formulas (FO)")
+        self._exigir_capacidad(fo, "evaluar_verdad")
+
+        salida = self.ejecutar_capacidad(
+            "FO",
+            "evaluar_verdad",
+            {
+                "C": C,
+                "L": L,
+                "K": K,
+                "alpha": alpha,
+                "beta": beta,
+                "externos": dict(externos or {}),
+                "meta": dict(meta or {}),
+            },
+        )
+        resultado_tru = self._resultado_exito(salida, "FO.evaluar_verdad")
+
+        return {
+            "estado": "EXITO",
+            "formula": "FORMULA_2_TRU",
+            "operacion": "calcular_verdad",
+            "modulo": fo.nombre,
+            "capacidad": "evaluar_verdad",
+            "factores": {"C": C, "L": L, "K": K},
+            "resultado": resultado_tru,
+        }
+
 
     def ciclo_omega_universal(
         self,

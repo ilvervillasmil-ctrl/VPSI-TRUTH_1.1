@@ -358,6 +358,7 @@ CONTENEDOR: Dict[str, Any] = {
         "inspeccionar": "inspeccionar",
         "registrar_inventario": "registrar_inventario",
         "evaluar_universal": "evaluar_universal",
+        "evaluar_coherencia": "evaluar_coherencia",
     },
 
     # -----------------------------------------------------------
@@ -469,6 +470,13 @@ CONTENEDOR: Dict[str, Any] = {
             "salida": "dict con hechos, traza, ejecutadas",
             "acceso_archivos": ["*"],
         },
+        "evaluar_coherencia": {
+            "descripcion": "Calcula C_Ω / C_β / C_α / C_total sobre el vector de capas (FO coherence).",
+            "entrada": "capas: list[float], frictions: list[float] | None",
+            "validar_esquema": ["*"],
+            "salida": "dict con c_omega, c_beta, c_alpha, c_total, energies, diagnostico",
+            "acceso_archivos": ["*"],
+        },
     },
 
     # -----------------------------------------------------------
@@ -494,6 +502,7 @@ CONTENEDOR: Dict[str, Any] = {
         "inspeccionar": True,
         "registrar_inventario": True,
         "evaluar_universal": True,
+        "evaluar_coherencia": True,
     },
 
     # -----------------------------------------------------------
@@ -720,6 +729,17 @@ def verificar_salida(salida: Dict[str, Any]) -> bool:
 def verificar() -> Dict[str, Any]:
     return barrer()
 
+def evaluar_coherencia(capas, frictions=None, **kwargs):
+    """
+    Capacidad contractual del módulo formulas.
+    Delega en formulas_omega.coherence.CoherenceEngine.
+    """
+    result = CoherenceEngine.full_analysis(
+        activations=capas,
+        frictions=frictions,
+        **kwargs
+    )
+    return result  # o el bloque que Engine espera (c_omega + detalle)
 # ---------------------------------------------------------------
 # 7.4 inventario
 # ---------------------------------------------------------------
@@ -1051,6 +1071,7 @@ _CAP_MAP = {
     "inspeccionar": inspeccionar,
     "registrar_inventario": registrar_inventario,
     "evaluar_universal": evaluar_universal,
+    "evaluar_coherencia": evaluar_coherencia,
 }
 
 def _resolver_capacidades(cont: Dict[str, Any]) -> None:
@@ -1140,4 +1161,5 @@ __all__ = [
     "FormulaError",
     "FormulaNoEncontradaError",
     "ContratoInvalido",
+    "evaluar_coherencia",
 ]

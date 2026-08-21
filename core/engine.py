@@ -2439,7 +2439,7 @@ class Engine:
 
         return salida
 
-    # ===========================================================
+# ===========================================================
 # Parte 29 — AGENCIA MATEMÁTICA INTERNA
 # ===========================================================
 #
@@ -2464,370 +2464,266 @@ class Engine:
 #
 # ===========================================================
 
-def _exigir_operativo(self) -> None:
-    if self.estado != ESTADO_OPERATIVO:
-        raise AgenciaMatematicaError(
-            "Engine no operativo (estado={0})".format(self.estado)
-        )
+    # ===============================================================
+    # CAPACIDAD ENGINE — CICLO DE COHERENCIA
+    # ===============================================================
 
+    def evaluar_coherencia(
+        self,
+        peticion: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Ejecuta el ciclo contractual de coherencia:
 
-def _exigir_contenedor(self, clave: str, etiqueta: str) -> Contenedor:
-    cont = self.registro.primero(clave)
-    if cont is None:
-        raise AgenciaMatematicaError(
-            "{0} ausente en el registro".format(etiqueta)
-        )
-    return cont
+            SF → ENGINE → FO → CoherenceEngine
 
+        SF aporta las perspectivas/capas.
+        ENGINE resuelve y transporta los hechos.
+        FO ejecuta evaluar_coherencia().
+        FO delega el cálculo en CoherenceEngine.full_analysis().
 
-def _exigir_capacidad(self, cont: Contenedor, nombre: str) -> None:
-    if not callable(cont.fn(nombre)):
-        raise FormulaNoDisponibleError(
-            "{0} no declara capacidad callable '{1}'".format(
-                cont.nombre,
-                nombre,
+        ENGINE no calcula C_Ω, C_β, C_α ni C_total.
+        ENGINE no calcula Tru_Ri ni Tru_total.
+        ENGINE no inventa capacidades.
+        """
+
+        peticion = dict(peticion) if isinstance(peticion, dict) else {}
+
+        resultado: Dict[str, Any] = {
+            "operacion": "evaluar_coherencia",
+            "estado": ESTADO_NO_INICIADO,
+            "coherente": False,
+            "sf": None,
+            "fo": None,
+            "coherencia": None,
+            "errores": [],
+        }
+
+        # -----------------------------------------------------------
+        # 1. RESOLVER SF
+        # -----------------------------------------------------------
+
+        try:
+            sf = self._resolver_modulo("SF")
+        except Exception as exc:
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                f"SF: resolución falló: {type(exc).__name__}: {exc}"
             )
-        )
+            return resultado
 
-
-def _resultado_exito(self, salida: Dict[str, Any], contexto: str) -> Any:
-    if not isinstance(salida, dict):
-        raise AgenciaMatematicaError(
-            "{0}: salida no es dict".format(contexto)
-        )
-
-    if salida.get("estado") != "EXITO":
-        raise AgenciaMatematicaError(
-            "{0}: {1}".format(
-                contexto,
-                salida.get("error") or "ejecución no exitosa",
+        if not isinstance(sf, dict):
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "SF: la resolución no produjo un CONTENEDOR válido."
             )
-        )
+            return resultado
 
-    return salida.get("resultado")
+        resultado["sf"] = sf
 
+        capacidades_sf = sf.get("capacidades")
 
-# ===========================================================
-# SELF — CAPAS
-# ===========================================================
-
-def obtener_capas_self(self) -> Any:
-    """
-    Fuente exclusiva de las capas L0..L6 para C_Ω.
-    """
-
-    self._exigir_operativo()
-
-    sf = self._exigir_contenedor(
-        "SF",
-        "Self (SF)",
-    )
-
-    if callable(sf.fn("capas")):
-        capacidad = "capas"
-    elif callable(sf.fn("estado_self")):
-        capacidad = "estado_self"
-    else:
-        raise FormulaNoDisponibleError(
-            "SF no declara 'capas' ni 'estado_self'"
-        )
-
-    salida = self.ejecutar_capacidad(
-        "SF",
-        capacidad,
-    )
-
-    capas = self._resultado_exito(
-        salida,
-        "SF.{0}".format(capacidad),
-    )
-
-    if capas is None:
-        raise CapasInvalidasError(
-            "SF devolvió capas vacías"
-        )
-
-    return capas
-
-
-# ===========================================================
-# FÓRMULA 1 — COHERENCIA DEL CARRIL C_Ω
-# ===========================================================
-
-def calcular_coherencia(
-    self,
-    capas: Optional[Any] = None,
-    externos: Optional[Dict[str, Any]] = None,
-    meta: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    """
-    Calcula exclusivamente C_Ω.
-
-    Entrada:
-        capas L0..L6 desde SF.
-
-    Cálculo:
-        FO.evaluar_coherencia.
-
-    Salida:
-        C_Ω.
-
-    PROHIBICIÓN SEMÁNTICA:
-        C_Ω no es C.
-        C_Ω no se utiliza como factor C de Tru.
-    """
-
-    self._exigir_operativo()
-
-    fo = self._exigir_contenedor(
-        "FO",
-        "Formulas (FO)",
-    )
-
-    self._exigir_capacidad(
-        fo,
-        "evaluar_coherencia",
-    )
-
-    if capas is None:
-        capas = self.obtener_capas_self()
-
-    salida = self.ejecutar_capacidad(
-        "FO",
-        "evaluar_coherencia",
-        {
-            "capas": capas,
-            "externos": dict(externos or {}),
-            "meta": dict(meta or {}),
-        },
-    )
-
-    c_omega = self._resultado_exito(
-        salida,
-        "FO.evaluar_coherencia",
-    )
-
-    return {
-        "estado": "EXITO",
-        "formula": "FORMULA_1_C_OMEGA",
-        "operacion": "calcular_coherencia",
-        "modulo": fo.nombre,
-        "capacidad": "evaluar_coherencia",
-        "capas": capas,
-        "c_omega": c_omega,
-    }
-
-
-# ===========================================================
-# FÓRMULA 2 — VERDAD TRU
-# ===========================================================
-
-def calcular_verdad(
-    self,
-    C: Any,
-    L: Any,
-    K: Any,
-    alpha: Optional[Any] = None,
-    beta: Optional[Any] = None,
-    externos: Optional[Dict[str, Any]] = None,
-    meta: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    """
-    Calcula exclusivamente Tru.
-
-    Entrada:
-        C, L, K = factores de dominio.
-        alpha, beta = constantes contractuales cuando correspondan.
-
-    Fuente:
-        CA/Conteos + CT.
-
-    Cálculo:
-        FO.evaluar_verdad.
-
-    Aislamiento:
-        No recibe C_Ω.
-        No recibe capas.
-        No interpreta SF.
-    """
-
-    self._exigir_operativo()
-
-    fo = self._exigir_contenedor(
-        "FO",
-        "Formulas (FO)",
-    )
-
-    self._exigir_capacidad(
-        fo,
-        "evaluar_verdad",
-    )
-
-    salida = self.ejecutar_capacidad(
-        "FO",
-        "evaluar_verdad",
-        {
-            "C": C,
-            "L": L,
-            "K": K,
-            "alpha": alpha,
-            "beta": beta,
-            "externos": dict(externos or {}),
-            "meta": dict(meta or {}),
-        },
-    )
-
-    resultado_tru = self._resultado_exito(
-        salida,
-        "FO.evaluar_verdad",
-    )
-
-    return {
-        "estado": "EXITO",
-        "formula": "FORMULA_2_TRU",
-        "operacion": "calcular_verdad",
-        "modulo": fo.nombre,
-        "capacidad": "evaluar_verdad",
-        "factores": {
-            "C": C,
-            "L": L,
-            "K": K,
-        },
-        "constantes": {
-            "alpha": alpha,
-            "beta": beta,
-        },
-        "resultado": resultado_tru,
-    }
-
-
-# ===========================================================
-# CICLO SEPARADO — COHERENCIA
-# ===========================================================
-
-def ciclo_coherencia(
-    self,
-    capas: Optional[Any] = None,
-    externos: Optional[Dict[str, Any]] = None,
-    meta: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    """
-    Ejecuta exclusivamente la Fórmula 1.
-
-        SF → FO → C_Ω
-    """
-
-    return self.calcular_coherencia(
-        capas=capas,
-        externos=externos,
-        meta=meta,
-    )
-
-
-# ===========================================================
-# CICLO SEPARADO — VERDAD
-# ===========================================================
-
-def ciclo_verdad(
-    self,
-    C: Any,
-    L: Any,
-    K: Any,
-    alpha: Optional[Any] = None,
-    beta: Optional[Any] = None,
-    externos: Optional[Dict[str, Any]] = None,
-    meta: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    """
-    Ejecuta exclusivamente la Fórmula 2.
-
-        CA/Conteos + CT → FO → Tru
-    """
-
-    return self.calcular_verdad(
-        C=C,
-        L=L,
-        K=K,
-        alpha=alpha,
-        beta=beta,
-        externos=externos,
-        meta=meta,
-    )
-
-
-# ===========================================================
-# CICLO COMPUESTO — DOS PRODUCTOS DISTINTOS
-# ===========================================================
-
-def ciclo_omega(
-    self,
-    capas: Optional[Any] = None,
-    C: Any = None,
-    L: Any = None,
-    K: Any = None,
-    alpha: Optional[Any] = None,
-    beta: Optional[Any] = None,
-    externos: Optional[Dict[str, Any]] = None,
-    meta: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    """
-    Ejecuta ambos cálculos sin fusionar sus semánticas.
-
-        RAMA A:
-            SF → FO → C_Ω
-
-        RAMA B:
-            CA/Conteos + CT → FO → Tru
-
-    IMPORTANTE:
-        El resultado C_Ω nunca se inserta como C.
-    """
-
-    self._exigir_operativo()
-
-    bloque_coherencia = self.ciclo_coherencia(
-        capas=capas,
-        externos=externos,
-        meta=meta,
-    )
-
-    bloque_verdad = None
-
-    if C is not None and L is not None and K is not None:
-        bloque_verdad = self.ciclo_verdad(
-            C=C,
-            L=L,
-            K=K,
-            alpha=alpha,
-            beta=beta,
-            externos=externos,
-            meta=meta,
-        )
-
-    return {
-        "estado": (
-            "EXITO"
-            if bloque_coherencia.get("estado") == "EXITO"
-            and (
-                bloque_verdad is None
-                or bloque_verdad.get("estado") == "EXITO"
+        if not isinstance(capacidades_sf, dict):
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "SF: CONTENEDOR['capacidades'] no es dict."
             )
-            else "ERROR"
-        ),
-        "operacion": "ciclo_omega",
-        "coherencia": {
-            "formula": "FORMULA_1_C_OMEGA",
-            "resultado": bloque_coherencia.get("c_omega"),
-        },
-        "verdad": (
-            {
-                "formula": "FORMULA_2_TRU",
-                "resultado": bloque_verdad.get("resultado"),
-            }
-            if bloque_verdad is not None
-            else None
-        ),
-    }
+            return resultado
+
+        # -----------------------------------------------------------
+        # 2. OBTENER PERSPECTIVAS DEL SELF
+        # -----------------------------------------------------------
+
+        perspectivas = None
+
+        for nombre in (
+            "yo_funcional",
+            "desde_donde",
+            "estado_self",
+        ):
+            referencia = capacidades_sf.get(nombre)
+
+            if callable(referencia):
+                try:
+                    perspectivas = referencia()
+                    break
+                except TypeError:
+                    try:
+                        perspectivas = referencia(peticion)
+                        break
+                    except Exception:
+                        continue
+                except Exception:
+                    continue
+
+        if perspectivas is None:
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "SF: no fue posible obtener una perspectiva contractual."
+            )
+            return resultado
+
+        # -----------------------------------------------------------
+        # 3. RESOLVER CAPAS DESDE LA PETICIÓN / SF
+        # -----------------------------------------------------------
+
+        capas = peticion.get("capas")
+
+        if capas is None and isinstance(perspectivas, dict):
+            capas = perspectivas.get("perspectivas")
+
+        if capas is None and isinstance(perspectivas, dict):
+            capas = perspectivas.get("capas")
+
+        if capas is None:
+            capas = peticion.get("activations")
+
+        if capas is None:
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "SF: no se obtuvo el vector contractual de capas para FO."
+            )
+            return resultado
+
+        if not isinstance(capas, (list, tuple)):
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "SF: las capas deben resolverse como list/tuple."
+            )
+            return resultado
+
+        # -----------------------------------------------------------
+        # 4. RESOLVER FO
+        # -----------------------------------------------------------
+
+        try:
+            fo = self._resolver_modulo("FO")
+        except Exception as exc:
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                f"FO: resolución falló: {type(exc).__name__}: {exc}"
+            )
+            return resultado
+
+        if not isinstance(fo, dict):
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "FO: la resolución no produjo un CONTENEDOR válido."
+            )
+            return resultado
+
+        resultado["fo"] = fo
+
+        capacidades_fo = fo.get("capacidades")
+
+        if not isinstance(capacidades_fo, dict):
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "FO: CONTENEDOR['capacidades'] no es dict."
+            )
+            return resultado
+
+        referencia_fo = capacidades_fo.get("evaluar_coherencia")
+
+        if not callable(referencia_fo):
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "FO: la capacidad contractual 'evaluar_coherencia' "
+                "no es callable."
+            )
+            return resultado
+
+        # -----------------------------------------------------------
+        # 5. ENGINE ENTREGA LOS HECHOS A FO
+        # -----------------------------------------------------------
+
+        kwargs = {}
+
+        if "frictions" in peticion:
+            kwargs["frictions"] = peticion["frictions"]
+
+        for clave in (
+            "rho",
+            "delta_t",
+            "tau",
+            "novelty",
+            "sensitivity",
+            "external_coherences",
+            "integration",
+            "quality",
+            "complexity",
+            "uncertainty",
+        ):
+            if clave in peticion:
+                kwargs[clave] = peticion[clave]
+
+        try:
+            coherencia = referencia_fo(
+                capas,
+                **kwargs,
+            )
+        except Exception as exc:
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                f"FO.evaluar_coherencia: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            return resultado
+
+        # -----------------------------------------------------------
+        # 6. VALIDAR SALIDA DE FO
+        # -----------------------------------------------------------
+
+        if not isinstance(coherencia, dict):
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "FO.evaluar_coherencia no produjo dict."
+            )
+            return resultado
+
+        resultado["coherencia"] = coherencia
+
+        requeridos = (
+            "c_omega",
+            "c_beta",
+            "c_alpha",
+            "c_total",
+            "energies",
+        )
+
+        faltantes = [
+            clave
+            for clave in requeridos
+            if clave not in coherencia
+        ]
+
+        if faltantes:
+            resultado["estado"] = ESTADO_DEGRADADO
+            resultado["errores"].append(
+                "FO: salida de coherencia incompleta: "
+                + ", ".join(faltantes)
+            )
+            return resultado
+
+        # -----------------------------------------------------------
+        # 7. RESULTADO CONTRACTUAL
+        # -----------------------------------------------------------
+
+        resultado["estado"] = ESTADO_OPERATIVO
+        resultado["coherente"] = True
+        resultado["capas"] = list(capas)
+        resultado["c_omega"] = coherencia["c_omega"]
+        resultado["c_beta"] = coherencia["c_beta"]
+        resultado["c_alpha"] = coherencia["c_alpha"]
+        resultado["c_total"] = coherencia["c_total"]
+        resultado["energies"] = coherencia["energies"]
+        resultado["diagnostico"] = coherencia.get(
+            "diagnostico",
+            coherencia.get("diagnostic_name"),
+        )
+
+        return resultado
+    
     # ===========================================================
     # Parte 29 CONSOLIDACIÓN
     # ===========================================================

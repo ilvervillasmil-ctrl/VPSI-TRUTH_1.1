@@ -660,20 +660,73 @@ class EngineContrato(Protocol):
         ...
 
 
-class ContenedorWrapper:
-    """Envuelve diccionarios de módulos para garantizar interfaz orientada a objetos."""
+class Contenedor:
+    """
+    Contenedor Contractual Unificado.
+    Soporta la carga por diccionario o por argumentos nombrados,
+    ofreciendo compatibilidad total con la línea 1312 y los 20+ módulos.
+    """
 
     __slots__ = ("_dict", "nombre", "capacidades")
 
-    def __init__(self, modulo_dict: Dict[str, Any]) -> None:
-        self._dict = modulo_dict
-        self.nombre: str = str(modulo_dict.get("nombre", "MODULO_ANONIMO"))
-        caps = modulo_dict.get("capacidades", {})
-        self.capacidades: Dict[str, Callable[..., Any]] = caps if isinstance(caps, dict) else {}
+    def __init__(
+        self,
+        modulo_dict: Optional[Dict[str, Any]] = None,
+        nombre: Optional[str] = None,
+        capacidades: Optional[Dict[str, Callable[..., Any]]] = None,
+        **kwargs: Any,
+    ) -> None:
+        # 1. Identificar el diccionario base
+        if isinstance(modulo_dict, dict):
+            self._dict = modulo_dict
+        elif "modulo" in kwargs and isinstance(kwargs["modulo"], dict):
+            self._dict = kwargs["modulo"]
+        else:
+            self._dict = {}
+
+        # 2. Asignar el nombre (venga del dict, parámetro directo o kwargs)
+        self.nombre = str(
+            nombre
+            or self._dict.get("nombre")
+            or kwargs.get("nombre")
+            or "MODULO_ANONIMO"
+        )
+
+        # 3. Asignar capacidades
+        caps = (
+            capacidades
+            or self._dict.get("capacidades")
+            or kwargs.get("capacidades")
+            or {}
+        )
+        self.capacidades = caps if isinstance(caps, dict) else {}
 
     def fn(self, nombre_capacidad: str) -> Optional[Callable[..., Any]]:
+        """Extrae la capacidad si existe en el diccionario."""
         return self.capacidades.get(nombre_capacidad)
 
+    def __getitem__(self, key: str) -> Any:
+        """Acceso tipo diccionario modulo['clave'] para compatibilidad legacy."""
+        if key == "nombre":
+            return self.nombre
+        if key == "capacidades":
+            return self.capacidades
+        return self._dict[key]
+
+    def __contains__(self, key: str) -> bool:
+        if key in ("nombre", "capacidades"):
+            return True
+        return key in self._dict
+
+    def get(self, key: str, default: Any = None) -> Any:
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+
+# Aliasing transparente por si alguna otra prueba requiere el nombre wrapper
+ContenedorWrapper = Contenedor
 
 # =====================================================================
 # Parte 12 — ENGINE (DECLARACIONES Y CLASE UNIFICADA)

@@ -2521,15 +2521,19 @@ class Engine:
     # COHERENCIA (FO)
     # -----------------------------------------------------------
 
-    def calcular_coherencia(
+        def calcular_coherencia(
         self,
         capas: Optional[Any] = None,
         externos: Optional[Dict[str, Any]] = None,
         meta: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Equivalente contractual de OmegaEngine.compute_coherence.
-        Capas → SF | Cálculo → FO.evaluar_coherencia
+        Capacidad contractual del Engine:
+        Ejecuta la Fórmula 1 — Coherencia del Carril (C_Ω).
+
+        Aislamiento estricto: Esta operación procesa el vector de activaciones 
+        L0..L6 y sus fricciones vía FO.evaluar_coherencia. Queda desvinculada de 
+        los factores de dominio C, L, K (Fórmula 2 - Tru).
         """
         self._exigir_operativo()
         fo = self._exigir_contenedor("FO", "Formulas (FO)")
@@ -2547,16 +2551,18 @@ class Engine:
                 "meta": dict(meta or {}),
             },
         )
-        resultado = self._resultado_exito(salida, "FO.evaluar_coherencia")
+        c_omega = self._resultado_exito(salida, "FO.evaluar_coherencia")
 
         return {
             "estado": "EXITO",
+            "formula": "FORMULA_1_C_OMEGA",
             "operacion": "calcular_coherencia",
             "modulo": fo.nombre,
             "capacidad": "evaluar_coherencia",
             "capas": capas,
-            "resultado": resultado,
+            "c_omega": c_omega,
         }
+
 
     # -----------------------------------------------------------
     # VERDAD (FO)

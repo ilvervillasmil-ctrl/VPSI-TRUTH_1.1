@@ -655,12 +655,12 @@ declarar({
 
 from .truth import tru_ri, tru_total, FORMULA as TRUTH_FORMULA  # noqa: E402
 
-    @registrar_formula("tru_ri", TRUTH_FORMULA)
-    def _tru_ri_wrapper(C: Fraction, L: Fraction, K: Fraction) -> Fraction:
+@registrar_formula("tru_ri", TRUTH_FORMULA)
+def _tru_ri_wrapper(C: Fraction, L: Fraction, K: Fraction) -> Fraction:
         return tru_ri(C, L, K)
 
-    @registrar_formula("tru_total", TRUTH_FORMULA)
-    def _tru_total_wrapper(Tru_Ri: Fraction) -> Fraction:
+@registrar_formula("tru_total", TRUTH_FORMULA)
+def _tru_total_wrapper(Tru_Ri: Fraction) -> Fraction:
         return tru_total(Tru_Ri)
 
 # ===============================================================

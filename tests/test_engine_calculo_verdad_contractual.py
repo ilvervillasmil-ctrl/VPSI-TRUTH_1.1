@@ -1,4 +1,3 @@
-
 """
 ===============================================================================
 TEST — VERDAD REAL MEDIANTE ENGINE
@@ -6,7 +5,8 @@ TEST — VERDAD REAL MEDIANTE ENGINE
 
 El test presenta al Engine una conversación y su contexto.
 
-La petición es determinar la VERDAD.
+La petición es determinar la VERDAD de la afirmación de Carlos
+basándose en la conversación y en la evidencia presentada.
 
 El Engine realiza todo el proceso matemático internamente.
 
@@ -19,8 +19,8 @@ El test no reproduce ninguna fórmula.
 
 from __future__ import annotations
 
-import math
 import sys
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -79,12 +79,11 @@ def engine():
         invocador_id="test_engine_calculo_verdad_contractual",
         strict=True,
     )
-
     assert eng.estado == "OPERATIVO", (
-        f"Engine no operativo: {eng.estado!r}; "
-        f"errores={eng.errores_arranque!r}"
+        "Engine no operativo: {0!r}; errores={1!r}".format(
+            eng.estado, eng.errores_arranque
+        )
     )
-
     return eng
 
 
@@ -96,20 +95,22 @@ def test_engine_calcula_verdad_por_ciclo_real(engine):
     """
     El Engine recibe una petición de verdad basada en el contexto.
 
+    Debe exponer C, L, K, tru_ri, tru_total como Fraction.
     El cálculo pertenece completamente al Engine.
     """
-
     peticion = _peticion_verdad()
-
     resultado = engine.ciclo_omega(capas=peticion)
 
     assert isinstance(resultado, dict)
 
+    assert "C" in resultado
+    assert "L" in resultado
+    assert "K" in resultado
     assert "tru_ri" in resultado
     assert "tru_total" in resultado
 
-    assert not isinstance(resultado["tru_ri"], bool)
-    assert not isinstance(resultado["tru_total"], bool)
-
-    assert math.isfinite(float(resultado["tru_ri"]))
-    assert math.isfinite(float(resultado["tru_total"]))
+    assert isinstance(resultado["C"], Fraction)
+    assert isinstance(resultado["L"], Fraction)
+    assert isinstance(resultado["K"], Fraction)
+    assert isinstance(resultado["tru_ri"], Fraction)
+    assert isinstance(resultado["tru_total"], Fraction)

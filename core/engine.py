@@ -2529,16 +2529,27 @@ class Engine:
     ) -> Dict[str, Any]:
         """
         Equivalente contractual de OmegaEngine.compute_coherence.
-        Capas → SF | Cálculo → FO.evaluar_coherencia
+        Obtiene las capas desde el módulo SF ("self") y ejecuta evaluar_coherencia en FO.
+        
+        INTEGRIDAD Y CONTROL DE AMBIGÜEDAD (UCF v3.3):
+        Este método calcula estrictamente la Coherencia Omega (C_omega) de trayectorias
+        del subpaquete formulas_omega, diferenciándose explícitamente del factor "C"
+        (coherencia conceptual) perteneciente a la fórmula de la verdad del módulo CA (Calculator).
         """
         self._exigir_operativo()
         fo = self._exigir_contenedor("FO", "Formulas (FO)")
         self._exigir_capacidad(fo, "evaluar_coherencia")
 
+        # Resolución limpia del Yo Funcional (SF) evitando colisiones con 'self' de Python
         if capas is None:
-            capas = self.obtener_capas_self()
+            sf_modulo = self._exigir_contenedor("SF", "Yo funcional (SF)")
+            self._exigir_capacidad(sf_modulo, "desde_donde")
+            
+            estado_sf = self.ejecutar_contrato("SF", "desde_donde")
+            capas = estado_sf.get("capa_activa")
 
-        salida = self.ejecutar_capacidad(
+        # Ejecución de la Coherencia Omega (C_omega) delegada al módulo FO
+        salida_analisis = self.ejecutar_capacidad(
             "FO",
             "evaluar_coherencia",
             {
@@ -2547,7 +2558,12 @@ class Engine:
                 "meta": dict(meta or {}),
             },
         )
-        resultado = self._resultado_exito(salida, "FO.evaluar_coherencia")
+        resultado_coherencia_omega = self._resultado_exito(salida_analisis, "FO.evaluar_coherencia")
+
+        # Extracción y aislamiento de C_omega para que nunca se confunda con el factor C de CA
+        c_omega_valor = None
+        if isinstance(resultado_coherencia_omega, dict):
+            c_omega_valor = resultado_coherencia_omega.get("c_omega") or resultado_coherencia_omega.get("coherencia_omega")
 
         return {
             "estado": "EXITO",
@@ -2555,7 +2571,8 @@ class Engine:
             "modulo": fo.nombre,
             "capacidad": "evaluar_coherencia",
             "capas": capas,
-            "resultado": resultado,
+            "coherencia_omega": c_omega_valor,
+            "resultado_coherencia_omega": resultado_coherencia_omega,
         }
 
     # -----------------------------------------------------------
@@ -2568,22 +2585,114 @@ class Engine:
     ) -> Dict[str, Any]:
         """
         Equivalente contractual de OmegaEngine.apply_vpsi_truth.
-        Engine no escribe la fórmula: FO.tru_total o propósito.
+        Engine actúa como coordinador puro: no escribe la fórmula ni altera los 
+        contratos, sino que resuelve C, L, K usando CA e inyecta los valores en FO.
         """
         self._exigir_operativo()
         fo = self._exigir_contenedor("FO", "Formulas (FO)")
         data = dict(payload or {})
 
-        if callable(fo.fn("tru_total")):
-            salida = self.ejecutar_capacidad("FO", "tru_total", data)
-            resultado = self._resultado_exito(salida, "FO.tru_total")
-            return {
-                "estado": "EXITO",
-                "operacion": "aplicar_verdad",
-                "modulo": fo.nombre,
-                "capacidad": "tru_total",
-                "resultado": resultado,
-            }
+        # Conversor racional determinista para asegurar la integridad de Fraction (PEP 484)
+        def _resolver_a_fraction(val: Any) -> Any:
+            if val is None:
+                return None
+            if isinstance(val, Fraction):
+                return val
+            # Identificar el singleton _Undefined de CA para evitar TypeErrors en FO
+            if hasattr(val, "__class__") and val.__class__.__name__ == "_Undefined":
+                return Fraction(0)
+            if isinstance(val, dict):
+                if val.get("undefined") is True:
+                    return Fraction(0)
+                for k in ("fraccion", "valor", "decimal"):
+                    v = val.get(k)
+                    if v is not None:
+                        return _resolver_a_fraction(v)
+            if isinstance(val, (int, str)):
+                try:
+                    return Fraction(val)
+                except Exception:
+                    return val
+            if isinstance(val, float):
+                return Fraction(val).limit_denominator(10000)
+            return val
+
+        fn_tru_total = fo.fn("tru_total") if hasattr(fo, "fn") else None
+        if not fn_tru_total:
+            caps = fo.get("capacidades", {}) if isinstance(fo, dict) else getattr(fo, "capacidades", {})
+            fn_tru_total = caps.get("tru_total")
+
+        if callable(fn_tru_total):
+            # 1. RESOLUCIÓN DE VARIABLES DESDE LA AUTORIDAD DE CÁLCULO (CA)
+            # Si C, L o K no están resueltos en el payload, el Engine los solicita a CA.
+            if any(k not in data for k in ("C", "L", "K")):
+                try:
+                    ca = self._exigir_contenedor("CA", "Calculator (CA)")
+                    self._exigir_capacidad(ca, "calcular")
+                    salida_ca = self.ejecutar_capacidad("CA", "calcular", data)
+                    resultado_ca = self._resultado_exito(salida_ca, "CA.calcular")
+                    if isinstance(resultado_ca, dict):
+                        factores = resultado_ca.get("resultados", resultado_ca)
+                        if isinstance(factores, dict):
+                            for k in ("C", "L", "K"):
+                                if k in factores:
+                                    data[k] = factores[k]
+                except Exception as exc:
+                    raise AgenciaMatematicaError(
+                        f"Engine no pudo resolver C, L, K de manera determinista usando CA: {exc}"
+                    ) from exc
+
+            # Extracción y normalización estricta a objetos Fraction racionales
+            C_frac = _resolver_a_fraction(data.get("C"))
+            L_frac = _resolver_a_fraction(data.get("L"))
+            K_frac = _resolver_a_fraction(data.get("K"))
+
+            # Fallbacks numéricos seguros ante estados degradados de presencia (p = 0)
+            C_frac = C_frac if C_frac is not None else Fraction(0)
+            L_frac = L_frac if L_frac is not None else Fraction(0)
+            K_frac = K_frac if K_frac is not None else Fraction(0)
+
+            try:
+                # 2. INSPECCIÓN DINÁMICA DE LA FIRMA CONTRACTUAL (Sin harcodear)
+                firma = inspect.signature(fn_tru_total)
+                params_firma = list(firma.parameters.keys())
+                argumentos_ejecucion: Dict[str, Any] = {}
+
+                # Resolución de dependencias cruzadas implícitas (Tru_Ri)
+                if "Tru_Ri" in params_firma and "Tru_Ri" not in data:
+                    salida_ri = self.ejecutar_capacidad("FO", "tru_ri", {"C": C_frac, "L": L_frac, "K": K_frac})
+                    res_ri = self._resultado_exito(salida_ri, "FO.tru_ri")
+                    data["Tru_Ri"] = _resolver_a_fraction(res_ri)
+
+                # Mapear dinámicamente los argumentos de acuerdo con la firma exacta de FO
+                for nombre_param, param_obj in firma.parameters.items():
+                    if param_obj.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY):
+                        if nombre_param == "C":
+                            argumentos_ejecucion["C"] = C_frac
+                        elif nombre_param == "L":
+                            argumentos_ejecucion["L"] = L_frac
+                        elif nombre_param == "K":
+                            argumentos_ejecucion["K"] = K_frac
+                        elif nombre_param in data:
+                            argumentos_ejecucion[nombre_param] = _resolver_a_fraction(data[nombre_param])
+                        elif param_obj.default is inspect.Parameter.empty:
+                            argumentos_ejecucion[nombre_param] = None
+
+                # Ejecución de la verdad en FO inyectando la firma exacta construida
+                salida = self.ejecutar_capacidad("FO", "tru_total", argumentos_ejecucion)
+                resultado = self._resultado_exito(salida, "FO.tru_total")
+                
+                return {
+                    "estado": "EXITO",
+                    "operacion": "aplicar_verdad",
+                    "modulo": fo.nombre if hasattr(fo, "nombre") else "formulas",
+                    "capacidad": "tru_total",
+                    "resultado": resultado,
+                }
+            except Exception as exc:
+                raise AgenciaMatematicaError(
+                    f"FO.tru_total: Error durante la resolución dinámica de la firma: {exc}"
+                ) from exc
 
         resultado = self.ejecutar_proposito(data)
         return {

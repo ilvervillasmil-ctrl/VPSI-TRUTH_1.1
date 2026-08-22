@@ -2585,28 +2585,24 @@ class Engine:
         payload: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
-        Equivalente contractual de OmegaEngine.apply_vpsi_truth.
-        Engine actúa como coordinador puro: no escribe la fórmula ni altera los
-        contratos, sino que resuelve C, L, K usando CA e inyecta los valores en FO.
+        Coordinador puro de la verdad VPSI.
 
-        CA entrega factor-objeto:
-            { valor, fraccion, numerador, denominador, decimal, display, ... }
-        FO exige:
-            C, L, K : Fraction
-        Engine solo extrae la magnitud Fraction del objeto CA y la inyecta en FO.
+        Cadena:
+            CA.calcular → C, L, K (objetos)
+            → Fraction
+            → FO.tru_ri(C, L, K) → Tru_Ri
+            → FO.tru_total(...)  → Tru_total
+            → reporta tru_ri + tru_total
+
+        No escribe la fórmula.
+        No altera contratos.
+        Inyección a FO por intersección pool ∩ firma (inspect).
         """
         self._exigir_operativo()
         fo = self._exigir_contenedor("FO", "Formulas (FO)")
         data = dict(payload or {})
 
         def _resolver_a_fraction(val: Any) -> Optional[Fraction]:
-            """
-            Extrae Fraction desde:
-              - Fraction
-              - objeto factor CA (dict con fraccion/valor)
-              - int / str / float
-            Nunca devuelve dict. Nunca devuelve el envoltorio CA.
-            """
             if val is None:
                 return None
             if isinstance(val, Fraction):
@@ -2616,7 +2612,12 @@ class Engine:
             if isinstance(val, dict):
                 if val.get("undefined") is True:
                     return None
-                for k in ("fraccion", "valor"):
+                for k in (
+                    "fraccion", "valor",
+                    "Tru_Ri", "tru_ri",
+                    "Tru_total", "tru_total",
+                    "resultado",
+                ):
                     v = val.get(k)
                     if v is None:
                         continue
@@ -2643,105 +2644,130 @@ class Engine:
                 return Fraction(val).limit_denominator(10000)
             return None
 
-        fn_tru_total = fo.fn("tru_total") if hasattr(fo, "fn") else None
-        if not fn_tru_total:
-            caps = fo.get("capacidades", {}) if isinstance(fo, dict) else getattr(fo, "capacidades", {})
-            fn_tru_total = caps.get("tru_total")
+        def _fn_capacidad(contenedor: Any, nombre: str) -> Any:
+            if hasattr(contenedor, "fn"):
+                fn = contenedor.fn(nombre)
+                if callable(fn):
+                    return fn
+            caps = (
+                contenedor.get("capacidades", {})
+                if isinstance(contenedor, dict)
+                else getattr(contenedor, "capacidades", {})
+            )
+            fn = caps.get(nombre) if isinstance(caps, dict) else None
+            return fn if callable(fn) else None
 
-        if callable(fn_tru_total):
-            # 1. RESOLUCIÓN DE VARIABLES DESDE LA AUTORIDAD DE CÁLCULO (CA)
-            if any(k not in data for k in ("C", "L", "K")):
-                try:
-                    ca = self._exigir_contenedor("CA", "Calculator (CA)")
-                    self._exigir_capacidad(ca, "calcular")
-                    salida_ca = self.ejecutar_capacidad("CA", "calcular", data)
-                    resultado_ca = self._resultado_exito(salida_ca, "CA.calcular")
-                    if isinstance(resultado_ca, dict):
-                        factores = resultado_ca.get("resultados", resultado_ca)
-                        if not isinstance(factores, dict):
-                            factores = resultado_ca
-                        if isinstance(resultado_ca.get("factores"), dict):
-                            for k in ("C", "L", "K"):
-                                if k not in factores and k in resultado_ca["factores"]:
-                                    factores[k] = resultado_ca["factores"][k]
-                        for k in ("C", "L", "K"):
-                            if k in resultado_ca:
-                                data[k] = resultado_ca[k]
-                            elif k in factores:
-                                data[k] = factores[k]
-                except Exception as exc:
-                    raise AgenciaMatematicaError(
-                        f"Engine no pudo resolver C, L, K de manera determinista usando CA: {exc}"
-                    ) from exc
+        def _kwargs_segun_firma(fn: Any, disponibles: Dict[str, Any]) -> Dict[str, Any]:
+            """Pool ∩ parámetros de fn. Sin if por nombre de factor."""
+            firma = inspect.signature(fn)
+            kwargs = {
+                nombre: disponibles[nombre]
+                for nombre in firma.parameters
+                if nombre in disponibles
+            }
+            bound = firma.bind_partial(**kwargs)
+            bound.apply_defaults()
+            return dict(bound.arguments)
 
-            # Extracción: solo Fraction (nunca dict de CA hacia FO)
-            C_frac = _resolver_a_fraction(data.get("C"))
-            L_frac = _resolver_a_fraction(data.get("L"))
-            K_frac = _resolver_a_fraction(data.get("K"))
+        fn_tru_ri = _fn_capacidad(fo, "tru_ri")
+        fn_tru_total = _fn_capacidad(fo, "tru_total")
 
-            C_frac = C_frac if C_frac is not None else Fraction(0)
-            L_frac = L_frac if L_frac is not None else Fraction(0)
-            K_frac = K_frac if K_frac is not None else Fraction(0)
+        if not callable(fn_tru_total):
+            resultado = self.ejecutar_proposito(data)
+            return {
+                "estado": "EXITO",
+                "operacion": "aplicar_verdad",
+                "modulo": "PROPOSITO",
+                "capacidad": self.clave_proposito,
+                "resultado": resultado,
+            }
 
+        # -----------------------------------------------------------
+        # 1. C, L, K desde CA
+        # -----------------------------------------------------------
+        if any(k not in data for k in ("C", "L", "K")):
             try:
-                # 2. INSPECCIÓN DINÁMICA DE LA FIRMA CONTRACTUAL (Sin hardcodear)
-                firma = inspect.signature(fn_tru_total)
-                params_firma = list(firma.parameters.keys())
-                argumentos_ejecucion: Dict[str, Any] = {}
-
-                # Resolución de dependencias cruzadas implícitas (Tru_Ri)
-                if "Tru_Ri" in params_firma and "Tru_Ri" not in data:
-                    salida_ri = self.ejecutar_capacidad(
-                        "FO", "tru_ri", **{"C": C_frac, "L": L_frac, "K": K_frac}
-                    )
-                    res_ri = self._resultado_exito(salida_ri, "FO.tru_ri")
-                    data["Tru_Ri"] = _resolver_a_fraction(res_ri)
-
-                # Mapear dinámicamente los argumentos de acuerdo con la firma exacta de FO
-                for nombre_param, param_obj in firma.parameters.items():
-                    if param_obj.kind in (
-                        inspect.Parameter.POSITIONAL_ONLY,
-                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                        inspect.Parameter.KEYWORD_ONLY,
+                ca = self._exigir_contenedor("CA", "Calculator (CA)")
+                self._exigir_capacidad(ca, "calcular")
+                salida_ca = self.ejecutar_capacidad("CA", "calcular", data)
+                resultado_ca = self._resultado_exito(salida_ca, "CA.calcular")
+                if isinstance(resultado_ca, dict):
+                    for k in ("C", "L", "K"):
+                        if k in resultado_ca:
+                            data[k] = resultado_ca[k]
+                    for contenedor_extra in (
+                        resultado_ca.get("resultados"),
+                        resultado_ca.get("factores"),
                     ):
-                        if nombre_param == "C":
-                            argumentos_ejecucion["C"] = C_frac
-                        elif nombre_param == "L":
-                            argumentos_ejecucion["L"] = L_frac
-                        elif nombre_param == "K":
-                            argumentos_ejecucion["K"] = K_frac
-                        elif nombre_param in data:
-                            resuelto = _resolver_a_fraction(data[nombre_param])
-                            argumentos_ejecucion[nombre_param] = (
-                                resuelto if resuelto is not None else data[nombre_param]
-                            )
-                        elif param_obj.default is inspect.Parameter.empty:
-                            argumentos_ejecucion[nombre_param] = None
-
-                # Ejecución de la verdad en FO: solo Fraction en C, L, K
-                salida = self.ejecutar_capacidad("FO", "tru_total", **argumentos_ejecucion)
-                resultado = self._resultado_exito(salida, "FO.tru_total")
-
-                return {
-                    "estado": "EXITO",
-                    "operacion": "aplicar_verdad",
-                    "modulo": fo.nombre if hasattr(fo, "nombre") else "formulas",
-                    "capacidad": "tru_total",
-                    "resultado": resultado,
-                }
+                        if isinstance(contenedor_extra, dict):
+                            for k in ("C", "L", "K"):
+                                if k not in data and k in contenedor_extra:
+                                    data[k] = contenedor_extra[k]
             except Exception as exc:
                 raise AgenciaMatematicaError(
-                    f"FO.tru_total: Error durante la resolución dinámica de la firma: {exc}"
+                    f"Engine no pudo resolver C, L, K de manera determinista usando CA: {exc}"
                 ) from exc
 
-        resultado = self.ejecutar_proposito(data)
-        return {
-            "estado": "EXITO",
-            "operacion": "aplicar_verdad",
-            "modulo": "PROPOSITO",
-            "capacidad": self.clave_proposito,
-            "resultado": resultado,
-        }
+        C_frac = _resolver_a_fraction(data.get("C"))
+        L_frac = _resolver_a_fraction(data.get("L"))
+        K_frac = _resolver_a_fraction(data.get("K"))
+
+        C_frac = C_frac if C_frac is not None else Fraction(0)
+        L_frac = L_frac if L_frac is not None else Fraction(0)
+        K_frac = K_frac if K_frac is not None else Fraction(0)
+
+        pool_factores = {"C": C_frac, "L": L_frac, "K": K_frac}
+
+        try:
+            # -----------------------------------------------------------
+            # 2. TRU_RI — siempre, callable FO
+            # -----------------------------------------------------------
+            if not callable(fn_tru_ri):
+                raise AgenciaMatematicaError("FO.tru_ri no es callable")
+
+            kwargs_ri = _kwargs_segun_firma(fn_tru_ri, pool_factores)
+            salida_ri = self.ejecutar_capacidad("FO", "tru_ri", **kwargs_ri)
+            res_ri = self._resultado_exito(salida_ri, "FO.tru_ri")
+            Tru_Ri = _resolver_a_fraction(res_ri)
+            if Tru_Ri is None:
+                raise AgenciaMatematicaError(
+                    "FO.tru_ri no devolvió Fraction resoluble"
+                )
+            data["Tru_Ri"] = Tru_Ri
+
+            # -----------------------------------------------------------
+            # 3. TRU_TOTAL — callable FO, kwargs por firma
+            # -----------------------------------------------------------
+            pool_total = {
+                "C": C_frac,
+                "L": L_frac,
+                "K": K_frac,
+                "Tru_Ri": Tru_Ri,
+                "tru_ri": Tru_Ri,
+            }
+            kwargs_total = _kwargs_segun_firma(fn_tru_total, pool_total)
+            salida_total = self.ejecutar_capacidad(
+                "FO", "tru_total", **kwargs_total
+            )
+            res_total = self._resultado_exito(salida_total, "FO.tru_total")
+
+            return {
+                "estado": "EXITO",
+                "operacion": "aplicar_verdad",
+                "modulo": fo.nombre if hasattr(fo, "nombre") else "formulas",
+                "capacidad": "tru_total",
+                "resultado": res_total,
+                "tru_ri": Tru_Ri,
+                "tru_total": res_total,
+                "C": C_frac,
+                "L": L_frac,
+                "K": K_frac,
+            }
+
+        except Exception as exc:
+            raise AgenciaMatematicaError(
+                f"FO.tru_total: Error durante la resolución dinámica de la firma: {exc}"
+            ) from exc
     # -----------------------------------------------------------
     # CICLO OMEGA
     # -----------------------------------------------------------

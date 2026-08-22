@@ -104,7 +104,8 @@ from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
-
+from decimal import Decimal, ROUND_HALF_UP, getcontext
+from fractions import Fraction
 from core.centinela import Centinela, Veredicto
 
 # --- Igual que el otro repo (rutas VPSI) ---

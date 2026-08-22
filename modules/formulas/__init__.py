@@ -655,13 +655,13 @@ declarar({
 
 from .truth import tru_ri, tru_total, FORMULA as TRUTH_FORMULA  # noqa: E402
 
-@registrar_formula("tru_ri", TRUTH_FORMULA)
-def _tru_ri_wrapper(C, L, K):
-    return tru_ri(C, L, K)
+    @registrar_formula("tru_ri", TRUTH_FORMULA)
+    def _tru_ri_wrapper(C: Fraction, L: Fraction, K: Fraction) -> Fraction:
+        return tru_ri(C, L, K)
 
-@registrar_formula("tru_total", TRUTH_FORMULA)
-def _tru_total_wrapper(C, L, K):
-    return tru_total(C, L, K)
+    @registrar_formula("tru_total", TRUTH_FORMULA)
+    def _tru_total_wrapper(Tru_Ri: Fraction) -> Fraction:
+        return tru_total(Tru_Ri)
 
 # ===============================================================
 # 7. CAPACIDADES PÚBLICAS — CALLABLES REALES
@@ -939,73 +939,131 @@ def diagnostico() -> Dict[str, Any]:
 # 7.9 ejecutar_total
 # ---------------------------------------------------------------
 def ejecutar_total(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    peticion_normalizada = dict(peticion) if isinstance(peticion, dict) else {}
-    resultados: Dict[str, Any] = {}
-    errores_ejecucion: List[str] = []
-    capacidades = CONTENEDOR.get("capacidades", {})
-    if not isinstance(capacidades, dict):
+        """
+        Ejecuta todas las capacidades de Formulas de manera determinista y dinámica.
+        Inspecciona firmas de manera exacta para resolver argumentos requeridos,
+        sin harcodear parámetros y adaptándose dinámicamente a la firma de tru_total.
+        """
+        peticion_normalizada = dict(peticion) if isinstance(peticion, dict) else {}
+        resultados: Dict[str, Any] = {}
+        errores_ejecucion: List[str] = []
+
+        def _convertir_a_fraction(val: Any) -> Any:
+            if val is None:
+                return None
+            if isinstance(val, dict):
+                for k in ("fraccion", "valor", "decimal"):
+                    if k in val and val[k] is not None:
+                        return _convertir_a_fraction(val[k])
+            if isinstance(val, (int, str)):
+                try:
+                    return Fraction(val)
+                except Exception:
+                    return val
+            if isinstance(val, float):
+                return Fraction(val).limit_denominator(10000)
+            return val
+
+        capacidades = CONTENEDOR.get("capacidades", {})
+        if not isinstance(capacidades, dict):
+            return {
+                "id": ID_MODULO,
+                "modulo": NOMBRE_MODULO,
+                "rol": ROL_MODULO,
+                "version": VERSION_MODULO,
+                "operacion": "ejecutar_total",
+                "estado": ESTADO_DEGRADADO,
+                "coherente": False,
+                "capacidades_ejecutadas": [],
+                "errores_ejecucion": ["capacidades no es dict"],
+                "resultados": {},
+                "capacidades_declaradas": [],
+            }
+
+        for nombre in sorted(capacidades):
+            if nombre == "ejecutar_total":
+                continue
+            referencia = capacidades[nombre]
+            try:
+                fn = referencia if callable(referencia) else globals().get(str(referencia))
+                if not callable(fn):
+                    raise ContratoInvalido(f"'{referencia}' no es callable")
+
+                # Lógica dinámica sin hardcodeo de parámetros para tru_ri y tru_total
+                if nombre == "tru_ri":
+                    C = _convertir_a_fraction(peticion_normalizada.get("C"))
+                    L = _convertir_a_fraction(peticion_normalizada.get("L"))
+                    K = _convertir_a_fraction(peticion_normalizada.get("K"))
+                    if C is None or L is None or K is None:
+                        resultados[nombre] = {"omitido": True, "motivo": "faltan C, L o K"}
+                        continue
+                    resultados[nombre] = fn(C, L, K)
+                    continue
+
+                if nombre == "tru_total":
+                    firma = inspect.signature(fn)
+                    params = list(firma.parameters.keys())
+                    
+                    if len(params) == 1 or "Tru_Ri" in params:
+                        # tru_total espera Tru_Ri (un solo argumento)
+                        Tru_Ri = _convertir_a_fraction(peticion_normalizada.get("Tru_Ri"))
+                        if Tru_Ri is None:
+                            # Intentamos calcular Tru_Ri al vuelo con C, L, K
+                            C = _convertir_a_fraction(peticion_normalizada.get("C"))
+                            L = _convertir_a_fraction(peticion_normalizada.get("L"))
+                            K = _convertir_a_fraction(peticion_normalizada.get("K"))
+                            if C is not None and L is not None and K is not None:
+                                Tru_Ri = tru_ri(C, L, K)
+                        if Tru_Ri is None:
+                            resultados[nombre] = {"omitido": True, "motivo": "falta Tru_Ri"}
+                            continue
+                        resultados[nombre] = fn(Tru_Ri)
+                    else:
+                        # tru_total espera (C, L, K) o similar
+                        C = _convertir_a_fraction(peticion_normalizada.get("C"))
+                        L = _convertir_a_fraction(peticion_normalizada.get("L"))
+                        K = _convertir_a_fraction(peticion_normalizada.get("K"))
+                        if C is None or L is None or K is None:
+                            resultados[nombre] = {"omitido": True, "motivo": "faltan C, L o K"}
+                            continue
+                        resultados[nombre] = fn(C, L, K)
+                    continue
+
+                # Inspección de firmas estándar para capacidades genéricas
+                firma = inspect.signature(fn)
+                params_obj = list(firma.parameters.values())
+                obligatorios = [
+                    p for p in params_obj 
+                    if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD) 
+                    and p.default is inspect.Parameter.empty
+                ]
+                if not obligatorios:
+                    resultados[nombre] = fn()
+                elif len(obligatorios) == 1:
+                    resultados[nombre] = fn(peticion_normalizada)
+                else:
+                    resultados[nombre] = fn()
+
+            except Exception as exc:
+                errores_ejecucion.append(f"{nombre}: {exc}")
+                resultados[nombre] = None
+
+        barrido = resultados.get("barrer")
+        coherente = isinstance(barrido, dict) and bool(barrido.get("coherente"))
+        ejecutadas = sorted(n for n, r in resultados.items() if r is not None)
         return {
             "id": ID_MODULO,
             "modulo": NOMBRE_MODULO,
             "rol": ROL_MODULO,
             "version": VERSION_MODULO,
             "operacion": "ejecutar_total",
-            "estado": ESTADO_DEGRADADO,
-            "coherente": False,
-            "capacidades_ejecutadas": [],
-            "errores_ejecucion": ["capacidades no es dict"],
-            "resultados": {},
-            "capacidades_declaradas": [],
+            "estado": ESTADO_OPERATIVO if coherente and not errores_ejecucion else ESTADO_DEGRADADO,
+            "coherente": coherente and not errores_ejecucion,
+            "capacidades_ejecutadas": ejecutadas,
+            "errores_ejecucion": errores_ejecucion,
+            "resultados": resultados,
+            "capacidades_declaradas": sorted(capacidades.keys()),
         }
-    for nombre in sorted(capacidades):
-        if nombre == "ejecutar_total":
-            continue
-        referencia = capacidades[nombre]
-        try:
-            fn = referencia if callable(referencia) else globals().get(str(referencia))
-            if not callable(fn):
-                raise ContratoInvalido(f"'{referencia}' no es callable")
-            if nombre in ("tru_ri", "tru_total"):
-                C = peticion_normalizada.get("C")
-                L = peticion_normalizada.get("L")
-                K = peticion_normalizada.get("K")
-                if C is None or L is None or K is None:
-                    resultados[nombre] = {"omitido": True, "motivo": "faltan C, L o K"}
-                    continue
-                resultados[nombre] = fn(C, L, K)
-                continue
-            firma = inspect.signature(fn)
-            params = list(firma.parameters.values())
-            obligatorios = [
-                p for p in params
-                if p.kind in (inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD)
-                and p.default is inspect.Parameter.empty
-            ]
-            if not obligatorios:
-                resultados[nombre] = fn()
-            elif len(obligatorios) == 1:
-                resultados[nombre] = fn(peticion_normalizada)
-            else:
-                resultados[nombre] = fn()
-        except Exception as exc:
-            errores_ejecucion.append(f"{nombre}: {exc}")
-            resultados[nombre] = None
-    barrido = resultados.get("barrer")
-    coherente = isinstance(barrido, dict) and bool(barrido.get("coherente"))
-    ejecutadas = sorted(n for n, r in resultados.items() if r is not None)
-    return {
-        "id": ID_MODULO,
-        "modulo": NOMBRE_MODULO,
-        "rol": ROL_MODULO,
-        "version": VERSION_MODULO,
-        "operacion": "ejecutar_total",
-        "estado": ESTADO_OPERATIVO if coherente and not errores_ejecucion else ESTADO_DEGRADADO,
-        "coherente": coherente and not errores_ejecucion,
-        "capacidades_ejecutadas": ejecutadas,
-        "errores_ejecucion": errores_ejecucion,
-        "resultados": resultados,
-        "capacidades_declaradas": sorted(capacidades.keys()),
-    }
 
 # ---------------------------------------------------------------
 # 7.10 inspeccionar

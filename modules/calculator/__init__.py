@@ -2040,19 +2040,32 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     Fórmula:
         L = 1 - r/p
 
-    Variables:
-        p = posturas (base)
-        r = reversiones (peso sobre la base)
+    Correspondencia:
+        p = posturas
+        r = reversiones
 
     Dominio estricto:
         p > 0
         0 ≤ r ≤ p
         L ∈ [0, 1] como Fraction
 
+    Flujo:
+        entrada
+        → método
+        → precisión
+        → conteos cuando corresponde
+        → evidencia
+        → API L
+        → resultado L
+        → normalización
+        → representación
+        → salida
+
     No calcula C ni K.
+    No implementa fórmula paralela.
+    No sustituye API L ausente.
     No admite UNDEFINED.
-    No inventa base.
-    Si el dominio no se cumple, la capacidad rechaza con notas y L nulo de representación.
+    Si el dominio no se cumple, rechaza con notas y L nulo de representación.
     """
 
     # -----------------------------------------------------------
@@ -2093,7 +2106,7 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     if metodo == "operacional":
         try:
             peticion = _asegurar_conteos(peticion)
-        except Exception as e:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             evidencia = _normalizar_evidencia(peticion.get("evidencia"))
             evidencia.append({
                 "id_evidencia": _nuevo_id_evidencia(),
@@ -2111,7 +2124,7 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "p": None,
                 "r": None,
                 "ruta": metodo,
-                "notas": ["Error preparando conteos para L: {0}".format(e)],
+                "notas": ["Error preparando conteos para L: {0}".format(exc)],
                 "evidencia": evidencia,
             }
 
@@ -2158,14 +2171,14 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 reversiones=peticion.get("reversiones"),
                 metodo=metodo,
             )
-    except Exception as e:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
         return {
             "L": representar(None, prec),
             "p": None,
             "r": None,
             "ruta": metodo,
-            "notas": ["Error en API L: {0}: {1}".format(type(e).__name__, e)],
+            "notas": ["Error en API L: {0}: {1}".format(type(exc).__name__, exc)],
             "evidencia": evidencia,
         }
 
@@ -2194,7 +2207,6 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # -----------------------------------------------------------
     # 8.6.9 — DOMINIO ESTRICTO (sin UNDEFINED)
     # -----------------------------------------------------------
-    # p debe ser entero > 0. Sin base no hay L numérico: se rechaza.
     try:
         p_int = int(p) if p is not None else int(peticion.get("p") or 0)
     except (TypeError, ValueError):
@@ -2216,14 +2228,14 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # -----------------------------------------------------------
     try:
         fraccion = val if isinstance(val, Fraction) else _a_fraction(val)
-    except Exception as e:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
         return {
             "L": representar(None, prec),
             "p": p_int,
             "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": ["Valor L no normalizable: {0}: {1}".format(type(e).__name__, e)],
+            "notas": ["Valor L no normalizable: {0}: {1}".format(type(exc).__name__, exc)],
             "evidencia": evidencia,
         }
 
@@ -2243,14 +2255,14 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # -----------------------------------------------------------
     try:
         obj = representar(fraccion, prec)
-    except Exception as e:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
         return {
             "L": representar(None, prec),
             "p": p_int,
             "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": ["Error representando L: {0}: {1}".format(type(e).__name__, e)],
+            "notas": ["Error representando L: {0}: {1}".format(type(exc).__name__, exc)],
             "evidencia": evidencia,
         }
 
@@ -2270,7 +2282,6 @@ def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # ===============================================================
 # FIN 8.6
 # ===============================================================
-
 # ===============================================================
 # 8.7 — CALCULAR K
 # ===============================================================

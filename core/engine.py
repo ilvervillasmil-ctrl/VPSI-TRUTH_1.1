@@ -2924,38 +2924,231 @@ class Engine:
         }
 
 
-    def ciclo_omega_universal(
+        # =========================================================================
+    # CE — ORQUESTACION UNIVERSAL
+    # Punto fijo externo entre modulos. Capacidad propia del Engine.
+    # No declara nada en los modulos: consume 'evaluar_universal' donde exista.
+    # =========================================================================
+
+    def evaluar_universal_todos(
         self,
-        capas: Optional[Any] = None,
-        externos: Optional[Dict[str, Any]] = None,
-        meta: Optional[Dict[str, Any]] = None,
-        peticion_universal: Optional[Dict[str, Any]] = None,
+        peticion: Optional[Dict[str, Any]] = None,
+        max_pasadas: int = 16,
     ) -> Dict[str, Any]:
         """
-        Ciclo completo:
-          1. ciclo_omega (SF + FO)
-          2. evaluar_universal en todos los módulos que la declaran
+        Encadena la mecanica universal de los modulos hasta punto fijo.
+
+        Cada modulo resuelve su propio punto fijo interno mediante su
+        capacidad 'evaluar_universal' y publica hechos. El Engine solo
+        transporta esos hechos entre modulos y repite hasta que ningun
+        modulo publique nada nuevo.
+
+        El Engine no conoce el significado de ningun hecho. Conoce:
+          - que modulos declaran la capacidad y la autorizan
+          - que hechos entrego
+          - que hechos se publicaron y quien los publico
+          - por que un modulo no pudo aportar
+
+        Invariantes:
+          - primer publicador gana: un hecho ya presente no se sobrescribe
+          - el fallo de un modulo se aisla y no aborta el ciclo
+          - orden de recorrido determinista (alfabetico por modulo)
         """
-        omega = self.ciclo_omega(
-            capas=capas,
-            externos=externos,
-            meta=meta,
-        )
-        universal = self.evaluar_universal_todos(
-            peticion=peticion_universal,
+        self._exigir_operativo()
+
+        estado = "CREATED"
+        hechos: Dict[str, Any] = dict(peticion or {})
+        origen: Dict[str, str] = {k: "PETICION" for k in hechos}
+        traza: List[Dict[str, Any]] = []
+        conflictos: List[Dict[str, Any]] = []
+        fallos: Dict[str, Dict[str, Any]] = {}
+        seq = 0
+
+        def _evento(**campos: Any) -> None:
+            nonlocal seq
+            seq += 1
+            campos["seq"] = seq
+            campos["estado_motor"] = estado
+            traza.append(campos)
+
+        # ------------------------------------------------------------------
+        # 1. DESCUBRIMIENTO — quien declara y autoriza la capacidad
+        # ------------------------------------------------------------------
+        estado = "DISCOVERING"
+        proveedores: List[str] = []
+        for nombre_mod in sorted(self.registro.contenedores):
+            cont = self.registro.contenedores[nombre_mod]
+            if cont.autoriza_engine.get("ejecutar") is not True:
+                continue
+            if not callable(cont.fn("evaluar_universal")):
+                continue
+            proveedores.append(nombre_mod)
+
+        _evento(fase="CENSO", proveedores=list(proveedores))
+
+        if not proveedores:
+            estado = "RECHAZADO"
+            return {
+                "estado": "RECHAZADO",
+                "operacion": "evaluar_universal_todos",
+                "hechos": dict(hechos),
+                "origen": dict(origen),
+                "modulos": [],
+                "pasadas": 0,
+                "traza": traza,
+                "diagnostico": {
+                    "causa": "SIN_PROVEEDORES",
+                    "detalle": "ningun modulo declara y autoriza "
+                               "'evaluar_universal'",
+                },
+            }
+
+        # ------------------------------------------------------------------
+        # 2. PUNTO FIJO EXTERNO
+        # ------------------------------------------------------------------
+        def _absorber(modulo: str, publicados: Any) -> List[str]:
+            nuevos: List[str] = []
+            if not isinstance(publicados, dict):
+                return nuevos
+            for clave in sorted(publicados):
+                if not isinstance(clave, str) or clave.startswith("_"):
+                    continue
+                valor = publicados[clave]
+                if clave in hechos:
+                    if origen.get(clave) != modulo and hechos[clave] != valor:
+                        conflictos.append(
+                            {
+                                "hecho": clave,
+                                "conserva": origen.get(clave),
+                                "descarta": modulo,
+                            }
+                        )
+                    continue
+                hechos[clave] = valor
+                origen[clave] = modulo
+                nuevos.append(clave)
+            return nuevos
+
+        pasada = 0
+        aportaron: set = set()
+        while pasada < max_pasadas:
+            pasada += 1
+            nuevos_en_pasada = 0
+
+            for nombre_mod in proveedores:
+                estado = "EXECUTING"
+                salida = self.ejecutar_capacidad(
+                    nombre_mod,
+                    "evaluar_universal",
+                    hechos=dict(hechos),
+                )
+
+                estado = "OBSERVING"
+                if not isinstance(salida, dict) or salida.get("estado") != "EXITO":
+                    clase = (
+                        salida.get("estado")
+                        if isinstance(salida, dict)
+                        else "SIN_SALIDA"
+                    )
+                    detalle = (
+                        salida.get("error") if isinstance(salida, dict) else None
+                    )
+                    fallos[nombre_mod] = {
+                        "clase": clase,
+                        "detalle": detalle,
+                        "pasada": pasada,
+                    }
+                    _evento(
+                        fase="FALLO",
+                        modulo=nombre_mod,
+                        clase=clase,
+                        detalle=detalle,
+                    )
+                    continue
+
+                fallos.pop(nombre_mod, None)
+                resultado = salida.get("resultado")
+                publicados = (
+                    resultado.get("hechos")
+                    if isinstance(resultado, dict) and "hechos" in resultado
+                    else resultado
+                )
+
+                estado = "ADVANCING"
+                nuevos = _absorber(nombre_mod, publicados)
+                if nuevos:
+                    aportaron.add(nombre_mod)
+                nuevos_en_pasada += len(nuevos)
+
+                _evento(
+                    fase="APORTE",
+                    modulo=nombre_mod,
+                    pasada=pasada,
+                    publica=nuevos,
+                    ejecutadas=(
+                        resultado.get("ejecutadas")
+                        if isinstance(resultado, dict)
+                        else None
+                    ),
+                )
+
+            if nuevos_en_pasada == 0:
+                break
+
+        # ------------------------------------------------------------------
+        # 3. CIERRE
+        # ------------------------------------------------------------------
+        punto_fijo = pasada < max_pasadas
+
+        if fallos and len(fallos) == len(proveedores):
+            estado = "RECHAZADO"
+        elif fallos or not punto_fijo:
+            estado = "PARCIAL"
+        else:
+            estado = "EXITO"
+
+        _evento(
+            fase="CIERRE",
+            pasadas=pasada,
+            punto_fijo=punto_fijo,
+            hechos=len(hechos),
         )
 
+        diagnostico: Optional[Dict[str, Any]] = None
+        if estado != "EXITO":
+            diagnostico = {
+                "causa": (
+                    "TODOS_LOS_PROVEEDORES_FALLARON"
+                    if estado == "RECHAZADO"
+                    else (
+                        "PUNTO_FIJO_NO_ALCANZADO"
+                        if not punto_fijo
+                        else "PROVEEDORES_CON_FALLO"
+                    )
+                ),
+                "fallos": dict(fallos),
+                "sin_aporte": sorted(
+                    set(proveedores) - aportaron - set(fallos)
+                ),
+            }
+
         return {
-            "estado": (
-                "EXITO"
-                if omega.get("estado") == "EXITO"
-                and universal.get("estado") in ("EXITO", "PARCIAL")
-                else "ERROR"
-            ),
-            "operacion": "ciclo_omega_universal",
-            "omega": omega,
-            "evaluar_universal": universal,
+            "estado": estado,
+            "operacion": "evaluar_universal_todos",
+            "hechos": dict(hechos),
+            "origen": dict(origen),
+            "modulos": {
+                "proveedores": list(proveedores),
+                "aportaron": sorted(aportaron),
+                "fallaron": sorted(fallos),
+            },
+            "pasadas": pasada,
+            "punto_fijo": punto_fijo,
+            "conflictos": conflictos,
+            "traza": traza,
+            "diagnostico": diagnostico,
         }
+
  
     # ===========================================================
     # Parte 29 CONSOLIDACIÓN

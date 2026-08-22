@@ -3,7 +3,7 @@
 # ===============================================================
 #
 # ENGINE
-# Versión:            20.0
+# Versión:            21.0
 # Esquema contrato:   VPSI-CONTRACT-2.0
 # API Engine:         1.0
 #
@@ -372,7 +372,7 @@ class AntiHackValidation:
 
 
 # ===============================================================
-# ROLES
+#  9.2 ROLES
 # ===============================================================
 ROLES: Tuple[str, ...] = (
     "CT", "AX", "FO", "MC", "SF", "CA", "CX", "DI",
@@ -750,7 +750,7 @@ class Engine:
 
        
     # ============================================================
-    # ANTI-HACK / STRUCTURAL GUARD
+    # X.0 ANTI-HACK / STRUCTURAL GUARD
     # ============================================================
 
     def _is_finite_number(self, value):
@@ -889,7 +889,7 @@ class Engine:
             )
 
     # ============================================================
-    # LAYERS
+    # L.0-L.7 LAYERS
     # ============================================================
 
     def _init_layers_silent(self):
@@ -955,26 +955,39 @@ class Engine:
         return min(ALPHA_VPSI, product)
 
     # ============================================================
-    # VPSI TRUTH THEOREM
+    # 3x3x3 VPSI TRUTH THEOREM
+    # ============================================================
+    #
+    #   Tru_Ri(D)    = C(D) * L(D) * K(D)
+    #   Tru_total(D) = (Tru_Ri(D) * alpha) + beta
+    #
+    #   alpha = 26/27
+    #   beta  =  1/27   ← piso estructural (Tru_total nunca es 0)
+    #
+    #   Tru_Ri    ∈ [0, 1]
+    #   Tru_total ∈ [beta, 1] = [1/27, 1]
+    #
     # ============================================================
 
     def apply_vpsi_truth(self, C, L=1.0, K=1.0):
         """
-        Truth_total(D) = beta + alpha * C(D) * L(D) * K(D)
+        Tru_Ri(D)    = C(D) * L(D) * K(D)
+        Tru_total(D) = (Tru_Ri(D) * alpha) + beta
+
+        Tru_total nunca es cero: el piso es beta = 1/27.
         """
-        for name, value in {"C": C, "L": L, "K": K}.items():
+        for name, value in (("C", C), ("L", L), ("K", K)):
             if not self._is_finite_number(value):
                 raise StructuralIntegrityError(
-                    f"{name} must be a finite number, got {value}."
+                    "{0} must be a finite number, got {1}.".format(name, value)
                 )
-
-            if not 0.0 <= value <= 1.0:
+            if not (0.0 <= value <= 1.0):
                 raise StructuralIntegrityError(
-                    f"{name} violates domain [0,1], got {value}."
+                    "{0} violates domain [0,1], got {1}.".format(name, value)
                 )
 
-        ri = C * L * K
-        truth_total = BETA_VPSI + (ALPHA_VPSI * ri)
+        tru_ri = C * L * K
+        truth_total = (tru_ri * ALPHA_VPSI) + BETA_VPSI
 
         self._assert_truth_formula(C, L, K, truth_total)
 
@@ -2924,44 +2937,55 @@ class Engine:
         }
 
 
-        # =========================================================================
-    # CE — ORQUESTACION UNIVERSAL
-    # Punto fijo externo entre modulos. Capacidad propia del Engine.
-    # No declara nada en los modulos: consume 'evaluar_universal' donde exista.
+    # =========================================================================
+    # CE — ORQUESTACIÓN UNIVERSAL
+    # Capacidad propia del Engine.
+    # Cada módulo ya posee su capacidad contractual 'evaluar_universal'.
+    # El Engine la descubre, ejecuta y coordina externamente.
     # =========================================================================
 
-    def evaluar_universal_todos(
+    def evaluar_universal(
         self,
-        peticion: Optional[Dict[str, Any]] = None,
+        hechos: Optional[Dict[str, Any]] = None,
         max_pasadas: int = 16,
     ) -> Dict[str, Any]:
         """
-        Encadena la mecanica universal de los modulos hasta punto fijo.
+        Encadena la mecánica universal de los módulos hasta punto fijo.
 
-        Cada modulo resuelve su propio punto fijo interno mediante su
-        capacidad 'evaluar_universal' y publica hechos. El Engine solo
-        transporta esos hechos entre modulos y repite hasta que ningun
-        modulo publique nada nuevo.
+        'evaluar_universal' es una capacidad existente en cada módulo.
+        El Engine no la crea ni modifica los contratos de los módulos:
+        únicamente descubre las capacidades declaradas y autorizadas,
+        las invoca, transporta sus hechos y repite hasta alcanzar un punto fijo.
 
-        El Engine no conoce el significado de ningun hecho. Conoce:
-          - que modulos declaran la capacidad y la autorizan
-          - que hechos entrego
-          - que hechos se publicaron y quien los publico
-          - por que un modulo no pudo aportar
+        El Engine no conoce el significado de ningún hecho. Conoce:
+          - qué módulos declaran y autorizan la capacidad;
+          - qué hechos entrega cada ejecución;
+          - qué hechos fueron publicados;
+          - quién publicó cada hecho;
+          - qué módulos fallaron;
+          - qué conflictos aparecieron;
+          - cuándo no existe progreso.
 
         Invariantes:
-          - primer publicador gana: un hecho ya presente no se sobrescribe
-          - el fallo de un modulo se aisla y no aborta el ciclo
-          - orden de recorrido determinista (alfabetico por modulo)
+          - primer valor publicado para un hecho se conserva;
+          - cualquier valor posterior distinto genera conflicto;
+          - un fallo retornado de un módulo se aísla y no aborta el ciclo;
+          - el orden de recorrido es determinista;
+          - la ejecución se distingue del aporte;
+          - el formato de retorno es uniforme;
+          - la ausencia de proveedores no constituye punto fijo;
+          - el Engine no interpreta semántica de dominio de los hechos.
         """
         self._exigir_operativo()
 
         estado = "CREATED"
-        hechos: Dict[str, Any] = dict(peticion or {})
-        origen: Dict[str, str] = {k: "PETICION" for k in hechos}
+        hechos_out: Dict[str, Any] = dict(hechos or {})
+        origen: Dict[str, str] = {k: "PETICION" for k in hechos_out}
         traza: List[Dict[str, Any]] = []
         conflictos: List[Dict[str, Any]] = []
         fallos: Dict[str, Dict[str, Any]] = {}
+        ejecutadas: set = set()
+        aportaron: set = set()
         seq = 0
 
         def _evento(**campos: Any) -> None:
@@ -2971,120 +2995,273 @@ class Engine:
             campos["estado_motor"] = estado
             traza.append(campos)
 
-        # ------------------------------------------------------------------
-        # 1. DESCUBRIMIENTO — quien declara y autoriza la capacidad
-        # ------------------------------------------------------------------
-        estado = "DISCOVERING"
-        proveedores: List[str] = []
-        for nombre_mod in sorted(self.registro.contenedores):
-            cont = self.registro.contenedores[nombre_mod]
-            if cont.autoriza_engine.get("ejecutar") is not True:
-                continue
-            if not callable(cont.fn("evaluar_universal")):
-                continue
-            proveedores.append(nombre_mod)
-
-        _evento(fase="CENSO", proveedores=list(proveedores))
-
-        if not proveedores:
-            estado = "RECHAZADO"
+        def _expediente(
+            estado_final: str,
+            diagnostico: Optional[Dict[str, Any]] = None,
+            pasadas: int = 0,
+            punto_fijo: bool = False,
+        ) -> Dict[str, Any]:
             return {
-                "estado": "RECHAZADO",
-                "operacion": "evaluar_universal_todos",
-                "hechos": dict(hechos),
+                "estado": estado_final,
+                "operacion": "evaluar_universal",
+                "hechos": dict(hechos_out),
+                "traza": list(traza),
+                "ejecutadas": sorted(ejecutadas),
                 "origen": dict(origen),
-                "modulos": [],
-                "pasadas": 0,
-                "traza": traza,
-                "diagnostico": {
-                    "causa": "SIN_PROVEEDORES",
-                    "detalle": "ningun modulo declara y autoriza "
-                               "'evaluar_universal'",
+                "modulos": {
+                    "proveedores": list(proveedores),
+                    "aportaron": sorted(aportaron),
+                    "fallaron": sorted(fallos),
                 },
+                "pasadas": pasadas,
+                "punto_fijo": punto_fijo,
+                "conflictos": list(conflictos),
+                "diagnostico": diagnostico,
             }
 
         # ------------------------------------------------------------------
-        # 2. PUNTO FIJO EXTERNO
+        # 1. DESCUBRIMIENTO — proveedores contractuales de la capacidad
         # ------------------------------------------------------------------
-        def _absorber(modulo: str, publicados: Any) -> List[str]:
+        estado = "DISCOVERING"
+        proveedores: List[str] = []
+
+        for nombre_mod in sorted(self.registro.contenedores):
+            cont = self.registro.contenedores[nombre_mod]
+
+            if cont.autoriza_engine.get("ejecutar") is not True:
+                continue
+
+            fn = cont.fn("evaluar_universal")
+
+            if not callable(fn):
+                continue
+
+            proveedores.append(nombre_mod)
+
+        _evento(
+            fase="CENSO",
+            proveedores=list(proveedores),
+        )
+
+        if not proveedores:
+            estado = "RECHAZADO"
+
+            diagnostico = {
+                "causa": "SIN_PROVEEDORES",
+                "detalle": (
+                    "ningún módulo declara y autoriza "
+                    "'evaluar_universal'"
+                ),
+            }
+
+            _evento(
+                fase="CIERRE",
+                causa="SIN_PROVEEDORES",
+                punto_fijo=False,
+                pasadas=0,
+            )
+
+            return _expediente(
+                estado_final="RECHAZADO",
+                diagnostico=diagnostico,
+                pasadas=0,
+                punto_fijo=False,
+            )
+
+        # ------------------------------------------------------------------
+        # 2. ABSORCIÓN DE HECHOS
+        # ------------------------------------------------------------------
+        def _absorber(
+            modulo: str,
+            publicados: Any,
+        ) -> List[str]:
             nuevos: List[str] = []
+
             if not isinstance(publicados, dict):
                 return nuevos
+
             for clave in sorted(publicados):
-                if not isinstance(clave, str) or clave.startswith("_"):
+                if not isinstance(clave, str):
                     continue
+
                 valor = publicados[clave]
-                if clave in hechos:
-                    if origen.get(clave) != modulo and hechos[clave] != valor:
+
+                if clave in hechos_out:
+                    valor_previo = hechos_out[clave]
+                    productor_previo = origen.get(clave)
+
+                    if valor_previo != valor:
                         conflictos.append(
                             {
                                 "hecho": clave,
-                                "conserva": origen.get(clave),
+                                "conserva": productor_previo,
                                 "descarta": modulo,
+                                "valor_conservado": valor_previo,
+                                "valor_nuevo": valor,
                             }
                         )
+
                     continue
-                hechos[clave] = valor
+
+                hechos_out[clave] = valor
                 origen[clave] = modulo
                 nuevos.append(clave)
+
             return nuevos
 
+        # ------------------------------------------------------------------
+        # 3. PUNTO FIJO EXTERNO
+        # ------------------------------------------------------------------
         pasada = 0
-        aportaron: set = set()
+
         while pasada < max_pasadas:
             pasada += 1
             nuevos_en_pasada = 0
 
             for nombre_mod in proveedores:
                 estado = "EXECUTING"
+
+                ejecutadas.add(nombre_mod)
+
                 salida = self.ejecutar_capacidad(
                     nombre_mod,
                     "evaluar_universal",
-                    hechos=dict(hechos),
+                    hechos=dict(hechos_out),
                 )
 
+                # ----------------------------------------------------------
+                # OBSERVING
+                # ----------------------------------------------------------
                 estado = "OBSERVING"
-                if not isinstance(salida, dict) or salida.get("estado") != "EXITO":
+
+                if (
+                    not isinstance(salida, dict)
+                    or salida.get("estado") != "EXITO"
+                ):
                     clase = (
                         salida.get("estado")
                         if isinstance(salida, dict)
                         else "SIN_SALIDA"
                     )
+
                     detalle = (
-                        salida.get("error") if isinstance(salida, dict) else None
+                        salida.get("error")
+                        if isinstance(salida, dict)
+                        else None
                     )
+
                     fallos[nombre_mod] = {
                         "clase": clase,
                         "detalle": detalle,
                         "pasada": pasada,
                     }
+
                     _evento(
                         fase="FALLO",
                         modulo=nombre_mod,
                         clase=clase,
                         detalle=detalle,
+                        pasada=pasada,
                     )
+
                     continue
 
                 fallos.pop(nombre_mod, None)
+
                 resultado = salida.get("resultado")
-                publicados = (
-                    resultado.get("hechos")
-                    if isinstance(resultado, dict) and "hechos" in resultado
-                    else resultado
+
+                # ----------------------------------------------------------
+                # VALIDATING — el módulo debe publicar hechos explícitos
+                # ----------------------------------------------------------
+                estado = "VALIDATING"
+
+                if not isinstance(resultado, dict):
+                    fallos[nombre_mod] = {
+                        "clase": "SALIDA_INVALIDA",
+                        "detalle": (
+                            "evaluar_universal debe devolver un resultado "
+                            "estructurado como diccionario"
+                        ),
+                        "pasada": pasada,
+                    }
+
+                    _evento(
+                        fase="FALLO",
+                        modulo=nombre_mod,
+                        clase="SALIDA_INVALIDA",
+                        detalle=(
+                            "resultado no es un diccionario"
+                        ),
+                        pasada=pasada,
+                    )
+
+                    continue
+
+                if "hechos" not in resultado:
+                    fallos[nombre_mod] = {
+                        "clase": "HECHOS_AUSENTES",
+                        "detalle": (
+                            "el resultado de evaluar_universal "
+                            "no contiene la clave contractual 'hechos'"
+                        ),
+                        "pasada": pasada,
+                    }
+
+                    _evento(
+                        fase="FALLO",
+                        modulo=nombre_mod,
+                        clase="HECHOS_AUSENTES",
+                        detalle=(
+                            "resultado sin clave 'hechos'"
+                        ),
+                        pasada=pasada,
+                    )
+
+                    continue
+
+                publicados = resultado["hechos"]
+
+                if not isinstance(publicados, dict):
+                    fallos[nombre_mod] = {
+                        "clase": "HECHOS_INVALIDOS",
+                        "detalle": (
+                            "la clave 'hechos' debe contener un diccionario"
+                        ),
+                        "pasada": pasada,
+                    }
+
+                    _evento(
+                        fase="FALLO",
+                        modulo=nombre_mod,
+                        clase="HECHOS_INVALIDOS",
+                        detalle=(
+                            "resultado['hechos'] no es un diccionario"
+                        ),
+                        pasada=pasada,
+                    )
+
+                    continue
+
+                # ----------------------------------------------------------
+                # ADVANCING
+                # ----------------------------------------------------------
+                estado = "ADVANCING"
+
+                nuevos = _absorber(
+                    nombre_mod,
+                    publicados,
                 )
 
-                estado = "ADVANCING"
-                nuevos = _absorber(nombre_mod, publicados)
                 if nuevos:
                     aportaron.add(nombre_mod)
+
                 nuevos_en_pasada += len(nuevos)
 
                 _evento(
                     fase="APORTE",
                     modulo=nombre_mod,
                     pasada=pasada,
-                    publica=nuevos,
+                    publica=list(nuevos),
                     ejecutadas=(
                         resultado.get("ejecutadas")
                         if isinstance(resultado, dict)
@@ -3092,62 +3269,67 @@ class Engine:
                     ),
                 )
 
+            # --------------------------------------------------------------
+            # CONVERGENCIA
+            # --------------------------------------------------------------
             if nuevos_en_pasada == 0:
                 break
 
         # ------------------------------------------------------------------
-        # 3. CIERRE
+        # 4. TERMINACIÓN
         # ------------------------------------------------------------------
-        punto_fijo = pasada < max_pasadas
+        punto_fijo = (
+            pasada < max_pasadas
+            and pasada > 0
+        )
 
         if fallos and len(fallos) == len(proveedores):
             estado = "RECHAZADO"
-        elif fallos or not punto_fijo:
+
+        elif not punto_fijo:
             estado = "PARCIAL"
+
+        elif fallos:
+            estado = "PARCIAL"
+
         else:
             estado = "EXITO"
+
+        diagnostico: Optional[Dict[str, Any]] = None
+
+        if estado != "EXITO":
+            if estado == "RECHAZADO":
+                causa = "TODOS_LOS_PROVEEDORES_FALLARON"
+
+            elif not punto_fijo:
+                causa = "PUNTO_FIJO_NO_ALCANZADO"
+
+            else:
+                causa = "PROVEEDORES_CON_FALLO"
+
+            diagnostico = {
+                "causa": causa,
+                "fallos": dict(fallos),
+                "sin_aporte": sorted(
+                    set(proveedores)
+                    - aportaron
+                    - set(fallos)
+                ),
+            }
 
         _evento(
             fase="CIERRE",
             pasadas=pasada,
             punto_fijo=punto_fijo,
-            hechos=len(hechos),
+            hechos=len(hechos_out),
         )
 
-        diagnostico: Optional[Dict[str, Any]] = None
-        if estado != "EXITO":
-            diagnostico = {
-                "causa": (
-                    "TODOS_LOS_PROVEEDORES_FALLARON"
-                    if estado == "RECHAZADO"
-                    else (
-                        "PUNTO_FIJO_NO_ALCANZADO"
-                        if not punto_fijo
-                        else "PROVEEDORES_CON_FALLO"
-                    )
-                ),
-                "fallos": dict(fallos),
-                "sin_aporte": sorted(
-                    set(proveedores) - aportaron - set(fallos)
-                ),
-            }
-
-        return {
-            "estado": estado,
-            "operacion": "evaluar_universal_todos",
-            "hechos": dict(hechos),
-            "origen": dict(origen),
-            "modulos": {
-                "proveedores": list(proveedores),
-                "aportaron": sorted(aportaron),
-                "fallaron": sorted(fallos),
-            },
-            "pasadas": pasada,
-            "punto_fijo": punto_fijo,
-            "conflictos": conflictos,
-            "traza": traza,
-            "diagnostico": diagnostico,
-        }
+        return _expediente(
+            estado_final=estado,
+            diagnostico=diagnostico,
+            pasadas=pasada,
+            punto_fijo=punto_fijo,
+        )
 
  
     # ===========================================================

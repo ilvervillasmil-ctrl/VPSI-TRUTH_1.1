@@ -1756,6 +1756,7 @@ def verificar() -> Dict[str, Any]:
 # ===============================================================
 # FIN 8.4
 # ===============================================================
+
 # ===============================================================
 # 8.5 — CALCULAR C
 # ===============================================================
@@ -2622,6 +2623,13 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         9. registra el cálculo en historial;
         10. devuelve el resultado completo.
 
+    Contrato de salida (C, L, K en la raíz):
+        id_calculo, C, L, K, precision, errores, advertencias,
+        metodo, evidencia, id_evidencias, versiones_utilizadas,
+        contratos_utilizados, modulos_consultados,
+        capacidades_consultadas, centinela, inicio, fin,
+        duracion_ms, version_ca, esquema
+
     No inventa fórmulas.
     No modifica C, L ni K.
     No sustituye una capacidad ausente.
@@ -2643,9 +2651,7 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "L": representar(None, PRECISION_DECIMAL_DEFAULT),
             "K": representar(None, PRECISION_DECIMAL_DEFAULT),
             "precision": PRECISION_DECIMAL_DEFAULT,
-            "errores": [
-                "Peticion invalida: se esperaba dict"
-            ],
+            "errores": ["Peticion invalida: se esperaba dict"],
             "advertencias": [],
             "metodo": None,
             "evidencia": [],
@@ -2656,9 +2662,7 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "capacidades_consultadas": [],
             "centinela": {
                 "ok": False,
-                "problemas": [
-                    "Peticion invalida: se esperaba dict"
-                ],
+                "problemas": ["Peticion invalida: se esperaba dict"],
             },
             "inicio": t0.isoformat(),
             "fin": datetime.now(timezone.utc).isoformat(),
@@ -2672,21 +2676,15 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # -----------------------------------------------------------
     # 8.9.2 — MÉTODO
     # -----------------------------------------------------------
-    metodo = str(
-        peticion.get("metodo") or "operacional"
-    )
+    metodo = str(peticion.get("metodo") or "operacional")
 
     # -----------------------------------------------------------
     # 8.9.3 — PRECISIÓN
     # -----------------------------------------------------------
     try:
-        prec = int(
-            peticion.get("precision")
-            or PRECISION_DECIMAL_DEFAULT
-        )
+        prec = int(peticion.get("precision") or PRECISION_DECIMAL_DEFAULT)
     except (TypeError, ValueError):
         prec = PRECISION_DECIMAL_DEFAULT
-
     if prec < 0:
         prec = PRECISION_DECIMAL_DEFAULT
 
@@ -2694,25 +2692,16 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # 8.9.4 — IDENTIDAD DEL CÁLCULO
     # -----------------------------------------------------------
     id_calculo = _nuevo_id_calculo()
-
     errores: List[str] = []
     advertencias: List[str] = []
 
     # -----------------------------------------------------------
     # 8.9.5 — VALIDACIÓN DE EVIDENCIA ENTRANTE
     # -----------------------------------------------------------
-    val_ev = validar_evidencia(
-        peticion.get("evidencia")
-    )
-
-    evidencia = list(
-        val_ev.get("evidencia_normalizada") or []
-    )
-
+    val_ev = validar_evidencia(peticion.get("evidencia"))
+    evidencia = list(val_ev.get("evidencia_normalizada") or [])
     if not val_ev.get("ok"):
-        errores.extend(
-            val_ev.get("problemas") or []
-        )
+        errores.extend(val_ev.get("problemas") or [])
 
     # -----------------------------------------------------------
     # 8.9.6 — PREPARACIÓN ÚNICA DE CONTEOS
@@ -2722,15 +2711,10 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             peticion = _asegurar_conteos(peticion)
         except Exception as e:  # noqa: BLE001
             errores.append(
-                "Error preparando conteos: {0}: {1}".format(
-                    type(e).__name__,
-                    e,
-                )
+                "Error preparando conteos: {0}: {1}".format(type(e).__name__, e)
             )
 
-    meta_conteos = peticion.get(
-        "_conteos_meta"
-    )
+    meta_conteos = peticion.get("_conteos_meta")
 
     # -----------------------------------------------------------
     # 8.9.7 — PETICIÓN NORMALIZADA PARA LAS CAPACIDADES
@@ -2750,10 +2734,7 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "C": representar(None, prec),
             "ruta": metodo,
             "notas": [
-                "Excepcion en calcular_C: {0}: {1}".format(
-                    type(e).__name__,
-                    e,
-                )
+                "Excepcion en calcular_C: {0}: {1}".format(type(e).__name__, e)
             ],
             "evidencia": [],
         }
@@ -2768,10 +2749,7 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "L": representar(None, prec),
             "ruta": metodo,
             "notas": [
-                "Excepcion en calcular_L: {0}: {1}".format(
-                    type(e).__name__,
-                    e,
-                )
+                "Excepcion en calcular_L: {0}: {1}".format(type(e).__name__, e)
             ],
             "evidencia": [],
         }
@@ -2786,16 +2764,13 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "K": representar(None, prec),
             "ruta": metodo,
             "notas": [
-                "Excepcion en calcular_K: {0}: {1}".format(
-                    type(e).__name__,
-                    e,
-                )
+                "Excepcion en calcular_K: {0}: {1}".format(type(e).__name__, e)
             ],
             "evidencia": [],
         }
 
     # -----------------------------------------------------------
-    # 8.9.11 — RESULTADOS DE LOS FACTORES
+    # 8.9.11 — RESULTADOS DE LOS FACTORES (RAÍZ)
     # -----------------------------------------------------------
     C = out_c.get("C")
     L = out_l.get("L")
@@ -2806,18 +2781,11 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # -----------------------------------------------------------
     ev_all: List[Dict[str, Any]] = []
     vistos_ev = set()
-
-    for bloque in (
-        out_c,
-        out_l,
-        out_k,
-    ):
+    for bloque in (out_c, out_l, out_k):
         for e in bloque.get("evidencia") or []:
             eid = e.get("id_evidencia")
-
             if eid is None:
                 continue
-
             if eid not in vistos_ev:
                 vistos_ev.add(eid)
                 ev_all.append(e)
@@ -2825,72 +2793,43 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # -----------------------------------------------------------
     # 8.9.13 — CONSOLIDACIÓN DE NOTAS Y ERRORES
     # -----------------------------------------------------------
-    for nombre_factor, bloque in (
-        ("C", out_c),
-        ("L", out_l),
-        ("K", out_k),
-    ):
-        notas = bloque.get("notas") or []
-
-        for nota in notas:
+    for nombre_factor, bloque in (("C", out_c), ("L", out_l), ("K", out_k)):
+        for nota in (bloque.get("notas") or []):
             texto = str(nota)
-
             if (
                 "Error" in texto
                 or "Excepcion" in texto
                 or "no disponible" in texto
                 or "invalida" in texto
             ):
-                errores.append(
-                    "{0}: {1}".format(
-                        nombre_factor,
-                        texto,
-                    )
-                )
+                errores.append("{0}: {1}".format(nombre_factor, texto))
             else:
-                advertencias.append(
-                    "{0}: {1}".format(
-                        nombre_factor,
-                        texto,
-                    )
-                )
+                advertencias.append("{0}: {1}".format(nombre_factor, texto))
 
     # -----------------------------------------------------------
     # 8.9.14 — VERSIONES Y CONTRATOS UTILIZADOS
     # -----------------------------------------------------------
     versiones_utilizadas: Dict[str, str] = {}
     contratos_utilizados: Dict[str, str] = {}
-
     for e in ev_all:
         mod = e.get("modulo")
-
         if mod and e.get("version_modulo"):
-            versiones_utilizadas[
-                str(mod)
-            ] = str(e["version_modulo"])
-
+            versiones_utilizadas[str(mod)] = str(e["version_modulo"])
         if mod and e.get("version_contrato"):
-            contratos_utilizados[
-                str(mod)
-            ] = str(e["version_contrato"])
+            contratos_utilizados[str(mod)] = str(e["version_contrato"])
 
     # -----------------------------------------------------------
     # 8.9.15 — TRAZABILIDAD DE CAPACIDADES
     # -----------------------------------------------------------
     modulos_consultados = sorted({
-        str(e.get("modulo"))
-        for e in ev_all
-        if e.get("modulo")
+        str(e.get("modulo")) for e in ev_all if e.get("modulo")
     })
-
     capacidades_consultadas = sorted({
-        str(e.get("capacidad"))
-        for e in ev_all
-        if e.get("capacidad")
+        str(e.get("capacidad")) for e in ev_all if e.get("capacidad")
     })
 
     # -----------------------------------------------------------
-    # 8.9.16 — SALIDA BASE
+    # 8.9.16 — SALIDA BASE (C, L, K EN LA RAÍZ)
     # -----------------------------------------------------------
     salida: Dict[str, Any] = {
         "id_calculo": id_calculo,
@@ -2923,7 +2862,6 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # 8.9.18 — ESCALA SOLICITADA
     # -----------------------------------------------------------
     escala_id = _id_escala_pedido(peticion)
-
     if escala_id:
         try:
             inv = leer_ids_escala()
@@ -2937,17 +2875,10 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
         conocidos = inv.get("ids") or []
         conocido = escala_id in conocidos
-
         desc = None
-
-        if (
-            _ESCALAS
-            and callable(_ESCALAS.get("por_id"))
-        ):
+        if _ESCALAS and callable(_ESCALAS.get("por_id")):
             try:
-                desc = _ESCALAS["por_id"](
-                    escala_id
-                )
+                desc = _ESCALAS["por_id"](escala_id)
             except Exception:
                 desc = None
 
@@ -2956,32 +2887,18 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "conocido": conocido,
             "ids_disponibles": list(conocidos),
         }
-
         if isinstance(desc, dict):
-            escala_meta["material"] = desc.get(
-                "material"
-            )
-            escala_meta["nombre"] = desc.get(
-                "nombre"
-            )
-
+            escala_meta["material"] = desc.get("material")
+            escala_meta["nombre"] = desc.get("nombre")
         salida["escala"] = escala_meta
 
     # -----------------------------------------------------------
     # 8.9.19 — CENTINELA DE RESULTADO
     # -----------------------------------------------------------
-    cent = _centinela_resultado(
-        salida,
-        peticion,
-        ev_all,
-    )
-
+    cent = _centinela_resultado(salida, peticion, ev_all)
     salida["centinela"] = cent
-
     if not cent.get("ok"):
-        salida["errores"] = list(
-            salida.get("errores") or []
-        ) + list(
+        salida["errores"] = list(salida.get("errores") or []) + list(
             cent.get("problemas") or []
         )
 
@@ -2989,28 +2906,21 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # 8.9.20 — METADATOS DE EJECUCIÓN
     # -----------------------------------------------------------
     t1 = datetime.now(timezone.utc)
-
     salida["inicio"] = t0.isoformat()
     salida["fin"] = t1.isoformat()
-    salida["duracion_ms"] = int(
-        (t1 - t0).total_seconds() * 1000
-    )
+    salida["duracion_ms"] = int((t1 - t0).total_seconds() * 1000)
     salida["version_ca"] = VERSION_MODULO
     salida["esquema"] = ESQUEMA_CONTRATO
 
     # -----------------------------------------------------------
     # 8.9.21 — REGISTRO DE EVIDENCIA
     # -----------------------------------------------------------
-    _EVIDENCIA_POR_CALC[
-        id_calculo
-    ] = ev_all
+    _EVIDENCIA_POR_CALC[id_calculo] = ev_all
 
     # -----------------------------------------------------------
     # 8.9.22 — HISTORIAL
     # -----------------------------------------------------------
-    def _resumen_factor(
-        factor: Any,
-    ) -> Dict[str, Any]:
+    def _resumen_factor(factor: Any) -> Dict[str, Any]:
         if not isinstance(factor, dict):
             return {
                 "fraccion": None,
@@ -3019,23 +2929,12 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
                 "decimal": None,
                 "display": None,
             }
-
         return {
-            "fraccion": factor.get(
-                "fraccion"
-            ),
-            "numerador": factor.get(
-                "numerador"
-            ),
-            "denominador": factor.get(
-                "denominador"
-            ),
-            "decimal": factor.get(
-                "decimal"
-            ),
-            "display": factor.get(
-                "display"
-            ),
+            "fraccion": factor.get("fraccion"),
+            "numerador": factor.get("numerador"),
+            "denominador": factor.get("denominador"),
+            "decimal": factor.get("decimal"),
+            "display": factor.get("display"),
         }
 
     _HISTORIAL.append({
@@ -3047,30 +2946,14 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
             "L": _resumen_factor(L),
             "K": _resumen_factor(K),
         },
-        "id_evidencias": list(
-            salida["id_evidencias"]
-        ),
-        "modulos_consultados": list(
-            modulos_consultados
-        ),
-        "capacidades_consultadas": list(
-            capacidades_consultadas
-        ),
-        "versiones_utilizadas": dict(
-            versiones_utilizadas
-        ),
-        "contratos_utilizados": dict(
-            contratos_utilizados
-        ),
-        "centinela_ok": bool(
-            cent.get("ok")
-        ),
-        "errores": list(
-            salida.get("errores") or []
-        ),
-        "duracion_ms": salida[
-            "duracion_ms"
-        ],
+        "id_evidencias": list(salida["id_evidencias"]),
+        "modulos_consultados": list(modulos_consultados),
+        "capacidades_consultadas": list(capacidades_consultadas),
+        "versiones_utilizadas": dict(versiones_utilizadas),
+        "contratos_utilizados": dict(contratos_utilizados),
+        "centinela_ok": bool(cent.get("ok")),
+        "errores": list(salida.get("errores") or []),
+        "duracion_ms": salida["duracion_ms"],
         "escala_id": escala_id,
         "precision": prec,
     })
@@ -3080,41 +2963,24 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     # -----------------------------------------------------------
     if salida["errores"]:
         try:
-            from core.diagnostico import (
-                DiagnosticoGlobal
-            )  # type: ignore
-
-            recibir = getattr(
-                DiagnosticoGlobal,
-                "recibir_reporte",
-                None,
-            )
-
+            from core.diagnostico import DiagnosticoGlobal  # type: ignore
+            recibir = getattr(DiagnosticoGlobal, "recibir_reporte", None)
             if callable(recibir):
                 recibir(
                     NOMBRE_MODULO,
                     [
-                        {
-                            "tipo": "error_calculo",
-                            "detalle": error,
-                        }
-                        for error in salida[
-                            "errores"
-                        ]
+                        {"tipo": "error_calculo", "detalle": error}
+                        for error in salida["errores"]
                     ],
                 )
             else:
                 advertencias.append(
-                    "DiagnosticoGlobal.reci" 
-                    "bir_reporte no es callable"
+                    "DiagnosticoGlobal.recibir_reporte no es callable"
                 )
-
         except Exception as e:  # noqa: BLE001
             advertencias.append(
-                "DiagnosticoGlobal no disponible: "
-                "{0}: {1}".format(
-                    type(e).__name__,
-                    e,
+                "DiagnosticoGlobal no disponible: {0}: {1}".format(
+                    type(e).__name__, e
                 )
             )
 
@@ -3127,44 +2993,37 @@ def calcular(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 # ===============================================================
 # FIN 8.9
 # ===============================================================
+
+
 # ===============================================================
 # 8.10 — EXPLICAR CÁLCULO
 # ===============================================================
 
-def explicar_calculo(
-    id_calculo: str,
-) -> Optional[Dict[str, Any]]:
+def explicar_calculo(id_calculo: str) -> Optional[Dict[str, Any]]:
     """
     Explicación determinista de un cálculo previamente registrado.
 
     La explicación se reconstruye exclusivamente desde:
-        1. id_calculo;
-        2. _HISTORIAL;
-        3. _EVIDENCIA_POR_CALC;
-        4. _REG_EVIDENCIA.
+        1. id_calculo
+        2. _HISTORIAL
+        3. _EVIDENCIA_POR_CALC
+        4. _REG_EVIDENCIA
 
     No ejecuta nuevamente C, L ni K.
     No modifica el cálculo.
-    No inventa evidencia.
-    No inventa módulos.
-    No inventa capacidades.
+    No inventa evidencia, módulos ni capacidades.
     No sustituye evidencia faltante por texto descriptivo.
 
-    Las fórmulas explicativas corresponden al contrato matemático
-    existente:
-
+    Fórmulas contractuales:
         C = 1 - k/m
         L = 1 - r/p
         K = 1 - f/c
-
-    La función explica el cálculo registrado; no vuelve a calcularlo.
     """
 
     # -----------------------------------------------------------
     # 8.10.1 — IDENTIFICACIÓN DEL CÁLCULO
     # -----------------------------------------------------------
     key = str(id_calculo or "").strip()
-
     if not key:
         return None
 
@@ -3172,69 +3031,47 @@ def explicar_calculo(
     # 8.10.2 — LOCALIZACIÓN EN HISTORIAL
     # -----------------------------------------------------------
     item = None
-
     for h in reversed(_HISTORIAL):
         if h.get("id_calculo") == key:
             item = h
             break
-
     if item is None:
         return None
 
     # -----------------------------------------------------------
     # 8.10.3 — RECUPERACIÓN DE EVIDENCIA
     # -----------------------------------------------------------
-    evidencia = list(
-        _EVIDENCIA_POR_CALC.get(key) or []
-    )
-
-    # Si no existe evidencia directa asociada al cálculo,
-    # reconstruirla exclusivamente mediante los IDs registrados
-    # en el historial.
+    evidencia = list(_EVIDENCIA_POR_CALC.get(key) or [])
     if not evidencia:
         for eid in item.get("id_evidencias") or []:
             if eid in _REG_EVIDENCIA:
-                evidencia.append(
-                    _REG_EVIDENCIA[eid]
-                )
+                evidencia.append(_REG_EVIDENCIA[eid])
 
     # -----------------------------------------------------------
     # 8.10.4 — CLASIFICACIÓN CONTRACTUAL POR CAPACIDAD EXACTA
     # -----------------------------------------------------------
-    por_factor: Dict[
-        str,
-        List[Dict[str, Any]]
-    ] = {
+    por_factor: Dict[str, List[Dict[str, Any]]] = {
         "C": [],
         "L": [],
         "K": [],
     }
-
     otros: List[Dict[str, Any]] = []
-
     for e in evidencia:
         capacidad = e.get("capacidad")
-
         if capacidad == "calcular_C":
             por_factor["C"].append(e)
-
         elif capacidad == "calcular_L":
             por_factor["L"].append(e)
-
         elif capacidad == "calcular_K":
             por_factor["K"].append(e)
-
         else:
             otros.append(e)
 
     # -----------------------------------------------------------
     # 8.10.5 — REPRESENTACIÓN DETERMINISTA DE EVIDENCIA
     # -----------------------------------------------------------
-    def _lineas(
-        evs: List[Dict[str, Any]]
-    ) -> List[str]:
+    def _lineas(evs: List[Dict[str, Any]]) -> List[str]:
         lineas: List[str] = []
-
         for e in evs:
             lineas.append(
                 "{0}.{1} aporte={2} version={3}".format(
@@ -3244,14 +3081,12 @@ def explicar_calculo(
                     e.get("version_modulo"),
                 )
             )
-
         return lineas
 
     # -----------------------------------------------------------
     # 8.10.6 — RESULTADO REGISTRADO
     # -----------------------------------------------------------
     resultado = item.get("resultado") or {}
-
     C = resultado.get("C")
     L = resultado.get("L")
     K = resultado.get("K")
@@ -3259,43 +3094,27 @@ def explicar_calculo(
     # -----------------------------------------------------------
     # 8.10.7 — EXTRACCIÓN SEGURA DEL DISPLAY
     # -----------------------------------------------------------
-    def _display(
-        factor: Any
-    ) -> Optional[Any]:
+    def _display(factor: Any) -> Optional[Any]:
         if not isinstance(factor, dict):
             return None
-
         return factor.get("display")
 
     # -----------------------------------------------------------
     # 8.10.8 — EXTRACCIÓN DE VARIABLES REGISTRADAS
     # -----------------------------------------------------------
-    def _variables_factor(
-        evs: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    def _variables_factor(evs: List[Dict[str, Any]]) -> Dict[str, Any]:
         variables: Dict[str, Any] = {}
-
         for e in evs:
             datos = e.get("variables")
-
             if isinstance(datos, dict):
                 for nombre, valor in datos.items():
                     if nombre not in variables:
                         variables[nombre] = valor
-
         return variables
 
-    variables_C = _variables_factor(
-        por_factor["C"]
-    )
-
-    variables_L = _variables_factor(
-        por_factor["L"]
-    )
-
-    variables_K = _variables_factor(
-        por_factor["K"]
-    )
+    variables_C = _variables_factor(por_factor["C"])
+    variables_L = _variables_factor(por_factor["L"])
+    variables_K = _variables_factor(por_factor["K"])
 
     # -----------------------------------------------------------
     # 8.10.9 — EXPLICACIÓN CONTRACTUAL DE C
@@ -3304,9 +3123,7 @@ def explicar_calculo(
         "formula": "C = 1 - k/m",
         "display": _display(C),
         "variables": variables_C,
-        "evidencia": _lineas(
-            por_factor["C"]
-        ),
+        "evidencia": _lineas(por_factor["C"]),
     }
 
     # -----------------------------------------------------------
@@ -3316,9 +3133,7 @@ def explicar_calculo(
         "formula": "L = 1 - r/p",
         "display": _display(L),
         "variables": variables_L,
-        "evidencia": _lineas(
-            por_factor["L"]
-        ),
+        "evidencia": _lineas(por_factor["L"]),
     }
 
     # -----------------------------------------------------------
@@ -3328,9 +3143,7 @@ def explicar_calculo(
         "formula": "K = 1 - f/c",
         "display": _display(K),
         "variables": variables_K,
-        "evidencia": _lineas(
-            por_factor["K"]
-        ),
+        "evidencia": _lineas(por_factor["K"]),
     }
 
     # -----------------------------------------------------------
@@ -3346,21 +3159,12 @@ def explicar_calculo(
     # 8.10.13 — ESTADO DE INFORMACIÓN DISPONIBLE
     # -----------------------------------------------------------
     faltantes: List[str] = []
-
     if not por_factor["C"]:
-        faltantes.append(
-            "evidencia de calcular_C"
-        )
-
+        faltantes.append("evidencia de calcular_C")
     if not por_factor["L"]:
-        faltantes.append(
-            "evidencia de calcular_L"
-        )
-
+        faltantes.append("evidencia de calcular_L")
     if not por_factor["K"]:
-        faltantes.append(
-            "evidencia de calcular_K"
-        )
+        faltantes.append("evidencia de calcular_K")
 
     # -----------------------------------------------------------
     # 8.10.14 — SALIDA
@@ -3368,59 +3172,22 @@ def explicar_calculo(
     return {
         "id_calculo": key,
         "resultado": resultado,
-
         "C": explicacion_C,
         "L": explicacion_L,
         "K": explicacion_K,
-
-        "evidencia_adicional": _lineas(
-            otros
-        ),
-
-        "modulos_consultados": item.get(
-            "modulos_consultados"
-        ),
-
-        "capacidades_consultadas": item.get(
-            "capacidades_consultadas"
-        ),
-
-        "versiones_utilizadas": item.get(
-            "versiones_utilizadas"
-        ),
-
-        "contratos_utilizados": item.get(
-            "contratos_utilizados"
-        ),
-
+        "evidencia_adicional": _lineas(otros),
+        "modulos_consultados": item.get("modulos_consultados"),
+        "capacidades_consultadas": item.get("capacidades_consultadas"),
+        "versiones_utilizadas": item.get("versiones_utilizadas"),
+        "contratos_utilizados": item.get("contratos_utilizados"),
         "evidencia": evidencia,
-
         "anclas": anclas,
-
-        "centinela_ok": item.get(
-            "centinela_ok"
-        ),
-
-        "errores": item.get(
-            "errores"
-        ),
-
-        "timestamp": item.get(
-            "timestamp"
-        ),
-
-        "duracion_ms": item.get(
-            "duracion_ms"
-        ),
-
-        "precision": item.get(
-            "precision"
-        ),
-
-        "evidencia_completa": not bool(
-            faltantes
-        ),
-
+        "centinela_ok": item.get("centinela_ok"),
+        "errores": item.get("errores"),
+        "timestamp": item.get("timestamp"),
+        "duracion_ms": item.get("duracion_ms"),
+        "precision": item.get("precision"),
+        "evidencia_completa": not bool(faltantes),
         "evidencia_faltante": faltantes,
     }
 

@@ -2661,7 +2661,7 @@ class Engine:
 
                 # Resolución de dependencias cruzadas implícitas (Tru_Ri)
                 if "Tru_Ri" in params_firma and "Tru_Ri" not in data:
-                    salida_ri = self.ejecutar_capacidad("FO", "tru_ri", {"C": C_frac, "L": L_frac, "K": K_frac})
+                    salida_ri = self.ejecutar_capacidad("FO", "tru_ri", **{"C": C_frac, "L": L_frac, "K": K_frac})
                     res_ri = self._resultado_exito(salida_ri, "FO.tru_ri")
                     data["Tru_Ri"] = _resolver_a_fraction(res_ri)
 
@@ -2680,7 +2680,7 @@ class Engine:
                             argumentos_ejecucion[nombre_param] = None
 
                 # Ejecución de la verdad en FO inyectando la firma exacta construida
-                salida = self.ejecutar_capacidad("FO", "tru_total", argumentos_ejecucion)
+                salida = self.ejecutar_capacidad("FO", "tru_total", **argumentos_ejecucion)
                 resultado = self._resultado_exito(salida, "FO.tru_total")
                 
                 return {

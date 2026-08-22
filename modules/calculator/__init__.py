@@ -2033,34 +2033,26 @@ def calcular_C(
 # 8.6 — CALCULAR L
 # ===============================================================
 
-def calcular_L(
-    peticion: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+def calcular_L(peticion: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
-    Ejecuta exclusivamente el cálculo contractual del factor L.
+    Cálculo contractual exclusivo del factor L.
 
-    Fórmula contractual ejecutada por la API L:
+    Fórmula:
         L = 1 - r/p
 
-    Correspondencia de variables:
-        p = posturas
-        r = reversiones
+    Variables:
+        p = posturas (base)
+        r = reversiones (peso sobre la base)
 
-    Flujo determinista:
-        entrada
-        → método
-        → precisión
-        → conteos cuando corresponde
-        → evidencia
-        → API L
-        → resultado L
-        → normalización
-        → representación
-        → salida.
+    Dominio estricto:
+        p > 0
+        0 ≤ r ≤ p
+        L ∈ [0, 1] como Fraction
 
     No calcula C ni K.
-    No implementa una fórmula paralela.
-    No sustituye una API L ausente.
+    No admite UNDEFINED.
+    No inventa base.
+    Si el dominio no se cumple, la capacidad rechaza con notas y L nulo de representación.
     """
 
     # -----------------------------------------------------------
@@ -2070,16 +2062,11 @@ def calcular_L(
         peticion = {}
     elif not isinstance(peticion, dict):
         return {
-            "L": representar(
-                None,
-                PRECISION_DECIMAL_DEFAULT,
-            ),
+            "L": representar(None, PRECISION_DECIMAL_DEFAULT),
             "p": None,
             "r": None,
             "ruta": None,
-            "notas": [
-                "Peticion invalida: se esperaba dict"
-            ],
+            "notas": ["Peticion invalida: se esperaba dict"],
             "evidencia": [],
         }
     else:
@@ -2088,35 +2075,26 @@ def calcular_L(
     # -----------------------------------------------------------
     # 8.6.2 — MÉTODO
     # -----------------------------------------------------------
-    metodo = str(
-        peticion.get("metodo") or "operacional"
-    )
+    metodo = str(peticion.get("metodo") or "operacional")
 
     # -----------------------------------------------------------
     # 8.6.3 — PRECISIÓN
     # -----------------------------------------------------------
     try:
-        prec = int(
-            peticion.get("precision")
-            or PRECISION_DECIMAL_DEFAULT
-        )
+        prec = int(peticion.get("precision") or PRECISION_DECIMAL_DEFAULT)
     except (TypeError, ValueError):
         prec = PRECISION_DECIMAL_DEFAULT
-
     if prec < 0:
         prec = PRECISION_DECIMAL_DEFAULT
 
     # -----------------------------------------------------------
-    # 8.6.4 — CONTEOS
+    # 8.6.4 — CONTEOS (solo método operacional)
     # -----------------------------------------------------------
     if metodo == "operacional":
         try:
             peticion = _asegurar_conteos(peticion)
         except Exception as e:  # noqa: BLE001
-            evidencia = _normalizar_evidencia(
-                peticion.get("evidencia")
-            )
-
+            evidencia = _normalizar_evidencia(peticion.get("evidencia"))
             evidencia.append({
                 "id_evidencia": _nuevo_id_evidencia(),
                 "modulo": NOMBRE_MODULO,
@@ -2126,28 +2104,21 @@ def calcular_L(
                 "version_contrato": VERSION_CONTRATO,
                 "rechazado": True,
             })
-
-            for e in evidencia:
-                _REG_EVIDENCIA[e["id_evidencia"]] = e
-
+            for item in evidencia:
+                _REG_EVIDENCIA[item["id_evidencia"]] = item
             return {
                 "L": representar(None, prec),
                 "p": None,
                 "r": None,
                 "ruta": metodo,
-                "notas": [
-                    "Error preparando conteos para L: {0}".format(e)
-                ],
+                "notas": ["Error preparando conteos para L: {0}".format(e)],
                 "evidencia": evidencia,
             }
 
     # -----------------------------------------------------------
     # 8.6.5 — EVIDENCIA
     # -----------------------------------------------------------
-    evidencia = _normalizar_evidencia(
-        peticion.get("evidencia")
-    )
-
+    evidencia = _normalizar_evidencia(peticion.get("evidencia"))
     evidencia.append({
         "id_evidencia": _nuevo_id_evidencia(),
         "modulo": NOMBRE_MODULO,
@@ -2157,31 +2128,26 @@ def calcular_L(
         "version_contrato": VERSION_CONTRATO,
         "rechazado": False,
     })
-
-    for e in evidencia:
-        _REG_EVIDENCIA[e["id_evidencia"]] = e
+    for item in evidencia:
+        _REG_EVIDENCIA[item["id_evidencia"]] = item
 
     # -----------------------------------------------------------
-    # 8.6.6 — RESOLUCIÓN DE API L
+    # 8.6.6 — API L
     # -----------------------------------------------------------
     fn = _APIS.get("L")
-
     if not callable(fn):
         evidencia[-1]["rechazado"] = True
-
         return {
             "L": representar(None, prec),
             "p": None,
             "r": None,
             "ruta": None,
-            "notas": [
-                "API L no disponible"
-            ],
+            "notas": ["API L no disponible"],
             "evidencia": evidencia,
         }
 
     # -----------------------------------------------------------
-    # 8.6.7 — EJECUCIÓN DE API L
+    # 8.6.7 — EJECUCIÓN
     # -----------------------------------------------------------
     try:
         if _acepta_dict(fn):
@@ -2189,49 +2155,36 @@ def calcular_L(
         else:
             raw = fn(
                 posturas=peticion.get("posturas"),
-                reversiones=peticion.get(
-                    "reversiones"
-                ),
+                reversiones=peticion.get("reversiones"),
                 metodo=metodo,
             )
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
-
         return {
             "L": representar(None, prec),
             "p": None,
             "r": None,
             "ruta": metodo,
-            "notas": [
-                "Error en API L: {0}: {1}".format(
-                    type(e).__name__,
-                    e,
-                )
-            ],
+            "notas": ["Error en API L: {0}: {1}".format(type(e).__name__, e)],
             "evidencia": evidencia,
         }
 
     # -----------------------------------------------------------
-    # 8.6.8 — RESULTADO L
+    # 8.6.8 — EXTRACCIÓN
     # -----------------------------------------------------------
     p = None
     r = None
-
     if isinstance(raw, dict):
         if "L" not in raw:
             evidencia[-1]["rechazado"] = True
-
             return {
                 "L": representar(None, prec),
                 "p": None,
                 "r": None,
                 "ruta": metodo,
-                "notas": [
-                    "API L retorno dict sin campo 'L'"
-                ],
+                "notas": ["API L retorno dict sin campo 'L'"],
                 "evidencia": evidencia,
             }
-
         val = raw["L"]
         p = raw.get("p")
         r = raw.get("r")
@@ -2239,48 +2192,49 @@ def calcular_L(
         val = raw
 
     # -----------------------------------------------------------
-    # 8.6.9 — UNDEFINED
+    # 8.6.9 — DOMINIO ESTRICTO (sin UNDEFINED)
     # -----------------------------------------------------------
-    if es_undefined(val):
-        obj = representar(
-            UNDEFINED,
-            prec,
-        )
+    # p debe ser entero > 0. Sin base no hay L numérico: se rechaza.
+    try:
+        p_int = int(p) if p is not None else int(peticion.get("p") or 0)
+    except (TypeError, ValueError):
+        p_int = 0
 
+    if p_int <= 0:
+        evidencia[-1]["rechazado"] = True
         return {
-            "L": obj,
-            "p": p,
+            "L": representar(None, prec),
+            "p": p_int,
             "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": [
-                "L=UNDEFINED (AM-D6)"
-            ],
+            "notas": ["Dominio invalido para L: se exige p > 0"],
             "evidencia": evidencia,
         }
 
     # -----------------------------------------------------------
-    # 8.6.10 — NORMALIZACIÓN
+    # 8.6.10 — NORMALIZACIÓN A Fraction
     # -----------------------------------------------------------
     try:
-        fraccion = (
-            val
-            if isinstance(val, Fraction)
-            else _a_fraction(val)
-        )
+        fraccion = val if isinstance(val, Fraction) else _a_fraction(val)
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
-
         return {
             "L": representar(None, prec),
-            "p": p,
+            "p": p_int,
             "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": [
-                "Valor L no normalizable: {0}: {1}".format(
-                    type(e).__name__,
-                    e,
-                )
-            ],
+            "notas": ["Valor L no normalizable: {0}: {1}".format(type(e).__name__, e)],
+            "evidencia": evidencia,
+        }
+
+    if fraccion < Fraction(0) or fraccion > Fraction(1):
+        evidencia[-1]["rechazado"] = True
+        return {
+            "L": representar(None, prec),
+            "p": p_int,
+            "r": str(r) if r is not None else None,
+            "ruta": metodo,
+            "notas": ["L fuera de [0, 1]: {0}".format(fraccion)],
             "evidencia": evidencia,
         }
 
@@ -2288,24 +2242,15 @@ def calcular_L(
     # 8.6.11 — REPRESENTACIÓN
     # -----------------------------------------------------------
     try:
-        obj = representar(
-            fraccion,
-            prec,
-        )
+        obj = representar(fraccion, prec)
     except Exception as e:  # noqa: BLE001
         evidencia[-1]["rechazado"] = True
-
         return {
             "L": representar(None, prec),
-            "p": p,
+            "p": p_int,
             "r": str(r) if r is not None else None,
             "ruta": metodo,
-            "notas": [
-                "Error representando L: {0}: {1}".format(
-                    type(e).__name__,
-                    e,
-                )
-            ],
+            "notas": ["Error representando L: {0}: {1}".format(type(e).__name__, e)],
             "evidencia": evidencia,
         }
 
@@ -2314,7 +2259,7 @@ def calcular_L(
     # -----------------------------------------------------------
     return {
         "L": obj,
-        "p": p,
+        "p": p_int,
         "r": str(r) if r is not None else None,
         "ruta": metodo,
         "notas": [],
@@ -2325,7 +2270,6 @@ def calcular_L(
 # ===============================================================
 # FIN 8.6
 # ===============================================================
-
 
 # ===============================================================
 # 8.7 — CALCULAR K

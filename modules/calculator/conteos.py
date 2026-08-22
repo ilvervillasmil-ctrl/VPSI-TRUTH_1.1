@@ -1,38 +1,29 @@
-"""
-VPSI-TRUTH --- modules/calculator/conteos.py
-
-Productor de conteos operacionales.
-
-Version: 3.5
-
-Oficio unico:
-    texto + O_context  ->  {
-        compromisos, contradicciones,      # m, k  (C = 1 - k/m)
-        posturas, reversiones,             # p, r  (L = 1 - r/p)
-        afirmaciones, afirmaciones_falsas  # c, f  (K = 1 - f/c)
-    }
-
-No calcula C, L, K. No calcula Tru. No inventa factores.
-Sin componentes estocasticos: solo patrones fijos y aritmetica exacta.
-
-======================================================================
-NOTA DE ATRIBUCION
-
-Los axiomas viven en modules/axiomas/. Este archivo NO los cita.
-Las decisiones que siguen son DISENO DE ESTE MODULO y deben ser
-auditadas como tales por AX, no aceptadas como derivadas de el:
-
-  - la lista de stopwords y su agresividad
-  - los patrones de _SENALES_ADOPCION / _SENALES_ACTO
-  - los patrones de _PATRONES_CONTRADICCION y sus pesos (calibrados)
-  - el umbral _MIN_TOKENS_UNIDAD
-  - el corte por clausula en _SEPARADORES
-  - el umbral de solape en _peso_reversion
-  - la cascada de lectura de _leer_texto
-
-Si alguna contradice una declaracion de AX, manda AX.
-======================================================================
-"""
+# ===============================================================
+# VPSI-TRUTH --- modules/calculator/conteos.py
+# ===============================================================
+#
+# Productor de conteos operacionales y factores derivados C, L, K.
+#
+# Version: 3.5
+#
+# Oficio:
+#     texto + O_context -> {
+#         compromisos, contradicciones,      # m, k  -> C = 1 - k/m
+#         posturas, reversiones,             # p, r  -> L = 1 - r/p
+#         afirmaciones, afirmaciones_falsas, # c, f  -> K = 1 - f/c
+#         C, L, K
+#     }
+#
+# Sin componentes estocasticos: solo patrones fijos y aritmetica exacta.
+# No calcula Tru. Tru lo calcula FO a partir de C, L, K.
+#
+# ===============================================================
+# NOTA DE ATRIBUCION
+#
+# Los axiomas viven en modules/axiomas/. Este archivo NO los cita.
+# Las decisiones de patrones, stopwords y umbrales son diseno de
+# este modulo y deben ser auditadas por AX.
+# ===============================================================
 
 from __future__ import annotations
 
@@ -40,16 +31,16 @@ import re
 from fractions import Fraction
 from typing import Any, Dict, List, Optional, Tuple
 
-VERSION = "3.2"
+VERSION = "3.5"
 
 # ===============================================================
 # SEGMENTO 1 --- RETICULA DE SEVERIDAD
 # ===============================================================
 
-PESO_ROCE    = Fraction(1, 4)   # toca sin romper
-PESO_PARCIAL = Fraction(1, 2)   # rompe parte
-PESO_GRAVE   = Fraction(3, 4)   # rompe casi todo
-PESO_TOTAL   = Fraction(1, 1)   # anula
+PESO_ROCE = Fraction(1, 4)
+PESO_PARCIAL = Fraction(1, 2)
+PESO_GRAVE = Fraction(3, 4)
+PESO_TOTAL = Fraction(1, 1)
 
 RETICULA = (PESO_ROCE, PESO_PARCIAL, PESO_GRAVE, PESO_TOTAL)
 
@@ -72,18 +63,18 @@ def nombre_reticula(peso: Fraction) -> str:
 # ===============================================================
 
 _PATRONES_CONTRADICCION: Tuple[Tuple[str, Fraction], ...] = (
-    (r"\by\s+no\b",                 PESO_TOTAL),
-    (r"\bpero\s+no\b",              PESO_TOTAL),
-    (r"\bes\b.+\bno\s+es\b",        PESO_TOTAL),
-    (r"\bno\s+es\b.+\bes\b",        PESO_TOTAL),
-    (r"\bs[iÃ­]\s+y\s+no\b",         PESO_TOTAL),
-    (r"\bno\s+y\s+s[iÃ­]\b",         PESO_TOTAL),
-    (r"\bsin\s+embargo\b",          PESO_PARCIAL),
-    (r"\bno\s+obstante\b",          PESO_PARCIAL),
+    (r"\by\s+no\b", PESO_TOTAL),
+    (r"\bpero\s+no\b", PESO_TOTAL),
+    (r"\bes\b.+\bno\s+es\b", PESO_TOTAL),
+    (r"\bno\s+es\b.+\bes\b", PESO_TOTAL),
+    (r"\bs[ií]\s+y\s+no\b", PESO_TOTAL),
+    (r"\bno\s+y\s+s[ií]\b", PESO_TOTAL),
+    (r"\bsin\s+embargo\b", PESO_PARCIAL),
+    (r"\bno\s+obstante\b", PESO_PARCIAL),
     (r"\bpor\s+un\s+lado\b.+\bpor\s+(?:el\s+)?otro\b", PESO_PARCIAL),
-    (r"\baunque\b",                 PESO_ROCE),
-    (r"\bmas\s+no\b",               PESO_PARCIAL),
-    (r"\bsin\s+dejar\s+de\b",       PESO_ROCE),
+    (r"\baunque\b", PESO_ROCE),
+    (r"\bmas\s+no\b", PESO_PARCIAL),
+    (r"\bsin\s+dejar\s+de\b", PESO_ROCE),
 )
 
 _SENALES_ADOPCION = (
@@ -100,7 +91,7 @@ _SENALES_ADOPCION = (
     r"\bme\s+comprometo\b",
     r"\bestablezco\b",
     r"\badopto\b",
-    r"\bproh[iÃ­]bo\b",
+    r"\bproh[ií]bo\b",
     r"\bobligo\b",
     r"\bqueda\s+fijado\b",
     r"\bqueda\s+establecido\b",
@@ -114,27 +105,27 @@ _SENALES_ACTO = (
     r"\bpropongamos\b",
     r"\bintroduzcamos\b",
     r"\bintroduzco\b",
-    r"\bpodr[iÃ­]amos\b",
-    r"\bsugerir[iÃ­]a\b",
+    r"\bpodr[ií]amos\b",
+    r"\bsugerir[ií]a\b",
     r"\bsugiero\b",
     r"\bplanteo\b",
     r"\bte\s+invito\b",
     r"\bvamos\s+a\s+llamar\b",
     r"\bvamos\s+a\s+definir\b",
     r"\bdefinamos\b",
-    r"\bcreo\s+el\s+s[iÃ­]mbolo\b",
+    r"\bcreo\s+el\s+s[ií]mbolo\b",
     r"(?<!no\s)\binvento\b",
 )
 
 _SENALES_NO_PROPOSICION = (
     r"^\s*(?:si|cuando|aunque|mientras|donde|como)\b",
     r"\?\s*$",
-    r"^\s*(?:Â¿|Â¡)",
+    r"^\s*(?:¿|¡)",
 )
 
 _ACTO_CONTRA_COMPROMISO = re.compile(
     r"\bpropongo\b|\bpropongamos\b|\bintroduzco\b|\bintroduzcamos\b|"
-    r"\binvento\b|\bcreo\s+el\s+s[iÃ­]mbolo\b|\bdefinamos\b|\bplanteo\b"
+    r"\binvento\b|\bcreo\s+el\s+s[ií]mbolo\b|\bdefinamos\b|\bplanteo\b"
 )
 
 _RESTRICCION = re.compile(
@@ -142,23 +133,22 @@ _RESTRICCION = re.compile(
     r"\bno\s+modifico\b|\bno\s+altero\b|\bno\s+tomo\s+decisiones\b"
 )
 
-_NEGACION = re.compile(r"\bno\b|\bnunca\b|\bjam[aÃ¡]s\b|\btampoco\b")
+_NEGACION = re.compile(r"\bno\b|\bnunca\b|\bjam[aá]s\b|\btampoco\b")
 
 _SEPARADORES = re.compile(
     r"[.;:!?\n]+|"
     r",\s*|"
     r"\s+(?:pero|porque|aunque|mientras|sino|pues)\s+|"
-    r"\by\s+(?=[A-ZÃÃÃÃÃÂ¿Â¡])|"
-    r"\b(?:ademÃ¡s|asimismo|por\s+otra\s+parte)\b",
+    r"\by\s+(?=[A-ZÁÉÍÓÚ¿¡])|"
+    r"\b(?:además|asimismo|por\s+otra\s+parte)\b",
     re.IGNORECASE,
 )
 
-_TOKEN = re.compile(r"[a-zÃ¡Ã©Ã­Ã³ÃºÃ¼Ã±0-9/Î±Î²]+")
-_SIMBOLICO = re.compile(r"[0-9=+\-*/^Î±Î²]")
+_TOKEN = re.compile(r"[a-záéíóúüñ0-9/αβ]+")
+_SIMBOLICO = re.compile(r"[0-9=+\-*/^αβ]")
 
 _MIN_TOKENS_UNIDAD = 2
 _UMBRAL_SOLAPE_REVERSION = Fraction(1, 4)
-
 
 # ===============================================================
 # SEGMENTO 3 --- STOPWORDS (es)
@@ -169,38 +159,37 @@ _DICCIONARIO_STOP: frozenset = frozenset({
     "lo", "al", "del",
     "a", "ante", "bajo", "cabe", "con", "contra", "de", "desde",
     "durante", "en", "entre", "hacia", "hasta", "mediante", "para",
-    "por", "segÃºn", "sin", "so", "sobre", "tras", "versus", "vÃ­a",
+    "por", "según", "sin", "so", "sobre", "tras", "versus", "vía",
     "y", "e", "ni", "o", "u", "pero", "sino", "aunque", "porque",
     "pues", "que", "si", "como", "cuando", "mientras", "donde",
-    "ademÃ¡s", "asimismo", "tambiÃ©n", "tampoco",
-    "yo", "tÃº", "ella", "nosotros", "nosotras", "vosotros",
+    "además", "asimismo", "también", "tampoco",
+    "yo", "tú", "ella", "nosotros", "nosotras", "vosotros",
     "vosotras", "ellos", "ellas", "usted", "ustedes",
     "me", "te", "se", "nos", "os", "le", "les",
     "mi", "tu", "su", "mis", "tus", "sus", "nuestro", "nuestra",
     "nuestros", "nuestras", "vuestro", "vuestra",
-    "mÃ­o", "mÃ­a", "tuyo", "tuya", "suyo", "suya",
+    "mío", "mía", "tuyo", "tuya", "suyo", "suya",
     "este", "esta", "estos", "estas", "ese", "esa", "esos", "esas",
     "aquel", "aquella", "aquellos", "aquellas",
-    "esto", "eso", "aquello", "quiÃ©n", "quiÃ©nes", "cual", "cuales",
-    "cuyo", "cuya", "cuyos", "cuyas", "cuÃ¡nto", "cuÃ¡nta",
+    "esto", "eso", "aquello", "quién", "quiénes", "cual", "cuales",
+    "cuyo", "cuya", "cuyos", "cuyas", "cuánto", "cuánta",
     "ser", "estar", "haber", "tener", "ir", "hacer",
-    "es", "son", "era", "eran", "fue", "fueron", "serÃ¡", "serÃ¡n",
-    "estÃ¡", "estÃ¡n", "estaba", "estaban", "estuvo", "estuvieron",
-    "ha", "han", "habÃ­a", "habÃ­an", "hubo", "habrÃ¡",
-    "tiene", "tienen", "tenÃ­a", "tenÃ­an",
+    "es", "son", "era", "eran", "fue", "fueron", "será", "serán",
+    "está", "están", "estaba", "estaban", "estuvo", "estuvieron",
+    "ha", "han", "había", "habían", "hubo", "habrá",
+    "tiene", "tienen", "tenía", "tenían",
     "hay",
-    "no", "sÃ­", "ya", "aÃºn", "todavÃ­a", "siempre", "nunca", "jamÃ¡s",
-    "mÃ¡s", "menos", "muy", "mucho", "muchos", "muchas", "poco",
+    "no", "sí", "ya", "aún", "todavía", "siempre", "nunca", "jamás",
+    "más", "menos", "muy", "mucho", "muchos", "muchas", "poco",
     "pocos", "pocas", "todo", "todos", "todas", "nada", "algo",
     "alguien", "nadie", "cada", "cualquier", "cualquiera",
-    "aquÃ­", "allÃ­", "ahÃ­", "acÃ¡", "allÃ¡", "ahora", "despuÃ©s",
-    "antes", "luego", "entonces", "asÃ­", "bien", "mal",
-    "solo", "sÃ³lo", "solamente", "apenas", "casi", "tan", "tanto",
-    "etc", "etcÃ©tera", "vs",
+    "aquí", "allí", "ahí", "acá", "allá", "ahora", "después",
+    "antes", "luego", "entonces", "así", "bien", "mal",
+    "solo", "sólo", "solamente", "apenas", "casi", "tan", "tanto",
+    "etc", "etcétera", "vs",
 })
 
 _STOP = _DICCIONARIO_STOP
-
 
 # ===============================================================
 # SEGMENTO 4 --- LECTURA DEL MATERIAL
@@ -275,15 +264,15 @@ def _partir_unidades(texto: str) -> List[str]:
     if not texto or not str(texto).strip():
         return []
     salida: List[str] = []
-    for p in _SEPARADORES.split(str(texto)):
-        if not p:
+    for parte in _SEPARADORES.split(str(texto)):
+        if not parte:
             continue
-        p = p.strip()
-        if not p:
+        parte = parte.strip()
+        if not parte:
             continue
-        if len(p.split()) < _MIN_TOKENS_UNIDAD and not _SIMBOLICO.search(p):
+        if len(parte.split()) < _MIN_TOKENS_UNIDAD and not _SIMBOLICO.search(parte):
             continue
-        salida.append(p)
+        salida.append(parte)
     return salida
 
 
@@ -368,11 +357,9 @@ def _divergencia_peso(
     if not inter:
         return PESO_TOTAL
     ratio = Fraction(len(inter), len(a_tok))
-    
-    # Si el solape es alto (>= 60%), se considera coincidencia convergente pura (f = 0)
     if ratio >= Fraction(3, 5):
         return Fraction(0)
-    elif ratio >= Fraction(1, 2):
+    if ratio >= Fraction(1, 2):
         return PESO_ROCE
     return Fraction(1) - ratio
 
@@ -451,6 +438,21 @@ def _compromisos_y_k(
 # ===============================================================
 
 def extraer_conteos(*args: Any, **kwargs: Any) -> Dict[str, Any]:
+    """
+    Productor operacional de bases y factores.
+
+    Produce:
+        compromisos, contradicciones  -> m, k -> C = 1 - k/m
+        posturas, reversiones         -> p, r -> L = 1 - r/p
+        afirmaciones, afirmaciones_falsas -> c, f -> K = 1 - f/c
+        C, L, K como Fraction cuando el dominio es valido.
+
+    Dominio estricto de L:
+        p > 0
+        0 <= r <= p
+        L en [0, 1] como Fraction
+        Sin UNDEFINED para L.
+    """
     peticion = _normalizar_entrada(*args, **kwargs)
     notas: List[str] = []
 
@@ -459,9 +461,7 @@ def extraer_conteos(*args: Any, **kwargs: Any) -> Dict[str, Any]:
     lexico_extra = _leer_lexico(peticion)
 
     o_presente = bool(o_ctx and str(o_ctx).strip())
-    texto_es_o = bool(
-        texto and o_presente and _norm(texto) == _norm(o_ctx)
-    )
+    texto_es_o = bool(texto and o_presente and _norm(texto) == _norm(o_ctx))
 
     unidades = _partir_unidades(texto)
 
@@ -489,9 +489,7 @@ def extraer_conteos(*args: Any, **kwargs: Any) -> Dict[str, Any]:
                 r += w
                 r_detalle.append((
                     u,
-                    "{0} ({1}, solape vs historial)".format(
-                        w, nombre_reticula(w)
-                    ),
+                    "{0} ({1}, solape vs historial)".format(w, nombre_reticula(w)),
                 ))
         if r > len(posturas):
             r = Fraction(len(posturas))
@@ -520,12 +518,50 @@ def extraer_conteos(*args: Any, **kwargs: Any) -> Dict[str, Any]:
     c = len(afirmaciones)
     base_nula_K = c == 0
 
+    # -----------------------------------------------------------
+    # FACTORES DERIVADOS C, L, K
+    # -----------------------------------------------------------
+    # C = 1 - k/m  cuando m > 0
+    if m > 0:
+        C = Fraction(1) - (k / Fraction(m))
+        if C < Fraction(0):
+            C = Fraction(0)
+        if C > Fraction(1):
+            C = Fraction(1)
+    else:
+        C = None
+
+    # L = 1 - r/p  cuando p > 0  (dominio estricto, sin UNDEFINED)
+    if p > 0:
+        if r < Fraction(0) or r > Fraction(p):
+            L = None
+            notas.append("Dominio invalido para L: se exige 0 <= r <= p")
+        else:
+            L = Fraction(1) - (r / Fraction(p))
+            if L < Fraction(0):
+                L = Fraction(0)
+            if L > Fraction(1):
+                L = Fraction(1)
+    else:
+        L = None
+        notas.append("Dominio invalido para L: se exige p > 0")
+
+    # K = 1 - f/c  cuando o_presente y c > 0
+    if o_presente and c > 0:
+        K = Fraction(1) - (f / Fraction(c))
+        if K < Fraction(0):
+            K = Fraction(0)
+        if K > Fraction(1):
+            K = Fraction(1)
+    else:
+        K = None
+
     brutos = sum(len(_tokens_brutos(u)) for u in unidades)
     netos = sum(len(_tokens(u, lexico_extra)) for u in unidades)
     tokens_restados = brutos - netos
 
     def _res(base: int) -> str:
-        return "indefinida" if base <= 0 else str(Fraction(1, base))
+        return str(Fraction(1, base)) if base > 0 else "sin_base"
 
     notas.append("material leido de: {0}".format(procedencia_texto))
     notas.append("marco leido de: {0}".format(procedencia_o))
@@ -538,9 +574,7 @@ def extraer_conteos(*args: Any, **kwargs: Any) -> Dict[str, Any]:
     if base_nula_C:
         notas.append("base_nula_C: m=0, nadie adopto nada")
     elif cumplimiento_puro_C:
-        notas.append(
-            "cumplimiento_puro_C: m={0} y k=0 (no es base nula)".format(m)
-        )
+        notas.append("cumplimiento_puro_C: m={0} y k=0 (no es base nula)".format(m))
     if base_nula_L:
         notas.append("base_nula_L: p=0")
     if base_nula_K:
@@ -555,17 +589,13 @@ def extraer_conteos(*args: Any, **kwargs: Any) -> Dict[str, Any]:
     actos = [u for u in unidades if _es_acto(u)]
     if actos:
         notas.append("actos detectados: {0}".format(len(actos)))
-    no_prop = [
-        u for u in unidades if not _es_proposicion(u) and not _es_acto(u)
-    ]
+    no_prop = [u for u in unidades if not _es_proposicion(u) and not _es_acto(u)]
     if no_prop:
         notas.append("unidades fuera de c: {0}".format(len(no_prop)))
     if lexico_extra:
         notas.append("lexico de dominio: {0} terminos".format(len(lexico_extra)))
     if brutos:
-        notas.append(
-            "stoplist resto {0}/{1} tokens".format(tokens_restados, brutos)
-        )
+        notas.append("stoplist resto {0}/{1} tokens".format(tokens_restados, brutos))
     notas.append(
         "unidades={0}  resolucion C={1} L={2} K={3}".format(
             len(unidades), _res(m), _res(p), _res(c)
@@ -582,6 +612,9 @@ def extraer_conteos(*args: Any, **kwargs: Any) -> Dict[str, Any]:
         "m": m,
         "p": p,
         "c": c,
+        "C": C,
+        "L": L,
+        "K": K,
         "base_nula_C": base_nula_C,
         "base_nula_L": base_nula_L,
         "base_nula_K": base_nula_K,
@@ -612,15 +645,26 @@ def inyectar_en_peticion(peticion: Optional[Dict[str, Any]] = None) -> Dict[str,
     base = dict(peticion or {})
     conteos = extraer_conteos(base)
     for clave in (
-        "compromisos", "contradicciones",
-        "posturas", "reversiones",
-        "afirmaciones", "afirmaciones_falsas",
+        "compromisos",
+        "contradicciones",
+        "posturas",
+        "reversiones",
+        "afirmaciones",
+        "afirmaciones_falsas",
+        "m",
+        "p",
+        "c",
+        "C",
+        "L",
+        "K",
     ):
-        base[clave] = conteos[clave]
+        if clave in conteos:
+            base[clave] = conteos[clave]
     base["_conteos_meta"] = {
         clave: conteos[clave]
         for clave in (
             "m", "p", "c",
+            "C", "L", "K",
             "base_nula_C", "base_nula_L", "base_nula_K",
             "cumplimiento_puro_C", "o_presente",
             "procedencia_texto", "procedencia_o", "texto_es_o",
@@ -630,31 +674,6 @@ def inyectar_en_peticion(peticion: Optional[Dict[str, Any]] = None) -> Dict[str,
             "diccionario_stop_size", "lexico_dominio_size",
             "version", "notas",
         )
+        if clave in conteos
     }
     return base
-
-
-def verificar_conteos(salida: Any) -> bool:
-    if not isinstance(salida, dict):
-        return False
-    requeridas = (
-        "compromisos", "contradicciones",
-        "posturas", "reversiones",
-        "afirmaciones", "afirmaciones_falsas",
-    )
-    return all(clave in salida for clave in requeridas)
-
-
-__all__ = [
-    "extraer_conteos",
-    "inyectar_en_peticion",
-    "verificar_conteos",
-    "nombre_reticula",
-    "VERSION",
-    "PESO_ROCE",
-    "PESO_PARCIAL",
-    "PESO_GRAVE",
-    "PESO_TOTAL",
-    "RETICULA",
-    "_DICCIONARIO_STOP",
-]
